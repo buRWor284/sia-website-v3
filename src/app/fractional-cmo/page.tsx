@@ -24,42 +24,41 @@ import {
 const WHAT_YOU_GET = [
   {
     n: "01",
-    title: "Marketing strategy",
-    body: "A 90-day roadmap built around your growth stage — not a generic framework. Channel selection, positioning, messaging architecture, and campaign priorities.",
+    title: "Strategy ownership",
+    body: "Positioning, ICP, GTM plan, brand narrative, quarterly OKRs. I write the marketing strategy and answer for it. No fractional handwaving.",
   },
   {
     n: "02",
-    title: "Earned media & PR",
-    body: "Forbes, HBR, and category-relevant publications. Journalist relationships, story engineering, and systematic press outreach — no retainer agency required.",
+    title: "Weekly cadence",
+    body: "A standing weekly call with the founder, plus a weekly sync with the team or vendors. Decisions get made on the call, not in week-long Slack threads.",
   },
   {
     n: "03",
-    title: "Content & SEO",
-    body: "Editorial planning, long-form content production oversight, and an SEO strategy that builds organic moats rather than chasing algorithm updates.",
+    title: "Execution through DMR.agency",
+    body: "Digital PR, SEO, content production, link earning, journalist outreach — the full agency stack at agency rates, inside the engagement. You don't pay a second retainer.",
   },
   {
     n: "04",
-    title: "Team & vendor management",
-    body: "Hire, brief, and manage your marketing team and freelancers. Syed acts as the strategic layer that translates business goals into executable briefs.",
+    title: "Hiring & vendor selection",
+    body: "When it's time to add a content lead, a paid-media specialist, or a freelance designer, I run the brief, interview the candidates, and stand behind the hire.",
   },
   {
     n: "05",
-    title: "Board & investor reporting",
-    body: "Marketing dashboards, board decks, and investor update sections that show marketing's contribution to pipeline and revenue — not just vanity metrics.",
+    title: "Investor & board narrative",
+    body: "Marketing slides for board meetings. Investor updates that show growth in language they trust. Sales support when a founder-led deal needs marketing air cover.",
   },
   {
     n: "06",
-    title: "Founder coaching",
-    body: "Positioning coaching for the founder as a public figure — LinkedIn, speaking, thought leadership — because in early-stage companies, founder brand is company brand.",
+    title: "The hard 'no'",
+    body: "A fractional CMO's most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship.",
   },
 ];
 
 const WHO_ITS_FOR = [
-  "Series A / Series B founders who need a CMO but not a full-time hire",
-  "Bootstrapped SaaS or services companies with $1M–$10M ARR",
-  "Professional services firms (law, consulting, finance) building authority",
-  "PE-backed companies in transition — outgoing CMO, incoming strategy",
-  "Founders entering a new market who need positioning done right",
+  "You are Series A or B and feel marketing is the missing function.",
+  "Revenue between roughly $1M and $20M ARR.",
+  "You want senior marketing thinking weekly, but not a full-time hire yet.",
+  "You can commit to six months of work and decision-making.",
 ];
 
 export default function FractionalCmoPage() {
@@ -115,10 +114,10 @@ export default function FractionalCmoPage() {
                 color: PAPER,
               }}
             >
-              CMO-level thinking.
+              Marketing leadership,
               <br />
               <span style={{ fontStyle: "italic", color: YEL }}>
-                Without the hire.
+                without the headcount.
               </span>
             </h1>
             <p
@@ -130,9 +129,10 @@ export default function FractionalCmoPage() {
                 maxWidth: 500,
               }}
             >
-              A fractional CMO arrangement gives you senior marketing leadership
-              at a fraction of the cost of a full-time hire — with none of the
-              onboarding delay, equity dilution, or performance-review overhead.
+              For founders without a marketing leader. I take the marketing chair
+              at your table on a monthly retainer: strategy ownership, weekly
+              cadence, agency-level execution through DMR.agency, and the kind of
+              decision-making that does not wait on a six-month CMO search.
             </p>
             <p
               style={{
@@ -143,9 +143,10 @@ export default function FractionalCmoPage() {
                 maxWidth: 500,
               }}
             >
-              Syed embeds into your leadership team, owns the marketing function,
-              and builds the systems, team, and positioning that survive after
-              the engagement ends.
+              The role looks different at every company, but the shape is
+              consistent: I show up weekly, I own the marketing function end to
+              end, and I have a small team behind me that can execute almost
+              anything we decide on, almost immediately.
             </p>
             <a
               href={CALENDLY}
@@ -178,28 +179,28 @@ export default function FractionalCmoPage() {
             <div style={{ marginTop: 20 }}>
               {[
                 {
-                  label: "Commitment",
-                  value: "3–12 month retainer",
+                  label: "Engagement",
+                  value: "Monthly retainer",
                 },
                 {
-                  label: "Time",
-                  value: "2–4 days per week embedded",
+                  label: "Minimum",
+                  value: "6 months",
                 },
                 {
-                  label: "Format",
-                  value: "Remote-first, on-site as needed",
+                  label: "Cadence",
+                  value: "Weekly · 1-on-1 + team",
                 },
                 {
-                  label: "Start",
-                  value: "2–4 week onboarding sprint",
+                  label: "Geography",
+                  value: "Remote · global",
                 },
                 {
-                  label: "Verticals",
-                  value: "B2B SaaS, Services, Tech",
+                  label: "Stack",
+                  value: "PR · SEO · content · paid",
                 },
                 {
-                  label: "Availability",
-                  value: "2 engagements maximum",
+                  label: "Reports to",
+                  value: "Founder / CEO",
                 },
               ].map(({ label, value }) => (
                 <div
@@ -409,9 +410,9 @@ export default function FractionalCmoPage() {
               color: PAPER,
             }}
           >
-            Two engagements open.{" "}
+            Thirty minutes,{" "}
             <span style={{ fontStyle: "italic", color: YEL }}>
-              Book the call.
+              no pitch deck.
             </span>
           </h2>
           <p
@@ -423,9 +424,10 @@ export default function FractionalCmoPage() {
               maxWidth: 480,
             }}
           >
-            A 30-minute discovery call to understand your stage, your bottlenecks,
-            and whether a fractional arrangement is the right model. No pitch —
-            just a diagnostic conversation.
+            Tell me where the business is, where you want it to be in twelve
+            months, and what marketing has and has not done so far. I will tell
+            you honestly whether a Fractional CMO is the right answer, or
+            something else is.
           </p>
           <DoubleRule dark />
           <div style={{ marginTop: 28 }}>

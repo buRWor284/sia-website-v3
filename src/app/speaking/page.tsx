@@ -31,75 +31,75 @@ const EVENTS: ReadonlyArray<{
 }> = [
   {
     n: "01",
-    city: "Peshawar",
-    country: "Pakistan",
-    period: "2013 → present",
-    events: "G-Day X · Durshal Tech Hub",
-    audience: "500+",
-  },
-  {
-    n: "02",
-    city: "Kuala Lumpur",
-    country: "Malaysia",
-    period: "2016 → 2019",
-    events: "Irfan Khairi workshops · webinars",
-    audience: "300+",
-  },
-  {
-    n: "03",
-    city: "Bali",
-    country: "Indonesia",
-    period: "Nov 2016",
-    events: "DMSS · Digital Marketing Summit",
-    audience: "200+",
-  },
-  {
-    n: "04",
     city: "Dubai",
     country: "UAE",
     period: "2016 → 2018",
-    events: "ATM · IN5 Hub · MPS 2016",
-    audience: "400+",
+    events: "AstroLabs · IK Institute · IN5 · MPS2016 (WTC Dubai) · ATM",
+    audience: "500 ★",
+  },
+  {
+    n: "02",
+    city: "Bali",
+    country: "Indonesia",
+    period: "Nov 2016",
+    events: "DMSS · Digital Marketing Summit · Media Hacks",
+    audience: "200+",
+  },
+  {
+    n: "03",
+    city: "Kuala Lumpur",
+    country: "Malaysia",
+    period: "2016",
+    events: "MaGIC · IK Institute of Business",
+    audience: "120+",
+  },
+  {
+    n: "04",
+    city: "Peshawar",
+    country: "Pakistan",
+    period: "2013 → 2018",
+    events: "IYDC · G-Day X · University of Peshawar · Durshal",
+    audience: "300+",
   },
   {
     n: "05",
-    city: "Online",
-    country: "US / UK",
+    city: "Remote",
+    country: "US / UK / Global",
     period: "2017 → present",
-    events: "12+ webinar sessions",
+    events: "Webinars · British SaaS training · Ruth King's Business Radio",
     audience: "1,000+",
   },
   {
     n: "06",
-    city: "Podcast",
+    city: "Podcast circuit",
     country: "Remote",
     period: "2018 → present",
-    events: "15+ guest appearances",
-    audience: "10,000+",
+    events: "12+ guest appearances — SEO, PR, content, personal branding",
+    audience: "Syndicated",
   },
 ];
 
 const TOPICS = [
   {
     n: "I",
-    title: "Writing Your Way to Success",
-    sub: "Content, SEO & Authority",
-    body: "How to build a sustainable content engine that earns media, drives traffic, and converts readers into clients. Covers keyword strategy, long-form writing, and the editorial mindset that separates brands that get covered from those that don't.",
-    tags: ["Content Strategy", "SEO", "Authority Building", "Editorial"],
+    title: "Digital PR for Publicity",
+    sub: "Earned Media & Press",
+    body: "How to land bylines, quotes, and features in publications your buyers actually read — without a PR agency. HARO, journalist outreach, story design, and the systems that compound over time. Headline result: 60+ media placements from a single campaign.",
+    tags: ["HARO", "Digital PR", "Earned Media", "Press"],
   },
   {
     n: "II",
-    title: "Brand Yourself for Success",
-    sub: "Personal Branding & Positioning",
-    body: "A tactical framework for building a personal brand that opens doors. Covers positioning, LinkedIn authority, thought leadership publishing, and how to become the recognized expert in your field — even if you're starting from zero.",
-    tags: ["Personal Branding", "Positioning", "Thought Leadership", "LinkedIn"],
+    title: "Boosting Organic Visibility Through SEO-PR",
+    sub: "SEO-PR & Organic Growth",
+    body: "The synthesis of SEO and digital PR: how to compound rankings and authority by earning links from publications, not buying them. Built on a hundred client campaigns. Ridester: 0 → 1.5M monthly visitors. Centriq: 120% organic traffic, 6× daily signups.",
+    tags: ["SEO-PR", "Link Building", "Organic Growth", "Case Studies"],
   },
   {
     n: "III",
-    title: "Media Hacks · Free Publicity Online",
-    sub: "Earned Media & PR",
-    body: "The Earned Media OS condensed into a keynote. How to get featured in Forbes, HBR, and top publications without a PR agency. Covers HARO, relationship-led pitching, story angles, and the systems that turn press into profit.",
-    tags: ["Earned Media", "PR", "HARO", "Publications"],
+    title: "Writing Your Way to Success",
+    sub: "Content, Authority & Brand",
+    body: "Content marketing that builds brand, authority, and pipeline — with case studies from Buffer, River Pools, and a client generating $200K/mo from content alone. The editorial mindset that separates brands that get covered from those that don't.",
+    tags: ["Content Strategy", "Brand Authority", "Writing", "Thought Leadership"],
   },
 ];
 
@@ -107,18 +107,34 @@ const TESTIMONIALS = [
   {
     n: "01",
     quote:
-      "The most practical media keynote I've seen. No fluff — just systems that work.",
-    name: "Agnieszka Borushko",
-    role: "Co-organiser, DMSS Bali",
-    location: "Bali, Indonesia",
+      "Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it, and it is hard not to like the guy.",
+    name: "Chuck Wang",
+    role: "Host · The MVP Marketing Podcast",
+    location: "San Francisco, USA",
   },
   {
     n: "02",
     quote:
-      "Syed knows how to hold a room. The audience left with an action plan, not just inspiration.",
-    name: "Egor Borushko",
-    role: "DMSS Conference",
-    location: "Bali, Indonesia",
+      "Due to their efforts, our main site experienced an increase of 120.21% in organic traffic. Our Public Database site's clicks increased by 515.87%. These results gained us a 6× increase in average daily signups.",
+    name: "Imani Lea Brown",
+    role: "Centriq",
+    location: "San Francisco, USA",
+  },
+  {
+    n: "03",
+    quote:
+      "Syed Irfan Ajmal and his agency helped us grow Ridester from zero to 1.5 million monthly unique visitors. The biggest content marketing success story I've been part of.",
+    name: "Brett Helling",
+    role: "Founder · Ridester",
+    location: "Omaha, NE",
+  },
+  {
+    n: "04",
+    quote:
+      "Generous with knowledge, sharp with execution. The kind of operator you want on your side of the table when the stakes are real.",
+    name: "Roberto Falchi",
+    role: "Marketing & speaking",
+    location: "Milan, Italy",
   },
 ];
 
@@ -171,10 +187,10 @@ export default function SpeakingPage() {
                 color: PAPER,
               }}
             >
-              Stages across
+              Talks that move
               <br />
               <span style={{ fontStyle: "italic", color: YEL }}>
-                four countries.
+                a metric.
               </span>
             </h1>
             <p
@@ -186,10 +202,11 @@ export default function SpeakingPage() {
                 maxWidth: 480,
               }}
             >
-              Keynotes in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for
-              American and British audiences. Fifteen-plus podcast guest appearances.
-              Every talk is researched, tailored, and built to leave the audience
-              with something they can use the same week.
+              On the speaker circuit since 2013, mostly on earned media and
+              SEO-PR: how to get found by the right journalists, covered by the right
+              publications, and build the kind of organic traffic that turns into
+              customers. Workshops at IN5, AstroLabs, MPS2016, DMSS, and MaGIC.
+              Available in person across Asia, MENA, and Europe — and virtually.
             </p>
             <a
               href={CALENDLY}
@@ -211,7 +228,7 @@ export default function SpeakingPage() {
                 textTransform: "uppercase",
               }}
             >
-              Enquire about a keynote →
+              Start the booking conversation →
             </a>
           </div>
 
@@ -223,10 +240,10 @@ export default function SpeakingPage() {
             }}
           >
             {[
-              { stat: "4", label: "Countries" },
-              { stat: "40+", label: "Talks & webinars" },
-              { stat: "15+", label: "Podcast guest spots" },
-              { stat: "10K+", label: "Audience reach" },
+              { stat: "04", label: "Countries on stage" },
+              { stat: "06", label: "Speaker formats" },
+              { stat: "12+", label: "Webinars & guest podcasts" },
+              { stat: "500", label: "Biggest live audience (MPS, WTC Dubai)" },
             ].map(({ stat, label }) => (
               <div
                 key={label}

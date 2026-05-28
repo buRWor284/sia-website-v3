@@ -24,50 +24,65 @@ import {
 } from "@/lib/tokens";
 
 const TIMELINE = [
-  { year: "2007", text: "M.Sc. Informatics, Mälardalen University, Västerås, Sweden" },
-  { year: "2008", text: "Marketing consultant, Marcus Evans, Stockholm" },
-  { year: "2009", text: "Digital marketing lead, InfoShare, Copenhagen" },
-  { year: "2010", text: "Founded The Bureau from Peshawar, Pakistan" },
-  { year: "2012", text: "Co-founded Silk Route Interactive (spatial intelligence)" },
-  { year: "2013", text: "First keynote — G-Day X, Peshawar" },
-  { year: "2016", text: "International circuit: DMSS Bali · ATM Dubai · KL workshops" },
-  { year: "2018", text: "Launched DMR.agency · EMOS framework developed" },
-  { year: "2022", text: "Incorporated SIA Enterprises Inc., Wyoming C-Corp" },
-  { year: "2024", text: "Fractional CMO engagements across US, EU & MENA" },
+  { year: "2004", text: "Bachelor in IT, Pakistan" },
+  { year: "2007", text: "Best Recruitment Campaign · Adecco, Fortune 500" },
+  { year: "2007", text: "SIFE National Cup Sweden · 2nd place" },
+  { year: "2007", text: "Affiliate Prophet, USA — MarTech startup, remote" },
+  { year: "2007", text: "InfoShare, Copenhagen — software development company" },
+  { year: "2007", text: "M.Sc. International Business & Entrepreneurship, Mälardalen University, Sweden" },
+  { year: "2007", text: "Marcus Evans, Stockholm — international business intelligence and events" },
+  { year: "2008", text: "Invited Judge, SIFE Competition — Students In Free Enterprise" },
+  { year: "2010", text: "Co-founded Silk Route Interactive, Peshawar — spatial intelligence, Head of Marketing" },
+  { year: "2013", text: "i2i Innovation to Impact, Finalist — Crime Mapper recognized for civic technology" },
+  { year: "2013", text: "P@SHA Best Startup Award — Crime Mapper; 34% crime reduction in 3 months" },
+  { year: "2013", text: "Founded DMR.agency — digital PR and earned media; 300+ clients served" },
+  { year: "2016", text: "Speaking debut, Dubai — AstroLabs · IK Institute · MPS2016 (500 attendees, WTC Dubai)" },
+  { year: "2016", text: "DMSS Conference, Bali — Media Hacks workshop, ~200 attendees" },
+  { year: "2017", text: "Panel: Arabian Travel Market, Dubai — with Tim Soulo (Ahrefs)" },
+  { year: "2018", text: "Speaking tour: IN5 Dubai · Durshal KP — Media Hacks and Personal Branding workshops" },
+  { year: "2018", text: "Launched The SIA Business Podcast — three seasons, twenty-nine episodes" },
+  { year: "2021", text: "SIA Enterprises Inc. — incorporated in Wyoming as a C-Corp" },
+  { year: "2026", text: "EMOS · Earned Media OS — productized the bureau's earned-media playbook" },
 ];
 
 const PRESS = [
   "Forbes",
   "Harvard Business Review",
   "HuffPost",
-  "The Next Web",
+  "The Next Web (TNW)",
   "Entrepreneur",
-  "Inc. Magazine",
-  "Fast Company",
-  "Content Marketing Institute",
+  "Reader's Digest",
+  "CNET",
+  "Virgin Startup",
   "Search Engine Journal",
-  "Social Media Examiner",
-  "Buffer Blog",
+  "SEMrush Blog",
+  "Business.com",
+  "SERPed",
+  "Spin Sucks",
+  "GrowMap",
+  "Aurora",
+  "The World Bank Blog",
+  "GBG · Google Business Group",
 ];
 
 const PRESS_QUOTES = [
   {
-    outlet: "Forbes",
+    outlet: "Azzam Sheikh · NTA UK",
     quote:
-      "One of the most compelling voices in digital marketing coming out of South Asia.",
-    year: "2018",
+      "Ranked a keyword to #4 on Google that gets over 160,000 searches a month. Commercial intent. Can't thank Irfan and the team enough.",
+    year: "Manchester",
   },
   {
-    outlet: "Harvard Business Review",
+    outlet: "Chuck Wang · MVP Marketing Podcast",
     quote:
-      "A practical, research-backed guide to earning media without a big budget.",
-    year: "2019",
+      "Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it, and it is hard not to like the guy.",
+    year: "San Francisco",
   },
   {
-    outlet: "HuffPost",
+    outlet: "Brett Helling · Ridester",
     quote:
-      "Syed's approach to personal branding is methodical, measured, and it works.",
-    year: "2017",
+      "Syed and his agency helped us grow Ridester from zero to 1.5 million monthly unique visitors. The biggest content marketing success I've been part of.",
+    year: "Omaha, NE",
   },
 ];
 
@@ -113,10 +128,12 @@ export default function AboutPage() {
                 maxWidth: 520,
               }}
             >
-              Syed Irfan Ajmal is a marketing consultant, author, and keynote
-              speaker. Since 2010 he has been building brands, generating press, and
-              advising founders from his bureau in Peshawar. His clients include
-              companies in the US, Europe, and the Middle East.
+              Twenty-two years of helping businesses get found, get covered, and
+              get customers. The work began in Sweden — M.Sc. at Mälardalen, then
+              three years across Stockholm and Copenhagen — before returning to
+              Peshawar and building what became DMR.agency: a digital PR practice
+              that has served roughly a hundred clients in twenty-plus countries,
+              including Procter &amp; Gamble.
             </p>
             <p
               style={{
@@ -128,8 +145,9 @@ export default function AboutPage() {
               }}
             >
               He is the CEO of <strong>DMR.agency</strong>, creator of the{" "}
-              <em>Earned Media OS</em> framework, and a fractional CMO to founders
-              who want authority without an in-house marketing team.
+              <em>Earned Media OS</em>, and a fractional CMO to founders who want
+              senior marketing thinking without a full-time hire. In 2021 he
+              incorporated SIA Enterprises in Wyoming. A book is coming.
             </p>
             <div style={{ marginTop: 32, display: "flex", gap: 14 }}>
               <a
@@ -194,14 +212,14 @@ export default function AboutPage() {
           <div>
             <Pill size={10.5} ls="0.18em">In Brief</Pill>
             {[
-              ["Founded", "2010"],
-              ["Location", "Peshawar · Remote"],
-              ["Education", "M.Sc. Mälardalen, Sweden"],
-              ["Press", "Forbes, HBR, HuffPost +8"],
-              ["Clients", "US, EU, MENA & APAC"],
-              ["Talks", "4 countries · 15+ podcasts"],
-              ["Articles", "29 long-form guides"],
-              ["Status", "Open for projects, Q3"],
+              ["Based in", "Peshawar, Pakistan"],
+              ["Educated in", "Sweden (M.Sc., Mälardalen, 2007)"],
+              ["Earlier degree", "Bachelor in IT, Pakistan (2004)"],
+              ["Worked in", "Stockholm & Copenhagen (2007–10)"],
+              ["Founder of", "DMR.agency · digital PR & SEO"],
+              ["Speaks", "English, Urdu, Pashto"],
+              ["Available for", "Fractional CMO · Speaking · Press"],
+              ["Status", "Two seats open · Q3 2026"],
             ].map(([label, value]) => (
               <div
                 key={label}
