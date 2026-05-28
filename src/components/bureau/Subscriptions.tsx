@@ -45,13 +45,16 @@ const MailchimpForm = () => {
   }
 
   return (
+    <>
+    {/* Hidden iframe absorbs the Mailchimp response — avoids popup-blocker killing the POST */}
+    <iframe name="mc-hidden-frame" style={{ display: "none" }} aria-hidden="true" title="" />
     <form
       action="https://syedirfanajmal.us9.list-manage.com/subscribe/post?u=92d894afae4496839afa2a07d&amp;id=4b6d81a50f&amp;v_id=4651&amp;f_id=003bd4e3f0"
       method="post"
       id="mc-embedded-subscribe-form"
       name="mc-embedded-subscribe-form"
       className="validate"
-      target="_blank"
+      target="mc-hidden-frame"
       noValidate
       onSubmit={onSubmit}
     >
@@ -214,6 +217,8 @@ const MailchimpForm = () => {
         </SCaps>
       </div>
     </form>
+    </>
+
   );
 };
 
