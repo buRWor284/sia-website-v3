@@ -49,7 +49,7 @@ const MailchimpForm = () => {
 
     // Unique callback name to avoid collisions
     const cbName = `_mc_cb_${Date.now()}`;
-    const url = `https://${MC_U.slice(0,2)}.list-manage.com/subscribe/post-json?${params.toString()}&c=${cbName}`;
+    const url = `https://us9.list-manage.com/subscribe/post-json?${params.toString()}&c=${cbName}`;
 
     // Clean up after 10 s in case Mailchimp never responds
     const timeout = setTimeout(() => {
