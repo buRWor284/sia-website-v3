@@ -116,7 +116,7 @@ const PreAgencyCard = ({ c }: { c: Client }) => (
   >
     <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
       <div style={{ display: "flex", alignItems: "baseline" }}>
-        <Flag c={c.country} w={22} />
+        <Flag c={c.country as any} w={22} />
         <SCaps size={10.5} ls="0.18em" color={INK55}>{c.countryLabel}</SCaps>
       </div>
       <SCaps size={10.5} ls="0.18em" color={INK55}>{c.when}</SCaps>
