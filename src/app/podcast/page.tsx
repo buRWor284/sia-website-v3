@@ -116,13 +116,24 @@ const STATS: ReadonlyArray<[string, string]> = [
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const Hero = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 56, paddingBottom: 60 }}>
+  <section style={{ background: PAPER, padding: "56px 56px 60px" }}>
     <div style={{ textAlign: "center", marginBottom: 24 }}>
       <SCaps color={INK70} size={12} ls="0.28em">
         The SIA Business Podcast &nbsp;·&nbsp; 29 episodes &nbsp;·&nbsp; 3 seasons &nbsp;·&nbsp; since 2018
       </SCaps>
     </div>
-    <h1 className="hero-h1" style={{ fontFamily: SERIF, fontWeight: 700, color: INK }}>
+    <h1
+      style={{
+        margin: 0,
+        textAlign: "center",
+        fontFamily: SERIF,
+        fontWeight: 700,
+        fontSize: 132,
+        color: INK,
+        lineHeight: 1.0,
+        letterSpacing: "-0.028em",
+      }}
+    >
       <span style={{ display: "block" }}>The SIA</span>
       <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
         <Mark>Business Podcast.</Mark>
@@ -138,10 +149,11 @@ const Hero = () => (
     <DoubleRule style={{ margin: "44px 0 36px" }} />
 
     {/* Lead — 2-col: about the show + listen-on aside */}
-    <div className="grid-hero-2col">
+    <div style={{ display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: 64, alignItems: "start" }}>
       <div
-        className="hero-body"
         style={{
+          columnCount: 2,
+          columnGap: 28,
           fontFamily: SERIF,
           fontSize: 17.5,
           color: INK,
@@ -151,13 +163,15 @@ const Hero = () => (
       >
         <p style={{ margin: 0 }}>
           <span
-            className="hero-drop-cap"
             style={{
               float: "left",
               fontFamily: SERIF,
               fontWeight: 700,
               fontStyle: "italic",
+              fontSize: 92,
+              lineHeight: 0.78,
               marginRight: 10,
+              marginTop: 6,
               color: INK,
               background: YEL,
               padding: "6px 8px 2px 8px",
@@ -239,17 +253,26 @@ const Hero = () => (
 
     {/* Stats strip */}
     <DoubleRule style={{ margin: "52px 0 0" }} />
-    <div
-      className="grid-stats"
-      style={{ borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}
-    >
-      {STATS.map(([n, l]) => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
+      {STATS.map(([n, l], i) => (
         <div
           key={n}
-          className="stat-item"
-          style={{ padding: "24px 28px 6px", textAlign: "center" }}
+          style={{
+            padding: "24px 28px 6px",
+            borderRight: i < 3 ? `1px solid ${INK35}` : "none",
+            textAlign: "center",
+          }}
         >
-          <div className="stat-number" style={{ fontFamily: SERIF, fontWeight: 700, color: INK }}>
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 60,
+              color: INK,
+              lineHeight: 1,
+              letterSpacing: "-0.02em",
+            }}
+          >
             {n}
           </div>
           <div style={{ marginTop: 8 }}>
@@ -264,15 +287,18 @@ const Hero = () => (
 // ─── §01 · Featured Episode ───────────────────────────────────────────────────
 
 const Featured = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 60 }}>
+  <section style={{ background: PAPER, padding: "90px 56px 60px" }}>
     <SectionMast n="01" label="Featured episode · Most-played" />
 
     <div
-      className="grid-featured-dark"
       style={{
         background: INK,
         color: PAPER,
-        padding: "48px 28px",
+        padding: "48px 48px",
+        display: "grid",
+        gridTemplateColumns: "1fr 1.3fr",
+        gap: 56,
+        alignItems: "center",
         position: "relative",
         border: `1px solid ${INK}`,
       }}
@@ -300,11 +326,11 @@ const Featured = () => (
       <div>
         <SCaps size={11} ls="0.20em" color={YEL}>{FEATURED.code}</SCaps>
         <h2
-          className="h2-sm"
           style={{
             margin: "14px 0 0",
             fontFamily: SERIF,
             fontWeight: 700,
+            fontSize: 44,
             color: PAPER,
             lineHeight: 1.08,
             letterSpacing: "-0.02em",
@@ -312,7 +338,7 @@ const Featured = () => (
         >
           {FEATURED.title}
         </h2>
-        <div style={{ marginTop: 22, display: "flex", gap: 24, alignItems: "baseline", flexWrap: "wrap" }}>
+        <div style={{ marginTop: 22, display: "flex", gap: 24, alignItems: "baseline" }}>
           <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.65)">
             Guest · {FEATURED.guest}
           </SCaps>
@@ -337,7 +363,7 @@ const Featured = () => (
         </p>
         <div style={{ marginTop: 28, display: "flex", gap: 12 }}>
           <a
-            href={`#${FEATURED.slug}`}
+            href={`/podcast/${FEATURED.slug}`}
             style={{
               flex: 1,
               display: "flex",
@@ -366,16 +392,24 @@ const Featured = () => (
 // ─── §02 · Notable Guests ────────────────────────────────────────────────────
 
 const Guests = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 60, paddingBottom: 90 }}>
+  <section style={{ background: PAPER, padding: "60px 56px 90px" }}>
     <SectionMast n="02" label="Notable guests · From the desk" />
 
-    <div className="grid-intro" style={{ marginBottom: 40 }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1.4fr",
+        gap: 60,
+        alignItems: "baseline",
+        marginBottom: 40,
+      }}
+    >
       <h2
-        className="h2-lg"
         style={{
           margin: 0,
           fontFamily: SERIF,
           fontWeight: 700,
+          fontSize: 72,
           color: INK,
           lineHeight: 0.98,
           letterSpacing: "-0.025em",
@@ -404,15 +438,20 @@ const Guests = () => (
     </div>
 
     <div
-      className="grid-cards-3"
-      style={{ border: `1px solid ${INK}` }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 0,
+        border: `1px solid ${INK}`,
+      }}
     >
       {NOTABLE_GUESTS.map((g, i) => (
         <div
           key={g.name}
-          className="card-border"
           style={{
             padding: "26px 24px",
+            borderRight: i % 3 !== 2 ? `1px solid ${INK}` : "none",
+            borderBottom: i < 3 ? `1px solid ${INK}` : "none",
             background: PAPER,
             display: "flex",
             flexDirection: "column",
@@ -475,7 +514,7 @@ const Guests = () => (
 // ─── §03 · All Episodes ───────────────────────────────────────────────────────
 
 const AllEpisodes = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 0, paddingBottom: 90 }}>
+  <section style={{ background: PAPER, padding: "0 56px 90px" }}>
     <SectionMast n="03" label="All episodes · Chronological index" />
 
     {SEASONS.map((s, si) => (
@@ -487,17 +526,15 @@ const AllEpisodes = () => (
             justifyContent: "space-between",
             paddingBottom: 12,
             borderBottom: `2px solid ${INK}`,
-            flexWrap: "wrap",
-            gap: 8,
           }}
         >
-          <div style={{ display: "flex", alignItems: "baseline", gap: 18, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
             <h3
               style={{
                 margin: 0,
                 fontFamily: SERIF,
                 fontWeight: 700,
-                fontSize: "clamp(28px, 6vw, 44px)",
+                fontSize: 44,
                 color: INK,
                 lineHeight: 1,
                 letterSpacing: "-0.02em",
@@ -517,7 +554,14 @@ const AllEpisodes = () => (
           {s.episodes.map((ep) => (
             <li
               key={ep[0]}
-              className="episode-row"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "90px 1fr 160px 60px",
+                gap: 20,
+                padding: "18px 0",
+                borderBottom: `1px solid ${INK15}`,
+                alignItems: "baseline",
+              }}
             >
               <div
                 style={{
@@ -531,7 +575,7 @@ const AllEpisodes = () => (
                 {ep[0]}
               </div>
               <a
-                href={`#${ep[3]}`}
+                href={`/podcast/${ep[3]}`}
                 style={{
                   fontFamily: SERIF,
                   fontWeight: 600,
@@ -555,7 +599,6 @@ const AllEpisodes = () => (
                 {ep[1]}
               </a>
               <div
-                className="episode-guest"
                 style={{
                   fontFamily: SERIF,
                   fontStyle: "italic",
@@ -565,10 +608,20 @@ const AllEpisodes = () => (
               >
                 {ep[2]}
               </div>
-              <div className="episode-listen" style={{ textAlign: "right" }}>
-                <SCaps size={11} ls="0.14em" color={INK55}>
+              <div style={{ textAlign: "right" }}>
+                <a
+                  href={`/podcast/${ep[3]}`}
+                  style={{
+                    fontFamily: GROT,
+                    fontSize: 11,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: INK55,
+                    textDecoration: "none",
+                  }}
+                >
                   Listen ↗
-                </SCaps>
+                </a>
               </div>
             </li>
           ))}
