@@ -172,9 +172,12 @@ const VideoCard = () => (
         {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
         <video
           src="/assets/emos-video.mp4"
+          autoPlay
+          muted
+          loop
           controls
           playsInline
-          preload="metadata"
+          preload="auto"
           style={{
             width: "100%",
             height: "100%",

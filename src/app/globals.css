@@ -893,9 +893,12 @@ body > * { position: relative; z-index: 2; }
 /* Tier1 featured clients (4-col interactive) */
 .grid-tier1 {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: 12px;
   grid-auto-flow: dense;
+}
+@media (min-width: 640px) {
+  .grid-tier1 { grid-template-columns: repeat(2, 1fr); }
 }
 @media (min-width: 1024px) {
   .grid-tier1 { grid-template-columns: repeat(4, 1fr); gap: 14px; }
