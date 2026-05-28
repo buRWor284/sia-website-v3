@@ -1,7 +1,108 @@
 "use client";
 
+import { useState } from "react";
 import { GROT, INK, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { SCaps, SectionMast, SiaLogo } from "./primitives";
+
+const MailchimpForm = () => {
+  const [email, setEmail] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const onSubmit = () => {
+    if (email && /.+@.+\..+/.test(email)) setSubmitted(true);
+  };
+
+  if (submitted) {
+    return (
+      <div>
+        <SCaps size={11} ls="0.20em" color={YEL}>Confirmation sent</SCaps>
+        <p style={{
+          margin: "14px 0 0", fontFamily: SERIF, fontSize: 19,
+          color: PAPER, lineHeight: 1.5, fontStyle: "italic",
+        }}>
+          Check <span style={{ color: YEL, fontStyle: "normal" }}>{email}</span>
+          {" "}— there&rsquo;s a confirmation note from the bureau waiting
+          for you. Click the link inside and you&rsquo;re on the list.
+        </p>
+        <button
+          onClick={() => { setSubmitted(false); setEmail(""); }}
+          style={{
+            marginTop: 18, padding: "10px 16px", background: "transparent",
+            color: PAPER, border: "1px solid rgba(241,235,222,.5)",
+            cursor: "pointer",
+            fontFamily: GROT, fontWeight: 700, fontSize: 11,
+            letterSpacing: "0.16em", textTransform: "uppercase",
+          }}
+        >Subscribe another email</button>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      action="https://syedirfanajmal.us9.list-manage.com/subscribe/post?u=92d894afae4496839afa2a07d&id=4b6d81a50f&f_id=003bd4e3f0"
+      method="post"
+      target="_blank"
+      noValidate
+      onSubmit={onSubmit}
+    >
+      <SCaps size={11} ls="0.20em" color={YEL}>Apply for a subscription</SCaps>
+      <div style={{ marginTop: 14, display: "flex" }}>
+        <input
+          type="email"
+          name="EMAIL"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@yourcompany.com"
+          style={{
+            flex: 1,
+            padding: "18px 18px",
+            border: "1px solid rgba(241,235,222,.5)",
+            borderRight: "none",
+            background: "transparent",
+            color: PAPER,
+            fontFamily: SERIF,
+            fontSize: 17,
+            outline: "none",
+          }}
+        />
+        <button
+          type="submit"
+          name="subscribe"
+          style={{
+            padding: "18px 26px",
+            background: YEL,
+            color: INK,
+            border: `1px solid ${YEL}`,
+            cursor: "pointer",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 12,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+          }}
+        >
+          Subscribe →
+        </button>
+      </div>
+      {/* Honeypot — must stay hidden, must keep this exact name */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-5000px" }}>
+        <input
+          type="text"
+          name="b_92d894afae4496839afa2a07d_4b6d81a50f"
+          tabIndex={-1}
+          defaultValue=""
+        />
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <SCaps size={10.5} ls="0.14em" color="rgba(241,235,222,.45)">
+          No spam · One-click unsubscribe · Hosted by Mailchimp
+        </SCaps>
+      </div>
+    </form>
+  );
+};
 
 export const Subscriptions = ({
   sectionNumber = "06",
@@ -78,49 +179,7 @@ export const Subscriptions = ({
         </p>
       </div>
 
-      <form onSubmit={(e) => e.preventDefault()}>
-        <SCaps size={11} ls="0.20em" color={YEL}>
-          Apply for a subscription
-        </SCaps>
-        <div style={{ marginTop: 14, display: "flex" }}>
-          <input
-            placeholder="you@yourcompany.com"
-            style={{
-              flex: 1,
-              padding: "18px 18px",
-              border: "1px solid rgba(241,235,222,.5)",
-              borderRight: "none",
-              background: "transparent",
-              color: PAPER,
-              fontFamily: SERIF,
-              fontSize: 17,
-              outline: "none",
-            }}
-          />
-          <button
-            type="submit"
-            style={{
-              padding: "18px 26px",
-              background: YEL,
-              color: INK,
-              border: `1px solid ${YEL}`,
-              cursor: "pointer",
-              fontFamily: GROT,
-              fontWeight: 800,
-              fontSize: 12,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-            }}
-          >
-            Subscribe →
-          </button>
-        </div>
-        <div style={{ marginTop: 12 }}>
-          <SCaps size={10.5} ls="0.14em" color="rgba(241,235,222,.45)">
-            No spam · One-click unsubscribe · Hosted by Mailmunch
-          </SCaps>
-        </div>
-      </form>
+      <MailchimpForm />
     </div>
   </section>
 );

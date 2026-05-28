@@ -103,7 +103,7 @@ export const SpeakingBand = () => (
               >
                 I.
               </span>
-              Writing Your Way to Success
+              The Scientific Benefits of Writing · Infographic
             </li>
             <li
               style={{

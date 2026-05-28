@@ -41,8 +41,7 @@ export const CLIENTS_PRE: ReadonlyArray<Client> = [
       "One of the world's largest such agencies — operates in 120+ countries " +
       "with €3B+ annual volume, fully backed by the German federal government.",
     wordmark: "GIZ",
-    logo:
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Deutsche_Gesellschaft_f%C3%BCr_Internationale_Zusammenarbeit_Logo.svg/640px-Deutsche_Gesellschaft_f%C3%BCr_Internationale_Zusammenarbeit_Logo.svg.png",
+    logo: null,
   },
   {
     key: "marcus-evans",

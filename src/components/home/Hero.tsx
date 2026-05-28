@@ -63,9 +63,9 @@ const ISSUE_ITEMS: ReadonlyArray<[string, string, string]> = [
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
-  ["$2.3M", "PR campaign ROI · case study"],
+  ["$1.2M", "revenue earned · SEO + Content Marketing"],
   ["№ 4",   "on Google for a 160K/mo keyword"],
-  ["100+",  "clients across 20+ countries"],
+  ["300+",  "clients served"],
   ["22+",   "years in marketing & press"],
 ];
 
@@ -411,8 +411,6 @@ export const Hero = () => (
           <span><Flag c="SE" />Stockholm</span>
           <span style={{ color: INK35 }}>·</span>
           <span><Flag c="DK" />Copenhagen</span>
-          <span style={{ color: INK35 }}>·</span>
-          <span><Flag c="US" />BlackBox Connect, SV</span>
         </div>
       </div>
     </div>
