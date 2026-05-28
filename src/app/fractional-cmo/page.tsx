@@ -172,7 +172,7 @@ export default function FractionalCmoPage() {
           </div>
 
           <div>
-            <Pill size={11} ls="0.18em" color="rgba(241,235,222,.8)">
+            <Pill size={11} ls="0.18em">
               Engagement model
             </Pill>
             <div style={{ marginTop: 20 }}>
