@@ -20,89 +20,109 @@ import {
   YEL,
 } from "@/lib/tokens";
 
+// ── Real episode data — The SIA Business Podcast (2018–2020, 29 episodes) ──
+
 const FEATURED_EPISODES: ReadonlyArray<{
-  n: string;
+  code: string;
   title: string;
   guest: string;
   topic: string;
   duration: string;
-  date: string;
+  season: number;
 }> = [
   {
-    n: "40",
-    title: "The Earned Media Playbook: How to Get in Forbes Without a PR Agency",
-    guest: "Solo",
-    topic: "Earned Media · PR",
-    duration: "48 min",
-    date: "May 2026",
+    code: "S03E09",
+    title: "Discussing HARO Outreach, SEO Agency Business, and Backlinks Management with Greg Heilers",
+    guest: "Greg Heilers · Jolly SEO",
+    topic: "Outreach · SEO",
+    duration: "~58 min",
+    season: 3,
   },
   {
-    n: "39",
-    title: "Personal Branding for Founders: The Five-Year Framework",
-    guest: "Solo",
-    topic: "Personal Branding",
-    duration: "42 min",
-    date: "Apr 2026",
+    code: "S01E08",
+    title: "Melanie Martin on a $2.3 Million ROI PR Campaign",
+    guest: "Melanie Martin · Publicist",
+    topic: "PR · Earned Media",
+    duration: "~52 min",
+    season: 1,
   },
   {
-    n: "38",
-    title: "Neuromarketing Deep Dive: The Psychology Behind Viral Content",
-    guest: "Solo",
-    topic: "Neuromarketing",
-    duration: "51 min",
-    date: "Apr 2026",
+    code: "S02E03",
+    title: "Ron Carucci on Power, Leadership, and Persuasion",
+    guest: "Ron Carucci · Navalent",
+    topic: "Leadership",
+    duration: "~64 min",
+    season: 2,
   },
   {
-    n: "37",
-    title: "SEO in 2026: What Changed, What Didn't, What Works",
-    guest: "Solo",
-    topic: "SEO · Content",
-    duration: "44 min",
-    date: "Mar 2026",
+    code: "S03E03",
+    title: "Faisal Khan on Remote Team Management, Inbound Leads, and Working Smarter",
+    guest: "Faisal Khan · Payments consultant",
+    topic: "Remote Work · Business",
+    duration: "~52 min",
+    season: 3,
   },
   {
-    n: "36",
-    title: "The Fractional CMO Model: How It Works for Founders",
-    guest: "Solo",
-    topic: "Fractional CMO",
-    duration: "38 min",
-    date: "Mar 2026",
+    code: "S02E10",
+    title: "Unleashing Your Inner Sales Warrior with Jason Forrest",
+    guest: "Jason Forrest · Forrest Performance Group",
+    topic: "Sales · Mindset",
+    duration: "~54 min",
+    season: 2,
   },
   {
-    n: "35",
-    title: "HARO Mastery: Getting 10 Press Mentions a Month",
-    guest: "Solo",
-    topic: "Earned Media",
-    duration: "45 min",
-    date: "Feb 2026",
+    code: "S02E09",
+    title: "Finding Your Unfair Advantage with Ash Ali & Hasan Kubba",
+    guest: "Ash Ali & Hasan Kubba · Authors",
+    topic: "Entrepreneurship",
+    duration: "~62 min",
+    season: 2,
   },
 ];
 
-const ALL_EPISODES: ReadonlyArray<{
-  n: string;
-  title: string;
-  topic: string;
-  duration: string;
-}> = [
-  { n: "34", title: "LinkedIn Authority: The 90-Day Blueprint", topic: "Personal Branding", duration: "36 min" },
-  { n: "33", title: "The Long-Form Content Moat", topic: "Content Strategy", duration: "41 min" },
-  { n: "32", title: "Storytelling for Business: The Three-Act Structure", topic: "Storytelling", duration: "39 min" },
-  { n: "31", title: "Building a Writing Habit That Compounds", topic: "Writing", duration: "33 min" },
-  { n: "30", title: "From Zero to Forbes: A Case Study", topic: "Earned Media", duration: "52 min" },
-  { n: "29", title: "Pricing Your Expertise: The Authority Premium", topic: "Consulting", duration: "44 min" },
-  { n: "28", title: "The Podcast Guest Playbook", topic: "Podcast · PR", duration: "37 min" },
-  { n: "27", title: "Why Your Blog Isn't Working (And How to Fix It)", topic: "Content", duration: "43 min" },
-  { n: "26", title: "Data Storytelling: Numbers That Persuade", topic: "Writing · Data", duration: "40 min" },
-  { n: "25", title: "How to Write an Op-Ed That Gets Published", topic: "Writing · PR", duration: "35 min" },
-  { n: "24", title: "The Consulting Funnel: Earned Media to Clients", topic: "Business Development", duration: "46 min" },
-  { n: "23", title: "Cognitive Biases Every Marketer Should Know", topic: "Neuromarketing", duration: "50 min" },
+const SEASON3: ReadonlyArray<{ code: string; title: string; duration: string; solo: boolean }> = [
+  { code: "S03E09", title: "Discussing HARO Outreach, SEO Agency Business, and Backlinks Management with Greg Heilers", duration: "~58 min", solo: false },
+  { code: "S03E08", title: "#SEObacklinks Tutorial — Type 3 Backlinks", duration: "~22 min", solo: true },
+  { code: "S03E07", title: "#SEObacklinks Tutorial — Type 2 Backlinks", duration: "~24 min", solo: true },
+  { code: "S03E06", title: "#SEObacklinks Tutorial — Type 1 Backlinks", duration: "~26 min", solo: true },
+  { code: "S03E05", title: "SEO Outreach Project Management Made Easy", duration: "~19 min", solo: true },
+  { code: "S03E04", title: "HARO Outreach vs Conventional Outreach for Quality Backlinks", duration: "~21 min", solo: true },
+  { code: "S03E03", title: "Faisal Khan on Remote Team Management, Inbound Leads, and Working Smarter", duration: "~52 min", solo: false },
+  { code: "S03E02", title: "Remote Work Productivity · Our Top 7 Tools", duration: "~23 min", solo: true },
+  { code: "S03E01", title: "Fighting the Corona Recession · Our 7-Pronged Business Plan", duration: "~28 min", solo: true },
+];
+
+const SEASON2: ReadonlyArray<{ code: string; title: string; duration: string; solo: boolean }> = [
+  { code: "S02E10", title: "Unleashing Your Inner Sales Warrior with Jason Forrest", duration: "~54 min", solo: false },
+  { code: "S02E09", title: "Finding Your Unfair Advantage with Ash Ali & Hasan Kubba", duration: "~62 min", solo: false },
+  { code: "S02E08", title: "Automated Outreach · Why I (Kind of) Changed My Mind", duration: "~20 min", solo: true },
+  { code: "S02E07", title: "Standing Out in the Crowd with a Simple Hack I Used in Denmark", duration: "~17 min", solo: true },
+  { code: "S02E06", title: "Collab Link Building", duration: "~22 min", solo: true },
+  { code: "S02E05", title: "Digital PR vs SEO · Key Similarities and Differences", duration: "~25 min", solo: true },
+  { code: "S02E04", title: "Leveraging Newsjacking for Content Promotion", duration: "~19 min", solo: true },
+  { code: "S02E03", title: "Ron Carucci on Power, Leadership, and Persuasion", duration: "~64 min", solo: false },
+  { code: "S02E02", title: "Top 3 Mistakes of My ~6 Year Speaking Career", duration: "~16 min", solo: true },
+  { code: "S02E01", title: "Recap of Season 1 + Introduction of Season 2", duration: "~14 min", solo: true },
+];
+
+const SEASON1: ReadonlyArray<{ code: string; title: string; duration: string; solo: boolean }> = [
+  { code: "S01E10", title: "How Negating Conventional Wisdom Led Me to Massive Success", duration: "~21 min", solo: true },
+  { code: "S01E09", title: "My Productivity Hacks of 2018", duration: "~18 min", solo: true },
+  { code: "S01E08", title: "Melanie Martin on a $2.3 Million ROI PR Campaign", duration: "~52 min", solo: false },
+  { code: "S01E07", title: "Unique Twist to HARO Outreach for IMPROVED Backlinks", duration: "~20 min", solo: true },
+  { code: "S01E06", title: "Publicity & Backlinks Using HARO", duration: "~24 min", solo: true },
+  { code: "S01E05", title: "SEO Myths", duration: "~17 min", solo: true },
+  { code: "S01E04", title: "Elvin Zhang on Startups", duration: "~46 min", solo: false },
+  { code: "S01E03", title: "Lisa Zahran on Copywriting", duration: "~48 min", solo: false },
+  { code: "S01E02", title: "Liam Martin on Productivity & Remote Management", duration: "~57 min", solo: false },
+  { code: "S01E01", title: "Peter Gould on Design Thinking, Branding, and Productivity", duration: "~50 min", solo: false },
 ];
 
 const PLATFORMS = [
-  { name: "Apple Podcasts", url: "#" },
-  { name: "Spotify", url: "#" },
-  { name: "YouTube", url: "#" },
-  { name: "RSS Feed", url: "#" },
+  { name: "Apple Podcasts", url: "https://podcasts.apple.com/us/podcast/the-sia-business-show/id1347540466" },
+  { name: "Spotify", url: "https://open.spotify.com/show/7GxDZnNXb37gjXLF8LZmMh" },
+  { name: "Anchor / RSS", url: "https://anchor.fm/syedirfanajmal/" },
+  { name: "Stitcher", url: "https://www.stitcher.com/show/the-sia-business-show" },
 ];
 
 export default function PodcastPage() {
@@ -133,7 +153,7 @@ export default function PodcastPage() {
           <SiaLogo height={320} />
         </div>
 
-        <SectionMast n="00" label="The Bureau Podcast · Audio Desk" dark />
+        <SectionMast n="00" label="The SIA Business Podcast · Audio Desk" dark />
 
         <div
           style={{
@@ -154,8 +174,8 @@ export default function PodcastPage() {
                 color: PAPER,
               }}
             >
-              Marketing,{" "}
-              <span style={{ fontStyle: "italic", color: YEL }}>media</span>
+              SEO, HARO,{" "}
+              <span style={{ fontStyle: "italic", color: YEL }}>outreach</span>
               <br />
               &amp; the long game.
             </h1>
@@ -168,10 +188,10 @@ export default function PodcastPage() {
                 maxWidth: 500,
               }}
             >
-              The Bureau Podcast is where Syed Irfan Ajmal thinks out loud about
-              earned media, personal branding, content strategy, and the craft of
-              building authority in public. No guests — just research, cases, and
-              honest takes. Forty episodes and counting.
+              The SIA Business Podcast ran for three seasons (2018–2020),
+              covering earned media, link building, SEO outreach, and business
+              growth. 29 episodes across solo deep-dives and guest interviews
+              with practitioners from around the world.
             </p>
 
             <div style={{ marginTop: 32, display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -179,6 +199,8 @@ export default function PodcastPage() {
                 <a
                   key={name}
                   href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     padding: "10px 16px",
                     border: "1px solid rgba(241,235,222,.3)",
@@ -205,10 +227,10 @@ export default function PodcastPage() {
             }}
           >
             {[
-              { stat: "40", label: "Episodes" },
-              { stat: "Solo", label: "Format" },
-              { stat: "35–55", label: "Minutes avg." },
-              { stat: "2021", label: "Launched" },
+              { stat: "29", label: "Episodes" },
+              { stat: "3", label: "Seasons" },
+              { stat: "10", label: "Guest interviews" },
+              { stat: "2018", label: "Launched" },
             ].map(({ stat, label }) => (
               <div
                 key={label}
@@ -244,7 +266,7 @@ export default function PodcastPage() {
 
       {/* ── Featured episodes ─────────────────────────────────── */}
       <section style={{ padding: "80px 56px" }}>
-        <SectionMast n="01" label="Recent Episodes · The Latest Six" />
+        <SectionMast n="01" label="Featured Episodes · Guest Interviews & Highlights" />
         <div
           style={{
             display: "grid",
@@ -252,8 +274,8 @@ export default function PodcastPage() {
             gap: 32,
           }}
         >
-          {FEATURED_EPISODES.map(({ n, title, topic, duration, date }) => (
-            <div key={n} style={{ borderTop: `2px solid ${INK}` }}>
+          {FEATURED_EPISODES.map(({ code, title, guest, topic, duration, season }) => (
+            <div key={code} style={{ borderTop: `2px solid ${INK}` }}>
               <div
                 style={{
                   padding: "14px 0 10px",
@@ -263,7 +285,7 @@ export default function PodcastPage() {
                 }}
               >
                 <div style={{ display: "flex", gap: 10, alignItems: "baseline" }}>
-                  <Pill size={9.5} ls="0.14em">Ep. {n}</Pill>
+                  <Pill size={9.5} ls="0.14em">{code}</Pill>
                   <SCaps size={10} ls="0.12em" color={YEL}>
                     {topic}
                   </SCaps>
@@ -274,15 +296,28 @@ export default function PodcastPage() {
               </div>
               <h3
                 style={{
-                  margin: "0 0 12px",
+                  margin: "0 0 8px",
                   fontWeight: 700,
-                  fontSize: 20,
+                  fontSize: 18,
                   lineHeight: 1.25,
                   letterSpacing: "-0.01em",
                 }}
               >
                 {title}
               </h3>
+              <div
+                style={{
+                  fontFamily: GROT,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  letterSpacing: "0.06em",
+                  color: INK55,
+                  marginBottom: 12,
+                  fontStyle: "italic",
+                }}
+              >
+                {guest}
+              </div>
               <HRule />
               <div
                 style={{
@@ -292,9 +327,11 @@ export default function PodcastPage() {
                   marginTop: 12,
                 }}
               >
-                <SCaps size={10} ls="0.12em" color={INK55}>{date}</SCaps>
+                <SCaps size={10} ls="0.12em" color={INK55}>Season {season}</SCaps>
                 <a
-                  href="#"
+                  href={PLATFORMS[0].url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     fontFamily: GROT,
                     fontWeight: 700,
@@ -315,58 +352,161 @@ export default function PodcastPage() {
 
       <HRule />
 
-      {/* ── All episodes list ─────────────────────────────────── */}
+      {/* ── Season archive ────────────────────────────────────── */}
       <section style={{ padding: "80px 56px", background: PAPER2 }}>
-        <SectionMast n="02" label="The Archive · All Episodes" />
-        <div>
-          {ALL_EPISODES.map(({ n, title, topic, duration }, i) => (
+        <SectionMast n="02" label="Full Archive · All 29 Episodes by Season" />
+
+        {/* Season 3 */}
+        <div style={{ marginBottom: 56 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: 16,
+              marginBottom: 16,
+              paddingBottom: 10,
+              borderBottom: `2px solid ${INK}`,
+            }}
+          >
             <div
-              key={n}
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 28,
+                letterSpacing: "-0.02em",
+                color: INK,
+              }}
+            >
+              Season 3
+            </div>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>2020 · 9 episodes</SCaps>
+          </div>
+          {SEASON3.map(({ code, title, duration, solo }) => (
+            <div
+              key={code}
               style={{
                 display: "grid",
-                gridTemplateColumns: "48px 1fr 160px 80px",
+                gridTemplateColumns: "80px 1fr 80px 80px",
                 gap: 24,
-                padding: "20px 0",
+                padding: "16px 0",
                 borderBottom: `1px solid ${INK15}`,
                 alignItems: "baseline",
               }}
             >
-              <SCaps size={11} ls="0.14em" color={INK35}>
-                {n}.
-              </SCaps>
-              <div
-                style={{
-                  fontFamily: SERIF,
-                  fontSize: 17,
-                  fontWeight: 600,
-                  color: INK,
-                  lineHeight: 1.3,
-                }}
-              >
+              <Pill size={9} ls="0.12em">{code}</Pill>
+              <div style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 500, color: INK, lineHeight: 1.35 }}>
                 {title}
               </div>
-              <SCaps size={10} ls="0.12em" color={YEL}>
-                {topic}
+              <SCaps size={10} ls="0.10em" color={solo ? INK55 : YEL}>
+                {solo ? "Solo" : "Guest"}
               </SCaps>
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <SCaps size={10} ls="0.10em" color={INK35}>
-                  {duration}
-                </SCaps>
-              </div>
+              <SCaps size={10} ls="0.10em" color={INK35} style={{ textAlign: "right" }}>
+                {duration}
+              </SCaps>
             </div>
           ))}
+        </div>
 
+        {/* Season 2 */}
+        <div style={{ marginBottom: 56 }}>
           <div
             style={{
-              marginTop: 32,
-              padding: "20px 0",
-              textAlign: "center",
+              display: "flex",
+              alignItems: "baseline",
+              gap: 16,
+              marginBottom: 16,
+              paddingBottom: 10,
+              borderBottom: `2px solid ${INK}`,
             }}
           >
-            <SCaps size={11} ls="0.18em" color={INK55}>
-              Episodes 1–22 available on Apple Podcasts, Spotify, and YouTube
-            </SCaps>
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 28,
+                letterSpacing: "-0.02em",
+                color: INK,
+              }}
+            >
+              Season 2
+            </div>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>2019 · 10 episodes</SCaps>
           </div>
+          {SEASON2.map(({ code, title, duration, solo }) => (
+            <div
+              key={code}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "80px 1fr 80px 80px",
+                gap: 24,
+                padding: "16px 0",
+                borderBottom: `1px solid ${INK15}`,
+                alignItems: "baseline",
+              }}
+            >
+              <Pill size={9} ls="0.12em">{code}</Pill>
+              <div style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 500, color: INK, lineHeight: 1.35 }}>
+                {title}
+              </div>
+              <SCaps size={10} ls="0.10em" color={solo ? INK55 : YEL}>
+                {solo ? "Solo" : "Guest"}
+              </SCaps>
+              <SCaps size={10} ls="0.10em" color={INK35} style={{ textAlign: "right" }}>
+                {duration}
+              </SCaps>
+            </div>
+          ))}
+        </div>
+
+        {/* Season 1 */}
+        <div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              gap: 16,
+              marginBottom: 16,
+              paddingBottom: 10,
+              borderBottom: `2px solid ${INK}`,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 28,
+                letterSpacing: "-0.02em",
+                color: INK,
+              }}
+            >
+              Season 1
+            </div>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>2018 · 10 episodes</SCaps>
+          </div>
+          {SEASON1.map(({ code, title, duration, solo }) => (
+            <div
+              key={code}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "80px 1fr 80px 80px",
+                gap: 24,
+                padding: "16px 0",
+                borderBottom: `1px solid ${INK15}`,
+                alignItems: "baseline",
+              }}
+            >
+              <Pill size={9} ls="0.12em">{code}</Pill>
+              <div style={{ fontFamily: SERIF, fontSize: 16, fontWeight: 500, color: INK, lineHeight: 1.35 }}>
+                {title}
+              </div>
+              <SCaps size={10} ls="0.10em" color={solo ? INK55 : YEL}>
+                {solo ? "Solo" : "Guest"}
+              </SCaps>
+              <SCaps size={10} ls="0.10em" color={INK35} style={{ textAlign: "right" }}>
+                {duration}
+              </SCaps>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -374,7 +514,7 @@ export default function PodcastPage() {
 
       {/* ── Guest appearances ─────────────────────────────────── */}
       <section style={{ padding: "72px 56px" }}>
-        <SectionMast n="03" label="Guest Circuit · 15+ Appearances" />
+        <SectionMast n="03" label="Guest Circuit · Appearances on Other Shows" />
         <div
           style={{
             display: "grid",
@@ -406,9 +546,10 @@ export default function PodcastPage() {
                 color: INK70,
               }}
             >
-              In addition to the Bureau Podcast, Syed has appeared as a guest
-              on 15+ podcasts in the US and UK — talking content marketing,
-              earned media, personal branding, and the business of consulting.
+              In addition to hosting the SIA Business Podcast, Syed has appeared
+              as a guest on podcasts in the US and UK — including the 12 Min Convos
+              Podcast with Engel Jones — talking content marketing, earned media,
+              personal branding, and the business of consulting.
             </p>
             <p
               style={{
@@ -419,7 +560,7 @@ export default function PodcastPage() {
               }}
             >
               To invite Syed as a guest on your podcast, use the contact form or
-              book a 15-minute speaker enquiry call.
+              book a speaker enquiry call.
             </p>
             <a
               href="/contact"
@@ -445,14 +586,14 @@ export default function PodcastPage() {
 
           <div>
             {[
-              "Content marketing strategy and why most brands get it wrong",
-              "Earned media: the underrated growth channel",
-              "Building a personal brand as a consultant",
-              "The long-form writing habit and how it compounds",
               "HARO and the art of the perfect pitch",
-              "From Peshawar to Forbes: the global marketing bureau",
+              "Earned media: the underrated growth channel for B2B",
+              "Link building strategy for SEO agencies",
+              "Building a personal brand as a consultant",
+              "Content marketing for service businesses",
+              "Remote team management lessons from DMR.agency",
               "Neuromarketing principles every marketer should know",
-              "Why SEO and PR belong in the same team",
+              "The SIA Business Podcast — Season 1 retrospective",
             ].map((topic, i) => (
               <div
                 key={topic}

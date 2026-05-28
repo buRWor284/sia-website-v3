@@ -28,69 +28,39 @@ const CHAPTERS: ReadonlyArray<{
 }> = [
   {
     n: "01",
-    title: "Research Before You Write",
-    body: "The biggest mistake in content writing is beginning with a blank document. Spend three times as long on research as on writing. Start with the search results for your target keyword: what do the top-ranking pages say? What questions do they fail to answer? What would make someone read your version instead of theirs? Then go deeper: academic papers, industry reports, original data, expert interviews. Your goal is to be the most informed writer on this topic on the day you write. The quality of your research determines the ceiling of your content quality.",
-    takeaway: "Research longer. Write faster. A well-researched piece practically writes itself.",
+    title: "Part 1 · Writing Quality Content (Tips 1–20)",
+    body: "Write crap — having the courage to write badly makes starting easier (the first draft is supposed to be bad). Writers write — call yourself a writer, then write daily until it is true. Build discipline by setting a daily writing quota. Read voraciously: Stephen King says, 'If you don't have time to read, you don't have the time or the tools to write.' Read what you want to write — imitation precedes voice. Don't edit while you write: as Hemingway said, 'Write drunk; edit sober.' Admit the first draft is rough — the shame is in not revising. Talk to 'you', not 'everyone' — the reader is one person at a time.",
+    takeaway: "Writers write. Call yourself one, then write daily until it is true. The first draft is supposed to be bad — its only job is to exist.",
   },
   {
     n: "02",
-    title: "The Inverted Pyramid",
-    body: "Journalism solved the reading problem a century ago: put the most important information first. Your lead paragraph should answer: who, what, where, when, why — or at least the most critical three. Everything after the lead is supporting detail, background, and elaboration. Online readers scan before they commit. If your most important point is buried in paragraph seven, most readers will never reach it. Write your conclusion first, then fill in the reasoning. This inverts the academic writing habit that most of us were trained in — and it makes every piece more readable.",
-    takeaway: "Lead with the conclusion. The reader decides whether to invest in your piece in the first three sentences.",
+    title: "Part 1 · Writing Quality Content (Tips 21–40)",
+    body: "Avoid 'I' — readers want to know 'what's in it for me?' Write as you talk (Seth Godin's approach). Read your words aloud for a readability check — the ear catches what the eye misses. Add subheadings, bullet points, and bold text to help readers scan. Use the inverted pyramid — lead with the most important information. Write a strong opening that hooks the reader within three sentences. Vary sentence length deliberately: short for emphasis, long for complexity. Use specific details — vague writing is forgettable, specific writing is memorable. Avoid clichés. Say what you mean directly.",
+    takeaway: "Read your work aloud. If you stumble, the reader will stumble. If you get bored, the reader left three paragraphs ago.",
   },
   {
     n: "03",
-    title: "The Headline Is Half the Article",
-    body: "David Ogilvy: 'When you have written your headline, you have spent eighty cents out of your dollar.' A headline has one job: get the next sentence read. Headline formulas that consistently work: the specific number ('7 Things That...'), the challenge to a belief ('Why X Is Wrong About Y'), the how-to with a specific outcome ('How to Get Covered in Forbes Without a PR Agency'), and the counter-intuitive claim ('The Less You Post, the More People Read'). Test every headline against this question: if this appeared in my inbox, would I open it?",
-    takeaway: "Write 10 headlines before you write the first paragraph. The first five are obvious. The next five are interesting.",
+    title: "Part 1 · Writing Quality Content (Tips 41–85)",
+    body: "Have a blog and start writing before you have a topic — the habit creates the material. Learn copywriting (the science of persuasion in writing). Use BuzzSumo to find topics that are already popular, then approach them from a fresh angle. Research your topic more deeply than you think you need to — the quality of your research determines the ceiling of your writing. Study great writers — Hemingway for brevity, Orwell for clarity, King for momentum. Write the headline last (or write ten headlines and pick the best). Use subheadings every 300–400 words for long-form content. A strong closing is as important as a strong opening.",
+    takeaway: "The headline and the first sentence are the two most important things you will write. The rest exists to justify them.",
   },
   {
     n: "04",
-    title: "Active Voice, Always",
-    body: "Passive voice hides agency and creates cognitive load. 'The report was written by the team' makes the reader do extra work to understand who did what. 'The team wrote the report' is clear. Passive voice often appears when writers are uncertain about their claims, or when institutions want to avoid accountability. In marketing copy, passive voice weakens your value proposition: 'Results are generated by our process' versus 'Our process generates results.' Same words, different impact. Run the 'by zombies' test on every sentence: if you can add 'by zombies' after the verb and it makes sense, it's passive.",
-    takeaway: "If you can add 'by zombies' and the sentence makes sense, it's passive. Rewrite it.",
+    title: "Part 2 · On Environment (Tips 86–92)",
+    body: "Your writing environment dramatically affects output quality and quantity. Write at the same time each day — consistency trains the brain to enter a writing state. Eliminate distractions during writing sessions: phone on silent, notifications off, browser tabs closed. Use tools like Freedom or ColdTurkey to block distracting sites. FocusWriter creates a distraction-free full-screen environment. A dedicated writing space — even a corner of a room — signals to the brain that it is time to write. Music helps some writers, silence helps others — experiment and commit to what works.",
+    takeaway: "Set a writing time and protect it. The environment shapes the output. A distraction-free hour is worth three interrupted ones.",
   },
   {
     n: "05",
-    title: "Sentence Length and Rhythm",
-    body: "Short sentences create urgency. They land. They stop the reader. Long sentences, by contrast, allow the writer to build momentum, to accumulate detail, and to carry the reader through a more complex idea before releasing them at a full stop. The best writing alternates between both. The rhythm of varied sentence lengths is what makes prose feel alive rather than monotonous. Read your work aloud: if you run out of breath, the sentence is too long. If every sentence sounds the same, you have a rhythm problem. Vary length deliberately, not accidentally.",
-    takeaway: "Vary sentence length deliberately. Short for emphasis. Long for complexity. Alternate.",
+    title: "Part 3 · On Grammar (Tips 93–96)",
+    body: "Good grammar is invisible — bad grammar is all the reader notices. The essentials: use active voice (passive voice hides agency and adds cognitive load). Avoid run-on sentences — a sentence that requires re-reading has failed. Keep subject and verb close together. Do not start sentences with 'There is' or 'There are' — they pad without adding meaning. Learn when a comma is needed and when it is not. The Oxford comma prevents genuine ambiguity — use it. When in doubt, use shorter sentences. Simplicity is not stupidity; complexity is not intelligence.",
+    takeaway: "Good grammar is the absence of friction. If the reader notices your grammar, something went wrong.",
   },
   {
     n: "06",
-    title: "The Specific Detail",
-    body: "Vague writing is forgettable. Specific writing is memorable. 'We helped a mid-market company grow their revenue' tells the reader nothing they can evaluate. 'We helped a 23-person logistics software company in Phoenix grow their ARR from $1.2M to $2.1M in 14 months' tells them who you work with, what you do, and what to expect. Specificity does three things: it increases credibility (because liars are vague), it makes the claim verifiable (which builds trust), and it makes the reader's imagination activate (which creates engagement). Always choose the concrete detail over the abstract claim.",
-    takeaway: "Replace every abstract claim with a specific detail. Specificity is the foundation of credibility.",
-  },
-  {
-    n: "07",
-    title: "The Edit: How to Cut Without Killing",
-    body: "Good writing is rewriting. The first draft is for getting ideas out; the second draft is for making them clear; the third draft is for making them sharp. When editing, read the piece aloud — the ear catches what the eye misses. Look for: adverbs (usually deletable), filler phrases ('it is worth noting that', 'in order to', 'the fact that'), the passive voice, hedging language ('kind of', 'sort of', 'in some ways'), and redundancy (saying the same thing twice in adjacent sentences). Cut until it hurts, then cut a little more. Hemingway: 'The first draft of anything is shit.'",
-    takeaway: "Cut every adverb. Cut every filler phrase. Cut every hedge. If cutting a sentence doesn't change the meaning, cut it.",
-  },
-  {
-    n: "08",
-    title: "Transitions That Hold",
-    body: "Transitions are the connective tissue of long-form writing. They tell the reader: here is where we were, here is where we are going, here is why we are going there. The weakest transitions are conjunctions at the start of sentences ('And', 'But', 'So'). The strongest transitions are explicit: 'The problem with that approach is...' 'This leads to a paradox.' 'But position doesn't explain the data from 2019, when...' Every transition should earn its place. If it does not accelerate the reader toward the next idea, cut it.",
-    takeaway: "Transitions should pull the reader forward, not just link sentences. Rewrite any transition that just says 'and then'.",
-  },
-  {
-    n: "09",
-    title: "The Closing That Lands",
-    body: "Most articles end with a summary of what they just said. This is the weakest possible ending — it tells the reader nothing new and gives them no reason to act. A strong closing does one of three things: zooms out (what does this mean in a larger context?), calls to action with specificity (not 'let me know your thoughts' but 'if this applies to you, book a call here'), or leaves the reader with an image or idea that stays with them. The last sentence is the one the reader carries away. Make it worth carrying.",
-    takeaway: "Your last sentence is the one they remember. Never end with a summary. End with a landing.",
-  },
-  {
-    n: "10",
-    title: "Building the Writing Habit",
-    body: "Writing is a practice, not a talent. The best writers are the ones who write consistently — not the ones who write perfectly when inspiration strikes. The habit stack that works: write at the same time each day (morning is best — decision fatigue is real), start with a minimum viable session (200 words, not 2,000), track streaks not word counts, and separate drafting from editing (never edit while you write). The writers who become authorities in their field are not more gifted — they are more consistent. Consistency at long time horizons is the only reliable predictor of output quality.",
-    takeaway: "200 words a day, every day, beats 2,000 words when inspiration strikes. Consistency is the craft.",
-  },
-  {
-    n: "11",
-    title: "Writing for SEO Without Destroying the Prose",
-    body: "The writers who hate SEO are the ones who were told to 'stuff keywords.' Modern SEO is topical authority: write the most complete, most useful, most specific piece on your topic — and the rankings follow. Practical rules: use your primary keyword in the title, first paragraph, and one subhead. Use semantically related terms naturally throughout. Write for a specific person with a specific problem, not for a search engine. Use short paragraphs and subheadings (the reader scans before they commit). Answer the question the headline promises — Google rewards completion rates. Good SEO and good writing are aligned, not opposed.",
-    takeaway: "Write for one reader who has one problem. Cover the topic completely. The ranking is a consequence of that, not a target.",
+    title: "Part 4 · Tools (Tips 97–100)",
+    body: "Grammarly catches grammar, style, and tone issues — use the premium version for more detailed suggestions. The Hemingway Editor identifies passive voice, overly complex sentences, and excessive adverbs — aim for Grade 6–8 readability for blog content. CoSchedule's Headline Analyzer scores and helps optimise headlines — aim for 70+. Coach.me tracks writing streaks and habit consistency. Draft enables version-controlled collaborative writing. For deep work sessions, Freedom blocks distracting apps and websites across all devices. Stack two or three of these tools — they compound.",
+    takeaway: "Tools do not replace the writing habit — they support it. Use Grammarly and Hemingway Editor as a minimum. Use Headline Analyzer for every post title.",
   },
 ];
 
@@ -137,7 +107,7 @@ export default function WritingTipsGuidePage() {
                 maxWidth: 580,
               }}
             >
-              Eleven chapters on the mechanics of clear, compelling writing — from
+              Six chapters covering 100+ writing tips on quality content, environment, grammar, and tools — from
               research and headlines to editing and the writing habit. For content
               marketers, consultants, and anyone who communicates for a living.
             </p>
@@ -180,9 +150,9 @@ export default function WritingTipsGuidePage() {
         >
           {[
             { label: "Author", value: "Syed Irfan Ajmal" },
-            { label: "Length", value: "11 chapters · 5,600 words" },
-            { label: "Read time", value: "14 minutes" },
-            { label: "Updated", value: "May 2026" },
+            { label: "Length", value: "100+ tips · 4 categories" },
+            { label: "Read time", value: "22 minutes" },
+            { label: "Published", value: "Feb 2016 · Revised Aug 2022" },
           ].map(({ label, value }) => (
             <div key={label}>
               <SCaps size={10} ls="0.14em" color={INK35}>{label}</SCaps>

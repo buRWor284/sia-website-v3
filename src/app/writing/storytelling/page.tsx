@@ -28,57 +28,57 @@ const CHAPTERS: ReadonlyArray<{
 }> = [
   {
     n: "01",
-    title: "Why the Brain Runs on Stories",
-    body: "Stories are not decoration. They are the brain's default mode of processing and storing information. Neuroscientist Uri Hasson demonstrated that when someone listens to a story, their brain activity synchronises with the storyteller's — a phenomenon called neural coupling. Data triggers two language-processing areas. Stories trigger the motor cortex, sensory cortex, frontal cortex, and limbic system simultaneously. A good story doesn't just inform — it is experienced. This is why a single case study converts more reliably than a page of statistics.",
-    takeaway: "Facts are processed. Stories are experienced. Always choose the story.",
+    title: "Why Storytelling Works (The Neurological Basis)",
+    body: "Stories work because of how the human brain is wired. When you listen to a presentation with facts and bullet points, certain language-processing parts of the brain activate. But when you hear a story with narrative, action, and emotion, the entire brain lights up — including the motor cortex and sensory areas. Stories trigger the release of oxytocin, a neurochemical that promotes empathy and connection. This is why a compelling brand story is not just nice to have — it is neurologically more persuasive than any list of features.",
+    takeaway: "Facts inform. Stories transform. The brain is wired to respond to narrative — not data.",
   },
   {
     n: "02",
-    title: "The Three-Act Structure for Business Narratives",
-    body: "Act I: Establish the world before — who the protagonist is, what they want, and what stands in their way. Act II: Introduce the conflict — the obstacle, the failed attempts, the moment of maximum difficulty. Act III: The transformation — what changed, what the protagonist achieved, and what the world looks like now. Every compelling case study, keynote, pitch, and brand origin story follows this structure. The mistake most businesses make is to start with Act III: 'We increased revenue by 40%.' Start with Act I: 'Three years ago, they were losing clients they couldn't afford to lose.'",
-    takeaway: "Start with the world before. Never lead with the result — lead with the problem.",
+    title: "Elements of a Compelling Brand Story",
+    body: "Every compelling brand story has five elements: a relatable protagonist (a person the audience identifies with), a goal or desire (what the protagonist wants), an obstacle (what stands in the way), a turning point (the moment everything changes), and a resolution (where the protagonist ends up). Without all five elements, you don't have a story — you have a summary. Most brands make the mistake of skipping straight to the resolution ('we help businesses grow') and wondering why nobody remembers them.",
+    takeaway: "Check your brand story for all five elements. Missing even one makes the narrative collapse.",
   },
   {
     n: "03",
-    title: "The Hero's Journey for Brand Narratives",
-    body: "Joseph Campbell's monomyth — the hero's journey — maps onto brand narratives with remarkable precision. Your client is the hero. Their problem is the call to adventure. Their failed attempts are the trials. Your service is the mentor, not the hero. This is the most common mistake in brand storytelling: the brand casts itself as the hero, when the buyer needs to see themselves as the hero. Apple's advertising never says 'Apple is amazing.' It says 'Look what you can do with Apple.' The brand is Gandalf. The customer is Frodo.",
-    takeaway: "Your brand is the mentor. Your client is the hero. Make this shift in every piece of content you produce.",
+    title: "The Hero's Journey Applied to Brand Narrative",
+    body: "Joseph Campbell's Hero's Journey — the monomyth — maps remarkably well onto brand storytelling. The key insight: your customer is the hero, not your brand. Your brand is the guide — Gandalf to their Frodo, Yoda to their Luke. When brands make themselves the hero ('we are the leading provider of...'), readers disengage. When brands make the customer the hero and position themselves as the guide that unlocks the hero's potential, they create stories that resonate deeply. Apple, Nike, and Airbnb all use this structure.",
+    takeaway: "Your brand is the mentor. Your customer is the hero. This single reframe changes how every piece of content you create is written.",
   },
   {
     n: "04",
-    title: "Writing Your Origin Story",
-    body: "Every founder, every consultant, every personal brand needs an origin story — a narrative that explains why you do what you do in a way that makes the reader feel it, not just understand it. The origin story formula: the moment of frustration or realisation that started everything + what you tried that didn't work + what you discovered + why you turned it into your work. The best origin stories are honest, specific, and slightly uncomfortable to tell. That discomfort is where the authenticity lives.",
-    takeaway: "Write the origin story you are slightly afraid to tell. That's the one people will remember.",
+    title: "How to Identify Your Brand's Story",
+    body: "Finding your brand's story starts with three questions: Why did you start? (The origin — what frustrated you, what you saw that others missed, what you decided to change.) Who do you serve, and what transformation do you create for them? (The mission — specific, concrete, human.) What do you believe about your industry that most people in it don't? (The conviction — your differentiating worldview.) The intersection of these three answers is the core of your brand's story. It should be specific enough to exclude some people. Vague stories serve nobody.",
+    takeaway: "Your brand story lives at the intersection of your origin, your mission, and your conviction. Find the specific details that make each one real.",
   },
   {
     n: "05",
-    title: "Case Studies That Convert",
-    body: "Most case studies are dead on arrival: they lead with results, skip the struggle, and read like a press release. A case study that converts has five elements. First, a specific protagonist (not 'a mid-market SaaS company' but 'the CEO of a 40-person logistics software firm'). Second, a vivid before-state that the reader recognises. Third, a real obstacle — the thing that almost stopped them. Fourth, a specific turning point — what changed and why. Fifth, the after-state with concrete results. The results are a chapter ending, not a chapter one.",
-    takeaway: "The struggle is the story. The results are the punchline. Most case studies have only the punchline.",
+    title: "Examples from Successful Brands",
+    body: "Dove's 'Real Beauty' campaign told the story of the gap between how women see themselves and how others see them — and positioned Dove as the brand that understood this truth. Airbnb's brand story is about belonging — not booking a room but feeling at home anywhere in the world. TOMS shoes built its entire brand on a one-for-one giving story. In each case, the brand's story is not about the product — it is about the meaning the product creates. Irfan's own brand story — from Peshawar to Forbes, building a global agency while sharing everything he learned — follows the same pattern.",
+    takeaway: "Study the brand stories of companies you admire. In every case, the story is about meaning and transformation, not product features.",
   },
   {
     n: "06",
-    title: "The Keynote Structure",
-    body: "A keynote is a story about a journey from a problem to an insight. The structure that works: open with a provocation (a counter-intuitive claim, a striking statistic, or a two-sentence story). Establish the problem in full — make the audience feel the pain of not solving it. Introduce your framework or insight. Walk through the proof (three examples or case studies, each more compelling than the last). Close with a call to action that is a next step, not a purchase request. The opening and closing are the only parts the audience will remember two weeks later. Write them last.",
-    takeaway: "Write your opening and closing last. They are load-bearing. The middle exists to make them credible.",
+    title: "Weaving Storytelling into Content",
+    body: "Content that gets shared is almost always story-driven. A data study becomes a story when you explain who discovered the data, what surprised them, and what it means for the reader. A how-to guide becomes a story when you open with the mistake that made the guide necessary. A product announcement becomes a story when it begins with the customer problem that inspired it. The technique is simple: before any piece of content, ask 'What is the conflict here?' Find the conflict, and you have found the story.",
+    takeaway: "Every piece of content has a conflict buried in it. Find the conflict, and you have found the story that makes the content worth reading.",
   },
   {
     n: "07",
-    title: "Story Structures for LinkedIn",
-    body: "LinkedIn's algorithm rewards posts that generate dwell time — the duration someone spends reading. Stories generate dwell time because the brain cannot resist a narrative in progress. The most effective LinkedIn story format: one-sentence hook (a statement that creates tension), five sentences of narrative (the before, the turn, the revelation), one-sentence moral or takeaway, and a soft prompt to engage. The hook must do two things: stop the scroll and promise a payoff. 'I lost my biggest client and it was the best thing that happened to my business.' That is a hook.",
-    takeaway: "Every LinkedIn post should have a hook, a story arc, and a takeaway. The hook is the only part that competes for attention.",
+    title: "Storytelling in Pitch Decks",
+    body: "The best pitch decks follow a narrative arc, not a data dump. Slide 1: the world as it is (the problem, vivid and specific). Slide 2: why now (what changed in the world that makes this the right moment). Slide 3: the protagonist (who you are and why you are the right person to solve this). Slide 4: the solution (the turning point — what you have built). Slides 5–8: the proof (traction, case studies, market size). Slide 9: the ask (what you need to write the next chapter). Each slide should answer the question the previous slide raised.",
+    takeaway: "A pitch deck is a story with each slide being a chapter. Every slide should raise a question; the next slide should answer it.",
   },
   {
     n: "08",
-    title: "Data Storytelling",
-    body: "Numbers without context are noise. Numbers inside a story are evidence. The three-step data storytelling framework: first, state the finding simply. Second, give it a frame — what does this number mean in human terms? Third, tell the story that explains why the number is what it is. '73% of B2B buyers complete their research before speaking to a sales rep' becomes: 'By the time a prospect calls you, they have already decided. They are calling to confirm what they have concluded. Your job is not to educate — it is to validate.' Same data. Completely different impact.",
-    takeaway: "Every statistic needs a story. The story is what makes the number mean something.",
+    title: "Storytelling for Presentations & Keynotes",
+    body: "The most memorable presentations open with a story, not a slide of agenda bullets. Nancy Duarte's research on great presentations found they all follow the same structure: move between 'what is' (the present reality) and 'what could be' (the possible future) throughout the talk, and close with the call to action that bridges the gap. Irfan opens his keynotes with a personal story that connects to the audience's experience — speaking in Bali, Dubai, and Peshawar — before transitioning to the framework or insight he is there to share.",
+    takeaway: "Open with a two-minute story, not an agenda. The story earns the audience's attention for everything that follows.",
   },
   {
     n: "09",
-    title: "Stories for the Sales Process",
-    body: "The sales process is a story process. Every successful sales conversation follows a narrative arc: establish rapport through shared context (Act I), diagnose the problem with specific questions (Act II rising action), introduce your solution as the turning point (Act II climax), and close with a vision of the after-state (Act III). The most powerful selling technique is not a closing script — it is a well-told story of a client who was exactly where the prospect is now, and where they are today. That story should be specific, recent, and honest about what the process involved.",
-    takeaway: "Keep three 'before and after' client stories in your head. Use them in every sales conversation at the diagnosis stage.",
+    title: "Practical Storytelling Frameworks",
+    body: "Three frameworks worth practising: (1) The ABT (And, But, Therefore) — 'Things were like this AND like this, BUT then this happened, THEREFORE this changed.' It is the most portable story structure in existence. (2) The SCQA (Situation, Complication, Question, Answer) — used by McKinsey for decades in client communications. (3) The Before/After/Bridge — 'Here is your world before. Here is your world after. Here is the bridge.' For social media, ABT. For presentations, SCQA. For landing pages, Before/After/Bridge.",
+    takeaway: "Learn ABT first — it works everywhere. Once it becomes habit, you will notice every great piece of content uses it instinctively.",
   },
 ];
 
@@ -168,9 +168,9 @@ export default function StorytellingGuidePage() {
         >
           {[
             { label: "Author", value: "Syed Irfan Ajmal" },
-            { label: "Length", value: "9 chapters · 6,800 words" },
+            { label: "Length", value: "9 chapters · ~6,500 words" },
             { label: "Read time", value: "17 minutes" },
-            { label: "Updated", value: "May 2026" },
+            { label: "Published", value: "Apr 2020 · Revised Jul 2021" },
           ].map(({ label, value }) => (
             <div key={label}>
               <SCaps size={10} ls="0.14em" color={INK35}>{label}</SCaps>

@@ -19,81 +19,107 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-const FEATURED: ReadonlyArray<{
+// Real flagship guides — live at /writing/*
+const GUIDES: ReadonlyArray<{
   n: string;
   category: string;
   title: string;
   excerpt: string;
   readTime: string;
-  date: string;
-  slug: string;
+  published: string;
+  href: string;
 }> = [
   {
     n: "01",
-    category: "Earned Media",
-    title: "How We Got Our Client Covered in Forbes Without a PR Agency",
+    category: "Personal Branding",
+    title: "Personal Branding 101: How to Brand Yourself for Success",
     excerpt:
-      "A step-by-step case study of the pitch, the hook, and the follow-up that landed a mid-market B2B brand on Forbes.com — and drove $180K in inbound pipeline in 90 days.",
-    readTime: "12 min read",
-    date: "May 2026",
-    slug: "forbes-without-pr-agency",
+      "A complete guide on personal branding — covering what it is, why it matters, and a step-by-step plan for finding your niche, building authority through content, getting press coverage, and speaking to audiences that include your ideal clients.",
+    readTime: "22 min read",
+    published: "June 2016 · Revised Dec 2021",
+    href: "/writing/personal-branding",
   },
   {
     n: "02",
-    category: "Personal Branding",
-    title: "The Five-Year Personal Brand: Why Playing the Long Game Wins",
+    category: "Neuromarketing",
+    title: "Neuromarketing 101: What Is Neuromarketing And How Does It Work?",
     excerpt:
-      "Short-term tactics get you followers. A five-year personal brand strategy gets you a waiting list, speaking fees, and the ability to raise prices without losing clients.",
-    readTime: "9 min read",
-    date: "Apr 2026",
-    slug: "five-year-personal-brand",
+      "What neuromarketing is, how it works, and how to apply it. Includes real-world case studies (Red Bull, Porsche, Coke vs Pepsi) and five practical techniques: anchoring, the power of free, fear of loss, social proof, and the decoy effect.",
+    readTime: "18 min read",
+    published: "Nov 2017 · Revised Jul 2021",
+    href: "/writing/neuromarketing",
   },
   {
     n: "03",
-    category: "Content Strategy",
-    title: "Why Long-Form Still Wins: A Data-Backed Case for 3,000-Word Posts",
+    category: "Storytelling",
+    title: "Storytelling 101: Elevate Your Brand",
     excerpt:
-      "Every year someone declares long-form dead. Every year the data proves them wrong. Here's what the numbers actually say — and how to write long-form that people finish.",
-    readTime: "11 min read",
-    date: "Apr 2026",
-    slug: "long-form-content-wins",
+      "The neuroscience of why stories work, the five elements of a compelling brand story, the Hero's Journey applied to brand narrative, how to find your brand's story, and practical storytelling frameworks for content, pitch decks, and keynotes.",
+    readTime: "24 min read",
+    published: "Apr 2020 · Revised Jul 2021",
+    href: "/writing/storytelling",
+  },
+  {
+    n: "04",
+    category: "Writing Craft",
+    title: "100+ Writing Tips to Become a Great Writer",
+    excerpt:
+      "A working list sharpened over a decade of writing. Covers 100+ tips across four categories: writing quality content (85 tips), writing environment (7 tips), grammar (4 tips), and tools (4 tips). Drawn from Hemingway, Stephen King, Seth Godin, and Irfan's own practice.",
+    readTime: "22 min read",
+    published: "Feb 2016 · Revised Aug 2022",
+    href: "/writing/writing-tips",
   },
 ];
 
-const ALL_ARTICLES: ReadonlyArray<{
+// Real archived articles — from the original site
+const ARCHIVED: ReadonlyArray<{
   n: string;
   category: string;
   title: string;
   readTime: string;
-  date: string;
+  author: string;
+  href: string;
 }> = [
-  { n: "04", category: "HARO", title: "HARO Mastery: Getting 10 Press Mentions a Month Without a PR Team", readTime: "14 min", date: "Mar 2026" },
-  { n: "05", category: "SEO", title: "The Topical Authority Framework: How to Rank for Every Keyword in Your Niche", readTime: "16 min", date: "Mar 2026" },
-  { n: "06", category: "Neuromarketing", title: "The 7 Cognitive Biases Every Content Marketer Should Exploit", readTime: "10 min", date: "Feb 2026" },
-  { n: "07", category: "Consulting", title: "How to Price Your Expertise: The Authority Premium Framework", readTime: "8 min", date: "Feb 2026" },
-  { n: "08", category: "LinkedIn", title: "The 90-Day LinkedIn Authority Blueprint: From 500 to 5,000 Followers", readTime: "13 min", date: "Jan 2026" },
-  { n: "09", category: "Writing", title: "How to Write an Op-Ed That Gets Published in Major Publications", readTime: "11 min", date: "Jan 2026" },
-  { n: "10", category: "Storytelling", title: "The Three-Act Structure for Business Case Studies (With Templates)", readTime: "9 min", date: "Dec 2025" },
-  { n: "11", category: "Fractional CMO", title: "When You Need a Fractional CMO (And When You Don't)", readTime: "7 min", date: "Dec 2025" },
-  { n: "12", category: "Earned Media", title: "The Anatomy of a Perfect Media Pitch: What Editors Actually Want", readTime: "12 min", date: "Nov 2025" },
-  { n: "13", category: "Content Strategy", title: "Building a Content Moat: The 180-Day Strategy That Compounds", readTime: "15 min", date: "Nov 2025" },
-  { n: "14", category: "Personal Branding", title: "The Positioning Statement Formula: How to Define What You Stand For", readTime: "8 min", date: "Oct 2025" },
-  { n: "15", category: "SEO", title: "Internal Linking Architecture: The Hidden SEO Lever Most Blogs Ignore", readTime: "10 min", date: "Oct 2025" },
-  { n: "16", category: "Writing", title: "Editing for Clarity: The 10-Minute Rewrite Method", readTime: "7 min", date: "Sep 2025" },
-  { n: "17", category: "Neuromarketing", title: "Social Proof Science: Which Types Actually Influence Purchase Decisions", readTime: "11 min", date: "Sep 2025" },
-  { n: "18", category: "Earned Media", title: "Podcast Guest Playbook: How to Get on 20 Shows in 90 Days", readTime: "9 min", date: "Aug 2025" },
-  { n: "19", category: "Content Strategy", title: "The Editorial Calendar That Drives 40% of Our Client Inbound Leads", readTime: "8 min", date: "Aug 2025" },
-];
-
-const CATEGORIES = [
-  "All",
-  "Earned Media",
-  "Personal Branding",
-  "Content Strategy",
-  "SEO",
-  "Neuromarketing",
-  "Writing",
-  "Consulting",
+  {
+    n: "05",
+    category: "Writing",
+    title: "How to Become a Good Writer",
+    readTime: "~6 min",
+    author: "Syed Irfan Ajmal",
+    href: "https://syedirfanajmal.com/become-a-good-writer/",
+  },
+  {
+    n: "06",
+    category: "Tools",
+    title: "6 Must-Have Digital Tools for Writers and Editors",
+    readTime: "~8 min",
+    author: "Azza Shahid",
+    href: "https://syedirfanajmal.com/digital-tools-writers-editors/",
+  },
+  {
+    n: "07",
+    category: "Productivity",
+    title: "6 Productivity Hacks for Entrepreneurs",
+    readTime: "~7 min",
+    author: "Jocelyn Brown",
+    href: "https://syedirfanajmal.com/6-productivity-hacks-entrepreneurs/",
+  },
+  {
+    n: "08",
+    category: "Analytics",
+    title: "5 Google Analytics Metrics to Include in Your Content Marketing Dashboard",
+    readTime: "~6 min",
+    author: "Azza Shahid",
+    href: "https://syedirfanajmal.com/google-analytics-content-marketing/",
+  },
+  {
+    n: "09",
+    category: "eCommerce",
+    title: "How To Maximize eCommerce Conversions Using Product Discovery",
+    readTime: "~8 min",
+    author: "Syed Irfan Ajmal",
+    href: "https://syedirfanajmal.com/maximize-ecommerce-conversions-using-product-discovery/",
+  },
 ];
 
 export default function BlogPage() {
@@ -103,7 +129,7 @@ export default function BlogPage() {
 
       {/* ── Header ───────────────────────────────────────────── */}
       <section style={{ padding: "72px 56px 56px" }}>
-        <SectionMast n="00" label="The Wire · Long-Form Articles" />
+        <SectionMast n="00" label="Articles · Essays & Guides" />
         <div
           style={{
             display: "grid",
@@ -122,7 +148,7 @@ export default function BlogPage() {
               letterSpacing: "-0.03em",
             }}
           >
-            29 articles.
+            Long-form.
             <br />
             <span style={{ fontStyle: "italic" }}>
               <Mark>No filler.</Mark>
@@ -137,12 +163,12 @@ export default function BlogPage() {
                 color: INK70,
               }}
             >
-              Research-backed guides on earned media, personal branding, content
-              strategy, SEO, and the craft of writing. Each piece is built to be
+              Research-backed guides on personal branding, neuromarketing,
+              storytelling, and the craft of writing. Each piece is built to be
               the definitive resource on its topic.
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {CATEGORIES.slice(1).map((cat) => (
+              {["Personal Branding", "Neuromarketing", "Storytelling", "Writing Craft", "Productivity"].map((cat) => (
                 <Pill key={cat} size={9.5} ls="0.12em">
                   {cat}
                 </Pill>
@@ -154,17 +180,17 @@ export default function BlogPage() {
 
       <HRule />
 
-      {/* ── Featured 3 ───────────────────────────────────────── */}
+      {/* ── Flagship guides ───────────────────────────────────── */}
       <section style={{ padding: "72px 56px" }}>
-        <SectionMast n="01" label="Featured · Editor's Picks" />
+        <SectionMast n="01" label="Flagship Guides · The 101 Series" />
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: 32,
           }}
         >
-          {FEATURED.map(({ n, category, title, excerpt, readTime, date }) => (
+          {GUIDES.map(({ n, category, title, excerpt, readTime, published, href }) => (
             <article key={n} style={{ borderTop: `2px solid ${INK}` }}>
               <div
                 style={{
@@ -183,7 +209,7 @@ export default function BlogPage() {
                 style={{
                   margin: "0 0 14px",
                   fontWeight: 700,
-                  fontSize: 22,
+                  fontSize: 20,
                   lineHeight: 1.2,
                   letterSpacing: "-0.01em",
                 }}
@@ -208,9 +234,9 @@ export default function BlogPage() {
                   alignItems: "center",
                 }}
               >
-                <SCaps size={10} ls="0.12em" color={INK55}>{date}</SCaps>
+                <SCaps size={10} ls="0.12em" color={INK55}>{published}</SCaps>
                 <a
-                  href={`/blog/${n}`}
+                  href={href}
                   style={{
                     fontFamily: GROT,
                     fontWeight: 700,
@@ -231,17 +257,26 @@ export default function BlogPage() {
 
       <HRule />
 
-      {/* ── All articles ─────────────────────────────────────── */}
+      {/* ── Archived articles ─────────────────────────────────── */}
       <section style={{ padding: "72px 56px", background: PAPER2 }}>
-        <SectionMast n="02" label="The Archive · All Articles" />
+        <SectionMast n="02" label="Archive · Articles from the Original Site" />
+
+        <div style={{ marginBottom: 32 }}>
+          <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: INK55, maxWidth: 680, fontStyle: "italic" }}>
+            These articles remain available on the original site while the full blog migration is in progress.
+          </p>
+        </div>
+
         <div>
-          {ALL_ARTICLES.map(({ n, category, title, readTime, date }, i) => (
+          {ARCHIVED.map(({ n, category, title, readTime, author, href }) => (
             <a
               key={n}
-              href={`/blog/${n}`}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 display: "grid",
-                gridTemplateColumns: "48px 100px 1fr 80px 80px",
+                gridTemplateColumns: "48px 120px 1fr 120px 80px",
                 gap: 24,
                 padding: "20px 0",
                 borderBottom: `1px solid ${INK15}`,
@@ -266,7 +301,7 @@ export default function BlogPage() {
                 {title}
               </div>
               <SCaps size={10} ls="0.10em" color={INK55}>
-                {date}
+                {author}
               </SCaps>
               <div style={{ textAlign: "right" }}>
                 <SCaps size={10} ls="0.10em" color={INK35}>
@@ -275,18 +310,6 @@ export default function BlogPage() {
               </div>
             </a>
           ))}
-
-          <div
-            style={{
-              marginTop: 32,
-              padding: "16px 0",
-              textAlign: "center",
-            }}
-          >
-            <SCaps size={11} ls="0.18em" color={INK55}>
-              Articles 20–29 available via the newsletter archive
-            </SCaps>
-          </div>
         </div>
       </section>
 

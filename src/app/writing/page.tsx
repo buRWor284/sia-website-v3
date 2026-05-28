@@ -31,11 +31,11 @@ const GUIDES: ReadonlyArray<{
     n: "I",
     title: "Personal Branding",
     subtitle: "The Complete Playbook",
-    body: "How to build a personal brand that positions you as the authority in your field — from crafting your positioning statement to landing your first press mention and building a LinkedIn following that converts.",
+    body: "What personal branding is and why it matters, examples from Gates, Branson, Jobs and Musk, top 10 personal branding statistics, and a step-by-step plan: find your niche, build authority through content, leverage social media, get PR coverage, speak publicly.",
     href: "/writing/personal-branding",
     stats: [
       { value: "12", label: "chapters" },
-      { value: "8,400", label: "words" },
+      { value: "~5,500", label: "words" },
       { value: "22 min", label: "read" },
     ],
   },
@@ -43,46 +43,46 @@ const GUIDES: ReadonlyArray<{
     n: "II",
     title: "Neuromarketing",
     subtitle: "The Marketer's Field Guide",
-    body: "The applied science of persuasion. Twelve cognitive biases with real-world marketing applications, social proof mechanics, emotional triggers in copywriting, and the psychology of trust signals.",
+    body: "What neuromarketing is, how it works, and three real-world case studies (Red Bull, Porsche, Coke vs Pepsi). Five actionable techniques: anchoring, the power of free, fear of loss, social proof, and the decoy effect.",
     href: "/writing/neuromarketing",
     stats: [
       { value: "10", label: "chapters" },
-      { value: "7,200", label: "words" },
-      { value: "19 min", label: "read" },
+      { value: "~4,500", label: "words" },
+      { value: "18 min", label: "read" },
     ],
   },
   {
     n: "III",
     title: "Storytelling",
     subtitle: "For Business & Brand",
-    body: "Why stories work neurologically, the hero's journey adapted for brand narratives, the three-act structure for case studies, and how to write origin stories, keynotes, and sales narratives that move people.",
+    body: "The neuroscience of why stories work, five elements of a compelling brand story, the Hero's Journey applied to brand narrative, examples from Dove, Airbnb, and TOMS, and three practical storytelling frameworks for content, pitch decks, and keynotes.",
     href: "/writing/storytelling",
     stats: [
       { value: "9", label: "chapters" },
-      { value: "6,800", label: "words" },
-      { value: "17 min", label: "read" },
+      { value: "~6,500", label: "words" },
+      { value: "24 min", label: "read" },
     ],
   },
   {
     n: "IV",
     title: "Writing Tips",
-    subtitle: "Craft & Clarity",
-    body: "The mechanics of clear, compelling writing. Research before writing, the inverted pyramid, active voice, headline formulas, the 10-minute rewrite, and how to develop a writing habit that compounds over years.",
+    subtitle: "100+ Tips · Craft & Clarity",
+    body: "A working list sharpened over a decade. 100+ tips across four categories: writing quality content (85 tips drawing on Hemingway, Stephen King, Seth Godin), writing environment, grammar, and tools including Grammarly and Hemingway Editor.",
     href: "/writing/writing-tips",
     stats: [
-      { value: "11", label: "chapters" },
-      { value: "5,600", label: "words" },
-      { value: "14 min", label: "read" },
+      { value: "100+", label: "tips" },
+      { value: "4", label: "categories" },
+      { value: "22 min", label: "read" },
     ],
   },
 ];
 
 const RECENT_ARTICLES = [
-  { title: "How We Got Covered in Forbes Without a PR Agency", category: "Earned Media", date: "May 2026" },
-  { title: "The Five-Year Personal Brand: Why Playing the Long Game Wins", category: "Personal Branding", date: "Apr 2026" },
-  { title: "Why Long-Form Still Wins: A Data-Backed Case for 3,000-Word Posts", category: "Content Strategy", date: "Apr 2026" },
-  { title: "HARO Mastery: Getting 10 Press Mentions a Month", category: "PR", date: "Mar 2026" },
-  { title: "The Topical Authority Framework", category: "SEO", date: "Mar 2026" },
+  { title: "How to Become a Good Writer", category: "Writing", href: "https://syedirfanajmal.com/become-a-good-writer/" },
+  { title: "6 Must-Have Digital Tools for Writers and Editors", category: "Tools", href: "https://syedirfanajmal.com/digital-tools-writers-editors/" },
+  { title: "6 Productivity Hacks for Entrepreneurs", category: "Productivity", href: "https://syedirfanajmal.com/6-productivity-hacks-entrepreneurs/" },
+  { title: "5 Google Analytics Metrics for Your Content Marketing Dashboard", category: "Analytics", href: "https://syedirfanajmal.com/google-analytics-content-marketing/" },
+  { title: "How To Maximize eCommerce Conversions Using Product Discovery", category: "eCommerce", href: "https://syedirfanajmal.com/maximize-ecommerce-conversions-using-product-discovery/" },
 ];
 
 export default function WritingPage() {
@@ -125,8 +125,8 @@ export default function WritingPage() {
                 color: INK70,
               }}
             >
-              Four comprehensive guides. Twenty-nine long-form articles. Five
-              visual frameworks. All built around one belief: that the best
+              Four comprehensive guides. Nine long-form articles. Five
+              infographics. All built around one belief: that the best
               marketing is earned, not bought — and the best way to earn attention
               is to be the most useful source in your category.
             </p>
@@ -179,9 +179,9 @@ export default function WritingPage() {
         >
           {[
             { stat: "4", label: "Comprehensive guides" },
-            { stat: "29", label: "Long-form articles" },
-            { stat: "5", label: "Visual frameworks" },
-            { stat: "9+", label: "Years of research" },
+            { stat: "9", label: "Articles & essays" },
+            { stat: "5", label: "Infographics" },
+            { stat: "9+", label: "Years of writing" },
           ].map(({ stat, label }) => (
             <div key={label} style={{ padding: "28px 24px", background: PAPER }}>
               <div
@@ -319,13 +319,15 @@ export default function WritingPage() {
       <section style={{ padding: "72px 56px" }}>
         <SectionMast n="02" label="Recent · From the Wire" />
         <div>
-          {RECENT_ARTICLES.map(({ title, category, date }, i) => (
+          {RECENT_ARTICLES.map(({ title, category, href }, i) => (
             <a
               key={title}
-              href="/blog"
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
               style={{
                 display: "grid",
-                gridTemplateColumns: "32px 1fr 140px 80px",
+                gridTemplateColumns: "32px 1fr 160px",
                 gap: 24,
                 padding: "20px 0",
                 borderBottom: `1px solid ${INK15}`,
@@ -341,9 +343,6 @@ export default function WritingPage() {
                 {title}
               </div>
               <Pill size={9.5} ls="0.10em">{category}</Pill>
-              <div style={{ textAlign: "right" }}>
-                <SCaps size={10} ls="0.10em" color={INK55}>{date}</SCaps>
-              </div>
             </a>
           ))}
 
@@ -360,7 +359,7 @@ export default function WritingPage() {
                 textDecoration: "none",
               }}
             >
-              All 29 articles →
+              All articles →
             </a>
           </div>
         </div>
@@ -380,11 +379,11 @@ export default function WritingPage() {
           }}
         >
           {[
-            "EMOS Framework",
-            "Personal Brand Pyramid",
-            "Content Flywheel",
-            "Neuromarketing Cheat Sheet",
-            "Authority Content Matrix",
+            "Top 11 Scientific Benefits of Writing",
+            "Managing Remote Teams with HubStaff",
+            "How to Form Writing Habits for Success",
+            "Getting Content Ideas from Your Customers",
+            "The Ultimate Bing SEO Guide",
           ].map((title, i) => (
             <div
               key={title}
