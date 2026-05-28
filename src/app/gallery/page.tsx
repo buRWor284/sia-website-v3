@@ -82,9 +82,9 @@ const PHOTO_SPANS: ReadonlyArray<[string, string]> = [
   ["span 4", "span 1"],  // 25 with-irfan-khairi
 ];
 
-type Video = { id: string; title: string; where: string; venue: string };
+type Video = { id: string; title: string; where: string; venue: string; startAt?: number };
 const VIDEOS: ReadonlyArray<Video> = [
-  { id: "uSn4s5ZbJcQ", title: "Panel · Marketing to the Modern Muslim Traveller", where: "ATM Dubai, UAE · April 2018",         venue: "ATM Dubai"   },
+  { id: "uSn4s5ZbJcQ", title: "Panel · Marketing to the Modern Muslim Traveller", where: "ATM Dubai, UAE · April 2018",         venue: "ATM Dubai",    startAt: 743 },
   { id: "2mJ3o2LyWAc", title: "Media Hacks · Free Publicity Online",              where: "IN5, Dubai, UAE · 2018",             venue: "IN5 Dubai"   },
   { id: "50SIoLI-TW4", title: "Digital Marketing Workshop @ MaGIC",               where: "Cyberjaya, Malaysia · 2016",         venue: "MaGIC · MY"  },
   { id: "OwQpDj4c1LE", title: "DMSS Conference · Media Hacks workshop",           where: "Bali, Indonesia · October 2017",     venue: "Bali · DMSS" },
@@ -279,7 +279,7 @@ const VideoCard = ({ v, i }: VideoCardProps) => (
       }}
     >
       <iframe
-        src={`https://www.youtube.com/embed/${v.id}`}
+        src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
         title={v.title}
         loading="lazy"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

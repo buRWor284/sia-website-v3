@@ -114,11 +114,12 @@ type Reel = {
   region: string;
   note: string;
   badge?: string;
+  startAt?: number;
 };
 
 const REELS: ReadonlyArray<Reel> = [
   { id: "uSn4s5ZbJcQ", title: "Panel · Marketing to the Modern Muslim Traveller",
-    venue: "Arabian Travel Market 2018", city: "Dubai",     region: "UAE",        note: "Finalist · onstage with industry leaders.", badge: "Featured" },
+    venue: "Arabian Travel Market 2018", city: "Dubai",     region: "UAE",        note: "Finalist · onstage with industry leaders.", badge: "Featured", startAt: 743 },
   { id: "2mJ3o2LyWAc", title: "Media Hacks · Free Publicity Online",
     venue: "IN5 Innovation Hub",        city: "Dubai",     region: "UAE",        note: "Workshop · the earned-media playbook"                           },
   { id: "50SIoLI-TW4", title: "Digital Marketing Workshop at MaGIC",
@@ -188,7 +189,19 @@ const FEATURED_KEYS = ["nta", "ridester", "centriq", "curednation", "alrug"];
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const Hero = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 60, paddingBottom: 70 }}>
+  <section style={{ background: PAPER, paddingBottom: 0 }}>
+    {/* Speaking photo banner */}
+    <div style={{ width: "100%", overflow: "hidden", maxHeight: "clamp(220px, 40vw, 480px)", position: "relative", background: "#0e0d0a" }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/assets/gallery/speaking-hero.jpg"
+        alt="Syed Irfan Ajmal speaking — audience at MPS2016, Dubai"
+        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%", display: "block", maxHeight: "clamp(220px, 40vw, 480px)" }}
+      />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 55%, rgba(249,246,240,0.7) 100%)" }} />
+    </div>
+
+    <div className="sx" style={{ paddingTop: 40, paddingBottom: 70 }}>
     <div style={{ textAlign: "center", marginBottom: 28 }}>
       <SCaps color={INK70} size={12} ls="0.28em">
         The Speaker Sheet · 2026 booking open
@@ -312,6 +325,7 @@ const Hero = () => (
         </div>
       ))}
     </div>
+    </div>{/* end .sx */}
   </section>
 );
 
@@ -398,7 +412,7 @@ const WatchTheWork = () => {
             <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(241,235,222,.25)", overflow: "hidden" }}>
               <iframe
                 key={v.id}
-                src={`https://www.youtube.com/embed/${v.id}?rel=0`}
+                src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
                 title={v.title}
                 loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -496,11 +510,31 @@ const Topics = () => (
 const MPSStrip = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 70, paddingBottom: 30 }}>
     <figure style={{ margin: 0, padding: 12, background: "#0e0d0a", border: `1px solid ${INK}` }}>
-      <div style={{ width: "100%", height: "clamp(200px, 40vw, 360px)", overflow: "hidden", border: "1px solid rgba(241,235,222,.25)", position: "relative", background: "#000" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/assets/gallery/mps-banner.jpg"
-          alt="Speaking at MPS2016, Dubai · How Startup Founders Can Use Personal Branding"
-          style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 35%", display: "block" }} />
+      <div className="grid-mps-2">
+        {/* Left: Irfan on stage — left half of banner */}
+        <div
+          style={{
+            height: "clamp(240px, 38vw, 440px)",
+            backgroundImage: "url('/assets/gallery/mps-banner.jpg')",
+            backgroundSize: "200% auto",
+            backgroundPosition: "left center",
+            border: "1px solid rgba(241,235,222,.25)",
+          }}
+          role="img"
+          aria-label="Syed Irfan Ajmal on stage at MPS2016, Dubai"
+        />
+        {/* Right: audience — standalone photo */}
+        <div
+          style={{
+            height: "clamp(240px, 38vw, 440px)",
+            backgroundImage: "url('/assets/gallery/mps-audience.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center 30%",
+            border: "1px solid rgba(241,235,222,.25)",
+          }}
+          role="img"
+          aria-label="MPS2016 audience, Dubai"
+        />
       </div>
       <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
         <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#f1ebde", lineHeight: 1.4 }}>

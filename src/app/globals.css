@@ -864,6 +864,16 @@ body > * { position: relative; z-index: 2; }
   .card-border-5:last-child { border-right: none; }
 }
 
+/* MPS 2-photo side-by-side grid */
+.grid-mps-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 600px) {
+  .grid-mps-2 { grid-template-columns: 1fr 1fr; }
+}
+
 /* Tier2 client cells — 5-col with lighter borders */
 .grid-tier2 {
   display: grid;
