@@ -72,7 +72,7 @@ const FIT_IN: ReadonlyArray<string> = [
 
 const FIT_OUT: ReadonlyArray<string> = [
   "You are pre-product-market-fit. (You need product, not marketing.)",
-  "You want someone to "do marketing" without setting strategy with you.",
+  "You want someone to “do marketing” without setting strategy with you.",
   "You want a CMO five hours a month for $2K. (Not what this is.)",
   "You are looking for paid-media-only or single-channel help.",
 ];
