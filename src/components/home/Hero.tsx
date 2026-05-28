@@ -26,15 +26,11 @@ const GROWTH: { eyebrow: string; lines: Line[] } = {
 
 const HeroHeadline = ({ lines }: { lines: Line[] }) => (
   <h1
+    className="hero-h1"
     style={{
-      margin: 0,
-      textAlign: "center",
       fontFamily: SERIF,
       fontWeight: 700,
-      fontSize: 124,
       color: INK,
-      lineHeight: 1.02,
-      letterSpacing: "-0.028em",
     }}
   >
     {lines.map((ln, i) => (
@@ -70,14 +66,14 @@ const STATS: ReadonlyArray<[string, string]> = [
 ];
 
 export const Hero = () => (
-  <section style={{ background: PAPER, padding: "40px 56px 56px" }}>
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 56 }}>
     <div style={{ textAlign: "center", marginBottom: 26 }}>
       <SCaps color={INK70} size={12} ls="0.28em">{GROWTH.eyebrow}</SCaps>
     </div>
 
     <HeroHeadline lines={GROWTH.lines} />
 
-    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
+    <div style={{ display: "flex", justifyContent: "center", marginTop: 22, flexWrap: "wrap", gap: 4, textAlign: "center" }}>
       <SCaps size={11.5} ls="0.22em" color={INK55}>
         By Syed Irfan Ajmal &nbsp;·&nbsp; Fractional CMO, Speaker
         &nbsp;·&nbsp; <span style={{ color: INK }}>Filed from Peshawar</span>
@@ -87,18 +83,11 @@ export const Hero = () => (
     <DoubleRule style={{ margin: "40px 0" }} />
 
     {/* Lead — three columns: body / portrait / sidebar */}
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1.6fr 1fr 1.6fr",
-        gap: 40,
-      }}
-    >
+    <div className="grid-hero-lead">
       {/* Body */}
       <div
+        className="hero-body"
         style={{
-          columnCount: 2,
-          columnGap: 28,
           fontFamily: SERIF,
           fontSize: 17.5,
           color: INK,
@@ -108,13 +97,12 @@ export const Hero = () => (
       >
         <p style={{ margin: 0, textIndent: 0 }}>
           <span
+            className="hero-drop-cap"
             style={{
               float: "left",
               fontFamily: SERIF,
               fontWeight: 700,
               fontStyle: "italic",
-              fontSize: 92,
-              lineHeight: 0.78,
               marginRight: 10,
               marginTop: 6,
               color: INK,
@@ -143,8 +131,9 @@ export const Hero = () => (
         </p>
       </div>
 
-      {/* Portrait */}
+      {/* Portrait — reordered on mobile to appear first */}
       <figure
+        className="hero-portrait-order"
         style={{
           margin: 0,
           background: PAPER2,
@@ -236,18 +225,18 @@ export const Hero = () => (
               key={i}
               style={{
                 display: "grid",
-                gridTemplateColumns: "54px 1fr auto",
-                gap: 12,
-                padding: "12px 0",
+                gridTemplateColumns: "46px 1fr auto",
+                gap: 10,
+                padding: "10px 0",
                 borderBottom: `1px solid ${INK15}`,
                 alignItems: "baseline",
               }}
             >
-              <SCaps size={10.5} ls="0.16em" color={INK70}>{p}</SCaps>
-              <div style={{ fontSize: 16, lineHeight: 1.3, fontWeight: 500 }}>
+              <SCaps size={10} ls="0.14em" color={INK70}>{p}</SCaps>
+              <div style={{ fontSize: 15, lineHeight: 1.3, fontWeight: 500 }}>
                 {title}
               </div>
-              <SCaps size={9.5} ls="0.16em" color={INK55}>{dept}</SCaps>
+              <SCaps size={9} ls="0.14em" color={INK55}>{dept}</SCaps>
             </li>
           ))}
         </ol>
@@ -259,7 +248,7 @@ export const Hero = () => (
             style={{
               flex: 1,
               textAlign: "center",
-              padding: "12px 14px",
+              padding: "14px 14px",
               background: INK,
               color: PAPER,
               textDecoration: "none",
@@ -277,7 +266,7 @@ export const Hero = () => (
             style={{
               flex: 1,
               textAlign: "center",
-              padding: "12px 14px",
+              padding: "14px 14px",
               background: YEL,
               color: INK,
               textDecoration: "none",
@@ -297,24 +286,21 @@ export const Hero = () => (
     <DoubleRule style={{ margin: "44px 0 24px" }} />
 
     {/* Stat strip */}
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
+    <div className="grid-stats" style={{ border: `1px solid ${INK}` }}>
       {STATS.map(([n, l], i) => (
         <div
           key={n}
+          className="stat-item"
           style={{
-            padding: "8px 28px",
-            borderRight: i < 3 ? `1px solid ${INK35}` : "none",
+            padding: "16px 20px",
             textAlign: "center",
           }}
         >
           <div
+            className="stat-number"
             style={{
               fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: 64,
               color: INK,
-              lineHeight: 1,
-              letterSpacing: "-0.02em",
             }}
           >
             {n}
@@ -328,90 +314,103 @@ export const Hero = () => (
 
     {/* Provenance band */}
     <DoubleRule style={{ margin: "40px 0 0" }} />
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "auto 1fr",
-        gap: 32,
-        alignItems: "baseline",
-        padding: "22px 0 4px",
-      }}
-    >
-      <Pill size={11} ls="0.20em">Provenance</Pill>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+    <div style={{ padding: "20px 0 4px" }}>
+      {/* Label row */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+        <Pill size={11} ls="0.20em">Provenance</Pill>
+        <div style={{ flex: 1, height: 1, background: INK35 }} />
+      </div>
+
+      {/* Two-row bordered table */}
+      <div style={{ border: `1px solid ${INK}` }}>
+
+        {/* Row 1 — Clients */}
         <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            flexWrap: "wrap",
-            gap: "4px 22px",
-            fontFamily: SERIF,
-            fontSize: 17,
-            color: INK,
-            lineHeight: 1.5,
-          }}
+          className="provenance-row"
+          style={{ borderBottom: `1px solid ${INK35}` }}
         >
-          <SCaps
-            size={10.5}
-            ls="0.18em"
-            color={INK55}
-            style={{ marginRight: 8 }}
+          <div
+            className="provenance-label"
+            style={{
+              padding: "14px 20px",
+              background: PAPER2,
+              display: "flex",
+              alignItems: "center",
+            }}
           >
-            Clients across
-          </SCaps>
-          <span><Flag c="US" />North America</span>
-          <span style={{ color: INK35 }}>·</span>
-          <span><Flag c="EU" />Europe</span>
-          <span style={{ color: INK35 }}>·</span>
-          <span style={{ display: "inline-flex", alignItems: "center" }}>
-            <span
-              style={{
-                fontFamily: GROT,
-                fontWeight: 700,
-                fontSize: 11.5,
-                letterSpacing: "0.10em",
-                padding: "2px 8px",
-                background: INK,
-                color: PAPER,
-                marginRight: 8,
-              }}
-            >
-              AE
+            <SCaps size={10.5} ls="0.18em" color={INK55}>Clients across</SCaps>
+          </div>
+          <div
+            style={{
+              padding: "14px 24px",
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "4px 20px",
+              fontFamily: SERIF,
+              fontSize: 16.5,
+              color: INK,
+            }}
+          >
+            <span><Flag c="US" />North America</span>
+            <span style={{ color: INK35 }}>·</span>
+            <span><Flag c="EU" />Europe</span>
+            <span style={{ color: INK35 }}>·</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 7 }}>
+              <span
+                style={{
+                  fontFamily: GROT,
+                  fontWeight: 700,
+                  fontSize: 10.5,
+                  letterSpacing: "0.10em",
+                  padding: "2px 7px",
+                  background: INK,
+                  color: PAPER,
+                }}
+              >
+                AE
+              </span>
+              MENA
             </span>
-            MENA
-          </span>
-          <span style={{ color: INK35 }}>·</span>
-          <span><Flag c="PK" />South Asia</span>
+          </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            flexWrap: "wrap",
-            gap: "4px 22px",
-            fontFamily: SERIF,
-            fontSize: 17,
-            color: INK,
-            lineHeight: 1.5,
-          }}
-        >
-          <SCaps
-            size={10.5}
-            ls="0.18em"
-            color={INK55}
-            style={{ marginRight: 8 }}
+
+        {/* Row 2 — Education */}
+        <div className="provenance-row">
+          <div
+            className="provenance-label"
+            style={{
+              padding: "14px 20px",
+              background: PAPER2,
+              display: "flex",
+              alignItems: "center",
+            }}
           >
-            Education &amp; lineage
-          </SCaps>
-          <span>
-            <Flag c="SE" />
-            <strong style={{ fontWeight: 700 }}>M.Sc. Mälardalen</strong>
-          </span>
-          <span style={{ color: INK35 }}>·</span>
-          <span><Flag c="SE" />Stockholm</span>
-          <span style={{ color: INK35 }}>·</span>
-          <span><Flag c="DK" />Copenhagen</span>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>Education &amp; lineage</SCaps>
+          </div>
+          <div
+            style={{
+              padding: "14px 24px",
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "4px 20px",
+              fontFamily: SERIF,
+              fontSize: 16.5,
+              color: INK,
+            }}
+          >
+            <span>
+              <Flag c="SE" />
+              <strong style={{ fontWeight: 700 }}>M.Sc. Mälardalen</strong>
+            </span>
+            <span style={{ color: INK35 }}>·</span>
+            <span><Flag c="SE" />Stockholm</span>
+            <span style={{ color: INK35 }}>·</span>
+            <span><Flag c="DK" />Copenhagen</span>
+          </div>
         </div>
+
       </div>
     </div>
   </section>

@@ -10,19 +10,13 @@ const LISTS: ReadonlyArray<LinkList> = [
 ];
 
 export const Colophon = () => (
-  <footer style={{ background: PAPER, padding: "60px 56px 36px" }}>
+  <footer className="sx" style={{ background: PAPER, paddingTop: 60, paddingBottom: 36 }}>
     <DoubleRule style={{ marginBottom: 36 }} />
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1.6fr 1fr 1fr 1fr",
-        gap: 40,
-        paddingBottom: 36,
-      }}
-    >
+    <div className="grid-colophon">
+      {/* Brand block */}
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
           <div style={{ background: INK, padding: "8px 14px" }}>
             <SiaLogo height={26} />
           </div>
@@ -30,7 +24,7 @@ export const Colophon = () => (
             style={{
               fontFamily: SERIF,
               fontWeight: 700,
-              fontSize: 42,
+              fontSize: "clamp(28px, 5vw, 42px)",
               color: INK,
               lineHeight: 1,
               letterSpacing: "-0.02em",
@@ -60,6 +54,7 @@ export const Colophon = () => (
         </p>
       </div>
 
+      {/* Link columns */}
       {LISTS.map(([head, items]) => (
         <div key={head}>
           <Pill size={11} ls="0.22em">{head}</Pill>
@@ -103,7 +98,7 @@ export const Colophon = () => (
         alignItems: "center",
         paddingTop: 18,
         flexWrap: "wrap",
-        gap: 24,
+        gap: 16,
       }}
     >
       <SCaps size={10.5} ls="0.16em" color={INK70}>

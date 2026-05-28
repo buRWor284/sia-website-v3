@@ -10,32 +10,24 @@ type Card = {
 };
 
 const CARDS: ReadonlyArray<Card> = [
-  { title: "Podcast",      n: "29",  sub: "episodes · 3 seasons", foot: "The SIA Business Podcast",                          href: "/podcast" },
+  { title: "Podcast",      n: "39",  sub: "episodes · 3 seasons", foot: "The SIA Business Podcast",                          href: "/podcast" },
   { title: "Articles",     n: "40",  sub: "long-form essays",     foot: "Personal Branding · Neuromarketing · Storytelling", href: "/writing" },
   { title: "Press",        n: "13",  sub: "outlets",              foot: "Forbes · HBR · HuffPost · TNW · WB",                href: "/about" },
   { title: "Infographics", n: "05",  sub: "visuals",              foot: "Writing Benefits · HubStaff · Bing SEO",            href: "/writing/scientific-benefits" },
-  { title: "Videos",       n: "9+",  sub: "on YouTube",           foot: "Talks · workshops · interviews",                    href: "/gallery" },
+  { title: "Videos",       n: "64+", sub: "on YouTube",           foot: "Talks · workshops · interviews",                    href: "/gallery" },
 ];
 
 export const Wire = () => (
-  <section style={{ background: PAPER, padding: "90px 56px" }}>
+  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
     <SectionMast n="05" label="The Wire · Latest dispatches" />
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.4fr",
-        gap: 60,
-        marginBottom: 48,
-        alignItems: "baseline",
-      }}
-    >
+    <div className="grid-intro">
       <h2
+        className="h2-lg"
         style={{
           margin: 0,
           fontFamily: SERIF,
           fontWeight: 700,
-          fontSize: 72,
           color: INK,
           lineHeight: 0.98,
           letterSpacing: "-0.025em",
@@ -52,7 +44,6 @@ export const Wire = () => (
           fontSize: 18,
           color: INK70,
           lineHeight: 1.55,
-          maxWidth: 540,
         }}
       >
         Podcasts, essays, infographics, talks. What the bureau has shipped
@@ -61,26 +52,23 @@ export const Wire = () => (
     </div>
 
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(5, 1fr)",
-        border: `1px solid ${INK}`,
-      }}
+      className="grid-wire"
+      style={{ border: `1px solid ${INK}` }}
     >
       {CARDS.map((c, i) => (
         <a
           key={c.title}
           href={c.href}
+          className="wire-card"
           style={{
-            padding: "24px 22px 22px",
-            borderRight: i < 4 ? `1px solid ${INK}` : "none",
+            padding: "22px 18px 20px",
             background: PAPER,
             textDecoration: "none",
             color: INK,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            minHeight: 280,
+            minHeight: 220,
             position: "relative",
           }}
         >
@@ -88,17 +76,7 @@ export const Wire = () => (
             <Pill size={10.5} ls="0.18em">
               Desk Nº {String(i + 1).padStart(2, "0")}
             </Pill>
-            <div
-              style={{
-                marginTop: 14,
-                fontFamily: SERIF,
-                fontWeight: 700,
-                fontSize: 88,
-                color: INK,
-                lineHeight: 0.9,
-                letterSpacing: "-0.03em",
-              }}
-            >
+            <div className="wire-number" style={{ marginTop: 12, color: INK }}>
               {c.n}
             </div>
           </div>
@@ -107,7 +85,7 @@ export const Wire = () => (
               style={{
                 fontFamily: SERIF,
                 fontWeight: 700,
-                fontSize: 24,
+                fontSize: "clamp(18px, 2.5vw, 24px)",
                 color: INK,
                 letterSpacing: "-0.01em",
               }}
@@ -119,10 +97,10 @@ export const Wire = () => (
             </div>
             <div
               style={{
-                marginTop: 10,
+                marginTop: 8,
                 fontFamily: SERIF,
                 fontStyle: "italic",
-                fontSize: 13.5,
+                fontSize: 13,
                 color: INK70,
                 lineHeight: 1.4,
               }}
@@ -133,8 +111,8 @@ export const Wire = () => (
           <div
             style={{
               position: "absolute",
-              top: 22,
-              right: 22,
+              top: 20,
+              right: 18,
               fontFamily: SERIF,
               fontSize: 18,
               color: INK,

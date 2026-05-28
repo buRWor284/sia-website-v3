@@ -61,24 +61,16 @@ const SERVICES: ReadonlyArray<Service> = [
 ];
 
 export const Departments = () => (
-  <section style={{ background: PAPER, padding: "80px 56px" }}>
+  <section className="sx" style={{ background: PAPER, paddingTop: 80, paddingBottom: 80 }}>
     <SectionMast n="01" label="Departments · Three ways to work" />
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.4fr",
-        gap: 60,
-        alignItems: "baseline",
-        marginBottom: 48,
-      }}
-    >
+    <div className="grid-intro">
       <h2
+        className="h2-xl"
         style={{
           margin: 0,
           fontFamily: SERIF,
           fontWeight: 700,
-          fontSize: 76,
           color: INK,
           lineHeight: 0.98,
           letterSpacing: "-0.025em",
@@ -97,7 +89,6 @@ export const Departments = () => (
           fontSize: 19,
           color: INK70,
           lineHeight: 1.55,
-          maxWidth: 560,
         }}
       >
         After twenty-two years and a hundred clients, the work has settled
@@ -107,19 +98,15 @@ export const Departments = () => (
     </div>
 
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 0,
-        border: `1px solid ${INK}`,
-      }}
+      className="grid-cards-3"
+      style={{ border: `1px solid ${INK}` }}
     >
       {SERVICES.map((s, i) => (
         <div
           key={s.t}
+          className="card-border"
           style={{
             padding: "32px 28px 26px",
-            borderRight: i < 2 ? `1px solid ${INK}` : "none",
             background: s.feature ? PAPER2 : PAPER,
             display: "flex",
             flexDirection: "column",

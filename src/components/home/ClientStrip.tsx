@@ -2,7 +2,6 @@ import Link from "next/link";
 import {
   GROT,
   INK,
-  INK15,
   INK55,
   INK70,
   PAPER,
@@ -20,7 +19,7 @@ export const ClientStrip = () => {
   const featured = CLIENTS_TIER1.filter((c) => FEATURED_KEYS.includes(c.key));
 
   return (
-    <section style={{ background: PAPER, padding: "24px 56px 36px" }}>
+    <section className="sx" style={{ background: PAPER, paddingTop: 24, paddingBottom: 36 }}>
       <DoubleRule />
       <div
         style={{
@@ -29,9 +28,10 @@ export const ClientStrip = () => {
           justifyContent: "space-between",
           padding: "18px 0 8px",
           gap: 16,
+          flexWrap: "wrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
           <Pill size={11} ls="0.22em">Filed for →</Pill>
           <SCaps size={11} ls="0.22em" color={INK70}>
             Pre-agency &amp; selected DMR.agency clients
@@ -49,38 +49,31 @@ export const ClientStrip = () => {
             textDecoration: "none",
             borderBottom: `1px solid ${INK}`,
             paddingBottom: 2,
+            whiteSpace: "nowrap",
           }}
         >
           The full roster · 26 clients →
         </Link>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr) 1px repeat(5, 1fr)",
-          gap: 0,
-          border: `1px solid ${INK}`,
-          background: PAPER,
-          marginTop: 6,
-        }}
-      >
+      {/* Responsive client grid */}
+      <div className="grid-clients">
         {pre.map((c, i) => (
           <div
             key={c.key}
+            className="client-cell"
             style={{
-              padding: "20px 16px",
-              borderRight: i < pre.length - 1 ? `1px solid ${INK15}` : "none",
+              padding: "16px 12px",
               background: PAPER2,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               gap: 6,
-              minHeight: 100,
+              minHeight: 80,
             }}
           >
-            <ClientLogo client={c} height={48} maxWidth={180} />
+            <ClientLogo client={c} height={40} maxWidth={120} />
             <div
               style={{
                 fontFamily: GROT,
@@ -89,27 +82,28 @@ export const ClientStrip = () => {
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
                 color: INK55,
+                textAlign: "center",
               }}
             >
               {c.countryLabel ? c.countryLabel.split("·")[0].trim() : ""}
             </div>
           </div>
         ))}
-        <div style={{ background: INK }} />
+        {/* Divider — desktop only */}
+        <div className="client-divider" style={{ background: INK }} />
         {featured.map((c, i) => (
           <div
             key={c.key}
+            className="client-cell"
             style={{
-              padding: "20px 16px",
-              borderRight:
-                i < featured.length - 1 ? `1px solid ${INK15}` : "none",
+              padding: "16px 12px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              minHeight: 100,
+              minHeight: 80,
             }}
           >
-            <ClientLogo client={c} height={42} maxWidth={140} />
+            <ClientLogo client={c} height={44} maxWidth={120} />
           </div>
         ))}
       </div>
@@ -121,6 +115,7 @@ export const ClientStrip = () => {
           alignItems: "baseline",
           marginTop: 10,
           gap: 16,
+          flexWrap: "wrap",
         }}
       >
         <SCaps size={10.5} ls="0.16em" color={INK55}>

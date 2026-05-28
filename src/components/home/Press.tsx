@@ -25,31 +25,21 @@ const MARKS: ReadonlyArray<Mark> = [
 ];
 
 export const Press = () => (
-  <section style={{ background: PAPER, padding: "8px 56px 36px" }}>
+  <section className="sx" style={{ background: PAPER, paddingTop: 8, paddingBottom: 36 }}>
     <DoubleRule />
     <div
       style={{
         display: "flex",
         alignItems: "center",
-        justifyContent: "space-between",
-        gap: 36,
+        gap: 16,
         padding: "22px 0",
+        flexWrap: "wrap",
       }}
     >
       <div style={{ flexShrink: 0 }}>
         <Pill size={11} ls="0.22em">Bylines &amp; Citations →</Pill>
       </div>
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          gap: 24,
-          flexWrap: "wrap",
-          marginLeft: 28,
-        }}
-      >
+      <div className="press-logos">
         {MARKS.map((l) => (
           <div
             key={l.name}
@@ -60,6 +50,7 @@ export const Press = () => (
               fontStyle: l.italic ? "italic" : "normal",
               letterSpacing: l.ls || "-0.005em",
               color: INK,
+              whiteSpace: "nowrap",
             }}
           >
             {l.name}

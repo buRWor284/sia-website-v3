@@ -1,3 +1,7 @@
+"use client";
+
+import { Fragment } from "react";
+import Script from "next/script";
 import { Colophon, Mast, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
@@ -6,7 +10,6 @@ import {
   Pill,
   SCaps,
   SectionMast,
-  SiaLogo,
 } from "@/components/bureau/primitives";
 import {
   CALENDLY,
@@ -21,442 +24,723 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-const WHAT_YOU_GET = [
-  {
-    n: "01",
-    title: "Strategy ownership",
-    body: "Positioning, ICP, GTM plan, brand narrative, quarterly OKRs. I write the marketing strategy and answer for it. No fractional handwaving.",
-  },
-  {
-    n: "02",
-    title: "Weekly cadence",
-    body: "A standing weekly call with the founder, plus a weekly sync with the team or vendors. Decisions get made on the call, not in week-long Slack threads.",
-  },
-  {
-    n: "03",
-    title: "Execution through DMR.agency",
-    body: "Digital PR, SEO, content production, link earning, journalist outreach — the full agency stack at agency rates, inside the engagement. You don't pay a second retainer.",
-  },
-  {
-    n: "04",
-    title: "Hiring & vendor selection",
-    body: "When it's time to add a content lead, a paid-media specialist, or a freelance designer, I run the brief, interview the candidates, and stand behind the hire.",
-  },
-  {
-    n: "05",
-    title: "Investor & board narrative",
-    body: "Marketing slides for board meetings. Investor updates that show growth in language they trust. Sales support when a founder-led deal needs marketing air cover.",
-  },
-  {
-    n: "06",
-    title: "The hard 'no'",
-    body: "A fractional CMO's most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship.",
-  },
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+const AVAILABILITY_SPECS: ReadonlyArray<[string, string]> = [
+  ["Engagement", "Monthly retainer"],
+  ["Minimum",    "6 months"],
+  ["Cadence",    "Weekly · 1-on-1 + team"],
+  ["Geography",  "Remote · global"],
+  ["Stack",      "PR · SEO · content · paid"],
+  ["Reports to", "Founder / CEO"],
 ];
 
-const WHO_ITS_FOR = [
+type ScopeItem = { no: string; t: string; d: string };
+const SCOPE: ReadonlyArray<ScopeItem> = [
+  { no: "01", t: "Strategy ownership",
+    d: "Positioning, ICP, GTM plan, brand narrative, quarterly OKRs. I write the marketing strategy and answer for it. No fractional handwaving." },
+  { no: "02", t: "Weekly cadence",
+    d: "A standing weekly call with the founder, plus a weekly sync with the team or vendors. Decisions get made on the call, not in week-long Slack threads." },
+  { no: "03", t: "Execution through DMR.agency",
+    d: "You get the agency behind me without buying a second retainer. Digital PR, SEO, content production, link earning, journalist outreach — the full stack at agency rates inside the engagement." },
+  { no: "04", t: "Hiring & vendor selection",
+    d: "When it is time to add a content lead, a paid-media specialist, or a freelance designer, I run the brief, interview the candidates, and stand behind the hire." },
+  { no: "05", t: "Investor & board narrative",
+    d: "Marketing slides for board meetings. Investor updates that show growth in language they trust. Sales support when a founder-led deal needs marketing air cover." },
+  { no: "06", t: "The hard "no"",
+    d: "A fractional CMO's most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship." },
+];
+
+type Stage = { range: string; t: string; d: string };
+const STAGES: ReadonlyArray<Stage> = [
+  { range: "Days 1–14",  t: "Intake & audit",
+    d: "Founder calls, sales call recordings, competitor scan, audit of every existing marketing asset and channel. You receive a written brief at the end of week two." },
+  { range: "Days 15–45", t: "First plan, first wins",
+    d: "A 60-day plan: positioning sharpening, ICP, two or three campaigns to ship immediately. We are looking for early signal, not perfection." },
+  { range: "Days 45–90", t: "System & cadence",
+    d: "The marketing function gets a real shape. Reporting cadence, content pipeline, PR calendar, the weekly rhythm. Hiring brief if a role needs filling." },
+  { range: "Day 91+",    t: "Compound or part ways",
+    d: "Quarterly review. We either renew, sharpen, or part ways. The retainer is monthly; you are never locked in past sixty days notice." },
+];
+
+const FIT_IN: ReadonlyArray<string> = [
   "You are Series A or B and feel marketing is the missing function.",
   "Revenue between roughly $1M and $20M ARR.",
   "You want senior marketing thinking weekly, but not a full-time hire yet.",
   "You can commit to six months of work and decision-making.",
 ];
 
-export default function FractionalCmoPage() {
-  return (
-    <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Fractional CMO" />
+const FIT_OUT: ReadonlyArray<string> = [
+  "You are pre-product-market-fit. (You need product, not marketing.)",
+  "You want someone to "do marketing" without setting strategy with you.",
+  "You want a CMO five hours a month for $2K. (Not what this is.)",
+  "You are looking for paid-media-only or single-channel help.",
+];
 
-      {/* ── Dark hero ─────────────────────────────────────────── */}
-      <section
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+const Hero = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 56, paddingBottom: 70 }}>
+    <div style={{ textAlign: "center", marginBottom: 26 }}>
+      <SCaps color={INK70} size={12} ls="0.28em">
+        Fractional CMO &nbsp;·&nbsp;{" "}
+        <span style={{ color: INK }}>Two seats open · Q3 2026</span>
+      </SCaps>
+    </div>
+    <h1
+      className="hero-h1"
+      style={{
+        margin: 0,
+        textAlign: "center",
+        fontFamily: SERIF,
+        fontWeight: 700,
+        color: INK,
+        lineHeight: 1.0,
+        letterSpacing: "-0.028em",
+      }}
+    >
+      <span style={{ display: "block" }}>Marketing leadership,</span>
+      <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
+        <Mark>without the headcount.</Mark>
+      </span>
+    </h1>
+    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
+      <SCaps size={11.5} ls="0.22em" color={INK55}>
+        Syed Irfan Ajmal &nbsp;·&nbsp; Fractional CMO &nbsp;·&nbsp;{" "}
+        <span style={{ color: INK }}>On retainer, by the month</span>
+      </SCaps>
+    </div>
+
+    <DoubleRule style={{ margin: "44px 0 36px" }} />
+
+    <div className="grid-hero-2col">
+      {/* Lead body */}
+      <div
+        className="hero-body"
         style={{
-          background: INK,
-          color: PAPER,
-          padding: "90px 56px",
-          position: "relative",
-          overflow: "hidden",
+          fontFamily: SERIF,
+          fontSize: 17.5,
+          color: INK,
+          lineHeight: 1.55,
+          textAlign: "justify",
         }}
       >
+        <p style={{ margin: 0 }}>
+          <span
+            className="hero-drop-cap"
+            style={{
+              float: "left",
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontStyle: "italic",
+              lineHeight: 0.78,
+              marginRight: 10,
+              marginTop: 6,
+              color: INK,
+              background: YEL,
+              padding: "6px 8px 2px 8px",
+            }}
+          >
+            F
+          </span>
+          or founders without a marketing leader. I take the marketing chair at
+          your table on a monthly retainer: strategy ownership, weekly cadence,
+          agency-level execution through <strong>DMR.agency</strong>, and the
+          kind of decision-making that does not wait on a six-month CMO search.
+        </p>
+        <p style={{ marginTop: "0.7em" }}>
+          The role looks different at every company, but the shape is
+          consistent: I show up weekly, I own the marketing function end to
+          end, and I have a small team behind me that can execute almost
+          anything we decide on, almost immediately. PR, SEO, content,
+          lifecycle, paid, brand. Hiring and vendor selection when it is time.
+          Board and investor updates when those are needed.
+        </p>
+        <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
+          Six-month minimum engagement. Monthly retainer. Two seats open this
+          quarter; book the call below if you would like to discuss.
+        </p>
+      </div>
+
+      {/* Availability aside */}
+      <aside
+        style={{
+          background: PAPER2,
+          border: `1px solid ${INK}`,
+          padding: 24,
+        }}
+      >
+        <Pill size={11} ls="0.20em">Availability</Pill>
         <div
-          aria-hidden
           style={{
-            position: "absolute",
-            top: -60,
-            right: -80,
-            opacity: 0.06,
-            pointerEvents: "none",
+            marginTop: 14,
+            fontFamily: SERIF,
+            fontSize: 22,
+            lineHeight: 1.25,
+            color: INK,
+            fontWeight: 700,
           }}
         >
-          <SiaLogo height={360} />
+          Two seats open
+          <br />
+          <span style={{ fontStyle: "italic", fontWeight: 600 }}>
+            this quarter.
+          </span>
         </div>
-
-        <SectionMast
-          n="00"
-          label="Fractional CMO · Strategic Marketing Leadership"
-          dark
-        />
-
         <div
           style={{
+            marginTop: 16,
+            paddingTop: 16,
+            borderTop: `1px solid ${INK15}`,
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: 80,
-            position: "relative",
+            gap: "10px 18px",
           }}
         >
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                fontWeight: 700,
-                fontSize: 72,
-                lineHeight: 0.96,
-                letterSpacing: "-0.03em",
-                color: PAPER,
-              }}
-            >
-              Marketing leadership,
-              <br />
-              <span style={{ fontStyle: "italic", color: YEL }}>
-                without the headcount.
-              </span>
-            </h1>
-            <p
-              style={{
-                marginTop: 28,
-                fontSize: 18,
-                lineHeight: 1.55,
-                color: "rgba(241,235,222,.72)",
-                maxWidth: 500,
-              }}
-            >
-              For founders without a marketing leader. I take the marketing chair
-              at your table on a monthly retainer: strategy ownership, weekly
-              cadence, agency-level execution through DMR.agency, and the kind of
-              decision-making that does not wait on a six-month CMO search.
-            </p>
-            <p
-              style={{
-                marginTop: 16,
-                fontSize: 18,
-                lineHeight: 1.55,
-                color: "rgba(241,235,222,.55)",
-                maxWidth: 500,
-              }}
-            >
-              The role looks different at every company, but the shape is
-              consistent: I show up weekly, I own the marketing function end to
-              end, and I have a small team behind me that can execute almost
-              anything we decide on, almost immediately.
-            </p>
-            <a
-              href={CALENDLY}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                marginTop: 36,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "14px 22px",
-                background: YEL,
-                color: INK,
-                textDecoration: "none",
-                fontFamily: GROT,
-                fontWeight: 800,
-                fontSize: 12,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-              }}
-            >
-              Start the conversation →
-            </a>
-          </div>
-
-          <div>
-            <Pill size={11} ls="0.18em">
-              Engagement model
-            </Pill>
-            <div style={{ marginTop: 20 }}>
-              {[
-                {
-                  label: "Engagement",
-                  value: "Monthly retainer",
-                },
-                {
-                  label: "Minimum",
-                  value: "6 months",
-                },
-                {
-                  label: "Cadence",
-                  value: "Weekly · 1-on-1 + team",
-                },
-                {
-                  label: "Geography",
-                  value: "Remote · global",
-                },
-                {
-                  label: "Stack",
-                  value: "PR · SEO · content · paid",
-                },
-                {
-                  label: "Reports to",
-                  value: "Founder / CEO",
-                },
-              ].map(({ label, value }) => (
-                <div
-                  key={label}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "140px 1fr",
-                    gap: 16,
-                    padding: "14px 0",
-                    borderBottom: "1px solid rgba(241,235,222,.14)",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <SCaps
-                    size={10.5}
-                    ls="0.14em"
-                    color="rgba(241,235,222,.5)"
-                  >
-                    {label}
-                  </SCaps>
-                  <div
-                    style={{
-                      fontFamily: SERIF,
-                      fontSize: 16,
-                      color: "rgba(241,235,222,.85)",
-                    }}
-                  >
-                    {value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── What you get ─────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px" }}>
-        <SectionMast n="01" label="The Scope · What Is Covered" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 32,
-          }}
-        >
-          {WHAT_YOU_GET.map(({ n, title, body }) => (
-            <div key={n} style={{ borderTop: `2px solid ${INK}` }}>
+          {AVAILABILITY_SPECS.map(([k, v]) => (
+            <Fragment key={k}>
+              <div>
+                <SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps>
+              </div>
               <div
                 style={{
-                  padding: "14px 0 10px",
-                  display: "flex",
-                  gap: 12,
-                  alignItems: "baseline",
+                  fontFamily: SERIF,
+                  fontSize: 14,
+                  color: INK,
+                  lineHeight: 1.4,
                 }}
               >
-                <SCaps size={11} ls="0.18em" color={YEL}>{n}</SCaps>
-                <SCaps size={10.5} ls="0.14em">Area {n}</SCaps>
+                {v}
               </div>
-              <h3
-                style={{
-                  margin: "0 0 14px",
-                  fontWeight: 700,
-                  fontSize: 24,
-                  lineHeight: 1.15,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {title}
-              </h3>
-              <HRule />
-              <p
-                style={{
-                  margin: "14px 0 0",
-                  fontSize: 16,
-                  lineHeight: 1.65,
-                  color: INK70,
-                }}
-              >
-                {body}
-              </p>
-            </div>
+            </Fragment>
           ))}
         </div>
-      </section>
-
-      <HRule />
-
-      {/* ── Who it's for ─────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px", background: PAPER2 }}>
-        <SectionMast n="02" label="The Brief · Who This Is For" />
-        <div
+        <a
+          href={CALENDLY}
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 64,
-            alignItems: "start",
+            marginTop: 22,
+            display: "block",
+            textAlign: "center",
+            padding: "14px 18px",
+            background: INK,
+            color: PAPER,
+            textDecoration: "none",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 12,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
           }}
         >
-          <div>
-            <h2
-              style={{
-                margin: "0 0 20px",
-                fontWeight: 700,
-                fontSize: 48,
-                lineHeight: 1.0,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              You&rsquo;re growing.
-              <br />
-              <span style={{ fontStyle: "italic" }}>
-                <Mark>Marketing is the bottleneck.</Mark>
-              </span>
-            </h2>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 17,
-                lineHeight: 1.65,
-                color: INK70,
-              }}
-            >
-              You have product-market fit. Revenue is growing. But marketing is
-              founder-led, inconsistent, and not converting at the rate it should.
-              You need someone to own the function — not an agency that runs ads
-              and sends monthly reports.
-            </p>
-            <p
-              style={{
-                margin: "16px 0 0",
-                fontSize: 17,
-                lineHeight: 1.65,
-                color: INK70,
-              }}
-            >
-              A fractional CMO brings ownership, accountability, and strategic
-              continuity without the $300K+ price tag of a full-time C-suite hire.
-            </p>
-          </div>
+          Book a discovery call →
+        </a>
+      </aside>
+    </div>
+  </section>
+);
 
-          <div>
-            {WHO_ITS_FOR.map((item, i) => (
-              <div
-                key={item}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "32px 1fr",
-                  gap: 16,
-                  padding: "16px 0",
-                  borderBottom: `1px solid ${INK15}`,
-                  alignItems: "start",
-                }}
-              >
-                <SCaps size={11} ls="0.14em" color={YEL}>
-                  {String(i + 1).padStart(2, "0")}.
-                </SCaps>
-                <div
-                  style={{
-                    fontFamily: SERIF,
-                    fontSize: 16.5,
-                    lineHeight: 1.45,
-                    color: INK,
-                  }}
-                >
-                  {item}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+// ─── §01 · Scope ─────────────────────────────────────────────────────────────
 
-      <HRule />
+const Scope = () => (
+  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
+    <SectionMast n="01" label="What's on the table · Scope of the retainer" />
 
-      {/* ── CTA ──────────────────────────────────────────────── */}
-      <section
+    <div className="grid-intro">
+      <h2
+        className="h2-xl"
         style={{
-          padding: "80px 56px",
-          background: INK,
-          position: "relative",
-          overflow: "hidden",
+          margin: 0,
+          fontFamily: SERIF,
+          fontWeight: 700,
+          color: INK,
+          lineHeight: 0.98,
+          letterSpacing: "-0.025em",
         }}
       >
+        Six things
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>you actually get.</Mark>
+        </span>
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontSize: 19,
+          color: INK70,
+          lineHeight: 1.55,
+          maxWidth: 560,
+        }}
+      >
+        Fractional CMO is a phrase that has been used to mean almost anything
+        in the last two years. Here is what it means at this bureau,
+        specifically.
+      </p>
+    </div>
+
+    <div
+      className="grid-cards-3"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {SCOPE.map((s, i) => (
         <div
-          aria-hidden
+          key={s.no}
+          className="card-border"
           style={{
-            position: "absolute",
-            bottom: -60,
-            left: -80,
-            opacity: 0.05,
-            pointerEvents: "none",
+            padding: "28px 24px 26px",
+            background: PAPER,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 240,
           }}
         >
-          <SiaLogo height={360} />
-        </div>
-
-        <div style={{ maxWidth: 640, position: "relative" }}>
-          <Pill size={11} ls="0.18em">§ 03 · Start the conversation</Pill>
-          <h2
+          <div
             style={{
-              margin: "20px 0 16px",
+              fontFamily: SERIF,
               fontWeight: 700,
-              fontSize: 56,
-              lineHeight: 1.0,
-              letterSpacing: "-0.025em",
-              color: PAPER,
+              fontSize: "clamp(32px, 6vw, 48px)",
+              color: INK,
+              lineHeight: 1,
+              letterSpacing: "-0.03em",
             }}
           >
-            Thirty minutes,{" "}
-            <span style={{ fontStyle: "italic", color: YEL }}>
-              no pitch deck.
-            </span>
-          </h2>
+            {s.no}
+          </div>
+          <HRule style={{ margin: "14px 0 16px" }} />
+          <h4
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 22,
+              color: INK,
+              lineHeight: 1.15,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {s.t}
+          </h4>
           <p
             style={{
-              margin: "0 0 32px",
-              fontSize: 18,
+              margin: "12px 0 0",
+              fontFamily: SERIF,
+              fontSize: 15,
+              color: INK70,
               lineHeight: 1.55,
-              color: "rgba(241,235,222,.72)",
-              maxWidth: 480,
+              fontStyle: "italic",
+              flex: 1,
             }}
           >
-            Tell me where the business is, where you want it to be in twelve
-            months, and what marketing has and has not done so far. I will tell
-            you honestly whether a Fractional CMO is the right answer, or
-            something else is.
+            {s.d}
           </p>
-          <DoubleRule dark />
-          <div style={{ marginTop: 28 }}>
-            <a
-              href={CALENDLY}
-              target="_blank"
-              rel="noopener noreferrer"
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §02 · First 90 Days ─────────────────────────────────────────────────────
+
+const Timeline = () => (
+  <section
+    className="sx"
+    style={{
+      background: PAPER2,
+      paddingTop: 90,
+      paddingBottom: 90,
+      borderTop: `1px solid ${INK}`,
+      borderBottom: `1px solid ${INK}`,
+    }}
+  >
+    <SectionMast n="02" label="The first 90 days · A working shape" />
+
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontWeight: 700,
+          color: INK,
+          lineHeight: 0.98,
+          letterSpacing: "-0.025em",
+        }}
+      >
+        Ninety days,
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>specifically.</Mark>
+        </span>
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontSize: 18.5,
+          color: INK70,
+          lineHeight: 1.55,
+          maxWidth: 540,
+        }}
+      >
+        Most fractional engagements drift in the first quarter. To avoid that,
+        every retainer at this bureau follows the same opening shape — and we
+        calibrate from there.
+      </p>
+    </div>
+
+    <div
+      className="grid-steps-4"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {STAGES.map((s, i) => (
+        <div
+          key={s.range}
+          className="step-card"
+          style={{
+            padding: "26px 22px 24px",
+            background: PAPER,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 240,
+          }}
+        >
+          <SCaps size={10.5} ls="0.18em" color={INK55}>{s.range}</SCaps>
+          <h4
+            style={{
+              margin: "12px 0 0",
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 24,
+              color: INK,
+              lineHeight: 1.15,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {s.t}
+          </h4>
+          <HRule style={{ margin: "14px 0" }} />
+          <p
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontSize: 15,
+              color: INK70,
+              lineHeight: 1.55,
+              fontStyle: "italic",
+              flex: 1,
+            }}
+          >
+            {s.d}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §03 · Fit ────────────────────────────────────────────────────────────────
+
+const Fit = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
+    <SectionMast n="03" label="Is it for you · The honest filter" />
+
+    <div
+      className="grid-subscriptions"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {/* Yes if */}
+      <div
+        style={{
+          padding: "36px 36px 32px",
+          background: PAPER2,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
+          <Pill size={11} ls="0.20em">Yes if</Pill>
+          <SCaps size={10.5} ls="0.18em" color={INK55}>Good fit</SCaps>
+        </div>
+        <ul
+          style={{
+            margin: "20px 0 0",
+            padding: 0,
+            listStyle: "none",
+            fontFamily: SERIF,
+            fontSize: 17,
+            color: INK,
+            lineHeight: 1.5,
+          }}
+        >
+          {FIT_IN.map((line, j) => (
+            <li
+              key={j}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "16px 28px",
-                background: YEL,
-                color: INK,
-                textDecoration: "none",
-                fontFamily: GROT,
-                fontWeight: 800,
-                fontSize: 13,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
+                padding: "14px 0 14px 28px",
+                position: "relative",
+                borderBottom: j < FIT_IN.length - 1 ? `1px solid ${INK15}` : "none",
               }}
             >
-              Book a discovery call →
-            </a>
-          </div>
-        </div>
-      </section>
+              <span
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 16,
+                  height: 16,
+                  background: YEL,
+                  border: `1.5px solid ${INK}`,
+                  display: "inline-block",
+                }}
+              />
+              {line}
+            </li>
+          ))}
+        </ul>
+      </div>
 
-      <Subscriptions sectionNumber="04" />
+      {/* Probably not if */}
+      <div style={{ padding: "36px 36px 32px", background: PAPER }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
+          <span
+            style={{
+              display: "inline-block",
+              padding: "4px 9px 5px",
+              border: `1.5px solid ${INK}`,
+              fontFamily: GROT,
+              fontWeight: 700,
+              fontSize: 11,
+              letterSpacing: "0.20em",
+              textTransform: "uppercase",
+              color: INK70,
+            }}
+          >
+            Probably not if
+          </span>
+          <SCaps size={10.5} ls="0.18em" color={INK55}>
+            Save us both the call
+          </SCaps>
+        </div>
+        <ul
+          style={{
+            margin: "20px 0 0",
+            padding: 0,
+            listStyle: "none",
+            fontFamily: SERIF,
+            fontSize: 17,
+            color: INK,
+            lineHeight: 1.5,
+          }}
+        >
+          {FIT_OUT.map((line, j) => (
+            <li
+              key={j}
+              style={{
+                padding: "14px 0 14px 28px",
+                position: "relative",
+                borderBottom: j < FIT_OUT.length - 1 ? `1px solid ${INK15}` : "none",
+              }}
+            >
+              <span
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 16,
+                  height: 16,
+                  border: `1.5px solid ${INK}`,
+                  background: "transparent",
+                }}
+              />
+              <span
+                aria-hidden
+                style={{
+                  position: "absolute",
+                  left: 3,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: 13,
+                  color: INK,
+                  fontWeight: 700,
+                }}
+              >
+                ×
+              </span>
+              {line}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── §04 · Book the Call ──────────────────────────────────────────────────────
+
+const BookCall = () => (
+  <section id="book" className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
+    <SectionMast n="04" label="Book the call · The next move" />
+
+    <div
+      className="grid-dark-card"
+      style={{
+        background: INK,
+        color: PAPER,
+        padding: "40px 32px",
+        position: "relative",
+        border: `1px solid ${INK}`,
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -1,
+          right: -1,
+          padding: "8px 16px",
+          background: YEL,
+          color: INK,
+          fontFamily: GROT,
+          fontWeight: 800,
+          fontSize: 11,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          border: `1px solid ${INK}`,
+        }}
+      >
+        Two seats open · Q3
+      </div>
+
+      <div>
+        <SCaps size={11} ls="0.20em" color={YEL}>
+          The honest next step
+        </SCaps>
+        <h2
+          className="h2-sm"
+          style={{
+            margin: "14px 0 0",
+            fontFamily: SERIF,
+            fontWeight: 700,
+            color: PAPER,
+            lineHeight: 1.02,
+            letterSpacing: "-0.022em",
+          }}
+        >
+          Thirty minutes,
+          <br />
+          <span style={{ fontStyle: "italic", color: YEL }}>no pitch deck.</span>
+        </h2>
+        <p
+          style={{
+            marginTop: 22,
+            fontFamily: SERIF,
+            fontSize: 17.5,
+            color: "rgba(241,235,222,.72)",
+            lineHeight: 1.55,
+            maxWidth: 520,
+          }}
+        >
+          Tell me where the business is, where you want it to be in twelve
+          months, and what marketing has and has not done so far. I will tell
+          you honestly whether a Fractional CMO is the right answer, or
+          something else is.
+        </p>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <a
+          href={CALENDLY}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "22px 26px",
+            background: YEL,
+            color: INK,
+            textDecoration: "none",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 14,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+          }}
+        >
+          <span>Book a discovery call</span>
+          <span style={{ fontFamily: SERIF, fontSize: 22 }}>→</span>
+        </a>
+        <a
+          href="mailto:sia@syedirfanajmal.com"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "22px 26px",
+            background: "transparent",
+            color: PAPER,
+            border: `1px solid ${PAPER}`,
+            textDecoration: "none",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 14,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+          }}
+        >
+          <span>Email instead</span>
+          <span style={{ fontFamily: SERIF, fontSize: 22 }}>↗</span>
+        </a>
+        <div style={{ marginTop: 10 }}>
+          <SCaps size={10.5} ls="0.16em" color="rgba(241,235,222,.55)">
+            Reply within one working day. Time zone: GMT+5.
+          </SCaps>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── Calendly ─────────────────────────────────────────────────────────────────
+
+const CalendlySection = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 80, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
+    <div style={{ maxWidth: 900, margin: "0 auto" }}>
+      <p style={{ margin: "0 0 8px", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK }}>
+        Book a slot
+      </p>
+      <h2 style={{ margin: "0 0 36px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 5vw, 48px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>
+        Pick a time that works for you.
+      </h2>
+      <div
+        className="calendly-inline-widget"
+        data-url="https://calendly.com/sia_dmr_agency/emos?hide_event_type_details=1"
+        style={{ minWidth: 320, height: 700 }}
+      />
+    </div>
+  </section>
+);
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function FractionalCMOPage() {
+  return (
+    <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
+      <Mast active="Fractional CMO" />
+      <Hero />
+      <Scope />
+      <Timeline />
+      <Fit />
+      <BookCall />
+      <CalendlySection />
+      <Subscriptions sectionNumber="06" />
       <Colophon />
     </div>
   );

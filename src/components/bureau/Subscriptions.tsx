@@ -27,7 +27,7 @@ const MailchimpForm = () => {
         <button
           onClick={() => { setSubmitted(false); setEmail(""); }}
           style={{
-            marginTop: 18, padding: "10px 16px", background: "transparent",
+            marginTop: 18, padding: "12px 16px", background: "transparent",
             color: PAPER, border: "1px solid rgba(241,235,222,.5)",
             cursor: "pointer",
             fontFamily: GROT, fontWeight: 700, fontSize: 11,
@@ -47,7 +47,7 @@ const MailchimpForm = () => {
       onSubmit={onSubmit}
     >
       <SCaps size={11} ls="0.20em" color={YEL}>Apply for a subscription</SCaps>
-      <div style={{ marginTop: 14, display: "flex" }}>
+      <div className="sub-form-row">
         <input
           type="email"
           name="EMAIL"
@@ -55,6 +55,7 @@ const MailchimpForm = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@yourcompany.com"
+          className="sub-input"
           style={{
             flex: 1,
             padding: "18px 18px",
@@ -65,13 +66,14 @@ const MailchimpForm = () => {
             fontFamily: SERIF,
             fontSize: 17,
             outline: "none",
+            minWidth: 0,
           }}
         />
         <button
           type="submit"
           name="subscribe"
+          className="sub-btn"
           style={{
-            padding: "18px 26px",
             background: YEL,
             color: INK,
             border: `1px solid ${YEL}`,
@@ -110,10 +112,12 @@ export const Subscriptions = ({
   sectionNumber?: string;
 }) => (
   <section
+    className="sx"
     style={{
       background: INK,
       color: PAPER,
-      padding: "80px 56px",
+      paddingTop: 80,
+      paddingBottom: 80,
       position: "relative",
       overflow: "hidden",
     }}
@@ -137,22 +141,14 @@ export const Subscriptions = ({
       dark
     />
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1.2fr 1fr",
-        gap: 64,
-        alignItems: "center",
-        position: "relative",
-      }}
-    >
+    <div className="grid-subscriptions">
       <div>
         <h2
+          className="sub-h2"
           style={{
             margin: 0,
             fontFamily: SERIF,
             fontWeight: 700,
-            fontSize: 72,
             color: PAPER,
             lineHeight: 0.98,
             letterSpacing: "-0.025em",

@@ -173,23 +173,16 @@ export default function ContactPage() {
       <Mast active="Contact" />
 
       {/* ── Header ───────────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px 72px" }}>
+      <section className="sx" style={{ paddingTop: 80, paddingBottom: 72 }}>
         <SectionMast n="00" label="The Correspondence Desk · Get in Touch" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1.2fr",
-            gap: 80,
-            alignItems: "start",
-          }}
-        >
+        <div className="grid-contact">
           {/* Left: info */}
           <div>
             <h1
               style={{
                 margin: "0 0 24px",
                 fontWeight: 700,
-                fontSize: 72,
+                fontSize: "clamp(36px, 8vw, 72px)",
                 lineHeight: 0.96,
                 letterSpacing: "-0.03em",
               }}
@@ -258,6 +251,7 @@ export default function ContactPage() {
                       fontSize: 16,
                       color: INK,
                       textDecoration: "none",
+                      wordBreak: "break-word",
                     }}
                   >
                     {value}
@@ -301,22 +295,15 @@ export default function ContactPage() {
       <HRule />
 
       {/* ── Calendly CTA ─────────────────────────────────────── */}
-      <section style={{ padding: "72px 56px", background: PAPER2 }}>
+      <section className="sx" style={{ paddingTop: 72, paddingBottom: 72, background: PAPER2 }}>
         <SectionMast n="01" label="The Calendar · Book a Call" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 64,
-            alignItems: "center",
-          }}
-        >
+        <div className="grid-contact-cta">
           <div>
             <h2
               style={{
                 margin: "0 0 20px",
                 fontWeight: 700,
-                fontSize: 52,
+                fontSize: "clamp(28px, 6vw, 52px)",
                 lineHeight: 1.0,
                 letterSpacing: "-0.02em",
               }}

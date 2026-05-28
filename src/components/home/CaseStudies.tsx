@@ -63,24 +63,16 @@ const CASES: ReadonlyArray<Case> = [
 ];
 
 export const CaseStudies = () => (
-  <section style={{ background: PAPER, padding: "90px 56px" }}>
+  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
     <SectionMast n="02" label="Casework · What the numbers did" />
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.4fr",
-        gap: 60,
-        alignItems: "baseline",
-        marginBottom: 48,
-      }}
-    >
+    <div className="grid-intro">
       <h2
+        className="h2-xl"
         style={{
           margin: 0,
           fontFamily: SERIF,
           fontWeight: 700,
-          fontSize: 76,
           color: INK,
           lineHeight: 0.98,
           letterSpacing: "-0.025em",
@@ -99,7 +91,6 @@ export const CaseStudies = () => (
           fontSize: 19,
           color: INK70,
           lineHeight: 1.55,
-          maxWidth: 560,
         }}
       >
         A small selection of recent work, all delivered through DMR.agency.
@@ -109,12 +100,8 @@ export const CaseStudies = () => (
     </div>
 
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 0,
-        border: `1px solid ${INK}`,
-      }}
+      className="grid-cards-3"
+      style={{ border: `1px solid ${INK}` }}
     >
       {CASES.map((c, i) => (
         <a
@@ -122,13 +109,13 @@ export const CaseStudies = () => (
           href={c.href}
           target="_blank"
           rel="noopener noreferrer"
+          className="card-border"
           style={{
             padding: "28px 28px 26px",
-            borderRight: i < 2 ? `1px solid ${INK}` : "none",
             background: c.featured ? PAPER2 : PAPER,
             display: "flex",
             flexDirection: "column",
-            minHeight: 460,
+            minHeight: 420,
             position: "relative",
             textDecoration: "none",
             color: INK,
@@ -164,7 +151,7 @@ export const CaseStudies = () => (
               margin: "14px 0 0",
               fontFamily: SERIF,
               fontWeight: 700,
-              fontSize: 30,
+              fontSize: 28,
               color: INK,
               lineHeight: 1.08,
               letterSpacing: "-0.015em",
@@ -199,12 +186,12 @@ export const CaseStudies = () => (
                   style={{
                     fontFamily: SERIF,
                     fontWeight: 700,
-                    fontSize: 44,
+                    fontSize: "clamp(28px, 5vw, 44px)",
                     color: INK,
                     lineHeight: 1,
                     letterSpacing: "-0.02em",
                     flexShrink: 0,
-                    minWidth: 110,
+                    minWidth: 80,
                   }}
                 >
                   {m.v}

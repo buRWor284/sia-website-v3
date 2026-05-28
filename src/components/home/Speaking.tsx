@@ -12,10 +12,12 @@ const ROWS: ReadonlyArray<[string, string, string, string]> = [
 
 export const SpeakingBand = () => (
   <section
+    className="sx"
     style={{
       background: INK,
       color: PAPER,
-      padding: "90px 56px",
+      paddingTop: 90,
+      paddingBottom: 90,
       position: "relative",
       overflow: "hidden",
     }}
@@ -35,21 +37,15 @@ export const SpeakingBand = () => (
 
     <SectionMast n="04" label="The Touring Desk · Stages & stages" dark />
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.5fr",
-        gap: 80,
-        position: "relative",
-      }}
-    >
+    <div className="grid-speaking" style={{ position: "relative" }}>
+      {/* Left: Headline + copy + CTA */}
       <div>
         <h2
+          className="h2-md"
           style={{
             margin: 0,
             fontFamily: SERIF,
             fontWeight: 700,
-            fontSize: 68,
             color: PAPER,
             lineHeight: 0.98,
             letterSpacing: "-0.025em",
@@ -86,58 +82,32 @@ export const SpeakingBand = () => (
               color: PAPER,
             }}
           >
-            <li
-              style={{
-                padding: "8px 0",
-                borderBottom: "1px solid rgba(241,235,222,.18)",
-              }}
-            >
-              <span
+            {[
+              "The Scientific Benefits of Writing · Infographic",
+              "Brand Yourself for Success",
+              "Media Hacks · Free Publicity Online",
+            ].map((topic, idx) => (
+              <li
+                key={idx}
                 style={{
-                  color: YEL,
-                  fontFamily: GROT,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  marginRight: 10,
+                  padding: "8px 0",
+                  borderBottom: idx < 2 ? "1px solid rgba(241,235,222,.18)" : "none",
                 }}
               >
-                I.
-              </span>
-              The Scientific Benefits of Writing · Infographic
-            </li>
-            <li
-              style={{
-                padding: "8px 0",
-                borderBottom: "1px solid rgba(241,235,222,.18)",
-              }}
-            >
-              <span
-                style={{
-                  color: YEL,
-                  fontFamily: GROT,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  marginRight: 10,
-                }}
-              >
-                II.
-              </span>
-              Brand Yourself for Success
-            </li>
-            <li style={{ padding: "8px 0" }}>
-              <span
-                style={{
-                  color: YEL,
-                  fontFamily: GROT,
-                  fontSize: 13,
-                  fontWeight: 700,
-                  marginRight: 10,
-                }}
-              >
-                III.
-              </span>
-              Media Hacks · Free Publicity Online
-            </li>
+                <span
+                  style={{
+                    color: YEL,
+                    fontFamily: GROT,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    marginRight: 10,
+                  }}
+                >
+                  {["I.", "II.", "III."][idx]}
+                </span>
+                {topic}
+              </li>
+            ))}
           </ol>
         </div>
         <a
@@ -162,27 +132,31 @@ export const SpeakingBand = () => (
         </a>
       </div>
 
+      {/* Right: Venues table */}
       <div>
         {ROWS.map((row, i) => (
           <div
             key={row[0]}
+            className="speaking-row"
             style={{
-              display: "grid",
-              gridTemplateColumns: "36px 1.6fr 1fr 1.4fr",
-              gap: 24,
-              padding: "20px 0",
               borderBottom: "1px solid rgba(241,235,222,.18)",
               alignItems: "baseline",
             }}
           >
-            <SCaps size={11} ls="0.16em" color="rgba(241,235,222,.5)">
-              {String(i + 1).padStart(2, "0")}.
-            </SCaps>
+            <div className="speaking-index">
+              <SCaps
+                size={11}
+                ls="0.16em"
+                color="rgba(241,235,222,.5)"
+              >
+                {String(i + 1).padStart(2, "0")}.
+              </SCaps>
+            </div>
             <div
               style={{
                 fontFamily: SERIF,
                 fontWeight: 700,
-                fontSize: 28,
+                fontSize: "clamp(18px, 3vw, 28px)",
                 color: PAPER,
                 letterSpacing: "-0.01em",
               }}
@@ -193,18 +167,18 @@ export const SpeakingBand = () => (
               style={{
                 fontFamily: SERIF,
                 fontStyle: "italic",
-                fontSize: 16,
+                fontSize: 15,
                 color: "rgba(241,235,222,.7)",
               }}
             >
               {row[1]}
             </div>
             <div>
-              <SCaps size={10.5} ls="0.14em" color="rgba(241,235,222,.55)">
+              <SCaps size={10} ls="0.12em" color="rgba(241,235,222,.55)">
                 {row[2]}
               </SCaps>
               <div style={{ marginTop: 4 }}>
-                <SCaps size={10.5} ls="0.10em" color={YEL}>{row[3]}</SCaps>
+                <SCaps size={10} ls="0.10em" color={YEL}>{row[3]}</SCaps>
               </div>
             </div>
           </div>

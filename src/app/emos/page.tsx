@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { Colophon, Mast, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
@@ -13,7 +14,6 @@ import {
   GROT,
   INK,
   INK15,
-  INK35,
   INK55,
   INK70,
   PAPER,
@@ -22,577 +22,598 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-const HOW_IT_WORKS = [
-  {
-    n: "01",
-    title: "Audit & Positioning",
-    body: "We map your existing authority, identify your most credible story angles, and position you as the go-to expert in your category. Most founders skip this — and it's why their pitches get ignored.",
-  },
-  {
-    n: "02",
-    title: "The Media List",
-    body: "We build a prioritised target list of publications, journalists, and podcasts that your ideal buyers actually read. No spray-and-pray. Every target is chosen for fit and conversion potential.",
-  },
-  {
-    n: "03",
-    title: "Story Engineering",
-    body: "We craft the pitches, data points, and narratives that make editors say yes. This includes HARO responses, direct pitches, op-ed drafts, and contributed article angles.",
-  },
-  {
-    n: "04",
-    title: "Outreach & Placement",
-    body: "We execute the outreach systematically — following up, building relationships, and landing placements in publications that move the needle for your business.",
-  },
-  {
-    n: "05",
-    title: "Amplification & Repurposing",
-    body: "Each placement is amplified across LinkedIn, turned into content, and added to your credibility asset library. Press compounds — we make sure it does.",
-  },
-  {
-    n: "06",
-    title: "Reporting & Iteration",
-    body: "Monthly reporting on placements, reach, and inbound leads attributed to earned media. We iterate the strategy based on what's converting.",
-  },
+const EMOS_URL = "https://dmr.agency/earnedmediaOS/";
+
+// ─── Data ────────────────────────────────────────────────────────────────────
+
+type InsideItem = { no: string; t: string; d: string };
+const INSIDE: ReadonlyArray<InsideItem> = [
+  { no: "01", t: "A working playbook",
+    d: "Step-by-step methods refined over 100+ digital PR campaigns. Pitch templates, journalist outreach scripts, story-design frameworks." },
+  { no: "02", t: "Trainings & cohorts",
+    d: "Live and recorded sessions for in-house marketing teams. Cohort-based learning, not yet another self-paced course." },
+  { no: "03", t: "Weekly cadence",
+    d: "Office hours, accountability check-ins, and a working rhythm that keeps the earned-media engine running, not just talked about." },
+  { no: "04", t: "The journalist contact book",
+    d: "Curated relationships with editors and journalists across Forbes, HBR, HuffPost, niche trade press. Built one byline at a time." },
 ];
 
-const RESULTS = [
-  { stat: "Forbes", label: "Top-tier placement" },
-  { stat: "HBR", label: "Authority vertical" },
-  { stat: "HuffPost", label: "Mass reach" },
-  { stat: "TNW", label: "Tech audience" },
-  { stat: "300%", label: "Avg. inbound lift" },
-  { stat: "90d", label: "First placement" },
+type Receipt = { v: string; l: string; sub: string };
+const RECEIPTS: ReadonlyArray<Receipt> = [
+  { v: "1.5M",  l: "monthly visitors",   sub: "Ridester · 0 to 1.5M in one year"       },
+  { v: "6×",    l: "daily signups",      sub: "Centriq · 120% organic traffic lift"     },
+  { v: "$535K", l: "in revenue",         sub: "E-commerce · five weeks"                 },
+  { v: "500+",  l: "high-quality links", sub: "Physicians Thrive · DR 33 to 57"         },
 ];
 
-const FAQS = [
-  {
-    q: "Who is EMOS for?",
-    a: "Founders, consultants, and executives who want to be known as the authority in their field — and know that press coverage is the fastest path there. You don't need to be famous. You need to have a point of view.",
-  },
-  {
-    q: "How long until we see results?",
-    a: "Most clients see their first placement within 60–90 days. Forbes, HBR, and top-tier verticals can take 3–6 months depending on your positioning and story strength.",
-  },
-  {
-    q: "Do you guarantee placements?",
-    a: "We don't guarantee specific outlets — no ethical PR operation does. We guarantee a systematic, professional earned media programme run by someone who has personally been featured in Forbes, HBR, and HuffPost.",
-  },
-  {
-    q: "What's included?",
-    a: "Positioning audit, media list, pitch writing, HARO monitoring, outreach execution, placement tracking, and monthly reporting. Everything in one retainer.",
-  },
-];
+// ─── Hero ─────────────────────────────────────────────────────────────────────
 
-export default function EmosPage() {
-  return (
-    <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="EMOS" />
-
-      {/* ── Dark hero ─────────────────────────────────────────── */}
-      <section
+const Hero = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 56, paddingBottom: 0 }}>
+    <div style={{ textAlign: "center", marginBottom: 24 }}>
+      <SCaps color={INK70} size={12} ls="0.28em">
+        A new offering from the Bureau · 2026
+      </SCaps>
+    </div>
+    <h1
+      style={{
+        margin: 0,
+        textAlign: "center",
+        fontFamily: SERIF,
+        fontWeight: 700,
+        color: INK,
+        lineHeight: 0.96,
+        letterSpacing: "-0.03em",
+      }}
+    >
+      <span
+        className="emos-h1-main"
         style={{
-          background: INK,
-          color: PAPER,
-          padding: "90px 56px",
-          position: "relative",
-          overflow: "hidden",
+          display: "block",
+          fontFamily: GROT,
+          fontWeight: 900,
+          fontStyle: "italic",
+          letterSpacing: "-0.04em",
         }}
       >
-        <div
-          aria-hidden
-          style={{
-            position: "absolute",
-            bottom: -80,
-            left: -100,
-            opacity: 0.06,
-            pointerEvents: "none",
-          }}
-        >
-          <SiaLogo height={400} />
-        </div>
+        EMOS.
+      </span>
+      <span
+        className="emos-h1-sub"
+        style={{
+          display: "block",
+          fontStyle: "italic",
+          fontWeight: 600,
+        }}
+      >
+        the <Mark>Earned Media</Mark> Operating System.
+      </span>
+    </h1>
+    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
+      <SCaps size={11.5} ls="0.22em" color={INK55}>
+        Productized by Syed Irfan Ajmal &nbsp;·&nbsp; Delivered through{" "}
+        <span style={{ color: INK }}>DMR.agency</span>
+      </SCaps>
+    </div>
 
-        <SectionMast
-          n="00"
-          label="EMOS · Earned Media Operating System"
-          dark
-        />
+    <DoubleRule style={{ margin: "44px 0 8px" }} />
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "baseline",
+        padding: "6px 0 36px",
+        flexWrap: "wrap",
+        gap: 8,
+      }}
+    >
+      <SCaps size={10.5} ls="0.18em" color={INK70}>
+        Below: a 30-second tour by the editor.
+      </SCaps>
+      <SCaps size={10.5} ls="0.18em" color={INK70}>
+        Run time: 0:30 · 1080 × 1080
+      </SCaps>
+    </div>
+  </section>
+);
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 80,
-            position: "relative",
-          }}
-        >
-          <div>
-            <h1
-              style={{
-                margin: 0,
-                fontWeight: 700,
-                fontSize: 76,
-                lineHeight: 0.96,
-                letterSpacing: "-0.03em",
-                color: PAPER,
-              }}
-            >
-              Get in{" "}
-              <span style={{ fontStyle: "italic", color: YEL }}>Forbes.</span>
-              <br />
-              Get in{" "}
-              <span style={{ fontStyle: "italic", color: YEL }}>HBR.</span>
-              <br />
-              Get clients.
-            </h1>
-            <p
-              style={{
-                marginTop: 28,
-                fontSize: 18,
-                lineHeight: 1.55,
-                color: "rgba(241,235,222,.72)",
-                maxWidth: 500,
-              }}
-            >
-              EMOS is a done-for-you earned media programme. We position you as the
-              authority, pitch your story to the right journalists, and land
-              placements in publications your buyers actually read.
-            </p>
-            <p
-              style={{
-                marginTop: 16,
-                fontSize: 18,
-                lineHeight: 1.55,
-                color: "rgba(241,235,222,.55)",
-                maxWidth: 500,
-              }}
-            >
-              No PR agency fees. No retainer black holes. A systematic process
-              run by someone who has done it himself — and knows what works.
-            </p>
-            <div style={{ marginTop: 36, display: "flex", gap: 16 }}>
-              <a
-                href={CALENDLY}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "14px 22px",
-                  background: YEL,
-                  color: INK,
-                  textDecoration: "none",
-                  fontFamily: GROT,
-                  fontWeight: 800,
-                  fontSize: 12,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                }}
-              >
-                Apply for EMOS →
-              </a>
-              <a
-                href="#how-it-works"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "14px 22px",
-                  border: "1px solid rgba(241,235,222,.3)",
-                  color: "rgba(241,235,222,.8)",
-                  textDecoration: "none",
-                  fontFamily: GROT,
-                  fontWeight: 700,
-                  fontSize: 12,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                }}
-              >
-                How it works ↓
-              </a>
-            </div>
-          </div>
+// ─── Video Card ───────────────────────────────────────────────────────────────
 
-          <div
+const VideoCard = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 0, paddingBottom: 60 }}>
+    <div
+      style={{
+        maxWidth: 760,
+        margin: "0 auto",
+        background: INK,
+        padding: 18,
+        border: `1px solid ${INK}`,
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "6px 8px 16px",
+          borderBottom: "1px solid rgba(241,235,222,.25)",
+          marginBottom: 14,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 1,
-              alignContent: "start",
-            }}
-          >
-            {RESULTS.map(({ stat, label }) => (
-              <div
-                key={label}
-                style={{
-                  padding: "28px 24px",
-                  background: "rgba(241,235,222,.04)",
-                  border: "1px solid rgba(241,235,222,.12)",
-                }}
-              >
-                <div
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 40,
-                    lineHeight: 1,
-                    letterSpacing: "-0.025em",
-                    color: YEL,
-                  }}
-                >
-                  {stat}
-                </div>
-                <SCaps
-                  size={10.5}
-                  ls="0.14em"
-                  color="rgba(241,235,222,.55)"
-                  style={{ marginTop: 8, display: "block" }}
-                >
-                  {label}
-                </SCaps>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Video ────────────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px", background: PAPER2 }}>
-        <SectionMast n="01" label="In Brief · Watch the Overview" />
-        <div
-          style={{
-            maxWidth: 840,
-            margin: "0 auto",
-          }}
-        >
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-          <video
-            src="/assets/emos-video.mp4"
-            controls
-            playsInline
-            style={{
-              width: "100%",
-              display: "block",
-              border: `1px solid ${INK35}`,
-              background: INK,
+              display: "inline-block",
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              background: YEL,
             }}
           />
-          <div style={{ marginTop: 12, textAlign: "center" }}>
-            <SCaps size={10.5} ls="0.16em" color={INK55}>
-              EMOS Overview · Syed Irfan Ajmal · DMR.agency
-            </SCaps>
-          </div>
+          <SCaps size={10.5} ls="0.20em" color="rgba(241,235,222,.85)">
+            REEL № 01 · A 30-second tour
+          </SCaps>
         </div>
-      </section>
+        <SCaps size={10.5} ls="0.20em" color="rgba(241,235,222,.55)">
+          EMOS / 2026
+        </SCaps>
+      </div>
 
-      <HRule />
-
-      {/* ── How it works ─────────────────────────────────────── */}
-      <section id="how-it-works" style={{ padding: "80px 56px" }}>
-        <SectionMast n="02" label="The Process · How EMOS Works" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 32,
-          }}
-        >
-          {HOW_IT_WORKS.map(({ n, title, body }) => (
-            <div key={n}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: 12,
-                  marginBottom: 16,
-                  borderTop: `2px solid ${INK}`,
-                  paddingTop: 16,
-                }}
-              >
-                <SCaps size={11} ls="0.18em" color={YEL}>
-                  {n}
-                </SCaps>
-                <SCaps size={10.5} ls="0.14em">Step {n}</SCaps>
-              </div>
-              <h3
-                style={{
-                  margin: "0 0 14px",
-                  fontWeight: 700,
-                  fontSize: 24,
-                  lineHeight: 1.15,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {title}
-              </h3>
-              <HRule />
-              <p
-                style={{
-                  margin: "14px 0 0",
-                  fontSize: 16,
-                  lineHeight: 1.65,
-                  color: INK70,
-                }}
-              >
-                {body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <HRule />
-
-      {/* ── Proof / press ────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px", background: PAPER2 }}>
-        <SectionMast n="03" label="The Proof · Creator's Own Press" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1.4fr",
-            gap: 64,
-            alignItems: "start",
-          }}
-        >
-          <div>
-            <h2
-              style={{
-                margin: "0 0 20px",
-                fontWeight: 700,
-                fontSize: 48,
-                lineHeight: 1.0,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              He practises what he{" "}
-              <span style={{ fontStyle: "italic" }}>
-                <Mark>preaches.</Mark>
-              </span>
-            </h2>
-            <p
-              style={{
-                margin: 0,
-                fontSize: 17,
-                lineHeight: 1.65,
-                color: INK70,
-              }}
-            >
-              Syed Irfan Ajmal built the EMOS framework by landing his own press
-              — Forbes, HBR, HuffPost, TNW, and more — without a PR agency, a
-              publicist, or a large budget. Every technique in EMOS is one he has
-              used himself.
-            </p>
-            <p
-              style={{
-                margin: "16px 0 0",
-                fontSize: 17,
-                lineHeight: 1.65,
-                color: INK70,
-              }}
-            >
-              He then packaged that process into a repeatable system and used it
-              to earn media for his clients — generating inbound leads, investor
-              interest, and category authority.
-            </p>
-            <a
-              href={CALENDLY}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                marginTop: 28,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "13px 20px",
-                background: INK,
-                color: PAPER,
-                textDecoration: "none",
-                fontFamily: GROT,
-                fontWeight: 700,
-                fontSize: 11.5,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-              }}
-            >
-              Book a discovery call →
-            </a>
-          </div>
-
-          <div>
-            {[
-              "Forbes",
-              "Harvard Business Review",
-              "HuffPost",
-              "The Next Web",
-              "Entrepreneur",
-              "Inc. Magazine",
-              "Fast Company",
-              "Content Marketing Institute",
-              "Search Engine Journal",
-            ].map((outlet, i, arr) => (
-              <div
-                key={outlet}
-                style={{
-                  padding: "14px 0",
-                  borderBottom:
-                    i < arr.length - 1 ? `1px solid ${INK15}` : undefined,
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: 16,
-                }}
-              >
-                <SCaps
-                  size={10.5}
-                  ls="0.12em"
-                  color={INK35}
-                  style={{ minWidth: 24 }}
-                >
-                  {String(i + 1).padStart(2, "0")}.
-                </SCaps>
-                <div
-                  style={{
-                    fontFamily: SERIF,
-                    fontStyle: "italic",
-                    fontSize: 20,
-                    fontWeight: 600,
-                    color: INK,
-                  }}
-                >
-                  {outlet}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <HRule />
-
-      {/* ── FAQ ──────────────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px" }}>
-        <SectionMast n="04" label="Common Questions · FAQ" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "0 64px",
-          }}
-        >
-          {FAQS.map(({ q, a }, i) => (
-            <div
-              key={q}
-              style={{
-                padding: "28px 0",
-                borderBottom: `1px solid ${INK15}`,
-              }}
-            >
-              <h3
-                style={{
-                  margin: "0 0 12px",
-                  fontWeight: 700,
-                  fontSize: 20,
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                {q}
-              </h3>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: 16,
-                  lineHeight: 1.65,
-                  color: INK70,
-                }}
-              >
-                {a}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── CTA ──────────────────────────────────────────────── */}
-      <section
+      <div
         style={{
-          padding: "80px 56px",
-          background: INK,
-          position: "relative",
+          width: "100%",
+          aspectRatio: "1 / 1",
+          background: "#000",
+          border: "1px solid rgba(241,235,222,.25)",
           overflow: "hidden",
         }}
       >
-        <div
-          aria-hidden
+        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+        <video
+          src="/assets/emos-video.mp4"
+          controls
+          playsInline
+          preload="metadata"
           style={{
-            position: "absolute",
-            top: -60,
-            right: -80,
-            opacity: 0.05,
-            pointerEvents: "none",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "baseline",
+          marginTop: 8,
+          borderTop: "1px solid rgba(241,235,222,.25)",
+          paddingTop: 14,
+          flexWrap: "wrap",
+          gap: 8,
+        }}
+      >
+        <div
+          style={{
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: 14,
+            color: "rgba(241,235,222,.85)",
+            lineHeight: 1.4,
+            maxWidth: 460,
           }}
         >
-          <SiaLogo height={360} />
+          A short film about{" "}
+          <strong style={{ color: YEL, fontStyle: "normal" }}>EMOS</strong>{" "}
+          &mdash; the Earned Media Operating System.
         </div>
+        <SCaps size={10} ls="0.14em" color="rgba(241,235,222,.55)">
+          DIR. SIA &nbsp;·&nbsp; 2026
+        </SCaps>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── §01 · What's Inside ─────────────────────────────────────────────────────
+
+const Inside = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 90 }}>
+    <SectionMast n="01" label="What's inside · A short brief" />
+
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontWeight: 700,
+          color: INK,
+          lineHeight: 0.98,
+          letterSpacing: "-0.025em",
+        }}
+      >
+        An agency,
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>productized.</Mark>
+        </span>
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontSize: 19,
+          color: INK70,
+          lineHeight: 1.55,
+          maxWidth: 560,
+        }}
+      >
+        EMOS is what happens when you take the way a good earned-media agency
+        actually works &mdash; the templates, the cadence, the journalist
+        relationships, the editorial instincts &mdash; and hand it to an
+        in-house marketing team to run themselves. For founders and operators
+        who want the bylines without the retainer.
+      </p>
+    </div>
+
+    <div
+      className="grid-steps-4"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {INSIDE.map((m, i) => (
         <div
+          key={m.no}
+          className="step-card"
           style={{
-            maxWidth: 640,
-            position: "relative",
+            padding: "26px 22px 24px",
+            background: PAPER,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 220,
           }}
         >
-          <Pill size={11} ls="0.18em">§ 05 · Apply Now</Pill>
-          <h2
+          <div
             style={{
-              margin: "20px 0 16px",
+              fontFamily: SERIF,
               fontWeight: 700,
-              fontSize: 56,
-              lineHeight: 1.0,
-              letterSpacing: "-0.025em",
-              color: PAPER,
+              fontSize: "clamp(36px, 6vw, 56px)",
+              color: INK,
+              lineHeight: 1,
+              letterSpacing: "-0.03em",
             }}
           >
-            Ready to get{" "}
-            <span style={{ fontStyle: "italic", color: YEL }}>covered?</span>
-          </h2>
+            {m.no}
+          </div>
+          <HRule style={{ margin: "14px 0" }} />
+          <h4
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 22,
+              color: INK,
+              lineHeight: 1.15,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {m.t}
+          </h4>
           <p
             style={{
-              margin: "0 0 32px",
-              fontSize: 18,
+              margin: "12px 0 0",
+              fontFamily: SERIF,
+              fontSize: 15,
+              color: INK70,
               lineHeight: 1.55,
-              color: "rgba(241,235,222,.72)",
-              maxWidth: 480,
+              fontStyle: "italic",
+              flex: 1,
             }}
           >
-            Book a 30-minute discovery call. We&rsquo;ll review your current
-            positioning, identify your best story angles, and tell you whether EMOS
-            is a good fit.
+            {m.d}
           </p>
-          <DoubleRule dark />
-          <div style={{ marginTop: 28 }}>
-            <a
-              href={CALENDLY}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "16px 28px",
-                background: YEL,
-                color: INK,
-                textDecoration: "none",
-                fontFamily: GROT,
-                fontWeight: 800,
-                fontSize: 13,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-              }}
-            >
-              Book a discovery call →
-            </a>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §02 · Proof ─────────────────────────────────────────────────────────────
+
+const Proof = () => (
+  <section
+    style={{
+      background: INK,
+      color: PAPER,
+      paddingTop: 90,
+      paddingBottom: 90,
+      position: "relative",
+      overflow: "hidden",
+    }}
+    className="sx"
+  >
+    <div
+      aria-hidden
+      style={{
+        position: "absolute",
+        top: -40,
+        right: -60,
+        opacity: 0.06,
+        pointerEvents: "none",
+      }}
+    >
+      <SiaLogo height={320} />
+    </div>
+
+    <SectionMast n="02" label="Receipts · What the system has produced" dark />
+
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontWeight: 700,
+          color: PAPER,
+          lineHeight: 0.98,
+          letterSpacing: "-0.025em",
+        }}
+      >
+        Numbers, by way
+        <br />
+        <span style={{ fontStyle: "italic", color: YEL }}>of evidence.</span>
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontSize: 18.5,
+          color: "rgba(241,235,222,.72)",
+          lineHeight: 1.55,
+          maxWidth: 540,
+        }}
+      >
+        EMOS is the same playbook that has produced these results for
+        DMR.agency&rsquo;s clients. Names, full write-ups, and methodology are
+        on the agency case-study page.
+      </p>
+    </div>
+
+    <div
+      className="grid-stats"
+      style={{
+        borderTop: "1px solid rgba(241,235,222,.25)",
+        borderBottom: "1px solid rgba(241,235,222,.25)",
+      }}
+    >
+      {RECEIPTS.map((r, i) => (
+        <div
+          key={r.v}
+          className="stat-item"
+          style={{
+            padding: "34px 24px",
+          }}
+        >
+          <div
+            className="stat-number"
+            style={{
+              color: YEL,
+            }}
+          >
+            {r.v}
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <SCaps size={11} ls="0.16em" color="rgba(241,235,222,.7)">
+              {r.l}
+            </SCaps>
+          </div>
+          <div
+            style={{
+              marginTop: 10,
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: 14,
+              color: "rgba(241,235,222,.6)",
+              lineHeight: 1.45,
+            }}
+          >
+            {r.sub}
           </div>
         </div>
-      </section>
+      ))}
+    </div>
 
-      <Subscriptions sectionNumber="06" />
+    <div style={{ marginTop: 36, textAlign: "center" }}>
+      <a
+        href="https://dmr.agency/case-studies/"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "14px 22px",
+          background: "transparent",
+          color: PAPER,
+          border: `1px solid ${PAPER}`,
+          textDecoration: "none",
+          fontFamily: GROT,
+          fontWeight: 700,
+          fontSize: 12,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+        }}
+      >
+        See all case studies on DMR.agency ↗
+      </a>
+    </div>
+  </section>
+);
+
+// ─── §03 · Handoff ────────────────────────────────────────────────────────────
+
+const Handoff = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
+    <SectionMast n="03" label="The handoff · For pricing, modules & booking" />
+
+    <div
+      className="grid-dark-card"
+      style={{
+        background: PAPER2,
+        border: `1px solid ${INK}`,
+        padding: "40px 32px",
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -1,
+          right: -1,
+          padding: "8px 16px",
+          background: YEL,
+          color: INK,
+          fontFamily: GROT,
+          fontWeight: 800,
+          fontSize: 11,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          border: `1px solid ${INK}`,
+        }}
+      >
+        Full info → DMR.agency
+      </div>
+
+      <div>
+        <SCaps size={11} ls="0.20em" color={INK70}>
+          For pricing, modules, booking
+        </SCaps>
+        <h2
+          className="h2-sm"
+          style={{
+            margin: "14px 0 0",
+            fontFamily: SERIF,
+            fontWeight: 700,
+            color: INK,
+            lineHeight: 1.02,
+            letterSpacing: "-0.022em",
+          }}
+        >
+          The full EMOS page lives on
+          <br />
+          <span style={{ fontStyle: "italic" }}>
+            <Mark>DMR.agency.</Mark>
+          </span>
+        </h2>
+        <p
+          style={{
+            marginTop: 22,
+            fontFamily: SERIF,
+            fontSize: 17.5,
+            color: INK70,
+            lineHeight: 1.55,
+            maxWidth: 520,
+          }}
+        >
+          This page is the trailer; the agency page is the feature. Module
+          breakdown, pricing, cohort dates, FAQs, and a booking form are all
+          over there.
+        </p>
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <a
+          href={EMOS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "22px 26px",
+            background: INK,
+            color: PAPER,
+            textDecoration: "none",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 14,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+          }}
+        >
+          <span>Visit the EMOS page</span>
+          <span style={{ fontFamily: SERIF, fontSize: 20 }}>↗</span>
+        </a>
+        <a
+          href={CALENDLY}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "22px 26px",
+            background: YEL,
+            color: INK,
+            textDecoration: "none",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 14,
+            letterSpacing: "0.10em",
+            textTransform: "uppercase",
+          }}
+        >
+          <span>Book a call with the editor</span>
+          <span style={{ fontFamily: SERIF, fontSize: 20 }}>→</span>
+        </a>
+        <div style={{ marginTop: 10 }}>
+          <SCaps size={10.5} ls="0.16em" color={INK55}>
+            Both open in a new tab. The agency page is hosted at{" "}
+            <span style={{ color: INK }}>dmr.agency/earnedmediaOS/</span>.
+          </SCaps>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── Calendly ─────────────────────────────────────────────────────────────────
+
+const CalendlySection = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 80, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
+    <div style={{ maxWidth: 900, margin: "0 auto" }}>
+      <p style={{ margin: "0 0 8px", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK }}>
+        Book a slot
+      </p>
+      <h2 style={{ margin: "0 0 36px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 5vw, 48px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>
+        Pick a time that works for you.
+      </h2>
+      <div
+        className="calendly-inline-widget"
+        data-url="https://calendly.com/sia_dmr_agency/emos?hide_event_type_details=1"
+        style={{ minWidth: 320, height: 700 }}
+      />
+    </div>
+  </section>
+);
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default function EMOSPage() {
+  return (
+    <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
+      <Mast active="EMOS" />
+      <Hero />
+      <VideoCard />
+      <Inside />
+      <Proof />
+      <Handoff />
+      <CalendlySection />
+      <Subscriptions sectionNumber="05" />
       <Colophon />
     </div>
   );

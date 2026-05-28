@@ -1,5 +1,6 @@
 import { Colophon, Mast, Subscriptions } from "@/components/bureau";
 import {
+  DoubleRule,
   HRule,
   Mark,
   Pill,
@@ -10,7 +11,6 @@ import {
   GROT,
   INK,
   INK15,
-  INK35,
   INK55,
   INK70,
   PAPER,
@@ -19,426 +19,540 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-const GUIDES: ReadonlyArray<{
-  n: string;
-  title: string;
-  subtitle: string;
-  body: string;
-  href: string;
-  stats: ReadonlyArray<{ value: string; label: string }>;
-}> = [
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
+const INTERNAL_SLUGS = new Set(["personal-branding", "storytelling", "neuromarketing", "writing-tips"]);
+
+const ART = (slug: string): string =>
+  INTERNAL_SLUGS.has(slug)
+    ? `/writing/${slug}`
+    : `https://syedirfanajmal.com/${slug}/`;
+
+const isInternal = (slug: string) => INTERNAL_SLUGS.has(slug);
+
+type Feature = { tag: string; no: string; title: string; sub: string; blurb: string; slug: string; wc: string; read: string };
+const FEATURES: ReadonlyArray<Feature> = [
   {
-    n: "I",
-    title: "Personal Branding",
-    subtitle: "The Complete Playbook",
-    body: "What personal branding is and why it matters, examples from Gates, Branson, Jobs and Musk, top 10 personal branding statistics, and a step-by-step plan: find your niche, build authority through content, leverage social media, get PR coverage, speak publicly.",
-    href: "/writing/personal-branding",
-    stats: [
-      { value: "12", label: "chapters" },
-      { value: "~5,500", label: "words" },
-      { value: "22 min", label: "read" },
-    ],
+    tag: "101 series", no: "01",
+    title: "Personal Branding 101",
+    sub: "How to brand yourself for success.",
+    blurb: "A long-form guide to building a personal brand that opens doors. Five pillars: clarity, consistency, content, community, credibility. Updated for 2021.",
+    slug: "personal-branding", wc: "~6,000 words", read: "24 min",
   },
   {
-    n: "II",
-    title: "Neuromarketing",
-    subtitle: "The Marketer's Field Guide",
-    body: "What neuromarketing is, how it works, and three real-world case studies (Red Bull, Porsche, Coke vs Pepsi). Five actionable techniques: anchoring, the power of free, fear of loss, social proof, and the decoy effect.",
-    href: "/writing/neuromarketing",
-    stats: [
-      { value: "10", label: "chapters" },
-      { value: "~4,500", label: "words" },
-      { value: "18 min", label: "read" },
-    ],
+    tag: "101 series", no: "02",
+    title: "Storytelling 101",
+    sub: "Elevate your brand.",
+    blurb: "The neurological case for stories, the hero's journey applied to brand narrative, and practical frameworks for weaving storytelling through content, decks, and pitches.",
+    slug: "storytelling", wc: "~5,500 words", read: "21 min",
   },
   {
-    n: "III",
-    title: "Storytelling",
-    subtitle: "For Business & Brand",
-    body: "The neuroscience of why stories work, five elements of a compelling brand story, the Hero's Journey applied to brand narrative, examples from Dove, Airbnb, and TOMS, and three practical storytelling frameworks for content, pitch decks, and keynotes.",
-    href: "/writing/storytelling",
-    stats: [
-      { value: "9", label: "chapters" },
-      { value: "~6,500", label: "words" },
-      { value: "24 min", label: "read" },
-    ],
-  },
-  {
-    n: "IV",
-    title: "Writing Tips",
-    subtitle: "100+ Tips · Craft & Clarity",
-    body: "A working list sharpened over a decade. 100+ tips across four categories: writing quality content (85 tips drawing on Hemingway, Stephen King, Seth Godin), writing environment, grammar, and tools including Grammarly and Hemingway Editor.",
-    href: "/writing/writing-tips",
-    stats: [
-      { value: "100+", label: "tips" },
-      { value: "4", label: "categories" },
-      { value: "22 min", label: "read" },
-    ],
+    tag: "101 series", no: "03",
+    title: "Neuromarketing 101",
+    sub: "What it is and how it works.",
+    blurb: "Anchoring, the power of free, loss aversion, social proof, the decoy effect. Red Bull, Porsche, Coke vs. Pepsi. Real research, practical applications.",
+    slug: "neuromarketing", wc: "~3,200 words", read: "13 min",
   },
 ];
 
-const RECENT_ARTICLES = [
-  { title: "How to Become a Good Writer", category: "Writing", href: "https://syedirfanajmal.com/become-a-good-writer/" },
-  { title: "6 Must-Have Digital Tools for Writers and Editors", category: "Tools", href: "https://syedirfanajmal.com/digital-tools-writers-editors/" },
-  { title: "6 Productivity Hacks for Entrepreneurs", category: "Productivity", href: "https://syedirfanajmal.com/6-productivity-hacks-entrepreneurs/" },
-  { title: "5 Google Analytics Metrics for Your Content Marketing Dashboard", category: "Analytics", href: "https://syedirfanajmal.com/google-analytics-content-marketing/" },
-  { title: "How To Maximize eCommerce Conversions Using Product Discovery", category: "eCommerce", href: "https://syedirfanajmal.com/maximize-ecommerce-conversions-using-product-discovery/" },
+type Article = { title: string; slug: string; cat: string; y: string; updated?: string };
+const ARTICLES: ReadonlyArray<Article> = [
+  { title: "100+ Writing Tips to Become a Great Writer", slug: "writing-tips",                                         cat: "Craft",       y: "2016", updated: "2022" },
+  { title: "How to Become a Good Writer",                slug: "become-a-good-writer",                                 cat: "Craft",       y: "—" },
+  { title: "6 Productivity Hacks for Entrepreneurs",     slug: "6-productivity-hacks-entrepreneurs",                   cat: "Operating",   y: "2021" },
+  { title: "6 Must-Have Digital Tools for Writers",      slug: "digital-tools-writers-editors",                       cat: "Tools",       y: "2020" },
+  { title: "5 Google Analytics Metrics for Content",     slug: "google-analytics-content-marketing",                   cat: "Measurement", y: "2020" },
+  { title: "How To Maximize eCommerce Conversions",      slug: "maximize-ecommerce-conversions-using-product-discovery", cat: "Strategy",  y: "—" },
 ];
+
+type Infographic = { title: string; slug: string; y: string; updated?: string };
+const INFOGRAPHICS: ReadonlyArray<Infographic> = [
+  { title: "Top 11 Scientific Benefits of Writing",        slug: "top-11-scientific-benefits-writing-infographic",       y: "2019" },
+  { title: "Managing Remote Teams with HubStaff",          slug: "managing-remote-teams-with-hubstaff-time-tracking",    y: "2016", updated: "2021" },
+  { title: "How to Form Writing Habits for Success",        slug: "form-writing-habits-success-infographic",              y: "—" },
+  { title: "Getting Content Ideas from Your Customers",     slug: "content-ideas-from-customers-infographic",             y: "—" },
+  { title: "The Ultimate Bing SEO Guide",                   slug: "the-ultimate-bing-seo-guide",                          y: "—" },
+];
+
+const PRESS_OUTLETS: ReadonlyArray<[string, string]> = [
+  ["Forbes",                   "Contributor & featured"],
+  ["Harvard Business Review",  "Guest contributor"],
+  ["HuffPost",                 "Contributor"],
+  ["The Next Web (TNW)",       "Featured"],
+  ["Entrepreneur",             "Contributor"],
+  ["Search Engine Journal",    "Contributor"],
+  ["SEMrush Blog",             "Contributor"],
+  ["Business.com",             "Contributor"],
+  ["Reader's Digest",          "Featured"],
+  ["Virgin Startup",           "Contributor"],
+  ["The World Bank Blog",      "Contributor"],
+  ["CNET",                     "Featured"],
+  ["SERPed",                   "Contributor"],
+];
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+
+const Hero = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 56, paddingBottom: 70 }}>
+    <div style={{ textAlign: "center", marginBottom: 24 }}>
+      <SCaps color={INK70} size={12} ls="0.28em">
+        Long-form writing &nbsp;·&nbsp; Essays, infographics, bylines
+      </SCaps>
+    </div>
+    <h1
+      className="hero-h1"
+      style={{ fontFamily: SERIF, fontWeight: 700, color: INK }}
+    >
+      <span style={{ display: "block" }}>Selected</span>
+      <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
+        <Mark>writing.</Mark>
+      </span>
+    </h1>
+    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
+      <SCaps size={11.5} ls="0.22em" color={INK55}>
+        Forty-plus essays &nbsp;·&nbsp; five infographics &nbsp;·&nbsp;
+        <span style={{ color: INK }}>thirteen-plus publications</span>
+      </SCaps>
+    </div>
+    <DoubleRule style={{ margin: "44px 0 0" }} />
+  </section>
+);
+
+// ─── §01 · Featured (101 Series) ─────────────────────────────────────────────
+
+const Featured = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 0, paddingBottom: 90 }}>
+    <SectionMast n="01" label="The 101 Series · Three long-form guides" />
+
+    <div className="grid-intro">
+      <h2
+        className="h2-xl"
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontWeight: 700,
+          color: INK,
+          lineHeight: 0.98,
+          letterSpacing: "-0.025em",
+        }}
+      >
+        Three guides
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>worth your hour.</Mark>
+        </span>
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontSize: 19,
+          color: INK70,
+          lineHeight: 1.55,
+          maxWidth: 560,
+        }}
+      >
+        The 101 Series: three of the most-read pieces on the site, each a
+        complete guide to a subject I have spent years putting into practice.
+        Updated annually; bookmark-worthy.
+      </p>
+    </div>
+
+    <div
+      className="grid-cards-3"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {FEATURES.map((f, i) => (
+        <a
+          key={f.title}
+          href={ART(f.slug)}
+          target={isInternal(f.slug) ? undefined : "_blank"}
+          rel={isInternal(f.slug) ? undefined : "noopener noreferrer"}
+          className="card-border"
+          style={{
+            padding: "32px 28px 28px",
+            background: i === 1 ? PAPER2 : PAPER,
+            textDecoration: "none",
+            color: INK,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 460,
+            position: "relative",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+            <Pill size={10.5} ls="0.20em">{f.tag}</Pill>
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 42,
+                color: INK,
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {f.no}
+            </div>
+          </div>
+          <h3
+            style={{
+              margin: "20px 0 0",
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 34,
+              color: INK,
+              lineHeight: 1.05,
+              letterSpacing: "-0.018em",
+            }}
+          >
+            {f.title}
+          </h3>
+          <div
+            style={{
+              marginTop: 8,
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: 19,
+              color: INK70,
+              lineHeight: 1.3,
+            }}
+          >
+            {f.sub}
+          </div>
+          <HRule style={{ margin: "18px 0" }} />
+          <p
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontSize: 15.5,
+              color: INK,
+              lineHeight: 1.55,
+              flex: 1,
+              textAlign: "justify",
+            }}
+          >
+            {f.blurb}
+          </p>
+          <div
+            style={{
+              marginTop: 24,
+              paddingTop: 14,
+              borderTop: `1px solid ${INK15}`,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+            }}
+          >
+            <SCaps size={10.5} ls="0.14em" color={INK70}>
+              {f.wc} &nbsp;·&nbsp; {f.read}
+            </SCaps>
+            <SCaps size={10.5} ls="0.16em" color={INK}>Read the guide ↗</SCaps>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §02 · All Articles ───────────────────────────────────────────────────────
+
+const AllArticles = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 0, paddingBottom: 90 }}>
+    <SectionMast n="02" label="From the archives · Selected articles" />
+
+    <ol
+      style={{
+        margin: 0,
+        padding: 0,
+        listStyle: "none",
+        borderTop: `2px solid ${INK}`,
+      }}
+    >
+      {ARTICLES.map((a, i) => (
+        <li
+          key={a.slug}
+          className="article-row"
+        >
+          <div
+            style={{
+              fontFamily: GROT,
+              fontWeight: 800,
+              fontSize: 13,
+              letterSpacing: "0.06em",
+              color: INK,
+            }}
+          >
+            {String(i + 1).padStart(2, "0")}.
+          </div>
+          <a
+            href={ART(a.slug)}
+            target={isInternal(a.slug) ? undefined : "_blank"}
+            rel={isInternal(a.slug) ? undefined : "noopener noreferrer"}
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 21,
+              color: INK,
+              textDecoration: "none",
+              lineHeight: 1.25,
+            }}
+          >
+            {a.title}
+          </a>
+          <div className="article-cat">
+            <SCaps size={10.5} ls="0.14em" color={INK70}>{a.cat}</SCaps>
+          </div>
+          <div
+            className="article-year"
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: 14,
+              color: INK55,
+            }}
+          >
+            {a.y}{a.updated ? ` · upd. ${a.updated}` : ""}
+          </div>
+          <div className="article-read" style={{ textAlign: "right" }}>
+            <SCaps size={10.5} ls="0.14em" color={INK55}>Read ↗</SCaps>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+);
+
+// ─── §03 · Infographics ───────────────────────────────────────────────────────
+
+const Infographics = () => (
+  <section
+    className="sx"
+    style={{
+      background: PAPER2,
+      paddingTop: 90,
+      paddingBottom: 90,
+      borderTop: `1px solid ${INK}`,
+      borderBottom: `1px solid ${INK}`,
+    }}
+  >
+    <SectionMast n="03" label="Infographics · Visual essays" />
+
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontWeight: 700,
+          color: INK,
+          lineHeight: 0.98,
+          letterSpacing: "-0.025em",
+        }}
+      >
+        Five infographics,
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>widely republished.</Mark>
+        </span>
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontSize: 18.5,
+          color: INK70,
+          lineHeight: 1.55,
+          maxWidth: 540,
+        }}
+      >
+        Each of these started as a research project and ended up reprinted on
+        a half-dozen other sites. Two are being redesigned for the new site;
+        the others remain in their original form for now.
+      </p>
+    </div>
+
+    <div
+      className="grid-5col"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {INFOGRAPHICS.map((ig, i) => (
+        <a
+          key={ig.slug}
+          href={`https://syedirfanajmal.com/${ig.slug}/`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="card-border-5"
+          style={{
+            padding: "22px 18px 20px",
+            background: PAPER,
+            textDecoration: "none",
+            color: INK,
+            display: "flex",
+            flexDirection: "column",
+            minHeight: 200,
+          }}
+        >
+          <SCaps size={10.5} ls="0.18em" color={INK55}>
+            Nº {String(i + 1).padStart(2, "0")}
+          </SCaps>
+          {/* Placeholder visual */}
+          <div
+            aria-hidden
+            style={{
+              margin: "14px 0 14px",
+              height: 64,
+              background: `repeating-linear-gradient(135deg, ${YEL} 0 6px, transparent 6px 12px)`,
+              border: `1px solid ${INK}`,
+            }}
+          />
+          <h4
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 17,
+              color: INK,
+              lineHeight: 1.25,
+              letterSpacing: "-0.005em",
+            }}
+          >
+            {ig.title}
+          </h4>
+          <div style={{ flex: 1 }} />
+          <div
+            style={{
+              marginTop: 12,
+              paddingTop: 10,
+              borderTop: `1px solid ${INK15}`,
+            }}
+          >
+            <SCaps size={10} ls="0.12em" color={INK70}>
+              {ig.y}{ig.updated ? ` · upd. ${ig.updated}` : ""}
+            </SCaps>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §04 · Press ─────────────────────────────────────────────────────────────
+
+const Press = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
+    <SectionMast n="04" label="Bylines & citations · Selected publications" />
+
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontWeight: 700,
+          color: INK,
+          lineHeight: 0.98,
+          letterSpacing: "-0.025em",
+        }}
+      >
+        Where the
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>writing has gone.</Mark>
+        </span>
+      </h2>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontSize: 18.5,
+          color: INK70,
+          lineHeight: 1.55,
+          maxWidth: 540,
+        }}
+      >
+        Publications I have written for, been quoted in, or been featured by.
+        A fuller index lives on the About page.
+      </p>
+    </div>
+
+    <div
+      className="grid-press-2"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {PRESS_OUTLETS.map(([n, note]) => (
+        <div
+          key={n}
+          className="press-cell"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr auto",
+            gap: 16,
+            padding: "16px 26px",
+            alignItems: "baseline",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: 21,
+              color: INK,
+            }}
+          >
+            {n}
+          </div>
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: 14,
+              color: INK70,
+              textAlign: "right",
+            }}
+          >
+            {note}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div style={{ marginTop: 36, textAlign: "center" }}>
+      <a
+        href="/about#press"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 12,
+          padding: "14px 22px",
+          background: INK,
+          color: PAPER,
+          textDecoration: "none",
+          fontFamily: GROT,
+          fontWeight: 800,
+          fontSize: 12,
+          letterSpacing: "0.16em",
+          textTransform: "uppercase",
+        }}
+      >
+        See the full press archive →
+      </a>
+    </div>
+  </section>
+);
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function WritingPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Mast active="Writing" />
-
-      {/* ── Header ───────────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px 72px" }}>
-        <SectionMast n="00" label="The Writing Desk · Guides & Articles" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 64,
-            alignItems: "end",
-          }}
-        >
-          <h1
-            style={{
-              margin: 0,
-              fontWeight: 700,
-              fontSize: 80,
-              lineHeight: 0.96,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            Everything
-            <br />
-            <span style={{ fontStyle: "italic" }}>
-              <Mark>in writing.</Mark>
-            </span>
-          </h1>
-          <div>
-            <p
-              style={{
-                margin: "0 0 24px",
-                fontSize: 18,
-                lineHeight: 1.6,
-                color: INK70,
-              }}
-            >
-              Four comprehensive guides. Nine long-form articles. Five
-              infographics. All built around one belief: that the best
-              marketing is earned, not bought — and the best way to earn attention
-              is to be the most useful source in your category.
-            </p>
-            <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-              <a
-                href="/blog"
-                style={{
-                  padding: "11px 18px",
-                  background: INK,
-                  color: PAPER,
-                  textDecoration: "none",
-                  fontFamily: GROT,
-                  fontWeight: 700,
-                  fontSize: 11.5,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                }}
-              >
-                All articles →
-              </a>
-              <a
-                href="/infographics"
-                style={{
-                  padding: "11px 18px",
-                  border: `1px solid ${INK}`,
-                  color: INK,
-                  textDecoration: "none",
-                  fontFamily: GROT,
-                  fontWeight: 700,
-                  fontSize: 11.5,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                }}
-              >
-                Infographics →
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Stat strip */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr 1fr",
-            gap: 1,
-            marginTop: 56,
-            background: INK15,
-          }}
-        >
-          {[
-            { stat: "4", label: "Comprehensive guides" },
-            { stat: "9", label: "Articles & essays" },
-            { stat: "5", label: "Infographics" },
-            { stat: "9+", label: "Years of writing" },
-          ].map(({ stat, label }) => (
-            <div key={label} style={{ padding: "28px 24px", background: PAPER }}>
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: 48,
-                  lineHeight: 1,
-                  letterSpacing: "-0.03em",
-                }}
-              >
-                {stat}
-              </div>
-              <SCaps
-                size={10.5}
-                ls="0.14em"
-                color={INK55}
-                style={{ marginTop: 8, display: "block" }}
-              >
-                {label}
-              </SCaps>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <HRule />
-
-      {/* ── Guides grid ──────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px", background: PAPER2 }}>
-        <SectionMast n="01" label="The Guides · Four Definitive References" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 32,
-          }}
-        >
-          {GUIDES.map(({ n, title, subtitle, body, href, stats }) => (
-            <div
-              key={n}
-              style={{
-                background: PAPER,
-                padding: "32px",
-                borderTop: `2px solid ${INK}`,
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "baseline",
-                  marginBottom: 16,
-                }}
-              >
-                <div style={{ display: "flex", gap: 12, alignItems: "baseline" }}>
-                  <SCaps size={11} ls="0.18em" color={YEL}>{n}.</SCaps>
-                  <SCaps size={10.5} ls="0.14em">Guide</SCaps>
-                </div>
-                <div style={{ display: "flex", gap: 16 }}>
-                  {stats.map(({ value, label }) => (
-                    <div key={label} style={{ textAlign: "right" }}>
-                      <div
-                        style={{
-                          fontWeight: 700,
-                          fontSize: 16,
-                          color: INK,
-                          lineHeight: 1,
-                        }}
-                      >
-                        {value}
-                      </div>
-                      <SCaps size={9} ls="0.10em" color={INK35} style={{ marginTop: 2 }}>
-                        {label}
-                      </SCaps>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <h2
-                style={{
-                  margin: "0 0 4px",
-                  fontWeight: 700,
-                  fontSize: 36,
-                  lineHeight: 1.05,
-                  letterSpacing: "-0.02em",
-                }}
-              >
-                {title}
-              </h2>
-              <div style={{ marginBottom: 16 }}>
-                <SCaps size={11} ls="0.16em" color={INK55}>{subtitle}</SCaps>
-              </div>
-
-              <HRule />
-
-              <p
-                style={{
-                  margin: "16px 0 24px",
-                  fontSize: 16,
-                  lineHeight: 1.65,
-                  color: INK70,
-                }}
-              >
-                {body}
-              </p>
-
-              <a
-                href={href}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                  padding: "11px 18px",
-                  background: INK,
-                  color: PAPER,
-                  textDecoration: "none",
-                  fontFamily: GROT,
-                  fontWeight: 700,
-                  fontSize: 11,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                }}
-              >
-                Read the guide →
-              </a>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <HRule />
-
-      {/* ── Recent articles ──────────────────────────────────── */}
-      <section style={{ padding: "72px 56px" }}>
-        <SectionMast n="02" label="Recent · From the Wire" />
-        <div>
-          {RECENT_ARTICLES.map(({ title, category, href }, i) => (
-            <a
-              key={title}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "32px 1fr 160px",
-                gap: 24,
-                padding: "20px 0",
-                borderBottom: `1px solid ${INK15}`,
-                alignItems: "baseline",
-                textDecoration: "none",
-                color: "inherit",
-              }}
-            >
-              <SCaps size={11} ls="0.14em" color={INK35}>
-                {String(i + 1).padStart(2, "0")}.
-              </SCaps>
-              <div style={{ fontFamily: SERIF, fontSize: 18, fontWeight: 600, color: INK }}>
-                {title}
-              </div>
-              <Pill size={9.5} ls="0.10em">{category}</Pill>
-            </a>
-          ))}
-
-          <div style={{ marginTop: 28 }}>
-            <a
-              href="/blog"
-              style={{
-                fontFamily: GROT,
-                fontWeight: 700,
-                fontSize: 11.5,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: INK,
-                textDecoration: "none",
-              }}
-            >
-              All articles →
-            </a>
-          </div>
-        </div>
-      </section>
-
-      <HRule />
-
-      {/* ── Infographics preview ─────────────────────────────── */}
-      <section style={{ padding: "72px 56px", background: PAPER2 }}>
-        <SectionMast n="03" label="Visual Desk · Infographics" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
-            gap: 16,
-            marginBottom: 28,
-          }}
-        >
-          {[
-            "Top 11 Scientific Benefits of Writing",
-            "Managing Remote Teams with HubStaff",
-            "How to Form Writing Habits for Success",
-            "Getting Content Ideas from Your Customers",
-            "The Ultimate Bing SEO Guide",
-          ].map((title, i) => (
-            <div
-              key={title}
-              style={{
-                background: PAPER,
-                border: `1px solid ${INK15}`,
-                padding: "28px 20px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: 10,
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: 700,
-                  fontSize: 32,
-                  color: INK15,
-                  lineHeight: 1,
-                  fontFamily: SERIF,
-                }}
-              >
-                {String(i + 1).padStart(2, "0")}
-              </div>
-              <div
-                style={{
-                  fontFamily: SERIF,
-                  fontSize: 14.5,
-                  fontWeight: 700,
-                  lineHeight: 1.3,
-                  color: INK,
-                }}
-              >
-                {title}
-              </div>
-            </div>
-          ))}
-        </div>
-        <a
-          href="/infographics"
-          style={{
-            fontFamily: GROT,
-            fontWeight: 700,
-            fontSize: 11.5,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color: INK,
-            textDecoration: "none",
-          }}
-        >
-          View all infographics →
-        </a>
-      </section>
-
-      <Subscriptions sectionNumber="04" />
+      <Hero />
+      <Featured />
+      <AllArticles />
+      <Infographics />
+      <Press />
+      <Subscriptions sectionNumber="05" />
       <Colophon />
     </div>
   );

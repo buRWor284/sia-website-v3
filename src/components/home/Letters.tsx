@@ -45,26 +45,19 @@ const TESTIMONIALS: ReadonlyArray<Testimonial> = [
 ];
 
 export const Letters = () => (
-  <section style={{ background: PAPER, padding: "40px 56px 90px" }}>
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 90 }}>
     <SectionMast n="03" label="What clients say · On the record" />
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(2, 1fr)",
-        gap: 0,
-        border: `1px solid ${INK}`,
-      }}
+      className="grid-testimonials"
+      style={{ border: `1px solid ${INK}` }}
     >
       {TESTIMONIALS.map((tm, i) => {
-        const isRight = i % 2 === 1;
-        const isBottom = i >= 2;
         return (
           <article
             key={i}
+            className="letter-card"
             style={{
-              padding: "36px 36px 30px",
-              borderRight: !isRight ? `1px solid ${INK}` : "none",
-              borderBottom: !isBottom ? `1px solid ${INK}` : "none",
+              padding: "32px 28px 28px",
               display: "flex",
               flexDirection: "column",
             }}
@@ -74,6 +67,8 @@ export const Letters = () => (
                 display: "flex",
                 alignItems: "baseline",
                 justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 8,
               }}
             >
               <Pill size={10.5} ls="0.18em">
@@ -87,7 +82,7 @@ export const Letters = () => (
               style={{
                 margin: "20px 0 0",
                 fontFamily: SERIF,
-                fontSize: 23.5,
+                fontSize: "clamp(18px, 3.5vw, 23.5px)",
                 color: INK,
                 lineHeight: 1.4,
                 letterSpacing: "-0.005em",
@@ -121,6 +116,8 @@ export const Letters = () => (
                 display: "flex",
                 alignItems: "baseline",
                 justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 8,
               }}
             >
               <div>
@@ -142,7 +139,7 @@ export const Letters = () => (
                 style={{
                   fontFamily: SERIF,
                   fontStyle: "italic",
-                  fontSize: 14,
+                  fontSize: 13,
                   color: INK55,
                 }}
               >

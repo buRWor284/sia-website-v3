@@ -10,17 +10,17 @@
   "guest_role": null,
   "is_solo": true,
   "is_featured": false,
-  "summary": "Part 1 of the #SEObacklinks tutorial series: Type 1 backlinks — what they are, how to identify them, and how to earn them at scale.",
-  "show_notes_text": "",
-  "transcript_text": "",
-  "full_content_text": "Part 1 of the #SEObacklinks tutorial series: Type 1 backlinks — what they are, how to identify them, and how to earn them at scale.",
-  "featured_image_url": null,
+  "summary": "Part 1 of the #SEObacklinks tutorial series: Type 1 backlinks.",
+  "show_notes_text": "### Type 1 Backlinks: Link Attribute Types\n\n1(a) Do-Follow\nStandard links that pass \"link juice\" / PageRank to the linked page. The default for most organic editorial links.\n\n1(b) No Follow\nLinks with the rel=\"nofollow\" attribute. Google treats these as hints rather than directives (post-2019 update). Common in user-generated content, comment sections, and some sponsored placements.\n\n1(c) Mention Only\nBrand or URL mentions that are not hyperlinked. No direct link equity passed, but valuable for brand awareness and potentially for entity recognition in search algorithms.\n\n1(d) Sponsored / UGC\nLinks tagged with rel=\"sponsored\" (paid/advertorial placements) or rel=\"ugc\" (user-generated content). Introduced by Google in 2019 alongside the \"nofollow as hint\" update.\n\n### Related Episodes in This Series\n\n- Type 2 Backlinks (S03E07): https://youtu.be/ZDq9jZxK0lk\n- Type 3 Backlinks (S03E08): https://youtu.be/__UauayC64k",
+  "transcript_text": "No transcript available for this episode.",
+  "full_content_text": "### Type 1 Backlinks: Link Attribute Types\n\n1(a) Do-Follow\nStandard links that pass \"link juice\" / PageRank to the linked page. The default for most organic editorial links.\n\n1(b) No Follow\nLinks with the rel=\"nofollow\" attribute. Google treats these as hints rather than directives (post-2019 update). Common in user-generated content, comment sections, and some sponsored placements.\n\n1(c) Mention Only\nBrand or URL mentions that are not hyperlinked. No direct link equity passed, but valuable for brand awareness and potentially for entity recognition in search algorithms.\n\n1(d) Sponsored / UGC\nLinks tagged with rel=\"sponsored\" (paid/advertorial placements) or rel=\"ugc\" (user-generated content). Introduced by Google in 2019 alongside the \"nofollow as hint\" update.\n\n### Related Episodes in This Series\n\n- Type 2 Backlinks (S03E07): https://youtu.be/ZDq9jZxK0lk\n- Type 3 Backlinks (S03E08): https://youtu.be/__UauayC64k\n\nNo transcript available for this episode.",
+  "featured_image_url": "https://syedirfanajmal.com/wp-content/uploads/2020/05/S03E03_Podcast_Banner_Fb.jpg",
   "hero_text_extracted": null,
   "embeds": {
     "youtube_id": null,
-    "anchor_embed_url": null,
-    "spotify_url": "https://open.spotify.com/show/7GxDZnNXb37gjXLF8LZmMh",
-    "apple_podcasts_url": "https://podcasts.apple.com/us/podcast/the-sia-business-show/id1347540466"
+    "anchor_embed_url": "https://anchor.fm/syedirfanajmal/embed/episodes/SEObacklinks-Tutorial---Type-1-Backlinks-S03E06-eo8psg/a-a1r6ksd",
+    "spotify_url": "https://open.spotify.com/episode/4tA8pfMFioDHgJTciIodmC",
+    "apple_podcasts_url": "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466"
   },
   "source_url": "https://syedirfanajmal.com/seo-backlinks-tutorial/",
   "_wp_post_id": null
