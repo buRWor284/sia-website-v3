@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Newsreader, Archivo, JetBrains_Mono } from "next/font/google";
 import Script from "next/script";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -40,7 +41,10 @@ export default function RootLayout({
       lang="en"
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <SpeedInsights />
+      </body>
       {/* Mailchimp embedded form validation — jQuery required by mc-validate.js */}
       <Script
         src="https://code.jquery.com/jquery-3.7.1.min.js"
