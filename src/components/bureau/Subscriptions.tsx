@@ -4,6 +4,12 @@ import { useState } from "react";
 import { GROT, INK, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { SCaps, SectionMast, SiaLogo } from "./primitives";
 
+const GDPR_CHECKBOXES = [
+  { id: "gdpr_2381", name: "gdpr[2381]", label: "Email" },
+  { id: "gdpr_2385", name: "gdpr[2385]", label: "Direct Mail" },
+  { id: "gdpr_2389", name: "gdpr[2389]", label: "Customized Online Advertising" },
+];
+
 const MailchimpForm = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -40,8 +46,11 @@ const MailchimpForm = () => {
 
   return (
     <form
-      action="https://syedirfanajmal.us9.list-manage.com/subscribe/post?u=92d894afae4496839afa2a07d&id=4b6d81a50f&f_id=003bd4e3f0"
+      action="https://syedirfanajmal.us9.list-manage.com/subscribe/post?u=92d894afae4496839afa2a07d&amp;id=4b6d81a50f&amp;v_id=4651&amp;f_id=003bd4e3f0"
       method="post"
+      id="mc-embedded-subscribe-form"
+      name="mc-embedded-subscribe-form"
+      className="validate"
       target="_blank"
       noValidate
       onSubmit={onSubmit}
@@ -51,11 +60,12 @@ const MailchimpForm = () => {
         <input
           type="email"
           name="EMAIL"
+          id="mce-EMAIL"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@yourcompany.com"
-          className="sub-input"
+          className="sub-input required email"
           style={{
             flex: 1,
             padding: "18px 18px",
@@ -72,6 +82,7 @@ const MailchimpForm = () => {
         <button
           type="submit"
           name="subscribe"
+          id="mc-embedded-subscribe"
           className="sub-btn"
           style={{
             background: YEL,
@@ -88,6 +99,105 @@ const MailchimpForm = () => {
           Subscribe →
         </button>
       </div>
+
+      {/* GDPR Marketing Permissions */}
+      <div id="mergeRow-gdpr" style={{ marginTop: 22 }}>
+        <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.55)">
+          Marketing Permissions
+        </SCaps>
+        <p style={{
+          margin: "8px 0 10px",
+          fontFamily: SERIF,
+          fontSize: 13.5,
+          color: "rgba(241,235,222,.45)",
+          lineHeight: 1.5,
+          fontStyle: "italic",
+        }}>
+          Select the ways you&rsquo;d like to hear from SIA Enterprises:
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {GDPR_CHECKBOXES.map(({ id, name, label }) => (
+            <label
+              key={id}
+              htmlFor={id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                cursor: "pointer",
+                fontFamily: GROT,
+                fontSize: 12,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "rgba(241,235,222,.65)",
+              }}
+            >
+              <input
+                type="checkbox"
+                id={id}
+                name={name}
+                className="gdpr"
+                value="Y"
+                style={{
+                  width: 14,
+                  height: 14,
+                  cursor: "pointer",
+                  flexShrink: 0,
+                  accentColor: YEL,
+                }}
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+        <p style={{
+          margin: "12px 0 0",
+          fontFamily: SERIF,
+          fontSize: 12.5,
+          color: "rgba(241,235,222,.35)",
+          lineHeight: 1.5,
+          fontStyle: "italic",
+        }}>
+          You can unsubscribe at any time by clicking the link in the footer of our emails.
+          We use Mailchimp as our marketing platform.{" "}
+          <a
+            href="https://mailchimp.com/legal/terms"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "rgba(241,235,222,.5)", textUnderlineOffset: 3 }}
+          >
+            Learn more
+          </a>{" "}
+          about Mailchimp&rsquo;s privacy practices.
+        </p>
+      </div>
+
+      {/* Mailchimp response messages */}
+      <div id="mce-responses" style={{ marginTop: 12 }}>
+        <div
+          id="mce-error-response"
+          style={{
+            display: "none",
+            fontFamily: SERIF,
+            fontSize: 14,
+            color: "#ff6b6b",
+            fontStyle: "italic",
+            marginBottom: 8,
+          }}
+        />
+        <div
+          id="mce-success-response"
+          style={{
+            display: "none",
+            fontFamily: SERIF,
+            fontSize: 14,
+            color: YEL,
+            fontStyle: "italic",
+            marginBottom: 8,
+          }}
+        />
+      </div>
+
       {/* Honeypot — must stay hidden, must keep this exact name */}
       <div aria-hidden="true" style={{ position: "absolute", left: "-5000px" }}>
         <input
@@ -97,7 +207,8 @@ const MailchimpForm = () => {
           defaultValue=""
         />
       </div>
-      <div style={{ marginTop: 12 }}>
+
+      <div style={{ marginTop: 14 }}>
         <SCaps size={10.5} ls="0.14em" color="rgba(241,235,222,.45)">
           No spam · One-click unsubscribe · Hosted by Mailchimp
         </SCaps>
