@@ -47,7 +47,7 @@ const SCOPE: ReadonlyArray<ScopeItem> = [
     d: "When it is time to add a content lead, a paid-media specialist, or a freelance designer, I run the brief, interview the candidates, and stand behind the hire." },
   { no: "05", t: "Investor & board narrative",
     d: "Marketing slides for board meetings. Investor updates that show growth in language they trust. Sales support when a founder-led deal needs marketing air cover." },
-  { no: "06", t: "The hard "no"",
+  { no: "06", t: "The hard “no”",
     d: "A fractional CMO's most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship." },
 ];
 
