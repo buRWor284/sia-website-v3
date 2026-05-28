@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
     // lockfile from a parent directory.
     root: path.resolve(__dirname),
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "syedirfanajmal.com",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
