@@ -250,32 +250,7 @@ export const Hero = () => (
             ["Speaking",         "/speaking"],
             ["Resources",        "/resources"],
           ] as const).map(([label, href]) => (
-            <a
-              key={label}
-              href={href}
-              style={{
-                padding: "10px 18px",
-                border: `1px solid rgba(241,235,222,.35)`,
-                color: PAPER,
-                textDecoration: "none",
-                fontFamily: GROT,
-                fontWeight: 700,
-                fontSize: 11,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                transition: "background 0.12s, border-color 0.12s",
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.background = YEL;
-                (e.currentTarget as HTMLElement).style.color = INK;
-                (e.currentTarget as HTMLElement).style.borderColor = YEL;
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.background = "transparent";
-                (e.currentTarget as HTMLElement).style.color = PAPER;
-                (e.currentTarget as HTMLElement).style.borderColor = "rgba(241,235,222,.35)";
-              }}
-            >
+            <a key={label} href={href} className="what-i-do-pill">
               {label} →
             </a>
           ))}
