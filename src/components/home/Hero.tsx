@@ -15,10 +15,10 @@ import { DoubleRule, Flag, Mark, Pill, SCaps } from "@/components/bureau/primiti
 // ── Stat strip data ──────────────────────────────────────────────────────────
 // [display number, descriptor label, italic citation]
 const STATS: ReadonlyArray<[string, string, string]> = [
-  ["$1.2M",    "client revenue · organic · 12 months",              "NTA · $160K → $1.2M"],
-  ["1.5M /mo", "monthly visitors · earned media · 12 months",       "Ridester · zero to 1.5M"],
-  ["300+",     "clients served",                                     ""],
-  ["23+",      "years in marketing & press",                         ""],
+  ["$1.2M",    "organic revenue",       "NTA · $160K → $1.2M · 12 mo"],
+  ["1.5M /mo", "monthly visitors",      "Ridester · 0 → 1.5M · 12 mo"],
+  ["300+",     "clients served",        ""],
+  ["22+",      "years in the field",    ""],
 ];
 
 // ── Right-panel dispatch items ───────────────────────────────────────────────
@@ -58,11 +58,10 @@ export const Hero = () => (
           />
 
           <div>
-            <div className="hero-stat-number">23</div>
+            <div className="hero-stat-number">22<span style={{ fontSize: "0.50em", fontStyle: "italic", verticalAlign: "0.10em" }}>+</span></div>
             <div className="hero-stat-label">
               <strong style={{ color: INK }}>Years</strong><br />
-              in marketing<br />
-              &amp; press
+              in the field
             </div>
           </div>
 
