@@ -319,111 +319,189 @@ const BtnSecondary = ({ children, onClick }: { children: React.ReactNode; onClic
 );
 
 // ─────────────────────────────────────────────────────────────
-// MARKDOWN RENDERER — converts AI output to formatted JSX
+// AI OUTPUT RENDERER
 // ─────────────────────────────────────────────────────────────
 
-function renderInline(text: string, key?: number): React.ReactNode {
-  // Parse **bold** and [link](url) inline
+// Parses **bold**, *italic*, and [link](url) within a line
+function renderInline(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
-  const re = /\*\*(.+?)\*\*|\[(.+?)\]\((https?:\/\/[^\)]+)\)/g;
-  let last = 0, m;
+  const re = /\*\*(.+?)\*\*|\*(.+?)\*|\[(.+?)\]\((https?:\/\/[^\)]+)\)/g;
+  let last = 0; let m;
   while ((m = re.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
-    if (m[1]) parts.push(<strong key={m.index} style={{ fontWeight: 700, color: PAPER }}>{m[1]}</strong>);
-    if (m[2]) parts.push(<a key={m.index} href={m[3]} target="_blank" rel="noopener noreferrer" style={{ color: YEL, textDecoration: "underline" }}>{m[2]}</a>);
+    if (m[1]) parts.push(<strong key={m.index} style={{ fontWeight: 700 }}>{m[1]}</strong>);
+    else if (m[2]) parts.push(<em key={m.index}>{m[2]}</em>);
+    else if (m[3]) parts.push(<a key={m.index} href={m[4]} target="_blank" rel="noopener noreferrer" style={{ color: INK, textDecoration: "underline" }}>{m[3]}</a>);
     last = re.lastIndex;
   }
   if (last < text.length) parts.push(text.slice(last));
-  return <span key={key}>{parts}</span>;
+  return <>{parts}</>;
 }
 
-function renderAIOutput(text: string): React.ReactNode {
+// Strips markdown symbols for plain text copy
+function stripMarkdown(text: string): string {
+  return text.replace(/\*\*(.+?)\*\*/g, "$1").replace(/\*(.+?)\*/g, "$1").replace(/\[(.+?)\]\(.+?\)/g, "$1").replace(/^##\s+/gm, "").replace(/^[-•→]\s+/gm, "• ");
+}
+
+// Detects output type from content
+function detectOutputType(text: string): "partners" | "email" | "brief" {
+  if (/^Subject:/im.test(text)) return "email";
+  if (/^##\s*\d+\./m.test(text) || /^\d+\.\s+\*\*/m.test(text)) return "partners";
+  return "brief";
+}
+
+// ── EMAIL renderer — looks like a formatted letter ──
+function renderEmailOutput(text: string): React.ReactNode {
   const lines = text.split("\n");
   const nodes: React.ReactNode[] = [];
-  let listBuffer: string[] = [];
-  let paraBuffer: string[] = [];
+  let subject = "";
+  let bodyLines: string[] = [];
+  let inBody = false;
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    if (/^Subject:/i.test(line)) { subject = line.replace(/^Subject:\s*/i, ""); inBody = false; continue; }
+    if (subject && !inBody && line === "") { inBody = true; continue; }
+    bodyLines.push(line);
+  }
+
+  // Subject header
+  if (subject) nodes.push(
+    <div key="subj" style={{ background: YEL, padding: "14px 20px", marginBottom: 0 }}>
+      <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: INK, marginBottom: 5, opacity: 0.6 }}>Subject line</div>
+      <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: INK, lineHeight: 1.25 }}>{subject}</div>
+    </div>
+  );
+
+  // Email body
+  const paras: React.ReactNode[] = [];
+  let buf: string[] = [];
+  const flush = () => {
+    if (!buf.length) return;
+    const joined = buf.join(" ").trim();
+    if (joined) paras.push(<p key={paras.length} style={{ fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.8, margin: "0 0 14px" }}>{renderInline(joined)}</p>);
+    buf = [];
+  };
+  for (const line of bodyLines) {
+    if (line === "") { flush(); continue; }
+    if (/^[-•→]\s+/.test(line)) { flush(); paras.push(<div key={paras.length} style={{ display: "flex", gap: 10, padding: "4px 0", alignItems: "baseline" }}><span style={{ color: INK, fontWeight: 700, flexShrink: 0 }}>→</span><span style={{ fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.7 }}>{renderInline(line.replace(/^[-•→]\s+/, ""))}</span></div>); continue; }
+    buf.push(line);
+  }
+  flush();
+
+  nodes.push(<div key="body" style={{ background: PAPER, padding: "24px 24px 16px", borderTop: "none" }}>{paras}</div>);
+  return <>{nodes}</>;
+}
+
+// ── PARTNERS renderer — each suggestion as a card ──
+function renderPartnersOutput(text: string): React.ReactNode {
+  // Split on --- or ## N. headings
+  const sections = text.split(/\n---\n|\n(?=##\s*\d+\.)/);
+  const cards: React.ReactNode[] = [];
+
+  // Introductory paragraph (before first ##)
+  const intro = sections[0];
+  if (intro && !/^##/.test(intro.trim())) {
+    const introText = intro.replace(/^#[^\n]+\n/, "").trim();
+    if (introText) cards.push(
+      <p key="intro" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(241,235,222,.65)", lineHeight: 1.7, marginBottom: 20 }}>{introText}</p>
+    );
+  }
+
+  // Each partner block
+  const partnerSections = sections.filter(s => /^##\s*\d+\./.test(s.trim()));
+  partnerSections.forEach((sec, idx) => {
+    const lines = sec.trim().split("\n");
+    const heading = lines[0].replace(/^##\s*\d+\.\s*/, "").trim();
+    const rest = lines.slice(1).join("\n");
+
+    // Parse labelled sub-sections (**Label:** content)
+    const labelRe = /\*\*([^*]+):\*\*\s*([^\n]+(?:\n(?!\*\*)[^\n]*)*)/g;
+    const subItems: { label: string; content: string }[] = [];
+    let lm;
+    while ((lm = labelRe.exec(rest)) !== null) {
+      subItems.push({ label: lm[1].trim(), content: lm[2].trim() });
+    }
+
+    cards.push(
+      <div key={idx} style={{ background: PAPER, marginBottom: 10, overflow: "hidden" }}>
+        {/* card header */}
+        <div style={{ background: PAPER2, padding: "14px 18px", borderBottom: `1px solid ${INK35}`, display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, color: INK55, flexShrink: 0 }}>#{idx + 1}</span>
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2 }}>{heading}</div>
+        </div>
+        {/* sub-items */}
+        {subItems.length > 0 ? (
+          <div>
+            {subItems.map((item, i) => (
+              <div key={i} style={{ padding: "12px 18px", borderBottom: i < subItems.length - 1 ? `1px solid ${INK15}` : "none", display: "grid", gridTemplateColumns: "140px 1fr", gap: 12 }}>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, paddingTop: 2 }}>{item.label}</div>
+                <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.65 }}>{renderInline(item.content)}</div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ padding: "14px 18px" }}>
+            <p style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.7, margin: 0 }}>{renderInline(rest.trim())}</p>
+          </div>
+        )}
+      </div>
+    );
+  });
+
+  // If no ## sections found, fall back to brief renderer
+  if (partnerSections.length === 0) return renderBriefOutput(text);
+  return <>{cards}</>;
+}
+
+// ── BRIEF renderer — section headers + prose ──
+function renderBriefOutput(text: string): React.ReactNode {
+  const lines = text.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let buf: string[] = [];
+  let listBuf: string[] = [];
 
   const flushPara = () => {
-    if (paraBuffer.length === 0) return;
-    const joined = paraBuffer.join(" ").trim();
-    if (joined) nodes.push(
-      <p key={nodes.length} style={{ fontFamily: SERIF, fontSize: 14, color: "rgba(241,235,222,.88)", lineHeight: 1.8, margin: "0 0 12px" }}>
-        {renderInline(joined)}
-      </p>
-    );
-    paraBuffer = [];
+    if (!buf.length) return;
+    const joined = buf.join(" ").trim();
+    if (joined) nodes.push(<p key={nodes.length} style={{ fontFamily: SERIF, fontSize: 15, color: PAPER, lineHeight: 1.8, margin: "0 0 14px" }}>{renderInline(joined)}</p>);
+    buf = [];
   };
-
   const flushList = () => {
-    if (listBuffer.length === 0) return;
-    nodes.push(
-      <ul key={nodes.length} style={{ margin: "4px 0 14px", padding: 0, listStyle: "none" }}>
-        {listBuffer.map((item, i) => (
-          <li key={i} style={{ display: "flex", gap: 10, alignItems: "baseline", padding: "5px 0", borderBottom: "1px solid rgba(241,235,222,.08)" }}>
-            <span style={{ color: YEL, fontFamily: SERIF, fontWeight: 700, fontSize: 13, flexShrink: 0 }}>→</span>
-            <span style={{ fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.88)", lineHeight: 1.65 }}>{renderInline(item)}</span>
-          </li>
-        ))}
-      </ul>
-    );
-    listBuffer = [];
+    if (!listBuf.length) return;
+    nodes.push(<ul key={nodes.length} style={{ padding: 0, listStyle: "none", margin: "0 0 16px" }}>
+      {listBuf.map((it, i) => (
+        <li key={i} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: `1px solid rgba(241,235,222,.1)`, alignItems: "baseline" }}>
+          <span style={{ color: YEL, fontWeight: 700, flexShrink: 0, fontFamily: SERIF }}>→</span>
+          <span style={{ fontFamily: SERIF, fontSize: 14.5, color: "rgba(241,235,222,.9)", lineHeight: 1.65 }}>{renderInline(it)}</span>
+        </li>
+      ))}
+    </ul>);
+    listBuf = [];
   };
 
   for (const raw of lines) {
     const line = raw.trimEnd();
-
-    // Subject line — render as prominent email header
-    if (/^Subject:/i.test(line)) {
-      flushPara(); flushList();
-      const subj = line.replace(/^Subject:\s*/i, "");
-      nodes.push(
-        <div key={nodes.length} style={{ background: "rgba(245,184,31,.12)", border: `1px solid rgba(245,184,31,.3)`, padding: "12px 16px", marginBottom: 16 }}>
-          <SCaps size={9} ls="0.18em" color="rgba(245,184,31,.7)" style={{ display: "block", marginBottom: 4 }}>Subject line</SCaps>
-          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER, lineHeight: 1.3 }}>{subj}</div>
-        </div>
-      );
-      continue;
-    }
-
-    // Section headers (## or numbered like "1." at start)
     if (/^##\s+/.test(line)) {
       flushPara(); flushList();
-      nodes.push(
-        <div key={nodes.length} style={{ paddingTop: 10, marginBottom: 8, borderTop: "1px solid rgba(241,235,222,.15)" }}>
-          <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.6)">{line.replace(/^##\s+/, "")}</SCaps>
-        </div>
-      );
-      continue;
-    }
-
-    // Numbered items like "1. Company Name" or "**1.**"
-    if (/^\d+\.\s+/.test(line)) {
-      flushPara();
-      const num = line.match(/^(\d+)\.\s+(.*)/)!;
-      listBuffer.push(num[2]);
-      continue;
-    }
-
-    // Bullet/arrow items
-    if (/^[-•→]\s+/.test(line)) {
-      flushPara();
-      listBuffer.push(line.replace(/^[-•→]\s+/, ""));
-      continue;
-    }
-
-    // Blank line — flush buffers
-    if (line === "") {
+      nodes.push(<div key={nodes.length} style={{ paddingTop: 18, marginBottom: 10, borderTop: "1px solid rgba(241,235,222,.15)" }}><SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.55)">{line.replace(/^##\s+/, "")}</SCaps></div>);
+    } else if (/^[-•→]\s+/.test(line)) {
+      flushPara(); listBuf.push(line.replace(/^[-•→]\s+/, ""));
+    } else if (line === "") {
       flushPara(); flushList();
-      continue;
+    } else {
+      flushList(); buf.push(line);
     }
-
-    // Regular line — accumulate into paragraph
-    flushList();
-    paraBuffer.push(line);
   }
-
   flushPara(); flushList();
   return <>{nodes}</>;
+}
+
+function renderAIOutput(text: string): React.ReactNode {
+  const type = detectOutputType(text);
+  if (type === "email") return renderEmailOutput(text);
+  if (type === "partners") return renderPartnersOutput(text);
+  return renderBriefOutput(text);
 }
 
 // AI feature card — matches the VideoCard dark pattern from Gallery
@@ -487,8 +565,12 @@ const AICard = ({
             Copy ↗
           </button>
         </div>
-        {/* formatted output */}
-        <div style={{ background: "rgba(0,0,0,.25)", padding: "22px 24px", borderLeft: `3px solid ${YEL}` }}>
+        {/* formatted output — background adapts to content type */}
+        <div style={{
+          background: detectOutputType(result) === "brief" ? "rgba(0,0,0,.3)" : "transparent",
+          padding: detectOutputType(result) === "brief" ? "22px 24px" : 0,
+          borderLeft: detectOutputType(result) === "brief" ? `3px solid ${YEL}` : "none",
+        }}>
           {renderAIOutput(result)}
         </div>
       </div>
