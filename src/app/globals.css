@@ -415,10 +415,13 @@ body > * { position: relative; z-index: 2; }
 }
 
 .stat-number {
-  font-size: clamp(32px, 6.5vw, 64px);
+  font-size: clamp(20px, 3vw, 36px);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
+  display: inline-block;
+  border-bottom: 2px solid var(--color-yellow);
+  padding-bottom: 4px;
 }
 
 /* Provenance table */
