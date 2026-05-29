@@ -318,6 +318,114 @@ const BtnSecondary = ({ children, onClick }: { children: React.ReactNode; onClic
   </button>
 );
 
+// ─────────────────────────────────────────────────────────────
+// MARKDOWN RENDERER — converts AI output to formatted JSX
+// ─────────────────────────────────────────────────────────────
+
+function renderInline(text: string, key?: number): React.ReactNode {
+  // Parse **bold** and [link](url) inline
+  const parts: React.ReactNode[] = [];
+  const re = /\*\*(.+?)\*\*|\[(.+?)\]\((https?:\/\/[^\)]+)\)/g;
+  let last = 0, m;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    if (m[1]) parts.push(<strong key={m.index} style={{ fontWeight: 700, color: PAPER }}>{m[1]}</strong>);
+    if (m[2]) parts.push(<a key={m.index} href={m[3]} target="_blank" rel="noopener noreferrer" style={{ color: YEL, textDecoration: "underline" }}>{m[2]}</a>);
+    last = re.lastIndex;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return <span key={key}>{parts}</span>;
+}
+
+function renderAIOutput(text: string): React.ReactNode {
+  const lines = text.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let listBuffer: string[] = [];
+  let paraBuffer: string[] = [];
+
+  const flushPara = () => {
+    if (paraBuffer.length === 0) return;
+    const joined = paraBuffer.join(" ").trim();
+    if (joined) nodes.push(
+      <p key={nodes.length} style={{ fontFamily: SERIF, fontSize: 14, color: "rgba(241,235,222,.88)", lineHeight: 1.8, margin: "0 0 12px" }}>
+        {renderInline(joined)}
+      </p>
+    );
+    paraBuffer = [];
+  };
+
+  const flushList = () => {
+    if (listBuffer.length === 0) return;
+    nodes.push(
+      <ul key={nodes.length} style={{ margin: "4px 0 14px", padding: 0, listStyle: "none" }}>
+        {listBuffer.map((item, i) => (
+          <li key={i} style={{ display: "flex", gap: 10, alignItems: "baseline", padding: "5px 0", borderBottom: "1px solid rgba(241,235,222,.08)" }}>
+            <span style={{ color: YEL, fontFamily: SERIF, fontWeight: 700, fontSize: 13, flexShrink: 0 }}>→</span>
+            <span style={{ fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.88)", lineHeight: 1.65 }}>{renderInline(item)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+    listBuffer = [];
+  };
+
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+
+    // Subject line — render as prominent email header
+    if (/^Subject:/i.test(line)) {
+      flushPara(); flushList();
+      const subj = line.replace(/^Subject:\s*/i, "");
+      nodes.push(
+        <div key={nodes.length} style={{ background: "rgba(245,184,31,.12)", border: `1px solid rgba(245,184,31,.3)`, padding: "12px 16px", marginBottom: 16 }}>
+          <SCaps size={9} ls="0.18em" color="rgba(245,184,31,.7)" style={{ display: "block", marginBottom: 4 }}>Subject line</SCaps>
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER, lineHeight: 1.3 }}>{subj}</div>
+        </div>
+      );
+      continue;
+    }
+
+    // Section headers (## or numbered like "1." at start)
+    if (/^##\s+/.test(line)) {
+      flushPara(); flushList();
+      nodes.push(
+        <div key={nodes.length} style={{ paddingTop: 10, marginBottom: 8, borderTop: "1px solid rgba(241,235,222,.15)" }}>
+          <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.6)">{line.replace(/^##\s+/, "")}</SCaps>
+        </div>
+      );
+      continue;
+    }
+
+    // Numbered items like "1. Company Name" or "**1.**"
+    if (/^\d+\.\s+/.test(line)) {
+      flushPara();
+      const num = line.match(/^(\d+)\.\s+(.*)/)!;
+      listBuffer.push(num[2]);
+      continue;
+    }
+
+    // Bullet/arrow items
+    if (/^[-•→]\s+/.test(line)) {
+      flushPara();
+      listBuffer.push(line.replace(/^[-•→]\s+/, ""));
+      continue;
+    }
+
+    // Blank line — flush buffers
+    if (line === "") {
+      flushPara(); flushList();
+      continue;
+    }
+
+    // Regular line — accumulate into paragraph
+    flushList();
+    paraBuffer.push(line);
+  }
+
+  flushPara(); flushList();
+  return <>{nodes}</>;
+}
+
 // AI feature card — matches the VideoCard dark pattern from Gallery
 const AICard = ({
   title, description, btnLabel, onClick, loading, result, resultLabel, disabled, note,
@@ -361,23 +469,28 @@ const AICard = ({
       <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.45)", marginTop: 10 }}>{note}</p>
     )}
 
-    {/* result output */}
+    {/* result output — fully formatted */}
     {result && (
       <div style={{ marginTop: 20, borderTop: `1px solid rgba(241,235,222,.18)`, paddingTop: 20 }}>
-        <SCaps size={9.5} ls="0.18em" color="rgba(241,235,222,.5)" style={{ display: "block", marginBottom: 12 }}>{resultLabel}</SCaps>
-        <div style={{ fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.88)", lineHeight: 1.85, whiteSpace: "pre-wrap" }}>{result}</div>
-        <button
-          onClick={() => navigator.clipboard.writeText(result).catch(() => {})}
-          style={{
-            marginTop: 14, display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "9px 16px", background: "transparent",
-            border: `1px solid rgba(241,235,222,.3)`, color: "rgba(241,235,222,.7)",
-            fontFamily: GROT, fontWeight: 700, fontSize: 10,
-            letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer",
-          }}
-        >
-          Copy ↗
-        </button>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <SCaps size={9.5} ls="0.18em" color="rgba(241,235,222,.5)">{resultLabel}</SCaps>
+          <button
+            onClick={() => navigator.clipboard.writeText(result).catch(() => {})}
+            style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "7px 14px", background: "transparent",
+              border: `1px solid rgba(241,235,222,.25)`, color: "rgba(241,235,222,.6)",
+              fontFamily: GROT, fontWeight: 700, fontSize: 10,
+              letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer",
+            }}
+          >
+            Copy ↗
+          </button>
+        </div>
+        {/* formatted output */}
+        <div style={{ background: "rgba(0,0,0,.25)", padding: "22px 24px", borderLeft: `3px solid ${YEL}` }}>
+          {renderAIOutput(result)}
+        </div>
       </div>
     )}
   </div>
