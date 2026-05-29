@@ -435,14 +435,23 @@ const css = `
   .clb-pill-r{background:var(--red-bg);color:var(--red);}
   .clb-quote-block{border-left:3px solid var(--gold);padding:14px 18px;margin:16px 0;font-size:13px;font-style:italic;color:#555;line-height:1.7;background:var(--gold-pale);}
   .clb-quote-block .q-attr{font-style:normal;font-size:11px;color:var(--mid);margin-top:8px;display:block;letter-spacing:.05em;}
-  .clb-ai-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:4px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:1px solid var(--gold);background:transparent;color:var(--gold);font-family:'Georgia',serif;transition:all .2s;margin-top:12px;}
-  .clb-ai-btn:hover{background:var(--gold-pale);}
-  .clb-ai-btn:disabled{opacity:.5;cursor:not-allowed;}
-  .clb-ai-spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--gold-light);border-top-color:var(--gold);border-radius:50%;animation:clb-spin .7s linear infinite;}
+  /* ── AI SECTIONS ── */
+  .clb-ai-card{background:var(--black);border:2px solid var(--gold);border-radius:8px;padding:28px;margin-top:24px;}
+  .clb-ai-card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .clb-ai-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--black);font-family:'Georgia',serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;padding:5px 12px;border-radius:3px;font-weight:normal;flex-shrink:0;}
+  .clb-ai-card-title{font-size:17px;font-weight:normal;color:var(--white);line-height:1.2;}
+  .clb-ai-card-desc{font-size:13px;color:#aaa;line-height:1.65;margin-bottom:20px;}
+  .clb-ai-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 24px;border-radius:4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;border:1px solid var(--gold);background:var(--gold);color:var(--black);font-family:'Georgia',serif;transition:all .2s;}
+  .clb-ai-btn:hover{background:#b0802a;border-color:#b0802a;}
+  .clb-ai-btn:disabled{opacity:.45;cursor:not-allowed;}
+  .clb-ai-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(13,13,11,.3);border-top-color:var(--black);border-radius:50%;animation:clb-spin .7s linear infinite;}
   @keyframes clb-spin{to{transform:rotate(360deg);}}
-  .clb-ai-result{background:#fafaf7;border:1px solid var(--gold-light);border-radius:6px;padding:20px;margin-top:16px;font-size:13px;line-height:1.85;white-space:pre-wrap;font-family:'Georgia',serif;color:var(--black);}
-  .clb-ai-result-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:block;}
-  .clb-ai-note{font-size:11px;color:var(--mid);margin-top:8px;font-style:italic;}
+  .clb-ai-result{background:#111110;border:1px solid #333;border-radius:6px;padding:22px;margin-top:18px;font-size:13px;line-height:1.85;white-space:pre-wrap;font-family:'Georgia',serif;color:#ddd;}
+  .clb-ai-result-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:block;}
+  .clb-ai-result-copy{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:8px 16px;border:1px solid #444;border-radius:4px;background:transparent;color:#aaa;font-family:'Georgia',serif;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+  .clb-ai-result-copy:hover{border-color:var(--gold);color:var(--gold);}
+  .clb-ai-note{font-size:11px;color:#777;margin-top:10px;font-style:italic;}
+  .clb-ai-error{font-size:12px;color:#e08080;margin-top:10px;}
   @media(max-width:700px){.clb-steps-row{grid-template-columns:1fr 1fr;}.clb-strategy-grid{grid-template-columns:1fr;}.clb-sp-row{grid-template-columns:1fr;}.clb-form-row{grid-template-columns:1fr;}.clb-proof-strip{grid-template-columns:1fr;}}
   @media print{.clb-topbar,.clb-prog-track,.clb-btn-row,.clb-strategies,.clb-hiw{display:none!important;}.clb-panel{display:block!important;}.clb-card{break-inside:avoid;}}
 `;
@@ -811,18 +820,22 @@ export default function CollabLinkBuildingTool() {
             ) : (
               <div className="clb-empty-state">← Complete Step 1 to see tailored suggestions.</div>
             )}
-            <div style={{ marginTop: "20px", paddingTop: "20px", borderTop: "1px solid var(--border)" }}>
-              <div style={{ fontSize: "11px", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--gold)", marginBottom: "8px" }}>✦ AI Partner Intelligence</div>
-              <p style={{ fontSize: "13px", color: "var(--mid)", lineHeight: "1.6" }}>Get specific company names, the right contact to find, and a tailored &quot;why them&quot; rationale — generated from your business details.</p>
+            <div className="clb-ai-card">
+              <div className="clb-ai-card-header">
+                <span className="clb-ai-badge">✦ AI-Powered</span>
+                <span className="clb-ai-card-title">AI Partner Intelligence</span>
+              </div>
+              <p className="clb-ai-card-desc">Instead of generic categories, get specific company names, the right LinkedIn contact to search for, and a tailored &ldquo;why them&rdquo; rationale — all generated from your exact business details.</p>
               <button className="clb-ai-btn" onClick={runAIPartners} disabled={aiPartnerLoading || (!biz && !desc)}>
-                {aiPartnerLoading ? <><span className="clb-ai-spinner" /> Generating…</> : "✦ Generate AI Partner Suggestions"}
+                {aiPartnerLoading ? <><span className="clb-ai-spinner" /> Generating partner suggestions…</> : "✦ Generate AI Partner Suggestions"}
               </button>
-              {!biz && !desc && <p className="clb-ai-note">Fill in Step 1 first to get personalised suggestions.</p>}
-              {aiError && <p style={{ color: "var(--red)", fontSize: "12px", marginTop: "8px" }}>{aiError}</p>}
+              {(!biz && !desc) && <p className="clb-ai-note">← Fill in your business details in Step 1 first.</p>}
+              {aiError && <p className="clb-ai-error">{aiError}</p>}
               {aiPartnerResult && (
                 <div className="clb-ai-result">
-                  <span className="clb-ai-result-label">AI-generated partner suggestions</span>
+                  <span className="clb-ai-result-label">✦ AI-generated — specific to your business</span>
                   {aiPartnerResult}
+                  <button className="clb-ai-result-copy" onClick={() => navigator.clipboard.writeText(aiPartnerResult).catch(() => {})}>Copy</button>
                 </div>
               )}
             </div>
@@ -930,20 +943,21 @@ export default function CollabLinkBuildingTool() {
             </div>
             <div className="clb-tpl-box">{templates[activeTpl]}</div>
             <button className="clb-btn clb-btn-outline" onClick={() => navigator.clipboard.writeText(templates[activeTpl]).catch(() => {})} style={{ fontSize: "11px" }}>Copy Template</button>
-            <div style={{ marginTop: "24px", paddingTop: "20px", borderTop: "1px solid var(--border)" }}>
-              <div style={{ fontSize: "11px", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--gold)", marginBottom: "8px" }}>✦ AI Outreach Email Writer</div>
-              <p style={{ fontSize: "13px", color: "var(--mid)", lineHeight: "1.6" }}>Generate a fully personalised email — not a template — using your business details, the scored partner, and the chosen strategy.</p>
+            <div className="clb-ai-card">
+              <div className="clb-ai-card-header">
+                <span className="clb-ai-badge">✦ AI-Powered</span>
+                <span className="clb-ai-card-title">AI Outreach Email Writer</span>
+              </div>
+              <p className="clb-ai-card-desc">Skip the template. Get a fully written, ready-to-send email personalised to your business, the partner you just scored, and your chosen strategy. Just review and hit send.</p>
               <button className="clb-ai-btn" onClick={runAIEmail} disabled={aiEmailLoading || !biz}>
-                {aiEmailLoading ? <><span className="clb-ai-spinner" /> Writing email…</> : "✦ Generate Personalised Email"}
+                {aiEmailLoading ? <><span className="clb-ai-spinner" /> Writing your email…</> : "✦ Write My Outreach Email"}
               </button>
-              {!biz && <p className="clb-ai-note">Fill in your business name in Step 1 first.</p>}
+              {!biz && <p className="clb-ai-note">← Fill in your business name in Step 1 first.</p>}
               {aiEmailResult && (
                 <div className="clb-ai-result">
-                  <span className="clb-ai-result-label">AI-written outreach email — review before sending</span>
+                  <span className="clb-ai-result-label">✦ AI-written — review before sending</span>
                   {aiEmailResult}
-                  <div style={{ marginTop: "12px" }}>
-                    <button className="clb-btn clb-btn-outline" onClick={() => navigator.clipboard.writeText(aiEmailResult).catch(() => {})} style={{ fontSize: "11px" }}>Copy Email</button>
-                  </div>
+                  <button className="clb-ai-result-copy" onClick={() => navigator.clipboard.writeText(aiEmailResult).catch(() => {})}>Copy Email</button>
                 </div>
               )}
             </div>
@@ -994,19 +1008,21 @@ export default function CollabLinkBuildingTool() {
                 {strategyDetails[selStrat].actions.map((a, i) => <div key={i}><span className="ni-check">→</span> {a}</div>)}
               </div>
             </div>
-            <div style={{ marginTop: "28px", paddingTop: "24px", borderTop: "1px solid var(--border)" }}>
-              <div style={{ fontSize: "11px", letterSpacing: ".15em", textTransform: "uppercase", color: "var(--gold)", marginBottom: "8px" }}>✦ AI Campaign Brief</div>
-              <p style={{ fontSize: "13px", color: "var(--mid)", lineHeight: "1.6" }}>Generate a full written strategy brief — personalised to your business, partners, and score — ready to share with your team or agency.</p>
+            <div className="clb-ai-card">
+              <div className="clb-ai-card-header">
+                <span className="clb-ai-badge">✦ AI-Powered</span>
+                <span className="clb-ai-card-title">AI Campaign Brief Generator</span>
+              </div>
+              <p className="clb-ai-card-desc">Takes everything you&apos;ve entered — your business, target partners, partner score, and strategy — and writes a complete, polished campaign brief ready to hand to a VA, team member, or agency.</p>
               <button className="clb-ai-btn" onClick={runAIBrief} disabled={aiBriefLoading || !biz}>
-                {aiBriefLoading ? <><span className="clb-ai-spinner" /> Writing brief…</> : "✦ Generate AI Campaign Brief"}
+                {aiBriefLoading ? <><span className="clb-ai-spinner" /> Writing your campaign brief…</> : "✦ Generate My Campaign Brief"}
               </button>
+              {!biz && <p className="clb-ai-note">← Fill in your business details in Step 1 first.</p>}
               {aiBriefResult && (
                 <div className="clb-ai-result">
-                  <span className="clb-ai-result-label">AI-generated campaign strategy brief</span>
+                  <span className="clb-ai-result-label">✦ AI-generated campaign strategy brief</span>
                   {aiBriefResult}
-                  <div style={{ marginTop: "12px" }}>
-                    <button className="clb-btn clb-btn-outline" onClick={() => navigator.clipboard.writeText(aiBriefResult).catch(() => {})} style={{ fontSize: "11px" }}>Copy Brief</button>
-                  </div>
+                  <button className="clb-ai-result-copy" onClick={() => navigator.clipboard.writeText(aiBriefResult).catch(() => {})}>Copy Brief</button>
                 </div>
               )}
             </div>
