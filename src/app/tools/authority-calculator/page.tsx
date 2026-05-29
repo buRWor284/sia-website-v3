@@ -23,6 +23,9 @@ import {
   YEL,
 } from "@/lib/tokens";
 
+// ── EMOS apply URL (separate from bureau Calendly) ───────────────────────────
+const EMOS_APPLY = "https://dmr.agency/earnedmediaos/apply/";
+
 // ── Semantic spot colours ────────────────────────────────────────────────────
 const GREEN = "#3e6b45";   // positive / owned / EMOS
 const RED   = "#c14a32";   // cost / negative
@@ -397,17 +400,27 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
             margin: "16px 0 0", fontFamily: SERIF,
             fontSize: 18, color: INK70, lineHeight: 1.55, maxWidth: 580,
           }}>
-            A <strong>one-time cohort</strong> that gives you the exact process, journalist contacts, and
-            pitch system used to land features in Forbes, HBR, HuffPost, and 50+ publications.
-            No retainer. No ongoing spend. The capability is yours permanently after one cohort.
+            A <strong>guided implementation system for founders 3–12 months from a raise</strong>.
+            Gives you the exact process, journalist contacts, and pitch system used to land
+            features in Forbes, HBR, HuffPost, and 50+ publications — in-house, permanently.
+            No retainer. No ongoing spend.
           </p>
           <p style={{
             margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic",
             fontSize: 15, color: INK55, lineHeight: 1.4,
           }}>
-            Alumni have been featured in Forbes, Harvard Business Review, HuffPost,
-            The Next Web, Entrepreneur, and Search Engine Journal.
+            Not a course. No agency retainers. No ad spend. No platform dependency.
           </p>
+          <div style={{
+            marginTop: 14, display: "inline-flex", alignItems: "center", gap: 8,
+            background: hexA(GREEN, 0.1), border: `1px solid ${GREEN}`,
+            padding: "8px 14px",
+          }}>
+            <span style={{ fontFamily: GROT, fontSize: 14 }}>🛡</span>
+            <span style={{ fontFamily: SERIF, fontSize: 14, color: INK }}>
+              <strong>1 verified placement in 60 days</strong> — or every dollar back.
+            </span>
+          </div>
         </div>
         {/* rent counter */}
         <div style={{
@@ -581,8 +594,9 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
   const isMid = variant === "mid";
   return (
     <section style={{
-      background: isMid ? PAPER2 : INK,
-      borderTop: `${isMid ? 1 : 3}px solid ${isMid ? INK : YEL}`,
+      background: isMid ? PAPER2 : GREEN,
+      borderTop: `${isMid ? 1 : 4}px solid ${isMid ? INK : YEL}`,
+      borderBottom: isMid ? "none" : `6px solid ${PAPER}`,
       padding: "clamp(40px,6vw,72px) clamp(22px,5vw,56px)",
     }}>
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
@@ -608,25 +622,25 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
               EMOS is the one-time investment that gets you there.
               Cohorts are small and run on a fixed calendar. Apply now to hold your spot.
             </p>
-            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{
+            <a href={EMOS_APPLY} target="_blank" rel="noopener noreferrer" style={{
               display: "inline-flex", alignItems: "center", gap: 18,
               background: INK, color: PAPER, textDecoration: "none",
               padding: "clamp(16px,2vw,22px) clamp(22px,3vw,36px)",
               fontFamily: GROT, fontWeight: 800,
               fontSize: "clamp(13px,1.8vw,17px)", letterSpacing: "0.1em", textTransform: "uppercase",
             }}>
-              <span>Apply for the Next EMOS Cohort</span>
+              <span>Submit Your Application</span>
               <span style={{ fontFamily: SERIF, fontSize: "clamp(20px,2.5vw,26px)", fontWeight: 400 }}>→</span>
             </a>
             <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
-              Free discovery call · No commitment · Cohorts are limited in size
+              5 minutes · Decision within 48 hours · 5 seats per cohort
             </p>
           </>
         ) : (
           // ── Close CTA (after all the evidence) ─────────────────────────────
           <>
             <div style={{ position: "relative" }}>
-              <div aria-hidden style={{ position: "absolute", top: -20, right: 0, opacity: 0.06, pointerEvents: "none" }}>
+              <div aria-hidden style={{ position: "absolute", top: -20, right: 0, opacity: 0.08, pointerEvents: "none" }}>
                 <SiaLogo height={200} />
               </div>
               <SCaps size={11.5} ls="0.22em" color={YEL} style={{ display: "block", marginBottom: 14 }}>
@@ -643,25 +657,25 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
               </h2>
               <p style={{
                 margin: "22px 0 0", fontFamily: SERIF, fontSize: 19,
-                color: "rgba(241,235,222,.75)", lineHeight: 1.55, maxWidth: 600,
+                color: "rgba(241,235,222,.85)", lineHeight: 1.55, maxWidth: 600,
               }}>
                 The system, the contacts, and the live placements — all in one cohort.
                 Alumni have gone on to land Forbes, HBR, HuffPost, and 50+ publications
                 without ever paying an agency again.
               </p>
               <div style={{ marginTop: 32, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-                <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{
+                <a href={EMOS_APPLY} target="_blank" rel="noopener noreferrer" style={{
                   display: "inline-flex", alignItems: "center", gap: 18,
                   background: YEL, color: INK, textDecoration: "none",
                   padding: "clamp(18px,2.5vw,26px) clamp(26px,4vw,44px)",
                   fontFamily: GROT, fontWeight: 800,
                   fontSize: "clamp(14px,2vw,18px)", letterSpacing: "0.1em", textTransform: "uppercase",
                 }}>
-                  <span>Apply for the Next EMOS Cohort</span>
+                  <span>Submit Your Application</span>
                   <span style={{ fontFamily: SERIF, fontSize: "clamp(22px,3vw,28px)", fontWeight: 400 }}>→</span>
                 </a>
-                <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(241,235,222,.5)" }}>
-                  Free discovery call · No commitment
+                <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(241,235,222,.6)" }}>
+                  5 minutes · Decision within 48 hours · 5 seats per cohort
                 </p>
               </div>
             </div>
@@ -673,19 +687,20 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
 };
 
 // ── Below the fold ────────────────────────────────────────────────────────────
+// Aligned with the EMOS 5-Return Framework from dmr.agency/earnedmediaos/
 const BENEFITS: [string, string][] = [
-  ["Unlinked brand mentions",
-   "HARO earns unlinked citations too. The link-equity line counts linked placements only — so the figure above is an undercount, not a stretch."],
-  ["Referral traffic, permanently",
-   "Each live placement sends direct visitors for years at zero cost-per-click. The agency invoice never stops; the referral traffic never bills."],
-  ["AI / LLM visibility",
-   "Cited brands get surfaced by ChatGPT, Perplexity, and Google AI Overviews — a channel invisible to standard attribution and growing fast."],
-  ["Compounding credentials",
-   "Mid-tier placements open tier-one doors. Acceptance rates rise, cost-per-placement falls, and the momentum is yours to keep."],
+  ["Investor proof",
+   "VCs Google you before the first meeting. A Tier 1 citation answers the credibility question before it's asked — and shapes the conversation before you're in the room."],
+  ["SEO authority",
+   "A DA 80+ backlink lifts your domain rating; target pages rank higher for the keywords your buyers use. The agency invoice stops; the domain authority stays."],
+  ["AI / LLM citations",
+   "ChatGPT, Perplexity, and Google AI Overviews cite credible publications. Cited brands surface in AI answers about their space — a channel growing faster than any other."],
   ["Permanent sales collateral",
-   "A Forbes or HBR mention works forever — in decks, investor materials, and email signatures. Bought once, cited indefinitely."],
-  ["Founder brand equity",
-   "Authority that survives pivots and new ventures. It can't be bought or delegated, and it doesn't leave when a retainer ends."],
+   "\"As seen in Forbes\" on your homepage, deck, and email signature. Bought once, used indefinitely — in investor materials, sales calls, and conference bios."],
+  ["Social signal & referral traffic",
+   "Each placement is shareable content for LinkedIn and X, and sends direct visitors for years at zero cost-per-click. The agency invoice never stops; the referral traffic never bills."],
+  ["Compounding credentials",
+   "Mid-tier placements open tier-one doors. Acceptance rates rise, cost-per-placement falls, and the momentum — the journalist relationships, the byline history — is yours to keep."],
 ];
 
 const BelowFold = () => (
