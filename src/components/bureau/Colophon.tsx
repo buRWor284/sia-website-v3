@@ -90,7 +90,7 @@ export const Colophon = () => (
             fontStyle: "italic",
           }}
         >
-          Serial entrepreneur. Fractional CMO. CEO of DMR.agency. Featured in Forbes, HBR &amp; HuffPost.
+          Serial entrepreneur. Fractional CMO. CEO of DMR.agency. Founder @ EMOS. Bylines/citations: Forbes, HBR &amp; HuffPost.
         </p>
       </div>
 
