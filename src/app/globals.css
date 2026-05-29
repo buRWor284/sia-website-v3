@@ -326,6 +326,24 @@ body > * { position: relative; z-index: 2; }
 .h2-lg { font-size: clamp(30px, 6vw, 72px); }
 .h2-md { font-size: clamp(28px, 5.5vw, 68px); }
 
+/* ---- 2-col card grid (Kits) --------------------------------------------- */
+.grid-cards-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .grid-cards-2 { grid-template-columns: repeat(2, 1fr); }
+}
+.card-border-2 {
+  border-right: none;
+  border-bottom: 1px solid var(--color-ink);
+}
+.card-border-2:last-child { border-bottom: none; }
+@media (min-width: 768px) {
+  .card-border-2 { border-bottom: none; border-right: 1px solid var(--color-ink); }
+  .card-border-2:last-child { border-right: none; }
+}
+
 /* ---- 3-col card grid ---------------------------------------------------- */
 .grid-cards-3 {
   display: grid;
