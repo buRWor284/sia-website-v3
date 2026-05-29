@@ -471,64 +471,123 @@ export default function CollabLinkBuildingTool() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
 
-      {/* ══ HERO ══ */}
-      <section style={{ background: PAPER, padding: "clamp(40px,6vw,72px) clamp(24px,5vw,56px) 0" }}>
-        <div style={{ textAlign: "center", marginBottom: 18 }}>
-          <SCaps size={12} ls="0.28em" color={INK70}>Interactive Tool · The SIA Business Podcast · S02E06</SCaps>
-        </div>
-        <h1 style={{ margin: 0, textAlign: "center", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(42px,7vw,96px)", color: INK, lineHeight: 0.95, letterSpacing: "-0.03em" }}>
-          The Collab<br />
-          <em style={{ fontStyle: "italic" }}><Mark>Link Building</Mark></em><br />
-          Partner Finder.
-        </h1>
-        <p style={{ margin: "22px auto 0", maxWidth: 640, textAlign: "center", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(16px,2.2vw,21px)", color: INK70, lineHeight: 1.5 }}>
-          Three proven strategies. Real case studies. A step-by-step system for earning high-quality backlinks by partnering with non-competing companies that share your audience.
-        </p>
+      {/* ══ HERO — Gallery pattern ══ */}
+      <section style={{ background: PAPER, padding: "0", overflow: "hidden" }}>
+        {/* 3-column split with watermark */}
+        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr 200px", borderBottom: `4px solid ${INK}`, position: "relative" }}>
 
-        {/* proof strip */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: INK, border: `1px solid ${INK}`, maxWidth: 900, margin: "40px auto 0" }}>
-          {[
-            { label: "NTA · Auto Retailer · UK", num: "£165K → £1.2M", desc: "Monthly organic revenue after Collab Link Building with car insurance & leasing companies.", tag: "Discount Partnership" },
-            { label: "Fitness Supplements · E-commerce", num: ".edu Backlinks", desc: "Earned university backlinks — the hardest type to get — by offering student discounts.", tag: "Institution Rebate" },
-            { label: "Sports Accessories · E-commerce", num: "Auto-Backlinks", desc: "Swimming coaches who used the branded badge embed automatically gave the site a backlink.", tag: "Expert Roundup + Badge" },
-          ].map(p => (
-            <div key={p.label} style={{ background: INK, padding: "26px 22px" }}>
-              <SCaps size={9} ls="0.18em" color="rgba(241,235,222,.45)" style={{ display: "block", marginBottom: 10 }}>{p.label}</SCaps>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 28, color: YEL, lineHeight: 1, marginBottom: 8, letterSpacing: "-0.015em" }}>{p.num}</div>
-              <p style={{ fontFamily: SERIF, fontSize: 12.5, color: "rgba(241,235,222,.65)", lineHeight: 1.55, margin: 0 }}>{p.desc}</p>
-              <div style={{ marginTop: 10, display: "inline-block", background: "rgba(241,235,222,.08)", padding: "3px 10px" }}>
-                <SCaps size={9} ls="0.1em" color="rgba(241,235,222,.4)">{p.tag}</SCaps>
+          {/* watermark word */}
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", pointerEvents: "none", overflow: "hidden" }}>
+            <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(80px,14vw,180px)", color: INK, opacity: 0.04, letterSpacing: "-0.04em", whiteSpace: "nowrap", userSelect: "none" }}>COLLAB</span>
+          </div>
+
+          {/* left col — stats */}
+          <div style={{ borderRight: `1px solid ${INK}`, padding: "40px 28px 36px" }}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 88, color: INK, lineHeight: 0.9, letterSpacing: "-0.04em", marginBottom: 10 }}>3</div>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>Proven strategies</SCaps>
+            <div style={{ marginTop: 28, paddingTop: 20, borderTop: `1px solid ${INK35}` }}>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 40, color: INK, lineHeight: 0.9, letterSpacing: "-0.03em", marginBottom: 8 }}>£1.2M</div>
+              <SCaps size={10} ls="0.16em" color={INK55}>Peak monthly revenue · NTA case</SCaps>
+            </div>
+            <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${INK35}` }}>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 40, color: INK, lineHeight: 0.9, letterSpacing: "-0.03em", marginBottom: 8 }}>4</div>
+              <SCaps size={10} ls="0.16em" color={INK55}>Steps to your brief</SCaps>
+            </div>
+          </div>
+
+          {/* centre col — headline */}
+          <div style={{ padding: "44px 36px 40px" }}>
+            <SCaps size={11} ls="0.26em" color={INK70} style={{ display: "block", marginBottom: 16 }}>Interactive Tool · SIA Business Podcast · S02E06</SCaps>
+            <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(36px,5vw,68px)", color: INK, lineHeight: 0.95, letterSpacing: "-0.03em" }}>
+              The Collab<br />
+              <em style={{ fontStyle: "italic" }}><Mark>Link Building</Mark></em><br />
+              Partner Finder.
+            </h1>
+            <p style={{ margin: "20px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(15px,1.8vw,19px)", color: INK70, lineHeight: 1.5, maxWidth: 480 }}>
+              Find the companies that share your audience, score them, write the email, and generate your campaign brief — three strategies, four steps, AI throughout.
+            </p>
+          </div>
+
+          {/* right col — strategy list */}
+          <div style={{ borderLeft: `1px solid ${INK}`, padding: "44px 22px 40px" }}>
+            {[
+              { icon: "🏷️", name: "Discount Partnership", sub: "Partner page links" },
+              { icon: "🎓", name: "Institution Rebate", sub: ".edu / .gov links" },
+              { icon: "🏅", name: "Expert Roundup", sub: "Badge auto-links" },
+            ].map((s, i) => (
+              <div key={s.name} style={{ paddingBottom: 16, marginBottom: 16, borderBottom: i < 2 ? `1px solid ${INK35}` : "none" }}>
+                <div style={{ fontSize: 20, marginBottom: 4 }}>{s.icon}</div>
+                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: INK, lineHeight: 1.2, marginBottom: 2 }}>{s.name}</div>
+                <SCaps size={9.5} ls="0.1em" color={INK55}>{s.sub}</SCaps>
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* step tabs strip — matches Gallery filter bar */}
+        <div style={{ background: PAPER2, borderBottom: `1px solid ${INK}` }}>
+          <div style={{ display: "flex", alignItems: "center", padding: "0 clamp(16px,3vw,28px)" }}>
+            <SCaps size={9.5} ls="0.16em" color={INK55} style={{ marginRight: 16, flexShrink: 0 }}>Step</SCaps>
+            {STEP_LABELS.map((label, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                style={{
+                  padding: "12px 16px", border: "none",
+                  borderRight: i < 3 ? `1px solid ${INK35}` : "none",
+                  background: step === i ? INK : "transparent",
+                  color: step === i ? PAPER : step > i ? INK : INK55,
+                  cursor: "pointer", fontFamily: GROT, fontWeight: 800,
+                  fontSize: 10.5, letterSpacing: "0.12em", textTransform: "uppercase",
+                  display: "flex", alignItems: "center", gap: 6,
+                  transition: "background .12s",
+                }}
+              >
+                {step > i && <span style={{ color: step === i ? YEL : INK55 }}>✓</span>}
+                0{i + 1} · {label}
+              </button>
+            ))}
+            <div style={{ flex: 1 }} />
+            <SCaps size={9.5} ls="0.14em" color={INK55} style={{ flexShrink: 0 }}>
+              Showing step {step + 1} of 4
+            </SCaps>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ AI FEATURES — visible on first load ══ */}
+      <section style={{ background: INK, padding: "40px clamp(24px,5vw,56px)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, paddingBottom: 16, borderBottom: `1px solid rgba(241,235,222,.15)` }}>
+          <span style={{ width: 9, height: 9, borderRadius: "50%", background: YEL, flexShrink: 0 }} />
+          <SCaps size={11} ls="0.2em" color="rgba(241,235,222,.85)">AI-Powered Features · Available throughout the tool</SCaps>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "rgba(241,235,222,.1)" }}>
+          {[
+            { step: "Step 2", icon: "🔍", title: "AI Partner Intelligence", desc: "Specific company names, the right LinkedIn contact, and a tailored 'why them' rationale — generated from your exact business details." },
+            { step: "Step 3", icon: "✉️", title: "AI Outreach Email Writer", desc: "A fully written, ready-to-send outreach email personalised to your business, the scored partner, and your chosen strategy." },
+            { step: "Step 4", icon: "📋", title: "AI Campaign Brief", desc: "A complete, polished campaign brief — takes everything you've entered and writes it up ready to hand to a VA, team member, or agency." },
+          ].map(f => (
+            <div key={f.title} style={{ background: INK, padding: "24px 22px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <span style={{ fontSize: 20 }}>{f.icon}</span>
+                <span style={{ display: "inline-block", padding: "2px 8px", background: "rgba(245,184,31,.15)", border: `1px solid rgba(245,184,31,.3)` }}>
+                  <SCaps size={9} ls="0.12em" color={YEL}>{f.step}</SCaps>
+                </span>
+              </div>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER, marginBottom: 8, lineHeight: 1.2 }}>{f.title}</div>
+              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.62)", lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
         </div>
-
-        <DoubleRule style={{ margin: "48px 0 0" }} />
-      </section>
-
-      {/* ══ STEP PROGRESS ══ */}
-      <nav style={{ background: PAPER2, borderBottom: `1px solid ${INK}`, position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ display: "flex", maxWidth: 900, margin: "0 auto", padding: "0 clamp(24px,5vw,56px)" }}>
-          {STEP_LABELS.map((label, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              style={{
-                flex: 1, padding: "13px 8px", border: "none",
-                borderRight: i < 3 ? `1px solid ${INK35}` : "none",
-                background: step === i ? INK : "transparent",
-                color: step === i ? PAPER : step > i ? INK70 : INK55,
-                cursor: "pointer", fontFamily: GROT, fontWeight: 700,
-                fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase",
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-              }}
-            >
-              <span style={{ fontSize: 14, fontFamily: SERIF, fontWeight: 700 }}>0{i + 1}{step > i ? " ✓" : ""}</span>
-              {label}
-            </button>
-          ))}
+        <div style={{ marginTop: 20, textAlign: "center" }}>
+          <button
+            onClick={() => goTo(0)}
+            style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "13px 24px", background: YEL, color: INK, border: "none", cursor: "pointer", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase" }}
+          >
+            Start the tool to unlock AI features →
+          </button>
         </div>
-      </nav>
+      </section>
 
       {/* ══ STEP PANELS ══ */}
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "clamp(32px,5vw,56px) clamp(24px,5vw,56px) 100px" }}>
