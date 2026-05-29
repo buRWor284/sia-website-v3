@@ -91,19 +91,34 @@ export const ClientStrip = () => {
         ))}
         {/* Divider — desktop only */}
         <div className="client-divider" style={{ background: INK }} />
-        {featured.map((c, i) => (
+        {featured.map((c) => (
           <div
             key={c.key}
             className="client-cell"
             style={{
               padding: "16px 12px",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
+              gap: 6,
               minHeight: 80,
             }}
           >
             <ClientLogo client={c} height={44} maxWidth={120} />
+            <div
+              style={{
+                fontFamily: GROT,
+                fontSize: 9.5,
+                fontWeight: 700,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: INK55,
+                textAlign: "center",
+              }}
+            >
+              {c.name}
+            </div>
           </div>
         ))}
       </div>

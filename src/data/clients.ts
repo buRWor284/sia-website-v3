@@ -5,7 +5,7 @@
  * Clients page, Speaking page strip.
  */
 
-export type ClientCountry = "DE" | "EU" | "DK" | "UK" | "US" | "PK";
+export type ClientCountry = "DE" | "EU" | "DK" | "UK" | "US" | "PK" | "CA";
 
 export type Client = {
   key: string;
@@ -71,7 +71,7 @@ export const CLIENTS_PRE: ReadonlyArray<Client> = [
       "engagement in the Scandinavian tech scene before the move into " +
       "international consulting.",
     wordmark: "InfoShare",
-    logo: null,
+    logo: "/assets/clients/infoshare.jpeg",
   },
 ];
 
@@ -89,7 +89,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "the result was published as a SEMrush case study.",
     role: "Lead · digital PR + organic strategy",
     caseStudy: "https://dmr.agency/case-studies/nta-case-study/",
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/nta-image.jpeg",
+    logo: "/assets/clients/nta.jpg",
     services: ["EMOS", "Fractional CMO"],
   },
   {
@@ -104,7 +104,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "earned-media programme from scratch to 1.5M monthly uniques.",
     role: "Strategy + outreach",
     caseStudy: "https://dmr.agency/case-studies/ridester-case-study/",
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/rid.png",
+    logo: "/assets/clients/ridester.png",
     services: ["EMOS", "Fractional CMO"],
   },
   {
@@ -119,7 +119,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "acquisition, content, and PR; the company subsequently raised $11M.",
     role: "Growth + earned media",
     caseStudy: null,
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/Untitled-design-5.png",
+    logo: "/assets/clients/centriq.png",
     services: ["Fractional CMO", "EMOS"],
   },
   {
@@ -135,7 +135,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
     role: "Strategy + execution",
     caseStudy:
       "https://dmr.agency/case-studies/how-dmr-agency-increased-the-organic-traffic-of-an-addiction-treatment-center-by-more-than-700/",
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/CURED.png",
+    logo: "/assets/clients/curednation.png",
     services: ["EMOS"],
   },
   {
@@ -150,7 +150,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "tripled revenue inside the engagement window.",
     role: "Strategy + outreach",
     caseStudy: "https://dmr.agency/case-studies/alrug-case-study/",
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/ALRUG.png",
+    logo: "/assets/clients/alrug.png",
     services: ["EMOS"],
   },
   {
@@ -165,7 +165,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "Earned citations from MSN, Reader's Digest, and other top-tier outlets.",
     role: "Outreach + media strategy",
     caseStudy: "https://dmr.agency/case-studies/dinar-standard-case-study/",
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/DS.png",
+    logo: "/assets/clients/dinar_standard.png",
     services: ["EMOS"],
   },
   {
@@ -180,7 +180,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "programme grew organic visitors to 30K/month.",
     role: "Strategy + outreach",
     caseStudy: "https://dmr.agency/case-studies/gigworker-case-study/",
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/gigworker_logo.jpeg",
+    logo: "/assets/clients/gigworker.png",
     services: ["EMOS"],
   },
   {
@@ -196,25 +196,75 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "Business Insider.",
     role: "Long-running outreach partner",
     caseStudy: null,
-    logo: "https://dmr.agency/wp-content/uploads/2024/06/phys.jpeg",
+    logo: "/assets/clients/physicians_thrive.png",
     services: ["EMOS"],
   },
 ];
 
 export const CLIENTS_TIER2: ReadonlyArray<Client> = [
-  { key: "dunlop",         name: "Dunlop Tires",          sector: "Automotive",            country: "UK", logo: "https://dmr.agency/wp-content/uploads/2024/06/DUNLOP.png" },
-  { key: "manchester",     name: "The Manchester College",sector: "Education",             country: "UK", logo: "https://dmr.agency/wp-content/uploads/2020/08/the.jpeg" },
-  { key: "smith-thompson", name: "Smith Thompson",        sector: "Home security",         country: "US", logo: "https://dmr.agency/wp-content/uploads/2024/06/smith.jpg" },
-  { key: "beebole",        name: "BeeBole",               sector: "SaaS · Time tracking",  country: "EU", logo: "https://dmr.agency/wp-content/uploads/2024/06/b.png" },
-  { key: "automizy",       name: "Automizy",              sector: "SaaS · Email",          country: "EU", logo: "https://dmr.agency/wp-content/uploads/2024/06/Untitled-design-4.png" },
-  { key: "quran-academy",  name: "Quran Academy",         sector: "EdTech",                country: "US", logo: "https://dmr.agency/wp-content/uploads/2024/06/Screenshot-2024-06-26-at-3.40.00-PM.png" },
-  { key: "efani",          name: "Efani",                 sector: "SaaS · Cybersecurity",  country: "US", logo: "https://dmr.agency/wp-content/uploads/2024/06/efani.webp" },
-  { key: "tbps",           name: "The Big Phone Store",   sector: "E-commerce",            country: "UK", logo: "https://dmr.agency/wp-content/uploads/2024/06/communityIcon_ajeiop9kvg7d1.png" },
-  { key: "digitech",       name: "DIGITECH",              sector: "Digital agency",        country: "US", logo: "https://dmr.agency/wp-content/uploads/2020/07/DTA-logo-1.jpg" },
-  { key: "logodesign",     name: "LogoDesign",            sector: "Design software",       country: "US", logo: "https://dmr.agency/wp-content/uploads/2024/06/Untitled-design-1.png" },
-  { key: "m3d",            name: "M3D",                   sector: "3D printing",           country: "US", logo: "https://dmr.agency/wp-content/uploads/2024/06/med.png" },
-  { key: "intl-insurance", name: "International Insurance", sector: "Insurance",           country: "US", logo: "https://dmr.agency/wp-content/uploads/2024/06/II.jpeg" },
-  { key: "qaleen",         name: "Qaleen",                sector: "Home goods · Rugs",     country: "PK", logo: "https://dmr.agency/wp-content/uploads/2024/06/qalweee.webp" },
-  { key: "canvas-prints",  name: "The Canvas Prints",     sector: "E-commerce",            country: "UK", logo: "https://dmr.agency/wp-content/uploads/2024/06/canvas.png" },
-  { key: "tyreshopper",    name: "TyreShopper",           sector: "Automotive e-comm.",    country: "UK", logo: "https://dmr.agency/wp-content/uploads/2020/07/tyreshopper-1.png" },
+  { key: "dunlop",         name: "Dunlop Tires",           sector: "Automotive",           country: "UK", logo: "/assets/clients/dunlop.png" },
+  { key: "manchester",     name: "The Manchester College", sector: "Education",            country: "UK", logo: null },
+  { key: "smith-thompson", name: "Smith Thompson",         sector: "Home security",        country: "US", logo: null },
+  { key: "beebole",        name: "BeeBole",                sector: "SaaS · Time tracking", country: "EU", logo: null },
+  { key: "automizy",       name: "Automizy",               sector: "SaaS · Email",         country: "EU", logo: "/assets/clients/automizy.png" },
+  { key: "quran-academy",  name: "Quran Academy",          sector: "EdTech",               country: "US", logo: "/assets/clients/quran_academy.png" },
+  { key: "efani",          name: "Efani",                  sector: "SaaS · Cybersecurity", country: "US", logo: "/assets/clients/efani.png" },
+  { key: "tbps",           name: "The Big Phone Store",    sector: "E-commerce",           country: "UK", logo: "/assets/clients/tbps.png" },
+  { key: "digitech",       name: "DIGITECH",               sector: "Digital agency",       country: "US", logo: null },
+  { key: "logodesign",     name: "LogoDesign",             sector: "Design software",      country: "US", logo: "/assets/clients/logo_design.png" },
+  { key: "m3d",            name: "M3D",                    sector: "3D printing",          country: "US", logo: null },
+  { key: "intl-insurance", name: "International Insurance",sector: "Insurance",            country: "US", logo: "/assets/clients/international_insurance.png" },
+  { key: "qaleen",         name: "Qaleen",                 sector: "Home goods · Rugs",    country: "PK", logo: "/assets/clients/qaleen.png" },
+  { key: "canvas-prints",  name: "The Canvas Prints",      sector: "E-commerce",           country: "UK", logo: null },
+  { key: "tyreshopper",    name: "TyreShopper",            sector: "Automotive e-comm.",   country: "UK", logo: null },
+  {
+    key: "avidon",
+    name: "Avidon Marketing Group",
+    short: "AMG",
+    sector: "Marketing agency",
+    country: "US",
+    blurb:
+      "US-based full-service marketing agency. Delivered multiple successful " +
+      "campaigns across mainstream and regulated verticals, all under NDA.",
+    role: "Agency partner",
+    caseStudy: null,
+    logo: "/assets/clients/amg.png",
+    services: ["EMOS"],
+  },
+  {
+    key: "the-brand-crew",
+    name: "The Brand Crew",
+    short: "TBC",
+    sector: "Marketing agency",
+    country: "PK",
+    blurb:
+      "Pakistan-based marketing agency specialising in beauty and financial " +
+      "sector brands. Multiple successful projects delivered, details under NDA.",
+    role: "Agency partner",
+    caseStudy: null,
+    logo: "/assets/clients/TBC.png",
+    services: ["EMOS"],
+  },
+  {
+    key: "link-caffeine",
+    name: "Link Caffeine",
+    sector: "Marketing agency · SEO",
+    country: "US",
+    blurb: "US-based SEO and link-building agency.",
+    role: "Agency partner",
+    caseStudy: null,
+    logo: "/assets/clients/link_caffeine.png",
+    services: ["EMOS"],
+  },
+  {
+    key: "precision-brands",
+    name: "Precision Brands",
+    sector: "Marketing agency",
+    country: "CA",
+    blurb: "Canadian marketing agency.",
+    role: "Agency partner",
+    caseStudy: null,
+    logo: "/assets/clients/precision_brands.png",
+    services: ["EMOS"],
+  },
 ];

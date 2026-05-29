@@ -18,7 +18,7 @@ const CARDS: ReadonlyArray<Card> = [
 ];
 
 export const Wire = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
+  <section id="wire" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
     <SectionMast n="05" label="The Wire · Latest dispatches" />
 
     <div className="grid-intro">

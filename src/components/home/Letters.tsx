@@ -72,7 +72,7 @@ const TESTIMONIALS: ReadonlyArray<Testimonial> = [
 ];
 
 export const Letters = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 90 }}>
+  <section id="letters" className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 90 }}>
     <SectionMast n="03" label="What clients say · On the record" />
     <div
       className="grid-testimonials"

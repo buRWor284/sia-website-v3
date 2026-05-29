@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GROT, INK, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
+import { availabilityLabel } from "@/lib/site-config";
 import { DoubleRule, Pill, SCaps } from "./primitives";
 
 type FooterLink = {
@@ -45,7 +46,6 @@ const COLS: ReadonlyArray<FooterCol> = [
       { label: "LinkedIn",      href: "https://www.linkedin.com/in/syedirfanajmal/",                                     external: true },
       { label: "YouTube",       href: "https://youtube.com/@syedirfanajmal/",                                             external: true },
       { label: "Apple Podcasts",href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466", external: true },
-      { label: "Spotify",       href: "#" },
     ],
   },
 ];
@@ -194,7 +194,7 @@ export const Colophon = () => (
             border: `1px solid ${INK}`,
           }}
         />
-        Open for projects
+        {availabilityLabel}
       </SCaps>
     </div>
   </footer>

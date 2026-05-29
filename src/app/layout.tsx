@@ -27,10 +27,11 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Syed Irfan Ajmal · The Bureau",
+  title: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
   description:
-    "Marketing consultant, author, speaker, founder of DMR.agency. " +
-    "Get found, get covered, get customers.",
+    "Fractional CMO, international speaker, and founder of DMR.agency. " +
+    "Helping founders and marketing teams get found, get covered, and get customers " +
+    "through SEO-PR, GEO, and earned media.",
   verification: {
     google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
   },

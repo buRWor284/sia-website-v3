@@ -49,20 +49,21 @@ const HeroHeadline = ({ lines }: { lines: Line[] }) => (
   </h1>
 );
 
-const ISSUE_ITEMS: ReadonlyArray<[string, string, string]> = [
-  ["P. 02", "Three ways to work, plainly stated",     "Departments"],
-  ["P. 04", "Casework, what the numbers did",         "Case Studies"],
-  ["P. 07", "What clients have said, on the record",  "Letters"],
-  ["P. 10", "Stages across four countries",           "Touring"],
-  ["P. 14", "The latest dispatches",                  "The Wire"],
-  ["P. 16", "A letter from the editor",               "Subscriptions"],
+// [page-label, title, dept-label, anchor-id]
+const ISSUE_ITEMS: ReadonlyArray<[string, string, string, string]> = [
+  ["P. 02", "Three ways to work, plainly stated",     "Departments",   "#departments"],
+  ["P. 04", "Casework, what the numbers did",         "Case Studies",  "#casework"],
+  ["P. 07", "What clients have said, on the record",  "Letters",       "#letters"],
+  ["P. 10", "Stages across four countries",           "Touring",       "#touring"],
+  ["P. 14", "The latest dispatches",                  "The Wire",      "#wire"],
+  ["P. 16", "A letter from the editor",               "Subscriptions", "#subscriptions"],
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
-  ["$1.2M", "revenue earned · SEO + Content Marketing"],
-  ["№ 4",   "on Google for a 160K/mo keyword"],
-  ["300+",  "clients served"],
-  ["22+",   "years in marketing & press"],
+  ["$1.2M",    "NTA · $160K → $1.2M client revenue · organic · 12 months"],
+  ["1.5M /mo", "Ridester · zero to 1.5M monthly visitors · earned media · 12 months"],
+  ["300+",     "clients served"],
+  ["22+",      "years in marketing & press"],
 ];
 
 export const Hero = () => (
@@ -76,7 +77,6 @@ export const Hero = () => (
     <div style={{ display: "flex", justifyContent: "center", marginTop: 22, flexWrap: "wrap", gap: 4, textAlign: "center" }}>
       <SCaps size={11.5} ls="0.22em" color={INK55}>
         By Syed Irfan Ajmal &nbsp;·&nbsp; Fractional CMO, Speaker
-        &nbsp;·&nbsp; <span style={{ color: INK }}>Filed from Peshawar</span>
       </SCaps>
     </div>
 
@@ -117,17 +117,8 @@ export const Hero = () => (
           was not advertising at all, but earning the right to be quoted?</em>
         </p>
         <p style={{ marginTop: "0.7em" }}>
-          The answer, repeated across one hundred clients in twenty-plus
-          countries, is yes, and it is repeatable. This is the case for
-          editorial coverage, a working bureau to deliver it, and a
-          productized OS to run it in-house.
-        </p>
-        <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
-          Routed through Sweden: a masters at Mälardalen, work at Marcus
-          Evans and InfoShare across Stockholm and Copenhagen, a spatial
-          intelligence company in Peshawar, a Silicon Valley accelerator,
-          before settling the bureau in Peshawar, where it has been
-          published since 2010.
+          The answer, tested across one hundred clients in twenty-plus
+          countries, is yes — and it is repeatable.
         </p>
       </div>
 
@@ -220,33 +211,39 @@ export const Hero = () => (
             color: INK,
           }}
         >
-          {ISSUE_ITEMS.map(([p, title, dept], i) => (
-            <li
-              key={i}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "46px 1fr auto",
-                gap: 10,
-                padding: "10px 0",
-                borderBottom: `1px solid ${INK15}`,
-                alignItems: "baseline",
-              }}
-            >
-              <SCaps size={10} ls="0.14em" color={INK70}>{p}</SCaps>
-              <div style={{ fontSize: 15, lineHeight: 1.3, fontWeight: 500 }}>
-                {title}
-              </div>
-              <SCaps size={9} ls="0.14em" color={INK55}>{dept}</SCaps>
+          {ISSUE_ITEMS.map(([p, title, dept, anchor], i) => (
+            <li key={i}>
+              <a
+                href={anchor}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "46px 1fr auto",
+                    gap: 10,
+                    padding: "10px 0",
+                    borderBottom: `1px solid ${INK15}`,
+                    alignItems: "baseline",
+                  }}
+                >
+                  <SCaps size={10} ls="0.14em" color={INK70}>{p}</SCaps>
+                  <div style={{ fontSize: 15, lineHeight: 1.3, fontWeight: 500 }}>
+                    {title}
+                  </div>
+                  <SCaps size={9} ls="0.14em" color={INK55}>{dept}</SCaps>
+                </div>
+              </a>
             </li>
           ))}
         </ol>
-        <div style={{ marginTop: 18, display: "flex", gap: 10 }}>
+        <div style={{ marginTop: 18 }}>
           <a
             href={CALENDLY}
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              flex: 1,
+              display: "block",
               textAlign: "center",
               padding: "14px 14px",
               background: INK,
@@ -260,24 +257,6 @@ export const Hero = () => (
             }}
           >
             Book a call →
-          </a>
-          <a
-            href="/podcast"
-            style={{
-              flex: 1,
-              textAlign: "center",
-              padding: "14px 14px",
-              background: YEL,
-              color: INK,
-              textDecoration: "none",
-              fontFamily: GROT,
-              fontWeight: 700,
-              fontSize: 11.5,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-            }}
-          >
-            The podcast
           </a>
         </div>
       </aside>
@@ -317,7 +296,7 @@ export const Hero = () => (
     <div style={{ padding: "20px 0 4px" }}>
       {/* Label row */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-        <Pill size={11} ls="0.20em">Provenance</Pill>
+        <Pill size={11} ls="0.20em">Background</Pill>
         <div style={{ flex: 1, height: 1, background: INK35 }} />
       </div>
 
@@ -386,7 +365,7 @@ export const Hero = () => (
               alignItems: "center",
             }}
           >
-            <SCaps size={10.5} ls="0.18em" color={INK55}>Education &amp; lineage</SCaps>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>Prior Work + Education</SCaps>
           </div>
           <div
             style={{
@@ -400,6 +379,8 @@ export const Hero = () => (
               color: INK,
             }}
           >
+            <span><Flag c="PK" />Peshawar</span>
+            <span style={{ color: INK35 }}>·</span>
             <span>
               <Flag c="SE" />
               <strong style={{ fontWeight: 700 }}>M.Sc. Mälardalen</strong>

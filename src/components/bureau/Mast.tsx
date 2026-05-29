@@ -11,6 +11,7 @@ import {
   PAPER,
   SERIF,
 } from "@/lib/tokens";
+import { availabilityLabel } from "@/lib/site-config";
 import {
   DoubleRule,
   HRule,
@@ -34,9 +35,18 @@ type MastProps = {
   dateline?: string;
 };
 
+function getDateline(): string {
+  return new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export const Mast = ({
   active = "Home",
-  dateline = "Friday, May 29, 2026",
+  dateline = getDateline(),
 }: MastProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -101,7 +111,7 @@ export const Mast = ({
                   textTransform: "uppercase",
                 }}
               >
-                Open for projects, Q3
+                {availabilityLabel}
               </span>
             </Mark>
           </div>

@@ -61,7 +61,7 @@ const SERVICES: ReadonlyArray<Service> = [
 ];
 
 export const Departments = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 80, paddingBottom: 80 }}>
+  <section id="departments" className="sx" style={{ background: PAPER, paddingTop: 80, paddingBottom: 80 }}>
     <SectionMast n="01" label="Departments · Three ways to work" />
 
     <div className="grid-intro">

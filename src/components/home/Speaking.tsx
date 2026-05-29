@@ -1,17 +1,38 @@
 import { GROT, INK, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { SCaps, SectionMast, SiaLogo } from "@/components/bureau/primitives";
 
-const ROWS: ReadonlyArray<[string, string, string, string]> = [
-  ["Peshawar",     "Pakistan",  "2013 → present", "G-Day X · Durshal"],
-  ["Kuala Lumpur", "Malaysia",  "2016 → 2019",    "Webinars · workshops"],
-  ["Bali",         "Indonesia", "Nov 2016",       "DMSS · 200+ audience"],
-  ["Dubai",        "UAE",       "2016 → 2018",    "ATM · IN5 · MPS2016"],
-  ["Webinars",     "US / UK",   "2017 → present", "12+ sessions"],
-  ["US podcasts",  "Remote",    "2018 → present", "15+ guest spots"],
+// [city, country, venue/notes] — dates removed intentionally
+const ROWS: ReadonlyArray<[string, string, string]> = [
+  ["Peshawar",     "Pakistan",  "G-Day X · Durshal"],
+  ["Kuala Lumpur", "Malaysia",  "Webinars · workshops"],
+  ["Bali",         "Indonesia", "DMSS · 200+ audience"],
+  ["Dubai",        "UAE",       "ATM · IN5 · MPS2016"],
+  ["Webinars",     "US / UK",   "12+ sessions"],
+  ["US podcasts",  "Remote",    "15+ guest spots"],
+];
+
+type PodcastEp = { code: string; title: string; slug: string };
+const FEATURED_EPISODES: ReadonlyArray<PodcastEp> = [
+  {
+    code: "S02E09",
+    title: "Finding Your Unfair Advantage",
+    slug: "ash-ali-hasan-kubba",
+  },
+  {
+    code: "S02E05",
+    title: "Digital PR vs SEO: Key Similarities & Differences",
+    slug: "digital-pr-vs-seo-key-s02e05",
+  },
+  {
+    code: "S03E09",
+    title: "HARO Outreach, SEO Agency Business & Backlinks",
+    slug: "greg-heilers-interview",
+  },
 ];
 
 export const SpeakingBand = () => (
   <section
+    id="touring"
     className="sx"
     style={{
       background: INK,
@@ -70,45 +91,60 @@ export const SpeakingBand = () => (
           guest spots on US podcasts.
         </p>
         <div style={{ marginTop: 28 }}>
-          <SCaps size={11} ls="0.20em" color={YEL}>Topics on file</SCaps>
+          <SCaps size={11} ls="0.20em" color={YEL}>From the podcast</SCaps>
           <ol
             style={{
               margin: "10px 0 0",
               padding: 0,
               listStyle: "none",
               fontFamily: SERIF,
-              fontSize: 17.5,
+              fontSize: 16,
               lineHeight: 1.45,
               color: PAPER,
             }}
           >
-            {[
-              "The Scientific Benefits of Writing · Infographic",
-              "Brand Yourself for Success",
-              "Media Hacks · Free Publicity Online",
-            ].map((topic, idx) => (
+            {FEATURED_EPISODES.map((ep, idx) => (
               <li
-                key={idx}
+                key={ep.slug}
                 style={{
                   padding: "8px 0",
-                  borderBottom: idx < 2 ? "1px solid rgba(241,235,222,.18)" : "none",
+                  borderBottom: idx < FEATURED_EPISODES.length - 1
+                    ? "1px solid rgba(241,235,222,.18)"
+                    : "none",
                 }}
               >
-                <span
-                  style={{
-                    color: YEL,
-                    fontFamily: GROT,
-                    fontSize: 13,
-                    fontWeight: 700,
-                    marginRight: 10,
-                  }}
+                <a
+                  href={`/podcast/${ep.slug}`}
+                  style={{ textDecoration: "none", color: "inherit", display: "flex", gap: 12, alignItems: "baseline" }}
                 >
-                  {["I.", "II.", "III."][idx]}
-                </span>
-                {topic}
+                  <SCaps size={10} ls="0.14em" color={YEL} style={{ flexShrink: 0 }}>
+                    {ep.code}
+                  </SCaps>
+                  <span>{ep.title} →</span>
+                </a>
               </li>
             ))}
           </ol>
+          <a
+            href="/ventures"
+            style={{
+              marginTop: 14,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              fontFamily: GROT,
+              fontWeight: 700,
+              fontSize: 11,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "rgba(241,235,222,.55)",
+              textDecoration: "none",
+              borderBottom: "1px solid rgba(241,235,222,.25)",
+              paddingBottom: 2,
+            }}
+          >
+            View ventures →
+          </a>
         </div>
         <a
           href="/speaking"
@@ -163,22 +199,19 @@ export const SpeakingBand = () => (
             >
               {row[0]}
             </div>
-            <div
-              style={{
-                fontFamily: SERIF,
-                fontStyle: "italic",
-                fontSize: 15,
-                color: "rgba(241,235,222,.7)",
-              }}
-            >
-              {row[1]}
-            </div>
             <div>
-              <SCaps size={10} ls="0.12em" color="rgba(241,235,222,.55)">
-                {row[2]}
-              </SCaps>
+              <div
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: 15,
+                  color: "rgba(241,235,222,.7)",
+                }}
+              >
+                {row[1]}
+              </div>
               <div style={{ marginTop: 4 }}>
-                <SCaps size={10} ls="0.10em" color={YEL}>{row[3]}</SCaps>
+                <SCaps size={10} ls="0.10em" color={YEL}>{row[2]}</SCaps>
               </div>
             </div>
           </div>

@@ -63,7 +63,7 @@ const CASES: ReadonlyArray<Case> = [
 ];
 
 export const CaseStudies = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
+  <section id="casework" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
     <SectionMast n="02" label="Casework · What the numbers did" />
 
     <div className="grid-intro">

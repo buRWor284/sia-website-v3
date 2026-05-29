@@ -196,6 +196,7 @@ export const Subscriptions = ({
   sectionNumber?: string;
 }) => (
   <section
+    id="subscriptions"
     className="sx"
     style={{
       background: INK, color: PAPER,
@@ -218,16 +219,17 @@ export const Subscriptions = ({
           className="sub-h2"
           style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: PAPER, lineHeight: 0.98, letterSpacing: "-0.025em" }}
         >
-          A letter
+          Real case studies.
           <br />
-          <span style={{ fontStyle: "italic", color: YEL }}>from the wire.</span>
+          <span style={{ fontStyle: "italic", color: YEL }}>Zero filler.</span>
         </h2>
         <p style={{ marginTop: 14, marginBottom: 0, fontFamily: GROT, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
           GEO · SEO-PR · Content Marketing
         </p>
         <p style={{ marginTop: 18, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 480 }}>
-          One or two letters a month. Real case studies, the campaigns I&rsquo;m
-          building right now, and zero filler. Unsubscribe whenever.
+          One or two emails a month. The campaigns I&rsquo;m building right
+          now, what&rsquo;s working in earned media, and the case studies
+          behind the numbers. Unsubscribe whenever.
         </p>
       </div>
 
