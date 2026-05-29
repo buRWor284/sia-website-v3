@@ -43,6 +43,18 @@ const INFOGRAPHICS: InfographicCard[] = [
   },
   {
     n: "02",
+    tag: "Interactive",
+    title: "The Journo Outreach Checklist",
+    blurb:
+      "Seven steps to a pitch reporters actually paste in. The SIA system for " +
+      "working HARO, Qwoted, Source of Sources, Featured, and Help a B2B Writer — " +
+      "with copy-clip snippets, an interactive progress meter, and a print mode.",
+    href: "/infographics/journo-outreach-checklist",
+    year: "2026",
+    status: "live",
+  },
+  {
+    n: "03",
     tag: "Infographic",
     title: "Managing Remote Teams with HubStaff",
     blurb:
@@ -53,7 +65,7 @@ const INFOGRAPHICS: InfographicCard[] = [
     status: "coming",
   },
   {
-    n: "03",
+    n: "04",
     tag: "Infographic",
     title: "How to Form Writing Habits for Success",
     blurb:
@@ -64,7 +76,7 @@ const INFOGRAPHICS: InfographicCard[] = [
     status: "coming",
   },
   {
-    n: "04",
+    n: "05",
     tag: "Infographic",
     title: "Getting Content Ideas from Your Customers",
     blurb:
@@ -131,8 +143,8 @@ const Hero = () => (
       }}
     >
       {([
-        ["4", "Infographics"],
-        ["1", "Interactive edition"],
+        ["5", "Infographics"],
+        ["2", "Interactive editions"],
         ["2019", "First published"],
       ] as [string, string][]).map(([k, v], i) => (
         <div
