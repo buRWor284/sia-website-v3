@@ -21,7 +21,7 @@ const COLS: ReadonlyArray<FooterCol> = [
     items: [
       { label: "Fractional CMO", href: "/fractional-cmo" },
       { label: "Speaking",       href: "/speaking" },
-      { label: "EMOS",           href: "/emos", strikePart: "Rented", suffix: " Own Authority" },
+      { label: "EMOS",           href: "/emos" },
       { label: "DMR.agency",     href: "https://dmr.agency", external: true },
       { label: "Ventures",       href: "/ventures" },
     ],
