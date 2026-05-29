@@ -18,7 +18,7 @@ const STATS: ReadonlyArray<[string, string, string]> = [
   ["$1.2M",    "client revenue · organic · 12 months",              "NTA · $160K → $1.2M"],
   ["1.5M /mo", "monthly visitors · earned media · 12 months",       "Ridester · zero to 1.5M"],
   ["300+",     "clients served",                                     ""],
-  ["22+",      "years in marketing & press",                         ""],
+  ["23+",      "years in marketing & press",                         ""],
 ];
 
 // ── Right-panel dispatch items ───────────────────────────────────────────────
@@ -42,19 +42,23 @@ export const Hero = () => (
     <div className="sx">
       <div className="grid-hero-newspaper">
 
-        {/* LEFT — stat */}
+        {/* LEFT — photo + stat */}
         <div className="hero-np-left">
-          <span className="hero-ghost-word" aria-hidden="true">HOME</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/headshot-circle.png"
+            alt="Syed Irfan Ajmal"
+            style={{
+              width: "100%",
+              maxWidth: 180,
+              display: "block",
+              position: "relative",
+              zIndex: 1,
+            }}
+          />
 
           <div>
-            <div className="hero-stat-number">
-              22<span style={{
-                fontSize: "0.50em",
-                letterSpacing: "-0.01em",
-                fontStyle: "italic",
-                verticalAlign: "0.10em",
-              }}>+</span>
-            </div>
+            <div className="hero-stat-number">23</div>
             <div className="hero-stat-label">
               <strong style={{ color: INK }}>Years</strong><br />
               in marketing<br />
@@ -63,7 +67,7 @@ export const Hero = () => (
           </div>
 
           <div className="hero-stat-label">
-            Est. 2003 · Peshawar<br />
+            Est. 2004<br />
             <strong style={{ color: INK }}>Open · Q3 2026</strong>
           </div>
         </div>
