@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { GROT, INK, YEL } from "@/lib/tokens";
 
 const TOC_ITEMS = [
+  { id: "res-tools",         label: "Tools" },
   { id: "res-kits",          label: "Kits" },
   { id: "res-playbooks",     label: "Playbooks" },
   { id: "res-articles",      label: "Articles" },

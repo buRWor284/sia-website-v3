@@ -46,6 +46,24 @@ const KITS: ReadonlyArray<Kit> = [
   },
 ];
 
+// ─── Tools data ───────────────────────────────────────────────────────────────
+
+type Tool = {
+  no: string; badge: string; title: string; sub: string;
+  blurb: string; href: string; accent: string;
+};
+const GREEN = "#3e6b45";
+const TOOLS: ReadonlyArray<Tool> = [
+  {
+    no: "01", badge: "ROI Calculator",
+    title: "The Authority Cost Calculator",
+    sub: "Stop renting. See the cost of renting credibility vs. owning it.",
+    blurb: "Enter your monthly agency spend or link budget, your traffic, and your AOV — and see the one-year financial case for owning the capability instead of renting it forever. Discover the solution at the end.",
+    href: "/tools/authority-calculator",
+    accent: GREEN,
+  },
+];
+
 type Playbook = { tag: string; no: string; title: string; sub: string; blurb: string; slug: string; wc: string; read: string };
 const PLAYBOOKS: ReadonlyArray<Playbook> = [
   {
@@ -135,7 +153,7 @@ const Hero = () => (
         { label: "Playbooks", active: true },
         { label: "Kits",      active: true },
         { label: "Podcast",   active: true },
-        { label: "Tools",     active: false, soon: true },
+        { label: "Tools",     active: true },
       ].map((cat) => (
         <span
           key={cat.label}
@@ -149,13 +167,6 @@ const Hero = () => (
           }}
         >
           {cat.label}
-          {cat.soon && (
-            <span style={{
-              padding: "1px 6px", background: YEL, color: INK,
-              fontFamily: GROT, fontWeight: 800, fontSize: 8,
-              letterSpacing: "0.16em", textTransform: "uppercase",
-            }}>soon</span>
-          )}
         </span>
       ))}
     </div>
@@ -180,11 +191,98 @@ const Hero = () => (
   </section>
 );
 
-// ─── §01 · Kits ──────────────────────────────────────────────────────────────
+// ─── §01 · Tools ─────────────────────────────────────────────────────────────
+
+const Tools = () => (
+  <section id="res-tools" className="sx" style={{ background: PAPER, paddingTop: 0, paddingBottom: 90 }}>
+    <SectionMast n="01" label="Tools · Calculators & decision aids" />
+
+    <div className="grid-intro" style={{ marginBottom: 48 }}>
+      <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
+        Run the numbers.<br />
+        <span style={{ fontStyle: "italic" }}><Mark>Then decide.</Mark></span>
+      </h2>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 19, color: INK70, lineHeight: 1.55, maxWidth: 560 }}>
+        Interactive calculators that turn your real inputs into a financial case.
+        No guesswork — the answer comes from your own numbers.
+      </p>
+    </div>
+
+    <div style={{ border: `1px solid ${INK}` }}>
+      {TOOLS.map((tool) => (
+        <a
+          key={tool.title}
+          href={tool.href}
+          style={{
+            display: "grid",
+            gridTemplateColumns: "80px 1fr 140px",
+            textDecoration: "none", color: INK, background: PAPER,
+          }}
+        >
+          {/* number column */}
+          <div style={{
+            padding: "32px 0", display: "flex", alignItems: "flex-start",
+            justifyContent: "center", borderRight: `1px solid ${INK}`,
+          }}>
+            <div style={{
+              fontFamily: SERIF, fontWeight: 700, fontSize: 42, color: INK,
+              lineHeight: 1, letterSpacing: "-0.02em",
+            }}>
+              Nº {tool.no}
+            </div>
+          </div>
+          {/* content column */}
+          <div style={{ padding: "32px 32px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+              <Pill size={10.5} ls="0.18em">{tool.badge}</Pill>
+            </div>
+            {/* hatched accent */}
+            <div
+              aria-hidden
+              style={{
+                height: 6, marginBottom: 18, width: 120,
+                background: `repeating-linear-gradient(90deg, ${tool.accent} 0 6px, transparent 6px 12px)`,
+              }}
+            />
+            <h3 style={{
+              margin: "0 0 10px", fontFamily: SERIF, fontWeight: 700,
+              fontSize: 28, color: INK, lineHeight: 1.1, letterSpacing: "-0.015em",
+            }}>
+              {tool.title}
+            </h3>
+            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: INK70, lineHeight: 1.35, marginBottom: 14 }}>
+              {tool.sub}
+            </div>
+            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15.5, color: INK, lineHeight: 1.55 }}>
+              {tool.blurb}
+            </p>
+          </div>
+          {/* cta column */}
+          <div style={{
+            padding: "32px 24px", display: "flex", flexDirection: "column",
+            justifyContent: "center", alignItems: "flex-end",
+            borderLeft: `1px solid ${INK15}`,
+          }}>
+            <div style={{
+              padding: "14px 18px", border: `1.5px solid ${INK}`,
+              background: INK, color: PAPER,
+              fontFamily: SERIF, fontWeight: 700, fontSize: 14, letterSpacing: "-0.01em",
+              textAlign: "center", lineHeight: 1.3,
+            }}>
+              Run the<br />calculator ↗
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §02 · Kits ──────────────────────────────────────────────────────────────
 
 const Kits = () => (
-  <section id="res-kits" className="sx" style={{ background: PAPER, paddingTop: 0, paddingBottom: 90 }}>
-    <SectionMast n="01" label="Kits · Interactive tools & checklists" />
+  <section id="res-kits" className="sx" style={{ background: PAPER2, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
+    <SectionMast n="02" label="Kits · Interactive tools & checklists" />
 
     <div className="grid-intro" style={{ marginBottom: 48 }}>
       <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
@@ -248,11 +346,11 @@ const Kits = () => (
   </section>
 );
 
-// ─── §02 · Playbooks (101 Series) ────────────────────────────────────────────
+// ─── §03 · Playbooks (101 Series) ────────────────────────────────────────────
 
 const Playbooks = () => (
-  <section id="res-playbooks" className="sx" style={{ background: PAPER2, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
-    <SectionMast n="02" label="Playbooks · Deep-dive guides" />
+  <section id="res-playbooks" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
+    <SectionMast n="03" label="Playbooks · Deep-dive guides" />
 
     <div className="grid-intro" style={{ marginBottom: 48 }}>
       <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
@@ -302,11 +400,11 @@ const Playbooks = () => (
   </section>
 );
 
-// ─── §03 · Articles ───────────────────────────────────────────────────────────
+// ─── §04 · Articles ───────────────────────────────────────────────────────────
 
 const Articles = () => (
-  <section id="res-articles" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
-    <SectionMast n="03" label="From the archives · Selected articles" />
+  <section id="res-articles" className="sx" style={{ background: PAPER2, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
+    <SectionMast n="04" label="From the archives · Selected articles" />
     <ol style={{ margin: 0, padding: 0, listStyle: "none", borderTop: `2px solid ${INK}` }}>
       {ARTICLES.map((a, i) => (
         <li key={a.slug} className="article-row">
@@ -334,7 +432,7 @@ const Articles = () => (
   </section>
 );
 
-// ─── §04 · Podcast ────────────────────────────────────────────────────────────
+// ─── §05 · Podcast ────────────────────────────────────────────────────────────
 
 const PodcastTeaser = () => (
   <section
@@ -342,7 +440,7 @@ const PodcastTeaser = () => (
     className="sx"
     style={{ background: INK, color: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `3px solid ${YEL}` }}
   >
-    <SectionMast n="04" label="Podcast · 39 Episodes" dark />
+    <SectionMast n="05" label="Podcast · 39 Episodes" dark />
 
     <div className="grid-intro">
       <div>
@@ -400,11 +498,11 @@ const PodcastTeaser = () => (
   </section>
 );
 
-// ─── §05 · Visual Essays ─────────────────────────────────────────────────────
+// ─── §06 · Visual Essays ─────────────────────────────────────────────────────
 
 const VisualEssays = () => (
   <section id="res-visual-essays" className="sx" style={{ background: PAPER2, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
-    <SectionMast n="05" label="Visual Essays · Infographics" />
+    <SectionMast n="06" label="Visual Essays · Infographics" />
 
     <div className="grid-intro" style={{ marginBottom: 48 }}>
       <h2 className="h2-lg" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
@@ -477,11 +575,11 @@ const VisualEssays = () => (
   </section>
 );
 
-// ─── §06 · Press ─────────────────────────────────────────────────────────────
+// ─── §07 · Press ─────────────────────────────────────────────────────────────
 
 const Press = () => (
   <section id="res-press" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
-    <SectionMast n="06" label="Bylines & citations · Selected publications" />
+    <SectionMast n="07" label="Bylines & citations · Selected publications" />
 
     <div className="grid-intro" style={{ marginBottom: 40 }}>
       <h2 className="h2-lg" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
@@ -531,13 +629,14 @@ export default function ResourcesPage() {
       <Mast active="Resources" />
       <Hero />
       <TocBar />
+      <Tools />
       <Kits />
       <Playbooks />
       <Articles />
       <PodcastTeaser />
       <VisualEssays />
       <Press />
-      <Subscriptions sectionNumber="07" />
+      <Subscriptions sectionNumber="08" />
       <Colophon />
     </div>
   );
