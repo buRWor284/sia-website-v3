@@ -1,12 +1,57 @@
-import { INK, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
+import Link from "next/link";
+import { GROT, INK, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { DoubleRule, Pill, SCaps, SiaLogo } from "./primitives";
 
-type LinkList = readonly [head: string, items: readonly string[]];
+type FooterLink = {
+  label: string;
+  href: string;
+  external?: boolean;
+  strikePart?: string;
+  suffix?: string;
+};
 
-const LISTS: ReadonlyArray<LinkList> = [
-  ["Departments", ["Digital PR", "EMOS", "Fractional CMO", "Speaking", "Podcast"]],
-  ["The Paper",   ["Home", "About", "Letters", "The Wire", "Subscriptions"]],
-  ["Elsewhere",   ["Twitter / X", "LinkedIn", "YouTube", "Apple Podcasts", "Spotify"]],
+type FooterCol = {
+  head: string;
+  items: ReadonlyArray<FooterLink>;
+};
+
+const COLS: ReadonlyArray<FooterCol> = [
+  {
+    head: "Services",
+    items: [
+      { label: "Fractional CMO",                href: "/fractional-cmo" },
+      { label: "EMOS",                           href: "/emos",                                          strikePart: "Rented", suffix: " Own Authority" },
+      { label: "Digital PR & Editorial Backlinks", href: "https://dmr.agency/earned-media-booster/",   external: true },
+      { label: "Done-For-You Services",          href: "https://dmr.agency",                            external: true },
+      { label: "Speaking",                       href: "/speaking" },
+    ],
+  },
+  {
+    head: "Navigate",
+    items: [
+      { label: "Home",       href: "/" },
+      { label: "About",      href: "/about" },
+      { label: "Podcast",    href: "/podcast" },
+      { label: "Insights",   href: "/insights" },
+      { label: "Newsletter", href: "/newsletter" },
+    ],
+  },
+  {
+    head: "Elsewhere",
+    items: [
+      { label: "Twitter / X",   href: "https://x.com/syedirfanajmal",                                                    external: true },
+      { label: "LinkedIn",      href: "https://www.linkedin.com/in/syedirfanajmal/",                                     external: true },
+      { label: "YouTube",       href: "https://youtube.com/@syedirfanajmal/",                                             external: true },
+      { label: "Apple Podcasts",href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466", external: true },
+      { label: "Spotify",       href: "#" },
+    ],
+  },
+];
+
+const LEGAL = [
+  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Terms",          href: "/terms" },
+  { label: "Refund Policy",  href: "/refund-policy" },
 ];
 
 export const Colophon = () => (
@@ -45,17 +90,12 @@ export const Colophon = () => (
             fontStyle: "italic",
           }}
         >
-          Syed Irfan Ajmal: marketing consultant, author, speaker, and CEO of
-          DMR.agency. Masters from Mälardalen University, Sweden (2007); work
-          at Marcus Evans (Sweden) and InfoShare (Denmark); co-founder of Silk
-          Route Interactive, a spatial intelligence company. Published from
-          Peshawar since 2010. As reported in Forbes, HBR, HuffPost, TNW and
-          others.
+          Serial entrepreneur. Fractional CMO. CEO of DMR.agency. Featured in Forbes, HBR &amp; HuffPost.
         </p>
       </div>
 
       {/* Link columns */}
-      {LISTS.map(([head, items]) => (
+      {COLS.map(({ head, items }) => (
         <div key={head}>
           <Pill size={11} ls="0.22em">{head}</Pill>
           <ul
@@ -68,22 +108,40 @@ export const Colophon = () => (
               gap: 8,
             }}
           >
-            {items.map((i) => (
-              <li key={i}>
-                <a
-                  href="#"
-                  style={{
-                    fontFamily: SERIF,
-                    fontSize: 16,
-                    color: INK,
-                    textDecoration: "none",
-                    fontWeight: 500,
-                  }}
-                >
-                  {i}
-                </a>
-              </li>
-            ))}
+            {items.map((item) => {
+              const linkStyle = {
+                fontFamily: SERIF,
+                fontSize: 16,
+                color: INK,
+                textDecoration: "none",
+                fontWeight: 500,
+              } as const;
+              const inner = (
+                <>
+                  {item.label}
+                  {item.strikePart && (
+                    <> <s style={{ opacity: 0.55 }}>{item.strikePart}</s></>
+                  )}
+                  {item.suffix}
+                  {item.external && (
+                    <span style={{ fontSize: 11, marginLeft: 3, opacity: 0.5 }}>↗</span>
+                  )}
+                </>
+              );
+              return (
+                <li key={item.label}>
+                  {item.external ? (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+                      {inner}
+                    </a>
+                  ) : (
+                    <Link href={item.href} style={linkStyle}>
+                      {inner}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       ))}
@@ -98,12 +156,33 @@ export const Colophon = () => (
         alignItems: "center",
         paddingTop: 18,
         flexWrap: "wrap",
-        gap: 16,
+        gap: 12,
       }}
     >
       <SCaps size={10.5} ls="0.16em" color={INK70}>
         © MMXXVI · Syed Irfan Ajmal · SIA Enterprises Inc · Wyoming C-Corp
       </SCaps>
+
+      <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
+        {LEGAL.map((link) => (
+          <Link
+            key={link.label}
+            href={link.href}
+            style={{
+              fontFamily: GROT,
+              fontSize: 10.5,
+              color: INK70,
+              textDecoration: "none",
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              fontWeight: 700,
+            }}
+          >
+            {link.label}
+          </Link>
+        ))}
+      </div>
+
       <SCaps size={10.5} ls="0.16em" color={INK70}>
         sia[@]syedirfanajmal[dot]com &nbsp;·&nbsp;
         <span
