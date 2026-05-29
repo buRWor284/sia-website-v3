@@ -29,7 +29,7 @@ const Hero = () => (
             color: INK,
           }}
         >
-          15
+          18
         </div>
         <div
           style={{
