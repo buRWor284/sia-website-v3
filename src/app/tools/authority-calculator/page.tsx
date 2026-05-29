@@ -378,42 +378,101 @@ const Comparison = ({ st }: { st: CalcState }) => {
 // Introduces EMOS AFTER the visitor has seen the rent-vs-own math.
 const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => void }) => (
   <section style={{ background: PAPER, padding: "48px clamp(22px,5vw,56px) 0" }}>
-    <div style={{ border: `2px solid ${INK}`, background: PAPER2, padding: "32px 36px" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 20, flexWrap: "wrap", marginBottom: 20 }}>
-        <div style={{ flex: "1 1 400px" }}>
-          <SCaps size={12} ls="0.26em" color={GREEN} style={{ display: "block", marginBottom: 10 }}>
-            The vehicle to get there
+    <div style={{ border: `2px solid ${INK}`, background: PAPER2, padding: "clamp(22px,4vw,40px) clamp(22px,4vw,40px)" }}>
+
+      {/* headline + rent counter */}
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 24, flexWrap: "wrap", marginBottom: 28 }}>
+        <div style={{ flex: "1 1 380px" }}>
+          <SCaps size={12} ls="0.26em" color={GREEN} style={{ display: "block", marginBottom: 12 }}>
+            The way out of the rent cycle
           </SCaps>
           <h2 style={{
             margin: 0, fontFamily: SERIF, fontWeight: 700,
-            fontSize: "clamp(28px, 4vw, 44px)",
-            color: INK, lineHeight: 1, letterSpacing: "-0.025em",
+            fontSize: "clamp(28px, 4vw, 48px)",
+            color: INK, lineHeight: 0.97, letterSpacing: "-0.028em",
           }}>
-            EMOS — The Earned Media<br />Operating System
+            EMOS — The Earned<br />Media Operating System
           </h2>
           <p style={{
-            margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic",
-            fontSize: 17, color: INK70, lineHeight: 1.5, maxWidth: 620,
+            margin: "16px 0 0", fontFamily: SERIF,
+            fontSize: 18, color: INK70, lineHeight: 1.55, maxWidth: 580,
           }}>
-            A one-time cohort that gives your team the process, contacts, and momentum
-            to earn press in-house — permanently. No retainer. No ongoing spend.
-            The capability is yours after one cohort.
+            A <strong>one-time cohort</strong> that gives you the exact process, journalist contacts, and
+            pitch system used to land features in Forbes, HBR, HuffPost, and 50+ publications.
+            No retainer. No ongoing spend. The capability is yours permanently after one cohort.
+          </p>
+          <p style={{
+            margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic",
+            fontSize: 15, color: INK55, lineHeight: 1.4,
+          }}>
+            Alumni have been featured in Forbes, Harvard Business Review, HuffPost,
+            The Next Web, Entrepreneur, and Search Engine Journal.
           </p>
         </div>
+        {/* rent counter */}
         <div style={{
           flexShrink: 0, border: `1.5px solid ${INK}`,
-          background: PAPER, padding: "18px 24px", textAlign: "center",
+          background: PAPER, padding: "20px 26px", textAlign: "center", alignSelf: "flex-start",
         }}>
-          <SCaps size={10.5} ls="0.18em" color={INK55}>vs. renting it for</SCaps>
-          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 44, color: RED, lineHeight: 1, letterSpacing: "-0.025em", marginTop: 6 }}>
+          <SCaps size={10.5} ls="0.18em" color={INK55}>you currently pay</SCaps>
+          <div style={{
+            fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(36px,5vw,48px)",
+            color: RED, lineHeight: 1, letterSpacing: "-0.025em", marginTop: 6,
+          }}>
             {fmt(compute(st).currentSpendYr)}
           </div>
-          <SCaps size={10} ls="0.14em" color={INK55} style={{ display: "block", marginTop: 6 }}>per year, and rising</SCaps>
+          <SCaps size={10} ls="0.14em" color={INK55} style={{ display: "block", marginTop: 6 }}>
+            per year to rent authority
+          </SCaps>
+          <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${INK15}` }}>
+            <SCaps size={10} ls="0.14em" color={GREEN}>EMOS costs</SCaps>
+            <div style={{
+              fontFamily: SERIF, fontWeight: 700, fontSize: 28,
+              color: GREEN, lineHeight: 1, letterSpacing: "-0.02em", marginTop: 4,
+            }}>
+              {fmt(TIERS.find(t => t.id === st.tier)!.fee)}
+            </div>
+            <SCaps size={9.5} ls="0.12em" color={GREEN} style={{ display: "block", marginTop: 4 }}>
+              once, total
+            </SCaps>
+          </div>
         </div>
       </div>
 
+      {/* what you get — three cards */}
+      <div style={{ marginBottom: 28 }}>
+        <SCaps size={11} ls="0.18em" color={INK} style={{ display: "block", marginBottom: 14 }}>
+          What one cohort gives you
+        </SCaps>
+        <div className="calc-grid3" style={{ border: `1px solid ${INK}`, background: PAPER }}>
+          {([
+            ["The system",   "The exact 7-step pitch process used to land coverage in tier-one and mid-tier outlets. Yours to run internally, forever, with no agency in the loop."],
+            ["The contacts", "A curated journalist database — updated each cohort, sorted by niche and beat. No cold-guessing who to pitch or what they cover."],
+            ["Live results", "You earn your first real media placements during the cohort itself. Results before it ends, not months after you've paid and waited."],
+          ] as [string, string][]).map(([h, b], i) => (
+            <div key={h} style={{
+              padding: "20px 22px",
+              borderLeft: i ? `1px solid ${INK}` : "none",
+              position: "relative",
+            }}>
+              <div aria-hidden style={{
+                position: "absolute", left: 0, top: 0, bottom: 0,
+                width: 3, background: GREEN, opacity: 0.6,
+              }} />
+              <SCaps size={11} ls="0.14em" color={GREEN}>{String(i + 1).padStart(2, "0")}</SCaps>
+              <h3 style={{
+                margin: "8px 0 0", fontFamily: SERIF, fontWeight: 700,
+                fontSize: 20, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em",
+              }}>{h}</h3>
+              <p style={{ margin: "8px 0 0", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.5, color: INK70 }}>{b}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* tier selector */}
       <SCaps size={11} ls="0.18em" color={INK} style={{ display: "block", marginBottom: 14 }}>
-        Choose your EMOS investment — then see your number below
+        Choose your EMOS investment — see your number update below
       </SCaps>
       <div className="calc-grid2">
         {TIERS.map((t) => {
@@ -508,19 +567,106 @@ const Result = ({ st }: { st: CalcState }) => {
               </div>
             ))}
           </div>
-
-          {/* CTA */}
-          <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            gap: 16, marginTop: 28, background: YEL, color: INK,
-            textDecoration: "none", padding: "20px 26px",
-            fontFamily: GROT, fontWeight: 800,
-            fontSize: "clamp(13px,2vw,16px)", letterSpacing: "0.08em", textTransform: "uppercase",
-          }}>
-            <span>Apply for the May 2026 cohort</span>
-            <span style={{ fontFamily: SERIF, fontSize: 22 }}>→</span>
-          </a>
         </div>
+      </div>
+    </section>
+  );
+};
+
+// ── CTA Block — reused twice (after Result, and after BelowFold) ──────────────
+// variant "mid"  — lighter, tied to the number they just saw
+// variant "close" — heavier close after all the evidence
+const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) => {
+  const c = compute(st);
+  const isMid = variant === "mid";
+  return (
+    <section style={{
+      background: isMid ? PAPER2 : INK,
+      borderTop: `${isMid ? 1 : 3}px solid ${isMid ? INK : YEL}`,
+      padding: "clamp(40px,6vw,72px) clamp(22px,5vw,56px)",
+    }}>
+      <div style={{ maxWidth: 860, margin: "0 auto" }}>
+        {isMid ? (
+          // ── Mid CTA (after result) ──────────────────────────────────────────
+          <>
+            <SCaps size={11.5} ls="0.22em" color={GREEN} style={{ display: "block", marginBottom: 14 }}>
+              Your numbers are ready
+            </SCaps>
+            <h2 style={{
+              margin: 0, fontFamily: SERIF, fontWeight: 700,
+              fontSize: "clamp(32px,5vw,60px)",
+              color: INK, lineHeight: 0.97, letterSpacing: "-0.028em",
+            }}>
+              {fmt(c.netImprovement)} says it&rsquo;s time<br />
+              <em>to stop renting.</em>
+            </h2>
+            <p style={{
+              margin: "18px 0 32px", fontFamily: SERIF, fontSize: 18,
+              color: INK70, lineHeight: 1.55, maxWidth: 620,
+            }}>
+              That figure is yours — built from your traffic, your spend, your deal value.
+              EMOS is the one-time investment that gets you there.
+              Cohorts are small and run on a fixed calendar. Apply now to hold your spot.
+            </p>
+            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{
+              display: "inline-flex", alignItems: "center", gap: 18,
+              background: INK, color: PAPER, textDecoration: "none",
+              padding: "clamp(16px,2vw,22px) clamp(22px,3vw,36px)",
+              fontFamily: GROT, fontWeight: 800,
+              fontSize: "clamp(13px,1.8vw,17px)", letterSpacing: "0.1em", textTransform: "uppercase",
+            }}>
+              <span>Apply for the Next EMOS Cohort</span>
+              <span style={{ fontFamily: SERIF, fontSize: "clamp(20px,2.5vw,26px)", fontWeight: 400 }}>→</span>
+            </a>
+            <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
+              Free discovery call · No commitment · Cohorts are limited in size
+            </p>
+          </>
+        ) : (
+          // ── Close CTA (after all the evidence) ─────────────────────────────
+          <>
+            <div style={{ position: "relative" }}>
+              <div aria-hidden style={{ position: "absolute", top: -20, right: 0, opacity: 0.06, pointerEvents: "none" }}>
+                <SiaLogo height={200} />
+              </div>
+              <SCaps size={11.5} ls="0.22em" color={YEL} style={{ display: "block", marginBottom: 14 }}>
+                Ready to own it?
+              </SCaps>
+              <h2 style={{
+                margin: 0, fontFamily: SERIF, fontWeight: 700,
+                fontSize: "clamp(36px,6vw,72px)",
+                color: PAPER, lineHeight: 0.95, letterSpacing: "-0.03em",
+              }}>
+                One cohort.<br />
+                <em style={{ color: YEL }}>No retainer.</em><br />
+                Yours forever.
+              </h2>
+              <p style={{
+                margin: "22px 0 0", fontFamily: SERIF, fontSize: 19,
+                color: "rgba(241,235,222,.75)", lineHeight: 1.55, maxWidth: 600,
+              }}>
+                The system, the contacts, and the live placements — all in one cohort.
+                Alumni have gone on to land Forbes, HBR, HuffPost, and 50+ publications
+                without ever paying an agency again.
+              </p>
+              <div style={{ marginTop: 32, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+                <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{
+                  display: "inline-flex", alignItems: "center", gap: 18,
+                  background: YEL, color: INK, textDecoration: "none",
+                  padding: "clamp(18px,2.5vw,26px) clamp(26px,4vw,44px)",
+                  fontFamily: GROT, fontWeight: 800,
+                  fontSize: "clamp(14px,2vw,18px)", letterSpacing: "0.1em", textTransform: "uppercase",
+                }}>
+                  <span>Apply for the Next EMOS Cohort</span>
+                  <span style={{ fontFamily: SERIF, fontSize: "clamp(22px,3vw,28px)", fontWeight: 400 }}>→</span>
+                </a>
+                <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(241,235,222,.5)" }}>
+                  Free discovery call · No commitment
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -691,7 +837,9 @@ export default function AuthorityCalculatorPage() {
         <Comparison st={st} />
         <EMOSReveal st={st} set={set} />
         <Result st={st} />
+        <CTABlock st={st} variant="mid" />
         <BelowFold />
+        <CTABlock st={st} variant="close" />
         <Subscriptions sectionNumber="05" />
         <Colophon />
       </div>
