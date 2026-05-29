@@ -27,7 +27,7 @@ const DISPATCH: ReadonlyArray<[string, string, string]> = [
   ["Press",      "Earned Media OS · The Method",        "/emos"],
   ["Speaking",   "Stages & Workshops · 4 Countries",    "/speaking"],
   ["Resources",  "Playbooks, Kits & Podcast",           "/resources"],
-  ["The Wire",   "Est. 2004",                           "#wire"],
+  ["Casework",   "What the numbers did",                "#casework"],
 ];
 
 export const Hero = () => (
@@ -66,36 +66,24 @@ export const Hero = () => (
             </div>
           </div>
 
-          <div className="hero-stat-label">
-            Est. 2004<br />
-            <strong style={{ color: INK }}>Open · Q3 2026</strong>
-          </div>
         </div>
 
         {/* CENTER — headline */}
         <div className="hero-np-center">
-          <div className="hero-np-overline">A Marketing Bureau · Est. 2010 · Peshawar</div>
-
           <h1
             className="hero-h1"
             style={{ fontFamily: SERIF, fontWeight: 700, color: INK }}
           >
-            <span style={{ display: "block" }}>Press coverage</span>
+            <span style={{ display: "block" }}>Why pay for attention</span>
             <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
-              that <Mark>compounds.</Mark>
+              when you can <Mark>earn it?</Mark>
             </span>
           </h1>
-
-          <div className="hero-np-byline">
-            By Syed Irfan Ajmal
-            &nbsp;·&nbsp; Fractional CMO &amp; Speaker
-            <span className="hero-np-filed">Filed from Peshawar</span>
-          </div>
 
           {/* Rule + CTAs */}
           <div style={{
             borderTop: `1px solid ${INK35}`,
-            margin: "24px 0 0",
+            margin: "32px 0 0",
             paddingTop: 22,
             display: "flex",
             gap: 12,
