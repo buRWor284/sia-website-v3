@@ -1063,7 +1063,7 @@ const EditorsNote = () => (
             fontFamily: GROT, fontWeight: 700, fontSize: 11.5,
             letterSpacing: "0.16em", textTransform: "uppercase",
           }}>← All Infographics</a>
-          <a href="/insights/writing-tips" style={{
+          <a href="/resources/writing-tips" style={{
             padding: "12px 18px", background: "transparent", color: INK,
             border: `1px solid ${INK}`, textDecoration: "none",
             fontFamily: GROT, fontWeight: 700, fontSize: 11.5,

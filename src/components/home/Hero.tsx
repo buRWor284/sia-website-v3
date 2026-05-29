@@ -164,8 +164,8 @@ export const Hero = () => (
           fontFamily: SERIF,
           fontSize: 17.5,
           color: INK,
-          lineHeight: 1.5,
-          textAlign: "justify",
+          lineHeight: 1.6,
+          textAlign: "left",
         }}
       >
         <p style={{ margin: 0, textIndent: 0 }}>
@@ -185,13 +185,13 @@ export const Hero = () => (
           >
             F
           </span>
-          or twenty-two years I have run a quiet experiment in the back rooms
-          of digital marketing: <em>what if the most reliable path to growth
-          was not advertising at all, but earning the right to be quoted?</em>
+          or twenty-two years, one question has driven every engagement:{" "}
+          <em>what if the most reliable path to growth was not advertising,
+          but earning the right to be quoted?</em>
         </p>
-        <p style={{ marginTop: "0.7em" }}>
-          The answer, tested across one hundred clients in twenty-plus
-          countries, is yes — and it is repeatable.
+        <p style={{ marginTop: "0.8em" }}>
+          One hundred clients. Twenty-plus countries. The answer, every time,
+          is yes — and it compounds.
         </p>
       </div>
 
@@ -291,54 +291,6 @@ export const Hero = () => (
       ))}
     </div>
 
-    {/* Ventures callout */}
-    <div
-      style={{
-        marginTop: 32,
-        border: `2px solid ${INK}`,
-        background: INK,
-        padding: "24px 28px",
-        display: "flex",
-        alignItems: "center",
-        gap: 28,
-        flexWrap: "wrap",
-      }}
-    >
-      <div style={{ flexShrink: 0 }}>
-        <SCaps size={10.5} ls="0.22em" color={YEL}>Ventures</SCaps>
-      </div>
-      <div
-        style={{
-          flex: 1,
-          fontFamily: SERIF,
-          fontSize: 18,
-          fontStyle: "italic",
-          color: PAPER,
-          lineHeight: 1.45,
-          minWidth: 200,
-        }}
-      >
-        Previously co-founded a spatial intelligence startup and a software
-        studio — both bootstrapped from zero to profit.
-      </div>
-      <a
-        href="/about#ventures"
-        style={{
-          flexShrink: 0,
-          fontFamily: GROT,
-          fontWeight: 700,
-          fontSize: 11,
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
-          color: YEL,
-          textDecoration: "none",
-          whiteSpace: "nowrap",
-        }}
-      >
-        View ventures →
-      </a>
-    </div>
-
     {/* Provenance band */}
     <DoubleRule style={{ margin: "40px 0 0" }} />
     <div style={{ padding: "20px 0 4px" }}>
@@ -365,7 +317,7 @@ export const Hero = () => (
               alignItems: "center",
             }}
           >
-            <SCaps size={10.5} ls="0.18em" color={INK55}>Clients across</SCaps>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>Since 2004 · Clients across</SCaps>
           </div>
           <div
             style={{
@@ -428,11 +380,6 @@ export const Hero = () => (
             }}
           >
             <span><Flag c="PK" />Peshawar</span>
-            <span style={{ color: INK35 }}>·</span>
-            <span>
-              <Flag c="SE" />
-              <strong style={{ fontWeight: 700 }}>M.Sc. Mälardalen</strong>
-            </span>
             <span style={{ color: INK35 }}>·</span>
             <span><Flag c="SE" />Stockholm</span>
             <span style={{ color: INK35 }}>·</span>

@@ -11,9 +11,9 @@ type Card = {
 
 const CARDS: ReadonlyArray<Card> = [
   { title: "Podcast",      n: "39",  sub: "episodes · 3 seasons", foot: "The SIA Business Podcast",                          href: "/podcast" },
-  { title: "Articles",     n: "40",  sub: "long-form essays",     foot: "Personal Branding · Neuromarketing · Storytelling", href: "/insights" },
+  { title: "Articles",     n: "40",  sub: "long-form essays",     foot: "Personal Branding · Neuromarketing · Storytelling", href: "/resources" },
   { title: "Press",        n: "13",  sub: "outlets",              foot: "Forbes · HBR · HuffPost · TNW · WB",                href: "/about" },
-  { title: "Infographics", n: "05",  sub: "visuals",              foot: "Writing Benefits · HubStaff · Bing SEO",            href: "/insights/scientific-benefits" },
+  { title: "Infographics", n: "04",  sub: "visuals",              foot: "Writing Benefits · HubStaff · Writing Habits",      href: "/infographics" },
   { title: "Videos",       n: "64+", sub: "on YouTube",           foot: "Talks · workshops · interviews",                    href: "/gallery" },
 ];
 

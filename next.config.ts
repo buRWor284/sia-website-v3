@@ -5,9 +5,13 @@ const nextConfig: NextConfig = {
   async redirects() {
     const p = true; // permanent: true shorthand
     return [
-      // /writing → /insights (slug change)
-      { source: "/writing",        destination: "/insights",        permanent: p },
-      { source: "/writing/:path*", destination: "/insights/:path*", permanent: p },
+      // /writing → /resources (slug change)
+      { source: "/writing",        destination: "/resources",        permanent: p },
+      { source: "/writing/:path*", destination: "/resources/:path*", permanent: p },
+
+      // /insights → /resources (section rename)
+      { source: "/insights",        destination: "/resources",        permanent: p },
+      { source: "/insights/:path*", destination: "/resources/:path*", permanent: p },
 
       // About (merged pages)
       { source: "/bio-of-syed-irfan-ajmal",  destination: "/about", permanent: p },
@@ -27,21 +31,21 @@ const nextConfig: NextConfig = {
       { source: "/videos",                   destination: "/gallery",  permanent: p },
       { source: "/videos/",                  destination: "/gallery",  permanent: p },
 
-      // Writing guides
-      { source: "/brand-yourself-for-success",                            destination: "/insights/personal-branding", permanent: p },
-      { source: "/brand-yourself-for-success/",                           destination: "/insights/personal-branding", permanent: p },
-      { source: "/neuromarketing-101-neuromarketing-work",                destination: "/insights/neuromarketing",    permanent: p },
-      { source: "/neuromarketing-101-neuromarketing-work/",               destination: "/insights/neuromarketing",    permanent: p },
-      { source: "/storytelling101-elevate-your-brand",                    destination: "/insights/storytelling",      permanent: p },
-      { source: "/storytelling101-elevate-your-brand/",                   destination: "/insights/storytelling",      permanent: p },
-      { source: "/writing-tips",                                          destination: "/insights/writing-tips",      permanent: p },
-      { source: "/writing-tips/",                                         destination: "/insights/writing-tips",      permanent: p },
-      { source: "/the-ultimate-bing-seo-guide",                           destination: "/insights/writing-tips",      permanent: p },
-      { source: "/the-ultimate-bing-seo-guide/",                          destination: "/insights/writing-tips",      permanent: p },
-      { source: "/become-a-good-writer",                                  destination: "/insights/writing-tips",      permanent: p },
-      { source: "/become-a-good-writer/",                                 destination: "/insights/writing-tips",      permanent: p },
-      { source: "/digital-tools-writers-editors",                         destination: "/insights/writing-tips",      permanent: p },
-      { source: "/digital-tools-writers-editors/",                        destination: "/insights/writing-tips",      permanent: p },
+      // Writing guides (playbooks)
+      { source: "/brand-yourself-for-success",                            destination: "/resources/personal-branding", permanent: p },
+      { source: "/brand-yourself-for-success/",                           destination: "/resources/personal-branding", permanent: p },
+      { source: "/neuromarketing-101-neuromarketing-work",                destination: "/resources/neuromarketing",    permanent: p },
+      { source: "/neuromarketing-101-neuromarketing-work/",               destination: "/resources/neuromarketing",    permanent: p },
+      { source: "/storytelling101-elevate-your-brand",                    destination: "/resources/storytelling",      permanent: p },
+      { source: "/storytelling101-elevate-your-brand/",                   destination: "/resources/storytelling",      permanent: p },
+      { source: "/writing-tips",                                          destination: "/resources/writing-tips",      permanent: p },
+      { source: "/writing-tips/",                                         destination: "/resources/writing-tips",      permanent: p },
+      { source: "/the-ultimate-bing-seo-guide",                           destination: "/resources/writing-tips",      permanent: p },
+      { source: "/the-ultimate-bing-seo-guide/",                          destination: "/resources/writing-tips",      permanent: p },
+      { source: "/become-a-good-writer",                                  destination: "/resources/writing-tips",      permanent: p },
+      { source: "/become-a-good-writer/",                                 destination: "/resources/writing-tips",      permanent: p },
+      { source: "/digital-tools-writers-editors",                         destination: "/resources/writing-tips",      permanent: p },
+      { source: "/digital-tools-writers-editors/",                        destination: "/resources/writing-tips",      permanent: p },
       { source: "/6-productivity-hacks-entrepreneurs",                    destination: "/blog",                       permanent: p },
       { source: "/6-productivity-hacks-entrepreneurs/",                   destination: "/blog",                       permanent: p },
       { source: "/google-analytics-content-marketing",                    destination: "/blog",                       permanent: p },

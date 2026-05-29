@@ -19,7 +19,7 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-// Real flagship guides — live at /insights/*
+// Real flagship guides — live at /resources/*
 const GUIDES: ReadonlyArray<{
   n: string;
   category: string;
@@ -125,7 +125,7 @@ const ARCHIVED: ReadonlyArray<{
 export default function BlogPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Insights" />
+      <Mast active="Resources" />
 
       {/* ── Header ───────────────────────────────────────────── */}
       <section style={{ padding: "72px 56px 56px" }}>

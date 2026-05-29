@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   GROT,
   INK,
+  INK35,
   INK55,
   INK70,
   PAPER,
@@ -9,220 +10,152 @@ import {
   SERIF,
 } from "@/lib/tokens";
 import { DoubleRule, HRule, Pill, SCaps } from "@/components/bureau/primitives";
-import { ClientLogo } from "@/components/bureau/ClientLogo";
-import { CLIENTS_PRE, CLIENTS_TIER1 } from "@/data/clients";
 
-const FEATURED_KEYS = ["nta", "ridester", "centriq", "curednation", "alrug"];
+// =========================================================================
+// DATA — 6 featured clients shown on the homepage strip
+// =========================================================================
+interface FeaturedClient {
+  name: string;
+  flag: string;   // emoji flag
+  country: string;
+  logo: string | null;
+  wordmark?: string;
+}
 
-export const ClientStrip = () => {
-  const pre = CLIENTS_PRE;
-  const featured = CLIENTS_TIER1.filter((c) => FEATURED_KEYS.includes(c.key));
+const FEATURED: ReadonlyArray<FeaturedClient> = [
+  { name: "GIZ",               flag: "🇩🇪", country: "Germany",        logo: null,                                wordmark: "GIZ"             },
+  { name: "Dunlop Tyres",      flag: "🇬🇧", country: "UK",             logo: "/assets/clients/dunlop.png"                                     },
+  { name: "Centriq",           flag: "🇺🇸", country: "USA",            logo: "/assets/clients/centriq.png"                                    },
+  { name: "Ridester",          flag: "🇺🇸", country: "USA",            logo: "/assets/clients/ridester.png"                                   },
+  { name: "ALRUG",             flag: "🇺🇸", country: "USA",            logo: "/assets/clients/alrug.png"                                      },
+  { name: "Physicians Thrive", flag: "🇺🇸", country: "USA",            logo: "/assets/clients/physicians_thrive.png"                          },
+];
 
-  return (
-    <section className="sx" style={{ background: PAPER, paddingTop: 24, paddingBottom: 36 }}>
-      <DoubleRule />
-      <div
+// =========================================================================
+// COMPONENT
+// =========================================================================
+export const ClientStrip = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 24, paddingBottom: 36 }}>
+    <DoubleRule />
+
+    {/* Header row */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "baseline",
+        justifyContent: "space-between",
+        padding: "18px 0 20px",
+        gap: 16,
+        flexWrap: "wrap",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
+        <Pill size={11} ls="0.22em">Clients →</Pill>
+        <SCaps size={11} ls="0.22em" color={INK70}>
+          Selected from the full roster
+        </SCaps>
+      </div>
+      <Link
+        href="/clients"
         style={{
-          display: "flex",
-          alignItems: "baseline",
-          justifyContent: "space-between",
-          padding: "18px 0 8px",
-          gap: 16,
-          flexWrap: "wrap",
+          fontFamily: GROT,
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: INK,
+          textDecoration: "none",
+          borderBottom: `1px solid ${INK}`,
+          paddingBottom: 2,
+          whiteSpace: "nowrap",
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
-          <Pill size={11} ls="0.22em">Filed for →</Pill>
-          <SCaps size={11} ls="0.22em" color={INK70}>
-            Pre-agency &amp; selected DMR.agency clients
-          </SCaps>
-        </div>
-        <Link
-          href="/clients"
+        The full roster of clients →
+      </Link>
+    </div>
+
+    {/* 6-cell client grid */}
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(6, 1fr)",
+        border: `1px solid ${INK}`,
+      }}
+    >
+      {FEATURED.map((c, i) => (
+        <div
+          key={c.name}
           style={{
-            fontFamily: GROT,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color: INK,
-            textDecoration: "none",
-            borderBottom: `1px solid ${INK}`,
-            paddingBottom: 2,
-            whiteSpace: "nowrap",
+            padding: "22px 16px 18px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            background: PAPER,
+            borderLeft: i > 0 ? `1px solid ${INK35}` : "none",
+            minHeight: 110,
           }}
         >
-          The full roster · 26 clients →
-        </Link>
-      </div>
-
-      {/* Responsive client grid */}
-      <div className="grid-clients">
-        {pre.map((c, i) => (
+          {/* Logo or wordmark */}
           <div
-            key={c.key}
-            className="client-cell"
             style={{
-              padding: "16px 12px",
-              background: PAPER2,
+              flex: 1,
               display: "flex",
-              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: 6,
-              minHeight: 80,
+              width: "100%",
             }}
           >
-            <ClientLogo client={c} height={40} maxWidth={120} />
-            <div
-              style={{
-                fontFamily: GROT,
-                fontSize: 9.5,
-                fontWeight: 700,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: INK55,
-                textAlign: "center",
-              }}
-            >
-              {c.countryLabel ? c.countryLabel.split("·")[0].trim() : ""}
-            </div>
+            {c.logo ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={c.logo}
+                alt={c.name}
+                style={{
+                  maxHeight: 36,
+                  maxWidth: 100,
+                  objectFit: "contain",
+                  filter: "grayscale(1)",
+                  opacity: 0.85,
+                }}
+              />
+            ) : (
+              <span
+                style={{
+                  fontFamily: GROT,
+                  fontWeight: 900,
+                  fontSize: 22,
+                  letterSpacing: "0.06em",
+                  color: INK,
+                }}
+              >
+                {c.wordmark ?? c.name}
+              </span>
+            )}
           </div>
-        ))}
-        {/* Divider — desktop only */}
-        <div className="client-divider" style={{ background: INK }} />
-        {featured.map((c) => (
-          <div
-            key={c.key}
-            className="client-cell"
-            style={{
-              padding: "16px 12px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-              minHeight: 80,
-            }}
-          >
-            <ClientLogo client={c} height={44} maxWidth={120} />
+
+          {/* Name + flag */}
+          <div style={{ textAlign: "center" }}>
             <div
               style={{
                 fontFamily: GROT,
                 fontSize: 9.5,
                 fontWeight: 700,
-                letterSpacing: "0.18em",
+                letterSpacing: "0.16em",
                 textTransform: "uppercase",
                 color: INK55,
-                textAlign: "center",
+                lineHeight: 1.3,
               }}
             >
               {c.name}
             </div>
+            <div style={{ marginTop: 3, fontSize: 13 }}>{c.flag}</div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
+    </div>
 
-      {/* Two labeled client strips */}
-      <div style={{ marginTop: 14, border: `1px solid ${INK}` }}>
-        {/* Strip 1 — Pre-agency */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            borderBottom: `1px solid ${INK}`,
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              padding: "10px 16px",
-              background: PAPER2,
-              borderRight: `1px solid ${INK}`,
-              flexShrink: 0,
-              minWidth: 120,
-            }}
-          >
-            <SCaps size={10} ls="0.18em" color={INK55}>Pre-agency</SCaps>
-          </div>
-          <div
-            style={{
-              padding: "10px 20px",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px 20px",
-              flexWrap: "wrap",
-            }}
-          >
-            {pre.map((c, i) => (
-              <span key={c.key} style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                <span
-                  style={{
-                    fontFamily: SERIF,
-                    fontSize: 15,
-                    color: INK,
-                    fontStyle: "italic",
-                  }}
-                >
-                  {c.name}
-                </span>
-                {i < pre.length - 1 && (
-                  <span style={{ color: INK55, fontSize: 12 }}>·</span>
-                )}
-              </span>
-            ))}
-          </div>
-        </div>
-        {/* Strip 2 — DMR.agency featured */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              padding: "10px 16px",
-              background: PAPER2,
-              borderRight: `1px solid ${INK}`,
-              flexShrink: 0,
-              minWidth: 120,
-            }}
-          >
-            <SCaps size={10} ls="0.18em" color={INK55}>DMR.agency</SCaps>
-            <SCaps size={10} ls="0.18em" color={INK55} style={{ marginTop: 2, display: "block" }}>Featured</SCaps>
-          </div>
-          <div
-            style={{
-              padding: "10px 20px",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px 20px",
-              flexWrap: "wrap",
-            }}
-          >
-            {featured.map((c, i) => (
-              <span key={c.key} style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                <span
-                  style={{
-                    fontFamily: SERIF,
-                    fontSize: 15,
-                    color: INK,
-                    fontStyle: "italic",
-                  }}
-                >
-                  {c.name}
-                </span>
-                {i < featured.length - 1 && (
-                  <span style={{ color: INK55, fontSize: 12 }}>·</span>
-                )}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-      <HRule style={{ marginTop: 18 }} />
-    </section>
-  );
-};
+    <HRule style={{ marginTop: 18 }} />
+  </section>
+);

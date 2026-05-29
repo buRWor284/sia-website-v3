@@ -4,12 +4,12 @@ import { SCaps, SectionMast, SiaLogo } from "@/components/bureau/primitives";
 // [city, country, venue/notes] — dates removed intentionally
 // Peshawar is 3rd (not 1st, 2nd, or last)
 const ROWS: ReadonlyArray<[string, string, string]> = [
-  ["Bali",      "Indonesia", "DMSS · 200+ audience"],
-  ["Kuala Lumpur", "Malaysia", "Workshop @ MaGIC"],
-  ["Peshawar",  "Pakistan",  "G-Day X · Durshal · Startup Grind · GDG · NIC"],
-  ["Dubai",     "UAE",       "ATM · IN5 · AstroLabs"],
-  ["Islamabad", "Pakistan",  "NIC"],
-  ["Remote",    "US · UK",   "20+ sessions & guest spots"],
+  ["Bali",         "Indonesia", "DMSS · 200+ audience"],
+  ["Kuala Lumpur", "Malaysia",  "MaGIC"],
+  ["Peshawar",     "Pakistan",  "G-Day X · Startup Grind · GDG + others"],
+  ["Dubai",        "UAE",       "ATM · IN5 · AstroLabs"],
+  ["Islamabad",    "Pakistan",  "NIC"],
+  ["Remote",       "US · UK",   "40+ sessions"],
 ];
 
 export const SpeakingBand = () => (
@@ -38,7 +38,7 @@ export const SpeakingBand = () => (
       <SiaLogo height={320} />
     </div>
 
-    <SectionMast n="04" label="The Touring Desk · Stages & stages" dark />
+    <SectionMast n="04" label="The Touring Desk · Stages & Sessions" dark />
 
     <div className="grid-speaking" style={{ position: "relative" }}>
       {/* Left: Headline + copy + CTA */}
@@ -69,8 +69,8 @@ export const SpeakingBand = () => (
           }}
         >
           Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and
-          Pakistan. Webinars for American and British listeners. Fifteen-plus
-          guest spots on US podcasts.
+          Pakistan. 40+ webinars, live trainings, and appearances on US/UK
+          podcasts and YouTube shows.
         </p>
         <a
           href="/speaking"
