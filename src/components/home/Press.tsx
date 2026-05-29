@@ -27,18 +27,8 @@ const MARKS: ReadonlyArray<Mark> = [
 export const Press = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 8, paddingBottom: 36 }}>
     <DoubleRule />
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 16,
-        padding: "22px 0",
-        flexWrap: "wrap",
-      }}
-    >
-      <div style={{ flexShrink: 0 }}>
-        <Pill size={11} ls="0.22em">Bylines &amp; Citations →</Pill>
-      </div>
+    <div style={{ padding: "22px 0" }}>
+      <Pill size={11} ls="0.22em">Bylines &amp; Citations →</Pill>
       <div className="press-logos">
         {MARKS.map((l) => (
           <div

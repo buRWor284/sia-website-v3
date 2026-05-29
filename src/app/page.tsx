@@ -4,6 +4,7 @@ import { ClientStrip } from "@/components/home/ClientStrip";
 import { Departments } from "@/components/home/Departments";
 import { Hero } from "@/components/home/Hero";
 import { Letters } from "@/components/home/Letters";
+import { PodcastStrip } from "@/components/home/PodcastStrip";
 import { Press } from "@/components/home/Press";
 import { SpeakingBand } from "@/components/home/Speaking";
 import { Wire } from "@/components/home/Wire";
@@ -26,6 +27,7 @@ export default function HomePage() {
       <CaseStudies />
       <Letters />
       <SpeakingBand />
+      <PodcastStrip />
       <Wire />
       <Subscriptions />
       <Colophon />

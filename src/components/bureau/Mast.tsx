@@ -57,28 +57,30 @@ export const Mast = ({
         {/* Left: logo + name + disciplines */}
         <div className="mast-name-left">
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-            <div style={{ background: INK, padding: "8px 14px", flexShrink: 0 }}>
-              <SiaLogo height={26} />
+            <div style={{ background: INK, padding: "10px 16px", flexShrink: 0, display: "flex", alignItems: "center" }}>
+              <SiaLogo height={32} />
             </div>
-            <Link href="/" style={{ textDecoration: "none" }}>
-              <div
-                style={{
-                  fontFamily: SERIF,
-                  fontWeight: 700,
-                  fontSize: "clamp(28px, 4.5vw, 48px)",
-                  color: INK,
-                  lineHeight: 1,
-                  letterSpacing: "0.01em",
-                }}
-              >
-                Syed Irfan Ajmal
+            <div>
+              <Link href="/" style={{ textDecoration: "none" }}>
+                <div
+                  style={{
+                    fontFamily: SERIF,
+                    fontWeight: 700,
+                    fontSize: "clamp(28px, 4.5vw, 48px)",
+                    color: INK,
+                    lineHeight: 1,
+                    letterSpacing: "0.01em",
+                  }}
+                >
+                  Syed Irfan Ajmal
+                </div>
+              </Link>
+              <div style={{ marginTop: 6 }}>
+                <SCaps size={10.5} ls="0.22em" color={INK55}>
+                  SEO-PR &nbsp;·&nbsp; GEO &nbsp;·&nbsp; Content Marketing
+                </SCaps>
               </div>
-            </Link>
-          </div>
-          <div style={{ marginTop: 8 }}>
-            <SCaps size={10.5} ls="0.22em" color={INK55}>
-              SEO-PR &nbsp;·&nbsp; GEO &nbsp;·&nbsp; Content Marketing
-            </SCaps>
+            </div>
           </div>
         </div>
 

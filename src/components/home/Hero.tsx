@@ -82,47 +82,9 @@ export const Hero = () => (
 
     <DoubleRule style={{ margin: "40px 0" }} />
 
-    {/* Lead — three columns: body / portrait / sidebar */}
+    {/* Lead — three columns: portrait / body / sidebar */}
     <div className="grid-hero-lead">
-      {/* Body */}
-      <div
-        className="hero-body"
-        style={{
-          fontFamily: SERIF,
-          fontSize: 17.5,
-          color: INK,
-          lineHeight: 1.5,
-          textAlign: "justify",
-        }}
-      >
-        <p style={{ margin: 0, textIndent: 0 }}>
-          <span
-            className="hero-drop-cap"
-            style={{
-              float: "left",
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontStyle: "italic",
-              marginRight: 10,
-              marginTop: 6,
-              color: INK,
-              background: YEL,
-              padding: "6px 8px 2px 8px",
-            }}
-          >
-            F
-          </span>
-          or twenty-two years I have run a quiet experiment in the back rooms
-          of digital marketing: <em>what if the most reliable path to growth
-          was not advertising at all, but earning the right to be quoted?</em>
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          The answer, tested across one hundred clients in twenty-plus
-          countries, is yes — and it is repeatable.
-        </p>
-      </div>
-
-      {/* Portrait — reordered on mobile to appear first */}
+      {/* Portrait — first in DOM → first column on desktop, top on mobile */}
       <figure
         className="hero-portrait-order"
         style={{
@@ -194,6 +156,44 @@ export const Hero = () => (
           </div>
         </figcaption>
       </figure>
+
+      {/* Body */}
+      <div
+        className="hero-body"
+        style={{
+          fontFamily: SERIF,
+          fontSize: 17.5,
+          color: INK,
+          lineHeight: 1.5,
+          textAlign: "justify",
+        }}
+      >
+        <p style={{ margin: 0, textIndent: 0 }}>
+          <span
+            className="hero-drop-cap"
+            style={{
+              float: "left",
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontStyle: "italic",
+              marginRight: 10,
+              marginTop: 6,
+              color: INK,
+              background: YEL,
+              padding: "6px 8px 2px 8px",
+            }}
+          >
+            F
+          </span>
+          or twenty-two years I have run a quiet experiment in the back rooms
+          of digital marketing: <em>what if the most reliable path to growth
+          was not advertising at all, but earning the right to be quoted?</em>
+        </p>
+        <p style={{ marginTop: "0.7em" }}>
+          The answer, tested across one hundred clients in twenty-plus
+          countries, is yes — and it is repeatable.
+        </p>
+      </div>
 
       {/* Sidebar — In this issue */}
       <aside>
@@ -289,6 +289,54 @@ export const Hero = () => (
           </div>
         </div>
       ))}
+    </div>
+
+    {/* Ventures callout */}
+    <div
+      style={{
+        marginTop: 32,
+        border: `2px solid ${INK}`,
+        background: INK,
+        padding: "24px 28px",
+        display: "flex",
+        alignItems: "center",
+        gap: 28,
+        flexWrap: "wrap",
+      }}
+    >
+      <div style={{ flexShrink: 0 }}>
+        <SCaps size={10.5} ls="0.22em" color={YEL}>Ventures</SCaps>
+      </div>
+      <div
+        style={{
+          flex: 1,
+          fontFamily: SERIF,
+          fontSize: 18,
+          fontStyle: "italic",
+          color: PAPER,
+          lineHeight: 1.45,
+          minWidth: 200,
+        }}
+      >
+        Co-founded a spatial intelligence startup and a software studio —
+        both bootstrapped from zero to profit.
+      </div>
+      <a
+        href="/about#ventures"
+        style={{
+          flexShrink: 0,
+          fontFamily: GROT,
+          fontWeight: 700,
+          fontSize: 11,
+          letterSpacing: "0.18em",
+          textTransform: "uppercase",
+          color: YEL,
+          textDecoration: "none",
+          whiteSpace: "nowrap",
+        }}
+      >
+        View ventures →
+      </a>
     </div>
 
     {/* Provenance band */}

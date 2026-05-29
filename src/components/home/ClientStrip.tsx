@@ -123,46 +123,104 @@ export const ClientStrip = () => {
         ))}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          marginTop: 10,
-          gap: 16,
-          flexWrap: "wrap",
-        }}
-      >
-        <SCaps size={10.5} ls="0.16em" color={INK55}>
-          <em
+      {/* Two labeled client strips */}
+      <div style={{ marginTop: 14, border: `1px solid ${INK}` }}>
+        {/* Strip 1 — Pre-agency */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            borderBottom: `1px solid ${INK}`,
+            flexWrap: "wrap",
+          }}
+        >
+          <div
             style={{
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              textTransform: "none",
-              letterSpacing: 0,
-              color: INK70,
+              padding: "10px 16px",
+              background: PAPER2,
+              borderRight: `1px solid ${INK}`,
+              flexShrink: 0,
+              minWidth: 120,
             }}
           >
-            Pre-agency:
-          </em>
-          &nbsp; GIZ &nbsp;·&nbsp; Marcus Evans &nbsp;·&nbsp; InfoShare
-          &nbsp;&nbsp;|&nbsp;&nbsp;
-          <em
+            <SCaps size={10} ls="0.18em" color={INK55}>Pre-agency</SCaps>
+          </div>
+          <div
             style={{
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              textTransform: "none",
-              letterSpacing: 0,
-              color: INK70,
+              padding: "10px 20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px 20px",
+              flexWrap: "wrap",
             }}
           >
-            DMR.agency featured:
-          </em>
-          &nbsp; NTA · Ridester · Centriq · Curednation · ALRUG
-        </SCaps>
-        <SCaps size={10.5} ls="0.16em" color={INK55}>
-          Eight featured · 26 on the roster
-        </SCaps>
+            {pre.map((c, i) => (
+              <span key={c.key} style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                <span
+                  style={{
+                    fontFamily: SERIF,
+                    fontSize: 15,
+                    color: INK,
+                    fontStyle: "italic",
+                  }}
+                >
+                  {c.name}
+                </span>
+                {i < pre.length - 1 && (
+                  <span style={{ color: INK55, fontSize: 12 }}>·</span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
+        {/* Strip 2 — DMR.agency featured */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <div
+            style={{
+              padding: "10px 16px",
+              background: PAPER2,
+              borderRight: `1px solid ${INK}`,
+              flexShrink: 0,
+              minWidth: 120,
+            }}
+          >
+            <SCaps size={10} ls="0.18em" color={INK55}>DMR.agency</SCaps>
+            <SCaps size={10} ls="0.18em" color={INK55} style={{ marginTop: 2, display: "block" }}>Featured</SCaps>
+          </div>
+          <div
+            style={{
+              padding: "10px 20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px 20px",
+              flexWrap: "wrap",
+            }}
+          >
+            {featured.map((c, i) => (
+              <span key={c.key} style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                <span
+                  style={{
+                    fontFamily: SERIF,
+                    fontSize: 15,
+                    color: INK,
+                    fontStyle: "italic",
+                  }}
+                >
+                  {c.name}
+                </span>
+                {i < featured.length - 1 && (
+                  <span style={{ color: INK55, fontSize: 12 }}>·</span>
+                )}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
       <HRule style={{ marginTop: 18 }} />
     </section>

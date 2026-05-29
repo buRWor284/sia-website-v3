@@ -2,32 +2,13 @@ import { GROT, INK, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { SCaps, SectionMast, SiaLogo } from "@/components/bureau/primitives";
 
 // [city, country, venue/notes] — dates removed intentionally
+// Peshawar is 3rd (not 1st, 2nd, or last)
 const ROWS: ReadonlyArray<[string, string, string]> = [
-  ["Peshawar",     "Pakistan",  "G-Day X · Durshal"],
-  ["Kuala Lumpur", "Malaysia",  "Webinars · workshops"],
-  ["Bali",         "Indonesia", "DMSS · 200+ audience"],
-  ["Dubai",        "UAE",       "ATM · IN5 · MPS2016"],
-  ["Webinars",     "US / UK",   "12+ sessions"],
-  ["US podcasts",  "Remote",    "15+ guest spots"],
-];
-
-type PodcastEp = { code: string; title: string; slug: string };
-const FEATURED_EPISODES: ReadonlyArray<PodcastEp> = [
-  {
-    code: "S02E09",
-    title: "Finding Your Unfair Advantage",
-    slug: "ash-ali-hasan-kubba",
-  },
-  {
-    code: "S02E05",
-    title: "Digital PR vs SEO: Key Similarities & Differences",
-    slug: "digital-pr-vs-seo-key-s02e05",
-  },
-  {
-    code: "S03E09",
-    title: "HARO Outreach, SEO Agency Business & Backlinks",
-    slug: "greg-heilers-interview",
-  },
+  ["Bali",               "Indonesia", "DMSS · 200+ audience"],
+  ["Kuala Lumpur",       "Malaysia",  "Workshop @ MaGIC · Malaysian Global Innovation & Creativity Centre"],
+  ["Peshawar",           "Pakistan",  "G-Day X · Durshal"],
+  ["Dubai",              "UAE",       "ATM · IN5 · AstroLabs"],
+  ["Podcasts + Webinars","Remote",    "US · UK · 20+ sessions & guest spots"],
 ];
 
 export const SpeakingBand = () => (
@@ -90,62 +71,6 @@ export const SpeakingBand = () => (
           Pakistan. Webinars for American and British listeners. Fifteen-plus
           guest spots on US podcasts.
         </p>
-        <div style={{ marginTop: 28 }}>
-          <SCaps size={11} ls="0.20em" color={YEL}>From the podcast</SCaps>
-          <ol
-            style={{
-              margin: "10px 0 0",
-              padding: 0,
-              listStyle: "none",
-              fontFamily: SERIF,
-              fontSize: 16,
-              lineHeight: 1.45,
-              color: PAPER,
-            }}
-          >
-            {FEATURED_EPISODES.map((ep, idx) => (
-              <li
-                key={ep.slug}
-                style={{
-                  padding: "8px 0",
-                  borderBottom: idx < FEATURED_EPISODES.length - 1
-                    ? "1px solid rgba(241,235,222,.18)"
-                    : "none",
-                }}
-              >
-                <a
-                  href={`/podcast/${ep.slug}`}
-                  style={{ textDecoration: "none", color: "inherit", display: "flex", gap: 12, alignItems: "baseline" }}
-                >
-                  <SCaps size={10} ls="0.14em" color={YEL} style={{ flexShrink: 0 }}>
-                    {ep.code}
-                  </SCaps>
-                  <span>{ep.title} →</span>
-                </a>
-              </li>
-            ))}
-          </ol>
-          <a
-            href="/ventures"
-            style={{
-              marginTop: 14,
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              fontFamily: GROT,
-              fontWeight: 700,
-              fontSize: 11,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "rgba(241,235,222,.55)",
-              textDecoration: "none",
-              borderBottom: "1px solid rgba(241,235,222,.25)",
-              paddingBottom: 2,
-            }}
-          >
-            View ventures →
-          </a>
-        </div>
         <a
           href="/speaking"
           style={{

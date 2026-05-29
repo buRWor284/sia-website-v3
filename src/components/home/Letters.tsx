@@ -74,17 +74,14 @@ const TESTIMONIALS: ReadonlyArray<Testimonial> = [
 export const Letters = () => (
   <section id="letters" className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 90 }}>
     <SectionMast n="03" label="What clients say · On the record" />
-    <div
-      className="grid-testimonials"
-      style={{ border: `1px solid ${INK}` }}
-    >
+    <div className="grid-testimonials">
       {TESTIMONIALS.map((tm, i) => {
         return (
           <article
             key={i}
             className="letter-card"
             style={{
-              padding: "32px 28px 28px",
+              padding: "24px 24px 20px",
               display: "flex",
               flexDirection: "column",
             }}
@@ -102,40 +99,39 @@ export const Letters = () => (
                 № {String(i + 1).padStart(2, "0")}
               </Pill>
               <SCaps size={10.5} ls="0.18em" color={INK55}>
-                Filed from {tm.place}
+                {tm.place}
               </SCaps>
+            </div>
+            {/* Quote mark as block element — no overlap */}
+            <div
+              aria-hidden
+              style={{
+                fontFamily: SERIF,
+                fontSize: 56,
+                lineHeight: 1,
+                color: INK,
+                fontStyle: "italic",
+                background: YEL,
+                display: "inline-block",
+                padding: "0 8px 0 6px",
+                marginTop: 16,
+                alignSelf: "flex-start",
+              }}
+            >
+              &ldquo;
             </div>
             <blockquote
               style={{
-                margin: "20px 0 0",
+                margin: "10px 0 0",
                 fontFamily: SERIF,
-                fontSize: "clamp(16px, 3vw, 21px)",
+                fontSize: "clamp(15px, 2.5vw, 18px)",
                 color: INK,
-                lineHeight: 1.4,
+                lineHeight: 1.45,
                 letterSpacing: "-0.005em",
                 fontStyle: "italic",
-                position: "relative",
-                paddingLeft: 32,
                 flex: 1,
               }}
             >
-              <span
-                aria-hidden
-                style={{
-                  position: "absolute",
-                  left: -4,
-                  top: -10,
-                  fontFamily: SERIF,
-                  fontSize: 96,
-                  lineHeight: 1,
-                  color: INK,
-                  fontStyle: "italic",
-                  background: YEL,
-                  padding: "0 4px",
-                }}
-              >
-                &ldquo;
-              </span>
               {tm.quote}
             </blockquote>
             <HRule style={{ margin: "24px 0 14px", background: INK35 }} />
