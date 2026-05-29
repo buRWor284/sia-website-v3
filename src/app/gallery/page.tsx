@@ -430,7 +430,7 @@ const VideoSection = () => (
             lineHeight: 1.5,
           }}
         >
-          Delivered in partnership with IDM Pakistan · Five sessions · Ten hours of instruction
+          Delivered in partnership with IDM Pakistan · Five sessions · Ten hours of instruction · In Urdu
         </div>
       </div>
       <a

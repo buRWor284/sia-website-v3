@@ -68,19 +68,9 @@ const STATS: ReadonlyArray<[string, string]> = [
 
 export const Hero = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 56 }}>
-    <div style={{ textAlign: "center", marginBottom: 26 }}>
-      <SCaps color={INK70} size={12} ls="0.28em">{GROWTH.eyebrow}</SCaps>
-    </div>
-
     <HeroHeadline lines={GROWTH.lines} />
 
-    <div style={{ display: "flex", justifyContent: "center", marginTop: 22, flexWrap: "wrap", gap: 4, textAlign: "center" }}>
-      <SCaps size={11.5} ls="0.22em" color={INK55}>
-        By Syed Irfan Ajmal &nbsp;·&nbsp; Fractional CMO, Speaker
-      </SCaps>
-    </div>
-
-    <DoubleRule style={{ margin: "40px 0" }} />
+    <DoubleRule style={{ margin: "32px 0" }} />
 
     {/* Lead — three columns: portrait / body / sidebar */}
     <div className="grid-hero-lead">
@@ -164,11 +154,11 @@ export const Hero = () => (
           fontFamily: SERIF,
           fontSize: 17.5,
           color: INK,
-          lineHeight: 1.6,
+          lineHeight: 1.7,
           textAlign: "left",
         }}
       >
-        <p style={{ margin: 0, textIndent: 0 }}>
+        <p style={{ margin: 0, textIndent: 0, overflow: "hidden" }}>
           <span
             className="hero-drop-cap"
             style={{
@@ -186,12 +176,10 @@ export const Hero = () => (
             F
           </span>
           or twenty-two years, one question has driven every engagement:{" "}
-          <em>what if the most reliable path to growth was not advertising,
-          but earning the right to be quoted?</em>
+          <em>what if the most reliable path to growth was not advertising, but earning the right to be quoted?</em>
         </p>
-        <p style={{ marginTop: "0.8em" }}>
-          One hundred clients. Twenty-plus countries. The answer, every time,
-          is yes — and it compounds.
+        <p style={{ margin: "1.2em 0 0", clear: "left" }}>
+          One hundred clients. Twenty-plus countries. The answer, every time, is yes — and it compounds.
         </p>
       </div>
 

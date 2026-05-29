@@ -149,7 +149,7 @@ const STAGES: ReadonlyArray<Stage> = [
   { yr: "2014",    evt: "G-Day X",                      city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship"                  },
   { yr: "2014",    evt: "University of Peshawar",       city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk"                                          },
   { yr: "2013",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion"                       },
-  { yr: "On call", evt: "IDM Pakistan",                  city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs"  },
+  { yr: "On call", evt: "IDM Pakistan",                  city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu"  },
   { yr: "On call", evt: "British SaaS startup",         city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training (private)",        flag: "GB" },
   { yr: "On call", evt: "World-class SEO SaaS",         city: "Remote",    country: "Global",    fmt: "Webinar",  topic: "SEO-PR strategy (audience to thousands)"               },
   { yr: "On call", evt: "Ruth King's Business Radio",   city: "Atlanta",   country: "USA",       fmt: "Radio",    topic: "Guest interview",                           flag: "US" },
