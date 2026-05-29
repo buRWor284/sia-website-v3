@@ -318,8 +318,8 @@ export const Hero = () => (
           minWidth: 200,
         }}
       >
-        Co-founded a spatial intelligence startup and a software studio —
-        both bootstrapped from zero to profit.
+        Previously co-founded a spatial intelligence startup and a software
+        studio — both bootstrapped from zero to profit.
       </div>
       <a
         href="/about#ventures"

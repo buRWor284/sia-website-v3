@@ -971,3 +971,29 @@ body > * { position: relative; z-index: 2; }
 
 /* ---- h2 small variant --------------------------------------------------- */
 .h2-sm { font-size: clamp(24px, 5vw, 52px); }
+
+/* ---- Reading Room cards ------------------------------------------------- */
+.grid-reading-room {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+@media (min-width: 640px) {
+  .grid-reading-room { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+@media (min-width: 1024px) {
+  .grid-reading-room { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+}
+
+/* ---- Podcast visual cards ----------------------------------------------- */
+.grid-podcast-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 640px) {
+  .grid-podcast-cards { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+}
+@media (min-width: 1024px) {
+  .grid-podcast-cards { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+}

@@ -6,6 +6,7 @@ import { Hero } from "@/components/home/Hero";
 import { Letters } from "@/components/home/Letters";
 import { PodcastStrip } from "@/components/home/PodcastStrip";
 import { Press } from "@/components/home/Press";
+import { ReadingRoom } from "@/components/home/ReadingRoom";
 import { SpeakingBand } from "@/components/home/Speaking";
 import { Wire } from "@/components/home/Wire";
 import { INK, PAPER, SERIF } from "@/lib/tokens";
@@ -28,6 +29,7 @@ export default function HomePage() {
       <Letters />
       <SpeakingBand />
       <PodcastStrip />
+      <ReadingRoom />
       <Wire />
       <Subscriptions />
       <Colophon />
