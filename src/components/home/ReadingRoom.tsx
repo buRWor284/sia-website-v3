@@ -18,7 +18,7 @@ const CARDS: ReadonlyArray<ReadingCard> = [
     blurb:
       "How to build a personal brand that opens doors — covering positioning, " +
       "storytelling, visibility, and why most people get it backwards.",
-    href: "https://syedirfanajmal.com/brand-yourself-for-success/",
+    href: "/writing/personal-branding",
     imgSrc: "https://syedirfanajmal.com/wp-content/uploads/2017/03/personal-branding-guide.jpg",
     imgAlt: "Personal Branding 101",
     cta: "Read the guide →",
@@ -29,7 +29,7 @@ const CARDS: ReadonlyArray<ReadingCard> = [
     blurb:
       "The most effective storytelling tactics in one place — with case studies " +
       "from Nike, Google, and Airbnb. How narrative turns browsers into believers.",
-    href: "https://syedirfanajmal.com/storytelling101-elevate-your-brand/",
+    href: "/writing/storytelling",
     imgSrc: "https://syedirfanajmal.com/wp-content/uploads/2020/04/books-3071110_1280.jpg",
     imgAlt: "Storytelling 101: Elevate Your Brand",
     cta: "Read the guide →",
@@ -40,7 +40,7 @@ const CARDS: ReadonlyArray<ReadingCard> = [
     blurb:
       "Reduced anxiety, stronger memory, sharper thinking — the research-backed " +
       "case for writing as a daily practice. An interactive infographic.",
-    href: "https://syedirfanajmal.com/top-11-scientific-benefits-writing-infographic/",
+    href: "/infographics",
     imgSrc:
       "https://syedirfanajmal.com/wp-content/uploads/2017/11/scientific_benefits_of_writing_low-web-header-banner.jpg",
     imgAlt: "Scientific Benefits of Writing infographic",
@@ -140,8 +140,7 @@ const ReadingCard = ({ card }: { card: ReadingCard }) => (
       <div style={{ marginTop: 18, borderTop: `1px solid ${INK35}`, paddingTop: 14 }}>
         <a
           href={card.href}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...(card.href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
           style={{
             fontFamily: GROT,
             fontWeight: 700,
@@ -179,9 +178,7 @@ export const ReadingRoom = () => (
         </SCaps>
       </div>
       <a
-        href="https://syedirfanajmal.com/blog/"
-        target="_blank"
-        rel="noopener noreferrer"
+        href="/blog"
         style={{
           fontFamily: GROT,
           fontSize: 11,

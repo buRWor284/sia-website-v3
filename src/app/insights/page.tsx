@@ -65,9 +65,9 @@ const ARTICLES: ReadonlyArray<Article> = [
   { title: "How To Maximize eCommerce Conversions",      slug: "maximize-ecommerce-conversions-using-product-discovery", cat: "Strategy",  y: "—" },
 ];
 
-type Infographic = { title: string; slug: string; y: string; updated?: string };
+type Infographic = { title: string; slug: string; y: string; updated?: string; href?: string };
 const INFOGRAPHICS: ReadonlyArray<Infographic> = [
-  { title: "Top 11 Scientific Benefits of Writing",        slug: "top-11-scientific-benefits-writing-infographic",       y: "2019" },
+  { title: "Top 11 Scientific Benefits of Writing",        slug: "top-11-scientific-benefits-writing-infographic",       y: "2019", href: "/infographics" },
   { title: "Managing Remote Teams with HubStaff",          slug: "managing-remote-teams-with-hubstaff-time-tracking",    y: "2016", updated: "2021" },
   { title: "How to Form Writing Habits for Success",        slug: "form-writing-habits-success-infographic",              y: "—" },
   { title: "Getting Content Ideas from Your Customers",     slug: "content-ideas-from-customers-infographic",             y: "—" },
@@ -379,9 +379,8 @@ const Infographics = () => (
       {INFOGRAPHICS.map((ig, i) => (
         <a
           key={ig.slug}
-          href={`https://syedirfanajmal.com/${ig.slug}/`}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={ig.href ?? `https://syedirfanajmal.com/${ig.slug}/`}
+          {...(!ig.href ? { target: "_blank", rel: "noopener noreferrer" } : {})}
           className="card-border-5"
           style={{
             padding: "22px 18px 20px",
