@@ -17,13 +17,13 @@ type FooterCol = {
 
 const COLS: ReadonlyArray<FooterCol> = [
   {
-    head: "Services",
+    head: "The Work",
     items: [
-      { label: "Fractional CMO",                href: "/fractional-cmo" },
-      { label: "EMOS",                           href: "/emos",                                          strikePart: "Rented", suffix: " Own Authority" },
-      { label: "Digital PR & Editorial Backlinks", href: "https://dmr.agency/earned-media-booster/",   external: true },
-      { label: "Done-For-You Services",          href: "https://dmr.agency",                            external: true },
-      { label: "Speaking",                       href: "/speaking" },
+      { label: "Fractional CMO", href: "/fractional-cmo" },
+      { label: "Speaking",       href: "/speaking" },
+      { label: "EMOS",           href: "/emos", strikePart: "Rented", suffix: " Own Authority" },
+      { label: "DMR.agency",     href: "https://dmr.agency", external: true },
+      { label: "Ventures",       href: "/ventures" },
     ],
   },
   {
