@@ -68,10 +68,10 @@ const ARTICLES: ReadonlyArray<Article> = [
 type Infographic = { title: string; slug: string; y: string; updated?: string; href?: string };
 const INFOGRAPHICS: ReadonlyArray<Infographic> = [
   { title: "Top 11 Scientific Benefits of Writing",        slug: "top-11-scientific-benefits-writing-infographic",       y: "2019", href: "/infographics/writing-benefits" },
+  { title: "The Journo Outreach Checklist",                slug: "journo-outreach-checklist",                            y: "2026", href: "/infographics/journo-outreach-checklist" },
   { title: "Managing Remote Teams with HubStaff",          slug: "managing-remote-teams-with-hubstaff-time-tracking",    y: "2016", updated: "2021" },
-  { title: "How to Form Writing Habits for Success",        slug: "form-writing-habits-success-infographic",              y: "—" },
-  { title: "Getting Content Ideas from Your Customers",     slug: "content-ideas-from-customers-infographic",             y: "—" },
-  { title: "The Ultimate Bing SEO Guide",                   slug: "the-ultimate-bing-seo-guide",                          y: "—" },
+  { title: "How to Form Writing Habits for Success",       slug: "form-writing-habits-success-infographic",              y: "—" },
+  { title: "Getting Content Ideas from Your Customers",    slug: "content-ideas-from-customers-infographic",             y: "—" },
 ];
 
 const PRESS_OUTLETS: ReadonlyArray<[string, string]> = [
