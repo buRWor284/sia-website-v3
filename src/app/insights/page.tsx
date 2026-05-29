@@ -67,7 +67,7 @@ const ARTICLES: ReadonlyArray<Article> = [
 
 type Infographic = { title: string; slug: string; y: string; updated?: string; href?: string };
 const INFOGRAPHICS: ReadonlyArray<Infographic> = [
-  { title: "Top 11 Scientific Benefits of Writing",        slug: "top-11-scientific-benefits-writing-infographic",       y: "2019", href: "/infographics" },
+  { title: "Top 11 Scientific Benefits of Writing",        slug: "top-11-scientific-benefits-writing-infographic",       y: "2019", href: "/infographics/writing-benefits" },
   { title: "Managing Remote Teams with HubStaff",          slug: "managing-remote-teams-with-hubstaff-time-tracking",    y: "2016", updated: "2021" },
   { title: "How to Form Writing Habits for Success",        slug: "form-writing-habits-success-infographic",              y: "—" },
   { title: "Getting Content Ideas from Your Customers",     slug: "content-ideas-from-customers-infographic",             y: "—" },

@@ -3,9 +3,65 @@ import path from "node:path";
 
 const nextConfig: NextConfig = {
   async redirects() {
+    const p = true; // permanent: true shorthand
     return [
-      { source: "/writing",        destination: "/insights",        permanent: true },
-      { source: "/writing/:path*", destination: "/insights/:path*", permanent: true },
+      // /writing → /insights (slug change)
+      { source: "/writing",        destination: "/insights",        permanent: p },
+      { source: "/writing/:path*", destination: "/insights/:path*", permanent: p },
+
+      // About (merged pages)
+      { source: "/bio-of-syed-irfan-ajmal",  destination: "/about", permanent: p },
+      { source: "/bio-of-syed-irfan-ajmal/", destination: "/about", permanent: p },
+      { source: "/press",                    destination: "/about", permanent: p },
+      { source: "/press/",                   destination: "/about", permanent: p },
+      { source: "/testimonials",             destination: "/about", permanent: p },
+      { source: "/testimonials/",            destination: "/about", permanent: p },
+      { source: "/honors-and-awards",        destination: "/about", permanent: p },
+      { source: "/honors-and-awards/",       destination: "/about", permanent: p },
+
+      // Speaking
+      { source: "/keynote-speaking-topics",  destination: "/speaking", permanent: p },
+      { source: "/keynote-speaking-topics/", destination: "/speaking", permanent: p },
+      { source: "/speaking-gallery",         destination: "/gallery",  permanent: p },
+      { source: "/speaking-gallery/",        destination: "/gallery",  permanent: p },
+      { source: "/videos",                   destination: "/gallery",  permanent: p },
+      { source: "/videos/",                  destination: "/gallery",  permanent: p },
+
+      // Writing guides
+      { source: "/brand-yourself-for-success",                            destination: "/insights/personal-branding", permanent: p },
+      { source: "/brand-yourself-for-success/",                           destination: "/insights/personal-branding", permanent: p },
+      { source: "/neuromarketing-101-neuromarketing-work",                destination: "/insights/neuromarketing",    permanent: p },
+      { source: "/neuromarketing-101-neuromarketing-work/",               destination: "/insights/neuromarketing",    permanent: p },
+      { source: "/storytelling101-elevate-your-brand",                    destination: "/insights/storytelling",      permanent: p },
+      { source: "/storytelling101-elevate-your-brand/",                   destination: "/insights/storytelling",      permanent: p },
+      { source: "/writing-tips",                                          destination: "/insights/writing-tips",      permanent: p },
+      { source: "/writing-tips/",                                         destination: "/insights/writing-tips",      permanent: p },
+      { source: "/the-ultimate-bing-seo-guide",                           destination: "/insights/writing-tips",      permanent: p },
+      { source: "/the-ultimate-bing-seo-guide/",                          destination: "/insights/writing-tips",      permanent: p },
+      { source: "/become-a-good-writer",                                  destination: "/insights/writing-tips",      permanent: p },
+      { source: "/become-a-good-writer/",                                 destination: "/insights/writing-tips",      permanent: p },
+      { source: "/digital-tools-writers-editors",                         destination: "/insights/writing-tips",      permanent: p },
+      { source: "/digital-tools-writers-editors/",                        destination: "/insights/writing-tips",      permanent: p },
+      { source: "/6-productivity-hacks-entrepreneurs",                    destination: "/blog",                       permanent: p },
+      { source: "/6-productivity-hacks-entrepreneurs/",                   destination: "/blog",                       permanent: p },
+      { source: "/google-analytics-content-marketing",                    destination: "/blog",                       permanent: p },
+      { source: "/google-analytics-content-marketing/",                   destination: "/blog",                       permanent: p },
+      { source: "/maximize-ecommerce-conversions-using-product-discovery",destination: "/blog",                       permanent: p },
+      { source: "/maximize-ecommerce-conversions-using-product-discovery/",destination: "/blog",                      permanent: p },
+
+      // Infographics — each old slug → the specific interactive page or gallery
+      { source: "/top-11-scientific-benefits-writing-infographic",        destination: "/infographics/writing-benefits", permanent: p },
+      { source: "/top-11-scientific-benefits-writing-infographic/",       destination: "/infographics/writing-benefits", permanent: p },
+      { source: "/managing-remote-teams-with-hubstaff-time-tracking",     destination: "/infographics",                  permanent: p },
+      { source: "/managing-remote-teams-with-hubstaff-time-tracking/",    destination: "/infographics",                  permanent: p },
+      { source: "/form-writing-habits-success-infographic",               destination: "/infographics",                  permanent: p },
+      { source: "/form-writing-habits-success-infographic/",              destination: "/infographics",                  permanent: p },
+      { source: "/content-ideas-from-customers-infographic",              destination: "/infographics",                  permanent: p },
+      { source: "/content-ideas-from-customers-infographic/",             destination: "/infographics",                  permanent: p },
+
+      // Contact
+      { source: "/contacting-syed-irfan-ajmal",  destination: "/contact", permanent: p },
+      { source: "/contacting-syed-irfan-ajmal/", destination: "/contact", permanent: p },
     ];
   },
   turbopack: {

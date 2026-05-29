@@ -1,13 +1,11 @@
-import { GROT, INK, INK15, INK35, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
-import { DoubleRule, HRule, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
+import { GROT, INK, INK35, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
+import { DoubleRule, HRule, Pill, SCaps } from "@/components/bureau/primitives";
 
 type ReadingCard = {
   tag: string;
   title: string;
   blurb: string;
   href: string;
-  imgSrc: string;
-  imgAlt: string;
   cta?: string;
 };
 
@@ -19,8 +17,6 @@ const CARDS: ReadonlyArray<ReadingCard> = [
       "How to build a personal brand that opens doors — covering positioning, " +
       "storytelling, visibility, and why most people get it backwards.",
     href: "/writing/personal-branding",
-    imgSrc: "https://syedirfanajmal.com/wp-content/uploads/2017/03/personal-branding-guide.jpg",
-    imgAlt: "Personal Branding 101",
     cta: "Read the guide →",
   },
   {
@@ -30,8 +26,6 @@ const CARDS: ReadonlyArray<ReadingCard> = [
       "The most effective storytelling tactics in one place — with case studies " +
       "from Nike, Google, and Airbnb. How narrative turns browsers into believers.",
     href: "/writing/storytelling",
-    imgSrc: "https://syedirfanajmal.com/wp-content/uploads/2020/04/books-3071110_1280.jpg",
-    imgAlt: "Storytelling 101: Elevate Your Brand",
     cta: "Read the guide →",
   },
   {
@@ -40,10 +34,7 @@ const CARDS: ReadonlyArray<ReadingCard> = [
     blurb:
       "Reduced anxiety, stronger memory, sharper thinking — the research-backed " +
       "case for writing as a daily practice. An interactive infographic.",
-    href: "/infographics",
-    imgSrc:
-      "https://syedirfanajmal.com/wp-content/uploads/2017/11/scientific_benefits_of_writing_low-web-header-banner.jpg",
-    imgAlt: "Scientific Benefits of Writing infographic",
+    href: "/infographics/writing-benefits",
     cta: "View the infographic →",
   },
 ];
@@ -57,38 +48,16 @@ const ReadingCard = ({ card }: { card: ReadingCard }) => (
       background: PAPER,
     }}
   >
-    {/* Image */}
+    {/* Tag bar */}
     <div
       style={{
-        width: "100%",
-        aspectRatio: "16/9",
-        overflow: "hidden",
+        padding: "10px 20px",
+        borderBottom: `1px solid ${INK35}`,
         background: PAPER2,
-        position: "relative",
-        flexShrink: 0,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={card.imgSrc}
-        alt={card.imgAlt}
+      <span
         style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          objectPosition: "center top",
-          filter: "grayscale(0.2) contrast(1.02)",
-          display: "block",
-        }}
-      />
-      {/* Tag overlay */}
-      <div
-        style={{
-          position: "absolute",
-          top: 10,
-          left: 10,
-          background: YEL,
-          padding: "4px 10px",
           fontFamily: GROT,
           fontWeight: 800,
           fontSize: 10,
@@ -98,7 +67,7 @@ const ReadingCard = ({ card }: { card: ReadingCard }) => (
         }}
       >
         {card.tag}
-      </div>
+      </span>
     </div>
 
     {/* Body */}

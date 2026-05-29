@@ -4,11 +4,12 @@ import { SCaps, SectionMast, SiaLogo } from "@/components/bureau/primitives";
 // [city, country, venue/notes] — dates removed intentionally
 // Peshawar is 3rd (not 1st, 2nd, or last)
 const ROWS: ReadonlyArray<[string, string, string]> = [
-  ["Bali",               "Indonesia", "DMSS · 200+ audience"],
-  ["Kuala Lumpur",       "Malaysia",  "Workshop @ MaGIC · Malaysian Global Innovation & Creativity Centre"],
-  ["Peshawar",           "Pakistan",  "G-Day X · Durshal"],
-  ["Dubai",              "UAE",       "ATM · IN5 · AstroLabs"],
-  ["Podcasts + Webinars","Remote",    "US · UK · 20+ sessions & guest spots"],
+  ["Bali",      "Indonesia", "DMSS · 200+ audience"],
+  ["Kuala Lumpur", "Malaysia", "Workshop @ MaGIC"],
+  ["Peshawar",  "Pakistan",  "G-Day X · Durshal · Startup Grind · GDG · NIC"],
+  ["Dubai",     "UAE",       "ATM · IN5 · AstroLabs"],
+  ["Islamabad", "Pakistan",  "NIC"],
+  ["Remote",    "US · UK",   "20+ sessions & guest spots"],
 ];
 
 export const SpeakingBand = () => (
