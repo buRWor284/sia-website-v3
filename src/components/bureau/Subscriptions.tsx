@@ -13,15 +13,13 @@ const MC_HONEYPOT = `b_${MC_U}_${MC_ID}`;
 
 const GDPR_CHECKBOXES = [
   { key: "2381", label: "Email" },
-  { key: "2385", label: "Direct Mail" },
-  { key: "2389", label: "Customized Online Advertising" },
 ];
 
 type Status = "idle" | "loading" | "success" | "error";
 
 const MailchimpForm = () => {
   const [email, setEmail]   = useState("");
-  const [gdpr, setGdpr]     = useState<Record<string, boolean>>({ "2381": false, "2385": false, "2389": false });
+  const [gdpr, setGdpr]     = useState<Record<string, boolean>>({ "2381": false });
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -88,11 +86,11 @@ const MailchimpForm = () => {
         <SCaps size={11} ls="0.20em" color={YEL}>Confirmation sent</SCaps>
         <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 19, color: PAPER, lineHeight: 1.5, fontStyle: "italic" }}>
           Check <span style={{ color: YEL, fontStyle: "normal" }}>{email}</span>
-          {" "}— there&rsquo;s a confirmation note from the bureau waiting for you.
+          {" "}— there&rsquo;s a confirmation note from the wire waiting for you.
           Click the link inside and you&rsquo;re on the list.
         </p>
         <button
-          onClick={() => { setStatus("idle"); setEmail(""); setGdpr({ "2381": false, "2385": false, "2389": false }); }}
+          onClick={() => { setStatus("idle"); setEmail(""); setGdpr({ "2381": false }); }}
           style={{
             marginTop: 18, padding: "12px 16px", background: "transparent",
             color: PAPER, border: "1px solid rgba(241,235,222,.5)",
@@ -106,7 +104,7 @@ const MailchimpForm = () => {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <SCaps size={11} ls="0.20em" color={YEL}>Apply for a subscription</SCaps>
+      <SCaps size={11} ls="0.20em" color={YEL}>Join our newsletter</SCaps>
       <div className="sub-form-row">
         <input
           type="email"
@@ -176,16 +174,16 @@ const MailchimpForm = () => {
         </div>
         <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 12.5, color: "rgba(241,235,222,.35)", lineHeight: 1.5, fontStyle: "italic" }}>
           You can unsubscribe at any time by clicking the link in the footer of our emails.
-          We use Mailchimp as our marketing platform.{" "}
+          We use Mailchimp to manage our newsletter.{" "}
           <a href="https://mailchimp.com/legal/terms" target="_blank" rel="noreferrer"
             style={{ color: "rgba(241,235,222,.5)", textUnderlineOffset: 3 }}>Learn more</a>{" "}
-          about Mailchimp&rsquo;s privacy practices.
+          about their privacy practices.
         </p>
       </div>
 
       <div style={{ marginTop: 14 }}>
         <SCaps size={10.5} ls="0.14em" color="rgba(241,235,222,.45)">
-          No spam · One-click unsubscribe · Hosted by Mailchimp
+          No spam · One-click unsubscribe
         </SCaps>
       </div>
     </form>
@@ -222,9 +220,12 @@ export const Subscriptions = ({
         >
           A letter
           <br />
-          <span style={{ fontStyle: "italic", color: YEL }}>from the bureau.</span>
+          <span style={{ fontStyle: "italic", color: YEL }}>from the wire.</span>
         </h2>
-        <p style={{ marginTop: 22, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 480 }}>
+        <p style={{ marginTop: 14, marginBottom: 0, fontFamily: GROT, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
+          GEO · SEO-PR · Content Marketing
+        </p>
+        <p style={{ marginTop: 18, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 480 }}>
           One or two letters a month. Real case studies, the campaigns I&rsquo;m
           building right now, and zero filler. Unsubscribe whenever.
         </p>

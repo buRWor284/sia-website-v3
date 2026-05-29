@@ -163,10 +163,13 @@ function Hero() {
     "Founder · DMR.agency",
     "The SIA Bureau",
     "Earned Media OS",
-    "Digital PR Strategist",
+    "Digital PR",
     "GEO · SEO · Content Marketing",
-    "Speaker · 10+ Countries",
+    "International Speaker + Podcaster",
     "Spotlight · Influence · Authority",
+    "Forbes · HBR · SEMrush · TNW · World Bank",
+    "Authority Over Algorithms",
+    "Content That Compounds",
   ];
 
   return (
@@ -174,7 +177,7 @@ function Hero() {
       {/* Eyebrow */}
       <div style={{ textAlign: "center", marginBottom: 28 }}>
         <SCaps color={INK70} size={12} ls="0.28em">
-          Ventures · The SIA Bureau · Est. 2010
+          Ventures · Est. 2010
         </SCaps>
       </div>
 
@@ -197,11 +200,18 @@ function Hero() {
         </span>
       </h1>
 
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
-        <SCaps size={11.5} ls="0.22em" color={INK55}>
-          Syed Irfan Ajmal &nbsp;·&nbsp; Founder, DMR.agency
-          &nbsp;·&nbsp; <span style={{ color: INK }}>Filed from Peshawar</span>
+      {/* Bylines — publication credits replace the name (already in Mast) */}
+      <div style={{ display: "flex", justifyContent: "center", marginTop: 22, gap: 6, flexWrap: "wrap" }}>
+        <SCaps size={11} ls="0.20em" color={INK55}>
+          As featured in
         </SCaps>
+        {["Forbes", "HBR", "SEMrush", "Search Engine Journal", "TNW", "World Bank"].map((pub, i, arr) => (
+          <span key={pub} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <SCaps size={11} ls="0.20em" color={INK} weight={800}>{pub}</SCaps>
+            {i < arr.length - 1 && <SCaps size={10} ls="0.12em" color={INK35}>·</SCaps>}
+          </span>
+        ))}
+        <SCaps size={11} ls="0.16em" color={INK55}>&amp; several others</SCaps>
       </div>
 
       <DoubleRule style={{ margin: "44px 0 0" }} />
@@ -945,7 +955,7 @@ function ClosingCTA() {
 export default function VenturesPage() {
   return (
     <div style={{ minHeight: "100vh" }}>
-      <Mast active="Ventures" filedAs="Ventures Edition · Vol. XV" />
+      <Mast active="Ventures" />
       <Hero />
       <CurrentVenturesSection />
       <PastVenturesSection />

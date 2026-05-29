@@ -6,8 +6,8 @@ import {
   CALENDLY,
   GROT,
   INK,
-  INK15,
   INK55,
+  INK70,
   PAPER,
   SERIF,
 } from "@/lib/tokens";
@@ -16,7 +16,6 @@ import {
   HRule,
   Mark,
   SCaps,
-  SiaLogo,
 } from "./primitives";
 
 const NAV: ReadonlyArray<{ label: string; href: string }> = [
@@ -35,120 +34,64 @@ const NAV: ReadonlyArray<{ label: string; href: string }> = [
 
 type MastProps = {
   active?: string;
-  filedAs?: string;
   dateline?: string;
 };
 
 export const Mast = ({
   active = "Home",
-  filedAs = "Peshawar Edition · Vol. XV",
-  dateline = "Wednesday, May 27, 2026",
+  dateline = "Friday, May 29, 2026",
 }: MastProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <header className="sx" style={{ background: PAPER, paddingTop: 20, paddingBottom: 16 }}>
-      {/* Top utility line */}
-      <div className="mast-utility">
-        <SCaps size={10.5} ls="0.20em">
-          {dateline} · {filedAs}
-        </SCaps>
-        <SCaps size={10.5} ls="0.20em" color={INK55}>
-          Issue Nº 029 &nbsp;·&nbsp;
-          <Mark>
-            <span
+      {/* Name + bureau meta */}
+      <div className="mast-namehead">
+        {/* Left: name + disciplines */}
+        <div className="mast-name-left">
+          <Link href="/" style={{ textDecoration: "none" }}>
+            <div
               style={{
-                fontFamily: GROT,
+                fontFamily: SERIF,
                 fontWeight: 700,
-                fontSize: 10.5,
-                letterSpacing: "0.20em",
-                textTransform: "uppercase",
+                fontSize: "clamp(28px, 4.5vw, 48px)",
+                color: INK,
+                lineHeight: 1,
+                letterSpacing: "0.01em",
               }}
             >
-              Open for projects, Q3
-            </span>
-          </Mark>
-        </SCaps>
-      </div>
-      <DoubleRule />
-
-      {/* Big masthead lockup */}
-      <div className="mast-lockup">
-        {/* Left caption — desktop only */}
-        <div className="mast-side">
-          <SCaps size={11.5} ls="0.22em">
-            The Sunday Bureau · Founded 2010
-          </SCaps>
-          <div
-            style={{
-              marginTop: 8,
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 14,
-              color: INK55,
-              lineHeight: 1.3,
-              maxWidth: 320,
-            }}
-          >
-            &ldquo;The pen is mightier than the sword, and, wielded well,
-            mightier than most marketing budgets.&rdquo;
-          </div>
-        </div>
-
-        {/* Centre logo — always visible */}
-        <div style={{ textAlign: "center" }}>
-          <Link href="/" style={{ display: "inline-block", textDecoration: "none" }}>
-            <div
-              className="mast-logo-block"
-              style={{ background: INK }}
-            >
-              <SiaLogo
-                height={56}
-                style={{ height: "clamp(32px, 5.5vw, 56px)", width: "auto" }}
-              />
-              <div
-                style={{
-                  width: 1,
-                  alignSelf: "stretch",
-                  background: "rgba(241,235,222,.25)",
-                }}
-              />
-              <div
-                className="mast-logo-text"
-                style={{
-                  fontFamily: SERIF,
-                  fontWeight: 700,
-                  color: PAPER,
-                }}
-              >
-                The <span style={{ fontStyle: "italic" }}>Bureau</span>
-              </div>
+              Syed Irfan Ajmal
             </div>
           </Link>
-          <div style={{ marginTop: 10 }}>
-            <SCaps size={11} ls="0.32em" color="rgba(26,20,16,.70)">
-              Syed · Irfan · Ajmal &nbsp;·&nbsp; Marketing, Media &amp; Press
+          <div style={{ marginTop: 8 }}>
+            <SCaps size={10.5} ls="0.22em" color={INK55}>
+              SEO-PR &nbsp;·&nbsp; GEO &nbsp;·&nbsp; Content Marketing
             </SCaps>
           </div>
         </div>
 
-        {/* Right caption — desktop only */}
-        <div className="mast-side-right">
-          <SCaps size={11.5} ls="0.22em">
-            Subscribe · Two emails a month
+        {/* Right: bureau meta + date + badge */}
+        <div className="mast-name-right">
+          <SCaps size={10.5} ls="0.22em" color={INK70}>
+            The Sunday Bureau &nbsp;·&nbsp; Est. 2004 &nbsp;·&nbsp; Global
           </SCaps>
-          <div
-            style={{
-              marginTop: 8,
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 14,
-              color: INK55,
-              maxWidth: 320,
-              marginLeft: "auto",
-            }}
-          >
-            Quiet, candid letters from the bureau.
+          <SCaps size={10.5} ls="0.20em" color={INK55} style={{ marginTop: 5, display: "block" }}>
+            {dateline} &nbsp;·&nbsp; Issue Nº 029
+          </SCaps>
+          <div style={{ marginTop: 8 }}>
+            <Mark>
+              <span
+                style={{
+                  fontFamily: GROT,
+                  fontWeight: 700,
+                  fontSize: 10.5,
+                  letterSpacing: "0.20em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Open for projects, Q3
+              </span>
+            </Mark>
           </div>
         </div>
       </div>

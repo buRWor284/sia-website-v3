@@ -1081,7 +1081,7 @@ const EditorsNote = () => (
 export default function InfographicsPage() {
   return (
     <div style={{ background: PAPER, minHeight: "100vh" }}>
-      <Mast active="Writing" filedAs="Peshawar Edition · Infographics Desk" />
+      <Mast active="Writing" />
       <Hero />
       <Findings />
       <Dose />
