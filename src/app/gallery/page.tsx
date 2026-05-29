@@ -368,6 +368,95 @@ const VideoSection = () => (
       ))}
     </div>
 
+    {/* IDM Pakistan curriculum — full-width card, links to playlist */}
+    <div
+      style={{
+        marginTop: 24,
+        background: INK,
+        color: PAPER,
+        padding: 28,
+        border: `1px solid ${INK}`,
+        display: "grid",
+        gridTemplateColumns: "1fr auto",
+        gap: 24,
+        alignItems: "center",
+      }}
+    >
+      <div>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginBottom: 14,
+            paddingBottom: 12,
+            borderBottom: "1px solid rgba(241,235,222,.25)",
+          }}
+        >
+          <span
+            style={{
+              display: "inline-block",
+              width: 9,
+              height: 9,
+              borderRadius: "50%",
+              background: YEL,
+            }}
+          />
+          <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.85)">
+            On-demand curriculum
+          </SCaps>
+          <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.5)" style={{ marginLeft: "auto" }}>
+            YouTube · 5 parts · 10 hrs
+          </SCaps>
+        </div>
+        <div
+          style={{
+            fontFamily: SERIF,
+            fontWeight: 700,
+            fontSize: 22,
+            color: PAPER,
+            lineHeight: 1.2,
+          }}
+        >
+          Inbound Marketing · Full Curriculum
+        </div>
+        <div
+          style={{
+            marginTop: 8,
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: 14,
+            color: "rgba(241,235,222,.75)",
+            lineHeight: 1.5,
+          }}
+        >
+          Delivered in partnership with IDM Pakistan · Five sessions · Ten hours of instruction
+        </div>
+      </div>
+      <a
+        href="https://www.youtube.com/playlist?list=PLY3hQIOPokOPlMnsJ_GqCIsAlaipM5j7j"
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "14px 20px",
+          background: PAPER,
+          color: INK,
+          textDecoration: "none",
+          fontFamily: GROT,
+          fontWeight: 800,
+          fontSize: 11,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Watch the series ↗
+      </a>
+    </div>
+
     <div
       style={{
         marginTop: 36,
