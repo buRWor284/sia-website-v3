@@ -1101,6 +1101,95 @@ const OffTheDesk = () => (
   </section>
 );
 
+// ─── §06 · Also at the Bureau ─────────────────────────────────────────────────
+
+const AlsoAtTheBureau = () => (
+  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
+    <SectionMast n="06" label="Also at the bureau · More from Irfan" />
+
+    <div
+      className="grid-cards-3"
+      style={{ border: `1px solid ${INK}` }}
+    >
+      {[
+        {
+          label: "Ventures",
+          href: "/ventures",
+          desc: "Companies, partnerships, and projects beyond DMR.agency.",
+        },
+        {
+          label: "Clients",
+          href: "/clients",
+          desc: "A selection of brands and founders the bureau has worked with.",
+        },
+        {
+          label: "Gallery",
+          href: "/gallery",
+          desc: "Events, stages, press, and moments from twenty-two years in the field.",
+        },
+        {
+          label: "Podcast",
+          href: "/podcast",
+          desc: "The SIA Business Podcast — three seasons, twenty-nine episodes.",
+        },
+      ].map((item) => (
+        <a
+          key={item.label}
+          href={item.href}
+          className="card-border"
+          style={{
+            padding: "28px 26px 26px",
+            background: PAPER,
+            display: "flex",
+            flexDirection: "column",
+            textDecoration: "none",
+            color: "inherit",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: "clamp(20px, 3vw, 28px)",
+              color: INK,
+              lineHeight: 1,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {item.label}
+          </div>
+          <div
+            style={{
+              marginTop: 12,
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: 15.5,
+              color: INK70,
+              lineHeight: 1.5,
+              flex: 1,
+            }}
+          >
+            {item.desc}
+          </div>
+          <div
+            style={{
+              marginTop: 18,
+              fontFamily: GROT,
+              fontWeight: 700,
+              fontSize: 11,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: INK,
+            }}
+          >
+            View →
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+);
+
 // ─── Outro ────────────────────────────────────────────────────────────────────
 
 const Outro = () => (
@@ -1194,8 +1283,9 @@ export default function AboutPage() {
       <PressArchive />
       <Letters />
       <OffTheDesk />
+      <AlsoAtTheBureau />
       <Outro />
-      <Subscriptions sectionNumber="06" />
+      <Subscriptions sectionNumber="07" />
       <Colophon />
     </div>
   );

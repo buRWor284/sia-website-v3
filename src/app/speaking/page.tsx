@@ -164,16 +164,36 @@ const FORMATS: ReadonlyArray<Format> = [
   { name: "Radio · video", dur: "On request",  note: "Business radio, video interviews, fireside chats. Examples: Ruth King's Business Radio Show."        },
 ];
 
-type HostQuote = { quote: string; name: string; role: string; place: string; stat?: string };
+type HostQuote = { quote: string; name: string; role: string; place: string; photo: string; stat?: string };
 const HOST_QUOTES: ReadonlyArray<HostQuote> = [
-  { quote: "Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it, and it is hard not to like the guy.",
-    name: "Chuck Wang",      role: "Host · The MVP Marketing Podcast", place: "San Francisco"                          },
-  { quote: "Due to their efforts, our main site experienced an increase of 120.21% in organic traffic. Our Public Database website's clicks increased by 515.87%. These results gained us a 6× increase in average daily signups.",
-    name: "Imani Lea Brown", role: "Centriq",                          place: "San Francisco", stat: "120% traffic · 6× signups" },
-  { quote: "Syed Irfan Ajmal and his agency have helped us over the last several years on different content marketing & SEO projects. The biggest success story has been helping to grow Ridester from zero to 1.5 million monthly UVs.",
-    name: "Brett Helling",   role: "Founder · Ridester",               place: "Omaha, NE",     stat: "0 → 1.5M monthly UVs"      },
-  { quote: "Generous with knowledge, sharp with execution. The kind of operator you want on your side of the table when the stakes are real.",
-    name: "Roberto Falchi",  role: "Marketing & speaking",             place: "Milan"                                  },
+  {
+    quote: "It was a pleasure collaborating with Syed for a Uhubs workshop on 'How We Grew from Zero to 1.5 Million Unique Monthly Visitors.' The audience enjoyed his super practical session, clear slides, and concise answers. He is a great speaker with hands-on, practical advice and an amazing personal story.",
+    name: "Ash Ali",
+    role: "Co-Founder, Uhubs · Author, The Unfair Advantage (150k+ copies)",
+    place: "London",
+    photo: "/assets/testimonials/ash-ali.jpg",
+  },
+  {
+    quote: "Being a great speaker takes one part art, one part science, a whole lot of experience, and an understanding of how to lead through storytelling, emotional intelligence, and personal clarity. Irfan delivers on all of this and more. If you are looking for a dynamic global speaker, reach out to Irfan.",
+    name: "Chuck Wang",
+    role: "Strategic Operations Executive, Former Founder/CEO",
+    place: "San Francisco",
+    photo: "/assets/testimonials/chuck-wang.jpg",
+  },
+  {
+    quote: "Syed spoke at our DMSS conference and is an excellent public speaker. He gave me great, actionable tips to increase our media exposure. He comes highly recommended.",
+    name: "Brie Moreau",
+    role: "Organizer, DMSS Conference (Bali)",
+    place: "Bali",
+    photo: "/assets/testimonials/brie-moreau.jpg",
+  },
+  {
+    quote: "Irfan was a distinguished guest speaker at IYDC2015, which featured more than 40 international and local speakers. His knowledge of content marketing, SEO, and growth hacking makes him an ideal speaker for entrepreneurs looking to expand their digital presence. His friendly nature and humble personality make attendees interact with him easily.",
+    name: "Maryam Arshad Mahmood",
+    role: "Partnerships, Google (Singapore)",
+    place: "Singapore",
+    photo: "/assets/testimonials/maryam-arshad-mahmood.jpg",
+  },
 ];
 
 type Step = { no: string; t: string; d: string };
@@ -657,10 +677,20 @@ const HostQuotes = () => (
             {tm.quote}
           </blockquote>
           <HRule style={{ margin: "22px 0 14px", background: INK35 }} />
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-            <div>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{tm.name}</div>
-              <div style={{ marginTop: 4 }}><SCaps size={10.5} ls="0.14em" color={INK70}>{tm.role}</SCaps></div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={tm.photo}
+                alt={tm.name}
+                width={44}
+                height={44}
+                style={{ width: 44, height: 44, borderRadius: "50%", border: `1.5px solid ${INK}`, objectFit: "cover", flexShrink: 0 }}
+              />
+              <div>
+                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{tm.name}</div>
+                <div style={{ marginTop: 4 }}><SCaps size={10.5} ls="0.14em" color={INK70}>{tm.role}</SCaps></div>
+              </div>
             </div>
             {tm.stat && (
               <div style={{ padding: "6px 10px", background: INK, color: YEL, fontFamily: GROT, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.10em" }}>{tm.stat}</div>

@@ -24,6 +24,7 @@ const COLS: ReadonlyArray<FooterCol> = [
       { label: "EMOS",           href: "/emos" },
       { label: "DMR.agency",     href: "https://dmr.agency", external: true },
       { label: "Ventures",       href: "/ventures" },
+      { label: "Clients",        href: "/clients" },
     ],
   },
   {
@@ -32,6 +33,7 @@ const COLS: ReadonlyArray<FooterCol> = [
       { label: "Home",       href: "/" },
       { label: "About",      href: "/about" },
       { label: "Podcast",    href: "/podcast" },
+      { label: "Gallery",    href: "/gallery" },
       { label: "Insights",   href: "/insights" },
       { label: "Newsletter", href: "/newsletter" },
     ],
@@ -75,7 +77,7 @@ export const Colophon = () => (
               letterSpacing: "-0.02em",
             }}
           >
-            The <span style={{ fontStyle: "italic" }}>Bureau</span>
+            The <span style={{ fontStyle: "italic" }}>SIA Wire</span>
           </div>
         </div>
         <p

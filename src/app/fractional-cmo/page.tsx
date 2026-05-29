@@ -582,11 +582,130 @@ const Fit = () => (
   </section>
 );
 
-// ─── §04 · Book the Call ──────────────────────────────────────────────────────
+// ─── §04 · Client Results ─────────────────────────────────────────────────────
+
+type CMOTestimonial = { quote: string; name: string; role: string; place: string; photo: string; stat?: string };
+const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
+  {
+    quote:
+      "Their biggest weapon has been doing outreach to earn high-quality " +
+      "backlinks and mentions at scale from the likes of Forbes, Mashable, " +
+      "Reader's Digest, and hundreds of other authority sites. The biggest " +
+      "success story has been helping grow Ridester from zero to 1.5 million " +
+      "monthly visitors.",
+    name: "Brett Helling",
+    role: "Enterprise SEO Lead, ClickUp",
+    place: "Omaha, NE",
+    photo: "/assets/testimonials/brett-helling.jpg",
+    stat: "0 to 1.5M monthly visitors",
+  },
+  {
+    quote:
+      "Syed's team earned us high authority links from publications like MSN " +
+      "and Yahoo. Our main site's organic traffic increased by 120%. Our " +
+      "Public Database saw a 515% increase in clicks, and our average daily " +
+      "signups grew 6x.",
+    name: "Imani Lea Brown",
+    role: "Content Architect and Systems Designer",
+    place: "San Francisco",
+    photo: "/assets/testimonials/imani-lea-brown.jpg",
+    stat: "120% traffic, 6x signups",
+  },
+  {
+    quote:
+      "Irfan and his team earned high authority backlinks from publications " +
+      "like Reader's Digest and MSN. The web portal's traffic increased by " +
+      "140% in 3 months, greatly exceeding our goals.",
+    name: "Reem El Shafaki",
+    role: "Partner, DinarStandard",
+    place: "Dubai",
+    photo: "/assets/testimonials/reem-el-shafaki.jpg",
+    stat: "140% traffic in 3 months",
+  },
+  {
+    quote:
+      "Irfan always goes above and beyond when it comes to strategizing our " +
+      "SEO tactics. He has provided really helpful recommendations and feedback " +
+      "on our website to help us make it as user-friendly and SEO optimized " +
+      "as possible.",
+    name: "Bridget Hanson",
+    role: "Manager of Grants and Community Engagement",
+    place: "USA",
+    photo: "/assets/testimonials/bridget-hanson.jpg",
+  },
+];
+
+const CMOTestimonials = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
+    <SectionMast n="04" label="Client results · On the record" />
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}
+      >
+        What clients
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>have said.</Mark>
+        </span>
+      </h2>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18.5, color: INK70, lineHeight: 1.55, maxWidth: 540 }}>
+        Results from clients across SEO, digital PR, content, and growth. Numbers, publications, and the people behind them.
+      </p>
+    </div>
+    <div className="grid-testimonials" style={{ border: `1px solid ${INK}` }}>
+      {CMO_TESTIMONIALS.map((tm, i) => (
+        <article key={i} className="letter-card" style={{ padding: "32px 28px 28px", display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+            <Pill size={10.5} ls="0.18em">№ {String(i + 1).padStart(2, "0")}</Pill>
+            <SCaps size={10.5} ls="0.18em" color={INK55}>Filed from {tm.place}</SCaps>
+          </div>
+          <blockquote
+            style={{
+              margin: "20px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 2.8vw, 20px)",
+              color: INK, lineHeight: 1.4, fontStyle: "italic", position: "relative",
+              paddingLeft: 32, flex: 1,
+            }}
+          >
+            <span
+              aria-hidden
+              style={{
+                position: "absolute", left: -4, top: -10, fontFamily: SERIF,
+                fontSize: 84, lineHeight: 1, color: INK, fontStyle: "italic",
+                background: YEL, padding: "0 4px",
+              }}
+            >&ldquo;</span>
+            {tm.quote}
+          </blockquote>
+          <HRule style={{ margin: "22px 0 14px" }} />
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={tm.photo} alt={tm.name} width={44} height={44}
+                style={{ width: 44, height: 44, borderRadius: "50%", border: `1.5px solid ${INK}`, objectFit: "cover", flexShrink: 0 }}
+              />
+              <div>
+                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{tm.name}</div>
+                <div style={{ marginTop: 3 }}><SCaps size={10.5} ls="0.14em" color={INK70}>{tm.role}</SCaps></div>
+              </div>
+            </div>
+            {tm.stat && (
+              <div style={{ padding: "5px 10px", background: INK, color: YEL, fontFamily: GROT, fontSize: 10, fontWeight: 800, letterSpacing: "0.10em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                {tm.stat}
+              </div>
+            )}
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §05 · Book the Call ──────────────────────────────────────────────────────
 
 const BookCall = () => (
   <section id="book" className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="04" label="Book the call · The next move" />
+    <SectionMast n="05" label="Book the call · The next move" />
 
     <div
       className="grid-dark-card"
@@ -738,9 +857,10 @@ export default function FractionalCMOPage() {
       <Scope />
       <Timeline />
       <Fit />
+      <CMOTestimonials />
       <BookCall />
       <CalendlySection />
-      <Subscriptions sectionNumber="06" />
+      <Subscriptions sectionNumber="07" />
       <Colophon />
     </div>
   );

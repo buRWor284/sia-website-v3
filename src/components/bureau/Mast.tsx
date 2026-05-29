@@ -21,14 +21,10 @@ import {
 const NAV: ReadonlyArray<{ label: string; href: string }> = [
   { label: "Home",            href: "/" },
   { label: "About",           href: "/about" },
-  { label: "Ventures",        href: "/ventures" },
   { label: "Speaking",        href: "/speaking" },
   { label: "EMOS",            href: "/emos" },
   { label: "Fractional CMO",  href: "/fractional-cmo" },
-  { label: "Podcast",         href: "/podcast" },
   { label: "Insights",        href: "/insights" },
-  { label: "Clients",         href: "/clients" },
-  { label: "Gallery",         href: "/gallery" },
   { label: "Contact",         href: "/contact" },
 ];
 
@@ -70,13 +66,23 @@ export const Mast = ({
           </div>
         </div>
 
-        {/* Right: bureau meta + date + badge */}
+        {/* Right: SIA Wire identity + date + badge */}
         <div className="mast-name-right">
-          <SCaps size={10.5} ls="0.22em" color={INK70}>
-            The Sunday Bureau &nbsp;·&nbsp; Est. 2004 &nbsp;·&nbsp; Global
-          </SCaps>
-          <SCaps size={10.5} ls="0.20em" color={INK55} style={{ marginTop: 5, display: "block" }}>
-            {dateline} &nbsp;·&nbsp; Issue Nº 029
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontStyle: "italic",
+              fontSize: "clamp(15px, 1.8vw, 20px)",
+              color: INK,
+              lineHeight: 1,
+              letterSpacing: "0.01em",
+            }}
+          >
+            The SIA Wire
+          </div>
+          <SCaps size={10.5} ls="0.20em" color={INK55} style={{ marginTop: 6, display: "block" }}>
+            Est. 2004 &nbsp;·&nbsp; Global &nbsp;·&nbsp; {dateline}
           </SCaps>
           <div style={{ marginTop: 8 }}>
             <Mark>
