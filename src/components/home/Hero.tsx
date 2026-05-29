@@ -33,14 +33,42 @@ const DISPATCH: ReadonlyArray<[string, string, string]> = [
 export const Hero = () => (
   <section style={{ background: PAPER }}>
 
-    {/* ── Double rule above 3-col grid ── */}
+    {/* ── Stat strip ── */}
     <div className="sx">
       <div className="hero-double-rule-top" />
+      <div className="grid-stats" style={{ border: `1px solid ${INK}`, borderTop: "none" }}>
+        {STATS.map(([n, l, cite], i) => (
+          <div
+            key={i}
+            className="stat-item"
+            style={{ padding: "22px 20px 26px", textAlign: "center" }}
+          >
+            <div className="stat-number" style={{ fontFamily: SERIF, color: INK }}>
+              {n}
+            </div>
+            <div style={{ marginTop: 7 }}>
+              <SCaps size={10.5} ls="0.16em" color={INK70}>{l}</SCaps>
+            </div>
+            {cite && (
+              <div style={{
+                marginTop: 8,
+                fontFamily: SERIF,
+                fontStyle: "italic",
+                fontSize: 13,
+                color: INK55,
+                lineHeight: 1.3,
+              }}>
+                {cite}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
 
     {/* ── Newspaper 3-col grid ── */}
     <div className="sx">
-      <div className="grid-hero-newspaper">
+      <div className="grid-hero-newspaper" style={{ borderTop: `1px solid ${INK}` }}>
 
         {/* LEFT — photo + stat */}
         <div className="hero-np-left">
@@ -175,35 +203,83 @@ export const Hero = () => (
       </div>
     </div>
 
-    {/* ── Stat strip ── */}
+    {/* ── What I do card ── */}
     <div className="sx">
-      <div className="grid-stats" style={{ border: `1px solid ${INK}`, borderTop: "none" }}>
-        {STATS.map(([n, l, cite], i) => (
-          <div
-            key={i}
-            className="stat-item"
-            style={{ padding: "22px 20px 26px", textAlign: "center" }}
-          >
-            <div className="stat-number" style={{ fontFamily: SERIF, color: INK }}>
-              {n}
-            </div>
-            <div style={{ marginTop: 7 }}>
-              <SCaps size={10.5} ls="0.16em" color={INK70}>{l}</SCaps>
-            </div>
-            {cite && (
-              <div style={{
-                marginTop: 8,
-                fontFamily: SERIF,
-                fontStyle: "italic",
-                fontSize: 13,
-                color: INK55,
-                lineHeight: 1.3,
-              }}>
-                {cite}
-              </div>
-            )}
-          </div>
-        ))}
+      <div style={{
+        background: INK,
+        padding: "40px 44px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 28,
+        borderLeft: `1px solid ${INK}`,
+        borderRight: `1px solid ${INK}`,
+        borderBottom: `1px solid ${INK}`,
+      }}>
+        {/* Overline */}
+        <div style={{
+          fontFamily: GROT,
+          fontWeight: 700,
+          fontSize: 10,
+          letterSpacing: "0.30em",
+          textTransform: "uppercase",
+          color: "rgba(241,235,222,.45)",
+        }}>
+          The Work
+        </div>
+
+        {/* Statement */}
+        <p style={{
+          margin: 0,
+          fontFamily: SERIF,
+          fontStyle: "italic",
+          fontWeight: 600,
+          fontSize: "clamp(22px, 3.2vw, 38px)",
+          color: PAPER,
+          lineHeight: 1.25,
+          letterSpacing: "-0.015em",
+          maxWidth: 820,
+        }}>
+          I help founders and brands get covered, get found,
+          and get customers — without paying for attention.
+        </p>
+
+        {/* Pills */}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {([
+            ["Earned Media OS",  "/emos"],
+            ["Speaking",         "/speaking"],
+            ["Resources",        "/resources"],
+          ] as const).map(([label, href]) => (
+            <a
+              key={label}
+              href={href}
+              style={{
+                padding: "10px 18px",
+                border: `1px solid rgba(241,235,222,.35)`,
+                color: PAPER,
+                textDecoration: "none",
+                fontFamily: GROT,
+                fontWeight: 700,
+                fontSize: 11,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                transition: "background 0.12s, border-color 0.12s",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.background = YEL;
+                (e.currentTarget as HTMLElement).style.color = INK;
+                (e.currentTarget as HTMLElement).style.borderColor = YEL;
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.background = "transparent";
+                (e.currentTarget as HTMLElement).style.color = PAPER;
+                (e.currentTarget as HTMLElement).style.borderColor = "rgba(241,235,222,.35)";
+              }}
+            >
+              {label} →
+            </a>
+          ))}
+        </div>
       </div>
     </div>
 

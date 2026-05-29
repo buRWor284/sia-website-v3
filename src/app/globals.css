@@ -830,6 +830,79 @@ body > * { position: relative; z-index: 2; }
   .forbes-spread { grid-template-columns: 320px 1fr; }
 }
 
+/* ---- Gallery · editorial hero (3-col) ---------------------------------- */
+.gallery-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .gallery-hero-grid {
+    grid-template-columns: 180px 1fr 170px;
+    min-height: 220px;
+  }
+}
+.gallery-hero-left {
+  border-bottom: 1px solid #1a1410;
+  padding: 28px 24px 24px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  position: relative; overflow: hidden;
+}
+@media (min-width: 768px) {
+  .gallery-hero-left {
+    border-bottom: none;
+    border-right: 1px solid #1a1410;
+    padding: 36px 28px 32px;
+  }
+}
+.gallery-hero-watermark {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 900; font-size: 90px;
+  letter-spacing: -0.04em; text-transform: uppercase;
+  color: rgba(26,20,16,.055); white-space: nowrap;
+  pointer-events: none; user-select: none; line-height: 1;
+}
+.gallery-hero-right {
+  border-top: 1px solid #1a1410;
+  padding: 24px 24px 24px;
+  display: flex; flex-direction: column; justify-content: center; gap: 18px;
+}
+@media (min-width: 768px) {
+  .gallery-hero-right {
+    border-top: none;
+    border-left: 1px solid #1a1410;
+    padding: 36px 28px 32px;
+    gap: 20px;
+  }
+}
+
+/* ---- Gallery · filter bar (sticky dark) -------------------------------- */
+.gallery-filter-bar {
+  background: #1a1410;
+  padding: 0 24px;
+  position: sticky; top: 0; z-index: 90;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap;
+  min-height: 52px;
+  gap: 8px;
+}
+@media (min-width: 768px) {
+  .gallery-filter-bar { padding: 0 56px; flex-wrap: nowrap; }
+}
+
+/* ---- Gallery · uniform 3-col photo grid -------------------------------- */
+.gallery-grid-photos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 640px) {
+  .gallery-grid-photos { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .gallery-grid-photos { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* ---- Gallery / photo mosaic (12-col with span overrides) --------------- */
 .gallery-mosaic {
   display: grid;
