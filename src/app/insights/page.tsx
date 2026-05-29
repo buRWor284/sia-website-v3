@@ -25,7 +25,7 @@ const INTERNAL_SLUGS = new Set(["personal-branding", "storytelling", "neuromarke
 
 const ART = (slug: string): string =>
   INTERNAL_SLUGS.has(slug)
-    ? `/writing/${slug}`
+    ? `/insights/${slug}`
     : `https://syedirfanajmal.com/${slug}/`;
 
 const isInternal = (slug: string) => INTERNAL_SLUGS.has(slug);
@@ -543,10 +543,10 @@ const Press = () => (
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function WritingPage() {
+export default function InsightsPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Writing" />
+      <Mast active="Insights" />
       <Hero />
       <Featured />
       <AllArticles />

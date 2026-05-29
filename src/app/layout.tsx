@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Newsreader, Archivo, JetBrains_Mono } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -30,6 +31,9 @@ export const metadata: Metadata = {
   description:
     "Marketing consultant, author, speaker, founder of DMR.agency. " +
     "Get found, get covered, get customers.",
+  verification: {
+    google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
+  },
 };
 
 export default function RootLayout({
@@ -41,6 +45,7 @@ export default function RootLayout({
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
     >
       <body>{children}</body>
+      <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       {/* Mailchimp embedded form validation — jQuery required by mc-validate.js */}
       <Script
         src="https://code.jquery.com/jquery-3.7.1.min.js"

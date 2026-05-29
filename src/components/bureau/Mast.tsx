@@ -26,7 +26,7 @@ const NAV: ReadonlyArray<{ label: string; href: string }> = [
   { label: "EMOS",            href: "/emos" },
   { label: "Fractional CMO",  href: "/fractional-cmo" },
   { label: "Podcast",         href: "/podcast" },
-  { label: "Writing",         href: "/writing" },
+  { label: "Insights",        href: "/insights" },
   { label: "Clients",         href: "/clients" },
   { label: "Gallery",         href: "/gallery" },
   { label: "Contact",         href: "/contact" },
