@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { GROT, INK, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
-import { DoubleRule, Pill, SCaps, SiaLogo } from "./primitives";
+import { DoubleRule, Pill, SCaps } from "./primitives";
 
 type FooterLink = {
   label: string;
@@ -63,22 +63,17 @@ export const Colophon = () => (
     <div className="grid-colophon">
       {/* Brand block */}
       <div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-          <div style={{ background: INK, padding: "8px 14px" }}>
-            <SiaLogo height={26} />
-          </div>
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: "clamp(28px, 5vw, 42px)",
-              color: INK,
-              lineHeight: 1,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            The <span style={{ fontStyle: "italic" }}>SIA Wire</span>
-          </div>
+        <div
+          style={{
+            fontFamily: SERIF,
+            fontWeight: 700,
+            fontSize: "clamp(28px, 5vw, 42px)",
+            color: INK,
+            lineHeight: 1,
+            letterSpacing: "-0.02em",
+          }}
+        >
+          Syed Irfan Ajmal
         </div>
         <p
           style={{
@@ -92,7 +87,7 @@ export const Colophon = () => (
             fontStyle: "italic",
           }}
         >
-          Serial entrepreneur. Fractional CMO. CEO of DMR.agency. Founder @ EMOS. Bylines/citations: Forbes, HBR &amp; HuffPost.
+          Serial entrepreneur. Fractional CMO. CEO of DMR.agency. Founder @ EMOS. Bylines &amp; citations: Forbes, HBR, SEMrush, SEJ &amp; more.
         </p>
       </div>
 

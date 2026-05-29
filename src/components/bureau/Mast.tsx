@@ -16,6 +16,7 @@ import {
   HRule,
   Mark,
   SCaps,
+  SiaLogo,
 } from "./primitives";
 
 const NAV: ReadonlyArray<{ label: string; href: string }> = [
@@ -43,22 +44,27 @@ export const Mast = ({
     <header className="sx" style={{ background: PAPER, paddingTop: 20, paddingBottom: 16 }}>
       {/* Name + bureau meta */}
       <div className="mast-namehead">
-        {/* Left: name + disciplines */}
+        {/* Left: logo + name + disciplines */}
         <div className="mast-name-left">
-          <Link href="/" style={{ textDecoration: "none" }}>
-            <div
-              style={{
-                fontFamily: SERIF,
-                fontWeight: 700,
-                fontSize: "clamp(28px, 4.5vw, 48px)",
-                color: INK,
-                lineHeight: 1,
-                letterSpacing: "0.01em",
-              }}
-            >
-              Syed Irfan Ajmal
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <div style={{ background: INK, padding: "8px 14px", flexShrink: 0 }}>
+              <SiaLogo height={26} />
             </div>
-          </Link>
+            <Link href="/" style={{ textDecoration: "none" }}>
+              <div
+                style={{
+                  fontFamily: SERIF,
+                  fontWeight: 700,
+                  fontSize: "clamp(28px, 4.5vw, 48px)",
+                  color: INK,
+                  lineHeight: 1,
+                  letterSpacing: "0.01em",
+                }}
+              >
+                Syed Irfan Ajmal
+              </div>
+            </Link>
+          </div>
           <div style={{ marginTop: 8 }}>
             <SCaps size={10.5} ls="0.22em" color={INK55}>
               SEO-PR &nbsp;·&nbsp; GEO &nbsp;·&nbsp; Content Marketing
