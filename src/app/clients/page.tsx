@@ -12,7 +12,6 @@ import {
 import { ClientLogo } from "@/components/bureau/ClientLogo";
 import { CLIENTS_PRE, CLIENTS_TIER1, CLIENTS_TIER2, type Client } from "@/data/clients";
 import {
-import { ScrollButtons } from "@/components/ScrollButtons";
   CALENDLY,
   GROT,
   INK,

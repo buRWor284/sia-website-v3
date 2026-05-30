@@ -7,7 +7,6 @@ import {
   SectionMast,
 } from "@/components/bureau/primitives";
 import {
-import { ScrollButtons } from "@/components/ScrollButtons";
   GROT,
   INK,
   INK15,

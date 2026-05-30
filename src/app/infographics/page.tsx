@@ -3,7 +3,6 @@
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { DoubleRule, HRule, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {
-import { ScrollButtons } from "@/components/ScrollButtons";
   GROT,
   INK,
   INK15,

@@ -20,7 +20,6 @@ import {
   YEL,
 } from "@/lib/tokens"
 import {
-import { ScrollButtons } from "@/components/ScrollButtons";
   generateEpisodeStaticParams,
   getAdjacentEpisodes,
   getEpisodeBySlug,
