@@ -133,6 +133,21 @@ const css = `
   .ticker__sep { color: var(--I15); }
   .ticker__bold { font-weight: 700; }
 
+  /* ── CTA TICKER (secondary, below testimonials) ─────────── */
+  .ticker--cta {
+    background: var(--INK); color: var(--BG);
+    border-top: 2px solid var(--INK); border-bottom: 2px solid var(--INK);
+    margin-bottom: 0;
+  }
+  .ticker--cta .ticker__sep { color: rgba(255,255,255,0.25); }
+  .ticker--cta .ticker__dot { color: var(--RED); }
+  .ticker--cta .ticker__bold { font-weight: 700; }
+  .ticker--cta a {
+    color: var(--BG); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.35);
+    transition: border-color .2s;
+  }
+  .ticker--cta a:hover { border-color: var(--RED); color: var(--RED); }
+
   .hero-grid {
     display: grid; grid-template-columns: 1.55fr 0.7fr;
     gap: 48px; align-items: end;
@@ -807,19 +822,14 @@ export default function HomePage() {
 
       {/* ══ HERO ══ */}
       <header className="hero">
-        <div className="ticker" aria-label="Fractional CMO availability · Publications · Speaking · EMOS">
+        <div className="ticker" aria-label="Publications · Speaking · Podcast">
           {[0, 1].map((i) => (
             <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
-              <span className="ticker__dot">●</span>
-              <span className="ticker__bold">1 FRACTIONAL CMO SPOT · Q3 2026</span>
-              <span className="ticker__sep">&nbsp;////&nbsp;</span>
-              <span>FORBES · HBR · HUFFPOST · SEMRUSH · ENTREPRENEUR · WORLD BANK · TNW</span>
+              <span>Forbes · HBR · SEMrush · TNW · many more</span>
               <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span>SPOKEN IN PK · MY · ID · AE</span>
               <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span>4 PODCAST SEASONS</span>
-              <span className="ticker__sep">&nbsp;////&nbsp;</span>
-              <span>GET CITED BEFORE YOUR SERIES A · EMOS FOUNDING CLASS</span>
               <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             </span>
           ))}
@@ -827,7 +837,6 @@ export default function HomePage() {
 
         <div className="hero-grid">
           <div>
-            <p className="hero-kicker">[ DIGITAL PR · SEO · EARNED MEDIA ]</p>
             <h1 className="hero-h1">
               WHY PAY<br />
               FOR ATTENTION<br />
@@ -1006,6 +1015,23 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ══ CTA TICKER ══ */}
+      <div className="ticker ticker--cta" aria-label="Availability and EMOS">
+        {[0, 1].map((i) => (
+          <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
+            <span className="ticker__dot">●</span>
+            <span className="ticker__bold">
+              <a href="/fractional-cmo">1 FRACTIONAL CMO SPOT · Q3 2026</a>
+            </span>
+            <span className="ticker__sep">&nbsp;////&nbsp;</span>
+            <span>
+              <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer">GET CITED BEFORE YOUR SERIES A · EMOS FOUNDING CLASS</a>
+            </span>
+            <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          </span>
+        ))}
+      </div>
 
       {/* ══ § 03 SPEAKING ══ */}
       <section className="speaking">
