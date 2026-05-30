@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 
 /**
- * Homepage v4 — Cream edition (SIA-homepage-v3 design)
+ * Homepage v4 Cream edition (SIA-homepage-v3 design)
  * Embedded directly from design_handoff_homepage/Homepage v4 Cream.html
  *
  * To roll back: copy page.tsx.bak → page.tsx
@@ -132,16 +132,16 @@ const css = `
     color: var(--INK); margin-bottom: 22px; font-weight: 600;
   }
   .hero-h1 {
-    font-family: var(--sans); font-weight: 900; font-size: 148px;
-    line-height: .87; letter-spacing: -.045em; color: var(--INK);
+    font-family: var(--sans); font-weight: 900; font-size: 82px;
+    line-height: .9; letter-spacing: -.04em; color: var(--INK);
     text-transform: uppercase;
   }
   .hero-h1 em {
     font-style: normal;
     text-decoration: underline;
     text-decoration-color: var(--RED);
-    text-underline-offset: 12px;
-    text-decoration-thickness: 9px;
+    text-underline-offset: 8px;
+    text-decoration-thickness: 5px;
   }
   .hero-sub {
     margin-top: 32px;
@@ -378,7 +378,12 @@ const css = `
   .stage__tag  { font-family: var(--mono); font-size: 11px; color: var(--RED); letter-spacing: .08em; font-weight: 700; }
 
   /* ── KITS (newspaper cards) ─────────────────────────────── */
-  .kits { background: var(--Y); padding: 100px 56px; }
+  .kits { background: var(--INK); padding: 100px 56px; }
+  .kits .sec-idx__rule { background: rgba(245,197,24,.25); }
+  .kits .sec-idx__n { color: var(--RED); }
+  .kits .sec-idx__label { color: rgba(245,197,24,.7); }
+  .kits .kits-header .section-h2 { color: var(--Y); }
+  .kits .kits-all { color: rgba(245,197,24,.7); }
   .kits-header {
     display: flex; align-items: baseline; justify-content: space-between;
     margin-bottom: 48px;
@@ -389,67 +394,67 @@ const css = `
   }
   .kits-grid {
     display: grid; grid-template-columns: repeat(2, 1fr);
-    border: 2px solid var(--INK);
+    border: 2px solid rgba(245,197,24,.25);
   }
   .kit-card {
-    padding: 36px 32px 32px; border-right: 2px solid var(--INK);
+    padding: 36px 32px 32px; border-right: 2px solid rgba(245,197,24,.25);
     display: flex; flex-direction: column;
   }
   .kit-card:last-child { border-right: none; }
   .kit-card__badge {
     display: inline-block; padding: 6px 12px;
-    background: var(--Y); border: 2px solid var(--INK);
+    background: var(--Y); border: 2px solid var(--Y);
     font-family: var(--mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .14em; text-transform: uppercase;
+    letter-spacing: .14em; text-transform: uppercase; color: var(--INK);
     align-self: flex-start; margin-bottom: 24px;
   }
   .kit-card__paper {
-    border: 1px solid var(--INK); padding: 16px;
-    background: rgba(14,13,10,.07); margin-bottom: 24px;
+    border: 1px solid rgba(245,197,24,.3); padding: 16px;
+    background: rgba(245,197,24,.07); margin-bottom: 24px;
   }
   .kit-card__paper-header {
     display: flex; justify-content: space-between; align-items: baseline;
-    border-bottom: 1px solid var(--INK); padding-bottom: 8px; margin-bottom: 12px;
+    border-bottom: 1px solid rgba(245,197,24,.3); padding-bottom: 8px; margin-bottom: 12px;
   }
   .kit-card__gazette {
     font-family: var(--mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .18em; text-transform: uppercase;
+    letter-spacing: .18em; text-transform: uppercase; color: var(--Y);
   }
   .kit-card__date {
-    font-family: var(--mono); font-size: 10px; color: var(--I45); letter-spacing: .06em;
+    font-family: var(--mono); font-size: 10px; color: rgba(245,197,24,.45); letter-spacing: .06em;
   }
   .kit-card__paper-title {
     font-family: var(--sans); font-weight: 900; font-size: 18px;
-    letter-spacing: -.01em; color: var(--INK); margin-bottom: 10px;
+    letter-spacing: -.01em; color: var(--Y); margin-bottom: 10px;
   }
   .kit-card__paper-cols {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    border-top: 1px solid var(--I15); padding-top: 10px;
+    border-top: 1px solid rgba(245,197,24,.15); padding-top: 10px;
   }
   .kit-card__paper-col {
-    font-family: var(--sans); font-size: 11px; color: var(--I70); line-height: 1.5;
+    font-family: var(--sans); font-size: 11px; color: rgba(245,197,24,.55); line-height: 1.5;
   }
   .kit-card__title {
     font-family: var(--sans); font-weight: 900; font-size: 28px;
-    color: var(--INK); line-height: 1.1; letter-spacing: -.015em;
+    color: var(--Y); line-height: 1.1; letter-spacing: -.015em;
   }
   .kit-card__title em { font-style: italic; }
   .kit-card__body {
-    font-family: var(--sans); font-size: 15px; color: var(--I70);
+    font-family: var(--sans); font-size: 15px; color: rgba(245,197,24,.65);
     font-style: italic; line-height: 1.5; margin-top: 10px; flex: 1;
   }
   .kit-card__footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 2px solid var(--INK); padding-top: 18px; margin-top: 24px;
+    border-top: 2px solid rgba(245,197,24,.25); padding-top: 18px; margin-top: 24px;
   }
   .kit-card__year {
-    font-family: var(--mono); font-size: 11px; color: var(--I45); letter-spacing: .06em;
+    font-family: var(--mono); font-size: 11px; color: rgba(245,197,24,.4); letter-spacing: .06em;
   }
   .kit-card__cta {
     font-family: var(--mono); font-size: 11px; font-weight: 700;
     letter-spacing: .12em; text-transform: uppercase;
     display: flex; align-items: center; gap: 6px;
-    color: var(--INK);
+    color: var(--Y);
   }
   .kit-card__cta:hover { color: var(--RED); }
 
@@ -587,15 +592,13 @@ export default function HomePage() {
       <header className="hero">
         <div className="ticker">
           <span className="ticker__dot">●</span>
-          <span className="ticker__bold">OPEN FOR PROJECTS — Q3 2026</span>
+          <span className="ticker__bold">OPEN FOR PROJECTS Q3 2026</span>
           <span className="ticker__sep">&nbsp;////&nbsp;</span>
           <span>FORBES · HBR · HUFFPOST · SEMRUSH · ENTREPRENEUR · WORLD BANK · TNW</span>
           <span className="ticker__sep">&nbsp;////&nbsp;</span>
           <span>SPOKEN IN PK · MY · ID · AE</span>
           <span className="ticker__sep">&nbsp;////&nbsp;</span>
-          <span>29 PODCAST EPISODES</span>
-          <span className="ticker__sep">&nbsp;////&nbsp;</span>
-          <span>BLACKBOX CONNECT · SILICON VALLEY · 2014</span>
+          <span>4 PODCAST SEASONS</span>
         </div>
 
         <div className="hero-grid">
@@ -608,8 +611,8 @@ export default function HomePage() {
               <em>EARN</em> IT?
             </h1>
             <p className="hero-sub">
-              I help founders and brands get covered, get found, get customers —
-              without <strong>paying for attention.</strong>
+              I help founders and brands get covered, get found, get customers.
+              Without <strong>paying for attention.</strong>
             </p>
             <div className="hero-ctas">
               <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="btn-primary">Book a discovery call <span className="mono-arrow">→</span></a>
@@ -618,16 +621,10 @@ export default function HomePage() {
           </div>
 
           <figure className="hero-portrait">
-            <svg viewBox="0 0 200 250" preserveAspectRatio="xMidYMax meet">
-              <ellipse cx="100" cy="90" rx="48" ry="56" fill="#2b2620"/>
-              <ellipse cx="100" cy="96" rx="38" ry="46" fill="#c89978"/>
-              <path d="M 56 78 Q 78 38 122 38 Q 152 44 148 86 Q 138 70 124 68 Q 110 72 98 74 Q 80 76 64 92 Z" fill="#2b2620"/>
-              <rect x="86" y="138" width="28" height="22" fill="#a87d5e"/>
-              <path d="M 18 250 L 44 158 Q 100 138 156 158 L 182 250 Z" fill="#0e0d0a"/>
-              <path d="M 86 158 L 100 178 L 114 158 Z" fill="#f5c518"/>
-            </svg>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/headshot.jpg" alt="Syed Irfan Ajmal" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top center'}} />
             <div className="portrait-badge portrait-badge--tl">HELLO.</div>
-            <div className="portrait-badge portrait-badge--br">PESHAWAR ↔ KL</div>
+            <div className="portrait-badge portrait-badge--br">PESHAWAR to KL</div>
           </figure>
         </div>
 
@@ -685,13 +682,13 @@ export default function HomePage() {
           <div className="service-card">
             <div className="service-card__num">01</div>
             <h3 className="service-card__title">Digital PR &amp; Earned Media</h3>
-            <p className="service-card__body">Land bylines and quotes in publications your buyers actually read — Forbes, HBR, HuffPost, niche trade press. HARO, journalist outreach, story design. No fluff, no directories nobody clicks.</p>
+            <p className="service-card__body">Land bylines and quotes in publications your buyers actually read Forbes, HBR, HuffPost, niche trade press. HARO, journalist outreach, story design. No fluff, no directories nobody clicks.</p>
             <a href="/clients" className="service-card__cta">View case studies →</a>
           </div>
           <div className="service-card">
             <div className="service-card__num">02</div>
             <h3 className="service-card__title">EMOS · Earned Media OS</h3>
-            <p className="service-card__body">A productized system for landing editorial coverage — trainings, templates, journalist playbooks. For in-house teams who want the press wins without the agency retainer.</p>
+            <p className="service-card__body">A productized system for landing editorial coverage trainings, templates, journalist playbooks. For in-house teams who want the press wins without the agency retainer.</p>
             <a href="/emos" className="service-card__cta">Tour EMOS →</a>
           </div>
           <div className="service-card">
@@ -718,7 +715,7 @@ export default function HomePage() {
             <div className="case-card__metric">1.5M<span className="case-card__metric-mo">&thinsp;/mo</span></div>
             <div className="case-card__client">RIDESTER · USA</div>
             <div className="case-card__result">Zero to 1.5M organic visitors in 12 months</div>
-            <p className="case-card__body">Built a content-led SEO strategy from scratch. Took a brand-new domain to 1.5M monthly visitors in under a year — through editorial content and strategic link acquisition.</p>
+            <p className="case-card__body">Built a content-led SEO strategy from scratch. Took a brand-new domain to 1.5M monthly visitors in under a year through editorial content and strategic link acquisition.</p>
             <a href="/clients" className="case-card__link">Full case study →</a>
           </div>
           <div className="case-card">
@@ -734,7 +731,7 @@ export default function HomePage() {
             <div className="case-card__metric">$2.3M</div>
             <div className="case-card__client">MELANIE MARTIN</div>
             <div className="case-card__result">$2.3M in attributable PR campaign ROI</div>
-            <p className="case-card__body">Designed and executed a story-driven digital PR campaign that earned editorial coverage in major outlets and converted directly to pipeline and revenue — zero ad spend.</p>
+            <p className="case-card__body">Designed and executed a story-driven digital PR campaign that earned editorial coverage in major outlets and converted directly to pipeline and revenue zero ad spend.</p>
             <a href="/clients" className="case-card__link">Full case study →</a>
           </div>
         </div>
@@ -770,7 +767,7 @@ export default function HomePage() {
             <div className="testi__badge">CONTENT &amp; SEO</div>
           </div>
           <blockquote className="testi__quote">
-            <span className="q">"</span>Highly knowledgeable about content marketing and SEO. Ideas and execution both cutting-edge strategic — doesn&apos;t lose sight of what matters.<span className="q">"</span>
+            <span className="q">"</span>Highly knowledgeable about content marketing and SEO. Ideas and execution both cutting-edge strategic doesn&apos;t lose sight of what matters.<span className="q">"</span>
           </blockquote>
           <div>
             <div className="testi__name">Lisa Zahran</div>
@@ -783,7 +780,7 @@ export default function HomePage() {
             <div className="testi__badge">TOP 100 DIGITAL MARKETER</div>
           </div>
           <blockquote className="testi__quote">
-            <span className="q">"</span>One of the good guys. Knows digital marketing inside out — his expertise and growth in this area is exemplary.<span className="q">"</span>
+            <span className="q">"</span>One of the good guys. Knows digital marketing inside out his expertise and growth in this area is exemplary.<span className="q">"</span>
           </blockquote>
           <div>
             <div className="testi__name">Sam Hurley</div>
@@ -796,7 +793,7 @@ export default function HomePage() {
             <div className="testi__badge">PODCAST GUEST</div>
           </div>
           <blockquote className="testi__quote">
-            <span className="q">"</span>Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it — and it is hard not to like the guy.<span className="q">"</span>
+            <span className="q">"</span>Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it and it is hard not to like the guy.<span className="q">"</span>
           </blockquote>
           <div>
             <div className="testi__name">Chuck Wang</div>
@@ -823,12 +820,12 @@ export default function HomePage() {
           <div>
             <div className="stage-row">
               <div className="stage__n">01</div><div className="stage__city">PESHAWAR</div>
-              <div className="stage__ctry">Pakistan</div><div className="stage__date">2013 — present</div>
+              <div className="stage__ctry">Pakistan</div><div className="stage__date">2013 to present</div>
               <div className="stage__tag">G-DAY X · DURSHAL</div>
             </div>
             <div className="stage-row">
               <div className="stage__n">02</div><div className="stage__city">KUALA LUMPUR</div>
-              <div className="stage__ctry">Malaysia</div><div className="stage__date">2016 — 2019</div>
+              <div className="stage__ctry">Malaysia</div><div className="stage__date">2016 to 2019</div>
               <div className="stage__tag">WEBINARS · WORKSHOPS</div>
             </div>
             <div className="stage-row">
@@ -838,17 +835,17 @@ export default function HomePage() {
             </div>
             <div className="stage-row">
               <div className="stage__n">04</div><div className="stage__city">DUBAI</div>
-              <div className="stage__ctry">UAE</div><div className="stage__date">2016 — 2018</div>
+              <div className="stage__ctry">UAE</div><div className="stage__date">2016 to 2018</div>
               <div className="stage__tag">ATM · IN5 · MPS2016</div>
             </div>
             <div className="stage-row">
               <div className="stage__n">05</div><div className="stage__city">WEBINARS</div>
-              <div className="stage__ctry">US / UK</div><div className="stage__date">2017 — present</div>
+              <div className="stage__ctry">US / UK</div><div className="stage__date">2017 to present</div>
               <div className="stage__tag">12+ SESSIONS</div>
             </div>
             <div className="stage-row">
               <div className="stage__n">06</div><div className="stage__city">US PODCASTS</div>
-              <div className="stage__ctry">Remote</div><div className="stage__date">2018 — present</div>
+              <div className="stage__ctry">Remote</div><div className="stage__date">2018 to present</div>
               <div className="stage__tag">15+ GUEST SPOTS</div>
             </div>
           </div>
@@ -857,13 +854,13 @@ export default function HomePage() {
 
       {/* ══ § 05 KITS / FREE RESOURCES ══ */}
       <section className="kits">
-        <div className="sec-idx">
+        <div className="sec-idx sec-idx--dark">
           <span className="sec-idx__n">§ 05</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">FREE RESOURCES</span>
         </div>
         <div className="kits-header">
-          <h2 className="section-h2" style={{margin:0}}>Open them.<br/>Use them today.</h2>
+          <h2 className="section-h2" style={{margin:0,color:'var(--Y)'}}>Resources. Tools, Kits,<br/>Playbooks, Calculators.<br/><span style={{fontSize:'60%',fontWeight:400,fontStyle:'italic'}}>Might not stay free for too long.</span></h2>
           <a href="/resources" className="kits-all">18 TOTAL IN THE LIBRARY →</a>
         </div>
         <div className="kits-grid">
@@ -921,7 +918,7 @@ export default function HomePage() {
               <span className="sec-idx__label">INNER CIRCLE</span>
             </div>
             <h2 className="newsletter__h2">Join 4,800<br/>marketers<br/>reading the<br/>newsletter.</h2>
-            <p className="newsletter__sub">1–2 emails a month. Real case studies, the campaigns I&apos;m building right now, and zero filler. Unsubscribe whenever.</p>
+            <p className="newsletter__sub">1-2 emails a month. Real case studies, the campaigns I&apos;m building right now, and zero filler. Unsubscribe whenever.</p>
           </div>
           <form className="newsletter__form" onSubmit={(e) => e.preventDefault()}>
             <div className="newsletter__row">
@@ -942,7 +939,7 @@ export default function HomePage() {
           <div>
             <div className="footer__wordmark">SIA.</div>
             <p className="footer__about">
-              Syed Irfan Ajmal — award-winning marketing consultant, author,
+              Syed Irfan Ajmal award-winning marketing consultant, author,
               speaker, and CEO of <strong>DMR.agency</strong>.
             </p>
           </div>
