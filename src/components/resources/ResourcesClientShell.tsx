@@ -1,875 +1,287 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
-import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
-import { GROT, INK, INK15, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
+import { useEffect, useState } from "react";
+import {
+  HRule,
+  Mark,
+  Pill,
+  SCaps,
+  SectionMast,
+} from "@/components/bureau/primitives";
+import {
+  GROT,
+  INK,
+  INK15,
+  INK55,
+  INK70,
+  PAPER,
+  PAPER2,
+  SERIF,
+  YEL,
+} from "@/lib/tokens";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TYPES
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Filter Dimensions ────────────────────────────────────────────────────────
 
-type ContentType =
-  | "kit"
-  | "tool"
-  | "calculator"
-  | "quiz"
-  | "playbook"
-  | "article"
-  | "visual-essay";
+const TOPICS = [
+  "SEO / GEO Backlinking",
+  "Digital PR",
+  "Content Marketing",
+] as const;
 
-type TopicKey =
-  | "pr"
-  | "seo"
-  | "backlinks"
-  | "content-marketing"
-  | "personal-branding"
-  | "writing"
-  | "strategy"
-  | "neuromarketing";
+const FORMATS = [
+  "Kit",
+  "Playbook",
+  "Long-form Essay",
+  "Short Article",
+  "Infographic",
+  "Tool",
+] as const;
 
-interface ContentBase {
-  id: string;
-  type: ContentType;
-  badge: string;
-  topics: TopicKey[];
-  title: string;
-  y: string;
-  updated?: string;
+const EXPERIENCES = ["Interactive", "Calculator", "Quiz"] as const;
+
+type Topic = (typeof TOPICS)[number];
+type Format = (typeof FORMATS)[number];
+type Experience = (typeof EXPERIENCES)[number];
+
+interface Meta {
+  topics?: Topic[];
+  formats: Format[];
+  experiences?: Experience[];
 }
 
-interface InteractiveContent extends ContentBase {
-  type: "kit" | "tool" | "calculator" | "quiz";
+function matches(
+  item: Meta,
+  t: Topic | null,
+  f: Format | null,
+  e: Experience | null
+): boolean {
+  if (t && !(item.topics ?? []).includes(t)) return false;
+  if (f && !item.formats.includes(f)) return false;
+  if (e && !(item.experiences ?? []).includes(e)) return false;
+  return true;
+}
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
+type Kit = Meta & {
+  no: string;
+  badge: string;
+  title: string;
   sub: string;
   blurb: string;
   href: string;
-  comingSoon?: boolean;
-  newsHeadline: string;
-  newsDeck: string;
-  cta: string;
-}
+  y: string;
+  updated?: string;
+  isBeta?: boolean;
+};
 
-interface PlaybookContent extends ContentBase {
-  type: "playbook";
+const KITS: Kit[] = [
+  {
+    no: "01",
+    badge: "Interactive Kit",
+    title: "Top 11 Scientific Benefits of Writing",
+    sub: "Eleven findings. Each with a prescription.",
+    blurb:
+      "Reduced anxiety, stronger memory, sharper thinking — the research-backed case for writing as a daily practice. Eleven findings, each with its study and a prescription you can follow this week.",
+    href: "/infographics/writing-benefits",
+    y: "2019",
+    updated: "2026",
+    isBeta: true,
+    topics: ["Content Marketing"],
+    formats: ["Kit"],
+    experiences: ["Interactive"],
+  },
+  {
+    no: "02",
+    badge: "Interactive Kit",
+    title: "The Journo Outreach Checklist",
+    sub: "Seven steps to a pitch reporters actually paste in.",
+    blurb:
+      "The SIA system for working HARO, Qwoted, Source of Sources, Featured, and Help a B2B Writer — with copy-clip snippets, an interactive progress meter, and a print mode.",
+    href: "/infographics/journo-outreach-checklist",
+    y: "2026",
+    isBeta: true,
+    topics: ["Digital PR", "SEO / GEO Backlinking"],
+    formats: ["Kit"],
+    experiences: ["Interactive"],
+  },
+  {
+    no: "03",
+    badge: "Tool",
+    title: "Authority Score Calculator",
+    sub: "How much authority does your domain actually have?",
+    blurb:
+      "Enter your domain and get an instant read on your earned authority — built for SEO practitioners and digital PR teams who want a fast signal before pitching or prospecting.",
+    href: "https://www.syedirfanajmal.com/tools/authority-calculator",
+    y: "2026",
+    isBeta: true,
+    topics: ["SEO / GEO Backlinking"],
+    formats: ["Kit", "Tool"],
+    experiences: ["Calculator", "Interactive"],
+  },
+];
+
+type Playbook = Meta & {
+  tag: string;
   no: string;
+  title: string;
   sub: string;
   blurb: string;
   slug: string;
   wc: string;
   read: string;
-}
+};
 
-interface ArticleContent extends ContentBase {
-  type: "article";
-  slug: string;
-  cat: string;
-  external?: boolean;
-  newsHeadline: string;
-  newsDeck: string;
-}
-
-interface VisualEssayContent extends ContentBase {
-  type: "visual-essay";
-  blurb: string;
-  href: string;
-}
-
-type ContentItem =
-  | InteractiveContent
-  | PlaybookContent
-  | ArticleContent
-  | VisualEssayContent;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CONTENT DATA
-// ─────────────────────────────────────────────────────────────────────────────
-
-const CONTENT: ContentItem[] = [
-  // ── KITS ────────────────────────────────────────────────────────────────
+const PLAYBOOKS: Playbook[] = [
   {
-    id: "kit-writing",
-    type: "kit",
-    badge: "Interactive Kit",
-    topics: ["writing", "content-marketing"],
-    title: "Top 11 Scientific Benefits of Writing",
-    sub: "Eleven research-backed findings. Each with a prescription.",
-    blurb:
-      "Reduced anxiety, stronger memory, sharper thinking — the science of writing as a daily practice. Each finding paired with a study and something you can do this week.",
-    href: "/infographics/writing-benefits",
-    y: "2019",
-    updated: "2026",
-    newsHeadline: "Writing Is Medicine",
-    newsDeck: "Science confirms what the Ancients knew about the written word",
-    cta: "Open the Kit",
-  },
-  {
-    id: "kit-journo",
-    type: "kit",
-    badge: "Interactive Kit",
-    topics: ["pr", "seo"],
-    title: "The Journo Outreach Checklist",
-    sub: "Seven steps to a pitch reporters actually use.",
-    blurb:
-      "The SIA system for HARO, Qwoted, Source of Sources, Featured, and Help a B2B Writer — with copy-clip snippets, a progress meter, and print mode.",
-    href: "/infographics/journo-outreach-checklist",
-    y: "2026",
-    newsHeadline: "Pitch Perfect",
-    newsDeck: "The seven-step system that gets reporters to say yes",
-    cta: "Open the Kit",
-  },
-
-  // ── TOOLS ────────────────────────────────────────────────────────────────
-  {
-    id: "tool-collablink",
-    type: "tool",
-    badge: "Interactive Tool",
-    topics: ["backlinks", "seo"],
-    title: "Collaborative Link Building Tool",
-    sub: "Find partnership link opportunities by industry.",
-    blurb:
-      "Enter your industry and instantly surface co-marketing, partnership, and link collaboration targets — with outreach framing for each. 15+ industries mapped.",
-    href: "/tools/collab-link-building",
-    y: "2026",
-    newsHeadline: "The Link Desk",
-    newsDeck: "Collaborative link opportunities across every industry, mapped",
-    cta: "Use the Tool",
-  },
-
-  // ── CALCULATORS ─────────────────────────────────────────────────────────
-  {
-    id: "calc-authority",
-    type: "calculator",
-    badge: "Calculator",
-    topics: ["pr", "strategy"],
-    title: "The Authority Cost Calculator",
-    sub: "Renting credibility vs. owning it — the real numbers.",
-    blurb:
-      "What do agency retainers, bought links, and sponsored placements actually cost over a year? Calculate your number versus owning authority through earned media.",
-    href: "/tools/authority-calculator",
-    y: "2025",
-    newsHeadline: "Renting vs. Owning",
-    newsDeck: "Calculate what credibility really costs you over twelve months",
-    cta: "Run the Calculator",
-  },
-
-  // ── QUIZZES ─────────────────────────────────────────────────────────────
-  {
-    id: "quiz-founder-press",
-    type: "quiz",
-    badge: "Score Quiz",
-    topics: ["pr", "personal-branding"],
-    title: "Founder Press Readiness Score",
-    sub: "How press-ready is your personal brand?",
-    blurb:
-      "Eight dimensions. Five minutes. Coverage volume, media relationships, narrative clarity, spokesperson readiness — scored with prescriptions for each gap.",
-    href: "/tools/founder-press-score",
-    comingSoon: true,
-    y: "2026",
-    newsHeadline: "Your Press Score",
-    newsDeck: "Eight dimensions of founder media readiness, scored and prescribed",
-    cta: "Take the Quiz",
-  },
-  {
-    id: "quiz-personal-brand",
-    type: "quiz",
-    badge: "Brand Quiz",
-    topics: ["personal-branding", "content-marketing"],
-    title: "Personal Brand Strength Quiz",
-    sub: "The five-pillar brand assessment.",
-    blurb:
-      "Niche clarity, content consistency, audience trust, online visibility, storytelling — assess across five pillars and receive a personalised prescription.",
-    href: "/tools/personal-brand-quiz",
-    comingSoon: true,
-    y: "2026",
-    newsHeadline: "Who Are You, Really?",
-    newsDeck: "A five-pillar personal brand assessment for founders and builders",
-    cta: "Take the Quiz",
-  },
-
-  // ── PLAYBOOKS ────────────────────────────────────────────────────────────
-  {
-    id: "play-personal-branding",
-    type: "playbook",
-    badge: "101 Series",
+    tag: "101 series",
     no: "01",
-    topics: ["personal-branding", "content-marketing"],
     title: "Personal Branding 101",
     sub: "How to brand yourself for success.",
     blurb:
-      "Five pillars: clarity, consistency, content, community, credibility. A complete guide to building a personal brand that opens doors. Updated for 2021.",
+      "A long-form guide to building a personal brand that opens doors. Five pillars: clarity, consistency, content, community, credibility. Updated for 2021.",
     slug: "personal-branding",
     wc: "~6,000 words",
     read: "24 min",
-    y: "2021",
+    topics: ["Content Marketing"],
+    formats: ["Playbook", "Long-form Essay"],
   },
   {
-    id: "play-storytelling",
-    type: "playbook",
-    badge: "101 Series",
+    tag: "101 series",
     no: "02",
-    topics: ["content-marketing", "strategy"],
     title: "Storytelling 101",
-    sub: "Elevate your brand through narrative.",
+    sub: "Elevate your brand.",
     blurb:
-      "The neurological case for stories, the hero's journey applied to brand narrative, and practical frameworks for content, decks, and pitches.",
+      "The neurological case for stories, the hero's journey applied to brand narrative, and practical frameworks for weaving storytelling through content, decks, and pitches.",
     slug: "storytelling",
     wc: "~5,500 words",
     read: "21 min",
-    y: "2020",
+    topics: ["Content Marketing"],
+    formats: ["Playbook", "Long-form Essay"],
   },
   {
-    id: "play-neuromarketing",
-    type: "playbook",
-    badge: "101 Series",
+    tag: "101 series",
     no: "03",
-    topics: ["neuromarketing", "strategy"],
     title: "Neuromarketing 101",
-    sub: "What it is and how it actually works.",
+    sub: "What it is and how it works.",
     blurb:
       "Anchoring, the power of free, loss aversion, social proof, the decoy effect. Red Bull, Porsche, Coke vs. Pepsi. Real research, practical applications.",
     slug: "neuromarketing",
     wc: "~3,200 words",
     read: "13 min",
-    y: "2020",
+    topics: ["Content Marketing"],
+    formats: ["Playbook", "Long-form Essay"],
   },
+];
 
-  // ── ARTICLES ─────────────────────────────────────────────────────────────
+type Article = Meta & {
+  title: string;
+  slug: string;
+  cat: string;
+  y: string;
+  updated?: string;
+  external?: boolean;
+};
+
+const ARTICLES: Article[] = [
   {
-    id: "art-writing-tips",
-    type: "article",
-    badge: "Article",
-    topics: ["writing", "content-marketing"],
     title: "100+ Writing Tips to Become a Great Writer",
     slug: "writing-tips",
     cat: "Craft",
     y: "2016",
     updated: "2022",
-    newsHeadline: "The Writer's Rulebook",
-    newsDeck: "Every rule serious writers live by, in one place",
+    topics: ["Content Marketing"],
+    formats: ["Long-form Essay"],
   },
   {
-    id: "art-good-writer",
-    type: "article",
-    badge: "Article",
-    topics: ["writing"],
     title: "How to Become a Good Writer",
     slug: "become-a-good-writer",
     cat: "Craft",
     y: "—",
     external: true,
-    newsHeadline: "Made, Not Born",
-    newsDeck: "The habits and disciplines that turn anyone into a writer",
+    topics: ["Content Marketing"],
+    formats: ["Short Article"],
   },
   {
-    id: "art-productivity",
-    type: "article",
-    badge: "Article",
-    topics: ["strategy"],
     title: "6 Productivity Hacks for Entrepreneurs",
     slug: "6-productivity-hacks-entrepreneurs",
     cat: "Operating",
     y: "2021",
     external: true,
-    newsHeadline: "The Founder's Edge",
-    newsDeck: "Six habits that give entrepreneurs an unfair time advantage",
+    formats: ["Short Article"],
   },
   {
-    id: "art-digital-tools",
-    type: "article",
-    badge: "Article",
-    topics: ["writing", "content-marketing"],
     title: "6 Must-Have Digital Tools for Writers",
     slug: "digital-tools-writers-editors",
     cat: "Tools",
     y: "2020",
     external: true,
-    newsHeadline: "Tools of the Trade",
-    newsDeck: "Six digital tools that make writing faster and sharper",
+    topics: ["Content Marketing"],
+    formats: ["Short Article", "Tool"],
   },
   {
-    id: "art-analytics",
-    type: "article",
-    badge: "Article",
-    topics: ["seo", "content-marketing"],
-    title: "5 Google Analytics Metrics for Content Marketers",
+    title: "5 Google Analytics Metrics for Content",
     slug: "google-analytics-content-marketing",
     cat: "Measurement",
     y: "2020",
     external: true,
-    newsHeadline: "Read the Numbers",
-    newsDeck: "The five analytics signals that tell you if your content is working",
+    topics: ["Content Marketing"],
+    formats: ["Short Article"],
   },
   {
-    id: "art-ecommerce",
-    type: "article",
-    badge: "Article",
-    topics: ["strategy", "content-marketing"],
     title: "How To Maximize eCommerce Conversions",
     slug: "maximize-ecommerce-conversions-using-product-discovery",
     cat: "Strategy",
     y: "—",
     external: true,
-    newsHeadline: "The Conversion Code",
-    newsDeck: "How product discovery turns browsers into buyers",
+    formats: ["Short Article"],
   },
+];
 
-  // ── VISUAL ESSAYS ────────────────────────────────────────────────────────
+const ART = (a: Article) =>
+  a.external ? `https://syedirfanajmal.com/${a.slug}/` : `/resources/${a.slug}`;
+
+type VisualEssay = Meta & {
+  no: string;
+  title: string;
+  blurb: string;
+  href: string;
+  y: string;
+  updated?: string;
+};
+
+const VISUAL_ESSAYS: VisualEssay[] = [
   {
-    id: "ve-hubstaff",
-    type: "visual-essay",
-    badge: "Visual Essay",
-    topics: ["strategy"],
+    no: "03",
     title: "Managing Remote Teams with HubStaff",
     blurb:
       "Time tracking, trust, and async communication across distributed teams. Originally produced in partnership with HubStaff.",
     href: "https://syedirfanajmal.com/managing-remote-teams-with-hubstaff-time-tracking/",
     y: "2016",
     updated: "2021",
+    formats: ["Infographic"],
   },
   {
-    id: "ve-writing-habits",
-    type: "visual-essay",
-    badge: "Visual Essay",
-    topics: ["writing"],
+    no: "04",
     title: "How to Form Writing Habits for Success",
     blurb:
-      "The science of habit formation applied to a daily writing practice — cues, routines, rewards, and the research behind each.",
+      "The science of habit formation applied specifically to a daily writing practice — cues, routines, rewards, and the research behind each.",
     href: "https://syedirfanajmal.com/form-writing-habits-success-infographic/",
     y: "—",
+    topics: ["Content Marketing"],
+    formats: ["Infographic"],
   },
   {
-    id: "ve-content-ideas",
-    type: "visual-essay",
-    badge: "Visual Essay",
-    topics: ["content-marketing", "strategy"],
+    no: "05",
     title: "Getting Content Ideas from Your Customers",
     blurb:
       "Listening systems, surveys, and social mining — how to extract an endless editorial calendar from the people already talking to your business.",
     href: "https://syedirfanajmal.com/content-ideas-from-customers-infographic/",
     y: "—",
+    topics: ["Content Marketing"],
+    formats: ["Infographic"],
   },
 ];
-
-// ─────────────────────────────────────────────────────────────────────────────
-// FILTER CONFIG
-// ─────────────────────────────────────────────────────────────────────────────
-
-const TYPE_TABS: { key: "all" | ContentType; label: string }[] = [
-  { key: "all",           label: "All Resources" },
-  { key: "kit",           label: "Kits" },
-  { key: "tool",          label: "Tools" },
-  { key: "calculator",    label: "Calculators" },
-  { key: "quiz",          label: "Quizzes" },
-  { key: "playbook",      label: "Playbooks" },
-  { key: "article",       label: "Articles" },
-  { key: "visual-essay",  label: "Visual Essays" },
-];
-
-const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
-  { id: "pr",                 label: "PR & Earned Media" },
-  { id: "seo",                label: "SEO" },
-  { id: "backlinks",          label: "Link Building" },
-  { id: "content-marketing",  label: "Content Marketing" },
-  { id: "personal-branding",  label: "Personal Branding" },
-  { id: "writing",            label: "Writing" },
-  { id: "strategy",           label: "Strategy" },
-  { id: "neuromarketing",     label: "Neuromarketing" },
-];
-
-const GROUP_ORDER: ContentType[] = [
-  "kit", "tool", "calculator", "quiz", "playbook", "article", "visual-essay",
-];
-
-const GROUP_LABEL: Record<ContentType, string> = {
-  "kit":           "Kits · Interactive tools & checklists",
-  "tool":          "Tools · Use them right now",
-  "calculator":    "Calculators · Run the numbers",
-  "quiz":          "Quizzes · Score your position",
-  "playbook":      "Playbooks · Deep-dive guides",
-  "article":       "Articles · From the archives",
-  "visual-essay":  "Visual Essays · Research made visible",
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// NEWSPAPER SNIPPET  (replaces hatched yellow strip on interactive cards)
-// ─────────────────────────────────────────────────────────────────────────────
-
-function NewspaperSnippet({ headline, deck }: { headline: string; deck: string }) {
-  return (
-    <div
-      aria-hidden
-      style={{
-        height: 82,
-        marginBottom: 20,
-        background: PAPER2,
-        border: `1px solid ${INK}`,
-        padding: "8px 11px",
-        overflow: "hidden",
-        flexShrink: 0,
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
-        <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 6, letterSpacing: "0.28em", textTransform: "uppercase", color: INK55 }}>
-          Bureau Gazette
-        </span>
-        <span style={{ fontFamily: GROT, fontSize: 6, color: "rgba(26,20,16,.32)", letterSpacing: "0.12em" }}>
-          MMXXVI
-        </span>
-      </div>
-      <div style={{ borderTop: "2px solid", borderTopColor: INK, marginBottom: 2 }} />
-      <div style={{ borderTop: "0.75px solid", borderTopColor: INK, marginBottom: 7 }} />
-      <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12.5, color: INK, lineHeight: 1.15, textTransform: "uppercase", letterSpacing: "-0.005em", marginBottom: 6 }}>
-        {headline}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 7px", borderTop: "0.5px solid rgba(26,20,16,.2)", paddingTop: 4 }}>
-        <div style={{ fontFamily: SERIF, fontSize: 7, color: INK55, lineHeight: 1.5 }}>{deck}</div>
-        <div style={{ fontFamily: SERIF, fontSize: 7, color: "rgba(26,20,16,.3)", lineHeight: 1.5 }}>
-          The SIA Bureau · Research desk · syedirfanajmal.com
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CARDS
-// ─────────────────────────────────────────────────────────────────────────────
-
-function InteractiveCard({ item }: { item: InteractiveContent }) {
-  const [hover, setHover] = useState(false);
-  const isExternal = item.href.startsWith("http");
-
-  if (item.comingSoon) {
-    return (
-      <div
-        style={{
-          display: "flex", flexDirection: "column",
-          padding: "28px 24px 22px",
-          background: PAPER,
-          minHeight: 340, height: "100%",
-          position: "relative",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-          <Pill size={10} ls="0.18em">{item.badge}</Pill>
-          <span style={{ padding: "3px 8px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
-            Coming Soon
-          </span>
-        </div>
-        <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
-        <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
-          {item.title}
-        </h3>
-        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15.5, color: INK70, lineHeight: 1.35, flex: 1 }}>
-          {item.sub}
-        </div>
-        <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}` }}>
-          <SCaps size={10} ls="0.12em" color={INK55}>{item.y}</SCaps>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <a
-      href={item.href}
-      target={isExternal ? "_blank" : undefined}
-      rel={isExternal ? "noopener noreferrer" : undefined}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        display: "flex", flexDirection: "column",
-        padding: "28px 24px 22px",
-        background: hover ? PAPER2 : PAPER,
-        textDecoration: "none", color: INK,
-        transition: "background 0.14s",
-        minHeight: 340, height: "100%",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-        <Pill size={10} ls="0.18em">{item.badge}</Pill>
-      </div>
-      <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
-      <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
-        {item.title}
-      </h3>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15.5, color: INK70, lineHeight: 1.35, marginBottom: 12, flex: 1 }}>
-        {item.sub}
-      </div>
-      <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <SCaps size={10} ls="0.12em" color={INK55}>
-          {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
-        </SCaps>
-        <SCaps size={10.5} ls="0.16em" color={INK}>{item.cta} ↗</SCaps>
-      </div>
-    </a>
-  );
-}
-
-function PlaybookCard({ item }: { item: PlaybookContent }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <a
-      href={`/resources/${item.slug}`}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        display: "flex", flexDirection: "column",
-        padding: "28px 24px 22px",
-        background: hover ? PAPER2 : PAPER,
-        textDecoration: "none", color: INK,
-        transition: "background 0.14s",
-        minHeight: 320, height: "100%",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
-        <Pill size={10} ls="0.18em">{item.badge}</Pill>
-        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 52, color: INK15, lineHeight: 1, letterSpacing: "-0.03em" }}>
-          {item.no}
-        </div>
-      </div>
-      <HRule style={{ marginBottom: 20 }} />
-      <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 24, color: INK, lineHeight: 1.05, letterSpacing: "-0.014em" }}>
-        {item.title}
-      </h3>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK70, lineHeight: 1.3, marginBottom: 14 }}>
-        {item.sub}
-      </div>
-      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.55, flex: 1 }}>
-        {item.blurb}
-      </p>
-      <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <SCaps size={10} ls="0.12em" color={INK55}>{item.wc} · {item.read}</SCaps>
-        <SCaps size={10.5} ls="0.16em" color={INK}>Read the guide ↗</SCaps>
-      </div>
-    </a>
-  );
-}
-
-function ArticleCard({ item }: { item: ArticleContent }) {
-  const [hover, setHover] = useState(false);
-  const href = item.external
-    ? `https://syedirfanajmal.com/${item.slug}/`
-    : `/resources/${item.slug}`;
-  return (
-    <a
-      href={href}
-      target={item.external ? "_blank" : undefined}
-      rel={item.external ? "noopener noreferrer" : undefined}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        display: "flex", flexDirection: "column",
-        padding: "28px 24px 22px",
-        background: hover ? PAPER2 : PAPER,
-        textDecoration: "none", color: INK,
-        transition: "background 0.14s",
-        minHeight: 340, height: "100%",
-      }}
-    >
-      <div style={{ marginBottom: 16 }}>
-        <Pill size={9.5} ls="0.18em">Article · {item.cat}</Pill>
-      </div>
-      <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
-      <h4 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em", flex: 1 }}>
-        {item.title}
-      </h4>
-      <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <SCaps size={9} ls="0.13em" color="rgba(26,20,16,.42)">
-          {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
-        </SCaps>
-        <SCaps size={10} ls="0.16em" color={INK}>Read ↗</SCaps>
-      </div>
-    </a>
-  );
-}
-
-function VisualEssayCard({ item }: { item: VisualEssayContent }) {
-  const [hover, setHover] = useState(false);
-  return (
-    <a
-      href={item.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        display: "flex", flexDirection: "column",
-        padding: "24px 20px",
-        background: hover ? PAPER2 : PAPER,
-        textDecoration: "none", color: INK,
-        transition: "background 0.14s",
-        minHeight: 200, height: "100%",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-        <Pill size={9.5} ls="0.14em">Infographic</Pill>
-        <SCaps size={9.5} ls="0.12em" color={INK55}>Redesign in production</SCaps>
-      </div>
-      <h4 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.15, letterSpacing: "-0.008em" }}>
-        {item.title}
-      </h4>
-      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14.5, color: INK70, lineHeight: 1.5, flex: 1 }}>
-        {item.blurb}
-      </p>
-      <div style={{ marginTop: 14, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
-        <SCaps size={10} ls="0.16em" color={INK}>View Original ↗</SCaps>
-      </div>
-    </a>
-  );
-}
-
-function ResourceCard({ item }: { item: ContentItem }) {
-  const INTERACTIVE: ContentType[] = ["kit", "tool", "calculator", "quiz"];
-  if (INTERACTIVE.includes(item.type)) return <InteractiveCard item={item as InteractiveContent} />;
-  if (item.type === "playbook")         return <PlaybookCard item={item as PlaybookContent} />;
-  if (item.type === "article")          return <ArticleCard item={item as ArticleContent} />;
-  if (item.type === "visual-essay")     return <VisualEssayCard item={item as VisualEssayContent} />;
-  return null;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// BORDER HELPER
-// ─────────────────────────────────────────────────────────────────────────────
-
-function cellBorder(i: number, n: number, cols = 3): React.CSSProperties {
-  return {
-    borderRight: (i + 1) % cols !== 0 ? `1px solid ${INK}` : "none",
-    borderBottom:
-      Math.floor(i / cols) < Math.floor((n - 1) / cols)
-        ? `1px solid ${INK}`
-        : "none",
-  };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// FILTER BAR
-// ─────────────────────────────────────────────────────────────────────────────
-
-function FilterBar({
-  activeType,
-  setActiveType,
-  activeTopics,
-  toggleTopic,
-  clearTopics,
-  count,
-}: {
-  activeType: "all" | ContentType;
-  setActiveType: (t: "all" | ContentType) => void;
-  activeTopics: Set<TopicKey>;
-  toggleTopic: (id: TopicKey) => void;
-  clearTopics: () => void;
-  count: number;
-}) {
-  return (
-    <div style={{ position: "sticky", top: 0, zIndex: 100, background: INK, borderBottom: `2px solid ${YEL}` }}>
-      {/* Row 1 — Type tabs */}
-      <div
-        style={{
-          display: "flex", alignItems: "stretch",
-          padding: "0 20px",
-          overflowX: "auto",
-          borderBottom: "1px solid rgba(241,235,222,.10)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", paddingRight: 20, marginRight: 4, flexShrink: 0, borderRight: "1px solid rgba(241,235,222,.12)" }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(241,235,222,.3)" }}>
-            Type
-          </span>
-        </div>
-        {TYPE_TABS.map((tab) => {
-          const isActive = activeType === tab.key;
-          const cnt = tab.key === "all" ? CONTENT.length : CONTENT.filter((c) => c.type === tab.key).length;
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveType(tab.key)}
-              style={{
-                display: "flex", alignItems: "center", gap: 6,
-                padding: "11px 14px", border: "none", cursor: "pointer",
-                background: "transparent",
-                fontFamily: GROT, fontWeight: isActive ? 800 : 600,
-                fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase",
-                color: isActive ? YEL : "rgba(241,235,222,.5)",
-                borderBottom: isActive ? `2px solid ${YEL}` : "2px solid transparent",
-                marginBottom: -2, whiteSpace: "nowrap",
-                transition: "color 0.12s, border-color 0.12s",
-              }}
-            >
-              {tab.label}
-              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.06em", color: isActive ? YEL : "rgba(241,235,222,.22)" }}>
-                {cnt}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Row 2 — Topic pills */}
-      <div style={{ display: "flex", alignItems: "center", padding: "7px 20px", gap: 7, overflowX: "auto" }}>
-        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(241,235,222,.28)", flexShrink: 0, marginRight: 4 }}>
-          Topic
-        </span>
-        {TOPIC_PILLS.map((topic) => {
-          const isActive = activeTopics.has(topic.id);
-          return (
-            <button
-              key={topic.id}
-              onClick={() => toggleTopic(topic.id)}
-              style={{
-                padding: "5px 12px 6px",
-                border: `1px solid ${isActive ? YEL : "rgba(241,235,222,.18)"}`,
-                background: isActive ? YEL : "transparent",
-                color: isActive ? INK : "rgba(241,235,222,.52)",
-                fontFamily: GROT, fontWeight: isActive ? 800 : 600,
-                fontSize: 9.5, letterSpacing: "0.14em", textTransform: "uppercase",
-                cursor: "pointer", whiteSpace: "nowrap",
-                transition: "all 0.12s",
-              }}
-            >
-              {topic.label}
-            </button>
-          );
-        })}
-        {activeTopics.size > 0 && (
-          <button
-            onClick={clearTopics}
-            style={{
-              marginLeft: 4, padding: "4px 10px",
-              background: "transparent", border: "none",
-              color: "rgba(241,235,222,.4)",
-              fontFamily: GROT, fontWeight: 700, fontSize: 9,
-              letterSpacing: "0.16em", textTransform: "uppercase",
-              cursor: "pointer", flexShrink: 0,
-            }}
-          >
-            ✕ Clear
-          </button>
-        )}
-        <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(241,235,222,.22)" }}>
-          {count} of {CONTENT.length}
-        </span>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CONTENT GRID
-// ─────────────────────────────────────────────────────────────────────────────
-
-function ContentGrid({ filtered, activeType }: { filtered: ContentItem[]; activeType: "all" | ContentType }) {
-  if (filtered.length === 0) {
-    return (
-      <div className="sx" style={{ paddingTop: 80, paddingBottom: 80, textAlign: "center", borderTop: `1px solid ${INK}` }}>
-        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK55, margin: 0 }}>
-          No resources match this filter.
-        </p>
-        <p style={{ marginTop: 10, fontFamily: GROT, fontSize: 10.5, color: "rgba(26,20,16,.32)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Try clearing a topic filter or selecting a different type.
-        </p>
-      </div>
-    );
-  }
-
-  // Grouped view — All Resources
-  if (activeType === "all") {
-    const visibleGroups = GROUP_ORDER
-      .map((typeKey) => ({ typeKey, items: filtered.filter((c) => c.type === typeKey) }))
-      .filter((g) => g.items.length > 0);
-
-    return (
-      <div>
-        {visibleGroups.map(({ typeKey, items }, groupIdx) => {
-          const n = String(groupIdx + 1).padStart(2, "0");
-          return (
-            <div
-              key={typeKey}
-              id={`res-${typeKey}`}
-              className="sx"
-              style={{
-                borderTop: `1px solid ${INK}`,
-                paddingTop: 56, paddingBottom: 64,
-                background: groupIdx % 2 === 0 ? PAPER : PAPER2,
-              }}
-            >
-              <SectionMast n={n} label={GROUP_LABEL[typeKey]} />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
-                {items.map((item, i) => (
-                  <div key={item.id} style={cellBorder(i, items.length)}>
-                    <ResourceCard item={item} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
-  // Flat grid — filtered by type or topic
-  return (
-    <div className="sx" style={{ paddingTop: 56, paddingBottom: 72, borderTop: `1px solid ${INK}` }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
-        {filtered.map((item, i) => (
-          <div key={item.id} style={cellBorder(i, filtered.length)}>
-            <ResourceCard item={item} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PODCAST TEASER
-// ─────────────────────────────────────────────────────────────────────────────
-
-function PodcastTeaser() {
-  return (
-    <section
-      id="res-podcast"
-      className="sx"
-      style={{ background: INK, color: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `3px solid ${YEL}` }}
-    >
-      <SectionMast n="08" label="Podcast · 39 Episodes" dark />
-      <div className="grid-intro">
-        <div>
-          <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: PAPER, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
-            The show<br />
-            <span style={{ fontStyle: "italic" }}><Mark>on the air.</Mark></span>
-          </h2>
-          <p style={{ marginTop: 22, fontFamily: SERIF, fontSize: 19, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 480 }}>
-            39 episodes on earned media, SEO-PR, content marketing, and building a brand that gets found.
-          </p>
-        </div>
-        <div>
-          <div style={{ border: "1px solid rgba(241,235,222,.2)", padding: 32, marginBottom: 16 }}>
-            <SCaps size={10.5} ls="0.18em" color={YEL}>Browse the archive</SCaps>
-            <p style={{ margin: "14px 0 24px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, lineHeight: 1.25, letterSpacing: "-0.01em" }}>
-              All 39 episodes — tactics, case studies, and conversations with marketing leaders.
-            </p>
-            <a href="/podcast" style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "14px 22px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-              Go to the Podcast →
-            </a>
-          </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {[{ name: "Apple Podcasts", href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" }, { name: "Spotify", href: "#" }].map((p) => (
-              <a key={p.name} href={p.href} target={p.href !== "#" ? "_blank" : undefined} rel={p.href !== "#" ? "noopener noreferrer" : undefined}
-                style={{ padding: "10px 16px", border: "1px solid rgba(241,235,222,.25)", color: "rgba(241,235,222,.6)", textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                {p.name} ↗
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// PRESS
-// ─────────────────────────────────────────────────────────────────────────────
 
 const PRESS_OUTLETS: [string, string][] = [
   ["Forbes", "Contributor & featured"],
@@ -887,29 +299,1186 @@ const PRESS_OUTLETS: [string, string][] = [
   ["SERPed", "Contributor"],
 ];
 
-function PressSection() {
+// ─── Tag Pill (on cards) ──────────────────────────────────────────────────────
+
+function TagPill({ label }: { label: string }) {
   return (
-    <section id="res-press" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
-      <SectionMast n="09" label="Bylines & Citations · Selected publications" />
-      <div className="grid-intro" style={{ marginBottom: 40 }}>
-        <h2 className="h2-lg" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
-          Where the<br />
-          <span style={{ fontStyle: "italic" }}><Mark>writing has gone.</Mark></span>
+    <span
+      style={{
+        display: "inline-flex",
+        padding: "2px 8px 3px",
+        border: "1px solid rgba(26,20,16,.14)",
+        background: "rgba(26,20,16,.04)",
+        fontFamily: GROT,
+        fontWeight: 600,
+        fontSize: 9,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase" as const,
+        color: INK55,
+        lineHeight: 1.4,
+      }}
+    >
+      {label}
+    </span>
+  );
+}
+
+// ─── Filter Pill (in bar) ─────────────────────────────────────────────────────
+
+function FilterPill({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "4px 11px 5px",
+        border: `1px solid ${active ? YEL : "rgba(241,235,222,.22)"}`,
+        background: active ? YEL : "transparent",
+        color: active ? INK : "rgba(241,235,222,.65)",
+        fontFamily: GROT,
+        fontWeight: active ? 800 : 600,
+        fontSize: 10,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase" as const,
+        cursor: "pointer",
+        whiteSpace: "nowrap" as const,
+        flexShrink: 0,
+        lineHeight: 1,
+        transition: "background 0.1s, color 0.1s, border-color 0.1s",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+// ─── Filter Bar ───────────────────────────────────────────────────────────────
+
+const TOC_ITEMS = [
+  { id: "res-kits", label: "Kits" },
+  { id: "res-playbooks", label: "Playbooks" },
+  { id: "res-articles", label: "Articles" },
+  { id: "res-podcast", label: "Podcast" },
+  { id: "res-visual-essays", label: "Visual Essays" },
+  { id: "res-press", label: "Press" },
+];
+
+function FilterBar({
+  activeTopic,
+  activeFormat,
+  activeExperience,
+  activeSection,
+  onTopic,
+  onFormat,
+  onExperience,
+  onClear,
+}: {
+  activeTopic: Topic | null;
+  activeFormat: Format | null;
+  activeExperience: Experience | null;
+  activeSection: string;
+  onTopic: (t: Topic | null) => void;
+  onFormat: (f: Format | null) => void;
+  onExperience: (e: Experience | null) => void;
+  onClear: () => void;
+}) {
+  const hasFilters = activeTopic || activeFormat || activeExperience;
+
+  const DIVIDER: React.CSSProperties = {
+    width: 1,
+    height: 18,
+    background: "rgba(241,235,222,.15)",
+    flexShrink: 0,
+    alignSelf: "center",
+  };
+
+  const GROUP_LABEL: React.CSSProperties = {
+    fontFamily: GROT,
+    fontWeight: 700,
+    fontSize: 9,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "rgba(241,235,222,.32)",
+    flexShrink: 0,
+  };
+
+  return (
+    <div
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+        background: INK,
+        borderBottom: `2px solid ${YEL}`,
+      }}
+    >
+      {/* Row 1 — Section anchors */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "stretch",
+          padding: "0 20px",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch" as never,
+          borderBottom: "1px solid rgba(241,235,222,.10)",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            paddingRight: 20,
+            marginRight: 6,
+            flexShrink: 0,
+            borderRight: "1px solid rgba(241,235,222,.12)",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: GROT,
+              fontWeight: 700,
+              fontSize: 10,
+              letterSpacing: "0.28em",
+              textTransform: "uppercase",
+              color: "rgba(241,235,222,.35)",
+            }}
+          >
+            Resources
+          </span>
+        </div>
+
+        {TOC_ITEMS.map((item, i) => {
+          const isActive = activeSection === item.id;
+          return (
+            <a
+              key={item.id}
+              href={`#${item.id}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "11px 14px",
+                textDecoration: "none",
+                fontFamily: GROT,
+                fontWeight: isActive ? 800 : 600,
+                fontSize: 10.5,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+                color: isActive ? YEL : "rgba(241,235,222,.50)",
+                borderBottom: isActive
+                  ? `2px solid ${YEL}`
+                  : "2px solid transparent",
+                marginBottom: -2,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: GROT,
+                  fontWeight: 700,
+                  fontSize: 9,
+                  letterSpacing: "0.08em",
+                  color: isActive ? YEL : "rgba(241,235,222,.25)",
+                }}
+              >
+                §0{i + 1}
+              </span>
+              {item.label}
+            </a>
+          );
+        })}
+      </div>
+
+      {/* Row 2 — Filters */}
+      <div
+        style={{
+          padding: "8px 20px 9px",
+          overflowX: "auto",
+          WebkitOverflowScrolling: "touch" as never,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            alignItems: "center",
+            minWidth: "max-content",
+          }}
+        >
+          <span style={GROUP_LABEL}>Topic</span>
+          {TOPICS.map((t) => (
+            <FilterPill
+              key={t}
+              label={t}
+              active={activeTopic === t}
+              onClick={() => onTopic(activeTopic === t ? null : t)}
+            />
+          ))}
+
+          <div style={DIVIDER} />
+
+          <span style={GROUP_LABEL}>Format</span>
+          {FORMATS.map((f) => (
+            <FilterPill
+              key={f}
+              label={f}
+              active={activeFormat === f}
+              onClick={() => onFormat(activeFormat === f ? null : f)}
+            />
+          ))}
+
+          <div style={DIVIDER} />
+
+          <span style={GROUP_LABEL}>Experience</span>
+          {EXPERIENCES.map((e) => (
+            <FilterPill
+              key={e}
+              label={e}
+              active={activeExperience === e}
+              onClick={() => onExperience(activeExperience === e ? null : e)}
+            />
+          ))}
+
+          {hasFilters && (
+            <>
+              <div style={DIVIDER} />
+              <button
+                onClick={onClear}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  padding: "4px 12px 5px",
+                  border: "1px solid rgba(241,235,222,.30)",
+                  background: "transparent",
+                  color: "rgba(241,235,222,.55)",
+                  fontFamily: GROT,
+                  fontWeight: 700,
+                  fontSize: 9.5,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase" as const,
+                  cursor: "pointer",
+                  whiteSpace: "nowrap" as const,
+                  flexShrink: 0,
+                  lineHeight: 1,
+                }}
+              >
+                × Clear
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Empty state ──────────────────────────────────────────────────────────────
+
+function EmptyState({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        padding: "52px 0",
+        textAlign: "center",
+        border: `1px solid rgba(26,20,16,.1)`,
+      }}
+    >
+      <p
+        style={{
+          fontFamily: SERIF,
+          fontStyle: "italic",
+          fontSize: 17,
+          color: INK55,
+          margin: 0,
+        }}
+      >
+        No {label} match the active filters.
+      </p>
+    </div>
+  );
+}
+
+// ─── §01 · Kits ──────────────────────────────────────────────────────────────
+
+function KitsSection({ items }: { items: Kit[] }) {
+  return (
+    <section
+      id="res-kits"
+      className="sx"
+      style={{ background: PAPER, paddingTop: 0, paddingBottom: 90 }}
+    >
+      <SectionMast n="01" label="Kits & Tools · Interactive resources" />
+
+      <div className="grid-intro" style={{ marginBottom: 48 }}>
+        <h2
+          className="h2-xl"
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontWeight: 700,
+            color: INK,
+            lineHeight: 0.98,
+            letterSpacing: "-0.025em",
+          }}
+        >
+          Open them.
+          <br />
+          <span style={{ fontStyle: "italic" }}>
+            <Mark>Use them today.</Mark>
+          </span>
         </h2>
-        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18.5, color: INK70, lineHeight: 1.55, maxWidth: 540 }}>
-          Publications I have written for, been quoted in, or been featured by. A fuller index lives on the About page.
+        <p
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontSize: 19,
+            color: INK70,
+            lineHeight: 1.55,
+            maxWidth: 560,
+          }}
+        >
+          Not just content to read — interactive tools with built-in progress
+          tracking, copy-clip snippets, and print modes. Open one when you have
+          a job to do.
         </p>
       </div>
+
+      {items.length === 0 ? (
+        <EmptyState label="kits" />
+      ) : (
+        <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
+          {items.map((kit, i) => (
+            <a
+              key={kit.title}
+              href={kit.href}
+              target={kit.href.startsWith("http") ? "_blank" : undefined}
+              rel={
+                kit.href.startsWith("http")
+                  ? "noopener noreferrer"
+                  : undefined
+              }
+              className="card-border"
+              style={{
+                padding: "36px 28px 28px",
+                background: i % 2 === 0 ? PAPER : PAPER2,
+                textDecoration: "none",
+                color: INK,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 360,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                  marginBottom: 22,
+                }}
+              >
+                {/* Badge + Beta */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Pill size={10.5} ls="0.18em">{kit.badge}</Pill>
+                  {kit.isBeta && (
+                    <span
+                      style={{
+                        padding: "2px 7px 3px",
+                        background: YEL,
+                        color: INK,
+                        fontFamily: GROT,
+                        fontWeight: 800,
+                        fontSize: 8.5,
+                        letterSpacing: "0.18em",
+                        textTransform: "uppercase",
+                        lineHeight: 1,
+                      }}
+                    >
+                      Beta
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    fontFamily: SERIF,
+                    fontWeight: 700,
+                    fontSize: 42,
+                    color: INK,
+                    lineHeight: 1,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  Nº {kit.no}
+                </div>
+              </div>
+
+              <div
+                aria-hidden
+                style={{
+                  height: 72,
+                  marginBottom: 24,
+                  background: `repeating-linear-gradient(135deg, ${YEL} 0 8px, transparent 8px 16px)`,
+                  border: `1px solid ${INK}`,
+                }}
+              />
+
+              <h3
+                style={{
+                  margin: "0 0 10px",
+                  fontFamily: SERIF,
+                  fontWeight: 700,
+                  fontSize: 28,
+                  color: INK,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.015em",
+                }}
+              >
+                {kit.title}
+              </h3>
+              <div
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: 18,
+                  color: INK70,
+                  lineHeight: 1.35,
+                  marginBottom: 16,
+                }}
+              >
+                {kit.sub}
+              </div>
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: SERIF,
+                  fontSize: 15.5,
+                  color: INK,
+                  lineHeight: 1.55,
+                  flex: 1,
+                }}
+              >
+                {kit.blurb}
+              </p>
+
+              <div
+                style={{
+                  marginTop: 18,
+                  display: "flex",
+                  gap: 5,
+                  flexWrap: "wrap",
+                }}
+              >
+                {kit.topics?.map((t) => <TagPill key={t} label={t} />)}
+                {kit.formats.map((f) => <TagPill key={f} label={f} />)}
+                {kit.experiences?.map((e) => <TagPill key={e} label={e} />)}
+              </div>
+
+              <div
+                style={{
+                  marginTop: 14,
+                  paddingTop: 14,
+                  borderTop: `1px solid ${INK15}`,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                }}
+              >
+                <SCaps size={10.5} ls="0.14em" color={INK70}>
+                  {kit.y}
+                  {kit.updated ? ` · upd. ${kit.updated}` : ""}
+                </SCaps>
+                <SCaps size={10.5} ls="0.16em" color={INK}>
+                  {kit.formats.includes("Tool") ? "Open the Tool ↗" : "Open the Kit ↗"}
+                </SCaps>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── §02 · Playbooks ─────────────────────────────────────────────────────────
+
+function PlaybooksSection({ items }: { items: Playbook[] }) {
+  return (
+    <section
+      id="res-playbooks"
+      className="sx"
+      style={{
+        background: PAPER2,
+        paddingTop: 90,
+        paddingBottom: 90,
+        borderTop: `1px solid ${INK}`,
+      }}
+    >
+      <SectionMast n="02" label="Playbooks · Deep-dive guides" />
+
+      <div className="grid-intro" style={{ marginBottom: 48 }}>
+        <h2
+          className="h2-xl"
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontWeight: 700,
+            color: INK,
+            lineHeight: 0.98,
+            letterSpacing: "-0.025em",
+          }}
+        >
+          Three guides
+          <br />
+          <span style={{ fontStyle: "italic" }}>
+            <Mark>worth your hour.</Mark>
+          </span>
+        </h2>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontSize: 19,
+            color: INK70,
+            lineHeight: 1.55,
+            maxWidth: 560,
+          }}
+        >
+          The 101 Series: three of the most-read pieces on the site, each a
+          complete guide to a subject I have spent years putting into practice.
+          Updated annually; bookmark-worthy.
+        </p>
+      </div>
+
+      {items.length === 0 ? (
+        <EmptyState label="playbooks" />
+      ) : (
+        <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
+          {items.map((f, i) => (
+            <a
+              key={f.title}
+              href={`/resources/${f.slug}`}
+              className="card-border"
+              style={{
+                padding: "32px 28px 28px",
+                background: i === 1 ? PAPER : PAPER2,
+                textDecoration: "none",
+                color: INK,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 460,
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Pill size={10.5} ls="0.20em">{f.tag}</Pill>
+                <div
+                  style={{
+                    fontFamily: SERIF,
+                    fontWeight: 700,
+                    fontSize: 42,
+                    color: INK,
+                    lineHeight: 1,
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  {f.no}
+                </div>
+              </div>
+              <h3
+                style={{
+                  margin: "20px 0 0",
+                  fontFamily: SERIF,
+                  fontWeight: 700,
+                  fontSize: 34,
+                  color: INK,
+                  lineHeight: 1.05,
+                  letterSpacing: "-0.018em",
+                }}
+              >
+                {f.title}
+              </h3>
+              <div
+                style={{
+                  marginTop: 8,
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: 19,
+                  color: INK70,
+                  lineHeight: 1.3,
+                }}
+              >
+                {f.sub}
+              </div>
+              <HRule style={{ margin: "18px 0" }} />
+              <p
+                style={{
+                  margin: 0,
+                  fontFamily: SERIF,
+                  fontSize: 15.5,
+                  color: INK,
+                  lineHeight: 1.55,
+                  flex: 1,
+                  textAlign: "justify",
+                }}
+              >
+                {f.blurb}
+              </p>
+              <div
+                style={{
+                  marginTop: 18,
+                  display: "flex",
+                  gap: 5,
+                  flexWrap: "wrap",
+                }}
+              >
+                {f.topics?.map((t) => <TagPill key={t} label={t} />)}
+                {f.formats.map((fmt) => <TagPill key={fmt} label={fmt} />)}
+              </div>
+              <div
+                style={{
+                  marginTop: 14,
+                  paddingTop: 14,
+                  borderTop: `1px solid ${INK15}`,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                }}
+              >
+                <SCaps size={10.5} ls="0.14em" color={INK70}>
+                  {f.wc} &nbsp;·&nbsp; {f.read}
+                </SCaps>
+                <SCaps size={10.5} ls="0.16em" color={INK}>
+                  Read the guide ↗
+                </SCaps>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── §03 · Articles ──────────────────────────────────────────────────────────
+
+function ArticlesSection({ items }: { items: Article[] }) {
+  return (
+    <section
+      id="res-articles"
+      className="sx"
+      style={{
+        background: PAPER,
+        paddingTop: 90,
+        paddingBottom: 90,
+        borderTop: `1px solid ${INK}`,
+      }}
+    >
+      <SectionMast n="03" label="From the archives · Selected articles" />
+
+      {items.length === 0 ? (
+        <EmptyState label="articles" />
+      ) : (
+        <ol
+          style={{
+            margin: 0,
+            padding: 0,
+            listStyle: "none",
+            borderTop: `2px solid ${INK}`,
+          }}
+        >
+          {items.map((a, i) => (
+            <li key={a.slug} className="article-row">
+              <div
+                style={{
+                  fontFamily: GROT,
+                  fontWeight: 800,
+                  fontSize: 13,
+                  letterSpacing: "0.06em",
+                  color: INK,
+                }}
+              >
+                {String(i + 1).padStart(2, "0")}.
+              </div>
+              <div>
+                <a
+                  href={ART(a)}
+                  target={a.external ? "_blank" : undefined}
+                  rel={a.external ? "noopener noreferrer" : undefined}
+                  style={{
+                    fontFamily: SERIF,
+                    fontWeight: 700,
+                    fontSize: 21,
+                    color: INK,
+                    textDecoration: "none",
+                    lineHeight: 1.25,
+                    display: "block",
+                  }}
+                >
+                  {a.title}
+                </a>
+                <div
+                  style={{
+                    marginTop: 7,
+                    display: "flex",
+                    gap: 5,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {a.topics?.map((t) => <TagPill key={t} label={t} />)}
+                  {a.formats.map((f) => <TagPill key={f} label={f} />)}
+                </div>
+              </div>
+              <div className="article-cat">
+                <SCaps size={10.5} ls="0.14em" color={INK70}>{a.cat}</SCaps>
+              </div>
+              <div
+                className="article-year"
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: 14,
+                  color: INK55,
+                }}
+              >
+                {a.y}
+                {a.updated ? ` · upd. ${a.updated}` : ""}
+              </div>
+              <div className="article-read" style={{ textAlign: "right" }}>
+                <SCaps size={10.5} ls="0.14em" color={INK55}>Read ↗</SCaps>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+  );
+}
+
+// ─── §04 · Podcast ────────────────────────────────────────────────────────────
+
+function PodcastTeaser() {
+  return (
+    <section
+      id="res-podcast"
+      className="sx"
+      style={{
+        background: INK,
+        color: PAPER,
+        paddingTop: 90,
+        paddingBottom: 90,
+        borderTop: `3px solid ${YEL}`,
+      }}
+    >
+      <SectionMast n="04" label="Podcast · 39 Episodes" dark />
+
+      <div className="grid-intro">
+        <div>
+          <h2
+            className="h2-xl"
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontWeight: 700,
+              color: PAPER,
+              lineHeight: 0.98,
+              letterSpacing: "-0.025em",
+            }}
+          >
+            The show
+            <br />
+            <span style={{ fontStyle: "italic" }}>
+              <Mark>on the air.</Mark>
+            </span>
+          </h2>
+          <p
+            style={{
+              marginTop: 22,
+              fontFamily: SERIF,
+              fontSize: 19,
+              color: "rgba(241,235,222,.72)",
+              lineHeight: 1.55,
+              maxWidth: 480,
+            }}
+          >
+            39 episodes on earned media, SEO-PR, content marketing, and
+            building a brand that gets found. Conversations with founders,
+            journalists, and marketing leaders.
+          </p>
+        </div>
+
+        <div>
+          <div
+            style={{
+              border: "1px solid rgba(241,235,222,.2)",
+              padding: 32,
+              marginBottom: 16,
+            }}
+          >
+            <SCaps size={10.5} ls="0.18em" color={YEL}>Browse the archive</SCaps>
+            <p
+              style={{
+                margin: "14px 0 24px",
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 22,
+                color: PAPER,
+                lineHeight: 1.25,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              All 39 episodes — tactics, case studies, and conversations with
+              marketing leaders.
+            </p>
+            <a
+              href="/podcast"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "14px 22px",
+                background: YEL,
+                color: INK,
+                textDecoration: "none",
+                fontFamily: GROT,
+                fontWeight: 800,
+                fontSize: 11.5,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+              }}
+            >
+              Go to the Podcast →
+            </a>
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {[
+              {
+                name: "Apple Podcasts",
+                href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466",
+              },
+              { name: "Spotify", href: "#" },
+            ].map((p) => (
+              <a
+                key={p.name}
+                href={p.href}
+                target={p.href !== "#" ? "_blank" : undefined}
+                rel={p.href !== "#" ? "noopener noreferrer" : undefined}
+                style={{
+                  padding: "10px 16px",
+                  border: "1px solid rgba(241,235,222,.25)",
+                  color: "rgba(241,235,222,.6)",
+                  textDecoration: "none",
+                  fontFamily: GROT,
+                  fontWeight: 700,
+                  fontSize: 10.5,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {p.name} ↗
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── §05 · Visual Essays ─────────────────────────────────────────────────────
+
+function VisualEssaysSection({ items }: { items: VisualEssay[] }) {
+  return (
+    <section
+      id="res-visual-essays"
+      className="sx"
+      style={{
+        background: PAPER2,
+        paddingTop: 90,
+        paddingBottom: 90,
+        borderTop: `1px solid ${INK}`,
+      }}
+    >
+      <SectionMast n="05" label="Visual Essays · Infographics" />
+
+      <div className="grid-intro" style={{ marginBottom: 48 }}>
+        <h2
+          className="h2-lg"
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontWeight: 700,
+            color: INK,
+            lineHeight: 0.98,
+            letterSpacing: "-0.025em",
+          }}
+        >
+          Research
+          <br />
+          <span style={{ fontStyle: "italic" }}>
+            <Mark>made visible.</Mark>
+          </span>
+        </h2>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontSize: 18.5,
+            color: INK70,
+            lineHeight: 1.55,
+            maxWidth: 540,
+          }}
+        >
+          Each started as a research project and ended up reprinted across a
+          half-dozen publications. Interactive redesigns are in production —
+          the originals remain live in the meantime.
+        </p>
+      </div>
+
+      {items.length === 0 ? (
+        <EmptyState label="visual essays" />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            border: `1px solid ${INK}`,
+          }}
+        >
+          {items.map((ig, i) => (
+            <a
+              key={ig.href}
+              href={ig.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "72px 1fr 130px",
+                borderBottom:
+                  i < items.length - 1 ? `1px solid ${INK}` : "none",
+                background: i % 2 === 0 ? PAPER : PAPER2,
+                textDecoration: "none",
+                color: INK,
+              }}
+            >
+              <div
+                style={{
+                  padding: "28px 0",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "center",
+                  borderRight: `1px solid ${INK}`,
+                }}
+              >
+                <SCaps size={12} ls="0.06em" color={INK70}>Nº {ig.no}</SCaps>
+              </div>
+              <div style={{ padding: "28px 28px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    marginBottom: 12,
+                  }}
+                >
+                  <Pill size={10} ls="0.15em">Infographic</Pill>
+                  <SCaps size={10} ls="0.14em" color={INK55}>
+                    Redesign in production
+                  </SCaps>
+                </div>
+                <h4
+                  style={{
+                    margin: "0 0 10px",
+                    fontFamily: SERIF,
+                    fontWeight: 700,
+                    fontSize: 22,
+                    color: INK,
+                    lineHeight: 1.2,
+                    letterSpacing: "-0.008em",
+                  }}
+                >
+                  {ig.title}
+                </h4>
+                <p
+                  style={{
+                    margin: "0 0 14px",
+                    fontFamily: SERIF,
+                    fontSize: 15.5,
+                    color: INK70,
+                    lineHeight: 1.55,
+                  }}
+                >
+                  {ig.blurb}
+                </p>
+                <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
+                  {ig.topics?.map((t) => <TagPill key={t} label={t} />)}
+                  {ig.formats.map((f) => <TagPill key={f} label={f} />)}
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: "28px 24px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "flex-end",
+                  borderLeft: `1px solid ${INK15}`,
+                }}
+              >
+                <SCaps size={10} ls="0.12em" color={INK55}>
+                  {ig.y}
+                  {ig.updated ? ` · upd. ${ig.updated}` : ""}
+                </SCaps>
+                <SCaps size={10.5} ls="0.16em" color={INK}>View original ↗</SCaps>
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
+      <div style={{ marginTop: 28, textAlign: "center" }}>
+        <a
+          href="/infographics"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "13px 22px",
+            border: `1px solid ${INK}`,
+            background: "transparent",
+            color: INK,
+            textDecoration: "none",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 11.5,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+          }}
+        >
+          View all on the Infographics desk →
+        </a>
+      </div>
+    </section>
+  );
+}
+
+// ─── §06 · Press ─────────────────────────────────────────────────────────────
+
+function PressSection() {
+  return (
+    <section
+      id="res-press"
+      className="sx"
+      style={{
+        background: PAPER,
+        paddingTop: 90,
+        paddingBottom: 90,
+        borderTop: `1px solid ${INK}`,
+      }}
+    >
+      <SectionMast n="06" label="Bylines & citations · Selected publications" />
+
+      <div className="grid-intro" style={{ marginBottom: 40 }}>
+        <h2
+          className="h2-lg"
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontWeight: 700,
+            color: INK,
+            lineHeight: 0.98,
+            letterSpacing: "-0.025em",
+          }}
+        >
+          Where the
+          <br />
+          <span style={{ fontStyle: "italic" }}>
+            <Mark>writing has gone.</Mark>
+          </span>
+        </h2>
+        <p
+          style={{
+            margin: 0,
+            fontFamily: SERIF,
+            fontSize: 18.5,
+            color: INK70,
+            lineHeight: 1.55,
+            maxWidth: 540,
+          }}
+        >
+          Publications I have written for, been quoted in, or been featured by.
+          A fuller index lives on the About page.
+        </p>
+      </div>
+
       <div className="grid-press-2" style={{ border: `1px solid ${INK}` }}>
         {PRESS_OUTLETS.map(([n, note]) => (
-          <div key={n} className="press-cell" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 16, padding: "16px 26px", alignItems: "baseline" }}>
-            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK }}>{n}</div>
-            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK70, textAlign: "right" }}>{note}</div>
+          <div
+            key={n}
+            className="press-cell"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr auto",
+              gap: 16,
+              padding: "16px 26px",
+              alignItems: "baseline",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 21,
+                color: INK,
+              }}
+            >
+              {n}
+            </div>
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontStyle: "italic",
+                fontSize: 14,
+                color: INK70,
+                textAlign: "right",
+              }}
+            >
+              {note}
+            </div>
           </div>
         ))}
       </div>
+
       <div style={{ marginTop: 36, textAlign: "center" }}>
-        <a href="/about#press" style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "14px 22px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase" }}>
+        <a
+          href="/about#press"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "14px 22px",
+            background: INK,
+            color: PAPER,
+            textDecoration: "none",
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 12,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+          }}
+        >
           See the full press archive →
         </a>
       </div>
@@ -917,50 +1486,66 @@ function PressSection() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN EXPORT
-// ─────────────────────────────────────────────────────────────────────────────
+// ─── Main Export ──────────────────────────────────────────────────────────────
 
 export function ResourcesClientShell() {
-  const [activeType, setActiveType] = useState<"all" | ContentType>("all");
-  const [activeTopics, setActiveTopics] = useState<Set<TopicKey>>(new Set());
+  const [activeTopic, setActiveTopic] = useState<Topic | null>(null);
+  const [activeFormat, setActiveFormat] = useState<Format | null>(null);
+  const [activeExperience, setActiveExperience] = useState<Experience | null>(null);
+  const [activeSection, setActiveSection] = useState("res-kits");
 
-  const toggleTopic = useCallback((topicId: TopicKey) => {
-    setActiveTopics((prev) => {
-      const next = new Set(prev);
-      if (next.has(topicId)) next.delete(topicId);
-      else next.add(topicId);
-      return next;
-    });
+  useEffect(() => {
+    const sections = TOC_ITEMS.map((t) =>
+      document.getElementById(t.id)
+    ).filter(Boolean) as HTMLElement[];
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id);
+        });
+      },
+      { rootMargin: "-10% 0px -75% 0px" }
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
   }, []);
 
-  const clearTopics = useCallback(() => setActiveTopics(new Set()), []);
-
-  const handleSetType = useCallback((type: "all" | ContentType) => {
-    setActiveType(type);
-    setActiveTopics(new Set());
-  }, []);
-
-  const filtered = useMemo(() => {
-    let items = CONTENT;
-    if (activeType !== "all") items = items.filter((c) => c.type === activeType);
-    if (activeTopics.size > 0)
-      items = items.filter((c) => c.topics.some((t) => activeTopics.has(t)));
-    return items;
-  }, [activeType, activeTopics]);
+  const visibleKits = KITS.filter((k) =>
+    matches(k, activeTopic, activeFormat, activeExperience)
+  );
+  const visiblePlaybooks = PLAYBOOKS.filter((p) =>
+    matches(p, activeTopic, activeFormat, activeExperience)
+  );
+  const visibleArticles = ARTICLES.filter((a) =>
+    matches(a, activeTopic, activeFormat, activeExperience)
+  );
+  const visibleVisualEssays = VISUAL_ESSAYS.filter((v) =>
+    matches(v, activeTopic, activeFormat, activeExperience)
+  );
 
   return (
     <>
       <FilterBar
-        activeType={activeType}
-        setActiveType={handleSetType}
-        activeTopics={activeTopics}
-        toggleTopic={toggleTopic}
-        clearTopics={clearTopics}
-        count={filtered.length}
+        activeTopic={activeTopic}
+        activeFormat={activeFormat}
+        activeExperience={activeExperience}
+        activeSection={activeSection}
+        onTopic={(t) => setActiveTopic(t)}
+        onFormat={(f) => setActiveFormat(f)}
+        onExperience={(e) => setActiveExperience(e)}
+        onClear={() => {
+          setActiveTopic(null);
+          setActiveFormat(null);
+          setActiveExperience(null);
+        }}
       />
-      <ContentGrid filtered={filtered} activeType={activeType} />
+      <KitsSection items={visibleKits} />
+      <PlaybooksSection items={visiblePlaybooks} />
+      <ArticlesSection items={visibleArticles} />
       <PodcastTeaser />
+      <VisualEssaysSection items={visibleVisualEssays} />
       <PressSection />
     </>
   );
