@@ -260,7 +260,7 @@ const css = `
     color: var(--INK); line-height: .92; letter-spacing: -.03em; margin: 0 0 60px;
   }
   .services-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     border: 2px solid var(--INK);
   }
   .service-card {
@@ -877,33 +877,15 @@ export default function HomePage() {
           <div className="stat">
             <div className="stat__num">300+</div>
             <div className="stat__label">Clients Served</div>
-            <div className="stat__sub">22+ countries · since 2004</div>
+            <div className="stat__sub">B2B SaaS · eComm · Tech · Media</div>
           </div>
           <div className="stat">
             <div className="stat__num">22+</div>
             <div className="stat__label">Years in the Field</div>
-            <div className="stat__sub">Digital PR · SEO · Earned Media</div>
+            <div className="stat__sub">Consulting · Agency · Speaking · Writing</div>
           </div>
         </div>
       </header>
-
-      {/* ══ PRESS BAND ══ */}
-      <section className="press">
-        <div className="press__inner">
-          <div className="press__tag">AS&nbsp;SEEN&nbsp;ON&nbsp;<span style={{color:'var(--RED)'}}>→</span></div>
-          <div className="press__logos">
-            <div style={{fontFamily:"'Georgia',serif",fontWeight:900,fontSize:'26px',color:'#fff',letterSpacing:'-.01em'}}>Forbes</div>
-            <div style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'19px',color:'#fff'}}>business.com</div>
-            <div style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:'18px',color:'#fff',letterSpacing:'.03em'}}>HUFFPOST</div>
-            <div style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'22px',color:'var(--RED)',fontStyle:'italic'}}>semrush</div>
-            <div style={{fontFamily:"'Georgia',serif",fontWeight:700,fontSize:'21px',color:'#fff',fontStyle:'italic'}}>Entrepreneur</div>
-            <div style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:'23px',color:'#fff',fontStyle:'italic'}}>Virgin</div>
-            <div style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:'23px',color:'#fff'}}>tnw</div>
-            <div style={{fontFamily:'var(--sans)',fontWeight:600,fontSize:'12.5px',color:'rgba(255,255,255,.75)',letterSpacing:'.10em'}}>THE WORLD BANK</div>
-            <div style={{fontFamily:"'Georgia',serif",fontWeight:900,fontSize:'22px',color:'#fff',letterSpacing:'.05em'}}>HBR</div>
-          </div>
-        </div>
-      </section>
 
       {/* ══ § 01 CASE STUDIES ══ */}
       <section className="casework">
@@ -928,14 +910,6 @@ export default function HomePage() {
             <div className="case-card__client">NATIONAL TYRES · UK</div>
             <div className="case-card__result">$160K → $1.2M organic revenue in 12 months</div>
             <p className="case-card__body">Turned a struggling content program into a revenue machine. Combined editorial SEO with Digital PR to rank high-intent keywords and drive traffic that converts at scale.</p>
-            <a href="/clients" className="case-card__link">Full case study →</a>
-          </div>
-          <div className="case-card">
-            <div className="case-card__tag">DIGITAL PR</div>
-            <div className="case-card__metric">$2.3M</div>
-            <div className="case-card__client">MELANIE MARTIN</div>
-            <div className="case-card__result">$2.3M in attributable PR campaign ROI</div>
-            <p className="case-card__body">Designed and executed a story-driven digital PR campaign that earned editorial coverage in major outlets and converted directly to pipeline and revenue zero ad spend.</p>
             <a href="/clients" className="case-card__link">Full case study →</a>
           </div>
         </div>
@@ -963,9 +937,8 @@ export default function HomePage() {
             <span className="q">"</span>Their expertise at doing customized outreach and earning quality whitehat backlinks day in and day out was critical to our phenomenal success and growth.<span className="q">"</span>
           </blockquote>
           <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>BH</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/testimonials/brett-helling.jpg" alt="Brett Helling" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Brett Helling</div>
             <div className="testi__role">CEO, Ridester.com / TrendlineSEO · USA</div>
           </div>
@@ -981,9 +954,8 @@ export default function HomePage() {
             <span className="q">"</span>120% increase in organic traffic. Our Public Database clicks jumped 515% and impressions from 30K to 198K — resulting in six times more average daily signups.<span className="q">"</span>
           </blockquote>
           <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>IB</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/testimonials/imani-lea-brown.jpg" alt="Imani Lea Brown" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Imani Lea Brown</div>
             <div className="testi__role">Centriq (raised $11M) · USA</div>
           </div>
@@ -999,7 +971,7 @@ export default function HomePage() {
             <span className="q">"</span>Ranked a keyword to #4 on Google that gets over 160,000 searches a month. Commercial intent. Can&apos;t thank Irfan and the team enough.<span className="q">"</span>
           </blockquote>
           <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0,borderRadius:'50%'}}>
               <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>AS</span>
             </div>
             <div className="testi__name">Azzam Sheikh</div>
@@ -1017,29 +989,27 @@ export default function HomePage() {
             <span className="q">"</span>Traffic increased 140% in 3 months — against a goal of 25% in 9 months. Page views up 102%. Impressions up 65%. They simply overdelivered.<span className="q">"</span>
           </blockquote>
           <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>RE</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/testimonials/reem-el-shafaki.jpg" alt="Reem El Shafaki" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Reem El Shafaki</div>
             <div className="testi__role">DinarStandard · UAE</div>
           </div>
         </div>
 
-        {/* № 05 — Trent Carter */}
+        {/* № 05 — Brie Moreau */}
         <div className="testi-row">
           <div>
             <div className="testi__num">№ 05</div>
-            <div className="testi__badge">DR 1 → 27 IN 2 MONTHS</div>
+            <div className="testi__badge">DMSS.IO BALI · WORKSHOP</div>
           </div>
           <blockquote className="testi__quote">
-            <span className="q">"</span>Within 2 months: links from Healthline (DR 92), The Mirror (DR 90), MSN (DR 92). Our domain rating jumped from 1 to 27. Highly recommended.<span className="q">"</span>
+            <span className="q">"</span>Syed spoke at our conference and gave me a private consultation on media exposure. An excellent public speaker with highly actionable advice. Comes highly recommended.<span className="q">"</span>
           </blockquote>
           <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>TC</span>
-            </div>
-            <div className="testi__name">Trent Carter</div>
-            <div className="testi__role">CEO &amp; Founder, Curednation · USA</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/testimonials/brie-moreau.jpg" alt="Brie Moreau" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <div className="testi__name">Brie Moreau</div>
+            <div className="testi__role">Co-founder, DMSS.io Conference · Bali</div>
           </div>
         </div>
 
@@ -1053,9 +1023,8 @@ export default function HomePage() {
             <span className="q">"</span>Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it and it is hard not to like the guy.<span className="q">"</span>
           </blockquote>
           <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>CW</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/testimonials/chuck-wang.jpg" alt="Chuck Wang" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Chuck Wang</div>
             <div className="testi__role">The MVP Marketing Podcast · USA</div>
           </div>
@@ -1204,7 +1173,7 @@ export default function HomePage() {
           <div className="service-card">
             <div className="service-card__num">01</div>
             <h3 className="service-card__title">Digital PR &amp; Earned Media</h3>
-            <p className="service-card__body">Land bylines and quotes in publications your buyers actually read — Forbes, HBR, HuffPost, niche trade press. HARO, journalist outreach, story design. No fluff, no directories nobody clicks.</p>
+            <p className="service-card__body">Get cited as an expert source in publications your buyers actually read — Forbes, HBR, HuffPost, niche trade press. Journalist outreach, expert commentary, story design. No fluff, no directories nobody clicks.</p>
             <a href="/clients" className="service-card__cta">View case studies →</a>
           </div>
           <div className="service-card">
@@ -1218,6 +1187,12 @@ export default function HomePage() {
             <h3 className="service-card__title">Fractional CMO</h3>
             <p className="service-card__body">For founders without a marketing leader. Weekly cadence, full strategy ownership, agency-level execution through DMR. You get a senior brain without the full-time price tag.</p>
             <a href="/fractional-cmo" className="service-card__cta">Inquire →</a>
+          </div>
+          <div className="service-card">
+            <div className="service-card__num">04</div>
+            <h3 className="service-card__title">Done-For-You Agency</h3>
+            <p className="service-card__body">For GEO, SEO-PR, and content marketing projects handled end-to-end. Strategy, execution, reporting — all done by the team at DMR.agency.</p>
+            <a href="https://dmr.agency" target="_blank" rel="noopener noreferrer" className="service-card__cta">Visit DMR.agency ↗</a>
           </div>
         </div>
         <div className="spacer-100"></div>
@@ -1254,10 +1229,10 @@ export default function HomePage() {
             <div className="footer__col-head">NAVIGATE</div>
             <ul className="footer__links">
               <li><a href="/" className="footer__link">Home</a></li>
+              <li><a href="/resources" className="footer__link">Resources</a></li>
               <li><a href="/about" className="footer__link">About</a></li>
               <li><a href="/podcast" className="footer__link">Podcast</a></li>
               <li><a href="/gallery" className="footer__link">Gallery</a></li>
-              <li><a href="/resources" className="footer__link">Resources</a></li>
               <li><a href="/newsletter" className="footer__link">Newsletter</a></li>
             </ul>
           </div>
@@ -1274,9 +1249,9 @@ export default function HomePage() {
         <div className="footer__bottom">
           <div className="footer__copy">© 2026 SYED IRFAN AJMAL · SIA ENTERPRISES INC · WYOMING C-CORP</div>
           <div className="footer__contact">
-            <span>+1-402-403-1948</span>
             <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
-            <span className="footer__open">● 1 FRACTIONAL CMO SPOT · Q3 2026</span>
+            <a href="/fractional-cmo" className="footer__open">● 1 FRACTIONAL CMO SPOT · Q3 2026</a>
+            <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer" className="footer__open">● EMOS FOUNDING CLASS · APPLY NOW</a>
           </div>
         </div>
       </footer>
