@@ -732,10 +732,69 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ══ § 01 TESTIMONIALS ══ */}
-      <section className="testimonials">
+      {/* ══ § 01 KITS / FREE RESOURCES ══ */}
+      <section className="kits">
         <div className="sec-idx">
           <span className="sec-idx__n">§ 01</span>
+          <div className="sec-idx__rule"></div>
+          <span className="sec-idx__label">FREE RESOURCES</span>
+        </div>
+        <div className="kits-header">
+          <div>
+            <h2 className="section-h2" style={{margin:0}}>Resources.</h2>
+            <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Kits · Playbooks · Calculators</p>
+            <p style={{fontFamily:'var(--sans)',fontWeight:400,fontStyle:'italic',fontSize:'15px',color:'var(--I70)',marginTop:'6px',marginBottom:0}}>Might not stay free for too long.</p>
+          </div>
+          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>18 TOTAL IN THE LIBRARY →</a>
+        </div>
+        <div className="kits-grid">
+          <div className="kit-card">
+            <div className="kit-card__badge">INTERACTIVE KIT</div>
+            <div className="kit-card__paper">
+              <div className="kit-card__paper-header">
+                <span className="kit-card__gazette">BUREAU GAZETTE</span>
+                <span className="kit-card__date">MMXXVI</span>
+              </div>
+              <div className="kit-card__paper-title">PITCH PERFECT</div>
+              <div className="kit-card__paper-cols">
+                <div className="kit-card__paper-col">The seven-step system that gets reporters to say yes</div>
+                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
+              </div>
+            </div>
+            <h3 className="kit-card__title">The Journo Outreach<br/>Checklist</h3>
+            <p className="kit-card__body">Seven steps to a pitch reporters actually use.</p>
+            <div className="kit-card__footer">
+              <span className="kit-card__year">2026</span>
+              <a href="/infographics/journo-outreach-checklist" className="kit-card__cta">OPEN THE KIT ↗</a>
+            </div>
+          </div>
+          <div className="kit-card">
+            <div className="kit-card__badge">AI-POWERED TOOL</div>
+            <div className="kit-card__paper">
+              <div className="kit-card__paper-header">
+                <span className="kit-card__gazette">BUREAU GAZETTE</span>
+                <span className="kit-card__date">MMXXVI</span>
+              </div>
+              <div className="kit-card__paper-title">COLLAB LINK BUILDER</div>
+              <div className="kit-card__paper-cols">
+                <div className="kit-card__paper-col">AI finds your best link-building partners in minutes, not weeks</div>
+                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
+              </div>
+            </div>
+            <h3 className="kit-card__title">Collab Link<br/>Building <em>Tool</em></h3>
+            <p className="kit-card__body">Drop in your niche and audience. The AI surfaces partner opportunities, scores fit, and drafts your outreach — faster than any spreadsheet ever could.</p>
+            <div className="kit-card__footer">
+              <span className="kit-card__year">2026</span>
+              <a href="/tools/collab-link-building" className="kit-card__cta">OPEN THE TOOL ↗</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ § 02 TESTIMONIALS ══ */}
+      <section className="testimonials">
+        <div className="sec-idx">
+          <span className="sec-idx__n">§ 02</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">CLIENT WORDS</span>
         </div>
@@ -847,10 +906,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ § 02 CASE STUDIES ══ */}
+      {/* ══ § 03 CASE STUDIES ══ */}
       <section className="casework">
         <div className="sec-idx sec-idx--dark">
-          <span className="sec-idx__n">§ 02</span>
+          <span className="sec-idx__n">§ 03</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">SELECTED CASEWORK</span>
         </div>
@@ -899,7 +958,7 @@ export default function HomePage() {
       {/* ══ § 03 SPEAKING ══ */}
       <section className="speaking">
         <div className="sec-idx sec-idx--dark">
-          <span className="sec-idx__n">§ 03</span>
+          <span className="sec-idx__n">§ 04</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">SPEAKING &amp; TRAINING</span>
         </div>
@@ -951,71 +1010,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ § 04 KITS / FREE RESOURCES ══ */}
-      <section className="kits">
-        <div className="sec-idx">
-          <span className="sec-idx__n">§ 04</span>
-          <div className="sec-idx__rule"></div>
-          <span className="sec-idx__label">FREE RESOURCES</span>
-        </div>
-        <div className="kits-header">
-          <div>
-            <h2 className="section-h2" style={{margin:0}}>Resources.</h2>
-            <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Kits · Playbooks · Calculators</p>
-            <p style={{fontFamily:'var(--sans)',fontWeight:400,fontStyle:'italic',fontSize:'15px',color:'var(--I70)',marginTop:'6px',marginBottom:0}}>Might not stay free for too long.</p>
-          </div>
-          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>18 TOTAL IN THE LIBRARY →</a>
-        </div>
-        <div className="kits-grid">
-          <div className="kit-card">
-            <div className="kit-card__badge">INTERACTIVE KIT</div>
-            <div className="kit-card__paper">
-              <div className="kit-card__paper-header">
-                <span className="kit-card__gazette">BUREAU GAZETTE</span>
-                <span className="kit-card__date">MMXXVI</span>
-              </div>
-              <div className="kit-card__paper-title">PITCH PERFECT</div>
-              <div className="kit-card__paper-cols">
-                <div className="kit-card__paper-col">The seven-step system that gets reporters to say yes</div>
-                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
-              </div>
-            </div>
-            <h3 className="kit-card__title">The Journo Outreach<br/>Checklist</h3>
-            <p className="kit-card__body">Seven steps to a pitch reporters actually use.</p>
-            <div className="kit-card__footer">
-              <span className="kit-card__year">2026</span>
-              <a href="/infographics/journo-outreach-checklist" className="kit-card__cta">OPEN THE KIT ↗</a>
-            </div>
-          </div>
-          <div className="kit-card">
-            <div className="kit-card__badge">AI-POWERED TOOL</div>
-            <div className="kit-card__paper">
-              <div className="kit-card__paper-header">
-                <span className="kit-card__gazette">BUREAU GAZETTE</span>
-                <span className="kit-card__date">MMXXVI</span>
-              </div>
-              <div className="kit-card__paper-title">COLLAB LINK BUILDER</div>
-              <div className="kit-card__paper-cols">
-                <div className="kit-card__paper-col">AI finds your best link-building partners in minutes, not weeks</div>
-                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
-              </div>
-            </div>
-            <h3 className="kit-card__title">Collab Link<br/>Building <em>Tool</em></h3>
-            <p className="kit-card__body">Drop in your niche and audience. The AI surfaces partner opportunities, scores fit, and drafts your outreach — faster than any spreadsheet ever could.</p>
-            <div className="kit-card__footer">
-              <span className="kit-card__year">2026</span>
-              <a href="/tools/collab-link-building" className="kit-card__cta">OPEN THE TOOL ↗</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ══ § 05 SERVICES ══ */}
       <section className="services">
         <div className="sec-idx">
           <span className="sec-idx__n">§ 05</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">WHAT I DO</span>
+
         </div>
         <h2 className="section-h2">Three ways to work,<br/>plainly stated.</h2>
         <div className="services-grid">
@@ -1043,6 +1044,7 @@ export default function HomePage() {
 
       {/* ══ § 06 NEWSLETTER ══ */}
       <Subscriptions sectionNumber="06" />
+
 
       {/* ══ SCROLL BUTTONS ══ */}
       <ScrollButtons />

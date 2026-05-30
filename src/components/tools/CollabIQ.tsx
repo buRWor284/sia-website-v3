@@ -29,6 +29,20 @@ interface AiPartner {
   tier:     "A" | "B" | "C";
 }
 
+// ── Loading messages ─────────────────────────────────────────
+const LOADING_MSGS = [
+  { h: "Scanning the internet for your perfect partners…",       s: "Claude is cross-referencing your industry, audience, and strategy in real time." },
+  { h: "Finding companies that want your audience's attention…", s: "Identifying non-competing businesses with overlapping customer bases." },
+  { h: "Cross-referencing DA scores and partner page structures…", s: "Not all backlinks are equal. We're only surfacing ones worth your time." },
+  { h: "No link building agency was harmed in this process.",    s: "Unlike an agency, Claude doesn't charge £5,000/month to do this." },
+  { h: "Profiling who contacts on LinkedIn…",                    s: "Head of Partnerships? SEO Manager? We're identifying the right inbox." },
+  { h: "Your future backlinks are being located.",               s: "Finding the deals that your competitors haven't thought of yet." },
+  { h: "Claude is reading the entire internet. Almost done.",    s: "We're not actually reading the whole internet. Just the useful parts." },
+  { h: "Finding the non-obvious partners other SEOs miss…",      s: "The best collab partners are rarely the first ones you think of." },
+  { h: "Calculating audience overlap with suspicious accuracy…", s: "Mapping shared customers, distribution channels, and partnership fit." },
+  { h: "Compiling a report that would take an agency a week.",   s: "You're getting this in about 10 seconds. You're welcome." },
+];
+
 // ── Constants ────────────────────────────────────────────────
 const INDUSTRIES = [
   "Automotive","Home & Real Estate","Finance & Insurance","Health & Wellness",
@@ -149,6 +163,7 @@ export function CollabIQ() {
   const [aiBrief,      setAiBrief]      = useState("");
   const [aiError,      setAiError]      = useState("");
   const [hasTriggered, setHasTriggered] = useState(false);
+  const [loadingMsgIdx, setLoadingMsgIdx] = useState(0);
 
   const ind = customInd || industry;
 
@@ -195,6 +210,13 @@ export function CollabIQ() {
     const t = setTimeout(() => triggerPartners(ind, strategy), 600);
     return () => clearTimeout(t);
   }, [ind, strategy, triggerPartners]);
+
+  // ── Cycle loading messages while AI is running
+  useEffect(() => {
+    if (aiMode !== "suggestions") { setLoadingMsgIdx(0); return; }
+    const t = setInterval(() => setLoadingMsgIdx(i => (i + 1) % LOADING_MSGS.length), 2800);
+    return () => clearInterval(t);
+  }, [aiMode]);
 
   // ── AI email
   const callEmail = useCallback(async () => {
