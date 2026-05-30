@@ -47,67 +47,6 @@ const css = `
   .sec-idx--dark .sec-idx__n { color: var(--RED); }
   .sec-idx--dark .sec-idx__label { color: rgba(245,197,24,.7); }
 
-  /* ── BUREAU MASTHEAD NAV ────────────────────────────────── */
-  .nav {
-    background: var(--INK); color: #f1ebde;
-    position: sticky; top: 0; z-index: 100;
-  }
-  .nav__top {
-    display: grid; grid-template-columns: auto 1fr auto;
-    align-items: center; gap: 24px;
-    padding: 16px 56px 14px;
-    border-bottom: 1px solid rgba(241,235,222,.12);
-  }
-  .nav__logo { display: flex; align-items: center; gap: 12px; }
-  .nav__mark {
-    width: 30px; height: 30px; background: var(--Y);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--sans); font-weight: 900; font-size: 13px;
-    color: var(--INK); flex: 0 0 auto;
-  }
-  .nav__wordmark {
-    font-family: 'Newsreader', Georgia, serif; font-weight: 700;
-    font-size: 17px; color: #f1ebde; letter-spacing: -0.01em; line-height: 1;
-  }
-  .nav__sub {
-    font-family: var(--sans); font-weight: 700; font-size: 8.5px;
-    letter-spacing: .22em; text-transform: uppercase;
-    color: rgba(241,235,222,.45); margin-top: 3px;
-  }
-  .nav__wire { text-align: center; }
-  .nav__wire-label {
-    font-family: var(--sans); font-weight: 700; font-size: 9px;
-    letter-spacing: .22em; text-transform: uppercase;
-    color: rgba(241,235,222,.5);
-  }
-  .nav__wire-date {
-    font-family: 'Newsreader', Georgia, serif; font-style: italic;
-    font-size: 13px; color: rgba(241,235,222,.4); margin-top: 3px;
-  }
-  .nav__status {
-    font-family: var(--sans); font-weight: 700; font-size: 9px;
-    letter-spacing: .16em; text-transform: uppercase;
-    color: rgba(241,235,222,.4); text-align: right;
-  }
-  .nav__bar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 11px 56px;
-  }
-  .nav__links { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
-  .nav__link {
-    font-family: var(--sans); font-size: 10px; font-weight: 700;
-    letter-spacing: .16em; text-transform: uppercase;
-    color: rgba(241,235,222,.5); transition: color .12s;
-  }
-  .nav__link:hover, .nav__link--active { color: #f1ebde; }
-  .nav__cta {
-    font-family: var(--sans); font-weight: 800; font-size: 10px;
-    letter-spacing: .12em; text-transform: uppercase;
-    background: var(--Y); color: var(--INK);
-    padding: 8px 15px; white-space: nowrap;
-    transition: background .12s;
-  }
-  .nav__cta:hover { background: var(--Y2); }
 
   /* ── HERO ───────────────────────────────────────────────── */
   .hero { background: var(--BG); padding: 36px 56px 0; }
@@ -137,7 +76,7 @@ const css = `
   .ticker--cta {
     background: var(--INK); color: var(--BG);
     border-top: 3px solid var(--INK); border-bottom: 3px solid var(--INK);
-    margin-top: 64px; margin-bottom: 0;
+    margin-top: 64px; margin-bottom: 64px;
     font-size: 14px; padding: 16px 0; letter-spacing: .05em;
   }
   .ticker--cta .ticker__sep { color: rgba(255,255,255,0.25); }
@@ -260,7 +199,7 @@ const css = `
     color: var(--INK); line-height: .92; letter-spacing: -.03em; margin: 0 0 60px;
   }
   .services-grid {
-    display: grid; grid-template-columns: repeat(4, 1fr);
+    display: grid; grid-template-columns: repeat(3, 1fr);
     border: 2px solid var(--INK);
   }
   .service-card {
@@ -292,7 +231,7 @@ const css = `
   .casework .section-h2 { color: var(--Y); margin-bottom: 56px; }
   .casework .section-h2 em { font-style: italic; }
   .cases-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(2, 1fr);
     border: 2px solid rgba(245,197,24,.25);
   }
   .case-card {
@@ -565,41 +504,11 @@ const css = `
   .spacer-100 { height: 100px; }
 
   /* ══════════════════════════════════════════════════════════
-     MOBILE NAV HAMBURGER
-  ══════════════════════════════════════════════════════════ */
-  .nav__hamburger {
-    display: none; background: none; border: none; cursor: pointer;
-    padding: 14px 20px; color: #f1ebde;
-    font-family: var(--sans); font-size: 10px; font-weight: 700;
-    letter-spacing: .16em; text-transform: uppercase;
-    align-items: center; gap: 10px;
-  }
-  .nav__mobile-menu {
-    display: none; flex-direction: column;
-    border-top: 1px solid rgba(241,235,222,.12);
-    padding: 8px 20px 16px;
-  }
-  .nav__mobile-menu.open { display: flex; }
-  .nav__mobile-link {
-    padding: 12px 0; border-bottom: 1px solid rgba(241,235,222,.10);
-    font-family: var(--sans); font-size: 15px; font-weight: 600;
-    color: rgba(241,235,222,.8); text-decoration: none;
-  }
-  .nav__mobile-link:hover { color: #f1ebde; }
-  .nav__mobile-cta {
-    margin-top: 14px; padding: 14px 20px; background: var(--Y); color: var(--INK);
-    text-align: center; font-family: var(--sans); font-weight: 800;
-    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
-    text-decoration: none; display: block;
-  }
-
-  /* ══════════════════════════════════════════════════════════
      RESPONSIVE BREAKPOINTS
   ══════════════════════════════════════════════════════════ */
 
   /* ── Tablet 1024px ──────────────────────────────────────── */
   @media (max-width: 1024px) {
-    .nav__top, .nav__bar { padding-left: 32px; padding-right: 32px; }
     .hero { padding: 28px 32px 0; }
     .services { padding: 72px 32px 0; }
     .casework, .testimonials, .speaking, .kits { padding: 72px 32px; }
@@ -615,12 +524,6 @@ const css = `
 
   /* ── Mobile 768px ──────────────────────────────────────── */
   @media (max-width: 820px) {
-    /* Nav — show hamburger, hide desktop bar */
-    .nav__top { grid-template-columns: 1fr auto; padding: 14px 20px; }
-    .nav__wire { display: none; }
-    .nav__bar { display: none; }
-    .nav__hamburger { display: flex; }
-
     /* Hero */
     .hero { padding: 24px 20px 0; }
     .ticker { font-size: 10px; }
@@ -706,7 +609,6 @@ const css = `
     .newsletter__sub { font-size: 15px; }
     .casework .section-h2 { font-size: 36px; }
     .case-card__metric { font-size: 44px; }
-    .nav__top { padding: 12px 16px; }
     .hero { padding: 20px 16px 0; }
     .services { padding: 44px 16px 0; }
     .casework, .testimonials, .speaking, .kits { padding: 44px 16px; }
@@ -757,69 +659,12 @@ function ScrollButtons() {
 }
 
 export default function HomePage() {
-  const [navOpen, setNavOpen] = useState(false);
-
-  useEffect(() => {
-    const d = new Date();
-    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const el = document.getElementById('wire-date');
-    if (el) el.textContent = `Est. 2004 · Global · ${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-  }, []);
-
   return (
     <>
       {/* eslint-disable-next-line react/no-danger */}
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      {/* ══ NAV ══ */}
-      <header className="nav">
-        <div className="nav__top">
-          <div className="nav__logo">
-            <div className="nav__mark">SIA</div>
-            <div>
-              <div className="nav__wordmark">Syed Irfan Ajmal</div>
-              <div className="nav__sub">SEO-PR &nbsp;·&nbsp; GEO &nbsp;·&nbsp; Content Marketing</div>
-            </div>
-          </div>
-          <div className="nav__wire">
-            <div className="nav__wire-label">The SIA Wire</div>
-            <div className="nav__wire-date" id="wire-date">Est. 2004 · Global</div>
-          </div>
-          <div className="nav__status">Open for projects, Q3 2026</div>
-        </div>
 
-        {/* Desktop nav row */}
-        <div className="nav__bar">
-          <nav className="nav__links">
-            <a href="/" className="nav__link nav__link--active">Home</a>
-            <a href="/about" className="nav__link">About</a>
-            <a href="/speaking" className="nav__link">Speaking</a>
-            <a href="/emos" className="nav__link">EMOS</a>
-            <a href="/fractional-cmo" className="nav__link">Fractional CMO</a>
-            <a href="/resources" className="nav__link">Resources</a>
-            <a href="/contact" className="nav__link">Contact</a>
-          </nav>
-          <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="nav__cta">Book a discovery call &rarr;</a>
-        </div>
-
-        {/* Mobile hamburger */}
-        <button className="nav__hamburger" onClick={() => setNavOpen(!navOpen)} aria-label="Toggle navigation">
-          {navOpen ? '✕' : '☰'}&nbsp;&nbsp;{navOpen ? 'CLOSE' : 'MENU'}
-        </button>
-
-        {/* Mobile dropdown */}
-        <nav className={`nav__mobile-menu${navOpen ? ' open' : ''}`}>
-          <a href="/" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Home</a>
-          <a href="/about" className="nav__mobile-link" onClick={() => setNavOpen(false)}>About</a>
-          <a href="/speaking" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Speaking</a>
-          <a href="/emos" className="nav__mobile-link" onClick={() => setNavOpen(false)}>EMOS</a>
-          <a href="/fractional-cmo" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Fractional CMO</a>
-          <a href="/resources" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Resources</a>
-          <a href="/contact" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Contact</a>
-          <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="nav__mobile-cta">Book a discovery call →</a>
-        </nav>
-      </header>
 
       {/* ══ HERO ══ */}
       <header className="hero">
@@ -938,7 +783,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/brett-helling.jpg" alt="Brett Helling" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/brett-helling.jpeg" alt="Brett Helling" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Brett Helling</div>
             <div className="testi__role">CEO, Ridester.com / TrendlineSEO · USA</div>
           </div>
@@ -971,9 +816,8 @@ export default function HomePage() {
             <span className="q">"</span>Ranked a keyword to #4 on Google that gets over 160,000 searches a month. Commercial intent. Can&apos;t thank Irfan and the team enough.<span className="q">"</span>
           </blockquote>
           <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0,borderRadius:'50%'}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>AS</span>
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/testimonials/azzam-sheikh.jpeg" alt="Azzam Sheikh" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Azzam Sheikh</div>
             <div className="testi__role">National Tyres &amp; Autocare · UK</div>
           </div>
@@ -1172,24 +1016,18 @@ export default function HomePage() {
         <div className="services-grid">
           <div className="service-card">
             <div className="service-card__num">01</div>
-            <h3 className="service-card__title">Digital PR &amp; Earned Media</h3>
-            <p className="service-card__body">Get cited as an expert source in publications your buyers actually read — Forbes, HBR, HuffPost, niche trade press. Journalist outreach, expert commentary, story design. No fluff, no directories nobody clicks.</p>
-            <a href="/clients" className="service-card__cta">View case studies →</a>
-          </div>
-          <div className="service-card">
-            <div className="service-card__num">02</div>
             <h3 className="service-card__title">EMOS · Earned Media OS</h3>
             <p className="service-card__body">A productized system for landing editorial coverage — trainings, templates, journalist playbooks. For in-house teams who want the press wins without the agency retainer.</p>
             <a href="/emos" className="service-card__cta">Tour EMOS →</a>
           </div>
           <div className="service-card">
-            <div className="service-card__num">03</div>
+            <div className="service-card__num">02</div>
             <h3 className="service-card__title">Fractional CMO</h3>
             <p className="service-card__body">For founders without a marketing leader. Weekly cadence, full strategy ownership, agency-level execution through DMR. You get a senior brain without the full-time price tag.</p>
             <a href="/fractional-cmo" className="service-card__cta">Inquire →</a>
           </div>
           <div className="service-card">
-            <div className="service-card__num">04</div>
+            <div className="service-card__num">03</div>
             <h3 className="service-card__title">Done-For-You Agency</h3>
             <p className="service-card__body">For GEO, SEO-PR, and content marketing projects handled end-to-end. Strategy, execution, reporting — all done by the team at DMR.agency.</p>
             <a href="https://dmr.agency" target="_blank" rel="noopener noreferrer" className="service-card__cta">Visit DMR.agency ↗</a>
