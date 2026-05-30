@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>About · The SIA Bureau</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600;1,6..72,700&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper:  #f1ebde;
+    --paper2: #e8e0cc;
+    --ink:    #1a1410;
+    --ink70:  rgba(26,20,16,.70);
+    --ink55:  rgba(26,20,16,.55);
+    --ink35:  rgba(26,20,16,.32);
+    --ink15:  rgba(26,20,16,.15);
+    --yel:    #f5b81f;
+    --serif:  'Newsreader', Georgia, serif;
+    --grot:   'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--paper); color: var(--ink); font-family: var(--serif); }
+  ::selection { background: var(--ink); color: var(--paper); }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.045;
+    background-image: radial-gradient(rgba(26,20,16,.6) 0.5px,transparent 0.5px), radial-gradient(rgba(26,20,16,.4) 0.5px,transparent 0.5px);
+    background-size: 3px 3px, 7px 7px; background-position: 0 0, 1px 1px;
+  }
+  #root { position: relative; z-index: 2; }
+  ::-webkit-scrollbar { width: 12px; }
+  ::-webkit-scrollbar-track { background: var(--paper); }
+  ::-webkit-scrollbar-thumb { background: var(--ink); border: 3px solid var(--paper); }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding: 0 56px; height: 54px; background: var(--paper); border-bottom: 1px solid var(--ink15); position: sticky; top: 0; z-index: 100; }
+  .nav-logo { font-family: var(--grot); font-weight: 900; font-size: 12px; letter-spacing: 0.24em; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { font-family: var(--grot); font-weight: 600; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink70); text-decoration: none; }
+  .nav-links a.active { color: var(--ink); border-bottom: 2px solid var(--yel); padding-bottom: 2px; font-weight: 800; }
+  .nav-cta { font-family: var(--grot); font-weight: 800; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; background: var(--yel); color: var(--ink); padding: 7px 14px; text-decoration: none; display: inline-block; }
+  /* primitives */
+  .scaps { font-family: var(--grot); font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink70); }
+  .pill  { display: inline-block; padding: 4px 9px 5px; background: var(--yel); color: var(--ink); font-family: var(--grot); font-weight: 800; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .pill-dark { display: inline-block; padding: 4px 9px 5px; background: var(--ink); color: var(--yel); font-family: var(--grot); font-weight: 800; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .mark { background: var(--yel); padding: 0 0.1em; }
+  .hrule { height: 1px; background: var(--ink); margin: 16px 0; }
+  .doublerule { border-top: 1px solid var(--ink); }
+  .doublerule::after { content: ''; display: block; margin-top: 3px; border-top: 3px solid var(--ink); }
+  .sec-mast { margin-bottom: 36px; }
+  .sec-mast-row { display: flex; align-items: baseline; gap: 14px; padding: 10px 0 6px; }
+  .sec-mast-rule { flex: 1; height: 1px; background: var(--ink35); }
+  .sec { padding: 0 56px 80px; }
+  .sec-h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(38px,4.5vw,66px); color: var(--ink); line-height: 0.98; letter-spacing: -0.025em; margin: 0; }
+  .sec-lead { font-family: var(--serif); font-size: 18px; color: var(--ink70); line-height: 1.55; max-width: 560px; margin: 0; }
+  /* hero */
+  .hero { padding: 52px 56px 64px; }
+  .hero-grid { display: grid; grid-template-columns: 90px 1fr 240px; gap: 52px; align-items: start; margin-top: 32px; }
+  .portrait { background: var(--paper2); border: 1px solid var(--ink); padding: 14px; display: flex; flex-direction: column; }
+  .portrait-img { width: 100%; aspect-ratio: 4/5; border: 1px solid var(--ink); background: var(--paper2); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .portrait-badge { position: absolute; top: 12px; left: 12px; background: var(--yel); padding: 4px 10px; font-family: var(--grot); font-weight: 800; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; }
+  .drop { float: left; font-family: var(--serif); font-weight: 700; font-style: italic; font-size: 86px; line-height: 0.78; margin-right: 10px; margin-top: 6px; background: var(--yel); padding: 6px 8px 2px; }
+  .vitals-row { display: grid; grid-template-columns: 120px 1fr; gap: 14px; padding: 11px 0; border-bottom: 1px solid var(--ink15); align-items: baseline; }
+  .vitals-row dd { margin: 0; font-size: 15px; line-height: 1.4; font-family: var(--serif); }
+  .btn-dark { flex:1; text-align:center; padding:12px 14px; background:var(--ink); color:var(--paper); text-decoration:none; font-family:var(--grot); font-weight:700; font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; }
+  .btn-yel-disabled { flex:1; text-align:center; padding:12px 14px; background:var(--yel); color:var(--ink); font-family:var(--grot); font-weight:700; font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; opacity:0.5; cursor:default; }
+  /* black/yellow boxes */
+  .ink-box { background: var(--ink); color: var(--paper); padding: 28px 30px 26px; display: flex; flex-direction: column; }
+  .yel-box { background: var(--yel); color: var(--ink); padding: 28px 30px 26px; display: flex; flex-direction: column; }
+  .box-year { font-family: var(--serif); font-weight: 700; font-size: 34px; letter-spacing: -0.02em; line-height: 1; }
+  .ink-box .box-year { color: var(--paper); }
+  .yel-box .box-year { color: var(--ink); }
+  .box-rule-light { height: 1px; background: rgba(241,235,222,.2); margin: 14px 0; }
+  .box-rule-dark  { height: 1px; background: rgba(26,20,16,.25); margin: 14px 0; }
+  .ink-box .box-title { font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--paper); line-height: 1.2; }
+  .yel-box .box-title { font-family: var(--serif); font-weight: 700; font-size: 20px; color: var(--ink); line-height: 1.2; }
+  .ink-box .box-body { font-family: var(--serif); font-style: italic; font-size: 14.5px; color: rgba(241,235,222,.7); line-height: 1.5; flex:1; margin-top: 8px; }
+  .yel-box .box-body { font-family: var(--serif); font-style: italic; font-size: 14.5px; color: rgba(26,20,16,.7); line-height: 1.5; flex:1; margin-top: 8px; }
+  /* timeline */
+  .timeline { border-top: 2px solid var(--ink); }
+  .tl-row { display: grid; grid-template-columns: 72px 1fr 2fr 60px; gap: 24px; padding: 16px 0; border-bottom: 1px solid var(--ink15); align-items: baseline; }
+  .tl-year { font-family: var(--serif); font-weight: 700; font-size: 23px; color: var(--ink); }
+  .tl-title { font-family: var(--serif); font-weight: 700; font-size: 17px; color: var(--ink); line-height: 1.3; }
+  .tl-desc { font-family: var(--serif); font-style: italic; font-size: 14.5px; color: var(--ink70); line-height: 1.45; }
+  /* ══════════════════════════════════════════
+     TICKER / MARQUEE SYSTEM
+  ══════════════════════════════════════════ */
+  @keyframes scroll-left  { from { transform: translateX(0);    } to { transform: translateX(-50%); } }
+  @keyframes scroll-right { from { transform: translateX(-50%); } to { transform: translateX(0);    } }
+  .ticker-band {
+    overflow: hidden;
+    position: relative;
+    border-top: 1px solid var(--ink15);
+    background: var(--paper);
+  }
+  .ticker-band:first-child { border-top: 2px solid var(--ink); }
+  .ticker-band::before,
+  .ticker-band::after {
+    content: ''; position: absolute; top: 0; width: 100px; height: 100%; z-index: 2; pointer-events: none;
+  }
+  .ticker-band::before { left: 0;  background: linear-gradient(to right, var(--paper) 30%, transparent); }
+  .ticker-band::after  { right: 0; background: linear-gradient(to left,  var(--paper) 30%, transparent); }
+  .ticker-band.on-dark::before { background: linear-gradient(to right, var(--ink) 30%, transparent); }
+  .ticker-band.on-dark::after  { background: linear-gradient(to left,  var(--ink) 30%, transparent); }
+  .ticker-band.on-yel::before  { background: linear-gradient(to right, var(--yel) 30%, transparent); }
+  .ticker-band.on-yel::after   { background: linear-gradient(to left,  var(--yel) 30%, transparent); }
+  .ticker-track { display: flex; width: max-content; animation: scroll-left 38s linear infinite; }
+  .ticker-track.reverse { animation: scroll-right 44s linear infinite; }
+  .ticker-track.slow { animation-duration: 52s; }
+  .ticker-track:hover { animation-play-state: paused; }
+  .ticker-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 15px 32px;
+    white-space: nowrap;
+    border-right: 1px solid var(--ink15);
+  }
+  .ticker-item.on-dark { border-right-color: rgba(241,235,222,.12); }
+  .ticker-item.on-yel  { border-right-color: rgba(26,20,16,.15); }
+  .t-name {
+    font-family: var(--serif); font-weight: 700;
+    font-size: 18px; color: var(--ink); line-height: 1;
+  }
+  .t-name.on-dark { color: var(--paper); }
+  .t-name.on-yel  { color: var(--ink); }
+  .t-tag {
+    font-family: var(--grot); font-weight: 800; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 3px 7px 4px;
+  }
+  /* tag colours */
+  .tag-byline   { background: var(--yel); color: var(--ink); }
+  .tag-citation { background: var(--ink); color: var(--yel); }
+  .tag-featured { background: transparent; color: var(--ink55); border: 1px solid var(--ink35); }
+  .tag-syndi    { background: var(--paper2); color: var(--ink70); border: 1px solid var(--ink35); }
+  /* on dark backgrounds */
+  .tag-byline.on-dark   { background: var(--yel); color: var(--ink); }
+  .tag-citation.on-dark { background: rgba(241,235,222,.15); color: var(--paper); border: 1px solid rgba(241,235,222,.2); }
+  .tag-featured.on-dark { background: transparent; color: rgba(241,235,222,.5); border: 1px solid rgba(241,235,222,.2); }
+  /* separator dot between name and tag */
+  .tick-sep { width: 3px; height: 3px; background: var(--ink35); border-radius: 50%; flex-shrink: 0; }
+  .tick-sep.on-dark { background: rgba(241,235,222,.25); }
+  /* section label bar (left of ticker block) — full bleed, text padded */
+  .ticker-section-label {
+    padding: 0 56px;
+    border-top: 1px solid var(--ink15);
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    height: 38px;
+    background: var(--paper2);
+    border-bottom: 1px solid var(--ink15);
+  }
+  /* ══════════════════════════════════════════
+     SPEAKING
+  ══════════════════════════════════════════ */
+  .speaking-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; border: 1px solid var(--ink); }
+  .speaking-card { padding: 28px 28px 26px; display: flex; flex-direction: column; }
+  .speaking-card:not(:last-child) { border-right: 1px solid var(--ink); }
+  .speaking-img { width: 100%; aspect-ratio: 16/9; border: 1px solid var(--ink); background: var(--paper2); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-family: var(--grot); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink35); text-align: center; padding: 12px; }
+  .speaking-title { font-family: var(--serif); font-weight: 700; font-size: 19px; color: var(--ink); line-height: 1.2; letter-spacing: -0.01em; }
+  .speaking-sub { margin-top: 8px; font-family: var(--serif); font-style: italic; font-size: 14.5px; color: var(--ink70); line-height: 1.5; flex: 1; }
+  .speaking-meta { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--ink15); }
+  /* ══════════════════════════════════════════
+     TESTIMONIALS
+  ══════════════════════════════════════════ */
+  .t-grid { display: grid; grid-template-columns: repeat(2,1fr); border: 1px solid var(--ink); }
+  .t-card { padding: 32px 32px 28px; display: flex; flex-direction: column; }
+  .t-card:nth-child(odd) { border-right: 1px solid var(--ink); }
+  .t-card:not(:nth-last-child(-n+1)):not(:nth-last-child(-n+2)) { border-bottom: 1px solid var(--ink); }
+  .t-card-full { grid-column: span 2; border-top: 1px solid var(--ink); }
+  .t-meta { display: flex; align-items: baseline; justify-content: space-between; }
+  blockquote.tq { margin: 20px 0 0; font-family: var(--serif); font-size: 17px; color: var(--ink); line-height: 1.45; font-style: italic; position: relative; padding-left: 30px; }
+  .tq-open { position: absolute; left: -4px; top: -8px; font-family: var(--serif); font-size: 80px; line-height: 1; color: var(--ink); font-style: italic; background: var(--yel); padding: 0 4px; }
+  .t-rule { height: 1px; background: var(--ink35); margin: 20px 0 14px; }
+  .t-name { font-family: var(--serif); font-weight: 700; font-size: 17px; color: var(--ink); }
+  .t-role { margin-top: 4px; font-family: var(--grot); font-weight: 700; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink70); }
+  /* gallery */
+  .gallery-mosaic { display: grid; grid-template-columns: repeat(12,1fr); gap: 10px; }
+  .gallery-cell { background: var(--paper2); border: 1px solid var(--ink); padding: 8px; display: flex; flex-direction: column; cursor: zoom-in; transition: opacity 0.15s; }
+  .gallery-cell:hover { opacity: 0.85; }
+  .gallery-img { border: 1px solid var(--ink); background: var(--paper2); display: flex; align-items: center; justify-content: center; font-family: var(--grot); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink35); text-align: center; overflow: hidden; }
+  .gallery-cap { padding: 6px 4px 2px; display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .gallery-cap-text { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink); line-height: 1.35; }
+  /* lightbox */
+  .lb-overlay { display: none; position: fixed; inset: 0; background: rgba(26,20,16,.92); z-index: 1000; align-items: center; justify-content: center; cursor: zoom-out; }
+  .lb-overlay.open { display: flex; }
+  .lb-inner { max-width: 90vw; max-height: 90vh; position: relative; background: var(--paper2); border: 1px solid var(--paper); padding: 16px; }
+  .lb-inner img { max-width: 84vw; max-height: 80vh; display: block; border: 1px solid var(--ink); }
+  .lb-close { position: absolute; top: -38px; right: 0; font-family: var(--grot); font-weight: 800; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--paper); cursor: pointer; background: none; border: none; padding: 6px 0; }
+  .lb-cap { margin-top: 10px; font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink); line-height: 1.4; }
+  .lb-placeholder { min-width: 400px; min-height: 300px; display: flex; align-items: center; justify-content: center; font-family: var(--grot); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink55); }
+  /* more */
+  .more-grid { display: grid; grid-template-columns: repeat(4,1fr); border: 1px solid var(--ink); }
+  .more-card { padding: 28px 26px 26px; background: var(--paper); display: flex; flex-direction: column; text-decoration: none; color: inherit; }
+  .more-card:not(:last-child) { border-right: 1px solid var(--ink); }
+  .more-title { font-family: var(--serif); font-weight: 700; font-size: 24px; color: var(--ink); line-height: 1; letter-spacing: -0.01em; }
+  .more-desc { margin-top: 12px; font-family: var(--serif); font-style: italic; font-size: 15px; color: var(--ink70); line-height: 1.5; flex: 1; }
+  .more-cta { margin-top: 18px; font-family: var(--grot); font-weight: 700; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); }
+  /* outro */
+  .outro { background: var(--paper2); padding: 90px 56px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); text-align: center; }
+  .outro h2 { font-family: var(--serif); font-weight: 700; font-size: clamp(26px,4vw,48px); color: var(--ink); line-height: 1.05; letter-spacing: -0.02em; max-width: 760px; margin: 16px auto 0; }
+  .cta-solid { padding:16px 28px; background:var(--ink); color:var(--paper); font-family:var(--grot); font-weight:800; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; text-decoration:none; display:inline-block; }
+  .cta-ghost { padding:16px 28px; background:transparent; color:var(--ink); border:1px solid var(--ink); font-family:var(--grot); font-weight:800; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; text-decoration:none; display:inline-block; }
+  /* semrush */
+  .semrush-wrap { background: var(--paper2); border: 1px solid var(--ink); padding: 36px 40px; }
+  .semrush-embed { margin-top: 28px; background: var(--paper); border: 1px solid var(--ink); display: flex; align-items: center; justify-content: center; min-height: 360px; position: relative; overflow: hidden; }
+  .embed-label { position: absolute; top: 10px; left: 10px; background: var(--yel); color: var(--ink); font-family: var(--grot); font-weight: 800; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; padding: 4px 9px; z-index:2; }
+  /* site footer */
+  .site-footer { background: var(--ink); color: var(--paper); padding: 22px 56px; display: flex; align-items: center; justify-content: space-between; border-top: 2px solid var(--ink); }
+</style>
+</head>
+<body>
+<div id="root">
+
+<nav class="nav">
+  <div class="nav-logo">The SIA Bureau</div>
+  <div class="nav-links">
+    <a href="#">Work</a>
+    <a href="#">Writing</a>
+    <a href="#" class="active">About</a>
+    <a href="#">Resources</a>
+    <a href="#">Contact</a>
+  </div>
+  <a href="#" class="nav-cta">Try EMOS →</a>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <div class="doublerule"></div>
+  <div style="display:flex;align-items:baseline;gap:14px;padding:10px 0 32px">
+    <span class="pill">About</span>
+    <span class="scaps" style="font-size:11px">Syed Irfan Ajmal · The SIA Bureau</span>
+    <div style="flex:1;height:1px;background:var(--ink35)"></div>
+    <span class="scaps" style="font-size:10px;color:var(--ink55)">Peshawar · Pakistan</span>
+  </div>
+
+  <!-- 2-col: portrait + bio -->
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:52px;align-items:start">
+    <figure class="portrait">
+      <div class="portrait-img" style="min-height:320px">
+        <div style="text-align:center"><span class="scaps" style="font-size:9px;color:var(--ink35)">headshot.jpg</span></div>
+        <div class="portrait-badge">The Editor</div>
+      </div>
+      <figcaption style="margin-top:10px">
+        <span class="scaps" style="font-size:9.5px">Peshawar, May 2026</span>
+      </figcaption>
+    </figure>
+
+    <div>
+      <span class="scaps" style="font-size:10px;color:var(--ink55)">Founder · Writer · Speaker</span>
+      <h1 style="margin-top:10px;font-family:var(--serif);font-weight:700;font-size:clamp(36px,4.5vw,64px);line-height:0.97;letter-spacing:-0.03em;color:var(--ink)">
+        The man behind<br><em style="font-weight:600">the bureau.</em>
+      </h1>
+      <p style="margin-top:22px;font-family:var(--serif);font-size:19px;color:var(--ink);line-height:1.55;max-width:520px">
+        Twenty-two years of digital PR and earned media. Roughly a hundred clients across twenty-plus countries. The question driving all of it — <em>who reads what, what earns trust, and why this story now</em> — has not changed once.
+      </p>
+      <p style="margin-top:12px;font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink70);line-height:1.55;max-width:480px">
+        Founded DMR.agency in 2013. Launched EMOS in 2026. Still in Peshawar. Still writing. Still answering email.
+      </p>
+      <div style="display:flex;gap:10px;margin-top:28px">
+        <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" class="btn-dark">Book a call →</a>
+        <span class="btn-yel-disabled">Press kit · Coming soon</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--ink);margin-top:44px">
+    <div style="padding:22px 26px;border-right:1px solid var(--ink)">
+      <div style="font-family:var(--serif);font-weight:700;font-size:42px;letter-spacing:-0.03em;line-height:1;color:var(--ink)">22+</div>
+      <div style="margin-top:7px;font-family:var(--grot);font-weight:700;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink55)">Years in practice</div>
+    </div>
+    <div style="padding:22px 26px;border-right:1px solid var(--ink)">
+      <div style="font-family:var(--serif);font-weight:700;font-size:42px;letter-spacing:-0.03em;line-height:1;color:var(--ink)">~100</div>
+      <div style="margin-top:7px;font-family:var(--grot);font-weight:700;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink55)">Clients served</div>
+    </div>
+    <div style="padding:22px 26px;border-right:1px solid var(--ink)">
+      <div style="font-family:var(--serif);font-weight:700;font-size:42px;letter-spacing:-0.03em;line-height:1;color:var(--ink)">20+</div>
+      <div style="margin-top:7px;font-family:var(--grot);font-weight:700;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink55)">Countries</div>
+    </div>
+    <div style="padding:22px 26px">
+      <div style="font-family:var(--serif);font-weight:700;font-size:42px;letter-spacing:-0.03em;line-height:1;color:var(--ink)">12+</div>
+      <div style="margin-top:7px;font-family:var(--grot);font-weight:700;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink55)">Publications</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ §01 · TIMELINE ══════════ -->
+<section class="sec">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 01</span>
+      <span class="scaps" style="font-size:11.5px">A career in brief</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+  <ol class="timeline" style="list-style:none;padding:0">
+    <li class="tl-row">
+      <div class="tl-year">2026</div>
+      <div><div class="tl-title">EMOS · Earned Media OS</div></div>
+      <div class="tl-desc">Productized the bureau's earned-media playbook for in-house teams.</div>
+      <div style="text-align:right"><span class="pill" style="font-size:9px">Now</span></div>
+    </li>
+    <li class="tl-row">
+      <div class="tl-year">2021</div>
+      <div><div class="tl-title">SIA Enterprises Inc</div></div>
+      <div class="tl-desc">Incorporated in Wyoming as a C-Corp.</div>
+      <div></div>
+    </li>
+    <li class="tl-row">
+      <div class="tl-year">2018</div>
+      <div><div class="tl-title">The SIA Business Podcast</div></div>
+      <div class="tl-desc">Business growth, earned media, and entrepreneurship. Four seasons, 2018–2021.</div>
+      <div></div>
+    </li>
+    <li class="tl-row">
+      <div class="tl-year">2013</div>
+      <div><div class="tl-title">Founded DMR.agency</div></div>
+      <div class="tl-desc">Digital PR and earned media. 100+ clients across 20+ countries, including Procter &amp; Gamble.</div>
+      <div></div>
+    </li>
+    <li class="tl-row">
+      <div class="tl-year">2013</div>
+      <div><div class="tl-title">Co-founded Silk Route Interactive</div></div>
+      <div class="tl-desc">Spatial intelligence company. Head of Marketing.</div>
+      <div></div>
+    </li>
+    <li class="tl-row">
+      <div class="tl-year">2004</div>
+      <div><div class="tl-title">Sweden · Denmark · Pakistan</div></div>
+      <div class="tl-desc">Previously studied in Sweden and Pakistan; worked in Stockholm and Copenhagen.</div>
+      <div></div>
+    </li>
+  </ol>
+</section>
+
+<!-- ══════════ §02 · WHERE THE WORK HAS BEEN READ ══════════ -->
+<section class="sec" style="padding-bottom:0">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 02</span>
+      <span class="scaps" style="font-size:11.5px">Where the work has been read</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Forbes ME featured card -->
+<div style="margin:0 56px;display:grid;grid-template-columns:280px 1fr;gap:0;padding:14px;background:var(--paper2);border:1px solid var(--ink);border-bottom:none">
+  <div style="margin:0;padding:8px;background:#1a1410;border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;min-height:200px">
+    <div style="text-align:center;color:rgba(255,255,255,.3);font-family:var(--grot);font-size:9px;letter-spacing:0.14em;text-transform:uppercase">forbes-me-print.jpg</div>
+  </div>
+  <div style="display:flex;flex-direction:column;justify-content:space-between;padding:8px 20px">
+    <div>
+      <div style="display:inline-block;padding:4px 10px;background:var(--yel);color:var(--ink);font-family:var(--grot);font-weight:800;font-size:10.5px;letter-spacing:0.18em;text-transform:uppercase">In print · Forbes ME</div>
+      <h3 style="margin:16px 0 0;font-family:var(--serif);font-weight:700;font-size:clamp(16px,2.2vw,24px);color:var(--ink);line-height:1.12;letter-spacing:-0.015em">
+        "How Qatar Can Become The Silicon Valley Of The Arab World."
+      </h3>
+      <p style="margin-top:12px;font-family:var(--serif);font-size:15px;color:var(--ink70);line-height:1.55">
+        Forbes Middle East Guide print edition. One of a small handful of in-print Forbes ME bylines by a Pakistani author.
+      </p>
+    </div>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--ink15);display:flex;justify-content:space-between">
+      <span class="scaps" style="font-size:10px">Forbes ME · 2017 · Print</span>
+      <span class="scaps" style="font-size:10px;color:var(--ink)">Featured byline</span>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER BAND 1 — Bylines (full-bleed, scrolls left) -->
+<div class="ticker-section-label">
+  <span class="scaps" style="font-size:10px;color:var(--ink)">Bylines</span>
+  <div style="flex:1;height:1px;background:var(--ink35)"></div>
+  <span class="scaps" style="font-size:9.5px;color:var(--ink55)">Publications where I've written</span>
+</div>
+<div class="ticker-band" style="border-top:2px solid var(--ink);border-bottom:1px solid var(--ink15)">
+  <div class="ticker-track">
+    <div class="ticker-item"><span class="t-name">Forbes</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Harvard Business Review</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">HuffPost</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Entrepreneur</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">The World Bank Blog</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Search Engine Journal</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">SEMrush Blog</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Business.com</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Virgin Startup</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Spin Sucks</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Aurora</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">GrowMap</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item"><span class="t-name">Forbes</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Harvard Business Review</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">HuffPost</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Entrepreneur</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">The World Bank Blog</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Search Engine Journal</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">SEMrush Blog</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Business.com</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Virgin Startup</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Spin Sucks</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">Aurora</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+    <div class="ticker-item"><span class="t-name">GrowMap</span><span class="tick-sep"></span><span class="t-tag tag-byline">Byline</span></div>
+  </div>
+</div>
+
+<!-- TICKER BAND 2 — Featured (full-bleed, scrolls right, slower) -->
+<div class="ticker-band" style="border-bottom:1px solid var(--ink15)">
+  <div class="ticker-track reverse slow">
+    <div class="ticker-item"><span class="t-name">The Next Web (TNW)</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">CNET</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">Reader's Digest</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">GBG · Google Business Group</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">Yahoo</span><span class="tick-sep"></span><span class="t-tag tag-syndi">Syndicated</span></div>
+    <div class="ticker-item"><span class="t-name">Born2Invest</span><span class="tick-sep"></span><span class="t-tag tag-syndi">Syndicated</span></div>
+    <div class="ticker-item"><span class="t-name">Snov.io</span><span class="tick-sep"></span><span class="t-tag tag-syndi">Syndicated</span></div>
+    <!-- duplicate -->
+    <div class="ticker-item"><span class="t-name">The Next Web (TNW)</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">CNET</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">Reader's Digest</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">GBG · Google Business Group</span><span class="tick-sep"></span><span class="t-tag tag-featured">Featured</span></div>
+    <div class="ticker-item"><span class="t-name">Yahoo</span><span class="tick-sep"></span><span class="t-tag tag-syndi">Syndicated</span></div>
+    <div class="ticker-item"><span class="t-name">Born2Invest</span><span class="tick-sep"></span><span class="t-tag tag-syndi">Syndicated</span></div>
+    <div class="ticker-item"><span class="t-name">Snov.io</span><span class="tick-sep"></span><span class="t-tag tag-syndi">Syndicated</span></div>
+  </div>
+</div>
+<div style="height:80px"></div>
+
+<!-- ══════════ §03 · CITED BY OTHERS ══════════ -->
+<section class="sec" style="padding-bottom:0">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 03</span>
+      <span class="scaps" style="font-size:11.5px">Cited by others · A different credential</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+  <p style="font-family:var(--serif);font-size:18px;color:var(--ink70);line-height:1.55;max-width:660px;margin-bottom:36px">
+    Being quoted is a different credential than holding the pen. Below: publications that cited my work in their own articles, separately from outlets where I've written directly.
+  </p>
+</section>
+
+<!-- TICKER BAND 3 — Citations (dark, full-bleed, scrolls left) -->
+<div class="ticker-section-label" style="background:var(--ink);border-color:rgba(241,235,222,.1)">
+  <span class="scaps" style="font-size:10px;color:rgba(241,235,222,.6)">Quoted in other people's articles</span>
+  <div style="flex:1;height:1px;background:rgba(241,235,222,.15)"></div>
+  <span class="scaps" style="font-size:9.5px;color:rgba(241,235,222,.35)">Others citing my work</span>
+</div>
+<div class="ticker-band on-dark" style="background:var(--ink);border-top:2px solid rgba(241,235,222,.15);border-bottom:1px solid rgba(241,235,222,.08)">
+  <div class="ticker-track">
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Forbes</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Harvard Business Review</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">The Next Web (TNW)</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Search Engine Journal</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Reader's Digest</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Clutch</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Instapage</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">SERPed</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <!-- duplicate -->
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Forbes</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Harvard Business Review</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">The Next Web (TNW)</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Search Engine Journal</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Reader's Digest</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Clutch</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">Instapage</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+    <div class="ticker-item on-dark"><span class="t-name on-dark">SERPed</span><span class="tick-sep on-dark"></span><span class="t-tag tag-citation on-dark">Citation</span></div>
+  </div>
+</div>
+
+<!-- Forbes citation callout -->
+<div style="background:var(--ink);padding:20px 56px;display:flex;align-items:baseline;gap:20px;flex-wrap:wrap;border-top:1px solid rgba(241,235,222,.08);border-bottom:2px solid var(--ink)">
+  <span style="font-family:var(--grot);font-weight:800;font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--yel);white-space:nowrap">Confirmed ↓</span>
+  <span style="font-family:var(--serif);font-style:italic;font-size:15px;color:rgba(241,235,222,.8);line-height:1.4">Forbes — "5 Successful Entrepreneurs Share Their Self-Confidence Secrets" · Kate Harrison, 2019</span>
+  <a href="https://www.forbes.com/sites/kateharrison/2019/03/26/5-successful-entrepreneurs-share-their-self-confidence-secrets/" target="_blank" style="font-family:var(--grot);font-size:9.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--yel);text-decoration:none;border-bottom:1px solid rgba(245,184,31,.4);padding-bottom:2px;white-space:nowrap">View article →</a>
+</div>
+<div style="height:80px"></div>
+
+<!-- ══════════ §04 · SEMRUSH WORKSHOP ══════════ -->
+<section class="sec">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 04</span>
+      <span class="scaps" style="font-size:11.5px">Workshop · Semrush (NYSE: SEMR) · 2016</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+  <div class="semrush-wrap">
+    <div style="display:grid;grid-template-columns:auto auto 1fr;gap:0;margin-bottom:28px;border:1px solid var(--ink)">
+      <div class="ink-box" style="padding:20px 28px;min-width:140px">
+        <div style="font-family:var(--serif);font-weight:700;font-size:42px;color:var(--yel);letter-spacing:-0.03em;line-height:1">$200K</div>
+        <div style="margin-top:6px;font-family:var(--grot);font-weight:700;font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(241,235,222,.5)">Monthly Revenue</div>
+      </div>
+      <div class="yel-box" style="padding:20px 28px;min-width:140px;border-left:1px solid var(--ink)">
+        <div style="font-family:var(--serif);font-weight:700;font-size:42px;color:var(--ink);letter-spacing:-0.03em;line-height:1">+23%</div>
+        <div style="margin-top:6px;font-family:var(--grot);font-weight:700;font-size:9.5px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(26,20,16,.6)">Revenue Increase</div>
+      </div>
+      <div style="padding:20px 28px;background:var(--paper);border-left:1px solid var(--ink)">
+        <div style="font-family:var(--serif);font-size:16px;color:var(--ink);line-height:1.55">
+          In 2016, I co-presented a case study for Semrush (NYSE: SEMR) alongside Paul Klebanov — demonstrating how strategic guest blogging grew an auto-care e-commerce site's organic traffic revenue from $162K to $200K per month in under a year.
+        </div>
+      </div>
+    </div>
+    <div class="semrush-embed">
+      <div class="embed-label">SlideShare · Semrush 2016</div>
+      <iframe src="https://www.slideshare.net/slideshow/embed_code/key/9ha9a2C3AlHR3j" width="600" height="400" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:none;max-width:100%" allowfullscreen></iframe>
+    </div>
+    <div style="margin-top:12px">
+      <a href="https://www.slideshare.net/slideshow/guest-posting-case-study-200k-revenue-2385-increase/75805727" target="_blank" style="font-family:var(--grot);font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--yel);padding-bottom:2px">
+        Guest Posting Case Study: $200K Revenue · Syed Irfan Ajmal on SlideShare →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ §05 · SPEAKING ══════════ -->
+<section class="sec">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 05</span>
+      <span class="scaps" style="font-size:11.5px">Speaking · On stages and in front of cameras</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+  <div class="speaking-grid">
+    <div class="speaking-card">
+      <div class="speaking-img">gallery/dmss-speaking-at.jpg</div>
+      <div style="display:inline-block;padding:4px 9px;background:var(--yel);font-family:var(--grot);font-weight:800;font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:12px">Keynote Workshop</div>
+      <div class="speaking-title">DMSS Conference, Bali</div>
+      <div class="speaking-sub">"Media Hacks" workshop · ~200 attendees. Tim Soulo of Ahrefs in attendance.</div>
+      <div class="speaking-meta"><span class="scaps" style="font-size:10px">Bali, Indonesia · 2016</span></div>
+    </div>
+    <div class="speaking-card">
+      <div class="speaking-img">gallery/atm-dubai-panel.jpg</div>
+      <div style="display:inline-block;padding:4px 9px;border:1px solid var(--ink);font-family:var(--grot);font-weight:800;font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:12px">Panel</div>
+      <div class="speaking-title">Arabian Travel Market, Dubai</div>
+      <div class="speaking-sub">"Marketing to the Modern Muslim Traveller." Co-panellists: Riyanto Sofyan (Ministry of Tourism, Indonesia), Mohsin Tutla (Chairman, World Hajj &amp; Umrah Convention), Shaji Abu Salih (Shaza Hotels).</div>
+      <div class="speaking-meta"><span class="scaps" style="font-size:10px">Dubai, UAE · 2017</span></div>
+    </div>
+    <div class="speaking-card">
+      <div class="speaking-img">gallery/mps-banner.jpg</div>
+      <div style="display:inline-block;padding:4px 9px;border:1px solid var(--ink);font-family:var(--grot);font-weight:800;font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:12px">Conference</div>
+      <div class="speaking-title">MPS 2016, Dubai</div>
+      <div class="speaking-sub">Digital marketing strategy. Speaker, main stage.</div>
+      <div class="speaking-meta"><span class="scaps" style="font-size:10px">Dubai, UAE · 2016</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ §06 · TESTIMONIALS ══════════ -->
+<section class="sec">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 06</span>
+      <span class="scaps" style="font-size:11.5px">The Letters File · On the record, in their own words</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:baseline;margin-bottom:40px">
+    <h2 class="sec-h2">On the record,<br><span style="font-style:italic"><span class="mark">in their own words.</span></span></h2>
+    <p class="sec-lead">Selected letters from clients, colleagues, and past hosts. All reproduced with permission.</p>
+  </div>
+  <div class="t-grid">
+    <div class="t-card">
+      <div class="t-meta"><span class="pill-dark" style="font-size:10px">№ 01</span><span class="scaps" style="font-size:10px;color:var(--ink55)">Ridester · 2019</span></div>
+      <blockquote class="tq"><span class="tq-open" aria-hidden>"</span>Their biggest weapon has been doing outreach to earn high-quality backlinks &amp; mentions at scale from the likes of Forbes, Mashable, Reader's Digest, and hundreds of other authority sites. The biggest success story has been helping to grow Ridester from zero to 1.5 million monthly unique visitors.</blockquote>
+      <div class="t-rule"></div>
+      <div class="t-name">Brett Helling</div>
+      <div class="t-role">Enterprise SEO &amp; AI Search · ClickUp</div>
+    </div>
+    <div class="t-card">
+      <div class="t-meta"><span class="pill" style="font-size:10px">№ 02</span><span class="scaps" style="font-size:10px;color:var(--ink55)">Uhubs Workshop · 2019</span></div>
+      <blockquote class="tq"><span class="tq-open" aria-hidden>"</span>The audience enjoyed his super practical session and approach to helping them understand how to grow an audience online. Syed has an amazing personal story, is a great speaker, and has hands-on practical advice on growing website traffic.</blockquote>
+      <div class="t-rule"></div>
+      <div class="t-name">Ash Ali</div>
+      <div class="t-role">Co-Founder, Uhubs · Author, <em>The Unfair Advantage</em> (150,000+ copies) · ex-Just Eat</div>
+    </div>
+    <div class="t-card">
+      <div class="t-meta"><span class="pill-dark" style="font-size:10px">№ 03</span><span class="scaps" style="font-size:10px;color:var(--ink55)">GCC Government · 2020</span></div>
+      <blockquote class="tq"><span class="tq-open" aria-hidden>"</span>Thanks to the high-quality links earned by DMR's HARO outreach service, the web portal's traffic increased by 140% in three months, greatly exceeding our goals.</blockquote>
+      <div class="t-rule"></div>
+      <div class="t-name">Imani Lea Brown</div>
+      <div class="t-role">Content Architect · UX Writing &amp; Systems</div>
+    </div>
+    <div class="t-card">
+      <div class="t-meta"><span class="pill" style="font-size:10px">№ 04</span><span class="scaps" style="font-size:10px;color:var(--ink55)">Client · 2021</span></div>
+      <blockquote class="tq"><span class="tq-open" aria-hidden>"</span>He's been extremely trustworthy and does a really good job of educating you on why they recommend specific strategies. I'd highly recommend working with DMR.agency if you are looking to improve SEO or build high authority backlinks.</blockquote>
+      <div class="t-rule"></div>
+      <div class="t-name">Bridget Hanson</div>
+      <div class="t-role">Manager, Grants and Community Engagement</div>
+    </div>
+    <div class="t-card t-card-full">
+      <div class="t-meta"><span class="pill-dark" style="font-size:10px">№ 05</span><span class="scaps" style="font-size:10px;color:var(--ink55)">Google · Speaking · 2015</span></div>
+      <blockquote class="tq" style="font-size:18px"><span class="tq-open" aria-hidden>"</span>Irfan's knowledge of Content Marketing, SEO, Growth Hacking, and the use of relevant marketing platforms and tools — including Google products — makes him an ideal candidate for workshops and speaker series sessions. It was a pleasure calling Irfan as a distinguished guest speaker for IYDC2015, which featured more than 40 international and local speakers.</blockquote>
+      <div class="t-rule"></div>
+      <div class="t-name">Maryam Arshad Mahmood</div>
+      <div class="t-role">Partnerships, Google</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ §07 · OFF THE DESK ══════════ -->
+<section class="sec">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 07</span>
+      <span class="scaps" style="font-size:11.5px">Off the desk · The bureau, after hours</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:60px;align-items:baseline;margin-bottom:40px">
+    <h2 class="sec-h2">The bureau,<br><span style="font-style:italic"><span class="mark">after hours.</span></span></h2>
+    <p class="sec-lead">Hiking the woods of Pakistan, climbing walls in Peshawar and Kuala Lumpur, and a stubborn habit of reading on planes.</p>
+  </div>
+  <div class="gallery-mosaic">
+    <div class="gallery-cell" style="grid-column:span 7;grid-row:span 2" data-caption="Climbing reel · Peshawar · Mar 2022">
+      <div class="gallery-img" style="flex:1;min-height:360px;background:#1a1410;position:relative">
+        <div style="text-align:center;color:rgba(255,255,255,0.3)"><div style="font-size:28px;margin-bottom:8px">▶</div><div style="font-family:var(--grot);font-size:9px;letter-spacing:0.14em;text-transform:uppercase">climb-video-1.mp4</div></div>
+        <div style="position:absolute;top:10px;left:10px;background:var(--yel);color:var(--ink);font-family:var(--grot);font-weight:800;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;padding:4px 9px">Reel · 01</div>
+      </div>
+      <div class="gallery-cap"><div class="gallery-cap-text">Climbing reel · Peshawar</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Mar 2022</span></div>
+    </div>
+    <div class="gallery-cell" style="grid-column:span 5;grid-row:span 2" data-caption="Climbing reel · Peshawar · Mar 2022">
+      <div class="gallery-img" style="flex:1;min-height:360px;background:#1a1410;position:relative">
+        <div style="text-align:center;color:rgba(255,255,255,0.3)"><div style="font-size:28px;margin-bottom:8px">▶</div><div style="font-family:var(--grot);font-size:9px;letter-spacing:0.14em;text-transform:uppercase">climb-video-2.mp4</div></div>
+        <div style="position:absolute;top:10px;left:10px;background:var(--yel);color:var(--ink);font-family:var(--grot);font-weight:800;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;padding:4px 9px">Reel · 02</div>
+      </div>
+      <div class="gallery-cap"><div class="gallery-cap-text">Climbing reel · Peshawar</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Mar 2022</span></div>
+    </div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="In the woods · Pakistan"><div class="gallery-img" style="min-height:200px">in-the-woods.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">In the woods</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Pakistan</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="A bench in the forest · Pakistan"><div class="gallery-img" style="min-height:200px">yoga.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">A bench in the forest</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Pakistan</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="On the water · Khanpur, Pakistan"><div class="gallery-img" style="min-height:200px">boat.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">On the water · Khanpur</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Pakistan</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="Mälardalen campus · Västerås, Sweden"><div class="gallery-img" style="min-height:200px">sweden-malardalen.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">Mälardalen campus</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Västerås, Sweden</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="SIFE competition · Sweden · c. 2007"><div class="gallery-img" style="min-height:200px">sweden-audience.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">SIFE competition</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Sweden · c. 2007</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="On the dock · Sweden"><div class="gallery-img" style="min-height:200px">sweden-waterfront.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">On the dock</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Sweden</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="San Francisco · July 2022"><div class="gallery-img" style="min-height:200px">sfo-2022.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">San Francisco</div><span class="scaps" style="font-size:9px;color:var(--ink55)">July 2022</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="Climbing wall · Kuala Lumpur"><div class="gallery-img" style="min-height:200px">climb-malaysia-2.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">Climbing wall</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Kuala Lumpur</span></div></div>
+    <div class="gallery-cell" style="grid-column:span 4" data-caption="The reading pile"><div class="gallery-img" style="min-height:200px">books.jpg</div><div class="gallery-cap"><div class="gallery-cap-text">The reading pile</div><span class="scaps" style="font-size:9px;color:var(--ink55)">Off the road</span></div></div>
+  </div>
+</section>
+
+<!-- ══════════ §08 · MORE FROM IRFAN ══════════ -->
+<section class="sec">
+  <div class="sec-mast">
+    <div class="doublerule"></div>
+    <div class="sec-mast-row">
+      <span class="pill">§ 08</span>
+      <span class="scaps" style="font-size:11.5px">More from Irfan</span>
+      <div class="sec-mast-rule"></div>
+    </div>
+  </div>
+  <div class="more-grid">
+    <a href="https://www.syedirfanajmal.com/ventures" class="more-card"><div class="more-title">Ventures</div><div class="more-desc">Companies, partnerships, and projects beyond DMR.agency.</div><div class="more-cta">View →</div></a>
+    <a href="https://www.syedirfanajmal.com/clients" class="more-card"><div class="more-title">Clients</div><div class="more-desc">A selection of brands and founders the bureau has worked with.</div><div class="more-cta">View →</div></a>
+    <a href="https://www.syedirfanajmal.com/gallery" class="more-card"><div class="more-title">Gallery</div><div class="more-desc">Events, stages, press, and moments from twenty-two years in the field.</div><div class="more-cta">View →</div></a>
+    <a href="https://www.syedirfanajmal.com/podcast" class="more-card"><div class="more-title">Podcast</div><div class="more-desc">The SIA Business Podcast — four seasons.</div><div class="more-cta">View →</div></a>
+  </div>
+</section>
+
+<!-- ══════════ OUTRO ══════════ -->
+<div class="outro">
+  <span class="scaps" style="font-size:11px">A note to close</span>
+  <h2>If your business needs to be <span style="font-style:italic"><span class="mark">found, covered, or believed</span></span>, you know where the bureau is.</h2>
+  <div style="display:flex;gap:14px;justify-content:center;margin-top:36px;flex-wrap:wrap">
+    <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" class="cta-solid">Book a discovery call →</a>
+    <a href="/" class="cta-ghost">Back to the front page</a>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <span class="scaps" style="font-size:9.5px;color:rgba(241,235,222,.35)">The SIA Bureau · syedirfanajmal.com</span>
+  <span class="scaps" style="font-size:9.5px;color:rgba(241,235,222,.35)">Peshawar · Wyoming · Worldwide</span>
+</footer>
+
+<!-- ══════════ LIGHTBOX ══════════ -->
+<div class="lb-overlay" id="lb-overlay">
+  <div class="lb-inner" id="lb-inner" onclick="event.stopPropagation()">
+    <button class="lb-close" id="lb-close">Close ✕</button>
+    <div id="lb-content"></div>
+    <div class="lb-cap" id="lb-cap"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var overlay = document.getElementById('lb-overlay');
+  var content = document.getElementById('lb-content');
+  var cap     = document.getElementById('lb-cap');
+  var close   = document.getElementById('lb-close');
+
+  document.querySelectorAll('.gallery-cell').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+      var img     = cell.querySelector('img');
+      var capText = cell.dataset.caption || cell.querySelector('.gallery-cap-text')?.textContent || '';
+      if (img) {
+        content.innerHTML = '<img src="' + img.src + '" alt="' + (img.alt || '') + '">';
+      } else {
+        content.innerHTML = '<div class="lb-placeholder">' + (cell.querySelector('.gallery-img')?.textContent?.trim() || capText) + '</div>';
+      }
+      cap.textContent = capText;
+      overlay.classList.add('open');
+    });
+  });
+
+  close.addEventListener('click', function(e) {
+    e.stopPropagation();
+    overlay.classList.remove('open');
+  });
+
+  overlay.addEventListener('click', function() {
+    overlay.classList.remove('open');
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') overlay.classList.remove('open');
+  });
+})();
+</script>
+
+</div>
+</body>
+</html>
