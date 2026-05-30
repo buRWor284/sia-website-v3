@@ -136,15 +136,16 @@ const css = `
   /* ── CTA TICKER (secondary, below testimonials) ─────────── */
   .ticker--cta {
     background: var(--INK); color: var(--BG);
-    border-top: 2px solid var(--INK); border-bottom: 2px solid var(--INK);
-    margin-bottom: 0;
+    border-top: 3px solid var(--INK); border-bottom: 3px solid var(--INK);
+    margin-top: 64px; margin-bottom: 0;
+    font-size: 14px; padding: 16px 0; letter-spacing: .05em;
   }
   .ticker--cta .ticker__sep { color: rgba(255,255,255,0.25); }
   .ticker--cta .ticker__dot { color: var(--RED); }
-  .ticker--cta .ticker__bold { font-weight: 700; }
+  .ticker--cta .ticker__bold { font-weight: 800; }
   .ticker--cta a {
     color: var(--BG); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.35);
-    transition: border-color .2s;
+    transition: border-color .2s, color .2s;
   }
   .ticker--cta a:hover { border-color: var(--RED); color: var(--RED); }
 
@@ -376,11 +377,11 @@ const css = `
   }
 
   /* ── SPEAKING ───────────────────────────────────────────── */
-  .speaking { background: var(--INK); padding: 100px 56px; color: var(--Y); }
+  .speaking { background: var(--INK); padding: 100px 56px; color: var(--BG); }
   .speaking-grid { display: grid; grid-template-columns: 1fr 1.45fr; gap: 80px; }
   .speaking__sub {
     margin-top: 26px; font-family: var(--sans); font-size: 18px;
-    color: rgba(245,197,24,.72); line-height: 1.55; max-width: 440px;
+    color: rgba(255,255,255,.65); line-height: 1.55; max-width: 440px;
   }
   .speaking__cta {
     margin-top: 36px; display: inline-flex; align-items: center; gap: 12px;
@@ -825,11 +826,12 @@ export default function HomePage() {
         <div className="ticker" aria-label="Publications · Speaking · Podcast">
           {[0, 1].map((i) => (
             <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
-              <span>Forbes · HBR · SEMrush · TNW · many more</span>
+              <span>Forbes · HBR · SEMrush · TNW · Entrepreneur · SERPed · Search Engine Journal · World Bank</span>
               <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span>SPOKEN IN PK · MY · ID · AE</span>
               <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span>4 PODCAST SEASONS</span>
+              <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             </span>
           ))}
@@ -948,11 +950,49 @@ export default function HomePage() {
         </div>
         <div className="testi-header">
           <h2 className="section-h2" style={{margin:0}}>What clients say.</h2>
-          <a href="/clients" className="testi-all">04 / 24 SHOWN &nbsp;·&nbsp; ALL TESTIMONIALS →</a>
+          <a href="/clients" className="testi-all">06 / 24 SHOWN &nbsp;·&nbsp; ALL TESTIMONIALS →</a>
         </div>
+
+        {/* № 01 — Brett Helling */}
         <div className="testi-row">
           <div>
             <div className="testi__num">№ 01</div>
+            <div className="testi__badge">0 → 1.5M MONTHLY UVs</div>
+          </div>
+          <blockquote className="testi__quote">
+            <span className="q">"</span>Their expertise at doing customized outreach and earning quality whitehat backlinks day in and day out was critical to our phenomenal success and growth.<span className="q">"</span>
+          </blockquote>
+          <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>BH</span>
+            </div>
+            <div className="testi__name">Brett Helling</div>
+            <div className="testi__role">CEO, Ridester.com / TrendlineSEO · USA</div>
+          </div>
+        </div>
+
+        {/* № 02 — Imani Lea Brown */}
+        <div className="testi-row">
+          <div>
+            <div className="testi__num">№ 02</div>
+            <div className="testi__badge">6× DAILY SIGNUPS</div>
+          </div>
+          <blockquote className="testi__quote">
+            <span className="q">"</span>120% increase in organic traffic. Our Public Database clicks jumped 515% and impressions from 30K to 198K — resulting in six times more average daily signups.<span className="q">"</span>
+          </blockquote>
+          <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>IB</span>
+            </div>
+            <div className="testi__name">Imani Lea Brown</div>
+            <div className="testi__role">Centriq (raised $11M) · USA</div>
+          </div>
+        </div>
+
+        {/* № 03 — Azzam Sheikh */}
+        <div className="testi-row">
+          <div>
+            <div className="testi__num">№ 03</div>
             <div className="testi__badge">160K/mo · #4 GOOGLE</div>
           </div>
           <blockquote className="testi__quote">
@@ -966,41 +1006,47 @@ export default function HomePage() {
             <div className="testi__role">National Tyres &amp; Autocare · UK</div>
           </div>
         </div>
-        <div className="testi-row">
-          <div>
-            <div className="testi__num">№ 02</div>
-            <div className="testi__badge">CONTENT &amp; SEO</div>
-          </div>
-          <blockquote className="testi__quote">
-            <span className="q">"</span>Highly knowledgeable about content marketing and SEO. Ideas and execution both cutting-edge strategic doesn&apos;t lose sight of what matters.<span className="q">"</span>
-          </blockquote>
-          <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>LZ</span>
-            </div>
-            <div className="testi__name">Lisa Zahran</div>
-            <div className="testi__role">Copy &amp; Coffee · Malaysia</div>
-          </div>
-        </div>
-        <div className="testi-row">
-          <div>
-            <div className="testi__num">№ 03</div>
-            <div className="testi__badge">TOP 100 DIGITAL MARKETER</div>
-          </div>
-          <blockquote className="testi__quote">
-            <span className="q">"</span>One of the good guys. Knows digital marketing inside out his expertise and growth in this area is exemplary.<span className="q">"</span>
-          </blockquote>
-          <div>
-            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
-              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>SH</span>
-            </div>
-            <div className="testi__name">Sam Hurley</div>
-            <div className="testi__role">OPTIM-EYEZ · UK</div>
-          </div>
-        </div>
+
+        {/* № 04 — Reem El Shafaki */}
         <div className="testi-row">
           <div>
             <div className="testi__num">№ 04</div>
+            <div className="testi__badge">140% TRAFFIC · 3 MONTHS</div>
+          </div>
+          <blockquote className="testi__quote">
+            <span className="q">"</span>Traffic increased 140% in 3 months — against a goal of 25% in 9 months. Page views up 102%. Impressions up 65%. They simply overdelivered.<span className="q">"</span>
+          </blockquote>
+          <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>RE</span>
+            </div>
+            <div className="testi__name">Reem El Shafaki</div>
+            <div className="testi__role">DinarStandard · UAE</div>
+          </div>
+        </div>
+
+        {/* № 05 — Trent Carter */}
+        <div className="testi-row">
+          <div>
+            <div className="testi__num">№ 05</div>
+            <div className="testi__badge">DR 1 → 27 IN 2 MONTHS</div>
+          </div>
+          <blockquote className="testi__quote">
+            <span className="q">"</span>Within 2 months: links from Healthline (DR 92), The Mirror (DR 90), MSN (DR 92). Our domain rating jumped from 1 to 27. Highly recommended.<span className="q">"</span>
+          </blockquote>
+          <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>TC</span>
+            </div>
+            <div className="testi__name">Trent Carter</div>
+            <div className="testi__role">CEO &amp; Founder, Curednation · USA</div>
+          </div>
+        </div>
+
+        {/* № 06 — Chuck Wang */}
+        <div className="testi-row">
+          <div>
+            <div className="testi__num">№ 06</div>
             <div className="testi__badge">PODCAST GUEST</div>
           </div>
           <blockquote className="testi__quote">
@@ -1017,7 +1063,7 @@ export default function HomePage() {
       </section>
 
       {/* ══ CTA TICKER ══ */}
-      <div className="ticker ticker--cta" aria-label="Availability and EMOS">
+      <div className="ticker ticker--cta" aria-label="Availability, EMOS, and Speaking">
         {[0, 1].map((i) => (
           <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
             <span className="ticker__dot">●</span>
@@ -1027,6 +1073,10 @@ export default function HomePage() {
             <span className="ticker__sep">&nbsp;////&nbsp;</span>
             <span>
               <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer">GET CITED BEFORE YOUR SERIES A · EMOS FOUNDING CLASS</a>
+            </span>
+            <span className="ticker__sep">&nbsp;////&nbsp;</span>
+            <span>
+              <a href="/speaking">INVITE ME TO YOUR STAGE · KEYNOTES &amp; WORKSHOPS</a>
             </span>
             <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
           </span>
@@ -1042,7 +1092,7 @@ export default function HomePage() {
         </div>
         <div className="speaking-grid">
           <div>
-            <h2 className="section-h2" style={{color:'var(--Y)',fontSize:'72px',marginBottom:0}}>
+            <h2 className="section-h2" style={{color:'var(--BG)',fontSize:'72px',marginBottom:0}}>
               Stages across<br/>four countries.
             </h2>
             <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>
