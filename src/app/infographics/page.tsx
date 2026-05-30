@@ -1,6 +1,7 @@
 "use client";
 
 import { Colophon, Subscriptions } from "@/components/bureau";
+import { ScrollButtons } from "@/components/ScrollButtons";
 import { DoubleRule, HRule, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {
   GROT,

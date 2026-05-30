@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ScrollButtons } from "@/components/ScrollButtons";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   Flag,

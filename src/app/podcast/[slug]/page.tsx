@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation"
+import { ScrollButtons } from "@/components/ScrollButtons";
 import { Colophon } from "@/components/bureau"
 import {
   DoubleRule,

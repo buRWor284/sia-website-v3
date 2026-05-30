@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { ScrollButtons } from "@/components/ScrollButtons";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,

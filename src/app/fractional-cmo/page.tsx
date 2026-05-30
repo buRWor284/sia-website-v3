@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
+import { ScrollButtons } from "@/components/ScrollButtons";
 import Script from "next/script";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import {

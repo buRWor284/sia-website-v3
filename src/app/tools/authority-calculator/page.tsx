@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { ScrollButtons } from "@/components/ScrollButtons";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
