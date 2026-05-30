@@ -1,6 +1,6 @@
 "use client";
 
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -200,7 +200,7 @@ function Hero() {
         </span>
       </h1>
 
-      {/* Bylines — publication credits replace the name (already in Mast) */}
+      {/* Bylines — publication credits replace the name (already in ) */}
       <div style={{ display: "flex", justifyContent: "center", marginTop: 22, gap: 6, flexWrap: "wrap" }}>
         <SCaps size={11} ls="0.20em" color={INK55}>
           As featured in
@@ -955,7 +955,6 @@ function ClosingCTA() {
 export default function VenturesPage() {
   return (
     <div style={{ minHeight: "100vh" }}>
-      <Mast active="Ventures" />
       <Hero />
       <CurrentVenturesSection />
       <PastVenturesSection />

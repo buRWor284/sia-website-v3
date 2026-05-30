@@ -1,4 +1,4 @@
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {
   CALENDLY,
@@ -180,7 +180,6 @@ function TipItem({ n, text }: Tip) {
 export default function WritingTipsGuidePage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Writing" />
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <section style={{ padding: "80px 56px 64px" }}>

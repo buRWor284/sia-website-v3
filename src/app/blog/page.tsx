@@ -1,4 +1,4 @@
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   HRule,
   Mark,
@@ -125,7 +125,6 @@ const ARCHIVED: ReadonlyArray<{
 export default function BlogPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Resources" />
 
       {/* ── Header ───────────────────────────────────────────── */}
       <section style={{ padding: "72px 56px 56px" }}>

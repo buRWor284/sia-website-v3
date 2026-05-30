@@ -1,4 +1,4 @@
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -545,7 +545,6 @@ const Press = () => (
 export default function InsightsPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Insights" />
       <Hero />
       <Featured />
       <AllArticles />

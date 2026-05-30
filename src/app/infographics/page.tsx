@@ -1,6 +1,6 @@
 "use client";
 
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import { DoubleRule, HRule, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {
   GROT,
@@ -333,7 +333,6 @@ const Grid = () => (
 export default function InfographicsPage() {
   return (
     <div style={{ background: PAPER, minHeight: "100vh" }}>
-      <Mast active="Writing" />
       <Hero />
       <Grid />
       <Subscriptions sectionNumber="02" />

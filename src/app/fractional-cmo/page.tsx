@@ -2,7 +2,7 @@
 
 import { Fragment } from "react";
 import Script from "next/script";
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -852,7 +852,6 @@ export default function FractionalCMOPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
-      <Mast active="Fractional CMO" />
       <Hero />
       <Scope />
       <Timeline />

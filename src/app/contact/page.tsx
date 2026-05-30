@@ -1,6 +1,6 @@
 "use client";
 
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -170,7 +170,6 @@ function ContactForm() {
 export default function ContactPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Contact" />
 
       {/* ── Header ───────────────────────────────────────────── */}
       <section className="sx" style={{ paddingTop: 80, paddingBottom: 72 }}>

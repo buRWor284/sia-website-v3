@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   Mark,
@@ -846,7 +846,6 @@ export default function AuthorityCalculatorPage() {
     <>
       <style>{PAGE_STYLES}</style>
       <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-        <Mast active="Resources" />
         <Hero />
         <Inputs st={st} set={set} />
         <Comparison st={st} />

@@ -1,4 +1,4 @@
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   Flag,
@@ -1276,7 +1276,6 @@ const Outro = () => (
 export default function AboutPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="About" />
       <Hero />
       <Curriculum />
       <Honours />

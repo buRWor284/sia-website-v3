@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   Flag,
   Mark,
@@ -638,7 +638,6 @@ const EditorsNote = () => (
 export default function ClientsPage() {
   return (
     <div style={{ background: PAPER, minHeight: "100vh" }}>
-      <Mast active="Clients" />
       <Hero />
       <PreAgency />
       <Tier1 />

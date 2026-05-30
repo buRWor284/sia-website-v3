@@ -1,4 +1,4 @@
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {
   CALENDLY,
@@ -33,7 +33,6 @@ const UL: React.CSSProperties = { margin: "0 0 20px", paddingLeft: 24, fontSize:
 export default function NeuromarketingGuidePage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Resources" />
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <section style={{ padding: "80px 56px 64px" }}>

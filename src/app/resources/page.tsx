@@ -1,4 +1,4 @@
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import { SCaps } from "@/components/bureau/primitives";
 import { ResourcesClientShell } from "@/components/resources/ResourcesClientShell";
 import { GROT, INK, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
@@ -152,7 +152,6 @@ const Hero = () => (
 export default function ResourcesPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Resources" />
       <Hero />
       <ResourcesClientShell />
       <Subscriptions sectionNumber="07" />

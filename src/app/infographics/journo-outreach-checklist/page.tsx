@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   Mark,
@@ -751,7 +751,6 @@ export default function JournoOutreachChecklistPage() {
       `}</style>
 
       <div style={{ background: PAPER, minHeight: "100vh" }}>
-        <Mast active="Writing" />
         <Hero />
 
         <Controls count={count} mode={mode} setMode={m => setMode(m as "interactive" | "print")} onReset={reset} />

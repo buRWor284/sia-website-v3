@@ -1,4 +1,4 @@
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -74,7 +74,6 @@ const UL: React.CSSProperties = {
 export default function PersonalBrandingGuidePage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Writing" />
 
       {/* ── Header ─────────────────────────────────────────────── */}
       <section style={{ padding: "80px 56px 64px" }}>

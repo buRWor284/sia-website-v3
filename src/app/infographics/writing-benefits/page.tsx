@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import { HRule, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {
   GROT,
@@ -1081,7 +1081,6 @@ const EditorsNote = () => (
 export default function InfographicsPage() {
   return (
     <div style={{ background: PAPER, minHeight: "100vh" }}>
-      <Mast active="Writing" />
       <Hero />
       <Findings />
       <Dose />

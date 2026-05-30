@@ -1317,3 +1317,25 @@ body > * { position: relative; z-index: 2; }
 @media (min-width: 1024px) {
   .grid-podcast-cards { grid-template-columns: repeat(3, 1fr); gap: 20px; }
 }
+
+/* =========================================================================
+   SITE HEADER (shared across all pages)
+   ========================================================================= */
+
+/* Tablet: tighten side padding */
+@media (max-width: 1024px) {
+  .site-header__top { padding-left: 32px !important; padding-right: 32px !important; }
+  .site-header__bar { padding-left: 32px !important; padding-right: 32px !important; }
+}
+
+/* Mobile: hide wire + desktop nav, show hamburger */
+@media (max-width: 820px) {
+  .site-header__top {
+    grid-template-columns: 1fr auto !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  .site-header__wire  { display: none !important; }
+  .site-header__bar   { display: none !important; }
+  .site-header__hamburger { display: flex !important; }
+}

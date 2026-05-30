@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation"
-import { Colophon, Mast } from "@/components/bureau"
+import { Colophon } from "@/components/bureau"
 import {
   DoubleRule,
   HRule,
@@ -62,7 +62,6 @@ export default async function EpisodePage({
 
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Mast active="Podcast" />
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section

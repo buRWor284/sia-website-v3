@@ -2,7 +2,7 @@
 
 import { useState, Fragment } from "react";
 import Script from "next/script";
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import { ClientLogo } from "@/components/bureau/ClientLogo";
 import {
   DoubleRule,
@@ -763,7 +763,6 @@ export default function SpeakingPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
-      <Mast active="Speaking" />
       <Hero />
       <WatchTheWork />
       <Topics />

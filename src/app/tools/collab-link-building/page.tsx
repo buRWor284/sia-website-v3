@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Colophon, Mast, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import CollabLinkBuildingTool from "@/components/tools/CollabLinkBuildingTool";
 
 export const metadata: Metadata = {
@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 export default function CollabLinkBuildingPage() {
   return (
     <>
-      <Mast active="Resources" />
       <CollabLinkBuildingTool />
       <Subscriptions sectionNumber="05" />
       <Colophon />

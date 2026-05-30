@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Newsreader, Archivo, JetBrains_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
+import { SiteHeader } from "@/components/bureau";
 import "./globals.css";
 
 const newsreader = Newsreader({
@@ -45,7 +46,10 @@ export default function RootLayout({
       lang="en"
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <SiteHeader />
+        {children}
+      </body>
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
       {/* Mailchimp embedded form validation — jQuery required by mc-validate.js */}
       <Script
