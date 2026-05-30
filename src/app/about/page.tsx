@@ -9,6 +9,8 @@ import {
   SCaps,
   SectionMast,
 } from "@/components/bureau/primitives";
+import { ClientLogo } from "@/components/bureau/ClientLogo";
+import { CLIENTS_PRE, CLIENTS_TIER1, type Client } from "@/data/clients";
 import {
   CALENDLY,
   GROT,
@@ -17,6 +19,7 @@ import {
   INK35,
   INK55,
   INK70,
+  MONO,
   PAPER,
   PAPER2,
   SERIF,
@@ -25,109 +28,142 @@ import {
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const BIO_STATS: ReadonlyArray<[string, string]> = [
-  ["Based in",       "Peshawar, Pakistan"],
-  ["Educated in",    "Sweden (M.Sc., Mälardalen, 2007)"],
-  ["Earlier degree", "Bachelor in IT, Pakistan (2004)"],
-  ["Worked in",      "Stockholm & Copenhagen (2007 to 10)"],
-  ["Accelerated at", "BlackBox Connect, SV (2014)"],
-  ["Founder of",     "DMR.agency · digital PR & SEO"],
-  ["Speaks",         "English, Urdu, Pashto"],
-  ["Available for",  "Fractional CMO, Speaking, Press"],
-];
-
-type TimelineItem = {
-  year: string;
-  t: string;
-  d: string;
-  flag?: "SE" | "DK" | "US" | "PK";
-  tag?: string;
+// Affiliate Prophet: US remote work signal (not in clients.ts — about page only)
+const AFFILIATE_PROPHET: Client = {
+  key: "affiliate-prophet",
+  name: "Affiliate Prophet",
+  fullName: "Affiliate Prophet · USA",
+  country: "US",
+  countryLabel: "Remote from Denmark",
+  role: "Marketing · remote from Denmark",
+  when: "2009",
+  blurb:
+    "A US-based MarTech startup, handled remotely from Denmark — among the " +
+    "earliest remote-first engagements before distributed work was common practice.",
+  wordmark: "Affiliate Prophet",
+  logo: null,
 };
 
-const TIMELINE: ReadonlyArray<TimelineItem> = [
-  { year: "2026", t: "EMOS · Earned Media OS",                      d: "Productized the bureau's playbook for in-house teams.",                                             tag: "New"   },
-  { year: "2021", t: "SIA Enterprises Inc",                          d: "Incorporated in Wyoming as a C-Corp, powering DMR.agency."                                                       },
-  { year: "2018", t: "The SIA Business Podcast",                     d: "Launched. Three seasons, twenty-nine episodes."                                                                   },
-  { year: "2018", t: "Speaking tour: IN5 Dubai · Durshal KP",        d: '"Media Hacks" and "Personal Branding" workshops.'                                                               },
-  { year: "2017", t: "Panel: Arabian Travel Market, Dubai",          d: '"Marketing to the Modern Muslim Traveller" — with Tim Soulo (Ahrefs).'                                           },
-  { year: "2016", t: "DMSS Conference, Bali",                        d: "Workshop on Media Hacks for ~200 attendees."                                                                     },
-  { year: "2016", t: "Speaking debut, Dubai",                        d: "Astrolabs · IK Institute of Business · MPS2016."                                                                 },
-  { year: "2014", t: "BlackBox Connect, Silicon Valley",             d: "Summer cohort of the global startup accelerator.",                                       flag: "US"               },
-  { year: "2013", t: "Founded DMR.agency",                           d: "Digital PR and earned media. 100+ clients across 20+ countries."                                                },
-  { year: "2013", t: "P@SHA Best Startup Award",                     d: "Silk Route Interactive (Crime Mapper) · 34% crime reduction in 3 months.",               tag: "Award"            },
-  { year: "2013", t: "i2i Innovation to Impact, Finalist",           d: "Crime Mapper recognized for civic technology."                                                                   },
-  { year: "2010", t: "Co-founded Silk Route Interactive",            d: "Spatial intelligence company, as Head of Marketing."                                                            },
-  { year: "2008", t: "Invited Judge, SIFE Competition",              d: "Students In Free Enterprise."                                                                                    },
-  { year: "2007", t: "M.Sc., Mälardalen University, Sweden",         d: "International Business & Entrepreneurship.",                                             flag: "SE"               },
-  { year: "2007", t: "Marcus Evans, Sweden",                         d: "Through 2010. International business intelligence and events.",                           flag: "SE"               },
-  { year: "2007", t: "InfoShare, Denmark",                           d: "Software development company, Copenhagen.",                                               flag: "DK"               },
-  { year: "2007", t: "Affiliate Prophet, USA (remote)",              d: "MarTech startup, remote role.",                                                           flag: "US"               },
-  { year: "2007", t: "SIFE National Cup Sweden · 2nd",               d: "Same team won the national cup in 2009 and 2010.",                                        flag: "SE"               },
-  { year: "2007", t: "Best Recruitment Campaign · Adecco",           d: "Fortune 500 recruitment award."                                                                                  },
-  { year: "2004", t: "Bachelor in IT, Pakistan",                     d: "Earliest degree."                                                                                               },
+// Override CLIENTS_PRE entries with corrected dates and display values for the about page.
+// (clients.ts is shared with the clients page so we don't mutate it there.)
+const PRE_AGENCY_CARDS: ReadonlyArray<Client> = [
+  // GIZ: correct year is 2012, Islamabad office context
+  {
+    ...CLIENTS_PRE[0],
+    when: "2012",
+    blurb:
+      "Germany's official agency for international development cooperation. " +
+      "Contributed to a technology programme through their Islamabad office. " +
+      "Operates in 120+ countries with EUR 3B+ annual volume, backed by the German federal government.",
+  },
+  // Marcus Evans: physically worked in Stockholm office of a UK-HQ'd company
+  {
+    ...CLIENTS_PRE[1],
+    country: "SE" as any,
+    countryLabel: "Stockholm, Sweden",
+    fullName: "Marcus Evans Group · London HQ",
+    role: "Conference producer · Stockholm office",
+    blurb:
+      "Premier global business intelligence and events company headquartered in London " +
+      "and operating in 60+ countries. Based in their Stockholm office, producing " +
+      "senior-executive conferences across major industries.",
+  },
+  // InfoShare: 2009, in person (not remote)
+  {
+    ...CLIENTS_PRE[2],
+    when: "2009",
+    role: "Digital / marketing · in person",
+    blurb:
+      "Danish digital organisation based in Copenhagen. An in-person engagement in " +
+      "the Scandinavian tech scene before moving into international consulting.",
+  },
+  AFFILIATE_PROPHET,
 ];
 
-type Award = { year: string; t: string; by: string };
-const AWARDS: ReadonlyArray<Award> = [
-  { year: "2014", t: "BlackBox Connect, Silicon Valley",     by: "Highly competitive global startup accelerator, Summer cohort."     },
-  { year: "2013", t: "P@SHA Best Startup Award",             by: 'For "Crime Mapper" — 34% crime reduction in three months.'        },
-  { year: "2013", t: "i2i Finalist",                          by: "Innovation to Impact competition."                                },
-  { year: "2008", t: "Invited Judge · SIFE Competition",     by: "Students In Free Enterprise."                                     },
-  { year: "2007", t: "SIFE National Cup Sweden · 2nd Place", by: "Team went on to win the national cup in 2009 & 2010."             },
-  { year: "2007", t: "Best Recruitment Campaign · Adecco",   by: "Awarded by Adecco (Fortune 500)."                                 },
+type Testi = {
+  badge: string;
+  quote: string;
+  name: string;
+  role: string;
+  place: string;
+  img: string;
+};
+
+const TESTIMONIALS: ReadonlyArray<Testi> = [
+  {
+    badge: "0 → 1.5M MONTHLY UVs",
+    quote:
+      "Their expertise at doing customized outreach and earning quality whitehat backlinks day in and day out was critical to our phenomenal success and growth.",
+    name: "Brett Helling",
+    role: "CEO, Ridester.com / TrendlineSEO",
+    place: "USA",
+    img: "/assets/testimonials/brett-helling.jpeg",
+  },
+  {
+    badge: "6× DAILY SIGNUPS",
+    quote:
+      "120% increase in organic traffic. Our Public Database clicks jumped 515% and impressions from 30K to 198K — resulting in six times more average daily signups.",
+    name: "Imani Lea Brown",
+    role: "Centriq (raised $11M)",
+    place: "USA",
+    img: "/assets/testimonials/imani-lea-brown.jpg",
+  },
+  {
+    badge: "160K/mo · #4 GOOGLE",
+    quote:
+      "Ranked a keyword to #4 on Google that gets over 160,000 searches a month. Commercial intent. Can't thank Irfan and the team enough.",
+    name: "Azzam Sheikh",
+    role: "National Tyres & Autocare, UK",
+    place: "Manchester",
+    img: "/assets/testimonials/azzam-sheikh.jpeg",
+  },
+  {
+    badge: "140% TRAFFIC · 3 MONTHS",
+    quote:
+      "Traffic increased 140% in 3 months — against a goal of 25% in 9 months. Page views up 102%. Impressions up 65%. They simply overdelivered.",
+    name: "Reem El Shafaki",
+    role: "DinarStandard",
+    place: "UAE",
+    img: "/assets/testimonials/reem-el-shafaki.jpg",
+  },
+  {
+    badge: "DMSS.IO BALI · WORKSHOP",
+    quote:
+      "Syed spoke at our conference and gave me a private consultation on media exposure. An excellent public speaker with highly actionable advice. Comes highly recommended.",
+    name: "Brie Moreau",
+    role: "Co-founder, DMSS.io Conference",
+    place: "Bali",
+    img: "/assets/testimonials/brie-moreau.jpg",
+  },
+  {
+    badge: "PODCAST GUEST",
+    quote:
+      "Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it, and it is hard not to like the guy.",
+    name: "Chuck Wang",
+    role: "The MVP Marketing Podcast",
+    place: "San Francisco",
+    img: "/assets/testimonials/chuck-wang.jpg",
+  },
 ];
 
-type PressGroup = { label: string; items: ReadonlyArray<[string, string]> };
+type PressGroup = { label: string; items: ReadonlyArray<string> };
 const PRESS_GROUPS: ReadonlyArray<PressGroup> = [
-  { label: "Global business & ideas", items: [
-    ["Forbes",                      "Contributor & featured"          ],
-    ["Harvard Business Review",     "Guest contributor"               ],
-    ["HuffPost",                    "Contributor · 358M monthly visitors"],
-    ["Entrepreneur",                "Contributor"                     ],
-    ["Reader's Digest",             "Featured"                        ],
-  ]},
-  { label: "Tech & startups", items: [
-    ["The Next Web (TNW)",          "Featured"                        ],
-    ["CNET",                        "Featured"                        ],
-    ["Virgin Startup",              "Contributor"                     ],
-    ["GBG · Google Business Group", "Featured"                        ],
-  ]},
-  { label: "Marketing, SEO & PR", items: [
-    ["SEMrush Blog",                "Contributor"                     ],
-    ["Search Engine Journal",       "Contributor"                     ],
-    ["SERPed",                      "Contributor"                     ],
-    ["Business.com",                "Contributor · 30M readers/month" ],
-    ["Spin Sucks",                  "Contributor"                     ],
-    ["GrowMap",                     "Contributor"                     ],
-  ]},
-  { label: "Regional & development", items: [
-    ["Aurora",                      "Pakistan's largest marketing magazine"],
-    ["The World Bank Blog",         "Contributor"                     ],
-  ]},
-];
-
-type Testimonial = { quote: string; name: string; role: string; place: string };
-const TESTIMONIALS: ReadonlyArray<Testimonial> = [
-  { quote: "Ranked a keyword to #4 on Google that gets over 160,000 searches a month. Commercial intent. Can't thank Irfan and the team enough.",
-    name: "Azzam Sheikh",   role: "National Tyres & Autocare, UK", place: "Manchester"    },
-  { quote: "Highly knowledgeable about content marketing and SEO. Ideas and execution both cutting-edge strategic, doesn't lose sight of what matters.",
-    name: "Lisa Zahran",    role: "Copy & Coffee, Malaysia",        place: "Kuala Lumpur" },
-  { quote: "One of the good guys. Knows digital marketing inside out. His expertise and growth in this area is exemplary.",
-    name: "Sam Hurley",     role: "OPTIM-EYEZ, UK",                 place: "London"       },
-  { quote: "Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it, and it is hard not to like the guy.",
-    name: "Chuck Wang",     role: "The MVP Marketing Podcast, USA", place: "San Francisco"},
-  { quote: "Working with Irfan was a masterclass in earned media. He knows how to find the angle that journalists actually want.",
-    name: "Ghazzal Mehdi",  role: "formerly Marcus Evans",          place: "Dubai"        },
-  { quote: "Real, tested SEO and content strategy. No fluff, no jargon, just outcomes you can put a number on.",
-    name: "Daniel Bak",     role: "Marketing consultant",           place: "Stockholm"    },
-  { quote: "Brought clarity to a campaign that had been spinning for months. We saw measurable lift inside the first quarter.",
-    name: "Ercan Varol",    role: "Digital marketing lead",         place: "Istanbul"     },
-  { quote: "Generous with knowledge, sharp with execution. The kind of operator you want on your side of the table.",
-    name: "Roberto Falchi", role: "Marketing & speaking",           place: "Milan"        },
-  { quote: "A trusted advisor for any founder navigating the awkward middle where you have product-market fit but not yet a brand.",
-    name: "Khurram Awan",   role: "Founder",                        place: "Lahore"       },
-  { quote: "He took the time to actually understand the business before recommending anything. Rare.",
-    name: "Ameen Khwaja",   role: "Client",                         place: "Riyadh"       },
+  {
+    label: "Global business & ideas",
+    items: ["Forbes", "Harvard Business Review", "HuffPost", "Entrepreneur", "Reader's Digest"],
+  },
+  {
+    label: "Tech & startups",
+    items: ["The Next Web (TNW)", "CNET", "Virgin Startup", "GBG · Google Business Group"],
+  },
+  {
+    label: "Marketing, SEO & PR",
+    items: ["SEMrush Blog", "Search Engine Journal", "SERPed", "Business.com", "Spin Sucks", "GrowMap"],
+  },
+  {
+    label: "Regional & development",
+    items: ["Aurora · Pakistan's largest marketing magazine", "The World Bank Blog"],
+  },
 ];
 
 type MediaItem = {
@@ -142,40 +178,77 @@ type MediaItem = {
   badge?: string;
 };
 
-const OFF_THE_DESK: ReadonlyArray<MediaItem> = [
-  { video: "/assets/personal/climb-video-1.mp4", poster: "/assets/personal/climb-1.jpg",
-    cap: "Climbing reel · Peshawar", sub: "Mar 2022",
-    col: "span 7", row: "span 2", minH: 380, badge: "Reel · 01" },
-  { video: "/assets/personal/climb-video-2.mp4", poster: "/assets/personal/climb-2.jpg",
-    cap: "Climbing reel · Peshawar", sub: "Mar 2022",
-    col: "span 5", row: "span 2", minH: 380, badge: "Reel · 02" },
-  { src: "/assets/personal/in-the-woods.jpg",
-    cap: "In the woods", sub: "Pakistan",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/yoga.jpg",
-    cap: "A bench in the forest", sub: "Pakistan",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/boat.jpg",
-    cap: "On the water · Khanpur", sub: "Pakistan",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/sweden-malardalen.jpg",
-    cap: "Mälardalen campus", sub: "Västerås, Sweden",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/sweden-audience.jpg",
-    cap: "SIFE competition audience", sub: "Sweden · c. 2007",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/sweden-waterfront.jpg",
-    cap: "On the dock", sub: "Sweden",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/sfo-2022.jpg",
-    cap: "San Francisco", sub: "July 2022",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/climb-malaysia-2.jpg",
-    cap: "Climbing wall", sub: "Kuala Lumpur",
-    col: "span 4", row: "span 1", minH: 220 },
-  { src: "/assets/personal/books.jpg",
-    cap: "The reading pile", sub: "Off the road",
-    col: "span 4", row: "span 1", minH: 220 },
+// Abroad photos only. Istanbul slot commented — add /assets/personal/istanbul.jpg when ready.
+const OFF_DESK: ReadonlyArray<MediaItem> = [
+  {
+    video: "/assets/personal/climb-video-1.mp4",
+    poster: "/assets/personal/climb-1.jpg",
+    cap: "Climbing reel · Peshawar",
+    sub: "Mar 2022",
+    col: "span 6",
+    row: "span 2",
+    minH: 280,
+    badge: "Reel · 01",
+  },
+  {
+    video: "/assets/personal/climb-video-2.mp4",
+    poster: "/assets/personal/climb-2.jpg",
+    cap: "Climbing reel · Peshawar",
+    sub: "Mar 2022",
+    col: "span 6",
+    row: "span 2",
+    minH: 280,
+    badge: "Reel · 02",
+  },
+  {
+    src: "/assets/personal/sweden-malardalen.jpg",
+    cap: "Mälardalen campus",
+    sub: "Västerås, Sweden",
+    col: "span 4",
+    row: "span 1",
+    minH: 220,
+  },
+  {
+    src: "/assets/personal/sweden-audience.jpg",
+    cap: "SIFE competition",
+    sub: "Sweden · 2007",
+    col: "span 4",
+    row: "span 1",
+    minH: 220,
+  },
+  {
+    src: "/assets/personal/sfo-2022.jpg",
+    cap: "San Francisco",
+    sub: "July 2022",
+    col: "span 4",
+    row: "span 1",
+    minH: 220,
+  },
+  {
+    src: "/assets/personal/sweden-waterfront.jpg",
+    cap: "On the dock",
+    sub: "Sweden",
+    col: "span 6",
+    row: "span 1",
+    minH: 220,
+  },
+  {
+    src: "/assets/personal/climb-malaysia-2.jpg",
+    cap: "Climbing wall",
+    sub: "Kuala Lumpur",
+    col: "span 6",
+    row: "span 1",
+    minH: 220,
+  },
+  {
+    src: "/assets/personal/Irfan_Istanbul_1.jpeg",
+    cap: "Istanbul",
+    sub: "Turkey",
+    col: "span 12",
+    row: "span 1",
+    minH: 300,
+    badge: "Istanbul",
+  },
 ];
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -184,7 +257,7 @@ const Hero = () => (
   <section className="sx" style={{ background: PAPER }}>
     <div className="res-hero-grid">
 
-      {/* Left: count */}
+      {/* Left: years count */}
       <div className="res-hero-left">
         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
           22
@@ -200,23 +273,23 @@ const Hero = () => (
           ABOUT
         </div>
         <SCaps size={10} ls="0.24em" color={INK55}>
-          Founder &nbsp;·&nbsp; Writer &nbsp;·&nbsp; Speaker &nbsp;·&nbsp; Filed from Peshawar
+          Entrepreneur &nbsp;·&nbsp; Marketer &nbsp;·&nbsp; Columnist &nbsp;·&nbsp; Int&apos;l Speaker
         </SCaps>
         <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
-          The man behind<br />
-          <em style={{ fontStyle: "italic", fontWeight: 600 }}>the bureau.</em>
+          The work speaks.<br />
+          <em style={{ fontStyle: "italic", fontWeight: 600 }}>The numbers confirm it.</em>
         </h1>
-        <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
-          From Peshawar to Silicon Valley — a hundred clients, a dozen publications, and a book still coming.
+        <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.55, color: INK70, maxWidth: 480 }}>
+          No retainer theatre. No vanity metrics. The results are on the record, and the case studies are below.
         </p>
       </div>
 
       {/* Right: topic index */}
       <div className="res-hero-right">
         {[
-          { label: "My Story",      sub: "Biography · 2004 – 2026" },
-          { label: "The Timeline",  sub: "Career milestones" },
-          { label: "Press & Awards", sub: "Recognition · Publications" },
+          { label: "Press",        sub: "Forbes · HBR · 13 more" },
+          { label: "Case Studies", sub: "Results on the record" },
+          { label: "Client words", sub: "6 testimonials on file" },
         ].map(t => (
           <div key={t.label}>
             <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
@@ -229,627 +302,210 @@ const Hero = () => (
   </section>
 );
 
-// ─── About Lead ───────────────────────────────────────────────────────────────
+// ─── Stats Strip ──────────────────────────────────────────────────────────────
 
-const AboutLead = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 48, paddingBottom: 60 }}>
-    <DoubleRule style={{ margin: "0 0 40px" }} />
+const STATS = [
+  { num: "Est. 2004", label: "In practice", sub: "US remote clients from day one" },
+  { num: "SE · DK · SV", label: "Countries, lived and worked", sub: "Peshawar and Islamabad now" },
+  { num: "300+", label: "Clients served", sub: "USA · EU · MENA · APAC" },
+  { num: "15+", label: "Major bylines", sub: "Forbes · HBR · HuffPost · and more" },
+] as const;
 
-    {/* Lead — portrait + 2-col body + vitals sidebar */}
-    <div className="grid-about-lead">
-      {/* Portrait card */}
-      <figure
-        style={{
-          margin: 0,
-          background: PAPER2,
-          border: `1px solid ${INK}`,
-          padding: 14,
-          display: "flex",
-          flexDirection: "column",
-          alignSelf: "start",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            aspectRatio: "4/5",
-            border: `1px solid ${INK}`,
-            background: PAPER,
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/assets/headshot.jpg"
-            alt="Syed Irfan Ajmal"
-            style={{
-              position: "absolute",
-              inset: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              objectPosition: "center 18%",
-              filter: "grayscale(0.18) contrast(1.02)",
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: 12,
-              left: 12,
-              background: YEL,
-              padding: "4px 10px",
-              fontFamily: GROT,
-              fontWeight: 800,
-              fontSize: 10.5,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: INK,
-            }}
-          >
-            The Editor
-          </div>
+const StatsStrip = () => (
+  <div
+    className="grid-stats"
+    style={{
+      borderTop: `2px solid ${INK}`,
+      borderBottom: `2px solid ${INK}`,
+    }}
+  >
+    {STATS.map((s, i) => (
+      <div key={i} className="stat-item" style={{ padding: "22px 28px" }}>
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(18px, 2.5vw, 28px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em", borderBottom: `2px solid ${YEL}`, paddingBottom: 4, display: "inline-block" }}>
+          {s.num}
         </div>
-        <figcaption style={{ marginTop: 12 }}>
-          <SCaps size={10} ls="0.20em" color={INK70}>Portrait, by staff</SCaps>
-          <div
-            style={{
-              marginTop: 6,
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 14,
-              color: INK,
-              lineHeight: 1.4,
-            }}
-          >
-            Syed Irfan Ajmal, photographed at the bureau. Peshawar, May 2026.
+        <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 800, fontSize: 13, color: INK, textTransform: "uppercase", letterSpacing: "-0.01em" }}>
+          {s.label}
+        </div>
+        {/* SE · DK · SV item: show flags */}
+        {i === 1 ? (
+          <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <Flag c="SE" w={18} />
+            <Flag c="DK" w={18} />
+            <Flag c="US" w={18} />
+            <span style={{ fontFamily: MONO, fontSize: 10, color: INK55, letterSpacing: "0.06em" }}>
+              SE · DK · SV · Peshawar now
+            </span>
           </div>
-        </figcaption>
-      </figure>
-
-      {/* Body — 2-col bio with drop cap */}
-      <div
-        className="hero-body"
-        style={{
-          fontFamily: SERIF,
-          fontSize: 17,
-          color: INK,
-          lineHeight: 1.55,
-          textAlign: "justify",
-        }}
-      >
-        <p style={{ margin: 0 }}>
-          <span
-            className="hero-drop-cap"
-            style={{
-              float: "left",
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontStyle: "italic",
-              lineHeight: 0.78,
-              marginRight: 10,
-              marginTop: 6,
-              color: INK,
-              background: YEL,
-              padding: "6px 8px 2px 8px",
-            }}
-          >
-            I
-          </span>
-          have spent the last twenty-two years doing one thing, badly at first
-          and then a little better each year: helping businesses get found, get
-          covered, and get customers. The methods have changed. The
-          questions <em>(who reads what; what earns trust; why this story now)</em>
-          {" "}have not.
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          The work began in Sweden, in 2007: a Master of Science in
-          International Business and Entrepreneurship at Mälardalen University,
-          followed by three years of hands-on work across Stockholm and
-          Copenhagen.
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          In 2010 I returned to Peshawar and co-founded{" "}
-          <strong>Silk Route Interactive</strong>, a spatial intelligence
-          company, as Head of Marketing. Our flagship product, Crime Mapper,
-          helped reduce crime in its participating areas by thirty-four percent
-          in three months and won the P@SHA Best Startup Award in 2013. The
-          next summer I was accepted to BlackBox Connect in Silicon Valley.
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          In Sweden I worked at <strong>Marcus Evans</strong>. In Denmark,
-          at <strong>InfoShare</strong>, a software development company. And
-          later, remotely from Pakistan, at{" "}
-          <strong>Affiliate Prophet</strong>, a MarTech startup in the United
-          States.
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          Soon after, I founded <strong>DMR.agency</strong>: a digital PR and
-          earned-media practice that has served roughly a hundred clients in
-          twenty-plus countries, including Procter &amp; Gamble. The writing
-          happened in parallel. Pieces in <em>Forbes</em>, the{" "}
-          <em>Harvard Business Review</em>, <em>HuffPost</em>,{" "}
-          <em>The Next Web</em>, <em>Entrepreneur</em>, the{" "}
-          <em>World Bank blog</em>. A podcast, three seasons, twenty-nine
-          episodes. Speaking dates in Malaysia, Indonesia, the UAE, and
-          Pakistan; webinars for American and British audiences. A book is
-          coming. (It has been coming for a while.)
-        </p>
-        <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
-          In 2021 I incorporated SIA Enterprises in Wyoming. In 2026 I
-          productized the way we work into{" "}
-          <strong>EMOS — the Earned Media OS</strong>. Otherwise: still in
-          Peshawar, still writing, still answering email.
-        </p>
+        ) : (
+          <div style={{ marginTop: 6, fontFamily: MONO, fontSize: 11, color: INK70, lineHeight: 1.5, letterSpacing: "0.04em" }}>
+            {s.sub}
+          </div>
+        )}
       </div>
-
-      {/* Sidebar — vital stats */}
-      <aside className="about-vitals-aside">
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Pill size={11} ls="0.20em">Vital Stats</Pill>
-          <div style={{ flex: 1, height: 1, background: INK35 }} />
-        </div>
-        <div style={{ borderTop: `2px solid ${INK}`, marginTop: 10 }} />
-        <dl style={{ margin: 0, padding: 0, fontFamily: SERIF, color: INK }}>
-          {BIO_STATS.map(([k, v]) => (
-            <div
-              key={k}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "120px 1fr",
-                gap: 14,
-                padding: "11px 0",
-                borderBottom: `1px solid ${INK15}`,
-                alignItems: "baseline",
-              }}
-            >
-              <dt>
-                <SCaps size={10.5} ls="0.14em" color={INK70}>{k}</SCaps>
-              </dt>
-              <dd
-                style={{
-                  margin: 0,
-                  fontSize: 15.5,
-                  lineHeight: 1.4,
-                }}
-              >
-                {v}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        <div style={{ marginTop: 22, display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <a
-            href={CALENDLY}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              flex: 1,
-              textAlign: "center",
-              padding: "12px 14px",
-              background: INK,
-              color: PAPER,
-              textDecoration: "none",
-              fontFamily: GROT,
-              fontWeight: 700,
-              fontSize: 11.5,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-            }}
-          >
-            Book a call →
-          </a>
-          <a
-            href="#"
-            style={{
-              flex: 1,
-              textAlign: "center",
-              padding: "12px 14px",
-              background: YEL,
-              color: INK,
-              textDecoration: "none",
-              fontFamily: GROT,
-              fontWeight: 700,
-              fontSize: 11.5,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-            }}
-          >
-            Press kit ↓
-          </a>
-        </div>
-      </aside>
-    </div>
-  </section>
+    ))}
+  </div>
 );
 
-// ─── §01 · Curriculum ─────────────────────────────────────────────────────────
+// ─── § A · Pre-agency desk ────────────────────────────────────────────────────
 
-const Curriculum = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="01" label="Curriculum · A career in brief" />
-
-    <div className="grid-intro">
-      <h2
-        className="h2-xl"
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontWeight: 700,
-          color: INK,
-          lineHeight: 0.98,
-          letterSpacing: "-0.025em",
-        }}
-      >
-        Twenty-two years,
-        <br />
-        <span style={{ fontStyle: "italic" }}>
-          <Mark>year by year.</Mark>
-        </span>
-      </h2>
-      <p
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontSize: 19,
-          color: INK70,
-          lineHeight: 1.55,
-          maxWidth: 560,
-        }}
-      >
-        The short version of the long story, filed in reverse chronological
-        order. Some of these are companies, some are talks, some are awards.
-        They are listed without ranking, because in this work everything ranks
-        itself soon enough.
-      </p>
+const PreAgencyCard = ({ c }: { c: Client }) => (
+  <article
+    style={{
+      background: PAPER,
+      border: `1px solid ${INK}`,
+      padding: 28,
+      display: "flex",
+      flexDirection: "column",
+      gap: 16,
+      minHeight: 340,
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <Flag c={c.country as any} w={22} />
+        <SCaps size={10.5} ls="0.18em" color={INK55}>{c.countryLabel}</SCaps>
+      </div>
+      <SCaps size={10.5} ls="0.18em" color={INK55}>{c.when}</SCaps>
     </div>
-
-    <ol
-      style={{
-        margin: 0,
-        padding: 0,
-        listStyle: "none",
-        borderTop: `2px solid ${INK}`,
-      }}
-    >
-      {TIMELINE.map((row, i) => (
-        <li key={i} className="curriculum-row">
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: "clamp(20px, 3vw, 28px)",
-              color: INK,
-              lineHeight: 1,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {row.year}
-          </div>
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: "clamp(15px, 2vw, 19px)",
-              color: INK,
-              lineHeight: 1.3,
-            }}
-          >
-            {row.t}
-          </div>
-          <div
-            className="curriculum-desc"
-            style={{
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 16,
-              color: INK70,
-              lineHeight: 1.45,
-            }}
-          >
-            {row.d}
-          </div>
-          <div
-            className="curriculum-flag"
-            style={{
-              textAlign: "right",
-              justifyContent: "flex-end",
-              gap: 6,
-              alignItems: "baseline",
-            }}
-          >
-            {row.flag === "SE" && <Flag c="SE" w={22} />}
-            {row.flag === "DK" && <Flag c="DK" w={22} />}
-            {row.flag === "US" && <Flag c="US" w={22} />}
-            {row.flag === "PK" && <Flag c="PK" w={22} />}
-            {row.tag && (
-              <Pill size={9.5} ls="0.14em">{row.tag}</Pill>
-            )}
-          </div>
-        </li>
-      ))}
-    </ol>
-  </section>
-);
-
-// ─── §02 · Honours & Awards ───────────────────────────────────────────────────
-
-const Honours = () => (
-  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="02" label="Honours & Awards · For the record" />
 
     <div
-      className="grid-cards-3"
-      style={{ border: `1px solid ${INK}` }}
+      style={{
+        flex: "0 0 auto",
+        borderTop: `1px solid ${INK15}`,
+        borderBottom: `1px solid ${INK15}`,
+        padding: "18px 0",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: 80,
+      }}
     >
-      {AWARDS.map((a, i) => (
-        <div
-          key={a.t}
-          className="card-border"
-          style={{
-            padding: "28px 26px 26px",
-            background: PAPER,
-            position: "relative",
-            display: "flex",
-            flexDirection: "column",
-            minHeight: 200,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              justifyContent: "space-between",
-            }}
-          >
-            <div
-              style={{
-                fontFamily: SERIF,
-                fontWeight: 700,
-                fontSize: "clamp(24px, 4vw, 36px)",
-                color: INK,
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-              }}
-            >
-              {a.year}
-            </div>
-            <SCaps size={10.5} ls="0.18em" color={INK55}>
-              Nº {String(i + 1).padStart(2, "0")}
-            </SCaps>
-          </div>
-          <HRule style={{ margin: "16px 0" }} />
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: "clamp(16px, 2.5vw, 21px)",
-              color: INK,
-              lineHeight: 1.2,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            {a.t}
-          </div>
-          <div
-            style={{
-              marginTop: 10,
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 15,
-              color: INK70,
-              lineHeight: 1.5,
-              flex: 1,
-            }}
-          >
-            {a.by}
-          </div>
-        </div>
+      <ClientLogo client={c} height={c.logo ? 56 : 48} maxWidth={200} />
+    </div>
+
+    <div>
+      <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.1, letterSpacing: "-0.015em", color: INK }}>
+        {c.name}
+      </h3>
+      <div style={{ marginTop: 5, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }}>
+        {c.fullName}
+      </div>
+      <div style={{ marginTop: 10 }}>
+        <SCaps size={10.5} ls="0.20em" color={INK}>{c.role}</SCaps>
+      </div>
+    </div>
+
+    <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.5, flex: 1 }}>
+      {c.blurb}
+    </p>
+  </article>
+);
+
+const PreAgency = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 72 }}>
+    <SectionMast n="A" label="Pre-agency desk · Before DMR.agency" />
+    <div className="grid-pre-agency-4">
+      {PRE_AGENCY_CARDS.map((c) => (
+        <PreAgencyCard key={c.key} c={c} />
       ))}
     </div>
   </section>
 );
 
-// ─── §03 · Press Archive ──────────────────────────────────────────────────────
+// ─── § B · Press Archive ──────────────────────────────────────────────────────
 
 const PressArchive = () => (
-  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="03" label="The Press Archive · Bylines & citations" />
+  <section className="sx" style={{ background: INK, paddingTop: 72, paddingBottom: 72 }}>
+    <SectionMast n="B" label="Where the work has been read · Bylines & citations" dark />
 
-    <div className="grid-intro">
+    <div className="grid-intro" style={{ marginBottom: 48 }}>
       <h2
-        className="h2-xl"
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontWeight: 700,
-          color: INK,
-          lineHeight: 0.98,
-          letterSpacing: "-0.025em",
-        }}
+        className="h2-lg"
+        style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: PAPER, lineHeight: 0.98, letterSpacing: "-0.025em" }}
       >
-        Where the work
-        <br />
+        Written for.<br />
         <span style={{ fontStyle: "italic" }}>
-          <Mark>has been read.</Mark>
+          <span style={{ background: YEL, color: INK, padding: "0 6px" }}>Quoted in.</span>
         </span>
       </h2>
-      <p
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontSize: 19,
-          color: INK70,
-          lineHeight: 1.55,
-          maxWidth: 560,
-        }}
-      >
-        Selected publications I have written for, been quoted in, or been
-        featured by. Grouped by department because thirteen outlets in one
-        row flattens the dignity of the older ones.
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.65)", lineHeight: 1.55, maxWidth: 520 }}>
+        Fifteen-plus publications across global business, technology, marketing,
+        and development. Contributor bylines, expert citations, and a print spread
+        in Forbes Middle East.
       </p>
     </div>
 
-    {/* Forbes ME print spread */}
+    {/* Forbes ME print feature */}
     <div
-      className="forbes-spread"
       style={{
+        display: "grid",
+        gridTemplateColumns: "1fr",
+        gap: 20,
         padding: 14,
-        background: PAPER2,
-        border: `1px solid ${INK}`,
-        alignItems: "stretch",
+        background: "#111",
+        border: `1px solid rgba(241,235,222,.18)`,
+        marginBottom: 36,
       }}
+      className="forbes-spread"
     >
-      <figure
-        style={{
-          margin: 0,
-          padding: 8,
-          background: "#1a1410",
-          border: `1px solid ${INK}`,
-          display: "flex",
-        }}
-      >
+      <figure style={{ margin: 0, padding: 8, background: "#0a0a0a", border: `1px solid rgba(241,235,222,.12)`, display: "flex" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/personal/forbes-me-print.jpg"
-          alt="How Qatar Can Become The Silicon Valley Of The Arab World · Forbes Middle East print, by Syed Irfan Ajmal"
-          style={{
-            width: "100%",
-            height: "auto",
-            maxHeight: 420,
-            objectFit: "contain",
-            display: "block",
-          }}
+          alt="How Qatar Can Become The Silicon Valley Of The Arab World · Forbes Middle East print"
+          style={{ width: "100%", height: "auto", maxHeight: 380, objectFit: "contain", display: "block" }}
         />
       </figure>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "4px 4px",
-        }}
-      >
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "4px 4px" }}>
         <div>
-          <div
-            style={{
-              display: "inline-block",
-              padding: "4px 10px",
-              background: YEL,
-              color: INK,
-              fontFamily: GROT,
-              fontWeight: 800,
-              fontSize: 10.5,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-            }}
-          >
+          <div style={{ display: "inline-block", padding: "4px 10px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase" }}>
             In print · Forbes ME
           </div>
-          <h3
-            style={{
-              margin: "18px 0 0",
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: "clamp(20px, 3.5vw, 30px)",
-              color: INK,
-              lineHeight: 1.1,
-              letterSpacing: "-0.015em",
-            }}
-          >
-            &ldquo;How Qatar Can Become The Silicon Valley
-            <br />
-            <span style={{ fontStyle: "italic", fontWeight: 600 }}>
-              Of The Arab World.&rdquo;
-            </span>
+          <h3 style={{ margin: "18px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(18px, 3vw, 26px)", color: PAPER, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
+            &ldquo;How Qatar Can Become The Silicon Valley<br />
+            <span style={{ fontStyle: "italic", fontWeight: 600 }}>Of The Arab World.&rdquo;</span>
           </h3>
-          <p
-            style={{
-              marginTop: 14,
-              fontFamily: SERIF,
-              fontSize: 16,
-              color: INK70,
-              lineHeight: 1.55,
-              maxWidth: 560,
-            }}
-          >
-            Published in the Forbes Middle East Guide print edition, in
-            collaboration with Arab Publisher House (APH). One of a small
-            handful of in-print Forbes ME bylines by a Pakistani author.
+          <p style={{ marginTop: 14, fontFamily: SERIF, fontSize: 15.5, color: "rgba(241,235,222,.65)", lineHeight: 1.55, maxWidth: 520 }}>
+            Published in the Forbes Middle East Guide print edition, in collaboration
+            with Arab Publisher House (APH). One of a small handful of in-print Forbes
+            ME bylines by a Pakistani author.
           </p>
         </div>
-        <div
-          style={{
-            marginTop: 18,
-            paddingTop: 14,
-            borderTop: `1px solid ${INK15}`,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
-            flexWrap: "wrap",
-            gap: 8,
-          }}
-        >
-          <SCaps size={10.5} ls="0.18em" color={INK55}>
-            Forbes ME Guide · 2017 · Print edition
-          </SCaps>
-          <SCaps size={10.5} ls="0.16em" color={INK}>
-            Featured byline
-          </SCaps>
+        <div style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid rgba(241,235,222,.12)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+          <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.45)">Forbes ME Guide · 2017 · Print edition</SCaps>
+          <SCaps size={10.5} ls="0.16em" color={PAPER}>Featured byline</SCaps>
         </div>
       </div>
     </div>
 
-    <div
-      className="grid-testimonials"
-      style={{ border: `1px solid ${INK}` }}
-    >
+    {/* Publication groups */}
+    <div className="grid-cards-2" style={{ border: `1px solid rgba(241,235,222,.18)` }}>
       {PRESS_GROUPS.map((g, gi) => (
         <div
           key={g.label}
-          className="letter-card"
           style={{
             padding: "28px 30px 26px",
-            background: PAPER,
+            background: "transparent",
+            borderRight: gi % 2 === 0 ? `1px solid rgba(241,235,222,.18)` : "none",
+            borderBottom: gi < 2 ? `1px solid rgba(241,235,222,.18)` : "none",
           }}
         >
-          <SCaps size={10.5} ls="0.20em" color={INK55}>{g.label}</SCaps>
-          <HRule style={{ margin: "14px 0" }} />
+          <SCaps size={10.5} ls="0.20em" color="rgba(241,235,222,.45)">{g.label}</SCaps>
+          <div style={{ marginTop: 14, marginBottom: 0, height: 1, background: "rgba(241,235,222,.18)" }} />
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-            {g.items.map(([name, note]) => (
+            {g.items.map((name) => (
               <li
                 key={name}
                 style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr auto",
-                  gap: 16,
+                  display: "flex",
                   padding: "10px 0",
-                  borderBottom: `1px solid ${INK15}`,
+                  borderBottom: `1px solid rgba(241,235,222,.08)`,
                   alignItems: "baseline",
                 }}
               >
-                <div
-                  style={{
-                    fontFamily: SERIF,
-                    fontWeight: 700,
-                    fontSize: "clamp(15px, 2.5vw, 19px)",
-                    color: INK,
-                  }}
-                >
+                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(15px, 2vw, 19px)", color: PAPER }}>
                   {name}
-                </div>
-                <div
-                  style={{
-                    fontFamily: SERIF,
-                    fontStyle: "italic",
-                    fontSize: 13.5,
-                    color: INK70,
-                    textAlign: "right",
-                  }}
-                >
-                  {note}
                 </div>
               </li>
             ))}
@@ -860,171 +516,150 @@ const PressArchive = () => (
   </section>
 );
 
-// ─── §04 · The Letters File ───────────────────────────────────────────────────
+// ─── § C · Selected results ───────────────────────────────────────────────────
 
-const Letters = () => (
-  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="04" label="The Letters File · What clients have said" />
+const CaseStudies = () => {
+  // Centriq first (index 2), then NTA (0), Ridester (1)
+  const cases = [CLIENTS_TIER1[2], CLIENTS_TIER1[0], CLIENTS_TIER1[1]];
+  return (
+    <section className="sx" style={{ background: PAPER2, paddingTop: 72, paddingBottom: 72 }}>
+      <SectionMast n="C" label="Selected results · The numbers on the record" />
 
-    <div className="grid-intro">
-      <h2
-        className="h2-xl"
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontWeight: 700,
-          color: INK,
-          lineHeight: 0.98,
-          letterSpacing: "-0.025em",
-        }}
-      >
-        On the record,
-        <br />
-        <span style={{ fontStyle: "italic" }}>
-          <Mark>in their own words.</Mark>
-        </span>
-      </h2>
-      <p
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontSize: 19,
-          color: INK70,
-          lineHeight: 1.55,
-          maxWidth: 560,
-        }}
-      >
-        Selected letters from clients, colleagues, and past hosts. All
-        reproduced with permission. A longer file is available on request,
-        with names and contact details for verification.
-      </p>
-    </div>
-
-    <div
-      className="grid-testimonials"
-      style={{ border: `1px solid ${INK}` }}
-    >
-      {TESTIMONIALS.map((tm, i) => (
-        <article
-          key={i}
-          className="letter-card"
-          style={{
-            padding: "32px 32px 28px",
-            display: "flex",
-            flexDirection: "column",
-          }}
+      <div className="grid-intro" style={{ marginBottom: 48 }}>
+        <h2
+          className="h2-lg"
+          style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}
         >
+          Numbers,<br />
+          <span style={{ fontStyle: "italic" }}>
+            <Mark>not promises.</Mark>
+          </span>
+        </h2>
+        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.55, maxWidth: 520 }}>
+          Three engagements with documented outcomes. Results are verifiable —
+          case studies are linked where available. If you want to speak with a
+          client directly, ask.
+        </p>
+      </div>
+
+      <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
+        {cases.map((c, i) => (
           <div
-            style={{
-              display: "flex",
-              alignItems: "baseline",
-              justifyContent: "space-between",
-            }}
+            key={c.key}
+            className="card-border"
+            style={{ padding: "36px 32px 32px", background: PAPER2, display: "flex", flexDirection: "column" }}
           >
-            <Pill size={10.5} ls="0.18em">
-              № {String(i + 1).padStart(2, "0")}
-            </Pill>
-            <SCaps size={10.5} ls="0.18em" color={INK55}>
-              Filed from {tm.place}
-            </SCaps>
-          </div>
-          <blockquote
-            style={{
-              margin: "20px 0 0",
-              fontFamily: SERIF,
-              fontSize: "clamp(16px, 3vw, 21px)",
-              color: INK,
-              lineHeight: 1.4,
-              letterSpacing: "-0.005em",
-              fontStyle: "italic",
-              position: "relative",
-              paddingLeft: 30,
-            }}
-          >
-            <span
-              aria-hidden
-              style={{
-                position: "absolute",
-                left: -4,
-                top: -8,
-                fontFamily: SERIF,
-                fontSize: 84,
-                lineHeight: 1,
-                color: INK,
-                fontStyle: "italic",
-                background: YEL,
-                padding: "0 4px",
-              }}
-            >
-              &ldquo;
-            </span>
-            {tm.quote}
-          </blockquote>
-          <HRule style={{ margin: "22px 0 14px", background: INK35 }} />
-          <div>
-            <div
-              style={{
-                fontFamily: SERIF,
-                fontWeight: 700,
-                fontSize: 17,
-                color: INK,
-              }}
-            >
-              {tm.name}
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+              <SCaps size={10} ls="0.14em" color={INK55}>{c.sector}</SCaps>
+              <Flag c={c.country as any} w={20} />
             </div>
-            <div style={{ marginTop: 4 }}>
-              <SCaps size={10.5} ls="0.14em" color={INK70}>{tm.role}</SCaps>
+            <HRule style={{ margin: "16px 0" }} />
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4vw, 44px)", color: INK, lineHeight: 1, letterSpacing: "-0.03em" }}>
+              {c.stat}
             </div>
+            <div style={{ marginTop: 8, fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, lineHeight: 1.4 }}>
+              {c.statLabel}
+            </div>
+            <div style={{ marginTop: 18, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(17px, 2vw, 21px)", color: INK, lineHeight: 1.15, letterSpacing: "-0.01em" }}>
+              {c.name}
+            </div>
+            <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70, lineHeight: 1.5, flex: 1 }}>
+              {c.blurb}
+            </p>
+            {c.caseStudy && (
+              <a
+                href={c.caseStudy}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ marginTop: 22, fontFamily: MONO, fontSize: 11, fontWeight: 700, color: INK, letterSpacing: "0.12em", textTransform: "uppercase", borderBottom: `2px solid ${INK}`, paddingBottom: 3, alignSelf: "flex-start" }}
+              >
+                Full case study →
+              </a>
+            )}
           </div>
-        </article>
-      ))}
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// ─── § D · Testimonials ───────────────────────────────────────────────────────
+
+const Testimonials = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 72, paddingBottom: 72 }}>
+    <SectionMast n="D" label="Client words · On the record" />
+
+    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 48 }}>
+      <h2 className="h2-lg" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
+        What clients say.
+      </h2>
+      <a href="/clients" style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700, color: INK, letterSpacing: "0.12em", whiteSpace: "nowrap" }}>
+        ALL TESTIMONIALS →
+      </a>
     </div>
+
+    {TESTIMONIALS.map((t, i) => (
+      <div key={i} className="about-testi-row" style={{ borderTop: i === 0 ? `2px solid ${INK}` : undefined }}>
+        {/* Left: index + badge */}
+        <div>
+          <div style={{ fontFamily: MONO, fontSize: 12, color: INK70, letterSpacing: "0.08em" }}>
+            № {String(i + 1).padStart(2, "0")}
+          </div>
+          <div style={{ display: "inline-block", padding: "6px 10px", marginTop: 12, background: INK, color: YEL, fontFamily: MONO, fontSize: 10.5, fontWeight: 700, letterSpacing: "0.10em" }}>
+            {t.badge}
+          </div>
+        </div>
+
+        {/* Centre: quote */}
+        <blockquote style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontSize: "clamp(18px, 2.5vw, 26px)", lineHeight: 1.28, color: INK, letterSpacing: "-0.01em" }}>
+          <span style={{ color: "rgba(26,20,16,.25)", fontFamily: SERIF, fontSize: "1.2em" }}>&ldquo;</span>
+          {t.quote}
+          <span style={{ color: "rgba(26,20,16,.25)", fontFamily: SERIF, fontSize: "1.2em" }}>&rdquo;</span>
+        </blockquote>
+
+        {/* Right: person */}
+        <div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={t.img}
+            alt={t.name}
+            style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", marginBottom: 12, display: "block" }}
+          />
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: INK }}>{t.name}</div>
+          <div style={{ marginTop: 5, fontFamily: MONO, fontSize: 11, color: INK70, letterSpacing: "0.04em", lineHeight: 1.5 }}>
+            {t.role}<br />
+            <span style={{ color: INK55 }}>{t.place}</span>
+          </div>
+        </div>
+      </div>
+    ))}
   </section>
 );
 
-// ─── §05 · Off the Desk ───────────────────────────────────────────────────────
+// ─── § E · Off the Desk ───────────────────────────────────────────────────────
 
 const OffTheDesk = () => (
-  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="05" label="Off the desk · Hobbies, hikes, and a wall to climb" />
+  <section className="sx" style={{ background: PAPER, paddingTop: 72, paddingBottom: 72 }}>
+    <SectionMast n="E" label="Off the desk · Filed from abroad" />
 
-    <div className="grid-intro">
+    <div className="grid-intro" style={{ marginBottom: 40 }}>
       <h2
         className="h2-lg"
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontWeight: 700,
-          color: INK,
-          lineHeight: 0.98,
-          letterSpacing: "-0.025em",
-        }}
+        style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}
       >
-        The bureau,
-        <br />
+        The bureau,<br />
         <span style={{ fontStyle: "italic" }}>
           <Mark>after hours.</Mark>
         </span>
       </h2>
-      <p
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontSize: 18.5,
-          color: INK70,
-          lineHeight: 1.55,
-          maxWidth: 540,
-        }}
-      >
-        Twenty-two years at a desk gets balanced out somewhere. For me that
-        has been hiking the woods of Pakistan, climbing walls in Peshawar
-        and Kuala Lumpur, the occasional bench in the forest, and a stubborn
-        habit of reading on planes.
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.55, maxWidth: 520 }}>
+        Sweden, Malaysia, San Francisco — and a climbing wall in Peshawar that
+        gets more use than it should.
       </p>
     </div>
 
     <div className="gallery-mosaic">
-      {OFF_THE_DESK.map((p, i) => (
+      {OFF_DESK.map((p, i) => (
         <figure
           key={i}
           style={{
@@ -1044,7 +679,7 @@ const OffTheDesk = () => (
               minHeight: p.minH,
               border: `1px solid ${INK}`,
               overflow: "hidden",
-              background: "#222",
+              background: "#1a1410",
               position: "relative",
             }}
           >
@@ -1057,12 +692,7 @@ const OffTheDesk = () => (
                 loop
                 playsInline
                 poster={p.poster}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element
@@ -1075,49 +705,19 @@ const OffTheDesk = () => (
                   height: "100%",
                   objectFit: "cover",
                   display: "block",
+                  // Istanbul: shift up to show face; default: center
+                  objectPosition: p.badge === "Istanbul" ? "center 15%" : "center center",
                 }}
               />
             )}
             {p.badge && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: 10,
-                  left: 10,
-                  background: YEL,
-                  color: INK,
-                  padding: "4px 9px",
-                  fontFamily: GROT,
-                  fontWeight: 800,
-                  fontSize: 9.5,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                }}
-              >
+              <div style={{ position: "absolute", top: 10, left: 10, background: YEL, color: INK, padding: "4px 9px", fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.16em", textTransform: "uppercase" }}>
                 {p.badge}
               </div>
             )}
           </div>
-          <figcaption
-            style={{
-              padding: "8px 4px 2px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "baseline",
-              gap: 12,
-            }}
-          >
-            <div
-              style={{
-                fontFamily: SERIF,
-                fontStyle: "italic",
-                fontSize: 13.5,
-                color: INK,
-                lineHeight: 1.35,
-              }}
-            >
-              {p.cap}
-            </div>
+          <figcaption style={{ padding: "8px 4px 2px", display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK, lineHeight: 1.35 }}>{p.cap}</div>
             <SCaps size={9.5} ls="0.14em" color={INK55}>{p.sub}</SCaps>
           </figcaption>
         </figure>
@@ -1126,170 +726,114 @@ const OffTheDesk = () => (
   </section>
 );
 
-// ─── §06 · Also at the Bureau ─────────────────────────────────────────────────
+// ─── § F · Editor's note ──────────────────────────────────────────────────────
 
-const AlsoAtTheBureau = () => (
-  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="06" label="Also at the bureau · More from Irfan" />
+const EditorNote = () => (
+  <section className="sx" style={{ background: PAPER2, paddingTop: 72, paddingBottom: 72 }}>
+    <SectionMast n="F" label="Editor's note · A working filter" />
 
-    <div
-      className="grid-cards-3"
-      style={{ border: `1px solid ${INK}` }}
-    >
-      {[
-        {
-          label: "Ventures",
-          href: "/ventures",
-          desc: "Companies, partnerships, and projects beyond DMR.agency.",
-        },
-        {
-          label: "Clients",
-          href: "/clients",
-          desc: "A selection of brands and founders the bureau has worked with.",
-        },
-        {
-          label: "Gallery",
-          href: "/gallery",
-          desc: "Events, stages, press, and moments from twenty-two years in the field.",
-        },
-        {
-          label: "Podcast",
-          href: "/podcast",
-          desc: "The SIA Business Podcast — three seasons, twenty-nine episodes.",
-        },
-      ].map((item) => (
-        <a
-          key={item.label}
-          href={item.href}
-          className="card-border"
-          style={{
-            padding: "28px 26px 26px",
-            background: PAPER,
-            display: "flex",
-            flexDirection: "column",
-            textDecoration: "none",
-            color: "inherit",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: "clamp(20px, 3vw, 28px)",
-              color: INK,
-              lineHeight: 1,
-              letterSpacing: "-0.01em",
-            }}
+    <div className="grid-intro">
+      <div>
+        <SCaps size={11} ls="0.22em" color={INK55}>From the desk of</SCaps>
+        <div style={{ marginTop: 6, fontFamily: SERIF, fontWeight: 700, fontSize: 28, letterSpacing: "-0.01em", lineHeight: 1.1, color: INK }}>
+          Syed Irfan Ajmal
+        </div>
+        <div style={{ marginTop: 4, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }}>
+          Peshawar · Founded DMR.agency 2013
+        </div>
+      </div>
+      <div>
+        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 20, lineHeight: 1.6, color: INK }}>
+          I started my career in tech, moved into sales, then found my
+          calling in SEO and earned media. The questions have stayed the
+          same since 2004: who reads what, what earns trust, why this story
+          now. I lived and worked in Sweden and Denmark, then built
+          DMR.agency from Peshawar into a practice serving clients across
+          twenty-plus countries.
+        </p>
+        <p style={{ marginTop: 16, fontFamily: SERIF, fontSize: 17, fontStyle: "italic", color: INK70, lineHeight: 1.6 }}>
+          You can usually find me writing from Peshawar. Occasionally I am
+          working remotely from California, Madinah, Kuala Lumpur, or Dubai
+          — not all at once.
+        </p>
+        <div style={{ marginTop: 28, display: "flex", gap: 12, flexWrap: "wrap" }}>
+          <a
+            href={CALENDLY}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ padding: "12px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}
           >
-            {item.label}
-          </div>
-          <div
-            style={{
-              marginTop: 12,
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 15.5,
-              color: INK70,
-              lineHeight: 1.5,
-              flex: 1,
-            }}
+            Book a discovery call →
+          </a>
+          <a
+            href="/emos"
+            style={{ padding: "12px 18px", background: "transparent", color: INK, border: `1px solid ${INK}`, textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}
           >
-            {item.desc}
-          </div>
-          <div
-            style={{
-              marginTop: 18,
-              fontFamily: GROT,
-              fontWeight: 700,
-              fontSize: 11,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: INK,
-            }}
+            EMOS →
+          </a>
+          <a
+            href="/fractional-cmo"
+            style={{ padding: "12px 18px", background: "transparent", color: INK, border: `1px solid ${INK}`, textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}
           >
-            View →
-          </div>
-        </a>
-      ))}
+            Fractional CMO →
+          </a>
+        </div>
+      </div>
     </div>
   </section>
 );
 
-// ─── Outro ────────────────────────────────────────────────────────────────────
+// ─── § G · Outro ──────────────────────────────────────────────────────────────
 
 const Outro = () => (
   <section
     className="sx"
     style={{
-      background: PAPER2,
+      background: INK,
       paddingTop: 90,
       paddingBottom: 90,
-      borderTop: `1px solid ${INK}`,
-      borderBottom: `1px solid ${INK}`,
+      borderTop: `1px solid rgba(241,235,222,.12)`,
     }}
   >
-    <div style={{ maxWidth: 880, margin: "0 auto", textAlign: "center" }}>
-      <SCaps size={11} ls="0.22em" color={INK70}>A note to close</SCaps>
+    <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
+      <SCaps size={11} ls="0.22em" color="rgba(241,235,222,.5)">A note to close</SCaps>
       <h2
         className="h2-sm"
         style={{
           margin: "18px 0 0",
           fontFamily: SERIF,
           fontWeight: 700,
-          color: INK,
+          color: PAPER,
           lineHeight: 1.05,
           letterSpacing: "-0.02em",
         }}
       >
         If your business needs to be{" "}
         <span style={{ fontStyle: "italic" }}>
-          <Mark>found, covered, or believed</Mark>
+          <span style={{ background: YEL, color: INK, padding: "0 6px" }}>found, covered, or believed</span>
         </span>
         , you know where the bureau is.
       </h2>
-      <div
-        style={{
-          marginTop: 36,
-          display: "flex",
-          gap: 14,
-          justifyContent: "center",
-          flexWrap: "wrap",
-        }}
-      >
+      <div style={{ marginTop: 36, display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
+        <a
+          href="/resources"
+          style={{ padding: "16px 26px", background: PAPER, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
+        >
+          Free resources →
+        </a>
+        <a
+          href="/emos"
+          style={{ padding: "16px 26px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
+        >
+          EMOS →
+        </a>
         <a
           href={CALENDLY}
           target="_blank"
           rel="noopener noreferrer"
-          style={{
-            padding: "16px 26px",
-            background: INK,
-            color: PAPER,
-            textDecoration: "none",
-            fontFamily: GROT,
-            fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-          }}
+          style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(241,235,222,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
-          Book a discovery call →
-        </a>
-        <a
-          href="/"
-          style={{
-            padding: "16px 26px",
-            background: "transparent",
-            color: INK,
-            textDecoration: "none",
-            border: `1px solid ${INK}`,
-            fontFamily: GROT,
-            fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-          }}
-        >
-          Back to the front page
+          Fractional CMO →
         </a>
       </div>
     </div>
@@ -1300,15 +844,15 @@ const Outro = () => (
 
 export default function AboutPage() {
   return (
-    <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+    <div style={{ background: PAPER }}>
       <Hero />
-      <AboutLead />
-      <Curriculum />
-      <Honours />
+      <StatsStrip />
+      <PreAgency />
       <PressArchive />
-      <Letters />
+      <CaseStudies />
+      <Testimonials />
       <OffTheDesk />
-      <AlsoAtTheBureau />
+      <EditorNote />
       <Outro />
       <Subscriptions sectionNumber="07" />
       <Colophon />
