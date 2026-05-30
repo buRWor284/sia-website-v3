@@ -90,7 +90,7 @@ const css = `
 
   .hero-grid {
     display: grid; grid-template-columns: 1.55fr 0.7fr;
-    gap: 48px; align-items: end;
+    gap: 48px; align-items: start;
   }
   .hero-kicker {
     font-family: var(--mono); font-size: 12px; letter-spacing: .18em;
@@ -158,7 +158,7 @@ const css = `
     overflow: hidden;
   }
   .speaking-photo img {
-    width: 100%; height: 180px; object-fit: cover; object-position: top center; display: block;
+    width: 100%; height: 180px; object-fit: cover; object-position: left center; display: block;
   }
   .speaking-photo__caption {
     font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
@@ -929,8 +929,8 @@ export default function HomePage() {
             <a href="/speaking" className="speaking__cta">Speaker sheet &amp; topics <span className="mono-arrow">→</span></a>
             <div className="speaking-photo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/speaking/startup-grind.jpg" alt="Syed Irfan Ajmal speaking at Startup Grind" />
-              <div className="speaking-photo__caption">STARTUP GRIND · PESHAWAR</div>
+              <img src="/assets/speaking/mps2016.jpg" alt="Syed Irfan Ajmal speaking at MPS2016 Dubai" />
+              <div className="speaking-photo__caption">MPS2016 · DUBAI, UAE</div>
             </div>
           </div>
           <div>
