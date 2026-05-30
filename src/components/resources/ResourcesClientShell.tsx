@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
+import { Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
 import { GROT, INK, INK15, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,6 +56,8 @@ interface PlaybookContent extends ContentBase {
   slug: string;
   wc: string;
   read: string;
+  newsHeadline: string;
+  newsDeck: string;
 }
 
 interface ArticleContent extends ContentBase {
@@ -71,6 +73,8 @@ interface VisualEssayContent extends ContentBase {
   type: "visual-essay";
   blurb: string;
   href: string;
+  newsHeadline: string;
+  newsDeck: string;
 }
 
 type ContentItem =
@@ -200,6 +204,8 @@ const CONTENT: ContentItem[] = [
     wc: "~6,000 words",
     read: "24 min",
     y: "2021",
+    newsHeadline: "The Authority Playbook",
+    newsDeck: "The complete system for building a recognisable expert brand in public",
   },
   {
     id: "play-storytelling",
@@ -215,6 +221,8 @@ const CONTENT: ContentItem[] = [
     wc: "~5,500 words",
     read: "21 min",
     y: "2020",
+    newsHeadline: "The Narrative Framework",
+    newsDeck: "The story structures behind every message that lands",
   },
   {
     id: "play-neuromarketing",
@@ -230,6 +238,8 @@ const CONTENT: ContentItem[] = [
     wc: "~3,200 words",
     read: "13 min",
     y: "2020",
+    newsHeadline: "The Persuasion Code",
+    newsDeck: "What cognitive science tells us about why some messages work",
   },
 
   // ── ARTICLES ─────────────────────────────────────────────────────────────
@@ -324,6 +334,8 @@ const CONTENT: ContentItem[] = [
     href: "https://syedirfanajmal.com/managing-remote-teams-with-hubstaff-time-tracking/",
     y: "2016",
     updated: "2021",
+    newsHeadline: "The Great Dispersal",
+    newsDeck: "Data on where work went and what it cost everyone",
   },
   {
     id: "ve-writing-habits",
@@ -335,6 +347,8 @@ const CONTENT: ContentItem[] = [
       "The science of habit formation applied to a daily writing practice — cues, routines, rewards, and the research behind each.",
     href: "https://syedirfanajmal.com/form-writing-habits-success-infographic/",
     y: "—",
+    newsHeadline: "Rituals of the Masters",
+    newsDeck: "The daily habits that made Hemingway, King, and Didion",
   },
   {
     id: "ve-content-ideas",
@@ -346,6 +360,8 @@ const CONTENT: ContentItem[] = [
       "Listening systems, surveys, and social mining — how to extract an endless editorial calendar from the people already talking to your business.",
     href: "https://syedirfanajmal.com/content-ideas-from-customers-infographic/",
     y: "—",
+    newsHeadline: "The Voice in the Reviews",
+    newsDeck: "Mining your audience for content angles that convert",
   },
 ];
 
@@ -521,22 +537,16 @@ function PlaybookCard({ item }: { item: PlaybookContent }) {
         minHeight: 320, height: "100%",
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
         <Pill size={10} ls="0.18em">{item.badge}</Pill>
-        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 52, color: INK15, lineHeight: 1, letterSpacing: "-0.03em" }}>
-          {item.no}
-        </div>
       </div>
-      <HRule style={{ marginBottom: 20 }} />
-      <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 24, color: INK, lineHeight: 1.05, letterSpacing: "-0.014em" }}>
+      <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
+      <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
         {item.title}
       </h3>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK70, lineHeight: 1.3, marginBottom: 14 }}>
+      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15.5, color: INK70, lineHeight: 1.35, marginBottom: 12, flex: 1 }}>
         {item.sub}
       </div>
-      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.55, flex: 1 }}>
-        {item.blurb}
-      </p>
       <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
         <SCaps size={10} ls="0.12em" color={INK55}>{item.wc} · {item.read}</SCaps>
         <SCaps size={10.5} ls="0.16em" color={INK}>Read the guide ↗</SCaps>
@@ -594,24 +604,25 @@ function VisualEssayCard({ item }: { item: VisualEssayContent }) {
       onMouseLeave={() => setHover(false)}
       style={{
         display: "flex", flexDirection: "column",
-        padding: "24px 20px",
+        padding: "28px 24px 22px",
         background: hover ? PAPER2 : PAPER,
         textDecoration: "none", color: INK,
         transition: "background 0.14s",
-        minHeight: 200, height: "100%",
+        minHeight: 320, height: "100%",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-        <Pill size={9.5} ls="0.14em">Infographic</Pill>
-        <SCaps size={9.5} ls="0.12em" color={INK55}>Redesign in production</SCaps>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
+        <Pill size={9.5} ls="0.14em">Visual Essay</Pill>
       </div>
-      <h4 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.15, letterSpacing: "-0.008em" }}>
+      <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
+      <h4 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
         {item.title}
       </h4>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14.5, color: INK70, lineHeight: 1.5, flex: 1 }}>
         {item.blurb}
       </p>
-      <div style={{ marginTop: 14, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
+      <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <SCaps size={9} ls="0.12em" color={INK55}>{item.y}{item.updated ? ` · upd. ${item.updated}` : ""}</SCaps>
         <SCaps size={10} ls="0.16em" color={INK}>View Original ↗</SCaps>
       </div>
     </a>
@@ -771,43 +782,8 @@ function ContentGrid({ filtered, activeType }: { filtered: ContentItem[]; active
     );
   }
 
-  if (activeType === "all") {
-    const visibleGroups = GROUP_ORDER
-      .map((typeKey) => ({ typeKey, items: filtered.filter((c) => c.type === typeKey) }))
-      .filter((g) => g.items.length > 0);
-
-    return (
-      <div>
-        {visibleGroups.map(({ typeKey, items }, groupIdx) => {
-          const n = String(groupIdx + 1).padStart(2, "0");
-          return (
-            <div
-              key={typeKey}
-              id={`res-${typeKey}`}
-              className="sx"
-              style={{
-                borderTop: `1px solid ${INK}`,
-                paddingTop: 56, paddingBottom: 64,
-                background: groupIdx % 2 === 0 ? PAPER : PAPER2,
-              }}
-            >
-              <SectionMast n={n} label={GROUP_LABEL[typeKey]} />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
-                {items.map((item, i) => (
-                  <div key={item.id} style={cellBorder(i, items.length)}>
-                    <ResourceCard item={item} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
-
   return (
-    <div className="sx" style={{ paddingTop: 56, paddingBottom: 72, borderTop: `1px solid ${INK}` }}>
+    <div className="sx" style={{ paddingTop: 48, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
         {filtered.map((item, i) => (
           <div key={item.id} style={cellBorder(i, filtered.length)}>

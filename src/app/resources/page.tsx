@@ -23,7 +23,7 @@ const Hero = () => (
           style={{
             fontFamily: SERIF,
             fontWeight: 700,
-            fontSize: "clamp(68px, 9vw, 108px)",
+            fontSize: "clamp(52px, 7vw, 84px)",
             lineHeight: 0.85,
             letterSpacing: "-0.04em",
             color: INK,
@@ -33,7 +33,7 @@ const Hero = () => (
         </div>
         <div
           style={{
-            marginTop: 14,
+            marginTop: 10,
             fontFamily: GROT,
             fontWeight: 700,
             fontSize: 9,
@@ -61,7 +61,7 @@ const Hero = () => (
             transform: "translate(-50%, -50%)",
             fontFamily: SERIF,
             fontWeight: 700,
-            fontSize: "clamp(64px, 12vw, 148px)",
+            fontSize: "clamp(56px, 10vw, 128px)",
             letterSpacing: "-0.04em",
             color: "rgba(26,20,16,.042)",
             whiteSpace: "nowrap",
@@ -78,11 +78,11 @@ const Hero = () => (
 
         <h1
           style={{
-            marginTop: 18,
+            marginTop: 12,
             fontFamily: SERIF,
             fontWeight: 700,
-            fontSize: "clamp(36px, 4.5vw, 60px)",
-            lineHeight: 1.0,
+            fontSize: "clamp(30px, 3.8vw, 52px)",
+            lineHeight: 1.02,
             letterSpacing: "-0.028em",
             color: INK,
           }}
@@ -96,13 +96,13 @@ const Hero = () => (
 
         <p
           style={{
-            marginTop: 20,
+            marginTop: 12,
             fontFamily: SERIF,
             fontStyle: "italic",
-            fontSize: 18,
-            lineHeight: 1.55,
+            fontSize: 16,
+            lineHeight: 1.5,
             color: INK70,
-            maxWidth: 520,
+            maxWidth: 480,
           }}
         >
           Interactive kits, playbooks, and original research on earned media,
