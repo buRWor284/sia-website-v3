@@ -159,6 +159,57 @@ const PAST: ReadonlyArray<PastVenture> = [
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 function Hero() {
+  return (
+    <section className="sx" style={{ background: PAPER }}>
+      <div className="res-hero-grid">
+
+        {/* Left: count */}
+        <div className="res-hero-left">
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
+            3
+          </div>
+          <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
+            Active<br />ventures
+          </div>
+        </div>
+
+        {/* Centre: headline */}
+        <div className="res-hero-center">
+          <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+            VENTURES
+          </div>
+          <SCaps size={10} ls="0.24em" color={INK55}>
+            Ventures &amp; Enterprises &nbsp;·&nbsp; Est. 2010
+          </SCaps>
+          <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
+            The businesses<br />
+            <em style={{ fontStyle: "italic", fontWeight: 600 }}>behind the bylines.</em>
+          </h1>
+          <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
+            From DMR.agency to EMOS — the enterprises that power the bureau.
+          </p>
+        </div>
+
+        {/* Right: topic index */}
+        <div className="res-hero-right">
+          {[
+            { label: "DMR.agency",    sub: "Digital PR & SEO bureau" },
+            { label: "The SIA Bureau", sub: "Speaking & publishing" },
+            { label: "EMOS",          sub: "Earned media OS" },
+          ].map(t => (
+            <div key={t.label}>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
+              <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>{t.sub}</div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
+function VenturesLead() {
   const TICKER = [
     "Founder · DMR.agency",
     "The SIA Bureau",
@@ -173,80 +224,16 @@ function Hero() {
   ];
 
   return (
-    <section style={{ background: PAPER, padding: "60px 56px 70px" }}>
-      {/* Eyebrow */}
-      <div style={{ textAlign: "center", marginBottom: 28 }}>
-        <SCaps color={INK70} size={12} ls="0.28em">
-          Ventures · Est. 2010
-        </SCaps>
-      </div>
-
-      {/* Headline */}
-      <h1
-        style={{
-          margin: 0,
-          textAlign: "center",
-          fontFamily: SERIF,
-          fontWeight: 700,
-          fontSize: "clamp(56px, 9vw, 120px)",
-          color: INK,
-          lineHeight: 1.0,
-          letterSpacing: "-0.028em",
-        }}
-      >
-        <span style={{ display: "block" }}>I build brands</span>
-        <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
-          that <Mark>earn</Mark> attention.
-        </span>
-      </h1>
-
-      {/* Bylines — publication credits replace the name (already in ) */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: 22, gap: 6, flexWrap: "wrap" }}>
-        <SCaps size={11} ls="0.20em" color={INK55}>
-          As featured in
-        </SCaps>
-        {["Forbes", "HBR", "SEMrush", "Search Engine Journal", "TNW", "World Bank"].map((pub, i, arr) => (
-          <span key={pub} style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <SCaps size={11} ls="0.20em" color={INK} weight={800}>{pub}</SCaps>
-            {i < arr.length - 1 && <SCaps size={10} ls="0.12em" color={INK35}>·</SCaps>}
-          </span>
-        ))}
-        <SCaps size={11} ls="0.16em" color={INK55}>&amp; several others</SCaps>
-      </div>
-
-      <DoubleRule style={{ margin: "44px 0 0" }} />
+    <section className="sx" style={{ background: PAPER, paddingTop: 0, paddingBottom: 70 }}>
+      <DoubleRule style={{ margin: "0 0 0" }} />
 
       {/* Ticker strip */}
       <div style={{ background: INK, padding: "11px 0", overflow: "hidden" }}>
-        <div
-          style={{
-            display: "flex",
-            gap: 56,
-            whiteSpace: "nowrap",
-            fontFamily: GROT,
-            fontWeight: 800,
-            fontSize: 11,
-            letterSpacing: "0.20em",
-            textTransform: "uppercase",
-            color: YEL,
-          }}
-        >
+        <div style={{ display: "flex", gap: 56, whiteSpace: "nowrap", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.20em", textTransform: "uppercase", color: YEL }}>
           {[...TICKER, ...TICKER].map((t, i) => (
-            <span
-              key={i}
-              style={{ display: "inline-flex", alignItems: "center", gap: 56 }}
-            >
+            <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 56 }}>
               {t}
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 4,
-                  height: 4,
-                  background: YEL,
-                  borderRadius: 999,
-                  flexShrink: 0,
-                }}
-              />
+              <span style={{ display: "inline-block", width: 4, height: 4, background: YEL, borderRadius: 999, flexShrink: 0 }} />
             </span>
           ))}
         </div>
@@ -255,43 +242,11 @@ function Hero() {
       <DoubleRule style={{ marginBottom: 0 }} />
 
       {/* Lead + SIA aside */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "clamp(300px, 60%, 1fr) 1fr",
-          gap: 64,
-          alignItems: "start",
-          marginTop: 40,
-        }}
-      >
+      <div style={{ display: "grid", gridTemplateColumns: "clamp(300px, 60%, 1fr) 1fr", gap: 64, alignItems: "start", marginTop: 40 }}>
         {/* Drop-cap lead */}
-        <div
-          style={{
-            columnCount: 2,
-            columnGap: 28,
-            fontFamily: SERIF,
-            fontSize: 17.5,
-            color: INK,
-            lineHeight: 1.55,
-            textAlign: "justify",
-          }}
-        >
+        <div style={{ columnCount: 2, columnGap: 28, fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55, textAlign: "justify" }}>
           <p style={{ margin: 0 }}>
-            <span
-              style={{
-                float: "left",
-                fontFamily: SERIF,
-                fontWeight: 700,
-                fontStyle: "italic",
-                fontSize: 92,
-                lineHeight: 0.78,
-                marginRight: 10,
-                marginTop: 6,
-                color: INK,
-                background: YEL,
-                padding: "6px 8px 2px 8px",
-              }}
-            >
+            <span style={{ float: "left", fontFamily: SERIF, fontWeight: 700, fontStyle: "italic", fontSize: 92, lineHeight: 0.78, marginRight: 10, marginTop: 6, color: INK, background: YEL, padding: "6px 8px 2px 8px" }}>
               E
             </span>
             very venture here is built on the same thesis: earned attention
@@ -317,99 +272,29 @@ function Hero() {
         {/* SIA paradigm aside */}
         <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
           <Pill size={11} ls="0.20em">The SIA Paradigm</Pill>
-          <div
-            style={{
-              marginTop: 14,
-              fontFamily: SERIF,
-              fontSize: 22,
-              lineHeight: 1.25,
-              color: INK,
-              fontWeight: 700,
-            }}
-          >
+          <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>
             Spotlight. Influence. Authority.
           </div>
-          <div
-            style={{
-              marginTop: 10,
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 14.5,
-              color: INK70,
-              lineHeight: 1.55,
-            }}
-          >
+          <div style={{ marginTop: 10, fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5, color: INK70, lineHeight: 1.55 }}>
             Three forces that compound into earned credibility. And yes — the
             fact that the initials spell{" "}
             <strong style={{ fontStyle: "normal", color: INK }}>SIA</strong> is
             almost entirely a coincidence.{" "}
             <span style={{ fontStyle: "normal" }}>😉</span>
           </div>
-          <div
-            style={{
-              marginTop: 20,
-              paddingTop: 16,
-              borderTop: `1px solid ${INK15}`,
-              display: "flex",
-              flexDirection: "column",
-              gap: 12,
-            }}
-          >
-            {(
-              [
-                [
-                  "S",
-                  "Spotlight",
-                  "Getting your story in front of the right journalists, editors, and outlets at exactly the right moment.",
-                ],
-                [
-                  "I",
-                  "Influence",
-                  "Building the credibility and reputation that makes your story worth covering in the first place.",
-                ],
-                [
-                  "A",
-                  "Authority",
-                  "Turning that coverage into compounding organic reach, domain authority, and lasting trust.",
-                ],
-              ] as [string, string, string][]
-            ).map(([k, title, desc]) => (
-              <div
-                key={k}
-                style={{ display: "flex", gap: 12, alignItems: "flex-start" }}
-              >
-                <div
-                  style={{
-                    width: 30,
-                    height: 30,
-                    flexShrink: 0,
-                    background: INK,
-                    color: YEL,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: GROT,
-                    fontWeight: 900,
-                    fontSize: 14,
-                  }}
-                >
+          <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${INK15}`, display: "flex", flexDirection: "column", gap: 12 }}>
+            {([
+              ["S", "Spotlight", "Getting your story in front of the right journalists, editors, and outlets at exactly the right moment."],
+              ["I", "Influence", "Building the credibility and reputation that makes your story worth covering in the first place."],
+              ["A", "Authority", "Turning that coverage into compounding organic reach, domain authority, and lasting trust."],
+            ] as [string, string, string][]).map(([k, title, desc]) => (
+              <div key={k} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div style={{ width: 30, height: 30, flexShrink: 0, background: INK, color: YEL, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 14 }}>
                   {k}
                 </div>
                 <div>
-                  <SCaps size={10} ls="0.14em" color={INK}>
-                    {title}
-                  </SCaps>
-                  <div
-                    style={{
-                      fontFamily: SERIF,
-                      fontSize: 13.5,
-                      color: INK70,
-                      lineHeight: 1.45,
-                      marginTop: 3,
-                    }}
-                  >
-                    {desc}
-                  </div>
+                  <SCaps size={10} ls="0.14em" color={INK}>{title}</SCaps>
+                  <div style={{ fontFamily: SERIF, fontSize: 13.5, color: INK70, lineHeight: 1.45, marginTop: 3 }}>{desc}</div>
                 </div>
               </div>
             ))}
@@ -956,6 +841,7 @@ export default function VenturesPage() {
   return (
     <div style={{ minHeight: "100vh" }}>
       <Hero />
+      <VenturesLead />
       <CurrentVenturesSection />
       <PastVenturesSection />
       <ClosingCTA />

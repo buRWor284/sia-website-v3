@@ -210,7 +210,7 @@ const FEATURED_KEYS = ["nta", "ridester", "centriq", "curednation", "alrug"];
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const Hero = () => (
-  <section style={{ background: PAPER, paddingBottom: 0 }}>
+  <section style={{ background: PAPER }}>
     {/* Speaking photo banner */}
     <div style={{ width: "100%", overflow: "hidden", maxHeight: "clamp(220px, 40vw, 480px)", position: "relative", background: "#0e0d0a" }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -222,66 +222,66 @@ const Hero = () => (
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 55%, rgba(249,246,240,0.7) 100%)" }} />
     </div>
 
-    <div className="sx" style={{ paddingTop: 40, paddingBottom: 70 }}>
-    <div style={{ textAlign: "center", marginBottom: 28 }}>
-      <SCaps color={INK70} size={12} ls="0.28em">
-        The Speaker Sheet · 2026 booking open
-      </SCaps>
-    </div>
-    <h1
-      className="hero-h1"
-      style={{
-        margin: 0,
-        textAlign: "center",
-        fontFamily: SERIF,
-        fontWeight: 700,
-        color: INK,
-        lineHeight: 1.0,
-        letterSpacing: "-0.028em",
-      }}
-    >
-      <span style={{ display: "block" }}>Talks that move</span>
-      <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
-        <Mark>a metric.</Mark>
-      </span>
-    </h1>
-    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
-      <SCaps size={11.5} ls="0.22em" color={INK55}>
-        Syed Irfan Ajmal &nbsp;·&nbsp; Fractional CMO, Speaker &nbsp;·&nbsp;{" "}
-        <span style={{ color: INK }}>Filed from Peshawar</span>
-      </SCaps>
-    </div>
+    <div className="sx" style={{ background: PAPER }}>
+      <div className="res-hero-grid">
 
-    <DoubleRule style={{ margin: "44px 0 24px" }} />
+        {/* Left: count */}
+        <div className="res-hero-left">
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
+            04
+          </div>
+          <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
+            Countries<br />on stage
+          </div>
+        </div>
+
+        {/* Centre: headline */}
+        <div className="res-hero-center">
+          <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+            SPEAKING
+          </div>
+          <SCaps size={10} ls="0.24em" color={INK55}>
+            Keynotes &nbsp;·&nbsp; Workshops &nbsp;·&nbsp; Panels &nbsp;·&nbsp; 2026 bookings open
+          </SCaps>
+          <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
+            Talks that move<br />
+            <em style={{ fontStyle: "italic", fontWeight: 600 }}>a metric.</em>
+          </h1>
+          <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
+            Business-savvy, case-study-led, with the receipts. Available in person and virtually worldwide.
+          </p>
+        </div>
+
+        {/* Right: topic index */}
+        <div className="res-hero-right">
+          {[
+            { label: "Digital PR",        sub: "Most-requested topic" },
+            { label: "Personal Branding", sub: "Authority & visibility" },
+            { label: "SEO & GEO",         sub: "Organic growth systems" },
+          ].map(t => (
+            <div key={t.label}>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
+              <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>{t.sub}</div>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  </section>
+);
+
+// ─── Speaking Lead ────────────────────────────────────────────────────────────
+
+const SpeakingLead = () => (
+  <div className="sx" style={{ paddingTop: 48, paddingBottom: 70 }}>
+    <DoubleRule style={{ margin: "0 0 24px" }} />
 
     <div className="grid-hero-2col">
       {/* Lead body */}
-      <div
-        className="hero-body"
-        style={{
-          fontFamily: SERIF,
-          fontSize: 17.5,
-          color: INK,
-          lineHeight: 1.55,
-          textAlign: "justify",
-        }}
-      >
+      <div className="hero-body" style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55, textAlign: "justify" }}>
         <p style={{ margin: 0 }}>
-          <span
-            className="hero-drop-cap"
-            style={{
-              float: "left",
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontStyle: "italic",
-              lineHeight: 0.78,
-              marginRight: 10,
-              marginTop: 6,
-              color: INK,
-              background: YEL,
-              padding: "6px 8px 2px 8px",
-            }}
-          >
+          <span className="hero-drop-cap" style={{ float: "left", fontFamily: SERIF, fontWeight: 700, fontStyle: "italic", lineHeight: 0.78, marginRight: 10, marginTop: 6, color: INK, background: YEL, padding: "6px 8px 2px 8px" }}>
             I
           </span>
           have been on the speaker circuit since 2013, mostly on the subject of{" "}
@@ -306,9 +306,7 @@ const Hero = () => (
       {/* Booking card */}
       <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
         <Pill size={11} ls="0.20em">Booking Desk</Pill>
-        <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>
-          Hire the speaker.
-        </div>
+        <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>Hire the speaker.</div>
         <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70, lineHeight: 1.5 }}>
           Tell me the event, the audience, and the metric you want moved. I&rsquo;ll
           come back inside a working day with topic options, dates, and terms.
@@ -321,33 +319,22 @@ const Hero = () => (
             </Fragment>
           ))}
         </div>
-        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{
-          marginTop: 22, display: "block", textAlign: "center",
-          padding: "14px 18px", background: INK, color: PAPER,
-          textDecoration: "none", fontFamily: GROT, fontWeight: 800,
-          fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase",
-        }}>Inquire about booking →</a>
-        <a href="#" style={{
-          marginTop: 10, display: "block", textAlign: "center",
-          padding: "14px 18px", background: YEL, color: INK,
-          textDecoration: "none", fontFamily: GROT, fontWeight: 800,
-          fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase",
-        }}>Download speaker sheet ↓</a>
+        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
+        <a href="#" style={{ marginTop: 10, display: "block", textAlign: "center", padding: "14px 18px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
       </aside>
     </div>
 
     {/* Stat strip */}
     <DoubleRule style={{ margin: "52px 0 0" }} />
     <div className="grid-stats">
-      {STATS.map(([n, l], i) => (
+      {STATS.map(([n, l]) => (
         <div key={n} className="stat-item" style={{ paddingTop: 24, paddingBottom: 6, textAlign: "center" }}>
           <div className="stat-number">{n}</div>
           <div style={{ marginTop: 8 }}><SCaps size={10.5} ls="0.16em" color={INK70}>{l}</SCaps></div>
         </div>
       ))}
     </div>
-    </div>{/* end .sx */}
-  </section>
+  </div>
 );
 
 // ─── §01 · Watch the Work ─────────────────────────────────────────────────────
@@ -764,6 +751,7 @@ export default function SpeakingPage() {
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
       <Hero />
+      <SpeakingLead />
       <WatchTheWork />
       <Topics />
       <MPSStrip />

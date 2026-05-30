@@ -116,37 +116,59 @@ const STATS: ReadonlyArray<[string, string]> = [
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const Hero = () => (
-  <section style={{ background: PAPER, padding: "56px 56px 60px" }}>
-    <div style={{ textAlign: "center", marginBottom: 24 }}>
-      <SCaps color={INK70} size={12} ls="0.28em">
-        The SIA Business Podcast &nbsp;·&nbsp; 29 episodes &nbsp;·&nbsp; 3 seasons &nbsp;·&nbsp; since 2018
-      </SCaps>
-    </div>
-    <h1
-      style={{
-        margin: 0,
-        textAlign: "center",
-        fontFamily: SERIF,
-        fontWeight: 700,
-        fontSize: 132,
-        color: INK,
-        lineHeight: 1.0,
-        letterSpacing: "-0.028em",
-      }}
-    >
-      <span style={{ display: "block" }}>The SIA</span>
-      <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
-        <Mark>Business Podcast.</Mark>
-      </span>
-    </h1>
-    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
-      <SCaps size={11.5} ls="0.22em" color={INK55}>
-        Hosted by Syed Irfan Ajmal &nbsp;·&nbsp;
-        <span style={{ color: INK }}>Filed from Peshawar &amp; remote</span>
-      </SCaps>
-    </div>
+  <section className="sx" style={{ background: PAPER }}>
+    <div className="res-hero-grid">
 
-    <DoubleRule style={{ margin: "44px 0 36px" }} />
+      {/* Left: count */}
+      <div className="res-hero-left">
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
+          29
+        </div>
+        <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
+          Episodes<br />three seasons
+        </div>
+      </div>
+
+      {/* Centre: headline */}
+      <div className="res-hero-center">
+        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+          PODCAST
+        </div>
+        <SCaps size={10} ls="0.24em" color={INK55}>
+          The SIA Business Podcast &nbsp;·&nbsp; Est. 2018 &nbsp;·&nbsp; Returning 2026
+        </SCaps>
+        <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
+          Conversations on<br />
+          <em style={{ fontStyle: "italic", fontWeight: 600 }}>business &amp; craft.</em>
+        </h1>
+        <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
+          Interviews, solo breakdowns, and field dispatches from the earned-media trenches.
+        </p>
+      </div>
+
+      {/* Right: topic index */}
+      <div className="res-hero-right">
+        {[
+          { label: "Season 3 · 2020", sub: "SEO & outreach" },
+          { label: "Season 2 · 2019", sub: "Growth & strategy" },
+          { label: "Season 1 · 2018", sub: "Foundations" },
+        ].map(t => (
+          <div key={t.label}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
+            <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>{t.sub}</div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </section>
+);
+
+// ─── Podcast Lead ─────────────────────────────────────────────────────────────
+
+const PodcastLead = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 56, paddingBottom: 60 }}>
+    <DoubleRule style={{ margin: "0 0 36px" }} />
 
     {/* Lead — 2-col: about the show + listen-on aside */}
     <div style={{ display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: 64, alignItems: "start" }}>
@@ -200,29 +222,12 @@ const Hero = () => (
       </div>
 
       {/* Listen-on aside */}
-      <aside
-        style={{
-          background: PAPER2,
-          border: `1px solid ${INK}`,
-          padding: 24,
-        }}
-      >
+      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
         <Pill size={11} ls="0.20em">Listen on</Pill>
-        <div
-          style={{
-            marginTop: 14,
-            fontFamily: SERIF,
-            fontSize: 22,
-            lineHeight: 1.25,
-            color: INK,
-            fontWeight: 700,
-          }}
-        >
+        <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>
           Wherever you
           <br />
-          <span style={{ fontStyle: "italic", fontWeight: 600 }}>
-            get your podcasts.
-          </span>
+          <span style={{ fontStyle: "italic", fontWeight: 600 }}>get your podcasts.</span>
         </div>
         <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8 }}>
           {PLATFORMS.map(([name, href]) => (
@@ -263,16 +268,7 @@ const Hero = () => (
             textAlign: "center",
           }}
         >
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: 60,
-              color: INK,
-              lineHeight: 1,
-              letterSpacing: "-0.02em",
-            }}
-          >
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 60, color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>
             {n}
           </div>
           <div style={{ marginTop: 8 }}>
@@ -637,6 +633,7 @@ export default function PodcastPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Hero />
+      <PodcastLead />
       <Featured />
       <Guests />
       <AllEpisodes />

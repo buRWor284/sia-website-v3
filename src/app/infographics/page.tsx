@@ -92,86 +92,50 @@ const INFOGRAPHICS: InfographicCard[] = [
 // HERO
 // =========================================================================
 const Hero = () => (
-  <section style={{ background: PAPER, padding: "56px 56px 40px" }}>
-    <div style={{ textAlign: "center" }}>
-      <SCaps size={11.5} ls="0.32em" color={INK70}>
-        The Infographics Desk &nbsp;·&nbsp; Visual research
-      </SCaps>
-    </div>
+  <section className="sx" style={{ background: PAPER }}>
+    <div className="res-hero-grid">
 
-    <h1
-      style={{
-        margin: "28px 0 0",
-        textAlign: "center",
-        fontFamily: SERIF,
-        fontWeight: 700,
-        fontSize: "clamp(56px, 8vw, 96px)",
-        lineHeight: 0.95,
-        letterSpacing: "-0.03em",
-        color: INK,
-      }}
-    >
-      Research made<br />
-      <span style={{ fontStyle: "italic" }}>visible.</span>
-    </h1>
-
-    <div style={{ maxWidth: 640, margin: "24px auto 0", textAlign: "center" }}>
-      <p
-        style={{
-          margin: 0,
-          fontFamily: SERIF,
-          fontSize: 19,
-          color: INK70,
-          lineHeight: 1.55,
-          fontStyle: "italic",
-        }}
-      >
-        Long-form research compressed into a single image — or in the case of
-        the newest edition, an interactive page with citations, prescriptions,
-        and a dose calculator.
-      </p>
-    </div>
-
-    <div
-      style={{
-        marginTop: 40,
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 0,
-        borderTop: `1px solid ${INK}`,
-        borderBottom: `1px solid ${INK}`,
-      }}
-    >
-      {([
-        ["5", "Infographics"],
-        ["2", "Interactive editions"],
-        ["2019", "First published"],
-      ] as [string, string][]).map(([k, v], i) => (
-        <div
-          key={i}
-          style={{
-            padding: "20px 20px",
-            borderLeft: i ? `1px solid ${INK35}` : "none",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontSize: 42,
-              color: INK,
-              lineHeight: 1,
-              letterSpacing: "-0.02em",
-            }}
-          >
-            {k}
-          </div>
-          <div style={{ marginTop: 6 }}>
-            <SCaps size={10.5} ls="0.18em" color={INK70}>{v}</SCaps>
-          </div>
+      {/* Left: count */}
+      <div className="res-hero-left">
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
+          5
         </div>
-      ))}
+        <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
+          Visual<br />essays
+        </div>
+      </div>
+
+      {/* Centre: headline */}
+      <div className="res-hero-center">
+        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+          VISUALS
+        </div>
+        <SCaps size={10} ls="0.24em" color={INK55}>
+          The Infographics Desk &nbsp;·&nbsp; Interactive editions
+        </SCaps>
+        <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
+          Research made<br />
+          <em style={{ fontStyle: "italic", fontWeight: 600 }}>visible.</em>
+        </h1>
+        <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
+          Long-form research compressed into a single image — or an interactive page with citations, prescriptions, and a dose calculator.
+        </p>
+      </div>
+
+      {/* Right: topic index */}
+      <div className="res-hero-right">
+        {[
+          { label: "Interactive Kits",  sub: "Tools you can use" },
+          { label: "Infographics",      sub: "Static visual essays" },
+          { label: "In Production",     sub: "Coming soon" },
+        ].map(t => (
+          <div key={t.label}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
+            <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>{t.sub}</div>
+          </div>
+        ))}
+      </div>
+
     </div>
   </section>
 );

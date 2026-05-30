@@ -80,67 +80,64 @@ const FIT_OUT: ReadonlyArray<string> = [
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const Hero = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 56, paddingBottom: 70 }}>
-    <div style={{ textAlign: "center", marginBottom: 26 }}>
-      <SCaps color={INK70} size={12} ls="0.28em">
-        Fractional CMO &nbsp;·&nbsp;{" "}
-        <span style={{ color: INK }}>Two seats open · Q3 2026</span>
-      </SCaps>
-    </div>
-    <h1
-      className="hero-h1"
-      style={{
-        margin: 0,
-        textAlign: "center",
-        fontFamily: SERIF,
-        fontWeight: 700,
-        color: INK,
-        lineHeight: 1.0,
-        letterSpacing: "-0.028em",
-      }}
-    >
-      <span style={{ display: "block" }}>Marketing leadership,</span>
-      <span style={{ display: "block", fontStyle: "italic", fontWeight: 600 }}>
-        <Mark>without the headcount.</Mark>
-      </span>
-    </h1>
-    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
-      <SCaps size={11.5} ls="0.22em" color={INK55}>
-        Syed Irfan Ajmal &nbsp;·&nbsp; Fractional CMO &nbsp;·&nbsp;{" "}
-        <span style={{ color: INK }}>On retainer, by the month</span>
-      </SCaps>
-    </div>
+  <section className="sx" style={{ background: PAPER }}>
+    <div className="res-hero-grid">
 
-    <DoubleRule style={{ margin: "44px 0 36px" }} />
+      {/* Left: count */}
+      <div className="res-hero-left">
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
+          2
+        </div>
+        <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
+          Seats open<br />this quarter
+        </div>
+      </div>
 
+      {/* Centre: headline */}
+      <div className="res-hero-center">
+        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+          CMO
+        </div>
+        <SCaps size={10} ls="0.24em" color={INK55}>
+          Senior Marketing Leadership &nbsp;·&nbsp; On retainer &nbsp;·&nbsp; By the month
+        </SCaps>
+        <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
+          Marketing leadership,<br />
+          <em style={{ fontStyle: "italic", fontWeight: 600 }}>without the headcount.</em>
+        </h1>
+        <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
+          Strategy ownership, weekly cadence, and agency-level execution through DMR.agency.
+        </p>
+      </div>
+
+      {/* Right: topic index */}
+      <div className="res-hero-right">
+        {[
+          { label: "Strategy",   sub: "Positioning & GTM" },
+          { label: "Execution",  sub: "PR, SEO, content" },
+          { label: "Reporting",  sub: "Board & investor" },
+        ].map(t => (
+          <div key={t.label}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
+            <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>{t.sub}</div>
+          </div>
+        ))}
+      </div>
+
+    </div>
+  </section>
+);
+
+// ─── CMO Lead ─────────────────────────────────────────────────────────────────
+
+const CMOLead = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 48, paddingBottom: 70 }}>
+    <DoubleRule style={{ margin: "0 0 36px" }} />
     <div className="grid-hero-2col">
       {/* Lead body */}
-      <div
-        className="hero-body"
-        style={{
-          fontFamily: SERIF,
-          fontSize: 17.5,
-          color: INK,
-          lineHeight: 1.55,
-          textAlign: "justify",
-        }}
-      >
+      <div className="hero-body" style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55, textAlign: "justify" }}>
         <p style={{ margin: 0 }}>
-          <span
-            className="hero-drop-cap"
-            style={{
-              float: "left",
-              fontFamily: SERIF,
-              fontWeight: 700,
-              fontStyle: "italic",
-              lineHeight: 0.78,
-              marginRight: 10,
-              marginTop: 6,
-              color: INK,
-              background: YEL,
-              padding: "6px 8px 2px 8px",
-            }}
-          >
+          <span className="hero-drop-cap" style={{ float: "left", fontFamily: SERIF, fontWeight: 700, fontStyle: "italic", lineHeight: 0.78, marginRight: 10, marginTop: 6, color: INK, background: YEL, padding: "6px 8px 2px 8px" }}>
             F
           </span>
           or founders without a marketing leader. I take the marketing chair at
@@ -163,77 +160,21 @@ const Hero = () => (
       </div>
 
       {/* Availability aside */}
-      <aside
-        style={{
-          background: PAPER2,
-          border: `1px solid ${INK}`,
-          padding: 24,
-        }}
-      >
+      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
         <Pill size={11} ls="0.20em">Availability</Pill>
-        <div
-          style={{
-            marginTop: 14,
-            fontFamily: SERIF,
-            fontSize: 22,
-            lineHeight: 1.25,
-            color: INK,
-            fontWeight: 700,
-          }}
-        >
-          Two seats open
-          <br />
-          <span style={{ fontStyle: "italic", fontWeight: 600 }}>
-            this quarter.
-          </span>
+        <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>
+          Two seats open<br />
+          <span style={{ fontStyle: "italic", fontWeight: 600 }}>this quarter.</span>
         </div>
-        <div
-          style={{
-            marginTop: 16,
-            paddingTop: 16,
-            borderTop: `1px solid ${INK15}`,
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "10px 18px",
-          }}
-        >
+        <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
           {AVAILABILITY_SPECS.map(([k, v]) => (
             <Fragment key={k}>
-              <div>
-                <SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps>
-              </div>
-              <div
-                style={{
-                  fontFamily: SERIF,
-                  fontSize: 14,
-                  color: INK,
-                  lineHeight: 1.4,
-                }}
-              >
-                {v}
-              </div>
+              <div><SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps></div>
+              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.4 }}>{v}</div>
             </Fragment>
           ))}
         </div>
-        <a
-          href={CALENDLY}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            marginTop: 22,
-            display: "block",
-            textAlign: "center",
-            padding: "14px 18px",
-            background: INK,
-            color: PAPER,
-            textDecoration: "none",
-            fontFamily: GROT,
-            fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-          }}
-        >
+        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>
           Book a discovery call →
         </a>
       </aside>
@@ -853,6 +794,7 @@ export default function FractionalCMOPage() {
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
       <Hero />
+      <CMOLead />
       <Scope />
       <Timeline />
       <Fit />

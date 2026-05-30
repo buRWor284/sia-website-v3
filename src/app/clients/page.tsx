@@ -30,72 +30,50 @@ import {
 const TOTAL = CLIENTS_PRE.length + CLIENTS_TIER1.length + CLIENTS_TIER2.length;
 
 const Hero = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 32 }}>
-    <div style={{ textAlign: "center" }}>
-      <SCaps size={11.5} ls="0.32em" color={INK70}>
-        The Bureau Portfolio &nbsp;·&nbsp; Filed clients, dated engagements &nbsp;·&nbsp; Edition of {new Date().getFullYear()}
-      </SCaps>
-    </div>
+  <section className="sx" style={{ background: PAPER }}>
+    <div className="res-hero-grid">
 
-    <h1
-      className="hero-h1"
-      style={{
-        margin: "28px 0 0",
-        fontFamily: SERIF,
-        fontWeight: 700,
-        color: INK,
-      }}
-    >
-      Selected
-      <br />
-      <span style={{ fontStyle: "italic" }}>engagements</span>, filed.
-    </h1>
-
-    <p
-      style={{
-        maxWidth: 760,
-        margin: "28px auto 0",
-        textAlign: "center",
-        fontFamily: SERIF,
-        fontSize: 21,
-        color: INK70,
-        lineHeight: 1.55,
-        fontStyle: "italic",
-      }}
-    >
-      A working roster — public-sector and corporate engagements before the
-      agency; eight featured engagements with case-study results; and a
-      supporting list of clients the bureau has been pleased to serve. Click
-      any featured card to read the brief.
-    </p>
-
-    <div
-      className="grid-stats"
-      style={{
-        marginTop: 40,
-        borderTop: `1px solid ${INK}`,
-        borderBottom: `1px solid ${INK}`,
-      }}
-    >
-      {[
-        [String(TOTAL),                       "Clients on the roster"],
-        [String(CLIENTS_TIER1.length),        "Featured · with results"],
-        ["6",                                 "Countries served"],
-        ["2007–",                             "Years in practice"],
-      ].map(([k, v]) => (
-        <div
-          key={k}
-          className="stat-item"
-          style={{ padding: "22px 20px", textAlign: "center" }}
-        >
-          <div className="stat-number" style={{ fontFamily: SERIF, fontWeight: 700, color: INK }}>
-            {k}
-          </div>
-          <div style={{ marginTop: 6 }}>
-            <SCaps size={10.5} ls="0.18em" color={INK70}>{v}</SCaps>
-          </div>
+      {/* Left: count */}
+      <div className="res-hero-left">
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
+          {TOTAL}
         </div>
-      ))}
+        <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
+          Clients on<br />the roster
+        </div>
+      </div>
+
+      {/* Centre: headline */}
+      <div className="res-hero-center">
+        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+          CLIENTS
+        </div>
+        <SCaps size={10} ls="0.24em" color={INK55}>
+          The Bureau Portfolio &nbsp;·&nbsp; Filed clients &nbsp;·&nbsp; Edition of {new Date().getFullYear()}
+        </SCaps>
+        <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
+          Selected<br />
+          <em style={{ fontStyle: "italic", fontWeight: 600 }}>engagements</em>, filed.
+        </h1>
+        <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
+          Eight featured case studies with results. A supporting roster of clients across 20+ countries.
+        </p>
+      </div>
+
+      {/* Right: topic index */}
+      <div className="res-hero-right">
+        {[
+          { label: "Pre-Agency",    sub: "Public sector · Civic tech" },
+          { label: "Featured",      sub: `${CLIENTS_TIER1.length} case studies with results` },
+          { label: "Full Roster",   sub: "All clients · Open archive" },
+        ].map(t => (
+          <div key={t.label}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
+            <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>{t.sub}</div>
+          </div>
+        ))}
+      </div>
+
     </div>
   </section>
 );

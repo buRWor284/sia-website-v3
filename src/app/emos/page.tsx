@@ -50,70 +50,50 @@ const RECEIPTS: ReadonlyArray<Receipt> = [
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const Hero = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 56, paddingBottom: 0 }}>
-    <div style={{ textAlign: "center", marginBottom: 24 }}>
-      <SCaps color={INK70} size={12} ls="0.28em">
-        A new offering from the Bureau · 2026
-      </SCaps>
-    </div>
-    <h1
-      style={{
-        margin: 0,
-        textAlign: "center",
-        fontFamily: SERIF,
-        fontWeight: 700,
-        color: INK,
-        lineHeight: 0.96,
-        letterSpacing: "-0.03em",
-      }}
-    >
-      <span
-        className="emos-h1-main"
-        style={{
-          display: "block",
-          fontFamily: GROT,
-          fontWeight: 900,
-          fontStyle: "italic",
-          letterSpacing: "-0.04em",
-        }}
-      >
-        EMOS.
-      </span>
-      <span
-        className="emos-h1-sub"
-        style={{
-          display: "block",
-          fontStyle: "italic",
-          fontWeight: 600,
-        }}
-      >
-        the <Mark>Earned Media</Mark> Operating System.
-      </span>
-    </h1>
-    <div style={{ display: "flex", justifyContent: "center", marginTop: 22 }}>
-      <SCaps size={11.5} ls="0.22em" color={INK55}>
-        Productized by Syed Irfan Ajmal &nbsp;·&nbsp; Delivered through{" "}
-        <span style={{ color: INK }}>DMR.agency</span>
-      </SCaps>
-    </div>
+  <section className="sx" style={{ background: PAPER }}>
+    <div className="res-hero-grid">
 
-    <DoubleRule style={{ margin: "44px 0 8px" }} />
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "baseline",
-        padding: "6px 0 36px",
-        flexWrap: "wrap",
-        gap: 8,
-      }}
-    >
-      <SCaps size={10.5} ls="0.18em" color={INK70}>
-        Below: a 30-second tour by the editor.
-      </SCaps>
-      <SCaps size={10.5} ls="0.18em" color={INK70}>
-        Run time: 0:30 · 1080 × 1080
-      </SCaps>
+      {/* Left: count */}
+      <div className="res-hero-left">
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
+          100+
+        </div>
+        <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
+          Client<br />campaigns
+        </div>
+      </div>
+
+      {/* Centre: headline */}
+      <div className="res-hero-center">
+        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+          EMOS
+        </div>
+        <SCaps size={10} ls="0.24em" color={INK55}>
+          A new offering from the Bureau &nbsp;·&nbsp; 2026
+        </SCaps>
+        <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
+          Earned Media,<br />
+          <em style={{ fontStyle: "italic", fontWeight: 600 }}>built into an OS.</em>
+        </h1>
+        <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
+          The complete system for founders who want coverage — not just content.
+        </p>
+      </div>
+
+      {/* Right: topic index */}
+      <div className="res-hero-right">
+        {[
+          { label: "The Playbook",       sub: "Step-by-step methods" },
+          { label: "Training & Cohorts", sub: "Live sessions · In-house teams" },
+          { label: "Office Hours",       sub: "Weekly accountability" },
+        ].map(t => (
+          <div key={t.label}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
+            <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>{t.sub}</div>
+          </div>
+        ))}
+      </div>
+
     </div>
   </section>
 );
