@@ -49,7 +49,7 @@ const css = `
 
 
   /* ── HERO ───────────────────────────────────────────────── */
-  .hero { background: var(--BG); padding: 36px 56px 0; }
+  .hero { background: var(--BG); padding: 20px 56px 0; }
 
   @keyframes ticker-scroll {
     from { transform: translateX(0); }
@@ -57,7 +57,7 @@ const css = `
   }
   .ticker {
     border-top: 2px solid var(--INK); border-bottom: 2px solid var(--INK);
-    padding: 11px 0; margin-bottom: 44px;
+    padding: 11px 0; margin-bottom: 28px;
     font-family: var(--mono); font-size: 11.5px; color: var(--INK);
     font-weight: 500; letter-spacing: .04em;
     overflow: hidden; white-space: nowrap; position: relative;
@@ -97,8 +97,8 @@ const css = `
     color: var(--INK); margin-bottom: 22px; font-weight: 600;
   }
   .hero-h1 {
-    font-family: var(--sans); font-weight: 900; font-size: 72px;
-    line-height: .9; letter-spacing: -.04em; color: var(--INK);
+    font-family: var(--sans); font-weight: 900; font-size: 58px;
+    line-height: .92; letter-spacing: -.04em; color: var(--INK);
     text-transform: uppercase;
   }
   .hero-h1 .strike {
@@ -116,11 +116,11 @@ const css = `
     display: flex; flex-direction: column; justify-content: center;
   }
   .hero-sub {
-    font-family: var(--sans); font-size: 22px; font-weight: 500;
+    font-family: var(--sans); font-size: 18px; font-weight: 500;
     color: var(--INK); line-height: 1.45;
   }
   .hero-sub strong { font-weight: 900; font-style: italic; }
-  .hero-ctas { display: flex; flex-direction: column; gap: 12px; margin-top: 36px; }
+  .hero-ctas { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
 
   .btn-primary {
     display: inline-flex; align-items: center; gap: 10px;
@@ -157,17 +157,17 @@ const css = `
 
   /* ── STATS STRIP ────────────────────────────────────────── */
   .stats-strip {
-    margin-top: 64px;
+    margin-top: 32px;
     display: grid; grid-template-columns: repeat(4, 1fr);
     border-top: 2px solid var(--INK); border-bottom: 2px solid var(--INK);
   }
   .stat {
-    padding: 36px 28px;
+    padding: 24px 28px;
     border-right: 2px solid var(--INK);
   }
   .stat:last-child { border-right: none; }
   .stat__num {
-    font-family: var(--sans); font-weight: 900; font-size: 72px; color: var(--INK);
+    font-family: var(--sans); font-weight: 900; font-size: 56px; color: var(--INK);
     line-height: 1; letter-spacing: -.04em;
     display: flex; align-items: baseline; gap: 4px;
   }

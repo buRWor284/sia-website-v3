@@ -224,7 +224,7 @@ export const Subscriptions = ({
           <span style={{ fontStyle: "italic", color: YEL }}>Zero filler.</span>
         </h2>
         <p style={{ marginTop: 14, marginBottom: 0, fontFamily: GROT, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
-          GEO · SEO-PR · Content Marketing
+          SEO-PR · GEO · Content Marketing
         </p>
         <p style={{ marginTop: 18, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 480 }}>
           One or two emails a month. The campaigns I&rsquo;m building right
