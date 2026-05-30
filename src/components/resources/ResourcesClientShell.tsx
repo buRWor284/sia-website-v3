@@ -63,6 +63,8 @@ interface ArticleContent extends ContentBase {
   slug: string;
   cat: string;
   external?: boolean;
+  newsHeadline: string;
+  newsDeck: string;
 }
 
 interface VisualEssayContent extends ContentBase {
@@ -241,6 +243,8 @@ const CONTENT: ContentItem[] = [
     cat: "Craft",
     y: "2016",
     updated: "2022",
+    newsHeadline: "The Writer's Rulebook",
+    newsDeck: "Every rule serious writers live by, in one place",
   },
   {
     id: "art-good-writer",
@@ -252,6 +256,8 @@ const CONTENT: ContentItem[] = [
     cat: "Craft",
     y: "—",
     external: true,
+    newsHeadline: "Made, Not Born",
+    newsDeck: "The habits and disciplines that turn anyone into a writer",
   },
   {
     id: "art-productivity",
@@ -263,6 +269,8 @@ const CONTENT: ContentItem[] = [
     cat: "Operating",
     y: "2021",
     external: true,
+    newsHeadline: "The Founder's Edge",
+    newsDeck: "Six habits that give entrepreneurs an unfair time advantage",
   },
   {
     id: "art-digital-tools",
@@ -274,6 +282,8 @@ const CONTENT: ContentItem[] = [
     cat: "Tools",
     y: "2020",
     external: true,
+    newsHeadline: "Tools of the Trade",
+    newsDeck: "Six digital tools that make writing faster and sharper",
   },
   {
     id: "art-analytics",
@@ -285,6 +295,8 @@ const CONTENT: ContentItem[] = [
     cat: "Measurement",
     y: "2020",
     external: true,
+    newsHeadline: "Read the Numbers",
+    newsDeck: "The five analytics signals that tell you if your content is working",
   },
   {
     id: "art-ecommerce",
@@ -296,6 +308,8 @@ const CONTENT: ContentItem[] = [
     cat: "Strategy",
     y: "—",
     external: true,
+    newsHeadline: "The Conversion Code",
+    newsDeck: "How product discovery turns browsers into buyers",
   },
 
   // ── VISUAL ESSAYS ────────────────────────────────────────────────────────
@@ -545,23 +559,24 @@ function ArticleCard({ item }: { item: ArticleContent }) {
       onMouseLeave={() => setHover(false)}
       style={{
         display: "flex", flexDirection: "column",
-        padding: "22px 20px",
+        padding: "28px 24px 22px",
         background: hover ? PAPER2 : PAPER,
         textDecoration: "none", color: INK,
         transition: "background 0.14s",
-        minHeight: 150, height: "100%",
+        minHeight: 340, height: "100%",
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 10 }}>
-        <SCaps size={9.5} ls="0.18em" color={INK55}>{item.cat}</SCaps>
-        <SCaps size={9.5} ls="0.14em" color="rgba(26,20,16,.28)">
-          {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
-        </SCaps>
+      <div style={{ marginBottom: 16 }}>
+        <Pill size={9.5} ls="0.18em">Article · {item.cat}</Pill>
       </div>
-      <h4 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 19, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em", flex: 1 }}>
+      <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
+      <h4 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em", flex: 1 }}>
         {item.title}
       </h4>
-      <div style={{ marginTop: 14 }}>
+      <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <SCaps size={9} ls="0.13em" color="rgba(26,20,16,.42)">
+          {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
+        </SCaps>
         <SCaps size={10} ls="0.16em" color={INK}>Read ↗</SCaps>
       </div>
     </a>
