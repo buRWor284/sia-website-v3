@@ -18,13 +18,13 @@ const MODEL = "claude-opus-4-6";
 
 function buildPartnerPrompt(d: Record<string, unknown>): string {
   const stratLabel: Record<string, string> = {
-    discount: "Discount Partnership (offer a discount to a partner's customers; they link to you from their partner/deals page)",
-    institution: "Institution Rebate (offer a discount specifically to universities/associations/.edu/.gov bodies; they list you on their rebate page)",
-    badge: "Expert Roundup + Badge (create a guide featuring experts/coaches; award a badge with embedded backlink code)",
+    discount: "Discount Partnership — offer a discount to a partner's customers; they link from their partner/deals/perks page",
+    institution: "Institution Rebate — offer a discount to universities/associations/.edu/.gov bodies; they list you on their rebate or resources page",
+    badge: "Expert Roundup + Badge — create a guide featuring experts/coaches; award a badge with an embedded backlink in the embed code",
   };
-  return `You are an expert link building strategist specialising in collab (partnership) link building.
+  return `You are an expert link building strategist specialising in collab (partnership) link building. Your task is to generate highly specific, actionable partner suggestions for the business below.
 
-A user has provided the following business details:
+BUSINESS DETAILS:
 - Business name: ${d.biz || "Not provided"}
 - Website: ${d.domain || "Not provided"}
 - What they do: ${d.desc || "Not provided"}
@@ -32,18 +32,23 @@ A user has provided the following business details:
 - Audience type: ${d.audType || "Not provided"}
 - Audience description: ${d.audDesc || "Not provided"}
 - Geography: ${d.geo || "Not provided"}
-- Chosen strategy: ${stratLabel[d.strategy as string] || String(d.strategy)}
+- Strategy: ${stratLabel[d.strategy as string] || String(d.strategy)}
 
-Your task: Generate 8–12 highly specific collab link building partner suggestions tailored to this exact business.
+Generate 8 partner suggestions. Name REAL, SPECIFIC companies where possible (not generic categories). Tailor every suggestion to the exact business, geography, and strategy above.
 
-For each suggestion provide:
-1. Company name or specific type (name real companies where appropriate)
-2. Why they're a perfect fit (1–2 sentences — shared audience, logical link placement)
-3. The page where a link would naturally live (e.g. "partner deals page", "student discounts page")
-4. Who to contact at the company (job title to search on LinkedIn)
-5. Why this matters for SEO (type of link, authority potential)
+Return ONLY a valid JSON array — no text before or after, no markdown fences. Each object must have exactly these fields:
 
-Format each suggestion clearly, numbered 1–12. Be specific and actionable. Tailor every suggestion to the geography and strategy chosen.`;
+[
+  {
+    "name": "Exact company name (e.g. Brex, PureGym, Shopify)",
+    "url": "their domain e.g. brex.com (or empty string if unknown)",
+    "why": "2-3 sentences: why their audience overlaps exactly with this business, and why this partnership makes sense for both sides",
+    "linkPage": "The specific page where the link would live, e.g. Brex Perks page, Student discounts section, Partner ecosystem page",
+    "contact": "Exact LinkedIn job title to search for, e.g. Head of Startup Partnerships, Student Services Officer",
+    "seoNote": "Estimated domain authority range and why this link matters — e.g. DA 70+, contextual link from a startup financial tool trusted by investors",
+    "tier": "A or B or C — A = highest priority, must approach first"
+  }
+]`;
 }
 
 function buildEmailPrompt(d: Record<string, unknown>): string {
@@ -172,7 +177,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1500,
+        max_tokens: type === "partner-suggestions" ? 3000 : 1500,
         messages: [{ role: "user", content: prompt }],
       }),
     });

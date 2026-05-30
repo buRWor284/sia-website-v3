@@ -89,32 +89,38 @@ const css = `
   .ticker--cta a:hover { border-color: var(--RED); color: var(--RED); }
 
   .hero-grid {
-    display: grid; grid-template-columns: 1.55fr 0.7fr;
-    gap: 48px; align-items: start;
+    display: grid; grid-template-columns: 1.3fr 1fr;
+    gap: 64px; align-items: center;
   }
   .hero-kicker {
     font-family: var(--mono); font-size: 12px; letter-spacing: .18em;
     color: var(--INK); margin-bottom: 22px; font-weight: 600;
   }
   .hero-h1 {
-    font-family: var(--sans); font-weight: 900; font-size: 82px;
+    font-family: var(--sans); font-weight: 900; font-size: 72px;
     line-height: .9; letter-spacing: -.04em; color: var(--INK);
     text-transform: uppercase;
   }
-  .hero-h1 em {
-    font-style: normal;
-    text-decoration: underline;
+  .hero-h1 .strike {
+    text-decoration: line-through;
     text-decoration-color: var(--RED);
-    text-underline-offset: 8px;
-    text-decoration-thickness: 5px;
+    text-decoration-thickness: 4px;
+  }
+  .hero-h1 .earn {
+    background: var(--Y);
+    color: var(--INK);
+    padding: 0 6px 4px;
+    display: inline-block;
+  }
+  .hero-right {
+    display: flex; flex-direction: column; justify-content: center;
   }
   .hero-sub {
-    margin-top: 32px;
-    font-family: var(--sans); font-size: 21px; font-weight: 500;
-    color: var(--INK); line-height: 1.45; max-width: 600px;
+    font-family: var(--sans); font-size: 22px; font-weight: 500;
+    color: var(--INK); line-height: 1.45;
   }
   .hero-sub strong { font-weight: 900; font-style: italic; }
-  .hero-ctas { display: flex; gap: 14px; margin-top: 36px; }
+  .hero-ctas { display: flex; flex-direction: column; gap: 12px; margin-top: 36px; }
 
   .btn-primary {
     display: inline-flex; align-items: center; gap: 10px;
@@ -134,27 +140,10 @@ const css = `
   .btn-outline:hover { background: rgba(14,13,10,.07); }
   .mono-arrow { font-family: var(--mono); }
 
-  /* portrait */
-  .portrait-col { display: flex; justify-content: flex-end; align-items: flex-end; }
-  .hero-portrait {
-    width: 45%; aspect-ratio: 4/5;
-    background: #d8cebc; border: 3px solid var(--INK);
-    position: relative; overflow: hidden; flex-shrink: 0;
-  }
-  .hero-portrait svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-  .portrait-badge {
-    position: absolute; padding: 7px 12px;
-    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: .12em;
-  }
-  .portrait-badge--tl { top: 14px; left: 14px; background: var(--INK); color: var(--Y); }
-  .portrait-badge--br {
-    bottom: 14px; right: 14px;
-    background: var(--INK); color: var(--Y); border: 2px solid var(--INK);
-  }
 
   /* speaking photo */
   .speaking-photo {
-    margin-top: 32px; border: 2px solid rgba(245,197,24,.35);
+    margin-top: 24px; margin-bottom: 24px; border: 2px solid rgba(245,197,24,.35);
     overflow: hidden;
   }
   .speaking-photo img {
@@ -700,11 +689,14 @@ export default function HomePage() {
         <div className="hero-grid">
           <div>
             <h1 className="hero-h1">
-              WHY PAY<br />
+              WHY <span className="strike">PAY</span><br />
               FOR ATTENTION<br />
               WHEN YOU CAN<br />
-              <em>EARN</em> IT?
+              <span className="earn">EARN</span> IT?
             </h1>
+          </div>
+
+          <div className="hero-right">
             <p className="hero-sub">
               I help founders and brands get covered, get found, get customers.
               Without <strong>paying for attention.</strong>
@@ -713,15 +705,6 @@ export default function HomePage() {
               <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="btn-primary">Book a discovery call <span className="mono-arrow">→</span></a>
               <a href="/podcast" className="btn-outline">Listen to the podcast</a>
             </div>
-          </div>
-
-          <div className="portrait-col">
-            <figure className="hero-portrait">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/headshot.jpg" alt="Syed Irfan Ajmal" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top center'}} />
-              <div className="portrait-badge portrait-badge--tl">HELLO.</div>
-              <div className="portrait-badge portrait-badge--br" style={{fontSize:'9px',lineHeight:1.4}}>PESHAWAR to<br/>STOCKHOLM &amp; BACK</div>
-            </figure>
           </div>
         </div>
 
@@ -925,13 +908,13 @@ export default function HomePage() {
             <h2 className="section-h2" style={{color:'var(--BG)',fontSize:'72px',marginBottom:0}}>
               Stages across<br/>four countries.
             </h2>
-            <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>
-            <a href="/speaking" className="speaking__cta">Speaker sheet &amp; topics <span className="mono-arrow">→</span></a>
             <div className="speaking-photo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/assets/speaking/mps2016.jpg" alt="Syed Irfan Ajmal speaking at MPS2016 Dubai" />
               <div className="speaking-photo__caption">MPS2016 · DUBAI, UAE</div>
             </div>
+            <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>
+            <a href="/speaking" className="speaking__cta">Speaker sheet &amp; topics <span className="mono-arrow">→</span></a>
           </div>
           <div>
             <div className="stage-row">
