@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { Subscriptions } from '@/components/bureau';
 
 /**
  * Homepage v4 Cream edition (SIA-homepage-v3 design)
@@ -300,16 +301,16 @@ const css = `
     font-size: 28px; font-weight: 700; color: rgba(245,197,24,.55);
   }
   .case-card__client {
-    font-family: var(--mono); font-size: 11px; color: rgba(245,197,24,.55);
+    font-family: var(--mono); font-size: 11px; color: rgba(241,235,222,.5);
     letter-spacing: .12em; margin-top: 12px; text-transform: uppercase;
   }
   .case-card__result {
     font-family: var(--sans); font-weight: 800; font-size: 21px;
-    color: var(--Y); line-height: 1.12; letter-spacing: -.01em;
+    color: #f1ebde; line-height: 1.12; letter-spacing: -.01em;
     margin-top: 18px;
   }
   .case-card__body {
-    font-family: var(--sans); font-size: 15px; color: rgba(245,197,24,.62);
+    font-family: var(--sans); font-size: 15px; color: rgba(241,235,222,.62);
     line-height: 1.55; margin-top: 14px; flex: 1;
   }
   .case-card__link {
@@ -319,7 +320,7 @@ const css = `
     text-transform: uppercase; border-bottom: 1px solid var(--RED);
     padding-bottom: 3px; align-self: flex-start;
   }
-  .case-card__link:hover { color: var(--Y); border-color: var(--Y); }
+  .case-card__link:hover { color: #f1ebde; border-color: #f1ebde; }
 
   /* ── TESTIMONIALS ───────────────────────────────────────── */
   .testimonials { background: var(--BG2); padding: 100px 56px; }
@@ -375,7 +376,7 @@ const css = `
   }
   .speaking__cta:hover { background: var(--RED); color: #fff; border-color: var(--RED); }
   .stage-row {
-    display: grid; grid-template-columns: 40px 1.6fr 1fr 1.1fr 1.2fr;
+    display: grid; grid-template-columns: 40px 1.6fr 1fr 1.4fr;
     gap: 24px; padding: 26px 0;
     border-bottom: 1px solid rgba(245,197,24,.18);
     align-items: baseline;
@@ -702,6 +703,43 @@ const css = `
   }
 `;
 
+function ScrollButtons() {
+  const [atBottom, setAtBottom] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      setAtBottom(scrolled >= total - 80);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <div style={{position:'fixed',bottom:24,right:24,zIndex:200,display:'flex',flexDirection:'column',gap:6}}>
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        title="Back to top"
+        style={{
+          width:44,height:44,background:'var(--INK)',color:'var(--Y)',border:'none',cursor:'pointer',
+          fontFamily:'var(--mono)',fontSize:18,fontWeight:700,display:'flex',alignItems:'center',
+          justifyContent:'center',opacity: atBottom ? 1 : 0.85,transition:'opacity .2s',
+          boxShadow:'0 2px 8px rgba(0,0,0,.25)',
+        }}
+      >↑</button>
+      <button
+        onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })}
+        title="Jump to bottom"
+        style={{
+          width:44,height:44,background:'var(--INK)',color:'var(--Y)',border:'none',cursor:'pointer',
+          fontFamily:'var(--mono)',fontSize:18,fontWeight:700,display:'flex',alignItems:'center',
+          justifyContent:'center',opacity: atBottom ? 0.4 : 0.85,transition:'opacity .2s',
+          boxShadow:'0 2px 8px rgba(0,0,0,.25)',
+        }}
+      >↓</button>
+    </div>
+  );
+}
+
 export default function HomePage() {
   const [navOpen, setNavOpen] = useState(false);
 
@@ -854,41 +892,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ § 01 SERVICES ══ */}
-      <section className="services">
-        <div className="sec-idx">
-          <span className="sec-idx__n">§ 01</span>
-          <div className="sec-idx__rule"></div>
-          <span className="sec-idx__label">WHAT I DO</span>
-        </div>
-        <h2 className="section-h2">Three ways to work,<br/>plainly stated.</h2>
-        <div className="services-grid">
-          <div className="service-card">
-            <div className="service-card__num">01</div>
-            <h3 className="service-card__title">Digital PR &amp; Earned Media</h3>
-            <p className="service-card__body">Land bylines and quotes in publications your buyers actually read Forbes, HBR, HuffPost, niche trade press. HARO, journalist outreach, story design. No fluff, no directories nobody clicks.</p>
-            <a href="/clients" className="service-card__cta">View case studies →</a>
-          </div>
-          <div className="service-card">
-            <div className="service-card__num">02</div>
-            <h3 className="service-card__title">EMOS · Earned Media OS</h3>
-            <p className="service-card__body">A productized system for landing editorial coverage trainings, templates, journalist playbooks. For in-house teams who want the press wins without the agency retainer.</p>
-            <a href="/emos" className="service-card__cta">Tour EMOS →</a>
-          </div>
-          <div className="service-card">
-            <div className="service-card__num">03</div>
-            <h3 className="service-card__title">Fractional CMO</h3>
-            <p className="service-card__body">For founders without a marketing leader. Weekly cadence, full strategy ownership, agency-level execution through DMR. You get a senior brain without the full-time price tag.</p>
-            <a href="/fractional-cmo" className="service-card__cta">Inquire →</a>
-          </div>
-        </div>
-        <div className="spacer-100"></div>
-      </section>
-
-      {/* ══ § 02 CASE STUDIES ══ */}
+      {/* ══ § 01 CASE STUDIES ══ */}
       <section className="casework">
         <div className="sec-idx sec-idx--dark">
-          <span className="sec-idx__n">§ 02</span>
+          <span className="sec-idx__n">§ 01</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">SELECTED CASEWORK</span>
         </div>
@@ -921,10 +928,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ § 03 TESTIMONIALS ══ */}
+      {/* ══ § 02 TESTIMONIALS ══ */}
       <section className="testimonials">
         <div className="sec-idx">
-          <span className="sec-idx__n">§ 03</span>
+          <span className="sec-idx__n">§ 02</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">CLIENT WORDS</span>
         </div>
@@ -998,10 +1005,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ══ § 04 SPEAKING ══ */}
+      {/* ══ § 03 SPEAKING ══ */}
       <section className="speaking">
         <div className="sec-idx sec-idx--dark">
-          <span className="sec-idx__n">§ 04</span>
+          <span className="sec-idx__n">§ 03</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">SPEAKING &amp; TRAINING</span>
         </div>
@@ -1015,48 +1022,52 @@ export default function HomePage() {
           </div>
           <div>
             <div className="stage-row">
-              <div className="stage__n">01</div><div className="stage__city">PESHAWAR</div>
-              <div className="stage__ctry">Pakistan</div><div className="stage__date">2013 to present</div>
-              <div className="stage__tag">G-DAY X · DURSHAL</div>
-            </div>
-            <div className="stage-row">
-              <div className="stage__n">02</div><div className="stage__city">KUALA LUMPUR</div>
-              <div className="stage__ctry">Malaysia</div><div className="stage__date">2016 to 2019</div>
+              <div className="stage__n">01</div><div className="stage__city">KUALA LUMPUR</div>
+              <div className="stage__ctry">Malaysia</div>
               <div className="stage__tag">WEBINARS · WORKSHOPS</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">03</div><div className="stage__city">BALI</div>
-              <div className="stage__ctry">Indonesia</div><div className="stage__date">2016</div>
+              <div className="stage__n">02</div><div className="stage__city">BALI</div>
+              <div className="stage__ctry">Indonesia</div>
               <div className="stage__tag">DMSS · 200+ AUDIENCE</div>
             </div>
             <div className="stage-row">
+              <div className="stage__n">03</div><div className="stage__city">PESHAWAR</div>
+              <div className="stage__ctry">Pakistan</div>
+              <div className="stage__tag">G-DAY X · DURSHAL</div>
+            </div>
+            <div className="stage-row">
               <div className="stage__n">04</div><div className="stage__city">DUBAI</div>
-              <div className="stage__ctry">UAE</div><div className="stage__date">2016 to 2018</div>
+              <div className="stage__ctry">UAE</div>
               <div className="stage__tag">ATM · IN5 · MPS2016</div>
             </div>
             <div className="stage-row">
               <div className="stage__n">05</div><div className="stage__city">WEBINARS</div>
-              <div className="stage__ctry">US / UK</div><div className="stage__date">2017 to present</div>
+              <div className="stage__ctry">US / UK</div>
               <div className="stage__tag">12+ SESSIONS</div>
             </div>
             <div className="stage-row">
               <div className="stage__n">06</div><div className="stage__city">US PODCASTS</div>
-              <div className="stage__ctry">Remote</div><div className="stage__date">2018 to present</div>
+              <div className="stage__ctry">Remote</div>
               <div className="stage__tag">15+ GUEST SPOTS</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ══ § 05 KITS / FREE RESOURCES ══ */}
+      {/* ══ § 04 KITS / FREE RESOURCES ══ */}
       <section className="kits">
         <div className="sec-idx">
-          <span className="sec-idx__n">§ 05</span>
+          <span className="sec-idx__n">§ 04</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">FREE RESOURCES</span>
         </div>
         <div className="kits-header">
-          <h2 className="section-h2" style={{margin:0}}>Resources. Tools, Kits,<br/>Playbooks, Calculators.<br/><span style={{fontSize:'55%',fontWeight:400,fontStyle:'italic',color:'var(--I70)'}}>Might not stay free for too long.</span></h2>
+          <div>
+            <h2 className="section-h2" style={{margin:0}}>Resources.</h2>
+            <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Kits · Playbooks · Calculators</p>
+            <p style={{fontFamily:'var(--sans)',fontWeight:400,fontStyle:'italic',fontSize:'15px',color:'var(--I70)',marginTop:'6px',marginBottom:0}}>Might not stay free for too long.</p>
+          </div>
           <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>18 TOTAL IN THE LIBRARY →</a>
         </div>
         <div className="kits-grid">
@@ -1081,53 +1092,64 @@ export default function HomePage() {
             </div>
           </div>
           <div className="kit-card">
-            <div className="kit-card__badge">INTERACTIVE KIT</div>
+            <div className="kit-card__badge">AI-POWERED TOOL</div>
             <div className="kit-card__paper">
               <div className="kit-card__paper-header">
                 <span className="kit-card__gazette">BUREAU GAZETTE</span>
                 <span className="kit-card__date">MMXXVI</span>
               </div>
-              <div className="kit-card__paper-title">WRITING IS MEDICINE</div>
+              <div className="kit-card__paper-title">COLLAB LINK BUILDER</div>
               <div className="kit-card__paper-cols">
-                <div className="kit-card__paper-col">Science confirms what the Ancients knew about the written word</div>
+                <div className="kit-card__paper-col">AI finds your best link-building partners in minutes, not weeks</div>
                 <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
               </div>
             </div>
-            <h3 className="kit-card__title">Top 11 Scientific Benefits<br/>of <em>Writing</em></h3>
-            <p className="kit-card__body">Eleven research-backed findings. Each with a prescription.</p>
+            <h3 className="kit-card__title">Collab Link<br/>Building <em>Tool</em></h3>
+            <p className="kit-card__body">Drop in your niche and audience. The AI surfaces partner opportunities, scores fit, and drafts your outreach — faster than any spreadsheet ever could.</p>
             <div className="kit-card__footer">
-              <span className="kit-card__year">2019 · UPD. 2026</span>
-              <a href="/infographics/writing-benefits" className="kit-card__cta">OPEN THE KIT ↗</a>
+              <span className="kit-card__year">2026</span>
+              <a href="/tools/collab-link-building" className="kit-card__cta">OPEN THE TOOL ↗</a>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ══ § 06 NEWSLETTER ══ */}
-      <section className="newsletter">
-        <div className="stripe"></div>
-        <div className="newsletter__inner">
-          <div>
-            <div className="sec-idx sec-idx--dark">
-              <span className="sec-idx__n">§ 06</span>
-              <div className="sec-idx__rule"></div>
-              <span className="sec-idx__label">INNER CIRCLE</span>
-            </div>
-            <h2 className="newsletter__h2">Join 4,800<br/>marketers<br/>reading the<br/>newsletter.</h2>
-            <p className="newsletter__sub">1-2 emails a month. Real case studies, the campaigns I&apos;m building right now, and zero filler. Unsubscribe whenever.</p>
-          </div>
-          <form className="newsletter__form" onSubmit={(e) => e.preventDefault()}>
-            <div className="newsletter__row">
-              <input className="newsletter__input" type="email" placeholder="you@yourcompany.com" />
-              <button className="newsletter__btn" type="submit">Subscribe →</button>
-            </div>
-            <div className="newsletter__note">
-              NO SPAM · UNSUBSCRIBE IN ONE CLICK · POWERED BY <span>MAILMUNCH</span>
-            </div>
-          </form>
+      {/* ══ § 05 SERVICES ══ */}
+      <section className="services">
+        <div className="sec-idx">
+          <span className="sec-idx__n">§ 05</span>
+          <div className="sec-idx__rule"></div>
+          <span className="sec-idx__label">WHAT I DO</span>
         </div>
-        <div className="stripe"></div>
+        <h2 className="section-h2">Three ways to work,<br/>plainly stated.</h2>
+        <div className="services-grid">
+          <div className="service-card">
+            <div className="service-card__num">01</div>
+            <h3 className="service-card__title">Digital PR &amp; Earned Media</h3>
+            <p className="service-card__body">Land bylines and quotes in publications your buyers actually read — Forbes, HBR, HuffPost, niche trade press. HARO, journalist outreach, story design. No fluff, no directories nobody clicks.</p>
+            <a href="/clients" className="service-card__cta">View case studies →</a>
+          </div>
+          <div className="service-card">
+            <div className="service-card__num">02</div>
+            <h3 className="service-card__title">EMOS · Earned Media OS</h3>
+            <p className="service-card__body">A productized system for landing editorial coverage — trainings, templates, journalist playbooks. For in-house teams who want the press wins without the agency retainer.</p>
+            <a href="/emos" className="service-card__cta">Tour EMOS →</a>
+          </div>
+          <div className="service-card">
+            <div className="service-card__num">03</div>
+            <h3 className="service-card__title">Fractional CMO</h3>
+            <p className="service-card__body">For founders without a marketing leader. Weekly cadence, full strategy ownership, agency-level execution through DMR. You get a senior brain without the full-time price tag.</p>
+            <a href="/fractional-cmo" className="service-card__cta">Inquire →</a>
+          </div>
+        </div>
+        <div className="spacer-100"></div>
       </section>
+
+      {/* ══ § 06 NEWSLETTER ══ */}
+      <Subscriptions sectionNumber="06" />
+
+      {/* ══ SCROLL BUTTONS ══ */}
+      <ScrollButtons />
 
       {/* ══ FOOTER ══ */}
       <footer className="footer">
@@ -1140,34 +1162,34 @@ export default function HomePage() {
             </p>
           </div>
           <div>
-            <div className="footer__col-head">SITE</div>
+            <div className="footer__col-head">THE WORK</div>
             <ul className="footer__links">
-              <li><a href="/" className="footer__link">Home</a></li>
-              <li><a href="/about" className="footer__link">About</a></li>
+              <li><a href="/fractional-cmo" className="footer__link">Fractional CMO</a></li>
               <li><a href="/speaking" className="footer__link">Speaking</a></li>
-              <li><a href="/podcast" className="footer__link">Podcast</a></li>
-              <li><a href="/blog" className="footer__link">Blog</a></li>
-              <li><a href="/contact" className="footer__link">Contact</a></li>
+              <li><a href="/emos" className="footer__link">EMOS</a></li>
+              <li><a href="https://dmr.agency" target="_blank" rel="noopener noreferrer" className="footer__link">DMR.agency ↗</a></li>
+              <li><a href="/ventures" className="footer__link">Ventures</a></li>
+              <li><a href="/clients" className="footer__link">Clients</a></li>
             </ul>
           </div>
           <div>
-            <div className="footer__col-head">WORK</div>
+            <div className="footer__col-head">NAVIGATE</div>
             <ul className="footer__links">
-              <li><a href="/clients" className="footer__link">Digital PR</a></li>
-              <li><a href="/clients" className="footer__link">SEO Content</a></li>
-              <li><a href="/fractional-cmo" className="footer__link">Fractional CMO</a></li>
-              <li><a href="/speaking" className="footer__link">Keynotes</a></li>
-              <li><a href="/clients" className="footer__link">Case studies</a></li>
+              <li><a href="/" className="footer__link">Home</a></li>
+              <li><a href="/about" className="footer__link">About</a></li>
+              <li><a href="/podcast" className="footer__link">Podcast</a></li>
+              <li><a href="/gallery" className="footer__link">Gallery</a></li>
+              <li><a href="/resources" className="footer__link">Resources</a></li>
+              <li><a href="/newsletter" className="footer__link">Newsletter</a></li>
             </ul>
           </div>
           <div>
             <div className="footer__col-head">ELSEWHERE</div>
             <ul className="footer__links">
-              <li><a href="https://twitter.com/irfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">Twitter / X</a></li>
-              <li><a href="https://linkedin.com/in/syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn</a></li>
-              <li><a href="https://youtube.com/@syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube</a></li>
-              <li><a href="/podcast" className="footer__link">Apple Podcasts</a></li>
-              <li><a href="/podcast" className="footer__link">Spotify</a></li>
+              <li><a href="https://x.com/syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">Twitter / X ↗</a></li>
+              <li><a href="https://www.linkedin.com/in/syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn ↗</a></li>
+              <li><a href="https://youtube.com/@syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>
+              <li><a href="https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" target="_blank" rel="noopener noreferrer" className="footer__link">Apple Podcasts ↗</a></li>
             </ul>
           </div>
         </div>
