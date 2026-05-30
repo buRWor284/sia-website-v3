@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Homepage v4 Cream edition (SIA-homepage-v3 design)
@@ -17,7 +17,7 @@ const css = `
     --I70:  rgba(14,13,10,.72);
     --I45:  rgba(14,13,10,.45);
     --I15:  rgba(14,13,10,.15);
-    --RED:  #e60050;
+    --RED:  #2e90c3;
     --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
     --BG:  #f5f0e8;
     --BG2: #ece7da;
@@ -111,21 +111,30 @@ const css = `
   /* ── HERO ───────────────────────────────────────────────── */
   .hero { background: var(--BG); padding: 36px 56px 0; }
 
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
   .ticker {
-    display: flex; align-items: center; gap: 28px;
     border-top: 2px solid var(--INK); border-bottom: 2px solid var(--INK);
     padding: 11px 0; margin-bottom: 44px;
     font-family: var(--mono); font-size: 11.5px; color: var(--INK);
     font-weight: 500; letter-spacing: .04em;
-    overflow: hidden; white-space: nowrap;
+    overflow: hidden; white-space: nowrap; position: relative;
   }
+  .ticker-track {
+    display: inline-flex; align-items: center; gap: 28px;
+    animation: ticker-scroll 28s linear infinite;
+    will-change: transform;
+  }
+  .ticker:hover .ticker-track { animation-play-state: paused; }
   .ticker__dot { color: var(--RED); }
   .ticker__sep { color: var(--I15); }
   .ticker__bold { font-weight: 700; }
 
   .hero-grid {
-    display: grid; grid-template-columns: 1.55fr 1fr;
-    gap: 56px; align-items: end;
+    display: grid; grid-template-columns: 1.55fr 0.7fr;
+    gap: 48px; align-items: end;
   }
   .hero-kicker {
     font-family: var(--mono); font-size: 12px; letter-spacing: .18em;
@@ -378,12 +387,7 @@ const css = `
   .stage__tag  { font-family: var(--mono); font-size: 11px; color: var(--RED); letter-spacing: .08em; font-weight: 700; }
 
   /* ── KITS (newspaper cards) ─────────────────────────────── */
-  .kits { background: var(--INK); padding: 100px 56px; }
-  .kits .sec-idx__rule { background: rgba(245,197,24,.25); }
-  .kits .sec-idx__n { color: var(--RED); }
-  .kits .sec-idx__label { color: rgba(245,197,24,.7); }
-  .kits .kits-header .section-h2 { color: var(--Y); }
-  .kits .kits-all { color: rgba(245,197,24,.7); }
+  .kits { background: var(--BG2); padding: 100px 56px; }
   .kits-header {
     display: flex; align-items: baseline; justify-content: space-between;
     margin-bottom: 48px;
@@ -394,67 +398,67 @@ const css = `
   }
   .kits-grid {
     display: grid; grid-template-columns: repeat(2, 1fr);
-    border: 2px solid rgba(245,197,24,.25);
+    border: 2px solid var(--INK);
   }
   .kit-card {
-    padding: 36px 32px 32px; border-right: 2px solid rgba(245,197,24,.25);
+    padding: 36px 32px 32px; border-right: 2px solid var(--INK);
     display: flex; flex-direction: column;
   }
   .kit-card:last-child { border-right: none; }
   .kit-card__badge {
     display: inline-block; padding: 6px 12px;
-    background: var(--Y); border: 2px solid var(--Y);
+    background: var(--INK); border: 2px solid var(--INK);
     font-family: var(--mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--INK);
+    letter-spacing: .14em; text-transform: uppercase; color: var(--BG);
     align-self: flex-start; margin-bottom: 24px;
   }
   .kit-card__paper {
-    border: 1px solid rgba(245,197,24,.3); padding: 16px;
-    background: rgba(245,197,24,.07); margin-bottom: 24px;
+    border: 1px solid var(--INK); padding: 16px;
+    background: rgba(14,13,10,.05); margin-bottom: 24px;
   }
   .kit-card__paper-header {
     display: flex; justify-content: space-between; align-items: baseline;
-    border-bottom: 1px solid rgba(245,197,24,.3); padding-bottom: 8px; margin-bottom: 12px;
+    border-bottom: 1px solid var(--INK); padding-bottom: 8px; margin-bottom: 12px;
   }
   .kit-card__gazette {
     font-family: var(--mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .18em; text-transform: uppercase; color: var(--Y);
+    letter-spacing: .18em; text-transform: uppercase; color: var(--INK);
   }
   .kit-card__date {
-    font-family: var(--mono); font-size: 10px; color: rgba(245,197,24,.45); letter-spacing: .06em;
+    font-family: var(--mono); font-size: 10px; color: var(--I45); letter-spacing: .06em;
   }
   .kit-card__paper-title {
     font-family: var(--sans); font-weight: 900; font-size: 18px;
-    letter-spacing: -.01em; color: var(--Y); margin-bottom: 10px;
+    letter-spacing: -.01em; color: var(--INK); margin-bottom: 10px;
   }
   .kit-card__paper-cols {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    border-top: 1px solid rgba(245,197,24,.15); padding-top: 10px;
+    border-top: 1px solid var(--I15); padding-top: 10px;
   }
   .kit-card__paper-col {
-    font-family: var(--sans); font-size: 11px; color: rgba(245,197,24,.55); line-height: 1.5;
+    font-family: var(--sans); font-size: 11px; color: var(--I70); line-height: 1.5;
   }
   .kit-card__title {
     font-family: var(--sans); font-weight: 900; font-size: 28px;
-    color: var(--Y); line-height: 1.1; letter-spacing: -.015em;
+    color: var(--INK); line-height: 1.1; letter-spacing: -.015em;
   }
   .kit-card__title em { font-style: italic; }
   .kit-card__body {
-    font-family: var(--sans); font-size: 15px; color: rgba(245,197,24,.65);
+    font-family: var(--sans); font-size: 15px; color: var(--I70);
     font-style: italic; line-height: 1.5; margin-top: 10px; flex: 1;
   }
   .kit-card__footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 2px solid rgba(245,197,24,.25); padding-top: 18px; margin-top: 24px;
+    border-top: 2px solid var(--INK); padding-top: 18px; margin-top: 24px;
   }
   .kit-card__year {
-    font-family: var(--mono); font-size: 11px; color: rgba(245,197,24,.4); letter-spacing: .06em;
+    font-family: var(--mono); font-size: 11px; color: var(--I45); letter-spacing: .06em;
   }
   .kit-card__cta {
     font-family: var(--mono); font-size: 11px; font-weight: 700;
     letter-spacing: .12em; text-transform: uppercase;
     display: flex; align-items: center; gap: 6px;
-    color: var(--Y);
+    color: var(--INK);
   }
   .kit-card__cta:hover { color: var(--RED); }
 
@@ -542,9 +546,165 @@ const css = `
 
   /* ── SPACER ─────────────────────────────────────────────── */
   .spacer-100 { height: 100px; }
+
+  /* ══════════════════════════════════════════════════════════
+     MOBILE NAV HAMBURGER
+  ══════════════════════════════════════════════════════════ */
+  .nav__hamburger {
+    display: none; background: none; border: none; cursor: pointer;
+    padding: 14px 20px; color: #f1ebde;
+    font-family: var(--sans); font-size: 10px; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase;
+    align-items: center; gap: 10px;
+  }
+  .nav__mobile-menu {
+    display: none; flex-direction: column;
+    border-top: 1px solid rgba(241,235,222,.12);
+    padding: 8px 20px 16px;
+  }
+  .nav__mobile-menu.open { display: flex; }
+  .nav__mobile-link {
+    padding: 12px 0; border-bottom: 1px solid rgba(241,235,222,.10);
+    font-family: var(--sans); font-size: 15px; font-weight: 600;
+    color: rgba(241,235,222,.8); text-decoration: none;
+  }
+  .nav__mobile-link:hover { color: #f1ebde; }
+  .nav__mobile-cta {
+    margin-top: 14px; padding: 14px 20px; background: var(--Y); color: var(--INK);
+    text-align: center; font-family: var(--sans); font-weight: 800;
+    font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    text-decoration: none; display: block;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     RESPONSIVE BREAKPOINTS
+  ══════════════════════════════════════════════════════════ */
+
+  /* ── Tablet 1024px ──────────────────────────────────────── */
+  @media (max-width: 1024px) {
+    .nav__top, .nav__bar { padding-left: 32px; padding-right: 32px; }
+    .hero { padding: 28px 32px 0; }
+    .services { padding: 72px 32px 0; }
+    .casework, .testimonials, .speaking, .kits { padding: 72px 32px; }
+    .newsletter__inner { padding: 56px 32px; }
+    .press { padding: 36px 32px; }
+    .footer { padding: 48px 32px 24px; }
+    .hero-h1 { font-size: 64px; }
+    .section-h2 { font-size: 64px; }
+    .stat__num { font-size: 56px; }
+    .case-card__metric { font-size: 60px; }
+    .newsletter__h2 { font-size: 58px; }
+  }
+
+  /* ── Mobile 768px ──────────────────────────────────────── */
+  @media (max-width: 820px) {
+    /* Nav — show hamburger, hide desktop bar */
+    .nav__top { grid-template-columns: 1fr auto; padding: 14px 20px; }
+    .nav__wire { display: none; }
+    .nav__bar { display: none; }
+    .nav__hamburger { display: flex; }
+
+    /* Hero */
+    .hero { padding: 24px 20px 0; }
+    .ticker { font-size: 10px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+    .hero-h1 { font-size: 52px; line-height: .92; }
+    .hero-sub { font-size: 18px; }
+    .hero-ctas { flex-direction: column; gap: 10px; }
+    .btn-primary, .btn-outline { justify-content: center; padding: 16px 24px; }
+    .hero-portrait { aspect-ratio: 3/2; max-height: 320px; }
+    .stats-strip { grid-template-columns: repeat(2, 1fr); margin-top: 40px; }
+    .stat { padding: 24px 20px; }
+    .stat__num { font-size: 48px; }
+    .stat:nth-child(2) { border-right: none; }
+    .stat:nth-child(3) { border-right: 2px solid var(--INK); border-top: 2px solid var(--INK); }
+    .stat:nth-child(4) { border-right: none; border-top: 2px solid var(--INK); }
+
+    /* Press */
+    .press { padding: 32px 20px; }
+    .press__inner { flex-direction: column; gap: 20px; }
+    .press__logos { gap: 16px 24px; flex-wrap: wrap; }
+
+    /* Services */
+    .services { padding: 56px 20px 0; }
+    .section-h2 { font-size: 44px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .service-card { border-right: none; border-bottom: 2px solid var(--INK); min-height: auto; }
+    .service-card:last-child { border-bottom: none; }
+
+    /* Case studies */
+    .casework { padding: 56px 20px; }
+    .cases-grid { grid-template-columns: 1fr; }
+    .case-card { border-right: none; border-bottom: 2px solid rgba(245,197,24,.25); }
+    .case-card:last-child { border-bottom: none; }
+    .case-card__metric { font-size: 56px; }
+
+    /* Testimonials */
+    .testimonials { padding: 56px 20px; }
+    .testi-header { flex-direction: column; gap: 14px; }
+    .testi-row { grid-template-columns: 1fr; gap: 20px; padding: 32px 0; }
+    .testi__quote { font-size: 21px; }
+
+    /* Speaking */
+    .speaking { padding: 56px 20px; }
+    .speaking-grid { grid-template-columns: 1fr; gap: 40px; }
+    .stage-row { grid-template-columns: 32px 1fr 1fr; gap: 10px; }
+    .stage__city { font-size: 20px; }
+    .stage__date, .stage__tag { font-size: 10px; }
+
+    /* Kits */
+    .kits { padding: 56px 20px; }
+    .kits-header { flex-direction: column; gap: 14px; }
+    .kits-grid { grid-template-columns: 1fr; }
+    .kit-card { border-right: none; border-bottom: 2px solid var(--INK); }
+    .kit-card:last-child { border-bottom: none; }
+    .kit-card__paper-cols { grid-template-columns: 1fr; }
+
+    /* Newsletter */
+    .newsletter__inner { grid-template-columns: 1fr; padding: 48px 20px; gap: 36px; }
+    .newsletter__h2 { font-size: 48px; }
+    .newsletter__row { flex-direction: column; }
+    .newsletter__input { border-right: 2px solid var(--Y); border-bottom: none; }
+    .newsletter__btn { width: 100%; }
+
+    /* Footer */
+    .footer { padding: 40px 20px 24px; }
+    .footer__grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+    .footer__bottom { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .footer__contact { flex-direction: column; gap: 6px; }
+    .footer__wordmark { font-size: 42px; }
+  }
+
+  /* ── Small phones 480px ────────────────────────────────── */
+  @media (max-width: 480px) {
+    .hero-h1 { font-size: 38px; letter-spacing: -.03em; }
+    .section-h2 { font-size: 36px; }
+    .stats-strip { grid-template-columns: 1fr 1fr; }
+    .stat__num { font-size: 36px; }
+    .stat__mo { font-size: 18px; }
+    .footer__grid { grid-template-columns: 1fr; }
+    .footer__copy { font-size: 10px; }
+    .testi__quote { font-size: 18px; }
+    .newsletter__h2 { font-size: 38px; }
+    .newsletter__sub { font-size: 15px; }
+    .casework .section-h2 { font-size: 36px; }
+    .case-card__metric { font-size: 44px; }
+    .nav__top { padding: 12px 16px; }
+    .hero { padding: 20px 16px 0; }
+    .services { padding: 44px 16px 0; }
+    .casework, .testimonials, .speaking, .kits { padding: 44px 16px; }
+    .footer { padding: 36px 16px 20px; }
+    .press { padding: 28px 16px; }
+    .speaking-grid .section-h2 { font-size: 40px; }
+    .stage-row { grid-template-columns: 1fr; gap: 4px; }
+    .stage__n { display: none; }
+    .stage__city { font-size: 18px; }
+  }
 `;
 
 export default function HomePage() {
+  const [navOpen, setNavOpen] = useState(false);
+
   useEffect(() => {
     const d = new Date();
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -574,6 +734,8 @@ export default function HomePage() {
           </div>
           <div className="nav__status">Open for projects, Q3 2026</div>
         </div>
+
+        {/* Desktop nav row */}
         <div className="nav__bar">
           <nav className="nav__links">
             <a href="/" className="nav__link nav__link--active">Home</a>
@@ -586,19 +748,41 @@ export default function HomePage() {
           </nav>
           <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="nav__cta">Book a discovery call &rarr;</a>
         </div>
+
+        {/* Mobile hamburger */}
+        <button className="nav__hamburger" onClick={() => setNavOpen(!navOpen)} aria-label="Toggle navigation">
+          {navOpen ? '✕' : '☰'}&nbsp;&nbsp;{navOpen ? 'CLOSE' : 'MENU'}
+        </button>
+
+        {/* Mobile dropdown */}
+        <nav className={`nav__mobile-menu${navOpen ? ' open' : ''}`}>
+          <a href="/" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Home</a>
+          <a href="/about" className="nav__mobile-link" onClick={() => setNavOpen(false)}>About</a>
+          <a href="/speaking" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Speaking</a>
+          <a href="/emos" className="nav__mobile-link" onClick={() => setNavOpen(false)}>EMOS</a>
+          <a href="/fractional-cmo" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Fractional CMO</a>
+          <a href="/resources" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Resources</a>
+          <a href="/contact" className="nav__mobile-link" onClick={() => setNavOpen(false)}>Contact</a>
+          <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="nav__mobile-cta">Book a discovery call →</a>
+        </nav>
       </header>
 
       {/* ══ HERO ══ */}
       <header className="hero">
-        <div className="ticker">
-          <span className="ticker__dot">●</span>
-          <span className="ticker__bold">OPEN FOR PROJECTS Q3 2026</span>
-          <span className="ticker__sep">&nbsp;////&nbsp;</span>
-          <span>FORBES · HBR · HUFFPOST · SEMRUSH · ENTREPRENEUR · WORLD BANK · TNW</span>
-          <span className="ticker__sep">&nbsp;////&nbsp;</span>
-          <span>SPOKEN IN PK · MY · ID · AE</span>
-          <span className="ticker__sep">&nbsp;////&nbsp;</span>
-          <span>4 PODCAST SEASONS</span>
+        <div className="ticker" aria-label="Open for projects · Publications · Speaking">
+          {[0, 1].map((i) => (
+            <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
+              <span className="ticker__dot">●</span>
+              <span className="ticker__bold">OPEN FOR PROJECTS · Q3 2026</span>
+              <span className="ticker__sep">&nbsp;////&nbsp;</span>
+              <span>FORBES · HBR · HUFFPOST · SEMRUSH · ENTREPRENEUR · WORLD BANK · TNW</span>
+              <span className="ticker__sep">&nbsp;////&nbsp;</span>
+              <span>SPOKEN IN PK · MY · ID · AE</span>
+              <span className="ticker__sep">&nbsp;////&nbsp;</span>
+              <span>4 PODCAST SEASONS</span>
+              <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </span>
+          ))}
         </div>
 
         <div className="hero-grid">
@@ -624,7 +808,7 @@ export default function HomePage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/headshot.jpg" alt="Syed Irfan Ajmal" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top center'}} />
             <div className="portrait-badge portrait-badge--tl">HELLO.</div>
-            <div className="portrait-badge portrait-badge--br">PESHAWAR to KL</div>
+            <div className="portrait-badge portrait-badge--br" style={{fontSize:'9px',lineHeight:1.4}}>PESHAWAR to<br/>STOCKHOLM &amp; BACK</div>
           </figure>
         </div>
 
@@ -757,6 +941,9 @@ export default function HomePage() {
             <span className="q">"</span>Ranked a keyword to #4 on Google that gets over 160,000 searches a month. Commercial intent. Can&apos;t thank Irfan and the team enough.<span className="q">"</span>
           </blockquote>
           <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>AS</span>
+            </div>
             <div className="testi__name">Azzam Sheikh</div>
             <div className="testi__role">National Tyres &amp; Autocare · UK</div>
           </div>
@@ -770,6 +957,9 @@ export default function HomePage() {
             <span className="q">"</span>Highly knowledgeable about content marketing and SEO. Ideas and execution both cutting-edge strategic doesn&apos;t lose sight of what matters.<span className="q">"</span>
           </blockquote>
           <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>LZ</span>
+            </div>
             <div className="testi__name">Lisa Zahran</div>
             <div className="testi__role">Copy &amp; Coffee · Malaysia</div>
           </div>
@@ -783,6 +973,9 @@ export default function HomePage() {
             <span className="q">"</span>One of the good guys. Knows digital marketing inside out his expertise and growth in this area is exemplary.<span className="q">"</span>
           </blockquote>
           <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>SH</span>
+            </div>
             <div className="testi__name">Sam Hurley</div>
             <div className="testi__role">OPTIM-EYEZ · UK</div>
           </div>
@@ -796,6 +989,9 @@ export default function HomePage() {
             <span className="q">"</span>Being a great speaker takes art and science, experience, and personal clarity. Irfan delivers on all of it and it is hard not to like the guy.<span className="q">"</span>
           </blockquote>
           <div>
+            <div style={{width:44,height:44,background:'var(--INK)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:12,flexShrink:0}}>
+              <span style={{fontFamily:'var(--sans)',fontWeight:900,fontSize:15,color:'var(--BG)',letterSpacing:'-.01em'}}>CW</span>
+            </div>
             <div className="testi__name">Chuck Wang</div>
             <div className="testi__role">The MVP Marketing Podcast · USA</div>
           </div>
@@ -854,14 +1050,14 @@ export default function HomePage() {
 
       {/* ══ § 05 KITS / FREE RESOURCES ══ */}
       <section className="kits">
-        <div className="sec-idx sec-idx--dark">
+        <div className="sec-idx">
           <span className="sec-idx__n">§ 05</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">FREE RESOURCES</span>
         </div>
         <div className="kits-header">
-          <h2 className="section-h2" style={{margin:0,color:'var(--Y)'}}>Resources. Tools, Kits,<br/>Playbooks, Calculators.<br/><span style={{fontSize:'60%',fontWeight:400,fontStyle:'italic'}}>Might not stay free for too long.</span></h2>
-          <a href="/resources" className="kits-all">18 TOTAL IN THE LIBRARY →</a>
+          <h2 className="section-h2" style={{margin:0}}>Resources. Tools, Kits,<br/>Playbooks, Calculators.<br/><span style={{fontSize:'55%',fontWeight:400,fontStyle:'italic',color:'var(--I70)'}}>Might not stay free for too long.</span></h2>
+          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>18 TOTAL IN THE LIBRARY →</a>
         </div>
         <div className="kits-grid">
           <div className="kit-card">
