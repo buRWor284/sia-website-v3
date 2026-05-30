@@ -12,6 +12,7 @@ import {
   SectionMast,
 } from "@/components/bureau/primitives";
 import {
+import { ScrollButtons } from "@/components/ScrollButtons";
   CALENDLY,
   GROT,
   INK,
@@ -803,6 +804,7 @@ export default function FractionalCMOPage() {
       <CalendlySection />
       <Subscriptions sectionNumber="07" />
       <Colophon />
+      <ScrollButtons />
     </div>
   );
 }

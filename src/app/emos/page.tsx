@@ -10,6 +10,7 @@ import {
   SiaLogo,
 } from "@/components/bureau/primitives";
 import {
+import { ScrollButtons } from "@/components/ScrollButtons";
   CALENDLY,
   GROT,
   INK,
@@ -707,6 +708,7 @@ export default function EMOSPage() {
       <CalendlySection />
       <Subscriptions sectionNumber="06" />
       <Colophon />
+      <ScrollButtons />
     </div>
   );
 }

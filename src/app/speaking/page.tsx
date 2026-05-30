@@ -28,6 +28,7 @@ import {
   YEL,
 } from "@/lib/tokens";
 import { CLIENTS_PRE, CLIENTS_TIER1 } from "@/data/clients";
+import { ScrollButtons } from "@/components/ScrollButtons";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -763,6 +764,7 @@ export default function SpeakingPage() {
       <CalendlySection />
       <Subscriptions sectionNumber="08" />
       <Colophon />
+      <ScrollButtons />
     </div>
   );
 }

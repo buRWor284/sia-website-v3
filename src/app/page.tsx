@@ -135,10 +135,11 @@ const css = `
   .mono-arrow { font-family: var(--mono); }
 
   /* portrait */
+  .portrait-col { display: flex; justify-content: flex-end; align-items: flex-end; }
   .hero-portrait {
-    width: 100%; aspect-ratio: 4/5;
+    width: 45%; aspect-ratio: 4/5;
     background: #d8cebc; border: 3px solid var(--INK);
-    position: relative; overflow: hidden;
+    position: relative; overflow: hidden; flex-shrink: 0;
   }
   .hero-portrait svg { position: absolute; inset: 0; width: 100%; height: 100%; }
   .portrait-badge {
@@ -149,6 +150,20 @@ const css = `
   .portrait-badge--br {
     bottom: 14px; right: 14px;
     background: var(--INK); color: var(--Y); border: 2px solid var(--INK);
+  }
+
+  /* speaking photo */
+  .speaking-photo {
+    margin-top: 32px; border: 2px solid rgba(245,197,24,.35);
+    overflow: hidden;
+  }
+  .speaking-photo img {
+    width: 100%; height: 180px; object-fit: cover; object-position: top center; display: block;
+  }
+  .speaking-photo__caption {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
+    color: rgba(245,197,24,.5); text-transform: uppercase;
+    padding: 8px 10px; border-top: 1px solid rgba(245,197,24,.2);
   }
 
   /* ── STATS STRIP ────────────────────────────────────────── */
@@ -700,12 +715,14 @@ export default function HomePage() {
             </div>
           </div>
 
-          <figure className="hero-portrait">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/headshot.jpg" alt="Syed Irfan Ajmal" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top center'}} />
-            <div className="portrait-badge portrait-badge--tl">HELLO.</div>
-            <div className="portrait-badge portrait-badge--br" style={{fontSize:'9px',lineHeight:1.4}}>PESHAWAR to<br/>STOCKHOLM &amp; BACK</div>
-          </figure>
+          <div className="portrait-col">
+            <figure className="hero-portrait">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/headshot.jpg" alt="Syed Irfan Ajmal" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover',objectPosition:'top center'}} />
+              <div className="portrait-badge portrait-badge--tl">HELLO.</div>
+              <div className="portrait-badge portrait-badge--br" style={{fontSize:'9px',lineHeight:1.4}}>PESHAWAR to<br/>STOCKHOLM &amp; BACK</div>
+            </figure>
+          </div>
         </div>
 
         <div className="stats-strip">
@@ -910,6 +927,11 @@ export default function HomePage() {
             </h2>
             <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>
             <a href="/speaking" className="speaking__cta">Speaker sheet &amp; topics <span className="mono-arrow">→</span></a>
+            <div className="speaking-photo">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/assets/speaking/startup-grind.jpg" alt="Syed Irfan Ajmal speaking at Startup Grind" />
+              <div className="speaking-photo__caption">STARTUP GRIND · PESHAWAR</div>
+            </div>
           </div>
           <div>
             <div className="stage-row">

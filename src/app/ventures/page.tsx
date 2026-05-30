@@ -10,6 +10,7 @@ import {
   SectionMast,
 } from "@/components/bureau/primitives";
 import {
+import { ScrollButtons } from "@/components/ScrollButtons";
   GROT,
   INK,
   INK15,
@@ -847,6 +848,7 @@ export default function VenturesPage() {
       <ClosingCTA />
       <Subscriptions sectionNumber="04" />
       <Colophon />
+      <ScrollButtons />
     </div>
   );
 }

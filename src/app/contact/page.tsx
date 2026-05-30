@@ -22,6 +22,7 @@ import {
   YEL,
 } from "@/lib/tokens";
 import { useState } from "react";
+import { ScrollButtons } from "@/components/ScrollButtons";
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -445,6 +446,7 @@ export default function ContactPage() {
 
       <Subscriptions sectionNumber="02" />
       <Colophon />
+      <ScrollButtons />
     </div>
   );
 }

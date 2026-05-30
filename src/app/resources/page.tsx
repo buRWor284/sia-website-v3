@@ -2,6 +2,7 @@ import { Colophon, Subscriptions } from "@/components/bureau";
 import { SCaps } from "@/components/bureau/primitives";
 import { ResourcesClientShell } from "@/components/resources/ResourcesClientShell";
 import { GROT, INK, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
+import { ScrollButtons } from "@/components/ScrollButtons";
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 // 3-column editorial layout: count left · headline centre · topics right
@@ -156,6 +157,7 @@ export default function ResourcesPage() {
       <ResourcesClientShell />
       <Subscriptions sectionNumber="07" />
       <Colophon />
+      <ScrollButtons />
     </div>
   );
 }

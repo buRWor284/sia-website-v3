@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import CollabLinkBuildingTool from "@/components/tools/CollabLinkBuildingTool";
+import { ScrollButtons } from "@/components/ScrollButtons";
 
 export const metadata: Metadata = {
   title: "Collab Link Building Partner Finder · SIA Wire S02E06",
@@ -14,6 +15,7 @@ export default function CollabLinkBuildingPage() {
       <CollabLinkBuildingTool />
       <Subscriptions sectionNumber="05" />
       <Colophon />
+      <ScrollButtons />
     </>
   );
 }

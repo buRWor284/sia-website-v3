@@ -11,6 +11,7 @@ import {
   SiaLogo,
 } from "@/components/bureau/primitives";
 import {
+import { ScrollButtons } from "@/components/ScrollButtons";
   CALENDLY,
   GROT,
   INK,
@@ -856,6 +857,7 @@ export default function AuthorityCalculatorPage() {
         <CTABlock st={st} variant="close" />
         <Subscriptions sectionNumber="05" />
         <Colophon />
+      <ScrollButtons />
       </div>
     </>
   );
