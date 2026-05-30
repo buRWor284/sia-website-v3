@@ -446,22 +446,90 @@ export function CollabIQ() {
               </div>
             )}
 
-            {/* Loading skeleton */}
+            {/* ── Animated loading state ── */}
             {aiMode === "suggestions" && (
               <div>
-                <div style={{ padding: "24px 0 18px", borderBottom: `1px solid ${INK15}`, display: "flex", alignItems: "center", gap: 14 }}>
-                  <div style={{ width: 36, height: 36, background: INK15, flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: MONO, fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: INK55, marginBottom: 6 }}>Generating partner intelligence…</div>
-                    <div style={{ fontSize: 12, color: INK35 }}>Claude is researching real companies that share your exact audience for {ind}</div>
+                <style>{`
+                  @keyframes ciq-fade {
+                    from { opacity: 0; transform: translateY(5px); }
+                    to   { opacity: 1; transform: translateY(0); }
+                  }
+                  @keyframes ciq-dot {
+                    0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+                    40%           { opacity: 1;   transform: scale(1); }
+                  }
+                  @keyframes ciq-shimmer {
+                    0%   { background-position: -400px 0; }
+                    100% { background-position:  400px 0; }
+                  }
+                  .ciq-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: ${YEL}; animation: ciq-dot 1.4s ease-in-out infinite; }
+                  .ciq-dot:nth-child(2) { animation-delay: 0.16s; }
+                  .ciq-dot:nth-child(3) { animation-delay: 0.32s; }
+                  .ciq-shimmer {
+                    background: linear-gradient(90deg, rgba(26,20,16,.07) 25%, rgba(26,20,16,.13) 50%, rgba(26,20,16,.07) 75%);
+                    background-size: 800px 100%;
+                    animation: ciq-shimmer 1.6s ease-in-out infinite;
+                  }
+                `}</style>
+
+                {/* Hero loading block */}
+                <div style={{ background: DARK, padding: "28px 28px 24px", marginBottom: 2 }}>
+                  {/* Top row: label + dots */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase" as const, color: "rgba(245,184,31,0.55)" }}>
+                        Claude · Live Research
+                      </span>
+                    </div>
+                    <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                      <span className="ciq-dot" />
+                      <span className="ciq-dot" />
+                      <span className="ciq-dot" />
+                    </div>
                   </div>
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: YEL }}>■ ■ ■</div>
+
+                  {/* Cycling headline — remounts on idx change to replay animation */}
+                  <div key={`h-${loadingMsgIdx}`} style={{ animation: "ciq-fade 0.45s ease both" }}>
+                    <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: PAPER, lineHeight: 1.2, letterSpacing: "-0.02em", marginBottom: 10 }}>
+                      {LOADING_MSGS[loadingMsgIdx].h}
+                    </div>
+                    <div style={{ fontFamily: GROT, fontSize: 13, fontWeight: 300, color: "rgba(241,235,222,0.45)", lineHeight: 1.6 }}>
+                      {LOADING_MSGS[loadingMsgIdx].s}
+                    </div>
+                  </div>
+
+                  {/* Progress ticker */}
+                  <div style={{ marginTop: 22, paddingTop: 18, borderTop: "1px solid rgba(241,235,222,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(241,235,222,0.22)" }}>
+                      Analysing {ind}
+                    </span>
+                    <span style={{ color: "rgba(241,235,222,0.12)", fontSize: 10 }}>·</span>
+                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(241,235,222,0.22)" }}>
+                      {["Discount Partnership","Institution Rebate","Expert Roundup + Badge"].find((_,i) => ["discount","institution","badge"][i] === strategy) || "Strategy"}
+                    </span>
+                    <span style={{ color: "rgba(241,235,222,0.12)", fontSize: 10 }}>·</span>
+                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(245,184,31,0.35)" }}>
+                      Powered by Claude
+                    </span>
+                  </div>
                 </div>
-                {[1,2,3,4].map(i => (
-                  <div key={i} style={{ padding: "22px 0", borderBottom: `1px solid ${INK15}`, opacity: 1 - i * 0.18 }}>
-                    <div style={{ height: 20, background: INK15, width: `${60 + i * 8}%`, marginBottom: 10 }} />
-                    <div style={{ height: 12, background: INK15, width: "90%", marginBottom: 6 }} />
-                    <div style={{ height: 12, background: INK15, width: "75%" }} />
+
+                {/* Shimmer skeleton cards */}
+                {[88, 72, 64, 56].map((w, i) => (
+                  <div key={i} style={{ padding: "22px 0", borderBottom: `1px solid ${INK15}`, opacity: 1 - i * 0.16 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 12 }}>
+                      <div className="ciq-shimmer" style={{ width: 24, height: 11, flexShrink: 0 }} />
+                      <div className="ciq-shimmer" style={{ width: `${w}%`, height: 20 }} />
+                    </div>
+                    <div style={{ marginLeft: 38 }}>
+                      <div className="ciq-shimmer" style={{ width: "100%", height: 11, marginBottom: 6 }} />
+                      <div className="ciq-shimmer" style={{ width: "82%", height: 11, marginBottom: 16 }} />
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                        {[60, 72, 55].map((sw, j) => (
+                          <div key={j} className="ciq-shimmer" style={{ width: `${sw}%`, height: 9 }} />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
