@@ -807,17 +807,19 @@ export default function HomePage() {
 
       {/* ══ HERO ══ */}
       <header className="hero">
-        <div className="ticker" aria-label="Open for projects · Publications · Speaking">
+        <div className="ticker" aria-label="Fractional CMO availability · Publications · Speaking · EMOS">
           {[0, 1].map((i) => (
             <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
               <span className="ticker__dot">●</span>
-              <span className="ticker__bold">OPEN FOR PROJECTS · Q3 2026</span>
+              <span className="ticker__bold">1 FRACTIONAL CMO SPOT · Q3 2026</span>
               <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span>FORBES · HBR · HUFFPOST · SEMRUSH · ENTREPRENEUR · WORLD BANK · TNW</span>
               <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span>SPOKEN IN PK · MY · ID · AE</span>
               <span className="ticker__sep">&nbsp;////&nbsp;</span>
               <span>4 PODCAST SEASONS</span>
+              <span className="ticker__sep">&nbsp;////&nbsp;</span>
+              <span>GET CITED BEFORE YOUR SERIES A · EMOS FOUNDING CLASS</span>
               <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
             </span>
           ))}
@@ -1198,7 +1200,7 @@ export default function HomePage() {
           <div className="footer__contact">
             <span>+1-402-403-1948</span>
             <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
-            <span className="footer__open">● OPEN FOR PROJECTS</span>
+            <span className="footer__open">● 1 FRACTIONAL CMO SPOT · Q3 2026</span>
           </div>
         </div>
       </footer>
