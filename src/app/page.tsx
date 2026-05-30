@@ -732,38 +732,10 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ══ § 01 CASE STUDIES ══ */}
-      <section className="casework">
-        <div className="sec-idx sec-idx--dark">
-          <span className="sec-idx__n">§ 01</span>
-          <div className="sec-idx__rule"></div>
-          <span className="sec-idx__label">SELECTED CASEWORK</span>
-        </div>
-        <h2 className="section-h2">Selected casework.<br/><em>Biggest numbers first.</em></h2>
-        <div className="cases-grid">
-          <div className="case-card">
-            <div className="case-card__tag">SEO CONTENT</div>
-            <div className="case-card__metric">1.5M<span className="case-card__metric-mo">&thinsp;/mo</span></div>
-            <div className="case-card__client">RIDESTER · USA</div>
-            <div className="case-card__result">Zero to 1.5M organic visitors in 12 months</div>
-            <p className="case-card__body">Built a content-led SEO strategy from scratch. Took a brand-new domain to 1.5M monthly visitors in under a year through editorial content and strategic link acquisition.</p>
-            <a href="/clients" className="case-card__link">Full case study →</a>
-          </div>
-          <div className="case-card">
-            <div className="case-card__tag">SEO · DIGITAL PR</div>
-            <div className="case-card__metric">$1.2M</div>
-            <div className="case-card__client">NATIONAL TYRES · UK</div>
-            <div className="case-card__result">$160K → $1.2M organic revenue in 12 months</div>
-            <p className="case-card__body">Turned a struggling content program into a revenue machine. Combined editorial SEO with Digital PR to rank high-intent keywords and drive traffic that converts at scale.</p>
-            <a href="/clients" className="case-card__link">Full case study →</a>
-          </div>
-        </div>
-      </section>
-
-      {/* ══ § 02 TESTIMONIALS ══ */}
+      {/* ══ § 01 TESTIMONIALS ══ */}
       <section className="testimonials">
         <div className="sec-idx">
-          <span className="sec-idx__n">§ 02</span>
+          <span className="sec-idx__n">§ 01</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">CLIENT WORDS</span>
         </div>
@@ -871,6 +843,34 @@ export default function HomePage() {
             <img src="/assets/testimonials/chuck-wang.jpg" alt="Chuck Wang" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Chuck Wang</div>
             <div className="testi__role">The MVP Marketing Podcast · USA</div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ § 02 CASE STUDIES ══ */}
+      <section className="casework">
+        <div className="sec-idx sec-idx--dark">
+          <span className="sec-idx__n">§ 02</span>
+          <div className="sec-idx__rule"></div>
+          <span className="sec-idx__label">SELECTED CASEWORK</span>
+        </div>
+        <h2 className="section-h2">Selected casework.<br/><em>Biggest numbers first.</em></h2>
+        <div className="cases-grid">
+          <div className="case-card">
+            <div className="case-card__tag">SEO CONTENT</div>
+            <div className="case-card__metric">1.5M<span className="case-card__metric-mo">&thinsp;/mo</span></div>
+            <div className="case-card__client">RIDESTER · USA</div>
+            <div className="case-card__result">Zero to 1.5M organic visitors in 12 months</div>
+            <p className="case-card__body">Built a content-led SEO strategy from scratch. Took a brand-new domain to 1.5M monthly visitors in under a year through editorial content and strategic link acquisition.</p>
+            <a href="/clients" className="case-card__link">Full case study →</a>
+          </div>
+          <div className="case-card">
+            <div className="case-card__tag">SEO · DIGITAL PR</div>
+            <div className="case-card__metric">$1.2M</div>
+            <div className="case-card__client">NATIONAL TYRES · UK</div>
+            <div className="case-card__result">$160K → $1.2M organic revenue in 12 months</div>
+            <p className="case-card__body">Turned a struggling content program into a revenue machine. Combined editorial SEO with Digital PR to rank high-intent keywords and drive traffic that converts at scale.</p>
+            <a href="/clients" className="case-card__link">Full case study →</a>
           </div>
         </div>
       </section>
