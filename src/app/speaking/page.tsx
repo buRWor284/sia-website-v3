@@ -261,42 +261,60 @@ const Hero = () => (
   </section>
 );
 
-// ─── Speaking Lead ────────────────────────────────────────────────────────────
+// ─── Speaking Lead + Booking (merged) ─────────────────────────────────────────
 
 const SpeakingLead = () => (
-  <div className="sx" style={{ paddingTop: 48, paddingBottom: 70 }}>
-    <DoubleRule style={{ margin: "0 0 24px" }} />
+  <section className="sx" style={{ paddingTop: 48, paddingBottom: 60 }}>
+    <DoubleRule style={{ margin: "0 0 28px" }} />
 
-    <div style={{ maxWidth: 720 }}>
-      {/* Lead body */}
-      <div className="hero-body" style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55, textAlign: "justify" }}>
-        <p style={{ margin: 0 }}>
-          <span className="hero-drop-cap" style={{ float: "left", fontFamily: SERIF, fontWeight: 700, fontStyle: "italic", lineHeight: 0.78, marginRight: 10, marginTop: 6, color: INK, background: YEL, padding: "6px 8px 2px 8px" }}>
-            O
-          </span>
-          n stage since 2013, talking <strong>earned media</strong> and{" "}
-          <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
-          DMSS (Bali, 500+ audience), IN5, AstroLabs, MaGIC (Malaysia), and webinar
-          &amp; podcast circuits across North America and the UK.
-        </p>
-        <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
-          Case-study-led, with the receipts. Available in person across Asia, MENA
-          and Europe, and virtually worldwide. Booking open for Q3–Q4 2026.
-        </p>
-      </div>
-    </div>
-
-    {/* Stat strip */}
-    <DoubleRule style={{ margin: "52px 0 0" }} />
-    <div className="grid-stats">
-      {STATS.map(([n, l]) => (
-        <div key={n} className="stat-item" style={{ paddingTop: 24, paddingBottom: 6, textAlign: "center" }}>
-          <div className="stat-number">{n}</div>
-          <div style={{ marginTop: 8 }}><SCaps size={10.5} ls="0.16em" color={INK70}>{l}</SCaps></div>
+    <div className="grid-hero-2col">
+      {/* Left — lead copy + inline stats */}
+      <div>
+        <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55 }}>
+          <p style={{ margin: 0 }}>
+            On stage since 2013, talking <strong>earned media</strong> and{" "}
+            <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
+            DMSS (Bali, 500+ audience), IN5, AstroLabs, and MaGIC (Malaysia) — plus
+            webinar &amp; podcast circuits across North America and the UK.
+          </p>
+          <p style={{ marginTop: "0.7em", fontStyle: "italic", color: INK70 }}>
+            Case-study-led, with the receipts. Available in person across Asia, MENA
+            and Europe, and virtually worldwide. Booking open for Q3–Q4 2026.
+          </p>
         </div>
-      ))}
+
+        {/* Compact stat row */}
+        <div style={{ marginTop: 28, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, borderTop: `2px solid ${INK}`, paddingTop: 20 }}>
+          {STATS.map(([n, l]) => (
+            <div key={n} style={{ textAlign: "center" }}>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 32px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{n}</div>
+              <div style={{ marginTop: 6 }}><SCaps size={9.5} ls="0.14em" color={INK70}>{l}</SCaps></div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Right — booking card */}
+      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
+        <Pill size={11} ls="0.20em">Booking Desk</Pill>
+        <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>Hire the speaker.</div>
+        <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70, lineHeight: 1.5 }}>
+          Tell me the event, the audience, and the metric you want moved. I&rsquo;ll
+          come back inside a working day with topic options, dates, and terms.
+        </div>
+        <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
+          {BOOKING_SPECS.map(([k, v]) => (
+            <Fragment key={k}>
+              <div><SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps></div>
+              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.4 }}>{v}</div>
+            </Fragment>
+          ))}
+        </div>
+        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
+        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 10, display: "block", textAlign: "center", padding: "14px 18px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
+      </aside>
     </div>
-  </div>
+  </section>
 );
 
 // ─── §01 · Watch the Work ─────────────────────────────────────────────────────
@@ -700,37 +718,6 @@ const BookingProcess = () => (
   </section>
 );
 
-// ─── Booking Card (standalone) ────────────────────────────────────────────
-
-const BookingCard = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 50, paddingBottom: 60 }}>
-    <div className="grid-hero-2col">
-      <div>
-        <Pill size={11} ls="0.20em">Booking Desk</Pill>
-        <h2 style={{ margin: "16px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4vw, 44px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
-          Hire the speaker.
-        </h2>
-        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: INK70, lineHeight: 1.5, maxWidth: 480 }}>
-          Tell me the event, the audience, and the metric you want moved. I&rsquo;ll
-          come back inside a working day with topic options, dates, and terms.
-        </p>
-      </div>
-      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
-          {BOOKING_SPECS.map(([k, v]) => (
-            <Fragment key={k}>
-              <div><SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps></div>
-              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.4 }}>{v}</div>
-            </Fragment>
-          ))}
-        </div>
-        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
-        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 10, display: "block", textAlign: "center", padding: "14px 18px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
-      </aside>
-    </div>
-  </section>
-);
-
 // ─── DMSS Audience Strip ─────────────────────────────────────────────────────
 
 const DMSSStrip = () => (
@@ -801,7 +788,6 @@ export default function SpeakingPage() {
       <Hero />
       <WatchTheWork />
       <SpeakingLead />
-      <BookingCard />
       <DMSSStrip />
       <Topics />
       <MPSStrip />
