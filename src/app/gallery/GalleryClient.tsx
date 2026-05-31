@@ -78,32 +78,34 @@ const FILTER_COUNTRIES = ["UAE", "Pakistan", "Indonesia", "Malaysia", "USA", "Tu
 // 5-col grid: auto | 1px rule | 1fr | 1px rule | auto
 // Count and deck stats update live with filter state.
 
-type HeroProps = { nPhotos: number; nVideos: number; hasFilters: boolean };
-
-const Hero = ({ nPhotos, nVideos, hasFilters }: HeroProps) => {
-  const displayCount = hasFilters ? nPhotos + nVideos : TOTAL_ITEMS;
-  const countSub     = hasFilters ? "Items shown" : "Items in archive";
-  const statsLine    = hasFilters
-    ? `${nPhotos} photograph${nPhotos !== 1 ? "s" : ""} · ${nVideos} reel${nVideos !== 1 ? "s" : ""}`
-    : `${TOTAL_PHOTOS} photographs · ${TOTAL_VIDEOS} reels`;
-
+const Hero = () => {
   return (
     <div className="gallery-hero">
       {/* Ghost background word */}
       <div aria-hidden className="gallery-hero-bg" style={{ fontFamily: GROT }}>GALLERY</div>
 
-      {/* Left · count */}
+      {/* Left · stats */}
       <div className="gallery-hero-left">
-        <div style={{
-          fontFamily: SERIF, fontWeight: 700,
-          fontSize: "clamp(54px,7vw,90px)",
-          color: INK, lineHeight: 0.88, letterSpacing: "-0.04em",
-        }}>
-          {displayCount}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {[
+            { num: "3", label: "Continents" },
+            { num: "9", label: "Countries" },
+            { num: String(TOTAL_PHOTOS + TOTAL_VIDEOS), label: "Moments captured" },
+          ].map(s => (
+            <div key={s.label}>
+              <div style={{
+                fontFamily: SERIF, fontWeight: 700,
+                fontSize: "clamp(32px,4vw,52px)",
+                color: INK, lineHeight: 0.95, letterSpacing: "-0.04em",
+              }}>
+                {s.num}
+              </div>
+              <SCaps size={8.5} ls="0.22em" color={INK55} style={{ marginTop: 4 }}>
+                {s.label}
+              </SCaps>
+            </div>
+          ))}
         </div>
-        <SCaps size={9.5} ls="0.22em" color={INK55} style={{ marginTop: 8 }}>
-          {countSub}
-        </SCaps>
       </div>
 
       {/* Rule */}
@@ -131,7 +133,6 @@ const Hero = ({ nPhotos, nVideos, hasFilters }: HeroProps) => {
           color: INK70, lineHeight: 1.4,
         }}>
           Speaking engagements, travel, and the people in between. 2014 to 2018.
-          &nbsp;·&nbsp; {statsLine}
         </p>
       </div>
 
@@ -276,44 +277,16 @@ const FilterBar = ({
 
 // ─── Video Card ───────────────────────────────────────────────────────────────
 
-const VideoCard = ({ v, i }: { v: VideoItem; i: number }) => (
-  <div style={{ background: INK, color: PAPER, padding: 16, border: `1px solid ${INK}` }}>
-    <div style={{
-      display: "flex", justifyContent: "space-between", alignItems: "center",
-      paddingBottom: 12, borderBottom: "1px solid rgba(241,235,222,.2)", marginBottom: 12,
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: YEL }} />
-        <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.8)">Reel № 0{i + 1}</SCaps>
-      </div>
-      <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.45)">YouTube</SCaps>
-    </div>
-    <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(241,235,222,.2)", overflow: "hidden" }}>
-      <iframe
-        src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
-        title={v.title} loading="lazy"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-        style={{ width: "100%", height: "100%", border: 0, display: "block" }}
-      />
-    </div>
-    <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(241,235,222,.2)" }}>
-      <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: PAPER, lineHeight: 1.2 }}>{v.title}</div>
-      <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.7)", lineHeight: 1.4 }}>{v.where}</div>
-    </div>
-  </div>
-);
-
 // ─── Photo Card ───────────────────────────────────────────────────────────────
 
-const PhotoCard = ({ p }: { p: PhotoItem }) => (
+// Featured photo: side-by-side layout (image left, caption right)
+const FeaturedPhotoCard = ({ p }: { p: PhotoItem }) => (
   <div style={{
     background: PAPER2, border: `1px solid ${INK}`, padding: 10,
-    display: "flex", flexDirection: "column",
-    ...(p.featured ? { gridColumn: "1 / -1" } : {}),
+    display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0,
   }}>
     <div style={{
-      aspectRatio: p.featured ? "21/9" : "4/3",
+      aspectRatio: "4/3",
       overflow: "hidden", border: `1px solid ${INK}`, background: "#222", position: "relative",
     }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -321,16 +294,42 @@ const PhotoCard = ({ p }: { p: PhotoItem }) => (
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
     </div>
     <div style={{
-      padding: p.featured ? "12px 6px 4px" : "8px 4px 2px",
-      display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12,
+      padding: "24px 28px",
+      display: "flex", flexDirection: "column", justifyContent: "center", gap: 16,
+      borderLeft: `1px solid ${INK}`,
     }}>
       <div style={{
         fontFamily: SERIF, fontStyle: "italic",
-        fontSize: p.featured ? 15 : 13,
-        color: INK, lineHeight: 1.35,
-        ...(p.featured ? { maxWidth: 720 } : {}),
+        fontSize: 19, color: INK, lineHeight: 1.45,
       }}>{p.cap}</div>
-      <SCaps size={p.featured ? 10 : 9} ls="0.14em" color={INK55} style={{ whiteSpace: "nowrap" }}>{p.venue}</SCaps>
+      <SCaps size={10} ls="0.18em" color={INK55}>{p.venue}</SCaps>
+    </div>
+  </div>
+);
+
+// Regular photo card
+const PhotoCard = ({ p }: { p: PhotoItem }) => (
+  <div style={{
+    background: PAPER2, border: `1px solid ${INK}`, padding: 10,
+    display: "flex", flexDirection: "column",
+  }}>
+    <div style={{
+      aspectRatio: "4/3",
+      overflow: "hidden", border: `1px solid ${INK}`, background: "#222", position: "relative",
+    }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={p.src} alt={p.cap} loading="lazy"
+        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+    </div>
+    <div style={{
+      padding: "8px 4px 2px",
+      display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12,
+    }}>
+      <div style={{
+        fontFamily: SERIF, fontStyle: "italic", fontSize: 13,
+        color: INK, lineHeight: 1.35,
+      }}>{p.cap}</div>
+      <SCaps size={9} ls="0.14em" color={INK55} style={{ whiteSpace: "nowrap" }}>{p.venue}</SCaps>
     </div>
   </div>
 );
@@ -348,50 +347,104 @@ const SectionLabel = ({ dotColor, label, count }: { dotColor: string; label: str
   </div>
 );
 
-// ─── Video Carousel ──────────────────────────────────────────────────────────
+// ─── Video Reel Player (speaking-page style) ─────────────────────────────────
 
-const VideoCarousel = ({ videos }: { videos: VideoItem[] }) => {
-  const [idx, setIdx] = useState(0);
-  const v = videos[idx];
-  const prev = () => setIdx(i => (i - 1 + videos.length) % videos.length);
-  const next = () => setIdx(i => (i + 1) % videos.length);
-
-  const navBtn: React.CSSProperties = {
-    background: "transparent", border: `1px solid rgba(241,235,222,.3)`,
-    color: PAPER, cursor: "pointer", width: 40, height: 40,
-    display: "flex", alignItems: "center", justifyContent: "center",
-    fontFamily: GROT, fontWeight: 700, fontSize: 18,
-    transition: "border-color 0.12s",
-  };
+const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
+  const [active, setActive] = useState(0);
+  const v = videos[active];
 
   return (
-    <div style={{ background: INK, color: PAPER, padding: 16, border: `1px solid ${INK}` }}>
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        paddingBottom: 12, borderBottom: "1px solid rgba(241,235,222,.2)", marginBottom: 12,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: YEL }} />
-          <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.8)">Reel {idx + 1} of {videos.length}</SCaps>
+    <div style={{
+      display: "grid", gridTemplateColumns: "340px 1fr", gap: 0,
+      background: INK, border: `1px solid ${INK}`,
+    }}>
+      {/* Left: reel list */}
+      <div style={{ borderRight: "1px solid rgba(241,235,222,.18)", display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid rgba(241,235,222,.18)" }}>
+          <h3 style={{
+            margin: 0, fontFamily: SERIF, fontWeight: 700,
+            fontSize: "clamp(22px, 3vw, 32px)", color: PAPER, lineHeight: 1.0, letterSpacing: "-0.02em",
+          }}>
+            Six reels<br />
+            <span style={{ fontStyle: "italic", color: YEL }}>from the road.</span>
+          </h3>
+          <p style={{ marginTop: 10, fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.6)", lineHeight: 1.45 }}>
+            Click any reel to play.
+          </p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <button onClick={prev} style={navBtn} aria-label="Previous reel">←</button>
-          <button onClick={next} style={navBtn} aria-label="Next reel">→</button>
+
+        <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 0 }}>
+          {videos.map((r, i) => {
+            const isActive = i === active;
+            return (
+              <button key={r.id} onClick={() => setActive(i)} style={{
+                display: "grid", gridTemplateColumns: "80px 1fr",
+                gap: 10, padding: "10px 12px", textAlign: "left",
+                background: isActive ? "rgba(245,184,31,.14)" : "transparent",
+                borderBottom: "1px solid rgba(241,235,222,.12)",
+                borderTop: "none", borderLeft: isActive ? `3px solid ${YEL}` : "3px solid transparent",
+                borderRight: "none",
+                cursor: "pointer", color: PAPER, font: "inherit",
+                transition: "background 0.12s",
+              }}>
+                <div style={{ width: 80, height: 50, background: "#000", position: "relative", overflow: "hidden", border: "1px solid rgba(241,235,222,.22)", flexShrink: 0 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`https://i.ytimg.com/vi/${r.id}/hqdefault.jpg`} alt={r.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  {isActive && (
+                    <div style={{ position: "absolute", inset: 0, background: "rgba(245,184,31,.30)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <div style={{ width: 0, height: 0, borderLeft: `10px solid ${YEL}`, borderTop: "7px solid transparent", borderBottom: "7px solid transparent" }} />
+                    </div>
+                  )}
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 13, lineHeight: 1.25, color: PAPER, overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</div>
+                  <div style={{ marginTop: 4 }}><SCaps size={8.5} ls="0.14em" color="rgba(241,235,222,.5)">{r.where}</SCaps></div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        <div style={{ padding: 12, borderTop: "1px solid rgba(241,235,222,.18)" }}>
+          <a href={PLAYLIST} target="_blank" rel="noopener noreferrer" style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            padding: "10px 16px", background: "transparent", color: PAPER,
+            textDecoration: "none", fontFamily: GROT, fontWeight: 700,
+            fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase",
+            border: `1px solid rgba(241,235,222,.3)`,
+          }}>
+            Full playlist on YouTube ↗
+          </a>
         </div>
       </div>
-      <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(241,235,222,.2)", overflow: "hidden" }}>
-        <iframe
-          key={v.id}
-          src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
-          title={v.title} loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          style={{ width: "100%", height: "100%", border: 0, display: "block" }}
-        />
-      </div>
-      <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(241,235,222,.2)" }}>
-        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: PAPER, lineHeight: 1.2 }}>{v.title}</div>
-        <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.7)", lineHeight: 1.4 }}>{v.where}</div>
+
+      {/* Right: main player */}
+      <div style={{ padding: 14 }}>
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "4px 4px 12px", borderBottom: "1px solid rgba(241,235,222,.25)", marginBottom: 12,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: YEL }} />
+            <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.85)">
+              Now playing · Reel № {String(active + 1).padStart(2, "0")}
+            </SCaps>
+          </div>
+        </div>
+        <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(241,235,222,.25)", overflow: "hidden" }}>
+          <iframe
+            key={v.id}
+            src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
+            title={v.title} loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ width: "100%", height: "100%", border: 0, display: "block" }}
+          />
+        </div>
+        <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(241,235,222,.25)" }}>
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(16px, 2.5vw, 22px)", color: PAPER, lineHeight: 1.2 }}>{v.title}</div>
+          <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(241,235,222,.75)", lineHeight: 1.4 }}>{v.where}</div>
+        </div>
       </div>
     </div>
   );
@@ -411,43 +464,23 @@ const GalleryBody = ({ videos, photos }: { videos: VideoItem[]; photos: PhotoIte
     );
   }
 
-  // Separate featured photo from the rest
-  const featuredPhoto = photos.find(p => p.featured);
+  // Featured is rendered above filter bar, only show non-featured here
   const regularPhotos = photos.filter(p => !p.featured);
 
   return (
     <div style={{ background: PAPER }}>
 
-      {/* Featured photo, full width above everything */}
-      {featuredPhoto && (
-        <div className="gallery-grid-section">
-          <PhotoCard p={featuredPhoto} />
-        </div>
-      )}
-
-      {/* Video carousel */}
+      {/* Video reel player */}
       {videos.length > 0 && (
-        <div className="gallery-grid-section" style={{ paddingTop: featuredPhoto ? 0 : undefined }}>
+        <div className="gallery-grid-section">
           <SectionLabel dotColor={YEL} label="Reels" count={videos.length} />
-          <div style={{ maxWidth: 800 }}>
-            <VideoCarousel videos={videos} />
-          </div>
-          <div style={{ marginTop: 28, display: "flex", justifyContent: "flex-start" }}>
-            <a href={PLAYLIST} target="_blank" rel="noopener noreferrer" style={{
-              display: "inline-flex", alignItems: "center", gap: 12,
-              padding: "14px 22px", background: INK, color: PAPER,
-              textDecoration: "none", fontFamily: GROT, fontWeight: 800,
-              fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase",
-            }}>
-              Open full playlist on YouTube ↗
-            </a>
-          </div>
+          <VideoReelPlayer videos={videos} />
         </div>
       )}
 
       {/* Photos in scrollable container */}
       {regularPhotos.length > 0 && (
-        <div className="gallery-grid-section" style={{ paddingTop: videos.length > 0 || featuredPhoto ? 0 : undefined }}>
+        <div className="gallery-grid-section" style={{ paddingTop: videos.length > 0 ? 0 : undefined }}>
           <SectionLabel dotColor={INK} label="Photographs" count={regularPhotos.length} />
           <div style={{
             maxHeight: 720, overflowY: "auto",
@@ -518,9 +551,20 @@ export default function GalleryClient() {
   const videos     = filtered.filter((i): i is VideoItem => i.format === "video");
   const hasFilters = activeTypes.length > 0 || activeCountries.length > 0 || activeFormats.length > 0;
 
+  // Separate featured from filtered for layout ordering
+  const featuredPhoto = photos.find(p => p.featured);
+
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Hero nPhotos={photos.length} nVideos={videos.length} hasFilters={hasFilters} />
+      <Hero />
+
+      {/* Featured photo above the filter bar */}
+      {featuredPhoto && (
+        <div className="gallery-grid-section" style={{ background: PAPER }}>
+          <FeaturedPhotoCard p={featuredPhoto} />
+        </div>
+      )}
+
       <FilterBar
         activeTypes={activeTypes}         setActiveTypes={setActiveTypes}
         activeCountries={activeCountries} setActiveCountries={setActiveCountries}
