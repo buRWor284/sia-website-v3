@@ -150,6 +150,7 @@ const CONTENT: ContentItem[] = [
     id: "quiz-founder-press",
     type: "quiz",
     badge: "Score Quiz",
+    private: true,
     topics: ["pr", "personal-branding"],
     title: "Founder Press Readiness Score",
     sub: "How press-ready is your personal brand?",
@@ -183,6 +184,7 @@ const CONTENT: ContentItem[] = [
     id: "quiz-personal-brand",
     type: "quiz",
     badge: "Brand Quiz",
+    private: true,
     topics: ["personal-branding", "content-marketing"],
     title: "Personal Brand Strength Quiz",
     sub: "The five-pillar brand assessment.",
@@ -392,6 +394,16 @@ const GROUP_LABEL: Record<ContentType, string> = {
   "visual-essay":  "Visual Essays · Research made visible",
 };
 
+const TYPE_ACCENT: Record<ContentType, string> = {
+  "kit":           YEL,
+  "tool":          "#C17817",
+  "calculator":    "#5B8A72",
+  "quiz":          "#8B6B99",
+  "playbook":      INK,
+  "article":       INK55,
+  "visual-essay":  "#A0522D",
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // NEWSPAPER SNIPPET
 // ─────────────────────────────────────────────────────────────────────────────
@@ -486,6 +498,7 @@ function InteractiveCard({ item, index }: { item: InteractiveContent; index: num
         display: "flex", flexDirection: "column",
         padding: "28px 24px 22px",
         background: hover ? PAPER2 : PAPER,
+        borderLeft: `4px solid ${TYPE_ACCENT[item.type]}`,
         textDecoration: "none", color: INK,
         transition: "background 0.14s",
         minHeight: 340, height: "100%",
@@ -527,6 +540,7 @@ function PlaybookCard({ item, index }: { item: PlaybookContent; index: number })
         display: "flex", flexDirection: "column",
         padding: "28px 24px 22px",
         background: hover ? PAPER2 : PAPER,
+        borderLeft: `4px solid ${TYPE_ACCENT[item.type]}`,
         textDecoration: "none", color: INK,
         transition: "background 0.14s",
         minHeight: 320, height: "100%",
@@ -602,6 +616,7 @@ function ArticleCard({ item, index }: { item: ArticleContent; index: number }) {
         display: "flex", flexDirection: "column",
         padding: "28px 24px 22px",
         background: hover ? PAPER2 : PAPER,
+        borderLeft: `4px solid ${TYPE_ACCENT[item.type]}`,
         textDecoration: "none", color: INK,
         transition: "background 0.14s",
         minHeight: 340, height: "100%",
@@ -674,6 +689,7 @@ function VisualEssayCard({ item, index }: { item: VisualEssayContent; index: num
         display: "flex", flexDirection: "column",
         padding: "28px 24px 22px",
         background: hover ? PAPER2 : PAPER,
+        borderLeft: `4px solid ${TYPE_ACCENT[item.type]}`,
         textDecoration: "none", color: INK,
         transition: "background 0.14s",
         minHeight: 320, height: "100%",
@@ -888,7 +904,7 @@ function FilterBar({
           </button>
         )}
         <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(241,235,222,.22)" }}>
-          {count} of {CONTENT.length}
+          {count}
         </span>
       </div>
     </div>
@@ -900,7 +916,10 @@ function FilterBar({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ContentGrid({ filtered, activeType }: { filtered: ContentItem[]; activeType: "all" | ContentType }) {
-  if (filtered.length === 0) {
+  const liveItems = filtered.filter((c) => !c.private);
+  const comingBackItems = filtered.filter((c) => c.private);
+
+  if (liveItems.length === 0 && comingBackItems.length === 0) {
     return (
       <div className="sx" style={{ paddingTop: 80, paddingBottom: 80, textAlign: "center", borderTop: `1px solid ${INK}` }}>
         <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK55, margin: 0 }}>
@@ -915,10 +934,46 @@ function ContentGrid({ filtered, activeType }: { filtered: ContentItem[]; active
 
   return (
     <div className="sx" style={{ paddingTop: 48, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
-        {filtered.map((item, i) => (
-          <div key={item.id} style={{ ...cellBorder(i, filtered.length), position: "relative", overflow: "visible" }}>
-            <ResourceCard item={item} index={i} />
+      {liveItems.length > 0 && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
+          {liveItems.map((item, i) => (
+            <div key={item.id} style={{ ...cellBorder(i, liveItems.length), position: "relative", overflow: "visible" }}>
+              <ResourceCard item={item} index={i} />
+            </div>
+          ))}
+        </div>
+      )}
+      {comingBackItems.length > 0 && (
+        <ComingBackSection items={comingBackItems} />
+      )}
+    </div>
+  );
+}
+
+function ComingBackSection({ items }: { items: ContentItem[] }) {
+  return (
+    <div style={{ marginTop: 48 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>
+          Being Updated
+        </span>
+        <div style={{ flex: 1, height: 1, background: INK15 }} />
+        <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.28)" }}>
+          {items.length} {items.length === 1 ? "item" : "items"}
+        </span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
+        {items.map((item) => (
+          <div key={item.id} style={{ background: PAPER, padding: "16px 18px 14px", opacity: 0.55, borderLeft: `3px solid ${TYPE_ACCENT[item.type]}` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+              <Pill size={8} ls="0.16em">{item.badge}</Pill>
+              <span style={{ marginLeft: "auto", padding: "2px 6px", background: "rgba(26,20,16,.08)", fontFamily: GROT, fontWeight: 700, fontSize: 7, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>
+                Updating
+              </span>
+            </div>
+            <h5 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
+              {item.title}
+            </h5>
           </div>
         ))}
       </div>
