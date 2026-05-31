@@ -43,7 +43,7 @@ const STATS: ReadonlyArray<[string, string]> = [
   ["04",  "countries hosted on stage"],
   ["06",  "speaker formats offered"],
   ["12+", "webinars & guest podcasts"],
-  ["200", "biggest live audience (DMSS, Bali)"],
+  ["500+", "biggest live audience"],
 ];
 
 type PrimaryTopic = {
@@ -278,7 +278,7 @@ const SpeakingLead = () => (
   <div className="sx" style={{ paddingTop: 48, paddingBottom: 70 }}>
     <DoubleRule style={{ margin: "0 0 24px" }} />
 
-    <div className="grid-hero-2col">
+    <div style={{ maxWidth: 720 }}>
       {/* Lead body */}
       <div className="hero-body" style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55, textAlign: "justify" }}>
         <p style={{ margin: 0 }}>
@@ -303,26 +303,6 @@ const SpeakingLead = () => (
           of the world. Booking is open for Q3 and Q4 of 2026.
         </p>
       </div>
-
-      {/* Booking card */}
-      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
-        <Pill size={11} ls="0.20em">Booking Desk</Pill>
-        <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>Hire the speaker.</div>
-        <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70, lineHeight: 1.5 }}>
-          Tell me the event, the audience, and the metric you want moved. I&rsquo;ll
-          come back inside a working day with topic options, dates, and terms.
-        </div>
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
-          {BOOKING_SPECS.map(([k, v]) => (
-            <Fragment key={k}>
-              <div><SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps></div>
-              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.4 }}>{v}</div>
-            </Fragment>
-          ))}
-        </div>
-        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
-        <a href="#" style={{ marginTop: 10, display: "block", textAlign: "center", padding: "14px 18px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
-      </aside>
     </div>
 
     {/* Stat strip */}
@@ -651,45 +631,59 @@ const Formats = () => (
 
 // ─── §05 · What Hosts Say ─────────────────────────────────────────────────────
 
-const HostQuotes = () => (
-  <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="05" label="What Hosts Say · On the record" />
-    <div className="grid-testimonials" style={{ border: `1px solid ${INK}` }}>
-      {HOST_QUOTES.map((tm, i) => (
-        <article key={i} className="letter-card" style={{ padding: "32px 28px 28px", display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
-            <Pill size={10.5} ls="0.18em">№ {String(i + 1).padStart(2, "0")}</Pill>
-            <SCaps size={10.5} ls="0.18em" color={INK55}>Filed from {tm.place}</SCaps>
-          </div>
-          <blockquote style={{ margin: "20px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 3vw, 21px)", color: INK, lineHeight: 1.4, fontStyle: "italic", position: "relative", paddingLeft: 30 }}>
-            <span aria-hidden style={{ position: "absolute", left: -4, top: -8, fontFamily: SERIF, fontSize: 84, lineHeight: 1, color: INK, fontStyle: "italic", background: YEL, padding: "0 4px" }}>&ldquo;</span>
-            {tm.quote}
-          </blockquote>
-          <HRule style={{ margin: "22px 0 14px", background: INK35 }} />
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={tm.photo}
-                alt={tm.name}
-                width={44}
-                height={44}
-                style={{ width: 44, height: 44, borderRadius: "50%", border: `1.5px solid ${INK}`, objectFit: "cover", flexShrink: 0 }}
-              />
-              <div>
-                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{tm.name}</div>
-                <div style={{ marginTop: 4 }}><SCaps size={10.5} ls="0.14em" color={INK70}>{tm.role}</SCaps></div>
-              </div>
+const HostQuotes = () => {
+  const gridQuotes = HOST_QUOTES.slice(0, -1);
+  const lastQuote = HOST_QUOTES[HOST_QUOTES.length - 1];
+  return (
+    <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
+      <SectionMast n="05" label="What Hosts Say · On the record" />
+      <div className="grid-testimonials" style={{ border: `1px solid ${INK}` }}>
+        {gridQuotes.map((tm, i) => (
+          <article key={i} className="letter-card" style={{ padding: "32px 28px 28px", display: "flex", flexDirection: "column" }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
+              <Pill size={10.5} ls="0.18em">№ {String(i + 1).padStart(2, "0")}</Pill>
+              <SCaps size={10.5} ls="0.18em" color={INK55}>Filed from {tm.place}</SCaps>
             </div>
-            {tm.stat && (
-              <div style={{ padding: "6px 10px", background: INK, color: YEL, fontFamily: GROT, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.10em" }}>{tm.stat}</div>
-            )}
+            <blockquote style={{ margin: "20px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 3vw, 21px)", color: INK, lineHeight: 1.4, fontStyle: "italic", position: "relative", paddingLeft: 30 }}>
+              <span aria-hidden style={{ position: "absolute", left: -4, top: -8, fontFamily: SERIF, fontSize: 84, lineHeight: 1, color: INK, fontStyle: "italic", background: YEL, padding: "0 4px" }}>&ldquo;</span>
+              {tm.quote}
+            </blockquote>
+            <HRule style={{ margin: "22px 0 14px", background: INK35 }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={tm.photo} alt={tm.name} width={44} height={44} style={{ width: 44, height: 44, borderRadius: "50%", border: `1.5px solid ${INK}`, objectFit: "cover", flexShrink: 0 }} />
+                <div>
+                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{tm.name}</div>
+                  <div style={{ marginTop: 4 }}><SCaps size={10.5} ls="0.14em" color={INK70}>{tm.role}</SCaps></div>
+                </div>
+              </div>
+              {tm.stat && (
+                <div style={{ padding: "6px 10px", background: INK, color: YEL, fontFamily: GROT, fontSize: 10.5, fontWeight: 800, letterSpacing: "0.10em" }}>{tm.stat}</div>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {/* Last testimonial — full-width horizontal bar */}
+      <article style={{ marginTop: 20, border: `1px solid ${INK}`, padding: "28px 32px", display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap", background: PAPER2 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={lastQuote.photo} alt={lastQuote.name} width={52} height={52} style={{ width: 52, height: 52, borderRadius: "50%", border: `1.5px solid ${INK}`, objectFit: "cover" }} />
+          <div>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{lastQuote.name}</div>
+            <div style={{ marginTop: 3 }}><SCaps size={10} ls="0.14em" color={INK70}>{lastQuote.role}</SCaps></div>
           </div>
-        </article>
-      ))}
-    </div>
-  </section>
-);
+        </div>
+        <blockquote style={{ margin: 0, fontFamily: SERIF, fontSize: "clamp(15px, 2vw, 18px)", color: INK, lineHeight: 1.5, fontStyle: "italic", flex: 1, minWidth: 260 }}>
+          &ldquo;{lastQuote.quote}&rdquo;
+        </blockquote>
+        <SCaps size={10} ls="0.14em" color={INK55}>Filed from {lastQuote.place}</SCaps>
+      </article>
+    </section>
+  );
+};
 
 // ─── §06 · Booking Process ────────────────────────────────────────────────────
 
@@ -725,6 +719,78 @@ const BookingProcess = () => (
   </section>
 );
 
+// ─── Booking Card (standalone) ────────────────────────────────────────────
+
+const BookingCard = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 50, paddingBottom: 60 }}>
+    <div className="grid-hero-2col">
+      <div>
+        <Pill size={11} ls="0.20em">Booking Desk</Pill>
+        <h2 style={{ margin: "16px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4vw, 44px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
+          Hire the speaker.
+        </h2>
+        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: INK70, lineHeight: 1.5, maxWidth: 480 }}>
+          Tell me the event, the audience, and the metric you want moved. I&rsquo;ll
+          come back inside a working day with topic options, dates, and terms.
+        </p>
+      </div>
+      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
+          {BOOKING_SPECS.map(([k, v]) => (
+            <Fragment key={k}>
+              <div><SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps></div>
+              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.4 }}>{v}</div>
+            </Fragment>
+          ))}
+        </div>
+        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
+        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 10, display: "block", textAlign: "center", padding: "14px 18px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
+      </aside>
+    </div>
+  </section>
+);
+
+// ─── DMSS Audience Strip ─────────────────────────────────────────────────────
+
+const DMSSStrip = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 30 }}>
+    <figure style={{ margin: 0, padding: 12, background: "#0e0d0a", border: `1px solid ${INK}` }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/assets/speaking/dmss-irfan-large-audience.jpg"
+        alt="Syed Irfan Ajmal speaking to a large audience at DMSS Conference, Bali"
+        style={{ width: "100%", height: "auto", display: "block", border: "1px solid rgba(241,235,222,.25)" }}
+      />
+      <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#f1ebde", lineHeight: 1.4 }}>
+          DMSS Conference, Bali · Presenting &ldquo;Media Hacks&rdquo; to 500+ attendees.
+        </div>
+        <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.55)">Photo by dmss.io</SCaps>
+      </figcaption>
+    </figure>
+  </section>
+);
+
+// ─── Bottom Booking CTA ──────────────────────────────────────────────────────
+
+const BottomBookingCTA = () => (
+  <section className="sx" style={{ background: INK, paddingTop: 60, paddingBottom: 60 }}>
+    <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
+      <SCaps size={11} ls="0.22em" color={YEL}>Ready to book?</SCaps>
+      <h2 style={{ margin: "14px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 5vw, 48px)", color: PAPER, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
+        Let&rsquo;s put a talk on your stage.
+      </h2>
+      <p style={{ margin: "14px auto 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: "rgba(241,235,222,.7)", lineHeight: 1.5, maxWidth: 520 }}>
+        Send a brief, get a response inside a working day. No salesy follow-up.
+      </p>
+      <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
+        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
+        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Speaker sheet ↓</a>
+      </div>
+    </div>
+  </section>
+);
+
 // ─── §07 · Calendly ───────────────────────────────────────────────────────────
 
 const CalendlySection = () => (
@@ -752,8 +818,10 @@ export default function SpeakingPage() {
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
       <Hero />
-      <SpeakingLead />
       <WatchTheWork />
+      <SpeakingLead />
+      <BookingCard />
+      <DMSSStrip />
       <Topics />
       <MPSStrip />
       <Stages />
@@ -761,6 +829,7 @@ export default function SpeakingPage() {
       <Formats />
       <HostQuotes />
       <BookingProcess />
+      <BottomBookingCTA />
       <CalendlySection />
       <CTATicker />
       <Subscriptions sectionNumber="08" />
