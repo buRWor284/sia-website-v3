@@ -280,11 +280,11 @@ const SpeakingLead = () => (
           organic traffic that turns into customers.
         </p>
         <p style={{ marginTop: "0.7em" }}>
-          The talks travel well. Workshop audiences at IN5 (Dubai), AstroLabs, MPS2016,
-          the IK Institute of Business, MaGIC in Malaysia, and DMSS in Bali. Panel
-          discussions at the Arabian Travel Market. Keynotes in Peshawar at G-Day X,
-          Durshal, and the University of Peshawar. Plus webinars and a couple of years
-          of podcast guest spots for hosts in North America, the UK, and Australia.
+          The talks travel well. Panel discussions at the Arabian Travel Market (Dubai),
+          a 500+ audience workshop at DMSS in Bali, plus stages at IN5, AstroLabs,
+          MPS2016, the IK Institute of Business, and MaGIC in Malaysia. Keynotes at
+          G-Day X and Durshal. Plus webinars and podcast guest spots for hosts in
+          North America and the UK.
         </p>
         <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
           Style: business-savvy, case-study-led, with the receipts to back it up.
