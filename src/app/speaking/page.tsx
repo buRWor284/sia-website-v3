@@ -212,17 +212,6 @@ const FEATURED_KEYS = ["nta", "ridester", "centriq", "curednation", "alrug"];
 
 const Hero = () => (
   <section style={{ background: PAPER }}>
-    {/* Speaking photo banner */}
-    <div style={{ width: "100%", overflow: "hidden", maxHeight: "clamp(220px, 40vw, 480px)", position: "relative", background: "#0e0d0a" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/assets/gallery/speaking-hero.jpg"
-        alt="Syed Irfan Ajmal speaking — audience at MPS2016, Dubai"
-        style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 40%", display: "block", maxHeight: "clamp(220px, 40vw, 480px)" }}
-      />
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, transparent 55%, rgba(249,246,240,0.7) 100%)" }} />
-    </div>
-
     <div className="sx" style={{ background: PAPER }}>
       <div className="res-hero-grid">
 

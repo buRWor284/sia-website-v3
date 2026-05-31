@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Canonical URL is /tools/collab-link-building
+// Legacy redirect — canonical URL is now /tools/collabiq
 export default function CollabIQResourcesRedirect() {
-  redirect("/tools/collab-link-building");
+  redirect("/tools/collabiq");
 }

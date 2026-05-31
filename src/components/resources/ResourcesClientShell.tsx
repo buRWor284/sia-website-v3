@@ -123,18 +123,18 @@ const CONTENT: ContentItem[] = [
 
   // ── TOOLS ────────────────────────────────────────────────────────────────
   {
-    id: "tool-collablink",
+    id: "tool-collabiq",
     type: "tool",
     badge: "Interactive Tool",
-    topics: ["backlinks", "seo"],
-    title: "Collaborative Link Building Tool",
-    sub: "Find partnership link opportunities by industry.",
+    topics: ["backlinks", "seo", "strategy"],
+    title: "CollabIQ — Partnership Intelligence Tool",
+    sub: "Find partnership, co-marketing, and distribution opportunities by industry.",
     blurb:
-      "Enter your industry and instantly surface co-marketing, partnership, and link collaboration targets — with outreach framing for each. 15+ industries mapped.",
-    href: "/tools/collab-link-building",
+      "Go beyond link building. Surface co-marketing allies, content collaborators, referral networks, and distribution partners — with qualification scoring and outreach templates. 15+ industries mapped.",
+    href: "/tools/collabiq",
     y: "2026",
-    newsHeadline: "The Link Desk",
-    newsDeck: "Collaborative link opportunities across every industry, mapped",
+    newsHeadline: "The Partnership Desk",
+    newsDeck: "Co-marketing, distribution, and link opportunities across every industry, mapped",
     cta: "Use the Tool",
   },
 
