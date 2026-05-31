@@ -175,6 +175,7 @@ type MediaItem = {
   col: string;
   row: string;
   minH: number;
+  fixedH?: number;   // when set, overrides flex:1 and locks to this exact height
   badge?: string;
   country?: string;
 };
@@ -253,6 +254,7 @@ const OFF_DESK: ReadonlyArray<MediaItem> = [
     col: "span 4",
     row: "span 1",
     minH: 140,
+    fixedH: 140,
     country: "SE",
   },
   // Row 3 right: Copenhagen
@@ -684,8 +686,9 @@ const OffTheDesk = () => (
         >
           <div
             style={{
-              flex: 1,
-              minHeight: p.minH,
+              flex: p.fixedH ? "none" : 1,
+              height: p.fixedH ?? undefined,
+              minHeight: p.fixedH ? undefined : p.minH,
               border: `1px solid ${INK}`,
               overflow: "hidden",
               background: "#1a1410",
