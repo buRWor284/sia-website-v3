@@ -442,7 +442,7 @@ function NewspaperSnippet({ headline, deck }: { headline: string; deck: string }
 // CARDS
 // ─────────────────────────────────────────────────────────────────────────────
 
-function InteractiveCard({ item }: { item: InteractiveContent }) {
+function InteractiveCard({ item, index }: { item: InteractiveContent; index: number }) {
   const [hover, setHover] = useState(false);
   const isExternal = item.href.startsWith("http");
 
@@ -458,7 +458,10 @@ function InteractiveCard({ item }: { item: InteractiveContent }) {
         }}
       >
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-          <Pill size={10} ls="0.18em">{item.badge}</Pill>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <IndexLabel index={index} />
+            <Pill size={10} ls="0.18em">{item.badge}</Pill>
+          </div>
           <span style={{ padding: "3px 8px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
             Coming Soon
           </span>
@@ -493,8 +496,11 @@ function InteractiveCard({ item }: { item: InteractiveContent }) {
         minHeight: 340, height: "100%",
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-        <Pill size={10} ls="0.18em">{item.badge}</Pill>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <IndexLabel index={index} />
+          <Pill size={10} ls="0.18em">{item.badge}</Pill>
+        </div>
       </div>
       <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
       <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
@@ -513,7 +519,7 @@ function InteractiveCard({ item }: { item: InteractiveContent }) {
   );
 }
 
-function PlaybookCard({ item }: { item: PlaybookContent }) {
+function PlaybookCard({ item, index }: { item: PlaybookContent; index: number }) {
   const [hover, setHover] = useState(false);
   return (
     <a
@@ -529,8 +535,11 @@ function PlaybookCard({ item }: { item: PlaybookContent }) {
         minHeight: 320, height: "100%",
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-        <Pill size={10} ls="0.18em">{item.badge}</Pill>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <IndexLabel index={index} />
+          <Pill size={10} ls="0.18em">{item.badge}</Pill>
+        </div>
       </div>
       <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
       <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
@@ -547,7 +556,7 @@ function PlaybookCard({ item }: { item: PlaybookContent }) {
   );
 }
 
-function ArticleCard({ item }: { item: ArticleContent }) {
+function ArticleCard({ item, index }: { item: ArticleContent; index: number }) {
   const [hover, setHover] = useState(false);
   const href = item.external
     ? `https://syedirfanajmal.com/${item.slug}/`
@@ -565,6 +574,7 @@ function ArticleCard({ item }: { item: ArticleContent }) {
         }}
       >
         <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <IndexLabel index={index} />
           <Pill size={9.5} ls="0.18em">Article · {item.cat}</Pill>
           <span style={{ padding: "3px 8px", background: "rgba(26,20,16,.35)", color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
             Private
@@ -600,7 +610,8 @@ function ArticleCard({ item }: { item: ArticleContent }) {
         minHeight: 340, height: "100%",
       }}
     >
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+        <IndexLabel index={index} />
         <Pill size={9.5} ls="0.18em">Article · {item.cat}</Pill>
       </div>
       <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
@@ -617,7 +628,7 @@ function ArticleCard({ item }: { item: ArticleContent }) {
   );
 }
 
-function VisualEssayCard({ item }: { item: VisualEssayContent }) {
+function VisualEssayCard({ item, index }: { item: VisualEssayContent; index: number }) {
   const [hover, setHover] = useState(false);
 
   if (item.private) {
@@ -631,8 +642,11 @@ function VisualEssayCard({ item }: { item: VisualEssayContent }) {
           minHeight: 320, height: "100%",
         }}
       >
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-          <Pill size={9.5} ls="0.14em">Visual Essay</Pill>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <IndexLabel index={index} />
+            <Pill size={9.5} ls="0.14em">Visual Essay</Pill>
+          </div>
           <span style={{ padding: "3px 8px", background: "rgba(26,20,16,.35)", color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
             Private
           </span>
@@ -668,8 +682,11 @@ function VisualEssayCard({ item }: { item: VisualEssayContent }) {
         minHeight: 320, height: "100%",
       }}
     >
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-        <Pill size={9.5} ls="0.14em">Visual Essay</Pill>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <IndexLabel index={index} />
+          <Pill size={9.5} ls="0.14em">Visual Essay</Pill>
+        </div>
       </div>
       <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
       <h4 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
@@ -690,10 +707,7 @@ function IndexLabel({ index }: { index: number }) {
   return (
     <span
       style={{
-        position: "absolute",
-        top: 12,
-        right: 12,
-        zIndex: 10,
+        display: "inline-flex",
         padding: "4px 8px",
         background: YEL,
         color: INK,
@@ -711,15 +725,11 @@ function IndexLabel({ index }: { index: number }) {
 
 function ResourceCard({ item, index }: { item: ContentItem; index: number }) {
   const INTERACTIVE: ContentType[] = ["kit", "tool", "calculator", "quiz"];
-  return (
-    <div style={{ position: "relative", height: "100%" }}>
-      <IndexLabel index={index} />
-      {INTERACTIVE.includes(item.type) && <InteractiveCard item={item as InteractiveContent} />}
-      {item.type === "playbook" && <PlaybookCard item={item as PlaybookContent} />}
-      {item.type === "article" && <ArticleCard item={item as ArticleContent} />}
-      {item.type === "visual-essay" && <VisualEssayCard item={item as VisualEssayContent} />}
-    </div>
-  );
+  if (INTERACTIVE.includes(item.type)) return <InteractiveCard item={item as InteractiveContent} index={index} />;
+  if (item.type === "playbook")         return <PlaybookCard item={item as PlaybookContent} index={index} />;
+  if (item.type === "article")          return <ArticleCard item={item as ArticleContent} index={index} />;
+  if (item.type === "visual-essay")     return <VisualEssayCard item={item as VisualEssayContent} index={index} />;
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
