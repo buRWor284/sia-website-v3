@@ -146,24 +146,11 @@ const TESTIMONIALS: ReadonlyArray<Testi> = [
   },
 ];
 
-type PressGroup = { label: string; items: ReadonlyArray<string> };
-const PRESS_GROUPS: ReadonlyArray<PressGroup> = [
-  {
-    label: "Global business & ideas",
-    items: ["Forbes", "Harvard Business Review", "HuffPost", "Entrepreneur", "Reader's Digest"],
-  },
-  {
-    label: "Tech & startups",
-    items: ["The Next Web (TNW)", "CNET", "Virgin Startup", "GBG · Google Business Group"],
-  },
-  {
-    label: "Marketing, SEO & PR",
-    items: ["SEMrush Blog", "Search Engine Journal", "SERPed", "Business.com", "Spin Sucks", "GrowMap"],
-  },
-  {
-    label: "Regional & development",
-    items: ["Aurora · Pakistan's largest marketing magazine", "The World Bank Blog"],
-  },
+const PRESS_NAMES: ReadonlyArray<string> = [
+  "Forbes", "Harvard Business Review", "HuffPost", "Entrepreneur", "Reader's Digest",
+  "The Next Web (TNW)", "CNET", "Virgin Startup", "Google Business Group",
+  "SEMrush", "Search Engine Journal", "SERPed", "Business.com", "Spin Sucks", "GrowMap",
+  "Aurora", "The World Bank Blog",
 ];
 
 type MediaItem = {
@@ -234,7 +221,17 @@ const OFF_DESK: ReadonlyArray<MediaItem> = [
     minH: 220,
     country: "TR",
   },
-  // Row 3 left: Reel 2, Kuala Lumpur (separated from Reel 1)
+  // Row 3 left: Copenhagen (wide)
+  {
+    src: "/assets/personal/Irfan_Copenhagen_Beach.JPG",
+    cap: "Copenhagen",
+    sub: "Denmark",
+    col: "span 8",
+    row: "span 1",
+    minH: 220,
+    country: "DK",
+  },
+  // Row 3 right: Reel 2, Kuala Lumpur
   {
     video: "/assets/personal/climb-video-2.mp4",
     poster: "/assets/personal/climb-2.jpg",
@@ -245,16 +242,6 @@ const OFF_DESK: ReadonlyArray<MediaItem> = [
     minH: 240,
     badge: "Reel 02",
     country: "MY",
-  },
-  // Row 3 right: Copenhagen
-  {
-    src: "/assets/personal/Irfan_Copenhagen_Beach.JPG",
-    cap: "Copenhagen",
-    sub: "Denmark",
-    col: "span 8",
-    row: "span 1",
-    minH: 220,
-    country: "DK",
   },
 ];
 
@@ -295,7 +282,7 @@ const Hero = () => (
       {/* Right: topic index */}
       <div className="res-hero-right">
         {[
-          { label: "Press",        sub: "Forbes · HBR · 13 more" },
+          { label: "Press",        sub: "Forbes · HBR · 100+ more" },
           { label: "Case Studies", sub: "Results on the record" },
           { label: "Client words", sub: "6 testimonials on file" },
         ].map(t => (
@@ -316,7 +303,7 @@ const STATS = [
   { num: "Est. 2004", label: "In practice", sub: "US remote clients from day one" },
   { num: "SE · DK · SV", label: "Countries, lived and worked", sub: "Peshawar and Islamabad now" },
   { num: "300+", label: "Clients served", sub: "USA · EU · MENA · APAC" },
-  { num: "15+", label: "Major bylines", sub: "Forbes · HBR · HuffPost · and more" },
+  { num: "100+", label: "Major bylines & citations", sub: "Forbes · HBR · HuffPost · and more" },
 ] as const;
 
 const StatsStrip = () => (
@@ -431,9 +418,8 @@ const PressArchive = () => (
         </span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.65)", lineHeight: 1.55, maxWidth: 520 }}>
-        Fifteen-plus publications across global business, technology, marketing,
-        and development. Contributor bylines, expert citations, and a print spread
-        in Forbes Middle East.
+        100+ bylines and citations across global business, technology, marketing,
+        and development — including a print spread in Forbes Middle East.
       </p>
     </div>
 
@@ -480,39 +466,38 @@ const PressArchive = () => (
       </figure>
     </div>
 
-    {/* Publication groups */}
-    <div className="grid-cards-2" style={{ border: `1px solid rgba(241,235,222,.18)` }}>
-      {PRESS_GROUPS.map((g, gi) => (
-        <div
-          key={g.label}
+    {/* Publication names — simple inline flow */}
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+      {PRESS_NAMES.map((name) => (
+        <span
+          key={name}
           style={{
-            padding: "28px 30px 26px",
-            background: "transparent",
-            borderRight: gi % 2 === 0 ? `1px solid rgba(241,235,222,.18)` : "none",
-            borderBottom: gi < 2 ? `1px solid rgba(241,235,222,.18)` : "none",
+            padding: "8px 16px",
+            border: `1px solid rgba(241,235,222,.2)`,
+            fontFamily: SERIF,
+            fontWeight: 700,
+            fontSize: "clamp(13px, 1.5vw, 16px)",
+            color: PAPER,
+            whiteSpace: "nowrap",
           }}
         >
-          <SCaps size={10.5} ls="0.20em" color="rgba(241,235,222,.45)">{g.label}</SCaps>
-          <div style={{ marginTop: 14, marginBottom: 0, height: 1, background: "rgba(241,235,222,.18)" }} />
-          <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-            {g.items.map((name) => (
-              <li
-                key={name}
-                style={{
-                  display: "flex",
-                  padding: "10px 0",
-                  borderBottom: `1px solid rgba(241,235,222,.08)`,
-                  alignItems: "baseline",
-                }}
-              >
-                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(15px, 2vw, 19px)", color: PAPER }}>
-                  {name}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+          {name}
+        </span>
       ))}
+      <span
+        style={{
+          padding: "8px 16px",
+          background: "rgba(241,235,222,.08)",
+          fontFamily: MONO,
+          fontSize: 12,
+          fontWeight: 700,
+          color: "rgba(241,235,222,.5)",
+          letterSpacing: "0.1em",
+          whiteSpace: "nowrap",
+        }}
+      >
+        + 80 MORE
+      </span>
     </div>
   </section>
 );
@@ -780,6 +765,7 @@ const Outro = () => (
       paddingTop: 90,
       paddingBottom: 90,
       borderTop: `1px solid rgba(241,235,222,.12)`,
+      borderBottom: `3px solid ${YEL}`,
     }}
   >
     <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
