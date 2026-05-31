@@ -28,7 +28,7 @@ import {
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-// Affiliate Prophet: US remote work signal (not in clients.ts — about page only)
+// Affiliate Prophet: US remote work signal (not in clients.ts, about page only)
 const AFFILIATE_PROPHET: Client = {
   key: "affiliate-prophet",
   name: "Affiliate Prophet",
@@ -38,7 +38,7 @@ const AFFILIATE_PROPHET: Client = {
   role: "Marketing · remote from Denmark",
   when: "2009",
   blurb:
-    "A US-based MarTech startup, handled remotely from Denmark — among the " +
+    "A US-based MarTech startup, handled remotely from Denmark, among the " +
     "earliest remote-first engagements before distributed work was common practice.",
   wordmark: "Affiliate Prophet",
   logo: null,
@@ -102,7 +102,7 @@ const TESTIMONIALS: ReadonlyArray<Testi> = [
   {
     badge: "6× DAILY SIGNUPS",
     quote:
-      "120% increase in organic traffic. Our Public Database clicks jumped 515% and impressions from 30K to 198K — resulting in six times more average daily signups.",
+      "120% increase in organic traffic. Our Public Database clicks jumped 515% and impressions from 30K to 198K, resulting in six times more average daily signups.",
     name: "Imani Lea Brown",
     role: "Centriq (raised $11M)",
     place: "USA",
@@ -120,7 +120,7 @@ const TESTIMONIALS: ReadonlyArray<Testi> = [
   {
     badge: "140% TRAFFIC · 3 MONTHS",
     quote:
-      "Traffic increased 140% in 3 months — against a goal of 25% in 9 months. Page views up 102%. Impressions up 65%. They simply overdelivered.",
+      "Traffic increased 140% in 3 months, against a goal of 25% in 9 months. Page views up 102%. Impressions up 65%. They simply overdelivered.",
     name: "Reem El Shafaki",
     role: "DinarStandard",
     place: "UAE",
@@ -176,71 +176,97 @@ type MediaItem = {
   row: string;
   minH: number;
   badge?: string;
+  country?: string;
 };
 
-// Abroad photos only. Istanbul slot commented — add /assets/personal/istanbul.jpg when ready.
+// Gallery: abroad photos. Reels separated, Sweden photos in different rows.
 const OFF_DESK: ReadonlyArray<MediaItem> = [
+  // Row 1-2 left: Reel 1, Peshawar
   {
     video: "/assets/personal/climb-video-1.mp4",
     poster: "/assets/personal/climb-1.jpg",
-    cap: "Climbing reel · Peshawar",
-    sub: "Mar 2022",
-    col: "span 6",
+    cap: "Climbing reel",
+    sub: "Peshawar, 2022",
+    col: "span 4",
     row: "span 2",
-    minH: 280,
-    badge: "Reel · 01",
+    minH: 240,
+    badge: "Reel 01",
+    country: "PK",
   },
-  {
-    video: "/assets/personal/climb-video-2.mp4",
-    poster: "/assets/personal/climb-2.jpg",
-    cap: "Climbing reel · Peshawar",
-    sub: "Mar 2022",
-    col: "span 6",
-    row: "span 2",
-    minH: 280,
-    badge: "Reel · 02",
-  },
+  // Row 1 right: SIFE competition (sweden-malardalen.jpg is the SIFE photo)
   {
     src: "/assets/personal/sweden-malardalen.jpg",
-    cap: "Mälardalen campus",
-    sub: "Västerås, Sweden",
-    col: "span 4",
-    row: "span 1",
-    minH: 220,
-  },
-  {
-    src: "/assets/personal/sweden-audience.jpg",
     cap: "SIFE competition",
-    sub: "Sweden · 2007",
-    col: "span 4",
+    sub: "Stockholm, 2007",
+    col: "span 5",
     row: "span 1",
     minH: 220,
+    country: "SE",
   },
+  // Row 1 far-right: SFO
   {
     src: "/assets/personal/sfo-2022.jpg",
     cap: "San Francisco",
-    sub: "July 2022",
-    col: "span 4",
+    sub: "California, 2022",
+    col: "span 3",
     row: "span 1",
     minH: 220,
+    country: "US",
   },
+  // Row 2 right: Malardalen campus (sweden-audience.jpg is the campus photo)
+  {
+    src: "/assets/personal/sweden-audience.jpg",
+    cap: "Malardalen campus",
+    sub: "Vasteras, Sweden",
+    col: "span 5",
+    row: "span 1",
+    minH: 220,
+    country: "SE",
+  },
+  // Row 2 far-right: Istanbul (small)
+  {
+    src: "/assets/personal/Irfan_Istanbul_1.jpeg",
+    cap: "Istanbul",
+    sub: "Turkey",
+    col: "span 3",
+    row: "span 1",
+    minH: 220,
+    country: "TR",
+  },
+  // Row 3 left: Reel 2, Kuala Lumpur (separated from Reel 1)
+  {
+    video: "/assets/personal/climb-video-2.mp4",
+    poster: "/assets/personal/climb-2.jpg",
+    cap: "Climbing reel",
+    sub: "Kuala Lumpur, 2019",
+    col: "span 4",
+    row: "span 1",
+    minH: 240,
+    badge: "Reel 02",
+    country: "MY",
+  },
+  // Row 3 middle: Sweden waterfront
   {
     src: "/assets/personal/sweden-waterfront.jpg",
     cap: "On the dock",
-    sub: "Sweden",
-    col: "span 6",
+    sub: "Vasteras, 2006",
+    col: "span 4",
     row: "span 1",
     minH: 220,
+    country: "SE",
   },
+  // Row 3 right: Copenhagen
   {
-    src: "/assets/personal/climb-malaysia-2.jpg",
-    cap: "Climbing wall",
-    sub: "Kuala Lumpur",
-    col: "span 6",
+    src: "/assets/personal/Irfan_Copenhagen_Beach.JPG",
+    cap: "Copenhagen",
+    sub: "Denmark",
+    col: "span 4",
     row: "span 1",
     minH: 220,
+    country: "DK",
   },
 ];
+
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -324,8 +350,9 @@ const StatsStrip = () => (
             <Flag c="SE" w={18} />
             <Flag c="DK" w={18} />
             <Flag c="US" w={18} />
+            <Flag c="PK" w={18} />
             <span style={{ fontFamily: MONO, fontSize: 10, color: INK55, letterSpacing: "0.06em" }}>
-              SE · DK · SV · Peshawar now
+              SE · DK · SV · Pakistan
             </span>
           </div>
         ) : (
@@ -519,8 +546,7 @@ const CaseStudies = () => {
           </span>
         </h2>
         <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.55, maxWidth: 520 }}>
-          Three engagements with documented outcomes. Results are verifiable —
-          case studies are linked where available. If you want to speak with a
+          Three engagements with documented outcomes. Results are verifiable; case studies are linked where available. If you want to speak with a
           client directly, ask.
         </p>
       </div>
@@ -630,14 +656,14 @@ const OffTheDesk = () => (
         className="h2-lg"
         style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}
       >
-        The bureau,<br />
+        The desk,<br />
         <span style={{ fontStyle: "italic" }}>
           <Mark>after hours.</Mark>
         </span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.55, maxWidth: 520 }}>
-        Sweden, Malaysia, San Francisco — and a climbing wall in Peshawar that
-        gets more use than it should.
+        Stockholm, Copenhagen, Istanbul, Kuala Lumpur, California. Filed as
+        they were lived.
       </p>
     </div>
 
@@ -699,8 +725,15 @@ const OffTheDesk = () => (
               </div>
             )}
           </div>
-          <figcaption style={{ padding: "8px 4px 2px", display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
-            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK, lineHeight: 1.35 }}>{p.cap}</div>
+          <figcaption style={{ padding: "8px 4px 2px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              {p.country === "MY" && <span style={{ fontSize: 13, lineHeight: 1 }}>🇲🇾</span>}
+              {p.country === "TR" && <span style={{ fontSize: 13, lineHeight: 1 }}>🇹🇷</span>}
+              {p.country && p.country !== "MY" && p.country !== "TR" && (
+                <Flag c={p.country as any} w={16} />
+              )}
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK, lineHeight: 1.35 }}>{p.cap}</div>
+            </div>
             <SCaps size={9.5} ls="0.14em" color={INK55}>{p.sub}</SCaps>
           </figcaption>
         </figure>
@@ -737,30 +770,9 @@ const EditorNote = () => (
         <p style={{ marginTop: 16, fontFamily: SERIF, fontSize: 17, fontStyle: "italic", color: INK70, lineHeight: 1.6 }}>
           You can usually find me writing from Peshawar. Occasionally I am
           working remotely from California, Madinah, Kuala Lumpur, or Dubai
-          — not all at once.
+          Not all at once.
         </p>
-        <div style={{ marginTop: 28, display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <a
-            href={CALENDLY}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ padding: "12px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}
-          >
-            Book a discovery call →
-          </a>
-          <a
-            href="/emos"
-            style={{ padding: "12px 18px", background: "transparent", color: INK, border: `1px solid ${INK}`, textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}
-          >
-            EMOS →
-          </a>
-          <a
-            href="/fractional-cmo"
-            style={{ padding: "12px 18px", background: "transparent", color: INK, border: `1px solid ${INK}`, textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}
-          >
-            Fractional CMO →
-          </a>
-        </div>
+
       </div>
     </div>
   </section>
@@ -795,7 +807,7 @@ const Outro = () => (
         <span style={{ fontStyle: "italic" }}>
           <span style={{ background: YEL, color: INK, padding: "0 6px" }}>found, covered, or believed</span>
         </span>
-        , you know where the bureau is.
+        , you know where to find us.
       </h2>
       <div style={{ marginTop: 36, display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
         <a
