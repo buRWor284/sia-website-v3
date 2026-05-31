@@ -847,10 +847,10 @@ body > * { position: relative; z-index: 2; }
   margin-bottom: 36px;
 }
 @media (min-width: 768px) {
-  .forbes-spread { grid-template-columns: 280px 1fr; gap: 28px; }
+  .forbes-spread { grid-template-columns: 1fr 280px; gap: 28px; }
 }
 @media (min-width: 1024px) {
-  .forbes-spread { grid-template-columns: 320px 1fr; }
+  .forbes-spread { grid-template-columns: 1fr 320px; }
 }
 
 /* ---- Gallery · hero (Variant C — 5-col editorial dispatch) ------------- */

@@ -224,11 +224,11 @@ const OFF_DESK: ReadonlyArray<MediaItem> = [
     minH: 220,
     country: "SE",
   },
-  // Row 2 far-right: Istanbul (small)
+  // Row 2 far-right: Tophane-i Amire, Istanbul
   {
-    src: "/assets/personal/Irfan_Istanbul_1.jpeg",
-    cap: "Istanbul",
-    sub: "Turkey",
+    src: "/assets/personal/irfan_tophane_amiri.jpg",
+    cap: "Tophane-i Amire",
+    sub: "Istanbul",
     col: "span 3",
     row: "span 1",
     minH: 220,
@@ -246,23 +246,12 @@ const OFF_DESK: ReadonlyArray<MediaItem> = [
     badge: "Reel 02",
     country: "MY",
   },
-  // Row 3 middle: Sweden waterfront
-  {
-    src: "/assets/personal/sweden-waterfront.jpg",
-    cap: "On the dock",
-    sub: "Vasteras, 2006",
-    col: "span 4",
-    row: "span 1",
-    minH: 140,
-    fixedH: 140,
-    country: "SE",
-  },
   // Row 3 right: Copenhagen
   {
     src: "/assets/personal/Irfan_Copenhagen_Beach.JPG",
     cap: "Copenhagen",
     sub: "Denmark",
-    col: "span 4",
+    col: "span 8",
     row: "span 1",
     minH: 220,
     country: "DK",
@@ -448,11 +437,11 @@ const PressArchive = () => (
       </p>
     </div>
 
-    {/* Forbes ME print feature */}
+    {/* Forbes ME print feature — text left, photo right */}
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "1fr",
+        gridTemplateColumns: "1fr 260px",
         gap: 20,
         padding: 14,
         background: "#111",
@@ -461,14 +450,6 @@ const PressArchive = () => (
       }}
       className="forbes-spread"
     >
-      <figure style={{ margin: 0, padding: 8, background: "#0a0a0a", border: `1px solid rgba(241,235,222,.12)`, display: "flex" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/assets/personal/forbes-me-print.jpg"
-          alt="How Qatar Can Become The Silicon Valley Of The Arab World · Forbes Middle East print"
-          style={{ width: "100%", height: "auto", maxHeight: 380, objectFit: "contain", display: "block" }}
-        />
-      </figure>
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "4px 4px" }}>
         <div>
           <div style={{ display: "inline-block", padding: "4px 10px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase" }}>
@@ -489,6 +470,14 @@ const PressArchive = () => (
           <SCaps size={10.5} ls="0.16em" color={PAPER}>Featured byline</SCaps>
         </div>
       </div>
+      <figure style={{ margin: 0, padding: 8, background: "#0a0a0a", border: `1px solid rgba(241,235,222,.12)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/assets/personal/forbes-me-print.jpg"
+          alt="How Qatar Can Become The Silicon Valley Of The Arab World · Forbes Middle East print"
+          style={{ width: "100%", height: "auto", maxHeight: 380, objectFit: "contain", display: "block" }}
+        />
+      </figure>
     </div>
 
     {/* Publication groups */}
