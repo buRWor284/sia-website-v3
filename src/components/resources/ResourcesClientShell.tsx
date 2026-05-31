@@ -686,13 +686,40 @@ function VisualEssayCard({ item }: { item: VisualEssayContent }) {
   );
 }
 
-function ResourceCard({ item }: { item: ContentItem }) {
+function IndexLabel({ index }: { index: number }) {
+  return (
+    <span
+      style={{
+        position: "absolute",
+        top: 12,
+        right: 12,
+        zIndex: 10,
+        padding: "4px 8px",
+        background: YEL,
+        color: INK,
+        fontFamily: GROT,
+        fontWeight: 800,
+        fontSize: 9,
+        letterSpacing: "0.12em",
+        lineHeight: 1,
+      }}
+    >
+      § {String(index + 1).padStart(2, "0")}
+    </span>
+  );
+}
+
+function ResourceCard({ item, index }: { item: ContentItem; index: number }) {
   const INTERACTIVE: ContentType[] = ["kit", "tool", "calculator", "quiz"];
-  if (INTERACTIVE.includes(item.type)) return <InteractiveCard item={item as InteractiveContent} />;
-  if (item.type === "playbook")         return <PlaybookCard item={item as PlaybookContent} />;
-  if (item.type === "article")          return <ArticleCard item={item as ArticleContent} />;
-  if (item.type === "visual-essay")     return <VisualEssayCard item={item as VisualEssayContent} />;
-  return null;
+  return (
+    <div style={{ position: "relative", height: "100%" }}>
+      <IndexLabel index={index} />
+      {INTERACTIVE.includes(item.type) && <InteractiveCard item={item as InteractiveContent} />}
+      {item.type === "playbook" && <PlaybookCard item={item as PlaybookContent} />}
+      {item.type === "article" && <ArticleCard item={item as ArticleContent} />}
+      {item.type === "visual-essay" && <VisualEssayCard item={item as VisualEssayContent} />}
+    </div>
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -843,26 +870,8 @@ function ContentGrid({ filtered, activeType }: { filtered: ContentItem[]; active
     <div className="sx" style={{ paddingTop: 48, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
         {filtered.map((item, i) => (
-          <div key={item.id} style={{ ...cellBorder(i, filtered.length), position: "relative" }}>
-            <span
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                zIndex: 2,
-                padding: "3px 7px",
-                background: YEL,
-                color: INK,
-                fontFamily: GROT,
-                fontWeight: 800,
-                fontSize: 8,
-                letterSpacing: "0.12em",
-                lineHeight: 1,
-              }}
-            >
-              § {String(i + 1).padStart(2, "0")}
-            </span>
-            <ResourceCard item={item} />
+          <div key={item.id} style={{ ...cellBorder(i, filtered.length), position: "relative", overflow: "visible" }}>
+            <ResourceCard item={item} index={i} />
           </div>
         ))}
       </div>
