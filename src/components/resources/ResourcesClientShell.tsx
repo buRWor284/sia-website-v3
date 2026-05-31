@@ -35,6 +35,7 @@ interface ContentBase {
   title: string;
   y: string;
   updated?: string;
+  private?: boolean;
 }
 
 interface InteractiveContent extends ContentBase {
@@ -257,32 +258,6 @@ const CONTENT: ContentItem[] = [
     newsDeck: "Every rule serious writers live by, in one place",
   },
   {
-    id: "art-good-writer",
-    type: "article",
-    badge: "Article",
-    topics: ["writing"],
-    title: "How to Become a Good Writer",
-    slug: "become-a-good-writer",
-    cat: "Craft",
-    y: "—",
-    external: true,
-    newsHeadline: "Made, Not Born",
-    newsDeck: "The habits and disciplines that turn anyone into a writer",
-  },
-  {
-    id: "art-productivity",
-    type: "article",
-    badge: "Article",
-    topics: ["strategy"],
-    title: "6 Productivity Hacks for Entrepreneurs",
-    slug: "6-productivity-hacks-entrepreneurs",
-    cat: "Operating",
-    y: "2021",
-    external: true,
-    newsHeadline: "The Founder's Edge",
-    newsDeck: "Six habits that give entrepreneurs an unfair time advantage",
-  },
-  {
     id: "art-digital-tools",
     type: "article",
     badge: "Article",
@@ -305,6 +280,7 @@ const CONTENT: ContentItem[] = [
     cat: "Measurement",
     y: "2020",
     external: true,
+    private: true,
     newsHeadline: "Read the Numbers",
     newsDeck: "The five analytics signals that tell you if your content is working",
   },
@@ -318,11 +294,26 @@ const CONTENT: ContentItem[] = [
     cat: "Strategy",
     y: "—",
     external: true,
+    private: true,
     newsHeadline: "The Conversion Code",
     newsDeck: "How product discovery turns browsers into buyers",
   },
 
   // ── VISUAL ESSAYS ────────────────────────────────────────────────────────
+  {
+    id: "ve-writing-benefits",
+    type: "visual-essay",
+    badge: "Infographic",
+    topics: ["writing", "content-marketing"],
+    title: "Science-Backed Benefits of Writing",
+    blurb:
+      "An infographic exploring the cognitive, emotional, and professional benefits of a consistent writing practice — backed by peer-reviewed research.",
+    href: "https://www.syedirfanajmal.com/infographics/writing-benefits",
+    y: "2019",
+    updated: "2026",
+    newsHeadline: "The Writer's Edge",
+    newsDeck: "Science-backed reasons to pick up the pen every day",
+  },
   {
     id: "ve-hubstaff",
     type: "visual-essay",
@@ -347,6 +338,7 @@ const CONTENT: ContentItem[] = [
       "The science of habit formation applied to a daily writing practice — cues, routines, rewards, and the research behind each.",
     href: "https://syedirfanajmal.com/form-writing-habits-success-infographic/",
     y: "—",
+    private: true,
     newsHeadline: "Rituals of the Masters",
     newsDeck: "The daily habits that made Hemingway, King, and Didion",
   },
@@ -560,6 +552,38 @@ function ArticleCard({ item }: { item: ArticleContent }) {
   const href = item.external
     ? `https://syedirfanajmal.com/${item.slug}/`
     : `/resources/${item.slug}`;
+
+  if (item.private) {
+    return (
+      <div
+        style={{
+          display: "flex", flexDirection: "column",
+          padding: "28px 24px 22px",
+          background: PAPER,
+          opacity: 0.55,
+          minHeight: 340, height: "100%",
+        }}
+      >
+        <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <Pill size={9.5} ls="0.18em">Article · {item.cat}</Pill>
+          <span style={{ padding: "3px 8px", background: "rgba(26,20,16,.35)", color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+            Private
+          </span>
+        </div>
+        <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
+        <h4 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em", flex: 1 }}>
+          {item.title}
+        </h4>
+        <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <SCaps size={9} ls="0.13em" color="rgba(26,20,16,.42)">
+            {item.y}
+          </SCaps>
+          <SCaps size={10} ls="0.16em" color={INK55}>Update Coming Soon</SCaps>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <a
       href={href}
@@ -595,6 +619,39 @@ function ArticleCard({ item }: { item: ArticleContent }) {
 
 function VisualEssayCard({ item }: { item: VisualEssayContent }) {
   const [hover, setHover] = useState(false);
+
+  if (item.private) {
+    return (
+      <div
+        style={{
+          display: "flex", flexDirection: "column",
+          padding: "28px 24px 22px",
+          background: PAPER,
+          opacity: 0.55,
+          minHeight: 320, height: "100%",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
+          <Pill size={9.5} ls="0.14em">Visual Essay</Pill>
+          <span style={{ padding: "3px 8px", background: "rgba(26,20,16,.35)", color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+            Private
+          </span>
+        </div>
+        <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
+        <h4 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
+          {item.title}
+        </h4>
+        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14.5, color: INK70, lineHeight: 1.5, flex: 1 }}>
+          {item.blurb}
+        </p>
+        <div style={{ marginTop: "auto", paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <SCaps size={9} ls="0.12em" color={INK55}>{item.y}</SCaps>
+          <SCaps size={10} ls="0.16em" color={INK55}>Update Coming Soon</SCaps>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <a
       href={item.href}
