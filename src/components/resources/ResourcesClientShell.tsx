@@ -91,22 +91,6 @@ type ContentItem =
 const CONTENT: ContentItem[] = [
   // ── KITS ────────────────────────────────────────────────────────────────
   {
-    id: "kit-writing",
-    type: "kit",
-    badge: "Interactive Kit",
-    topics: ["writing", "content-marketing"],
-    title: "Top 11 Scientific Benefits of Writing",
-    sub: "Eleven research-backed findings. Each with a prescription.",
-    blurb:
-      "Reduced anxiety, stronger memory, sharper thinking — the science of writing as a daily practice. Each finding paired with a study and something you can do this week.",
-    href: "/infographics/writing-benefits",
-    y: "2019",
-    updated: "2026",
-    newsHeadline: "Writing Is Medicine",
-    newsDeck: "Science confirms what the Ancients knew about the written word",
-    cta: "Open the Kit",
-  },
-  {
     id: "kit-journo",
     type: "kit",
     badge: "Interactive Kit",
@@ -172,6 +156,22 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Your Press Score",
     newsDeck: "Eight dimensions of founder media readiness, scored and prescribed",
     cta: "Take the Quiz",
+  },
+  {
+    id: "kit-writing",
+    type: "kit",
+    badge: "Interactive Kit",
+    topics: ["writing", "content-marketing"],
+    title: "Top 11 Scientific Benefits of Writing",
+    sub: "Eleven research-backed findings. Each with a prescription.",
+    blurb:
+      "Reduced anxiety, stronger memory, sharper thinking — the science of writing as a daily practice. Each finding paired with a study and something you can do this week.",
+    href: "/infographics/writing-benefits",
+    y: "2019",
+    updated: "2026",
+    newsHeadline: "Writing Is Medicine",
+    newsDeck: "Science confirms what the Ancients knew about the written word",
+    cta: "Open the Kit",
   },
   {
     id: "quiz-personal-brand",
@@ -843,7 +843,25 @@ function ContentGrid({ filtered, activeType }: { filtered: ContentItem[]; active
     <div className="sx" style={{ paddingTop: 48, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}` }}>
         {filtered.map((item, i) => (
-          <div key={item.id} style={cellBorder(i, filtered.length)}>
+          <div key={item.id} style={{ ...cellBorder(i, filtered.length), position: "relative" }}>
+            <span
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                zIndex: 2,
+                padding: "3px 7px",
+                background: YEL,
+                color: INK,
+                fontFamily: GROT,
+                fontWeight: 800,
+                fontSize: 8,
+                letterSpacing: "0.12em",
+                lineHeight: 1,
+              }}
+            >
+              § {String(i + 1).padStart(2, "0")}
+            </span>
             <ResourceCard item={item} />
           </div>
         ))}
