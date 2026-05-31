@@ -9,7 +9,7 @@ import {
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type ItemType   = "speaking" | "travel" | "friends" | "hobbies";
-type PhotoItem  = { format: "photo";  type: ItemType; country: string | null; src: string; cap: string; venue: string };
+type PhotoItem  = { format: "photo";  type: ItemType; country: string | null; src: string; cap: string; venue: string; featured?: boolean };
 type VideoItem  = { format: "video";  type: ItemType; country: string | null; id: string; title: string; where: string; startAt?: number };
 type GalleryItem = PhotoItem | VideoItem;
 
@@ -19,59 +19,32 @@ const GA = (f: string) => `/assets/gallery/${f}`;
 
 const ALL_ITEMS: ReadonlyArray<GalleryItem> = [
 
-  // ── SPEAKING · UAE ────────────────────────────────────────────────────────
-  { format:"photo", type:"speaking", country:"UAE", src:GA("mps-banner.jpg"),        cap:'MPS2016 · "Personal Branding for Founders"',       venue:"Dubai · Oct 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("mps-audience-wide.jpg"), cap:"MPS2016 audience · wide hall, Dubai trade centre",  venue:"MPS Dubai · 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("atm-dubai-panel.jpg"),   cap:"Panel · Marketing to the Modern Muslim Traveller",  venue:"ATM Dubai · Apr 2018" },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("in5-dubai.jpg"),          cap:"Media Hacks · Free Publicity Online",               venue:"IN5 · Dubai · 2018"   },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("mps-emirati.jpg"),        cap:"Emirati attendees at MPS2016",                      venue:"MPS Dubai · 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("mps-audience.jpg"),       cap:"Audience question · MPS2016",                       venue:"MPS Dubai · 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("mps-zoom.jpg"),           cap:"Listening in · MPS2016",                            venue:"MPS Dubai · 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("astrolabs-1.jpg"),        cap:"Astrolabs · Growth Hacking Your Brand",             venue:"Dubai · Oct 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("astrolabs-2.jpg"),        cap:"Astrolabs · Growth Hacking",                        venue:"Dubai · Oct 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("astrolabs-3.jpg"),        cap:"Astrolabs · Growth Hacking",                        venue:"Dubai · Oct 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("astrolabs-4.jpg"),        cap:"Astrolabs · Growth Hacking",                        venue:"Dubai · Oct 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("ik-audience.jpg"),        cap:"Audience · IK Institute of Business",               venue:"Dubai · Oct 2016"     },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("ik-workshop.jpg"),        cap:"IK Institute workshop audience",                    venue:"Dubai"                },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("ik-cospeaker.jpg"),       cap:"Co-speaker · IK Institute workshop",                venue:"Dubai"                },
-  { format:"photo", type:"speaking", country:"UAE", src:GA("ik-cotrainer.jpg"),       cap:"Co-trainer · IK Institute workshop",                venue:"Dubai"                },
+  // ── FEATURED ───────────────────────────────────────────────────────────────
+  { format:"photo", type:"travel", country:"Indonesia", src:GA("bali-galleria.jpg"), cap:"Mal Bali Galleria. Last-minute visa, 24 hours of flights, straight into delivering a workshop at DMSS, then finally a moment to breathe. Two hours later I flew to Dubai for another one.", venue:"Bali, 2017", featured:true },
 
-  // ── SPEAKING · PAKISTAN ───────────────────────────────────────────────────
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("empower-pakistan.jpg"), cap:"Empower Pakistan · World Bank Group",       venue:"Pakistan"        },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("startup-grind.jpg"),    cap:"Startup Grind · Powered by Google",         venue:"Peshawar"        },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("empower-pk-group.jpg"), cap:"Empower Pakistan · group photograph",       venue:"Pakistan"        },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("uop-talk.jpg"),          cap:"University of Peshawar talk",               venue:"Peshawar"        },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("iydc-panel.jpg"),        cap:"Panel · Social Media @ IYDC",               venue:"Peshawar · 2015" },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("gdayx-1.jpg"),           cap:"Keynote at G-Day X",                        venue:"Peshawar · 2014" },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("gdayx-2.jpg"),           cap:"G-Day X audience",                          venue:"Peshawar · 2014" },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("gdayx-3.jpg"),           cap:"G-Day X room",                              venue:"Peshawar · 2014" },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("gdayx-img1816.jpg"),     cap:"Speaking at G-Day X",                       venue:"Peshawar"        },
+  // ── SPEAKING · UAE (3 curated) ────────────────────────────────────────────
+  { format:"photo", type:"speaking", country:"UAE", src:GA("mps-banner.jpg"),      cap:'MPS2016, "Personal Branding for Founders"',       venue:"Dubai, Oct 2016"     },
+  { format:"photo", type:"speaking", country:"UAE", src:GA("atm-dubai-panel.jpg"), cap:"Panel, Marketing to the Modern Muslim Traveller", venue:"ATM Dubai, Apr 2018" },
+  { format:"photo", type:"speaking", country:"UAE", src:GA("astrolabs-1.jpg"),     cap:"Astrolabs, Growth Hacking Your Brand",            venue:"Dubai, Oct 2016"     },
 
-  // ── SPEAKING · INDONESIA ──────────────────────────────────────────────────
-  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-bali.jpg"),              cap:"Media Hacks workshop",                    venue:"DMSS · Bali · Oct 2017" },
-  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-speakers-grid.jpg"),     cap:"Among the DMSS speaker roster",           venue:"DMSS Bali 2017"         },
-  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-speaking-at.jpg"),       cap:'"I\'m speaking at DMSS" card',             venue:"Bali · 2017"            },
-  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-media-hacks-slide.jpg"), cap:"On the screen · Media Hacks title slide", venue:"DMSS Bali"              },
+  // ── SPEAKING · PAKISTAN (2 curated) ───────────────────────────────────────
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("empower-pakistan.jpg"), cap:"Empower Pakistan, World Bank Group", venue:"Pakistan"  },
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("startup-grind.jpg"),    cap:"Startup Grind, Powered by Google",  venue:"Peshawar"  },
 
-  // ── FRIENDS ───────────────────────────────────────────────────────────────
-  { format:"photo", type:"friends", country:"UAE",       src:GA("with-irfan-khairi.jpg"),   cap:"With Irfan Khairi · founder, IK Institute", venue:"Dubai"          },
-  { format:"photo", type:"friends", country:"Indonesia", src:GA("with-agnieszka-bali.jpg"), cap:'With Agnieszka · "I am in Bali now"',        venue:"DMSS Bali 2017" },
-  { format:"photo", type:"friends", country:"Indonesia", src:GA("with-egor-borushko.jpg"),  cap:"With Egor Borushko · Time Doctor",           venue:"DMSS Bali 2017" },
+  // ── SPEAKING · INDONESIA (2 curated) ──────────────────────────────────────
+  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-bali.jpg"),          cap:"Media Hacks workshop",          venue:"DMSS, Bali, Oct 2017" },
+  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-speakers-grid.jpg"), cap:"Among the DMSS speaker roster", venue:"DMSS Bali 2017"       },
 
-  // ── TRAVEL · UAE ──────────────────────────────────────────────────────────
-  { format:"photo", type:"travel", country:"UAE", src:GA("forbes-me-visit.jpg"),  cap:"At Forbes Middle East · APH",            venue:"Dubai"        },
-  { format:"photo", type:"travel", country:"UAE", src:GA("dubai-beach-2018.jpg"), cap:"Dubai beach · Burj Al Arab in the back", venue:"Dubai · 2018" },
-  { format:"photo", type:"travel", country:"UAE", src:GA("dubai-mall-2017.jpg"),  cap:"Dubai Mall",                             venue:"Dubai · 2017" },
+  // ── TRAVEL (2 curated) ────────────────────────────────────────────────────
+  { format:"photo", type:"travel", country:"UAE",       src:GA("forbes-me-visit.jpg"),  cap:"At Forbes Middle East, APH",     venue:"Dubai"           },
+  { format:"photo", type:"travel", country:"Indonesia", src:GA("dmss-group-pano.jpg"), cap:"DMSS Bali 2017, group panorama", venue:"Bali, Oct 2017" },
 
-  // ── TRAVEL · INDONESIA ────────────────────────────────────────────────────
-  { format:"photo", type:"travel", country:"Indonesia", src:GA("dmss-group-pano.jpg"), cap:"DMSS Bali 2017 · group panorama", venue:"Bali · Oct 2017" },
-  { format:"photo", type:"travel", country:"Indonesia", src:GA("dmss-venue.jpg"),       cap:"The Trans Resort · DMSS venue",   venue:"Bali"            },
-  { format:"photo", type:"travel", country:"Indonesia", src:GA("bali-galleria.jpg"),    cap:"Arriving at Mal Bali Galleria",   venue:"Bali · 2017"     },
+  // ── FRIENDS (1 curated) ───────────────────────────────────────────────────
+  { format:"photo", type:"friends", country:"UAE", src:GA("with-irfan-khairi.jpg"), cap:"With Irfan Khairi, founder of IK Institute", venue:"Dubai" },
 
-  // ── HOBBIES · Wall Climbing ───────────────────────────────────────────────
-  { format:"photo", type:"hobbies", country:"USA",    src:GA("wall-climbing-usa-1.jpg"),  cap:"Wall climbing · indoor route", venue:"USA"    },
-  { format:"photo", type:"hobbies", country:"USA",    src:GA("wall-climbing-usa-2.jpg"),  cap:"Wall climbing · top rope",     venue:"USA"    },
-  { format:"photo", type:"hobbies", country:"Sweden", src:GA("wall-climbing-sweden.jpg"), cap:"Wall climbing · bouldering",   venue:"Sweden" },
+  // ── HOBBIES (2 curated) ───────────────────────────────────────────────────
+  { format:"photo", type:"hobbies", country:"USA",    src:GA("wall-climbing-usa-1.jpg"),  cap:"Wall climbing, indoor route", venue:"USA"    },
+  { format:"photo", type:"hobbies", country:"Sweden", src:GA("wall-climbing-sweden.jpg"), cap:"Wall climbing, bouldering",   venue:"Sweden" },
 
   // ── VIDEOS ────────────────────────────────────────────────────────────────
   { format:"video", type:"speaking", country:"UAE",       id:"uSn4s5ZbJcQ", title:"Panel · Marketing to the Modern Muslim Traveller", where:"ATM Dubai, UAE · April 2018",    startAt:743 },
@@ -158,7 +131,7 @@ const Hero = ({ nPhotos, nVideos, hasFilters }: HeroProps) => {
           fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5,
           color: INK70, lineHeight: 1.4,
         }}>
-          Speaking engagements, travel, and the people in between &mdash; 2014 to 2018.
+          Speaking engagements, travel, and the people in between. 2014 to 2018.
           &nbsp;·&nbsp; {statsLine}
         </p>
       </div>
@@ -169,9 +142,9 @@ const Hero = ({ nPhotos, nVideos, hasFilters }: HeroProps) => {
       {/* Right · locations */}
       <div className="gallery-hero-right">
         {[
-          { city: "Dubai",    sub: "UAE · 2016–2018"      },
-          { city: "Bali",     sub: "Indonesia · 2017"     },
-          { city: "Peshawar", sub: "Pakistan · 2014–2015" },
+          { city: "Dubai",    sub: "UAE · 2016 to 2018"      },
+          { city: "Bali",     sub: "Indonesia · 2017"      },
+          { city: "Peshawar", sub: "Pakistan · 2014 to 2015" },
         ].map(loc => (
           <div key={loc.city} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
             <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: INK, lineHeight: 1, letterSpacing: "-0.01em" }}>
@@ -186,7 +159,7 @@ const Hero = ({ nPhotos, nVideos, hasFilters }: HeroProps) => {
 };
 
 // ─── Filter Bar ───────────────────────────────────────────────────────────────
-// Light (PAPER) background — ink-bordered chips, active = ink fill.
+// Light (PAPER) background, ink-bordered chips, active = ink fill.
 
 type FilterBarProps = {
   activeTypes:     string[];  setActiveTypes:     (v: string[]) => void;
@@ -335,15 +308,30 @@ const VideoCard = ({ v, i }: { v: VideoItem; i: number }) => (
 // ─── Photo Card ───────────────────────────────────────────────────────────────
 
 const PhotoCard = ({ p }: { p: PhotoItem }) => (
-  <div style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 10, display: "flex", flexDirection: "column" }}>
-    <div style={{ aspectRatio: "4/3", overflow: "hidden", border: `1px solid ${INK}`, background: "#222", position: "relative" }}>
+  <div style={{
+    background: PAPER2, border: `1px solid ${INK}`, padding: 10,
+    display: "flex", flexDirection: "column",
+    ...(p.featured ? { gridColumn: "1 / -1" } : {}),
+  }}>
+    <div style={{
+      aspectRatio: p.featured ? "21/9" : "4/3",
+      overflow: "hidden", border: `1px solid ${INK}`, background: "#222", position: "relative",
+    }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={p.src} alt={p.cap} loading="lazy"
         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
     </div>
-    <div style={{ padding: "8px 4px 2px", display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK, lineHeight: 1.35 }}>{p.cap}</div>
-      <SCaps size={9} ls="0.14em" color={INK55} style={{ whiteSpace: "nowrap" }}>{p.venue}</SCaps>
+    <div style={{
+      padding: p.featured ? "12px 6px 4px" : "8px 4px 2px",
+      display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12,
+    }}>
+      <div style={{
+        fontFamily: SERIF, fontStyle: "italic",
+        fontSize: p.featured ? 15 : 13,
+        color: INK, lineHeight: 1.35,
+        ...(p.featured ? { maxWidth: 720 } : {}),
+      }}>{p.cap}</div>
+      <SCaps size={p.featured ? 10 : 9} ls="0.14em" color={INK55} style={{ whiteSpace: "nowrap" }}>{p.venue}</SCaps>
     </div>
   </div>
 );
