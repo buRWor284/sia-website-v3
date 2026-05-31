@@ -264,54 +264,55 @@ const Hero = () => (
 // ─── Speaking Lead + Booking (merged) ─────────────────────────────────────────
 
 const SpeakingLead = () => (
-  <section className="sx" style={{ paddingTop: 48, paddingBottom: 60 }}>
-    <DoubleRule style={{ margin: "0 0 28px" }} />
+  <section className="sx" style={{ paddingTop: 36, paddingBottom: 40 }}>
+    <DoubleRule style={{ margin: "0 0 24px" }} />
 
-    <div className="grid-hero-2col">
+    <div className="grid-hero-2col" style={{ alignItems: "stretch" }}>
       {/* Left — lead copy + inline stats */}
-      <div>
-        <div style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55 }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        <div style={{ fontFamily: SERIF, fontSize: 17, color: INK, lineHeight: 1.5 }}>
           <p style={{ margin: 0 }}>
             On stage since 2013, talking <strong>earned media</strong> and{" "}
             <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
             DMSS (Bali, 500+ audience), IN5, AstroLabs, and MaGIC (Malaysia) — plus
             webinar &amp; podcast circuits across North America and the UK.
           </p>
-          <p style={{ marginTop: "0.7em", fontStyle: "italic", color: INK70 }}>
-            Case-study-led, with the receipts. Available in person across Asia, MENA
-            and Europe, and virtually worldwide. Booking open for Q3–Q4 2026.
+          <p style={{ marginTop: "0.6em", fontStyle: "italic", color: INK70, fontSize: 16 }}>
+            Case-study-led, with the receipts. In person across Asia, MENA and Europe;
+            virtually worldwide. Booking open Q3–Q4 2026.
           </p>
         </div>
 
         {/* Compact stat row */}
-        <div style={{ marginTop: 28, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, borderTop: `2px solid ${INK}`, paddingTop: 20 }}>
+        <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, borderTop: `2px solid ${INK}`, paddingTop: 16 }}>
           {STATS.map(([n, l]) => (
             <div key={n} style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 32px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{n}</div>
-              <div style={{ marginTop: 6 }}><SCaps size={9.5} ls="0.14em" color={INK70}>{l}</SCaps></div>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px, 2.5vw, 28px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{n}</div>
+              <div style={{ marginTop: 5 }}><SCaps size={9} ls="0.12em" color={INK70}>{l}</SCaps></div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Right — booking card */}
-      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
-        <Pill size={11} ls="0.20em">Booking Desk</Pill>
-        <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>Hire the speaker.</div>
-        <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70, lineHeight: 1.5 }}>
-          Tell me the event, the audience, and the metric you want moved. I&rsquo;ll
-          come back inside a working day with topic options, dates, and terms.
+      <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: "20px 22px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <Pill size={10} ls="0.18em">Booking Desk</Pill>
         </div>
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
+        <div style={{ marginTop: 10, fontFamily: SERIF, fontSize: 20, lineHeight: 1.25, color: INK, fontWeight: 700 }}>Hire the speaker.</div>
+        <div style={{ marginTop: 4, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK70, lineHeight: 1.45 }}>
+          Send the event, audience, and the metric you want moved. Response within one working day.
+        </div>
+        <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 14px" }}>
           {BOOKING_SPECS.map(([k, v]) => (
             <Fragment key={k}>
-              <div><SCaps size={10} ls="0.16em" color={INK55}>{k}</SCaps></div>
-              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.4 }}>{v}</div>
+              <div><SCaps size={9.5} ls="0.14em" color={INK55}>{k}</SCaps></div>
+              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.35 }}>{v}</div>
             </Fragment>
           ))}
         </div>
-        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
-        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 10, display: "block", textAlign: "center", padding: "14px 18px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
+        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 16, display: "block", textAlign: "center", padding: "12px 16px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
+        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 8, display: "block", textAlign: "center", padding: "12px 16px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
       </aside>
     </div>
   </section>
