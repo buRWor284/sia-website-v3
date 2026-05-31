@@ -3,7 +3,7 @@
 import { Fragment } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import Script from "next/script";
-import { Colophon, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -802,6 +802,7 @@ export default function FractionalCMOPage() {
       <CMOTestimonials />
       <BookCall />
       <CalendlySection />
+      <CTATicker />
       <Subscriptions sectionNumber="07" />
       <Colophon />
       <ScrollButtons />

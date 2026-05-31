@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Subscriptions } from '@/components/bureau';
+import { Subscriptions, CTATicker } from '@/components/bureau';
 
 /**
  * Homepage v4 Cream edition (SIA-homepage-v3 design)
@@ -672,19 +672,7 @@ export default function HomePage() {
 
       {/* ══ HERO ══ */}
       <header className="hero">
-        <div className="ticker" aria-label="Publications · Speaking · Podcast">
-          {[0, 1].map((i) => (
-            <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
-              <span>Forbes · HBR · SEMrush · TNW · Entrepreneur · SERPed · Search Engine Journal · World Bank</span>
-              <span className="ticker__sep">&nbsp;////&nbsp;</span>
-              <span>SPOKEN IN PK · MY · ID · AE</span>
-              <span className="ticker__sep">&nbsp;////&nbsp;</span>
-              <span>4 PODCAST SEASONS</span>
-              <span className="ticker__sep">&nbsp;////&nbsp;</span>
-              <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            </span>
-          ))}
-        </div>
+        {/* Credibility ticker is rendered globally via layout.tsx */}
 
         <div className="hero-grid">
           <div>
@@ -935,25 +923,7 @@ export default function HomePage() {
       </section>
 
       {/* ══ CTA TICKER ══ */}
-      <div className="ticker ticker--cta" aria-label="Availability, EMOS, and Speaking">
-        {[0, 1].map((i) => (
-          <span key={i} className="ticker-track" aria-hidden={i > 0 ? true : undefined}>
-            <span className="ticker__dot">●</span>
-            <span className="ticker__bold">
-              <a href="/fractional-cmo">1 FRACTIONAL CMO SPOT · Q3 2026</a>
-            </span>
-            <span className="ticker__sep">&nbsp;////&nbsp;</span>
-            <span>
-              <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer">GET CITED BEFORE YOUR SERIES A · EMOS FOUNDING CLASS</a>
-            </span>
-            <span className="ticker__sep">&nbsp;////&nbsp;</span>
-            <span>
-              <a href="/speaking">INVITE ME TO YOUR STAGE · KEYNOTES &amp; WORKSHOPS</a>
-            </span>
-            <span className="ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-          </span>
-        ))}
-      </div>
+      <CTATicker />
 
       {/* ══ § 03 SPEAKING ══ */}
       <section className="speaking">

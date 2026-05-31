@@ -1,6 +1,6 @@
 import Script from "next/script";
 import { ScrollButtons } from "@/components/ScrollButtons";
-import { Colophon, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -706,6 +706,7 @@ export default function EMOSPage() {
       <EMOSTestimonials />
       <Handoff />
       <CalendlySection />
+      <CTATicker />
       <Subscriptions sectionNumber="06" />
       <Colophon />
       <ScrollButtons />

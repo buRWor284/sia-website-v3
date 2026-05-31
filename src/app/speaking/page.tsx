@@ -2,7 +2,7 @@
 
 import { useState, Fragment } from "react";
 import Script from "next/script";
-import { Colophon, Subscriptions } from "@/components/bureau";
+import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import { ClientLogo } from "@/components/bureau/ClientLogo";
 import {
   DoubleRule,
@@ -762,6 +762,7 @@ export default function SpeakingPage() {
       <HostQuotes />
       <BookingProcess />
       <CalendlySection />
+      <CTATicker />
       <Subscriptions sectionNumber="08" />
       <Colophon />
       <ScrollButtons />
