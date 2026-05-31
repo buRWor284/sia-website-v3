@@ -27,24 +27,23 @@ const ALL_ITEMS: ReadonlyArray<GalleryItem> = [
   { format:"photo", type:"speaking", country:"UAE", src:GA("atm-dubai-panel.jpg"), cap:"Panel, Marketing to the Modern Muslim Traveller", venue:"ATM Dubai, Apr 2018" },
   { format:"photo", type:"speaking", country:"UAE", src:GA("astrolabs-1.jpg"),     cap:"Astrolabs, Growth Hacking Your Brand",            venue:"Dubai, Oct 2016"     },
 
-  // ── SPEAKING · PAKISTAN (2 curated) ───────────────────────────────────────
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("empower-pakistan.jpg"), cap:"Empower Pakistan, World Bank Group", venue:"Pakistan"  },
-  { format:"photo", type:"speaking", country:"Pakistan", src:GA("startup-grind.jpg"),    cap:"Startup Grind, Powered by Google",  venue:"Peshawar"  },
-
-  // ── SPEAKING · INDONESIA (2 curated) ──────────────────────────────────────
-  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-bali.jpg"),          cap:"Media Hacks workshop",          venue:"DMSS, Bali, Oct 2017" },
-  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-speakers-grid.jpg"), cap:"Among the DMSS speaker roster", venue:"DMSS Bali 2017"       },
+  // ── SPEAKING · INDONESIA (1 curated) ──────────────────────────────────────
+  { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-bali.jpg"), cap:"Media Hacks workshop", venue:"DMSS, Bali, Oct 2017" },
 
   // ── TRAVEL (2 curated) ────────────────────────────────────────────────────
-  { format:"photo", type:"travel", country:"UAE",       src:GA("forbes-me-visit.jpg"),  cap:"At Forbes Middle East, APH",     venue:"Dubai"           },
+  { format:"photo", type:"travel", country:"UAE",       src:GA("forbes-me-visit.jpg"), cap:"At Forbes Middle East, APH",     venue:"Dubai"          },
   { format:"photo", type:"travel", country:"Indonesia", src:GA("dmss-group-pano.jpg"), cap:"DMSS Bali 2017, group panorama", venue:"Bali, Oct 2017" },
+
+  // ── SPEAKING · PAKISTAN (2 curated, placed mid-gallery) ───────────────────
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("empower-pakistan.jpg"), cap:"Empower Pakistan, World Bank Group", venue:"Pakistan" },
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("startup-grind.jpg"),    cap:"Startup Grind, Powered by Google",  venue:"Peshawar" },
 
   // ── FRIENDS (1 curated) ───────────────────────────────────────────────────
   { format:"photo", type:"friends", country:"UAE", src:GA("with-irfan-khairi.jpg"), cap:"With Irfan Khairi, founder of IK Institute", venue:"Dubai" },
 
   // ── HOBBIES (2 curated) ───────────────────────────────────────────────────
-  { format:"photo", type:"hobbies", country:"USA",    src:GA("wall-climbing-usa-1.jpg"),  cap:"Wall climbing, indoor route", venue:"USA"    },
-  { format:"photo", type:"hobbies", country:"Sweden", src:GA("wall-climbing-sweden.jpg"), cap:"Wall climbing, bouldering",   venue:"Sweden" },
+  { format:"photo", type:"hobbies", country:"Malaysia", src:GA("wall-climbing-malaysia-1.jpg"), cap:"Wall climbing, indoor route", venue:"Malaysia" },
+  { format:"photo", type:"hobbies", country:"Malaysia", src:GA("wall-climbing-malaysia-2.jpg"), cap:"Wall climbing, top rope",     venue:"Malaysia" },
 
   // ── VIDEOS ────────────────────────────────────────────────────────────────
   { format:"video", type:"speaking", country:"UAE",       id:"uSn4s5ZbJcQ", title:"Panel · Marketing to the Modern Muslim Traveller", where:"ATM Dubai, UAE · April 2018",    startAt:743 },
@@ -349,6 +348,55 @@ const SectionLabel = ({ dotColor, label, count }: { dotColor: string; label: str
   </div>
 );
 
+// ─── Video Carousel ──────────────────────────────────────────────────────────
+
+const VideoCarousel = ({ videos }: { videos: VideoItem[] }) => {
+  const [idx, setIdx] = useState(0);
+  const v = videos[idx];
+  const prev = () => setIdx(i => (i - 1 + videos.length) % videos.length);
+  const next = () => setIdx(i => (i + 1) % videos.length);
+
+  const navBtn: React.CSSProperties = {
+    background: "transparent", border: `1px solid rgba(241,235,222,.3)`,
+    color: PAPER, cursor: "pointer", width: 40, height: 40,
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontFamily: GROT, fontWeight: 700, fontSize: 18,
+    transition: "border-color 0.12s",
+  };
+
+  return (
+    <div style={{ background: INK, color: PAPER, padding: 16, border: `1px solid ${INK}` }}>
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        paddingBottom: 12, borderBottom: "1px solid rgba(241,235,222,.2)", marginBottom: 12,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: YEL }} />
+          <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.8)">Reel {idx + 1} of {videos.length}</SCaps>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <button onClick={prev} style={navBtn} aria-label="Previous reel">←</button>
+          <button onClick={next} style={navBtn} aria-label="Next reel">→</button>
+        </div>
+      </div>
+      <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(241,235,222,.2)", overflow: "hidden" }}>
+        <iframe
+          key={v.id}
+          src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
+          title={v.title} loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          style={{ width: "100%", height: "100%", border: 0, display: "block" }}
+        />
+      </div>
+      <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(241,235,222,.2)" }}>
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: PAPER, lineHeight: 1.2 }}>{v.title}</div>
+        <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.7)", lineHeight: 1.4 }}>{v.where}</div>
+      </div>
+    </div>
+  );
+};
+
 // ─── Gallery Body ─────────────────────────────────────────────────────────────
 
 const GalleryBody = ({ videos, photos }: { videos: VideoItem[]; photos: PhotoItem[] }) => {
@@ -363,17 +411,28 @@ const GalleryBody = ({ videos, photos }: { videos: VideoItem[]; photos: PhotoIte
     );
   }
 
+  // Separate featured photo from the rest
+  const featuredPhoto = photos.find(p => p.featured);
+  const regularPhotos = photos.filter(p => !p.featured);
+
   return (
     <div style={{ background: PAPER }}>
 
-      {/* Videos first */}
-      {videos.length > 0 && (
+      {/* Featured photo, full width above everything */}
+      {featuredPhoto && (
         <div className="gallery-grid-section">
+          <PhotoCard p={featuredPhoto} />
+        </div>
+      )}
+
+      {/* Video carousel */}
+      {videos.length > 0 && (
+        <div className="gallery-grid-section" style={{ paddingTop: featuredPhoto ? 0 : undefined }}>
           <SectionLabel dotColor={YEL} label="Reels" count={videos.length} />
-          <div className="gallery-grid-videos">
-            {videos.map((v, i) => <VideoCard key={v.id} v={v} i={i} />)}
+          <div style={{ maxWidth: 800 }}>
+            <VideoCarousel videos={videos} />
           </div>
-          <div style={{ marginTop: 28, display: "flex", justifyContent: "center" }}>
+          <div style={{ marginTop: 28, display: "flex", justifyContent: "flex-start" }}>
             <a href={PLAYLIST} target="_blank" rel="noopener noreferrer" style={{
               display: "inline-flex", alignItems: "center", gap: 12,
               padding: "14px 22px", background: INK, color: PAPER,
@@ -386,12 +445,17 @@ const GalleryBody = ({ videos, photos }: { videos: VideoItem[]; photos: PhotoIte
         </div>
       )}
 
-      {/* Photos */}
-      {photos.length > 0 && (
-        <div className="gallery-grid-section" style={{ paddingTop: videos.length > 0 ? 0 : undefined }}>
-          <SectionLabel dotColor={INK} label="Photographs" count={photos.length} />
-          <div className="gallery-grid-photos">
-            {photos.map((p, i) => <PhotoCard key={i} p={p} />)}
+      {/* Photos in scrollable container */}
+      {regularPhotos.length > 0 && (
+        <div className="gallery-grid-section" style={{ paddingTop: videos.length > 0 || featuredPhoto ? 0 : undefined }}>
+          <SectionLabel dotColor={INK} label="Photographs" count={regularPhotos.length} />
+          <div style={{
+            maxHeight: 720, overflowY: "auto",
+            border: `1px solid ${INK}`, padding: 14, background: PAPER,
+          }}>
+            <div className="gallery-grid-photos">
+              {regularPhotos.map((p, i) => <PhotoCard key={i} p={p} />)}
+            </div>
           </div>
         </div>
       )}
