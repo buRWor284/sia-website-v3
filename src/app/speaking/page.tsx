@@ -272,24 +272,16 @@ const SpeakingLead = () => (
       <div className="hero-body" style={{ fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55, textAlign: "justify" }}>
         <p style={{ margin: 0 }}>
           <span className="hero-drop-cap" style={{ float: "left", fontFamily: SERIF, fontWeight: 700, fontStyle: "italic", lineHeight: 0.78, marginRight: 10, marginTop: 6, color: INK, background: YEL, padding: "6px 8px 2px 8px" }}>
-            I
+            O
           </span>
-          have been on the speaker circuit since 2013, mostly on the subject of{" "}
-          <strong>earned media</strong> and <strong>SEO-PR</strong>: how to get found by the
-          right journalists, get covered by the right publications, and get the kind of
-          organic traffic that turns into customers.
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          The talks travel well. Panel discussions at the Arabian Travel Market (Dubai),
-          a 500+ audience workshop at DMSS in Bali, plus stages at IN5, AstroLabs,
-          MPS2016, the IK Institute of Business, and MaGIC in Malaysia. Keynotes at
-          G-Day X and Durshal. Plus webinars and podcast guest spots for hosts in
-          North America and the UK.
+          n stage since 2013, talking <strong>earned media</strong> and{" "}
+          <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
+          DMSS (Bali, 500+ audience), IN5, AstroLabs, MaGIC (Malaysia), and webinar
+          &amp; podcast circuits across North America and the UK.
         </p>
         <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
-          Style: business-savvy, case-study-led, with the receipts to back it up.
-          Available in person across Asia, MENA and Europe, and virtually for the rest
-          of the world. Booking is open for Q3 and Q4 of 2026.
+          Case-study-led, with the receipts. Available in person across Asia, MENA
+          and Europe, and virtually worldwide. Booking open for Q3–Q4 2026.
         </p>
       </div>
     </div>
