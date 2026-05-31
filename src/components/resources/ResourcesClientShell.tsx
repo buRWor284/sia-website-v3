@@ -36,6 +36,8 @@ interface ContentBase {
   y: string;
   updated?: string;
   private?: boolean;
+  beta?: boolean;
+  underReview?: boolean;
 }
 
 interface InteractiveContent extends ContentBase {
@@ -94,6 +96,7 @@ const CONTENT: ContentItem[] = [
     id: "kit-journo",
     type: "kit",
     badge: "Interactive Kit",
+    beta: true,
     topics: ["pr", "seo"],
     title: "The Journo Outreach Checklist",
     sub: "Seven steps to a pitch reporters actually use.",
@@ -111,6 +114,7 @@ const CONTENT: ContentItem[] = [
     id: "tool-collabiq",
     type: "tool",
     badge: "Interactive Tool",
+    beta: true,
     topics: ["backlinks", "seo", "strategy"],
     title: "CollabIQ — Partnership Intelligence Tool",
     sub: "Find partnership, co-marketing, and distribution opportunities by industry.",
@@ -128,6 +132,7 @@ const CONTENT: ContentItem[] = [
     id: "calc-authority",
     type: "calculator",
     badge: "Calculator",
+    beta: true,
     topics: ["pr", "strategy"],
     title: "The Authority Cost Calculator",
     sub: "Renting credibility vs. owning it — the real numbers.",
@@ -161,6 +166,7 @@ const CONTENT: ContentItem[] = [
     id: "kit-writing",
     type: "kit",
     badge: "Interactive Kit",
+    underReview: true,
     topics: ["writing", "content-marketing"],
     title: "Top 11 Scientific Benefits of Writing",
     sub: "Eleven research-backed findings. Each with a prescription.",
@@ -267,6 +273,7 @@ const CONTENT: ContentItem[] = [
     cat: "Tools",
     y: "2020",
     external: true,
+    private: true,
     newsHeadline: "Tools of the Trade",
     newsDeck: "Six digital tools that make writing faster and sharper",
   },
@@ -301,24 +308,11 @@ const CONTENT: ContentItem[] = [
 
   // ── VISUAL ESSAYS ────────────────────────────────────────────────────────
   {
-    id: "ve-writing-benefits",
-    type: "visual-essay",
-    badge: "Infographic",
-    topics: ["writing", "content-marketing"],
-    title: "Science-Backed Benefits of Writing",
-    blurb:
-      "An infographic exploring the cognitive, emotional, and professional benefits of a consistent writing practice — backed by peer-reviewed research.",
-    href: "https://www.syedirfanajmal.com/infographics/writing-benefits",
-    y: "2019",
-    updated: "2026",
-    newsHeadline: "The Writer's Edge",
-    newsDeck: "Science-backed reasons to pick up the pen every day",
-  },
-  {
     id: "ve-hubstaff",
     type: "visual-essay",
     badge: "Visual Essay",
     topics: ["strategy"],
+    private: true,
     title: "Managing Remote Teams with HubStaff",
     blurb:
       "Time tracking, trust, and async communication across distributed teams. Originally produced in partnership with HubStaff.",
@@ -347,6 +341,7 @@ const CONTENT: ContentItem[] = [
     type: "visual-essay",
     badge: "Visual Essay",
     topics: ["content-marketing", "strategy"],
+    private: true,
     title: "Getting Content Ideas from Your Customers",
     blurb:
       "Listening systems, surveys, and social mining — how to extract an endless editorial calendar from the people already talking to your business.",
@@ -501,6 +496,8 @@ function InteractiveCard({ item, index }: { item: InteractiveContent; index: num
           <IndexLabel index={index} />
           <Pill size={10} ls="0.18em">{item.badge}</Pill>
         </div>
+        {item.beta && <BetaBadge />}
+        {item.underReview && <UnderReviewBadge />}
       </div>
       <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
       <h3 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
@@ -687,6 +684,7 @@ function VisualEssayCard({ item, index }: { item: VisualEssayContent; index: num
           <IndexLabel index={index} />
           <Pill size={9.5} ls="0.14em">Visual Essay</Pill>
         </div>
+        {item.underReview && <UnderReviewBadge />}
       </div>
       <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
       <h4 style={{ margin: "0 0 10px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.1, letterSpacing: "-0.012em" }}>
@@ -719,6 +717,45 @@ function IndexLabel({ index }: { index: number }) {
       }}
     >
       § {String(index + 1).padStart(2, "0")}
+    </span>
+  );
+}
+
+function BetaBadge() {
+  return (
+    <span
+      style={{
+        padding: "3px 8px",
+        background: "#D4A017",
+        color: INK,
+        fontFamily: GROT,
+        fontWeight: 800,
+        fontSize: 8,
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+      }}
+    >
+      Beta
+    </span>
+  );
+}
+
+function UnderReviewBadge() {
+  return (
+    <span
+      style={{
+        padding: "3px 8px",
+        background: "rgba(26,20,16,.12)",
+        color: INK70,
+        fontFamily: GROT,
+        fontWeight: 800,
+        fontSize: 8,
+        letterSpacing: "0.2em",
+        textTransform: "uppercase",
+        border: `1px solid ${INK15}`,
+      }}
+    >
+      Under Review
     </span>
   );
 }
