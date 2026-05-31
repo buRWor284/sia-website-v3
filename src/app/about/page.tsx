@@ -240,15 +240,6 @@ const OFF_DESK: ReadonlyArray<MediaItem> = [
     row: "span 1",
     minH: 220,
   },
-  {
-    src: "/assets/personal/Irfan_Istanbul_1.jpeg",
-    cap: "Istanbul",
-    sub: "Turkey",
-    col: "span 12",
-    row: "span 1",
-    minH: 300,
-    badge: "Istanbul",
-  },
 ];
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -385,15 +376,7 @@ const PreAgencyCard = ({ c }: { c: Client }) => (
     </div>
 
     <div>
-      <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.1, letterSpacing: "-0.015em", color: INK }}>
-        {c.name}
-      </h3>
-      <div style={{ marginTop: 5, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }}>
-        {c.fullName}
-      </div>
-      <div style={{ marginTop: 10 }}>
-        <SCaps size={10.5} ls="0.20em" color={INK}>{c.role}</SCaps>
-      </div>
+      <SCaps size={10.5} ls="0.20em" color={INK}>{c.role}</SCaps>
     </div>
 
     <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.5, flex: 1 }}>
