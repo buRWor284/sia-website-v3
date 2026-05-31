@@ -252,7 +252,7 @@ const OFF_DESK: ReadonlyArray<MediaItem> = [
     sub: "Vasteras, 2006",
     col: "span 4",
     row: "span 1",
-    minH: 220,
+    minH: 140,
     country: "SE",
   },
   // Row 3 right: Copenhagen
