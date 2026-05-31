@@ -270,14 +270,14 @@ const SpeakingLead = () => (
     <div className="grid-hero-2col" style={{ alignItems: "stretch" }}>
       {/* Left — lead copy + inline stats */}
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        <div style={{ fontFamily: SERIF, fontSize: 17, color: INK, lineHeight: 1.5 }}>
+        <div style={{ fontFamily: SERIF, fontSize: "clamp(20px, 2.5vw, 26px)", color: INK, lineHeight: 1.45 }}>
           <p style={{ margin: 0 }}>
             On stage since 2013, talking <strong>earned media</strong> and{" "}
             <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
             DMSS (Bali, 500+ audience), IN5, AstroLabs, and MaGIC (Malaysia) — plus
             webinar &amp; podcast circuits across North America and the UK.
           </p>
-          <p style={{ marginTop: "0.6em", fontStyle: "italic", color: INK70, fontSize: 16 }}>
+          <p style={{ marginTop: "0.6em", fontStyle: "italic", color: INK70 }}>
             Case-study-led, with the receipts. In person across Asia, MENA and Europe;
             virtually worldwide. Booking open Q3–Q4 2026.
           </p>
@@ -287,8 +287,8 @@ const SpeakingLead = () => (
         <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, borderTop: `2px solid ${INK}`, paddingTop: 16 }}>
           {STATS.map(([n, l]) => (
             <div key={n} style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px, 2.5vw, 28px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{n}</div>
-              <div style={{ marginTop: 5 }}><SCaps size={9} ls="0.12em" color={INK70}>{l}</SCaps></div>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px, 3vw, 36px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{n}</div>
+              <div style={{ marginTop: 5 }}><SCaps size={9.5} ls="0.12em" color={INK70}>{l}</SCaps></div>
             </div>
           ))}
         </div>
@@ -438,13 +438,13 @@ const Topics = () => (
       </p>
     </div>
 
-    {/* Primary topics */}
-    <div className="grid-testimonials" style={{ border: `1px solid ${INK}`, marginBottom: 24 }}>
+    {/* Primary topics — 2-col centered */}
+    <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20, maxWidth: 960, margin: "0 auto 24px" }} className="speaking-topics-2col">
       {PRIMARY_TOPICS.map((tp, i) => (
         <div key={tp.title} className="letter-card" style={{
           padding: "36px 28px 30px",
           background: i === 0 ? PAPER : PAPER2,
-          display: "flex", flexDirection: "column", minHeight: 460,
+          display: "flex", flexDirection: "column",
         }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
             <Pill size={10.5} ls="0.20em">Topic {tp.no}</Pill>
@@ -722,13 +722,13 @@ const BookingProcess = () => (
 // ─── DMSS Audience Strip ─────────────────────────────────────────────────────
 
 const DMSSStrip = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 30 }}>
-    <figure style={{ margin: 0, padding: 12, background: "#0e0d0a", border: `1px solid ${INK}` }}>
+  <section className="sx" style={{ background: PAPER, paddingTop: 30, paddingBottom: 20 }}>
+    <figure style={{ margin: "0 auto", padding: 10, background: "#0e0d0a", border: `1px solid ${INK}`, maxWidth: 900 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/assets/speaking/dmss-irfan-large-audience.jpg"
         alt="Syed Irfan Ajmal speaking to a large audience at DMSS Conference, Bali"
-        style={{ width: "100%", height: "auto", display: "block", border: "1px solid rgba(241,235,222,.25)" }}
+        style={{ width: "100%", height: "auto", display: "block", border: "1px solid rgba(241,235,222,.25)", maxHeight: 360, objectFit: "cover", objectPosition: "center 30%" }}
       />
       <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
         <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#f1ebde", lineHeight: 1.4 }}>

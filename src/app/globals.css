@@ -599,6 +599,9 @@ body > * { position: relative; z-index: 2; }
 .letter-card {
   border: 1px solid var(--color-ink);
 }
+@media (min-width: 640px) {
+  .speaking-topics-2col { grid-template-columns: repeat(2, 1fr); }
+}
 
 /* ---- Speaking ----------------------------------------------------------- */
 .grid-speaking {
