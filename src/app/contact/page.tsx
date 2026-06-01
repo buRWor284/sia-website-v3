@@ -78,14 +78,50 @@ function Hero() {
 }
 
 function ContactForm() {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSent(true);
+    setStatus("sending");
+    setErrorMsg("");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const payload = {
+      name: formData.get("name") as string,
+      email: formData.get("email") as string,
+      company: formData.get("company") as string,
+      message: formData.get("message") as string,
+      interests: formData.getAll("interest") as string[],
+    };
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong.");
+      }
+
+      setStatus("sent");
+    } catch (err) {
+      setErrorMsg(
+        err instanceof Error
+          ? err.message
+          : "Failed to send. Please try again or email sia@syedirfanajmal.com directly."
+      );
+      setStatus("error");
+    }
   }
 
-  if (sent) {
+  if (status === "sent") {
     return (
       <div
         style={{
@@ -113,11 +149,30 @@ function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+
+      {/* Error banner */}
+      {status === "error" && (
+        <div
+          style={{
+            marginBottom: 20,
+            padding: "14px 16px",
+            border: `1px solid #c0392b`,
+            background: "rgba(192,57,43,0.06)",
+            fontFamily: SERIF,
+            fontSize: 15,
+            lineHeight: 1.5,
+            color: "#c0392b",
+          }}
+        >
+          {errorMsg}
+        </div>
+      )}
+
       {[
-        { id: "name", label: "Your name", type: "text", placeholder: "Full name" },
-        { id: "email", label: "Email address", type: "email", placeholder: "you@yourcompany.com" },
-        { id: "company", label: "Company or project", type: "text", placeholder: "Optional" },
-      ].map(({ id, label, type, placeholder }) => (
+        { id: "name", label: "Your name", type: "text", placeholder: "Full name", required: true },
+        { id: "email", label: "Email address", type: "email", placeholder: "you@yourcompany.com", required: true },
+        { id: "company", label: "Company or project", type: "text", placeholder: "Optional", required: false },
+      ].map(({ id, label, type, placeholder, required }) => (
         <div key={id} style={{ marginBottom: 20 }}>
           <SCaps size={10.5} ls="0.16em" style={{ display: "block", marginBottom: 8 }}>
             {label}
@@ -127,6 +182,8 @@ function ContactForm() {
             name={id}
             type={type}
             placeholder={placeholder}
+            required={required}
+            disabled={status === "sending"}
             style={{
               width: "100%",
               padding: "14px 16px",
@@ -137,6 +194,7 @@ function ContactForm() {
               color: INK,
               outline: "none",
               boxSizing: "border-box",
+              opacity: status === "sending" ? 0.6 : 1,
             }}
           />
         </div>
@@ -150,6 +208,8 @@ function ContactForm() {
           id="message"
           name="message"
           rows={5}
+          required
+          disabled={status === "sending"}
           placeholder="Tell us about your project, timeline, and what you're trying to achieve."
           style={{
             width: "100%",
@@ -162,6 +222,7 @@ function ContactForm() {
             outline: "none",
             resize: "vertical",
             boxSizing: "border-box",
+            opacity: status === "sending" ? 0.6 : 1,
           }}
         />
       </div>
@@ -184,13 +245,20 @@ function ContactForm() {
                 display: "flex",
                 alignItems: "center",
                 gap: 8,
-                cursor: "pointer",
+                cursor: status === "sending" ? "default" : "pointer",
                 fontFamily: SERIF,
                 fontSize: 15,
                 color: INK70,
+                opacity: status === "sending" ? 0.6 : 1,
               }}
             >
-              <input type="checkbox" name="interest" value={opt} style={{ accentColor: INK }} />
+              <input
+                type="checkbox"
+                name="interest"
+                value={opt}
+                disabled={status === "sending"}
+                style={{ accentColor: INK }}
+              />
               {opt}
             </label>
           ))}
@@ -201,21 +269,23 @@ function ContactForm() {
 
       <button
         type="submit"
+        disabled={status === "sending"}
         style={{
           alignSelf: "flex-start",
           padding: "14px 28px",
           background: INK,
           color: PAPER,
           border: "none",
-          cursor: "pointer",
+          cursor: status === "sending" ? "wait" : "pointer",
           fontFamily: GROT,
           fontWeight: 700,
           fontSize: 12,
           letterSpacing: "0.14em",
           textTransform: "uppercase",
+          opacity: status === "sending" ? 0.6 : 1,
         }}
       >
-        Send message →
+        {status === "sending" ? "Sending…" : "Send message →"}
       </button>
     </form>
   );
