@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# swap files
+*.swp
+*.swo
+
+# design handoff archives (not app code)
+frontend_claude_design/
