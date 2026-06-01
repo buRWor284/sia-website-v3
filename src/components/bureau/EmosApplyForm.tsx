@@ -13,6 +13,7 @@ import {
   MONO,
   YEL,
 } from "@/lib/tokens";
+import { Turnstile } from "@/components/Turnstile";
 
 /* =========================================================================
    EMOS Apply Form — Client Component
@@ -44,6 +45,9 @@ export function EmosApplyForm() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+
+  const handleToken = useCallback((token: string) => setTurnstileToken(token), []);
 
   const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -51,13 +55,13 @@ export function EmosApplyForm() {
     setError("");
 
     const form = e.currentTarget;
-    const data = Object.fromEntries(new FormData(form));
+    const formData = Object.fromEntries(new FormData(form)) as Record<string, string>;
 
     try {
       const res = await fetch("/api/emos-apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...formData, turnstileToken }),
       });
 
       if (!res.ok) {
@@ -103,6 +107,15 @@ export function EmosApplyForm() {
 
   return (
     <form onSubmit={handleSubmit}>
+      {/* Honeypot — hidden from real users, bots will fill it */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: "-9999px", opacity: 0, height: 0, overflow: "hidden" }}>
+        <label htmlFor="emos-website">Website</label>
+        <input type="text" id="emos-website" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      {/* Invisible Turnstile */}
+      <Turnstile onToken={handleToken} />
+
       {/* ── Name (required) ── */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 20 }}>
         <div>

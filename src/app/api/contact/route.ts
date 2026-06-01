@@ -8,6 +8,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
@@ -137,11 +139,42 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // ── Rate limiting ──────────────────────────────────────────
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+  const { ok: withinLimit } = rateLimit(ip);
+  if (!withinLimit) {
+    return NextResponse.json(
+      { error: "Too many submissions. Please wait a minute and try again." },
+      { status: 429 }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON." }, { status: 400 });
+  }
+
+  // ── Honeypot check ─────────────────────────────────────────
+  if (body && typeof body === "object" && (body as Record<string, unknown>).website) {
+    // Bot filled the hidden field — silently accept to not tip them off
+    return NextResponse.json({ ok: true });
+  }
+
+  // ── Turnstile verification ─────────────────────────────────
+  const turnstileToken = body && typeof body === "object"
+    ? (body as Record<string, unknown>).turnstileToken as string
+    : null;
+  const turnstileOk = await verifyTurnstile(turnstileToken, ip);
+  if (!turnstileOk) {
+    return NextResponse.json(
+      { error: "Bot verification failed. Please refresh and try again." },
+      { status: 403 }
+    );
   }
 
   const result = validate(body);

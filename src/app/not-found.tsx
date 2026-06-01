@@ -1,5 +1,5 @@
 import { Colophon } from "@/components/bureau";
-import { DoubleRule, Pill, SCaps } from "@/components/bureau/primitives";
+import { DoubleRule, SCaps } from "@/components/bureau/primitives";
 import { CALENDLY, GROT, INK, INK55, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
 
 export default function NotFound() {
@@ -17,54 +17,37 @@ export default function NotFound() {
           textAlign: "center",
         }}
       >
-        <div
+        <h1
           style={{
             fontFamily: SERIF,
             fontWeight: 700,
-            fontSize: "clamp(80px, 14vw, 180px)",
-            lineHeight: 0.85,
-            letterSpacing: "-0.04em",
+            fontSize: "clamp(36px, 5.5vw, 72px)",
+            lineHeight: 1.02,
+            letterSpacing: "-0.03em",
             color: INK,
+            maxWidth: 700,
           }}
         >
-          404
-        </div>
-
-        <DoubleRule style={{ marginTop: 28, marginBottom: 28, maxWidth: 200 }} />
-
-        <Pill size={11} ls="0.22em">Story Not Filed</Pill>
+          You&rsquo;ve taken a wrong turn.
+        </h1>
 
         <p
           style={{
-            marginTop: 24,
-            fontFamily: SERIF,
-            fontSize: 22,
-            fontWeight: 700,
-            color: INK,
-            maxWidth: 500,
-            lineHeight: 1.3,
-            letterSpacing: "-0.01em",
-          }}
-        >
-          Even the best reporters hit a dead end sometimes.
-        </p>
-
-        <p
-          style={{
-            marginTop: 12,
+            marginTop: 16,
             fontFamily: SERIF,
             fontStyle: "italic",
-            fontSize: 16,
+            fontSize: 19,
             color: INK70,
-            maxWidth: 440,
+            maxWidth: 480,
             lineHeight: 1.55,
           }}
         >
-          This page either never existed, got pulled from the archives,
-          or wandered off after deadline. It happens.
+          But hey, the best discoveries happen off the beaten path.
         </p>
 
-        <div style={{ marginTop: 32, display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+        <DoubleRule style={{ marginTop: 36, marginBottom: 36, maxWidth: 200 }} />
+
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
           <a
             href="/"
             style={{
@@ -124,9 +107,9 @@ export default function NotFound() {
 
         <SCaps size={9} ls="0.18em" color={INK55} style={{ marginTop: 40 }}>
           Or try: &nbsp;
-          <a href="/about" style={{ color: INK, textDecoration: "underline" }}>About</a> &nbsp;·&nbsp;
-          <a href="/resources" style={{ color: INK, textDecoration: "underline" }}>Resources</a> &nbsp;·&nbsp;
-          <a href="/emos" style={{ color: INK, textDecoration: "underline" }}>EMOS</a> &nbsp;·&nbsp;
+          <a href="/about" style={{ color: INK, textDecoration: "underline" }}>About</a> &nbsp;&middot;&nbsp;
+          <a href="/resources" style={{ color: INK, textDecoration: "underline" }}>Resources</a> &nbsp;&middot;&nbsp;
+          <a href="/emos" style={{ color: INK, textDecoration: "underline" }}>EMOS</a> &nbsp;&middot;&nbsp;
           <a href="/speaking" style={{ color: INK, textDecoration: "underline" }}>Speaking</a>
         </SCaps>
       </section>

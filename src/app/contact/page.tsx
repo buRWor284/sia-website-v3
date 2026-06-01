@@ -21,7 +21,8 @@ import {
   SERIF,
   YEL,
 } from "@/lib/tokens";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { Turnstile } from "@/components/Turnstile";
 import { ScrollButtons } from "@/components/ScrollButtons";
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -80,6 +81,9 @@ function Hero() {
 function ContactForm() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+
+  const handleToken = useCallback((token: string) => setTurnstileToken(token), []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -95,6 +99,10 @@ function ContactForm() {
       company: formData.get("company") as string,
       message: formData.get("message") as string,
       interests: formData.getAll("interest") as string[],
+      // Honeypot — should always be empty
+      website: formData.get("website") as string,
+      // Turnstile token
+      turnstileToken,
     };
 
     try {
@@ -149,6 +157,15 @@ function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+
+      {/* Honeypot — hidden from real users, bots will fill it */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: "-9999px", opacity: 0, height: 0, overflow: "hidden" }}>
+        <label htmlFor="website">Website</label>
+        <input type="text" id="website" name="website" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      {/* Invisible Turnstile */}
+      <Turnstile onToken={handleToken} />
 
       {/* Error banner */}
       {status === "error" && (

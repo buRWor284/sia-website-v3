@@ -6,6 +6,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
@@ -21,11 +23,39 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // ── Rate limiting ──────────────────────────────────────────
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+  const { ok: withinLimit } = rateLimit(ip);
+  if (!withinLimit) {
+    return NextResponse.json(
+      { error: "Too many submissions. Please wait a minute and try again." },
+      { status: 429 }
+    );
+  }
+
   let body: Record<string, string>;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  // ── Honeypot check ─────────────────────────────────────────
+  if (body.website) {
+    // Bot filled the hidden field — silently accept to not tip them off
+    return NextResponse.json({ success: true, id: "ok" });
+  }
+
+  // ── Turnstile verification ─────────────────────────────────
+  const turnstileOk = await verifyTurnstile(body.turnstileToken, ip);
+  if (!turnstileOk) {
+    return NextResponse.json(
+      { error: "Bot verification failed. Please refresh and try again." },
+      { status: 403 }
+    );
   }
 
   const { first_name, last_name, email, company, tier, arr_range,
