@@ -12,10 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAIL = "sia@syedirfanajmal.com";
 
-// Resend's free-tier "from" when you haven't verified a domain yet.
-// Once you verify syedirfanajmal.com in Resend, change this to e.g.
-// "SIA Website <contact@syedirfanajmal.com>"
-const FROM_EMAIL = "SIA Website <onboarding@resend.dev>";
+const FROM_EMAIL = "Syed Irfan Ajmal <contact@syedirfanajmal.com>";
 
 // ─── Validation ──────────────────────────────────────────────
 
