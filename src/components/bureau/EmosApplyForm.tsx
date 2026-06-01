@@ -95,9 +95,7 @@ export function EmosApplyForm() {
             lineHeight: 1.6,
           }}
         >
-          Syed reviews every submission personally. You&rsquo;ll hear back
-          within 48 hours. Check your inbox (and spam folder) for a reply from{" "}
-          <strong>sia@syedirfanajmal.com</strong>.
+          Syed reviews every submission personally. Expect a response within 48 hours.
         </p>
       </div>
     );
