@@ -35,7 +35,7 @@ export default function EmosPage() {
     <>
       {/* ── Announcement bar ──────────────────────────────────────────── */}
       <div className="emos-announce">
-        Cohort 1 begins <strong>June 8, 2026</strong> &nbsp;·&nbsp; 5 founders
+        Cohort 1 begins <strong>June 22, 2026</strong> &nbsp;·&nbsp; 5 founders
         &nbsp;·&nbsp; Application required
       </div>
 
@@ -532,7 +532,7 @@ export default function EmosPage() {
                 <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.60)", marginBottom: 16 }}>Apply for Cohort 1</div>
                 <div className="emos-apply-grid">
                   <div>
-                    <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: PAPER, lineHeight: 1.1, marginBottom: 16 }}>5 seats. June 8, 2026.<br />Here&#39;s how to claim one.</h3>
+                    <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: PAPER, lineHeight: 1.1, marginBottom: 16 }}>5 seats. June 22, 2026.<br />Here&#39;s how to claim one.</h3>
                     <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: "rgba(241,235,222,.60)" }}>One short application. I review every submission personally within 48 hours. If it&#39;s a fit, I&#39;ll send a Calendly link to talk through the details.</p>
                     <p style={{ marginTop: 14, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.40)" }}>Both tracks include lifetime access to every future EMOS cohort</p>
                   </div>
@@ -608,7 +608,7 @@ export default function EmosPage() {
                 This time next year, your team owns the system. Your name lives in the publications your buyers and investors already trust. The coverage compounds long after the program ends.
               </p>
               <p style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "rgba(241,235,222,.40)", marginBottom: 28 }}>
-                Cohort 1 opens June 8 &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
+                Cohort 1 opens June 22 &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
               </p>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                 <a href="/emos/apply/" className="emos-cta-yellow" style={{ fontSize: 13, padding: "18px 36px" }}>Submit Your Application →</a>
