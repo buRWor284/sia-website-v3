@@ -1,5 +1,16 @@
+import type { Metadata } from "next";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { SCaps } from "@/components/bureau/primitives";
+
+export const metadata: Metadata = {
+  title: "Resources · Playbooks, Guides & Tools — Syed Irfan Ajmal",
+  description:
+    "Free playbooks on personal branding, neuromarketing, storytelling, writing tips, and SEO-PR tools. Practical guides from a fractional CMO with 20+ years in digital marketing.",
+  openGraph: {
+    title: "Resources — Syed Irfan Ajmal",
+    description: "Free playbooks and tools on personal branding, neuromarketing, storytelling, and SEO-PR.",
+  },
+};
 import { ResourcesClientShell } from "@/components/resources/ResourcesClientShell";
 import { GROT, INK, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
 import { ScrollButtons } from "@/components/ScrollButtons";

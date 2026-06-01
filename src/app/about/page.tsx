@@ -1,5 +1,16 @@
+import type { Metadata } from "next";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
+
+export const metadata: Metadata = {
+  title: "About Syed Irfan Ajmal · Career, Press & Recognitions",
+  description:
+    "The story behind SIA — from bootstrapping a remote agency in 2010 to fractional CMO, international speaker, and Forbes/HBR contributor. Career chronicle, press mentions, and recognitions.",
+  openGraph: {
+    title: "About Syed Irfan Ajmal",
+    description: "Career chronicle, press, and recognitions of a fractional CMO, speaker, and earned-media strategist.",
+  },
+};
 import {
   DoubleRule,
   Flag,

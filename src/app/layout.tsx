@@ -28,11 +28,27 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
+  metadataBase: new URL("https://syedirfanajmal.com"),
+  title: {
+    default: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
+    template: "%s — Syed Irfan Ajmal",
+  },
   description:
     "Fractional CMO, international speaker, and founder of DMR.agency. " +
     "Helping founders and marketing teams get found, get covered, and get customers " +
     "through SEO-PR, GEO, and earned media.",
+  openGraph: {
+    type: "website",
+    siteName: "Syed Irfan Ajmal",
+    title: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
+    description:
+      "Fractional CMO, international speaker, and founder of DMR.agency — SEO-PR, GEO, and earned media.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@syedirfanajmal",
+    creator: "@syedirfanajmal",
+  },
   verification: {
     google: process.env.NEXT_PUBLIC_GSC_VERIFICATION,
   },

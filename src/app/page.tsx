@@ -1065,8 +1065,8 @@ export default function HomePage() {
           <div className="footer__copy">© 2026 SYED IRFAN AJMAL · SIA ENTERPRISES INC · WYOMING C-CORP</div>
           <div className="footer__contact">
             <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
-            <a href="/fractional-cmo" className="footer__open">● 1 FRACTIONAL CMO SPOT · Q3 2026</a>
-            <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer" className="footer__open">● EMOS FOUNDING CLASS · APPLY NOW</a>
+            <a href="/fractional-cmo" className="footer__open">● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
+            <a href="/emos" className="footer__open">● EMOS FOUNDING CLASS · APPLY NOW</a>
           </div>
         </div>
       </footer>

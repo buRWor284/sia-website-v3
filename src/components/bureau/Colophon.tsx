@@ -51,7 +51,7 @@ const COLS: ReadonlyArray<FooterCol> = [
 ];
 
 const LEGAL = [
-  { label: "Privacy Policy", href: "/privacy-policy" },
+  { label: "Privacy Policy", href: "/privacy" },
   { label: "Terms",          href: "/terms" },
   { label: "Refund Policy",  href: "/refund-policy" },
 ];

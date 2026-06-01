@@ -1,5 +1,16 @@
+import type { Metadata } from "next";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
+
+export const metadata: Metadata = {
+  title: "Blog · Short-Form Writing — Syed Irfan Ajmal",
+  description:
+    "Short-form posts on SEO, PR, content marketing, remote work, and entrepreneurship by Syed Irfan Ajmal.",
+  openGraph: {
+    title: "Blog — Syed Irfan Ajmal",
+    description: "Short-form posts on SEO, PR, content marketing, and entrepreneurship.",
+  },
+};
 import {
   HRule,
   Mark,

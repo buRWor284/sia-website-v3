@@ -9,7 +9,7 @@ export const SITE = {
     quarter: "Q3",
     year: 2026,
     /** Number of Fractional CMO seats open this quarter */
-    seatsOpen: 2,
+    seatsOpen: 1,
     service: "Fractional CMO",
   },
 } as const;
@@ -18,6 +18,6 @@ export const SITE = {
 export const availabilityLabel =
   `Open for projects, ${SITE.availability.quarter} ${SITE.availability.year}`;
 
-/** "2 seats open · Fractional CMO" */
+/** "1 seats open · Fractional CMO" */
 export const seatsLabel =
   `${SITE.availability.seatsOpen} seats open · ${SITE.availability.service}`;

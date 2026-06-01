@@ -1,5 +1,16 @@
+import type { Metadata } from "next";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
+
+export const metadata: Metadata = {
+  title: "Podcast · The SIA Show — Syed Irfan Ajmal",
+  description:
+    "29 episodes across 3 seasons — conversations with founders, marketers, and operators on SEO, PR, link building, remote work, and growth. Hosted by Syed Irfan Ajmal.",
+  openGraph: {
+    title: "The SIA Show — Podcast",
+    description: "Conversations on SEO, PR, link building, and growth with founders and operators.",
+  },
+};
 import {
   DoubleRule,
   HRule,
