@@ -517,7 +517,7 @@ const EditorsNote = () => (
             color: INK70,
           }}
         >
-          Peshawar · Founded DMR.agency 2010
+          Peshawar · Founded DMR.agency 2013
         </div>
       </div>
       <div>

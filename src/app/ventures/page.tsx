@@ -180,7 +180,7 @@ function Hero() {
             VENTURES
           </div>
           <SCaps size={10} ls="0.24em" color={INK55}>
-            Ventures &amp; Enterprises &nbsp;·&nbsp; Est. 2010
+            Ventures &amp; Enterprises &nbsp;·&nbsp; Est. 2004
           </SCaps>
           <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
             The businesses<br />

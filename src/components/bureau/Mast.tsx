@@ -77,7 +77,7 @@ export const Mast = ({
               </Link>
               <div style={{ marginTop: 6 }}>
                 <SCaps size={10.5} ls="0.22em" color={INK55}>
-                  SEO-PR &nbsp;·&nbsp; GEO &nbsp;·&nbsp; Content Marketing
+                  GEO &nbsp;·&nbsp; SEO-PR &nbsp;·&nbsp; Content Marketing
                 </SCaps>
               </div>
             </div>

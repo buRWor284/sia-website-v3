@@ -36,13 +36,13 @@ export const metadata: Metadata = {
   description:
     "Fractional CMO, international speaker, and founder of DMR.agency. " +
     "Helping founders and marketing teams get found, get covered, and get customers " +
-    "through SEO-PR, GEO, and earned media.",
+    "through GEO, SEO-PR, and earned media.",
   openGraph: {
     type: "website",
     siteName: "Syed Irfan Ajmal",
     title: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
     description:
-      "Fractional CMO, international speaker, and founder of DMR.agency — SEO-PR, GEO, and earned media.",
+      "Fractional CMO, international speaker, and founder of DMR.agency — GEO, SEO-PR, and earned media.",
   },
   twitter: {
     card: "summary_large_image",

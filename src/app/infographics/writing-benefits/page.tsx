@@ -1013,7 +1013,7 @@ const EditorsNote = () => (
           marginTop: 4, fontFamily: SERIF, fontStyle: "italic",
           fontSize: 16, color: INK70,
         }}>
-          Peshawar · Founded the bureau 2010
+          Peshawar · Est. 2004
         </div>
       </div>
       <div>

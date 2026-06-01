@@ -82,7 +82,7 @@ export const SiteHeader = () => {
               letterSpacing: ".22em", textTransform: "uppercase",
               color: CREAM45, marginTop: 3,
             }}>
-              SEO-PR &nbsp;·&nbsp; GEO &nbsp;·&nbsp; Content Marketing
+              GEO &nbsp;·&nbsp; SEO-PR &nbsp;·&nbsp; Content Marketing
             </div>
           </div>
         </div>

@@ -66,6 +66,12 @@ const nextConfig: NextConfig = {
       // Contact
       { source: "/contacting-syed-irfan-ajmal",  destination: "/contact", permanent: p },
       { source: "/contacting-syed-irfan-ajmal/", destination: "/contact", permanent: p },
+
+      // CollabIQ — canonical URL is /tools/collabiq; retire stale routes
+      { source: "/tools/collab-link-building",     destination: "/tools/collabiq", permanent: p },
+      { source: "/tools/collab-link-building/",    destination: "/tools/collabiq", permanent: p },
+      { source: "/resources/collab-link-building",  destination: "/tools/collabiq", permanent: p },
+      { source: "/resources/collab-link-building/", destination: "/tools/collabiq", permanent: p },
     ];
   },
   turbopack: {
