@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAIL = "sia@syedirfanajmal.com";
-const FROM_EMAIL = "EMOS Applications <noreply@syedirfanajmal.com>";
+const FROM_EMAIL = "EMOS Applications <emos@syedirfanajmal.com>";
 
 export async function POST(req: NextRequest) {
   const key = process.env.RESEND_API_KEY;
