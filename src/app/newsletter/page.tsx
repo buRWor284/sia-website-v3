@@ -5,7 +5,7 @@ import { DoubleRule, Pill, SCaps } from "@/components/bureau/primitives";
 import { GROT, INK, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
 
 export const metadata: Metadata = {
-  title: "Newsletter · Two Emails a Month — Syed Irfan Ajmal",
+  title: "Newsletter — Syed Irfan Ajmal",
   description:
     "Real case studies. Unfiltered lessons. Two emails a month from a fractional CMO with 20+ years in the trenches.",
 };
@@ -23,8 +23,11 @@ export default function NewsletterPage() {
         </h1>
         <p style={{ marginTop: 16, fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: INK70, maxWidth: 520, lineHeight: 1.55, margin: "16px auto 0" }}>
           Real case studies, unfiltered lessons, and the occasional behind-the-scenes
-          dispatch — from a fractional CMO with 20+ years in the trenches.
+          dispatch from a fractional CMO with 20+ years in the trenches.
         </p>
+        <SCaps size={10} ls="0.18em" color={INK55} style={{ marginTop: 24, display: "block" }}>
+          Join below.
+        </SCaps>
       </section>
       <Subscriptions sectionNumber="01" />
       <Colophon />

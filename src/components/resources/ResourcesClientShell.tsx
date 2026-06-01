@@ -1061,9 +1061,7 @@ function ContentGrid({
           className="res-card-grid"
           style={{
             display: "grid",
-            gap: "1px",
-            background: INK,
-            border: `1px solid ${INK}`,
+            gap: "28px",
           }}
         >
           {liveItems.map((item, i) => {
@@ -1076,6 +1074,7 @@ function ContentGrid({
                   gridColumn: cardOpen ? undefined : "span 1",
                   position: "relative",
                   overflow: "visible",
+                  border: `1px solid ${INK}`,
                 }}
               >
                 <ResourceCard
@@ -1231,20 +1230,14 @@ function ResponsiveGridStyle() {
   return (
     <style>{`
       .res-card-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 960px;
+        margin: 0 auto;
       }
       .res-card-open {
-        grid-column: span 2;
+        grid-column: 1 / -1;
       }
-      @media (max-width: 860px) {
-        .res-card-grid {
-          grid-template-columns: repeat(2, 1fr) !important;
-        }
-        .res-card-open {
-          grid-column: span 1 !important;
-        }
-      }
-      @media (max-width: 560px) {
+      @media (max-width: 660px) {
         .res-card-grid {
           grid-template-columns: 1fr !important;
         }
