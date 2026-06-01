@@ -20,9 +20,9 @@ import { ScrollButtons } from "@/components/ScrollButtons";
 // No centred text.
 
 const TOPICS = [
-  { label: "SEO / GEO Backlinking", sub: "Link building · GEO" },
-  { label: "Digital PR",            sub: "Outreach · HARO" },
-  { label: "Content Marketing",     sub: "Writing · Strategy" },
+  { label: "GEO",          sub: "Brand mentions · AI visibility" },
+  { label: "SEO-PR",       sub: "Digital-PR links · Earned authority" },
+  { label: "Press",        sub: "Persuasive pitches · Linkable assets" },
 ] as const;
 
 const Hero = () => (
@@ -85,7 +85,7 @@ const Hero = () => (
         </div>
 
         <SCaps size={10} ls="0.24em" color={INK55}>
-          A working library &nbsp;·&nbsp; Earned Media &amp; SEO
+          A working library &nbsp;·&nbsp; GEO · SEO-PR · Earned Media
         </SCaps>
 
         <h1

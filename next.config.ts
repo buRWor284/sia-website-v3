@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
       { source: "/insights",        destination: "/resources",        permanent: p },
       { source: "/insights/:path*", destination: "/resources/:path*", permanent: p },
 
+      // /blog → /resources (retiring blog)
+      { source: "/blog",        destination: "/resources",        permanent: p },
+      { source: "/blog/:path*", destination: "/resources/:path*", permanent: p },
+
       // About (merged pages)
       { source: "/bio-of-syed-irfan-ajmal",  destination: "/about", permanent: p },
       { source: "/bio-of-syed-irfan-ajmal/", destination: "/about", permanent: p },
@@ -42,16 +46,16 @@ const nextConfig: NextConfig = {
       { source: "/writing-tips/",                                         destination: "/resources/writing-tips",      permanent: p },
       { source: "/the-ultimate-bing-seo-guide",                           destination: "/resources/writing-tips",      permanent: p },
       { source: "/the-ultimate-bing-seo-guide/",                          destination: "/resources/writing-tips",      permanent: p },
-      { source: "/become-a-good-writer",                                  destination: "/resources/writing-tips",      permanent: p },
-      { source: "/become-a-good-writer/",                                 destination: "/resources/writing-tips",      permanent: p },
-      { source: "/digital-tools-writers-editors",                         destination: "/resources/writing-tips",      permanent: p },
-      { source: "/digital-tools-writers-editors/",                        destination: "/resources/writing-tips",      permanent: p },
-      { source: "/6-productivity-hacks-entrepreneurs",                    destination: "/blog",                       permanent: p },
-      { source: "/6-productivity-hacks-entrepreneurs/",                   destination: "/blog",                       permanent: p },
-      { source: "/google-analytics-content-marketing",                    destination: "/blog",                       permanent: p },
-      { source: "/google-analytics-content-marketing/",                   destination: "/blog",                       permanent: p },
-      { source: "/maximize-ecommerce-conversions-using-product-discovery",destination: "/blog",                       permanent: p },
-      { source: "/maximize-ecommerce-conversions-using-product-discovery/",destination: "/blog",                      permanent: p },
+      { source: "/become-a-good-writer",                                  destination: "/resources",      permanent: p },
+      { source: "/become-a-good-writer/",                                 destination: "/resources",      permanent: p },
+      { source: "/digital-tools-writers-editors",                         destination: "/resources",      permanent: p },
+      { source: "/digital-tools-writers-editors/",                        destination: "/resources",      permanent: p },
+      { source: "/6-productivity-hacks-entrepreneurs",                    destination: "/resources",                       permanent: p },
+      { source: "/6-productivity-hacks-entrepreneurs/",                   destination: "/resources",                       permanent: p },
+      { source: "/google-analytics-content-marketing",                    destination: "/resources",                       permanent: p },
+      { source: "/google-analytics-content-marketing/",                   destination: "/resources",                       permanent: p },
+      { source: "/maximize-ecommerce-conversions-using-product-discovery",destination: "/resources",                       permanent: p },
+      { source: "/maximize-ecommerce-conversions-using-product-discovery/",destination: "/resources",                      permanent: p },
 
       // Infographics — each old slug → the specific interactive page or gallery
       { source: "/top-11-scientific-benefits-writing-infographic",        destination: "/infographics/writing-benefits", permanent: p },
