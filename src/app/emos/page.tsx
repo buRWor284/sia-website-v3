@@ -627,7 +627,7 @@ export default function EmosPage() {
           <footer className="emos-footer sx">
             <div className="max emos-footer-inner">
               <div className="emos-footer-copy">© 2026 Syed Irfan Ajmal &nbsp;·&nbsp; SIA Enterprises Inc</div>
-              <div className="emos-footer-links"><a href="/privacy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="mailto:sia@syedirfanajmal.com">sia@syedirfanajmal.com</a></div>
+              <div className="emos-footer-links"><a href="/privacy-policy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="mailto:sia@syedirfanajmal.com">sia@syedirfanajmal.com</a></div>
             </div>
           </footer>
         </div>

@@ -1641,6 +1641,16 @@ body > * { position: relative; z-index: 2; }
 @media (max-width: 700px) { .emos-process-steps { grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 420px) { .emos-process-steps { grid-template-columns: 1fr; } }
 
+/* ── Apply page grid ────────────────────────────────────────────────────── */
+.emos-apply-page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+@media (max-width: 900px) { .emos-apply-page-grid { grid-template-columns: 1fr; gap: 40px; } }
+
+/* ── Process steps ──────────────────────────────────────────────────────── */
+.emos-process-steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--color-ink-15); border: 1px solid var(--color-ink-15); }
+.emos-process-step-card { padding: 32px 20px; background: var(--color-paper); text-align: center; }
+@media (max-width: 700px) { .emos-process-steps { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 420px) { .emos-process-steps { grid-template-columns: 1fr; } }
+
 /* ── Responsive nav ──────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .emos-nav-items { display: none; }

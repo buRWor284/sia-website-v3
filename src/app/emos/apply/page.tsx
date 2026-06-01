@@ -253,7 +253,7 @@ export default function EmosApplyPage() {
                     }}
                   >
                     <strong>5 seats only.</strong> Cohort 1 starts June 22, 2026.
-                    We close applications as soon as the cohort fills — early
+                    We close applications as soon as the cohort fills &mdash; early
                     applicants get priority on the 15-minute call slots.
                   </p>
                 </div>
@@ -316,7 +316,7 @@ export default function EmosApplyPage() {
                     textAlign: "center" as const,
                   }}
                 >
-                  📋 We review every application and respond within 48 hours.
+                  We review every application and respond within 48 hours.
                 </p>
               </div>
             </div>
