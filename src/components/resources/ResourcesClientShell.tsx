@@ -1069,9 +1069,7 @@ function ContentGrid({
             return (
               <div
                 key={item.id}
-                className={cardOpen ? "res-card-open" : undefined}
                 style={{
-                  gridColumn: cardOpen ? undefined : "span 1",
                   position: "relative",
                   overflow: "visible",
                   border: `1px solid ${INK}`,
@@ -1234,15 +1232,9 @@ function ResponsiveGridStyle() {
         max-width: 960px;
         margin: 0 auto;
       }
-      .res-card-open {
-        grid-column: 1 / -1;
-      }
       @media (max-width: 660px) {
         .res-card-grid {
           grid-template-columns: 1fr !important;
-        }
-        .res-card-open {
-          grid-column: span 1 !important;
         }
       }
     `}</style>
