@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const RESEND_API = "https://api.resend.com/emails";
-const TO_EMAIL = "sia@syedirfanajmal.com";
+const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
 const FROM_EMAIL = "EMOS Applications <emos@syedirfanajmal.com>";
 
 export async function POST(req: NextRequest) {
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         from: FROM_EMAIL,
-        to: [TO_EMAIL],
+        to: TO_EMAILS,
         reply_to: email,
         subject: `EMOS Application: ${first_name} ${last_name} — ${tierLabel}`,
         html,
