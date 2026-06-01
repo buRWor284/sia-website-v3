@@ -10,7 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const RESEND_API = "https://api.resend.com/emails";
-const TO_EMAIL = "sia@syedirfanajmal.com";
+const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
 
 const FROM_EMAIL = "Syed Irfan Ajmal <contact@syedirfanajmal.com>";
 
@@ -100,7 +100,7 @@ async function sendEmail(
   apiKey: string,
   payload: {
     from: string;
-    to: string;
+    to: string | string[];
     reply_to?: string;
     subject: string;
     html: string;
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
     // 1. Send notification to SIA
     await sendEmail(apiKey, {
       from: FROM_EMAIL,
-      to: TO_EMAIL,
+      to: TO_EMAILS,
       reply_to: data.email,
       subject: `[syedirfanajmal.com] ${data.name} — ${data.interests[0] || "General inquiry"}`,
       html: buildNotificationHtml(data),
