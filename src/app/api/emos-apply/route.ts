@@ -11,7 +11,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
-const FROM_EMAIL = "EMOS Applications <emos@syedirfanajmal.com>";
+const FROM_EMAIL = "EMOS Applications <contact@syedirfanajmal.com>";
 
 export async function POST(req: NextRequest) {
   const key = process.env.RESEND_API_KEY;
