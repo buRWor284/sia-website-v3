@@ -192,6 +192,8 @@ const GLOBAL_CSS = `
   @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}}
   .v2-collabiq *{box-sizing:border-box}
   .v2-collabiq input,.v2-collabiq textarea,.v2-collabiq select{font-family:var(--font-grot),sans-serif}
+  .v2-contact-tip:hover .v2-tooltip{display:block!important}
+  .v2-tooltip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1c1a16}
 `;
 
 // ── Stage 0: Animated Explainer ────────────────────────────────────────────────
@@ -621,20 +623,31 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
               <div><span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Link placement</span><span style={{ fontSize: 12, color: INFO, fontWeight: 600, fontFamily: GF }}>{p.linkPage}</span></div>
               <div>
                 <span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Contact</span>
-                <span style={{ fontSize: 12, color: TX2, fontFamily: GF, display: "block" }}>{p.contact}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 12, color: TX2, fontFamily: GF }}>{p.contact}</span>
+                  <span className="v2-contact-tip" style={{ position: "relative", display: "inline-flex", alignItems: "center", cursor: "help" }}>
+                    <span style={{ width: 14, height: 14, borderRadius: "50%", background: "rgba(196,144,10,0.15)", border: `1px solid ${AMB2}`, display: "inline-flex", alignItems: "center", justifyContent: "center", fontFamily: MF, fontSize: 8, fontWeight: 700, color: AMB2, lineHeight: 1, flexShrink: 0 }}>!</span>
+                    <span className="v2-tooltip" style={{
+                      display: "none", position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)",
+                      background: "#1c1a16", border: `1px solid ${AMB2}`, padding: "10px 12px", width: 220, zIndex: 99,
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.3)"
+                    }}>
+                      <div style={{ fontFamily: GF, fontSize: 11, color: "#f1ebde", lineHeight: 1.55, marginBottom: 6 }}>
+                        Contact data is AI-suggested from training knowledge — not verified in real time. Names and LinkedIn URLs may be outdated or inaccurate. Always verify before outreach.
+                      </div>
+                      <div style={{ fontFamily: MF, fontSize: 9, color: AMB2, letterSpacing: "0.04em" }}>
+                        ✦ Verified real-time contacts coming soon
+                      </div>
+                    </span>
+                  </span>
+                </div>
                 <div style={{ marginTop: 4 }}>
                   {p.contactLinkedIn ? (
-                    <>
-                      <a href={`https://${p.contactLinkedIn.replace(/^https?:\/\//,"")}`} target="_blank" rel="noopener noreferrer"
-                        style={{ fontFamily: MF, fontSize: 8, color: INFO, textDecoration: "none", letterSpacing: "0.04em" }}>View LinkedIn profile ↗</a>
-                      <span style={{ fontFamily: MF, fontSize: 8, color: TX4, marginLeft: 6 }}>· AI-suggested, verify before outreach</span>
-                    </>
+                    <a href={`https://${p.contactLinkedIn.replace(/^https?:\/\//,"")}`} target="_blank" rel="noopener noreferrer"
+                      style={{ fontFamily: MF, fontSize: 8, color: INFO, textDecoration: "none", letterSpacing: "0.04em" }}>View LinkedIn profile ↗</a>
                   ) : (
-                    <>
-                      <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(p.contact + " " + p.name)}`} target="_blank" rel="noopener noreferrer"
-                        style={{ fontFamily: MF, fontSize: 8, color: INFO, textDecoration: "none", letterSpacing: "0.04em" }}>Search LinkedIn ↗</a>
-                      <span style={{ fontFamily: MF, fontSize: 8, color: TX4, marginLeft: 6 }}>· searches by role + company; results vary</span>
-                    </>
+                    <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(p.contact + " " + p.name)}`} target="_blank" rel="noopener noreferrer"
+                      style={{ fontFamily: MF, fontSize: 8, color: INFO, textDecoration: "none", letterSpacing: "0.04em" }}>Search LinkedIn ↗</a>
                   )}
                 </div>
               </div>
