@@ -81,16 +81,16 @@ export const SiteHeader = () => {
         {/* Right: availability CTAs — one row with gap */}
         <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <a href="/fractional-cmo" style={{
-            fontFamily: GROT, fontWeight: 700, fontSize: 11,
+            fontFamily: GROT, fontWeight: 700, fontSize: 9,
             letterSpacing: ".14em", textTransform: "uppercase",
-            color: YEL, textDecoration: "none", whiteSpace: "nowrap",
+            color: "#2e90c3", textDecoration: "none", whiteSpace: "nowrap",
           }}>
             ● 2 FRACTIONAL CMO SPOTS · Q3 2026
           </a>
           <a href="/emos" style={{
-            fontFamily: GROT, fontWeight: 700, fontSize: 11,
+            fontFamily: GROT, fontWeight: 700, fontSize: 9,
             letterSpacing: ".14em", textTransform: "uppercase",
-            color: YEL, textDecoration: "none", whiteSpace: "nowrap",
+            color: "#2e90c3", textDecoration: "none", whiteSpace: "nowrap",
           }}>
             ● EMOS FOUNDING CLASS · APPLY NOW
           </a>
