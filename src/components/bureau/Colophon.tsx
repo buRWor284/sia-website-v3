@@ -42,6 +42,7 @@ const COLS: ReadonlyArray<FooterCol> = [
       { label: "LinkedIn ↗",       href: "https://www.linkedin.com/in/syedirfanajmal/",                     external: true },
       { label: "YouTube ↗",        href: "https://youtube.com/@syedirfanajmal/",                             external: true },
       { label: "Apple Podcasts ↗", href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466", external: true },
+      { label: "Spotify ↗",        href: "https://creators.spotify.com/pod/profile/syedirfanajmal/episodes/",   external: true },
     ],
   },
 ];
