@@ -790,7 +790,7 @@ function ClosingCTA() {
               marginTop: 22,
               fontFamily: SERIF,
               fontSize: 18,
-              color: "rgba(241,235,222,.72)",
+              color: "rgba(250,250,250,.72)",
               lineHeight: 1.55,
               maxWidth: 480,
             }}
@@ -817,7 +817,7 @@ function ClosingCTA() {
                 padding: "18px 28px",
                 background: primary ? YEL : "transparent",
                 color: primary ? INK : PAPER,
-                border: primary ? `1px solid ${YEL}` : "1px solid rgba(241,235,222,.35)",
+                border: primary ? `1px solid ${YEL}` : "1px solid rgba(250,250,250,.35)",
                 textDecoration: "none",
                 fontFamily: GROT,
                 fontWeight: primary ? 800 : 700,

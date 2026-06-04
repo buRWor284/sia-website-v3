@@ -93,7 +93,7 @@ const MailchimpForm = () => {
           onClick={() => { setStatus("idle"); setEmail(""); setGdpr({ "2381": false }); }}
           style={{
             marginTop: 18, padding: "12px 16px", background: "transparent",
-            color: PAPER, border: "1px solid rgba(241,235,222,.5)",
+            color: PAPER, border: "1px solid rgba(250,250,250,.5)",
             cursor: "pointer", fontFamily: GROT, fontWeight: 700,
             fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase",
           }}
@@ -117,7 +117,7 @@ const MailchimpForm = () => {
           className="sub-input"
           style={{
             flex: 1, padding: "18px 18px",
-            border: "1px solid rgba(241,235,222,.5)", borderRight: "none",
+            border: "1px solid rgba(250,250,250,.5)", borderRight: "none",
             background: "transparent", color: PAPER,
             fontFamily: SERIF, fontSize: 17, outline: "none", minWidth: 0,
           }}
@@ -146,8 +146,8 @@ const MailchimpForm = () => {
 
       {/* GDPR Marketing Permissions */}
       <div id="mergeRow-gdpr" style={{ marginTop: 22 }}>
-        <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.55)">Marketing Permissions</SCaps>
-        <p style={{ margin: "8px 0 10px", fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.45)", lineHeight: 1.5, fontStyle: "italic" }}>
+        <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.55)">Marketing Permissions</SCaps>
+        <p style={{ margin: "8px 0 10px", fontFamily: SERIF, fontSize: 13.5, color: "rgba(250,250,250,.45)", lineHeight: 1.5, fontStyle: "italic" }}>
           Select the ways you&rsquo;d like to hear from SIA Enterprises:
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -157,7 +157,7 @@ const MailchimpForm = () => {
               style={{
                 display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
                 fontFamily: GROT, fontSize: 12, letterSpacing: "0.12em",
-                textTransform: "uppercase", color: "rgba(241,235,222,.65)",
+                textTransform: "uppercase", color: "rgba(250,250,250,.65)",
               }}
             >
               <input
@@ -172,17 +172,17 @@ const MailchimpForm = () => {
             </label>
           ))}
         </div>
-        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 12.5, color: "rgba(241,235,222,.35)", lineHeight: 1.5, fontStyle: "italic" }}>
+        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 12.5, color: "rgba(250,250,250,.35)", lineHeight: 1.5, fontStyle: "italic" }}>
           You can unsubscribe at any time by clicking the link in the footer of our emails.
           We use Mailchimp to manage our newsletter.{" "}
           <a href="https://mailchimp.com/legal/terms" target="_blank" rel="noreferrer"
-            style={{ color: "rgba(241,235,222,.5)", textUnderlineOffset: 3 }}>Learn more</a>{" "}
+            style={{ color: "rgba(250,250,250,.5)", textUnderlineOffset: 3 }}>Learn more</a>{" "}
           about their privacy practices.
         </p>
       </div>
 
       <div style={{ marginTop: 14 }}>
-        <SCaps size={10.5} ls="0.14em" color="rgba(241,235,222,.45)">
+        <SCaps size={10.5} ls="0.14em" color="rgba(250,250,250,.45)">
           No spam · One-click unsubscribe
         </SCaps>
       </div>
@@ -223,10 +223,10 @@ export const Subscriptions = ({
           <br />
           <span style={{ fontStyle: "italic", color: YEL }}>Zero filler.</span>
         </h2>
-        <p style={{ marginTop: 14, marginBottom: 0, fontFamily: GROT, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
+        <p style={{ marginTop: 14, marginBottom: 0, fontFamily: GROT, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(250,250,250,.5)" }}>
           GEO · SEO-PR · Content Marketing
         </p>
-        <p style={{ marginTop: 18, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 480 }}>
+        <p style={{ marginTop: 18, fontFamily: SERIF, fontSize: 18, color: "rgba(250,250,250,.72)", lineHeight: 1.55, maxWidth: 480 }}>
           One or two emails a month. The campaigns I&rsquo;m building right
           now, what&rsquo;s working in earned media, and the case studies
           behind the numbers. Unsubscribe whenever.

@@ -133,11 +133,11 @@ export const SectionMast = ({
           style={{
             flex: 1,
             height: 1,
-            background: dark ? "rgba(241,235,222,.4)" : INK35,
+            background: dark ? "rgba(250,250,250,.4)" : INK35,
           }}
         />
         <SCaps
-          color={dark ? "rgba(241,235,222,.5)" : INK55}
+          color={dark ? "rgba(250,250,250,.5)" : INK55}
           size={11}
           ls="0.18em"
         >
@@ -147,7 +147,7 @@ export const SectionMast = ({
       <div
         style={{
           marginTop: -1,
-          borderTop: `1px solid ${dark ? "rgba(241,235,222,.6)" : INK}`,
+          borderTop: `1px solid ${dark ? "rgba(250,250,250,.6)" : INK}`,
         }}
       />
     </div>

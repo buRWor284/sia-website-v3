@@ -63,7 +63,7 @@ export const SpeakingBand = () => (
             marginTop: 24,
             fontFamily: SERIF,
             fontSize: 18,
-            color: "rgba(241,235,222,.72)",
+            color: "rgba(250,250,250,.72)",
             lineHeight: 1.55,
             maxWidth: 440,
           }}
@@ -101,7 +101,7 @@ export const SpeakingBand = () => (
             key={row[0]}
             className="speaking-row"
             style={{
-              borderBottom: "1px solid rgba(241,235,222,.18)",
+              borderBottom: "1px solid rgba(250,250,250,.18)",
               alignItems: "baseline",
             }}
           >
@@ -109,7 +109,7 @@ export const SpeakingBand = () => (
               <SCaps
                 size={11}
                 ls="0.16em"
-                color="rgba(241,235,222,.5)"
+                color="rgba(250,250,250,.5)"
               >
                 {String(i + 1).padStart(2, "0")}.
               </SCaps>
@@ -131,7 +131,7 @@ export const SpeakingBand = () => (
                   fontFamily: SERIF,
                   fontStyle: "italic",
                   fontSize: 15,
-                  color: "rgba(241,235,222,.7)",
+                  color: "rgba(250,250,250,.7)",
                 }}
               >
                 {row[1]}

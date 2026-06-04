@@ -60,7 +60,7 @@ export function TocBar() {
             display: "flex",
             alignItems: "center",
             paddingRight: 20,
-            borderRight: "1px solid rgba(241,235,222,.15)",
+            borderRight: "1px solid rgba(250,250,250,.15)",
             marginRight: 6,
             flexShrink: 0,
           }}
@@ -72,7 +72,7 @@ export function TocBar() {
               fontSize: 10,
               letterSpacing: "0.28em",
               textTransform: "uppercase",
-              color: "rgba(241,235,222,.4)",
+              color: "rgba(250,250,250,.4)",
             }}
           >
             Resources
@@ -96,7 +96,7 @@ export function TocBar() {
                 fontSize: 10.5,
                 letterSpacing: "0.18em",
                 textTransform: "uppercase",
-                color: isActive ? YEL : "rgba(241,235,222,.55)",
+                color: isActive ? YEL : "rgba(250,250,250,.55)",
                 borderBottom: isActive ? `2px solid ${YEL}` : "2px solid transparent",
                 marginBottom: -2,
                 whiteSpace: "nowrap",
@@ -108,7 +108,7 @@ export function TocBar() {
                   fontWeight: 700,
                   fontSize: 9,
                   letterSpacing: "0.08em",
-                  color: isActive ? YEL : "rgba(241,235,222,.3)",
+                  color: isActive ? YEL : "rgba(250,250,250,.3)",
                 }}
               >
                 §0{i + 1}

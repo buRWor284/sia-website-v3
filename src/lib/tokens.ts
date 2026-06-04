@@ -4,8 +4,8 @@
  * faithful to the prototype `style={{}}` measurements.
  */
 
-export const PAPER   = "#f1ebde";
-export const PAPER2  = "#e8e0cc";
+export const PAPER   = "#FAFAFA";
+export const PAPER2  = "#F0F0EE";
 export const INK     = "#1a1410";
 export const INK70   = "rgba(26,20,16,.70)";
 export const INK55   = "rgba(26,20,16,.55)";

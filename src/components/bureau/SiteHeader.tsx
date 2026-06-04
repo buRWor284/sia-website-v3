@@ -7,11 +7,11 @@ import { CALENDLY, GROT, INK, SERIF, YEL, YEL2 } from "@/lib/tokens";
 import { availabilityLabel } from "@/lib/site-config";
 
 /* ─── Token aliases matching homepage design ──────────────────────────────── */
-const CREAM   = "#f1ebde";
-const CREAM50 = "rgba(241,235,222,.50)";
-const CREAM45 = "rgba(241,235,222,.45)";
-const CREAM40 = "rgba(241,235,222,.40)";
-const CREAM12 = "rgba(241,235,222,.12)";
+const CREAM   = "#FAFAFA";
+const CREAM50 = "rgba(250,250,250,.50)";
+const CREAM45 = "rgba(250,250,250,.45)";
+const CREAM40 = "rgba(250,250,250,.40)";
+const CREAM12 = "rgba(250,250,250,.12)";
 
 const NAV: ReadonlyArray<{ label: string; href: string; matchPrefix?: string }> = [
   { label: "Home",           href: "/"              },
@@ -188,9 +188,9 @@ export const SiteHeader = () => {
             onClick={() => setMenuOpen(false)}
             style={{
               padding: "12px 0",
-              borderBottom: `1px solid rgba(241,235,222,.10)`,
+              borderBottom: `1px solid rgba(250,250,250,.10)`,
               fontFamily: GROT, fontSize: 15, fontWeight: 600,
-              color: "rgba(241,235,222,.8)",
+              color: "rgba(250,250,250,.8)",
               textDecoration: "none",
             }}
           >

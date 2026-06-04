@@ -206,8 +206,8 @@ const StatBlock = ({ stat, label, dark }: { stat: string; label: string; dark?: 
   const fs  = len > 10 ? 32 : len > 6 ? 40 : 52;
   return (
     <div style={{
-      borderTop: `1px solid ${dark ? "rgba(241,235,222,.5)" : INK}`,
-      borderBottom: `1px solid ${dark ? "rgba(241,235,222,.5)" : INK}`,
+      borderTop: `1px solid ${dark ? "rgba(250,250,250,.5)" : INK}`,
+      borderBottom: `1px solid ${dark ? "rgba(250,250,250,.5)" : INK}`,
       padding: "14px 0",
     }}>
       <div style={{
@@ -218,7 +218,7 @@ const StatBlock = ({ stat, label, dark }: { stat: string; label: string; dark?: 
         marginTop: 6,
         fontFamily: GROT, fontSize: 10.5, fontWeight: 600,
         letterSpacing: "0.14em", textTransform: "uppercase",
-        color: dark ? "rgba(241,235,222,.7)" : INK70,
+        color: dark ? "rgba(250,250,250,.7)" : INK70,
         lineHeight: 1.35,
       }}>{label}</div>
     </div>
@@ -482,7 +482,7 @@ const BenefitCard = ({
           <div>
             <p style={{
               margin: 0, fontFamily: SERIF, fontSize: 17.5,
-              lineHeight: 1.5, color: "rgba(241,235,222,.85)",
+              lineHeight: 1.5, color: "rgba(250,250,250,.85)",
             }}>
               {b.finding}
             </p>
@@ -502,7 +502,7 @@ const BenefitCard = ({
           <div>
             <StatBlock stat={b.stat} label={b.statLabel} dark />
             <div style={{ marginTop: 18 }}>
-              <SCaps size={10.5} ls="0.22em" color="rgba(241,235,222,.55)">
+              <SCaps size={10.5} ls="0.22em" color="rgba(250,250,250,.55)">
                 Source · the receipts
               </SCaps>
               <div style={{
@@ -513,20 +513,20 @@ const BenefitCard = ({
               </div>
               <div style={{
                 marginTop: 4, fontFamily: SERIF, fontStyle: "italic",
-                fontSize: 14.5, color: "rgba(241,235,222,.7)", lineHeight: 1.4,
+                fontSize: 14.5, color: "rgba(250,250,250,.7)", lineHeight: 1.4,
               }}>
                 {b.journal}
               </div>
             </div>
             <div style={{ marginTop: 22 }}>
-              <SCaps size={10.5} ls="0.22em" color="rgba(241,235,222,.55)">
+              <SCaps size={10.5} ls="0.22em" color="rgba(250,250,250,.55)">
                 Active brain regions
               </SCaps>
               <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 6 }}>
                 {b.brain.map(r => (
                   <span key={r} style={{
                     padding: "5px 9px",
-                    border: "1px solid rgba(241,235,222,.45)",
+                    border: "1px solid rgba(250,250,250,.45)",
                     fontFamily: MONO, fontSize: 11, color: PAPER,
                     letterSpacing: "0.04em",
                   }}>
@@ -955,13 +955,13 @@ const Receipts = () => {
       <SectionMast n="04" label="Receipts · The studies, in order" dark />
       <div style={{
         display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 0,
-        borderTop: "1px solid rgba(241,235,222,.4)",
+        borderTop: "1px solid rgba(250,250,250,.4)",
       }}>
         {cites.map(([who, yr, jrnl, note], i) => (
           <div key={i} style={{
             padding: "20px 22px",
-            borderBottom: "1px solid rgba(241,235,222,.25)",
-            borderRight: (i % 3) !== 2 ? "1px solid rgba(241,235,222,.25)" : "none",
+            borderBottom: "1px solid rgba(250,250,250,.25)",
+            borderRight: (i % 3) !== 2 ? "1px solid rgba(250,250,250,.25)" : "none",
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <span style={{
@@ -969,7 +969,7 @@ const Receipts = () => {
                 letterSpacing: "0.16em", color: YEL,
               }}>{yr}</span>
               <span style={{
-                fontFamily: MONO, fontSize: 10, color: "rgba(241,235,222,.45)",
+                fontFamily: MONO, fontSize: 10, color: "rgba(250,250,250,.45)",
               }}>Nº {String(i + 1).padStart(2, "0")}</span>
             </div>
             <div style={{
@@ -978,11 +978,11 @@ const Receipts = () => {
             }}>{who}</div>
             <div style={{
               marginTop: 4, fontFamily: SERIF, fontStyle: "italic",
-              fontSize: 14, color: "rgba(241,235,222,.7)",
+              fontSize: 14, color: "rgba(250,250,250,.7)",
             }}>{jrnl}</div>
             <div style={{
               marginTop: 10, fontFamily: SERIF, fontSize: 14.5,
-              color: "rgba(241,235,222,.85)", lineHeight: 1.45,
+              color: "rgba(250,250,250,.85)", lineHeight: 1.45,
             }}>{note}</div>
           </div>
         ))}

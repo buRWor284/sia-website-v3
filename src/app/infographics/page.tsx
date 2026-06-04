@@ -224,7 +224,7 @@ const InfographicCard = ({ card }: { card: InfographicCard }) => {
           fontStyle: "italic",
           fontSize: 15.5,
           lineHeight: 1.5,
-          color: card.status === "live" ? "rgba(241,235,222,.72)" : INK70,
+          color: card.status === "live" ? "rgba(250,250,250,.72)" : INK70,
           flex: 1,
         }}
       >
@@ -235,7 +235,7 @@ const InfographicCard = ({ card }: { card: InfographicCard }) => {
         style={{
           marginTop: 20,
           paddingTop: 14,
-          borderTop: `1px solid ${card.status === "live" ? "rgba(241,235,222,.25)" : INK15}`,
+          borderTop: `1px solid ${card.status === "live" ? "rgba(250,250,250,.25)" : INK15}`,
           display: "flex",
           justifyContent: "space-between",
           alignItems: "baseline",
@@ -244,7 +244,7 @@ const InfographicCard = ({ card }: { card: InfographicCard }) => {
         <SCaps
           size={10}
           ls="0.14em"
-          color={card.status === "live" ? "rgba(241,235,222,.5)" : INK55}
+          color={card.status === "live" ? "rgba(250,250,250,.5)" : INK55}
         >
           {card.year}
         </SCaps>

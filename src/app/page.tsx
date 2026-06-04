@@ -260,16 +260,16 @@ const css = `
     font-size: 28px; font-weight: 700; color: rgba(245,197,24,.55);
   }
   .case-card__client {
-    font-family: var(--mono); font-size: 11px; color: rgba(241,235,222,.5);
+    font-family: var(--mono); font-size: 11px; color: rgba(250,250,250,.5);
     letter-spacing: .12em; margin-top: 12px; text-transform: uppercase;
   }
   .case-card__result {
     font-family: var(--sans); font-weight: 800; font-size: 21px;
-    color: #f1ebde; line-height: 1.12; letter-spacing: -.01em;
+    color: #FAFAFA; line-height: 1.12; letter-spacing: -.01em;
     margin-top: 18px;
   }
   .case-card__body {
-    font-family: var(--sans); font-size: 15px; color: rgba(241,235,222,.62);
+    font-family: var(--sans); font-size: 15px; color: rgba(250,250,250,.62);
     line-height: 1.55; margin-top: 14px; flex: 1;
   }
   .case-card__link {
@@ -279,7 +279,7 @@ const css = `
     text-transform: uppercase; border-bottom: 1px solid var(--RED);
     padding-bottom: 3px; align-self: flex-start;
   }
-  .case-card__link:hover { color: #f1ebde; border-color: #f1ebde; }
+  .case-card__link:hover { color: #FAFAFA; border-color: #FAFAFA; }
 
   /* ── TESTIMONIALS ───────────────────────────────────────── */
   .testimonials { background: var(--BG2); padding: 100px 56px; }

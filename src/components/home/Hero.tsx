@@ -222,7 +222,7 @@ export const Hero = () => (
           fontSize: 10,
           letterSpacing: "0.30em",
           textTransform: "uppercase",
-          color: "rgba(241,235,222,.45)",
+          color: "rgba(250,250,250,.45)",
         }}>
           The Work
         </div>
@@ -272,7 +272,7 @@ export const Hero = () => (
           <div className="provenance-row" style={{ borderBottom: `1px solid ${INK35}` }}>
             <div
               className="provenance-label"
-              style={{ padding: "14px 20px", background: "#e8e0cc", display: "flex", alignItems: "center" }}
+              style={{ padding: "14px 20px", background: "#F0F0EE", display: "flex", alignItems: "center" }}
             >
               <SCaps size={10.5} ls="0.18em" color={INK55}>Since 2004 · Clients across</SCaps>
             </div>
@@ -309,7 +309,7 @@ export const Hero = () => (
           <div className="provenance-row">
             <div
               className="provenance-label"
-              style={{ padding: "14px 20px", background: "#e8e0cc", display: "flex", alignItems: "center" }}
+              style={{ padding: "14px 20px", background: "#F0F0EE", display: "flex", alignItems: "center" }}
             >
               <SCaps size={10.5} ls="0.18em" color={INK55}>Prior Work + Education</SCaps>
             </div>

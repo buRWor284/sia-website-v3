@@ -578,7 +578,7 @@ function renderPartnersOutput(text: string): React.ReactNode {
   const intro = sections[0];
   if (intro && !/^##/.test(intro.trim())) {
     const introText = intro.replace(/^#[^\n]+\n/, "").trim();
-    if (introText) cards.push(<p key="intro" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(241,235,222,.65)", lineHeight: 1.7, marginBottom: 20 }}>{introText}</p>);
+    if (introText) cards.push(<p key="intro" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(250,250,250,.65)", lineHeight: 1.7, marginBottom: 20 }}>{introText}</p>);
   }
   const partnerSections = sections.filter(s => /^##\s*\d+\./.test(s.trim()));
   partnerSections.forEach((sec, idx) => {
@@ -617,10 +617,10 @@ function renderBriefOutput(text: string): React.ReactNode {
   const nodes: React.ReactNode[] = [];
   let buf: string[] = []; let listBuf: string[] = [];
   const flushPara = () => { if (!buf.length) return; const j = buf.join(" ").trim(); if (j) nodes.push(<p key={nodes.length} style={{ fontFamily: SERIF, fontSize: 15, color: PAPER, lineHeight: 1.8, margin: "0 0 14px" }}>{renderInline(j)}</p>); buf = []; };
-  const flushList = () => { if (!listBuf.length) return; nodes.push(<ul key={nodes.length} style={{ padding: 0, listStyle: "none", margin: "0 0 16px" }}>{listBuf.map((it, i) => (<li key={i} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: `1px solid rgba(241,235,222,.1)`, alignItems: "baseline" }}><span style={{ color: YEL, fontWeight: 700, flexShrink: 0, fontFamily: SERIF }}>→</span><span style={{ fontFamily: SERIF, fontSize: 14.5, color: "rgba(241,235,222,.9)", lineHeight: 1.65 }}>{renderInline(it)}</span></li>))}</ul>); listBuf = []; };
+  const flushList = () => { if (!listBuf.length) return; nodes.push(<ul key={nodes.length} style={{ padding: 0, listStyle: "none", margin: "0 0 16px" }}>{listBuf.map((it, i) => (<li key={i} style={{ display: "flex", gap: 10, padding: "7px 0", borderBottom: `1px solid rgba(250,250,250,.1)`, alignItems: "baseline" }}><span style={{ color: YEL, fontWeight: 700, flexShrink: 0, fontFamily: SERIF }}>→</span><span style={{ fontFamily: SERIF, fontSize: 14.5, color: "rgba(250,250,250,.9)", lineHeight: 1.65 }}>{renderInline(it)}</span></li>))}</ul>); listBuf = []; };
   for (const raw of lines) {
     const line = raw.trimEnd();
-    if (/^##\s+/.test(line)) { flushPara(); flushList(); nodes.push(<div key={nodes.length} style={{ paddingTop: 18, marginBottom: 10, borderTop: "1px solid rgba(241,235,222,.15)" }}><SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.55)">{line.replace(/^##\s+/, "")}</SCaps></div>); }
+    if (/^##\s+/.test(line)) { flushPara(); flushList(); nodes.push(<div key={nodes.length} style={{ paddingTop: 18, marginBottom: 10, borderTop: "1px solid rgba(250,250,250,.15)" }}><SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.55)">{line.replace(/^##\s+/, "")}</SCaps></div>); }
     else if (/^[-•→]\s+/.test(line)) { flushPara(); listBuf.push(line.replace(/^[-•→]\s+/, "")); }
     else if (line === "") { flushPara(); flushList(); }
     else { flushList(); buf.push(line); }
@@ -646,12 +646,12 @@ const AICard = ({ title, description, btnLabel, onClick, loading, result, result
   disabled?: boolean; note?: string;
 }) => (
   <div style={{ background: INK, color: PAPER, padding: "28px 32px", border: `1px solid ${INK}`, margin: "32px 0 0" }}>
-    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, paddingBottom: 16, borderBottom: `1px solid rgba(241,235,222,.18)` }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 18, paddingBottom: 16, borderBottom: `1px solid rgba(250,250,250,.18)` }}>
       <span style={{ width: 9, height: 9, borderRadius: "50%", background: YEL, flexShrink: 0 }} />
-      <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.85)">AI-Powered Feature</SCaps>
+      <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.85)">AI-Powered Feature</SCaps>
     </div>
     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, color: PAPER, lineHeight: 1.1, marginBottom: 10, letterSpacing: "-0.01em" }}>{title}</div>
-    <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(241,235,222,.72)", lineHeight: 1.55, marginBottom: 22 }}>{description}</p>
+    <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(250,250,250,.72)", lineHeight: 1.55, marginBottom: 22 }}>{description}</p>
     <button onClick={onClick} disabled={disabled || loading} style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
       width: "100%", padding: "16px 20px",
@@ -665,12 +665,12 @@ const AICard = ({ title, description, btnLabel, onClick, loading, result, result
       </span>
       {!loading && <span style={{ fontFamily: SERIF, fontSize: 18 }}>→</span>}
     </button>
-    {note && !result && <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.45)", marginTop: 10 }}>{note}</p>}
+    {note && !result && <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(250,250,250,.45)", marginTop: 10 }}>{note}</p>}
     {result && (
-      <div style={{ marginTop: 20, borderTop: `1px solid rgba(241,235,222,.18)`, paddingTop: 20 }}>
+      <div style={{ marginTop: 20, borderTop: `1px solid rgba(250,250,250,.18)`, paddingTop: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <SCaps size={9.5} ls="0.18em" color="rgba(241,235,222,.5)">{resultLabel}</SCaps>
-          <button onClick={() => navigator.clipboard.writeText(result).catch(() => {})} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 14px", background: "transparent", border: `1px solid rgba(241,235,222,.25)`, color: "rgba(241,235,222,.6)", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Copy ↗</button>
+          <SCaps size={9.5} ls="0.18em" color="rgba(250,250,250,.5)">{resultLabel}</SCaps>
+          <button onClick={() => navigator.clipboard.writeText(result).catch(() => {})} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "7px 14px", background: "transparent", border: `1px solid rgba(250,250,250,.25)`, color: "rgba(250,250,250,.6)", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", cursor: "pointer" }}>Copy ↗</button>
         </div>
         <div style={{ background: detectOutputType(result) === "brief" ? "rgba(0,0,0,.3)" : "transparent", padding: detectOutputType(result) === "brief" ? "22px 24px" : 0, borderLeft: detectOutputType(result) === "brief" ? `3px solid ${YEL}` : "none" }}>
           {renderAIOutput(result)}
@@ -920,11 +920,11 @@ export default function CollabLinkBuildingTool() {
 
       {/* ── AI FEATURES OVERVIEW ─────────────────────────── */}
       <section style={{ background: INK, padding: "40px clamp(24px,5vw,56px)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, paddingBottom: 16, borderBottom: `1px solid rgba(241,235,222,.15)` }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, paddingBottom: 16, borderBottom: `1px solid rgba(250,250,250,.15)` }}>
           <span style={{ width: 9, height: 9, borderRadius: "50%", background: YEL, flexShrink: 0 }} />
-          <SCaps size={11} ls="0.2em" color="rgba(241,235,222,.85)">AI-Powered Features · Available throughout the tool</SCaps>
+          <SCaps size={11} ls="0.2em" color="rgba(250,250,250,.85)">AI-Powered Features · Available throughout the tool</SCaps>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "rgba(241,235,222,.1)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: "rgba(250,250,250,.1)" }}>
           {[
             { step: "Step 2", icon: "🔍", title: "AI Partner Intelligence", desc: "Specific company names, the right LinkedIn contact, and a tailored why-them rationale — generated from your exact business details." },
             { step: "Step 3", icon: "✉️", title: "AI Outreach Email Writer", desc: "A fully written, ready-to-send email personalised to your business, the scored partner, and your chosen strategy. Templates are also pre-filled with your details." },
@@ -938,7 +938,7 @@ export default function CollabLinkBuildingTool() {
                 </span>
               </div>
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER, marginBottom: 8, lineHeight: 1.2 }}>{f.title}</div>
-              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.62)", lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(250,250,250,.62)", lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
         </div>
@@ -1054,7 +1054,7 @@ export default function CollabLinkBuildingTool() {
                   }}>
                     <div style={{ fontSize: 28, marginBottom: 8 }}>{s.icon}</div>
                     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{s.name}</div>
-                    <SCaps size={9.5} ls="0.1em" color={selStrat === s.id ? "rgba(241,235,222,.6)" : INK55}>{s.sub}</SCaps>
+                    <SCaps size={9.5} ls="0.1em" color={selStrat === s.id ? "rgba(250,250,250,.6)" : INK55}>{s.sub}</SCaps>
                   </div>
                 ))}
               </div>
@@ -1106,8 +1106,8 @@ export default function CollabLinkBuildingTool() {
                           </div>
                         )}
                         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, marginBottom: 5 }}>{n.name}</div>
-                        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: sel ? "rgba(241,235,222,.72)" : INK70, lineHeight: 1.5, margin: "0 0 8px" }}>{n.why}</p>
-                        <SCaps size={9} ls="0.1em" color={sel ? "rgba(241,235,222,.45)" : INK55}>{n.example}</SCaps>
+                        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: sel ? "rgba(250,250,250,.72)" : INK70, lineHeight: 1.5, margin: "0 0 8px" }}>{n.why}</p>
+                        <SCaps size={9} ls="0.1em" color={sel ? "rgba(250,250,250,.45)" : INK55}>{n.example}</SCaps>
                         <br />
                         <SCaps size={9} ls="0.08em" color={sel ? "rgba(245,184,31,.7)" : INK55}>Link placement: {n.link}</SCaps>
                       </div>
@@ -1290,10 +1290,10 @@ export default function CollabLinkBuildingTool() {
                   <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 52, color: YEL, lineHeight: 1, letterSpacing: "-0.02em" }}>
                     {Object.keys(scores).length > 0 ? `${scorePct}%` : "—"}
                   </div>
-                  <SCaps size={9.5} ls="0.14em" color="rgba(241,235,222,.5)">Fit Score</SCaps>
+                  <SCaps size={9.5} ls="0.14em" color="rgba(250,250,250,.5)">Fit Score</SCaps>
                 </div>
                 <div style={{ flex: 1, minWidth: 200 }}>
-                  <div style={{ height: 6, background: "rgba(241,235,222,.15)", borderRadius: 3, overflow: "hidden", marginBottom: 12 }}>
+                  <div style={{ height: 6, background: "rgba(250,250,250,.15)", borderRadius: 3, overflow: "hidden", marginBottom: 12 }}>
                     <div style={{ height: "100%", width: `${scorePct}%`, background: YEL, transition: "width .4s ease" }} />
                   </div>
                   <p style={{ fontFamily: SERIF, fontSize: 13.5, color: scorePct >= 70 ? "#7ad4a0" : scorePct >= 45 ? "#f0c070" : "#e08080", lineHeight: 1.55, margin: 0 }}>

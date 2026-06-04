@@ -64,9 +64,9 @@ function buildNotificationHtml(d: ContactPayload): string {
   <p><strong>From:</strong> ${d.name} &lt;${d.email}&gt;</p>
   ${companyLine}
   ${interestLine}
-  <hr style="border: none; border-top: 1px solid #e8e0cc; margin: 20px 0;" />
+  <hr style="border: none; border-top: 1px solid #F0F0EE; margin: 20px 0;" />
   <div style="white-space: pre-wrap; line-height: 1.6;">${d.message}</div>
-  <hr style="border: none; border-top: 1px solid #e8e0cc; margin: 20px 0;" />
+  <hr style="border: none; border-top: 1px solid #F0F0EE; margin: 20px 0;" />
   <p style="font-size: 13px; color: #888;">
     Reply directly to this email to respond to ${d.name}.
   </p>

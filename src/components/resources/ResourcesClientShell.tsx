@@ -555,14 +555,14 @@ function UnderReviewBadge({ open }: { open?: boolean }) {
     <span
       style={{
         padding: "3px 8px",
-        background: open ? "rgba(241,235,222,.15)" : "rgba(26,20,16,.1)",
-        color: open ? "rgba(241,235,222,.55)" : INK55,
+        background: open ? "rgba(250,250,250,.15)" : "rgba(26,20,16,.1)",
+        color: open ? "rgba(250,250,250,.55)" : INK55,
         fontFamily: GROT,
         fontWeight: 800,
         fontSize: 8,
         letterSpacing: "0.2em",
         textTransform: "uppercase",
-        border: `1px solid ${open ? "rgba(241,235,222,.2)" : INK15}`,
+        border: `1px solid ${open ? "rgba(250,250,250,.2)" : INK15}`,
       }}
     >
       Under Review
@@ -575,8 +575,8 @@ function ComingSoonBadge({ open }: { open?: boolean }) {
     <span
       style={{
         padding: "3px 8px",
-        background: open ? "rgba(241,235,222,.15)" : INK,
-        color: open ? "rgba(241,235,222,.55)" : PAPER,
+        background: open ? "rgba(250,250,250,.15)" : INK,
+        color: open ? "rgba(250,250,250,.55)" : PAPER,
         fontFamily: GROT,
         fontWeight: 800,
         fontSize: 8,
@@ -701,9 +701,9 @@ function ResourceCard({
       {/* ── Type row (badge row) ──────────────────────────────────────── */}
       <div
         style={{
-          borderTop: `1px solid ${isOpen ? "rgba(241,235,222,.25)" : INK}`,
-          borderBottom: `1px solid ${isOpen ? "rgba(241,235,222,.25)" : INK}`,
-          borderLeft: `3px solid ${isOpen ? "rgba(241,235,222,.25)" : accent}`,
+          borderTop: `1px solid ${isOpen ? "rgba(250,250,250,.25)" : INK}`,
+          borderBottom: `1px solid ${isOpen ? "rgba(250,250,250,.25)" : INK}`,
+          borderLeft: `3px solid ${isOpen ? "rgba(250,250,250,.25)" : accent}`,
           padding: "10px 20px",
           marginTop: isOpen ? 8 : 12,
           display: "flex",
@@ -743,7 +743,7 @@ function ResourceCard({
               fontFamily: SERIF,
               fontStyle: "italic",
               fontSize: 14.5,
-              color: isOpen ? "rgba(241,235,222,.55)" : INK55,
+              color: isOpen ? "rgba(250,250,250,.55)" : INK55,
               marginTop: 5,
             }}
           >
@@ -807,7 +807,7 @@ function ResourceCard({
                 margin: "0 0 18px",
                 fontFamily: SERIF,
                 fontSize: 15.5,
-                color: "rgba(241,235,222,.78)",
+                color: "rgba(250,250,250,.78)",
                 lineHeight: 1.65,
               }}
             >
@@ -823,13 +823,13 @@ function ResourceCard({
                   key={t}
                   style={{
                     padding: "4px 9px 5px",
-                    border: "1px solid rgba(241,235,222,.2)",
+                    border: "1px solid rgba(250,250,250,.2)",
                     fontFamily: GROT,
                     fontWeight: 700,
                     fontSize: 8.5,
                     letterSpacing: "0.14em",
                     textTransform: "uppercase",
-                    color: "rgba(241,235,222,.45)",
+                    color: "rgba(250,250,250,.45)",
                   }}
                 >
                   {TOPIC_LABEL[t]}
@@ -841,7 +841,7 @@ function ResourceCard({
           {/* CTA row */}
           <div
             style={{
-              borderTop: "1px solid rgba(241,235,222,.15)",
+              borderTop: "1px solid rgba(250,250,250,.15)",
               paddingTop: 16,
               display: "flex",
               alignItems: "center",
@@ -857,7 +857,7 @@ function ResourceCard({
                   fontSize: 10,
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
-                  color: "rgba(241,235,222,.35)",
+                  color: "rgba(250,250,250,.35)",
                 }}
               >
                 Available Soon
@@ -899,7 +899,7 @@ function ResourceCard({
                 fontSize: 9,
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: "rgba(241,235,222,.3)",
+                color: "rgba(250,250,250,.3)",
               }}
             >
               {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
@@ -938,11 +938,11 @@ function FilterBar({
           display: "flex", alignItems: "stretch",
           padding: "0 20px",
           overflowX: "auto",
-          borderBottom: "1px solid rgba(241,235,222,.10)",
+          borderBottom: "1px solid rgba(250,250,250,.10)",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", paddingRight: 20, marginRight: 4, flexShrink: 0, borderRight: "1px solid rgba(241,235,222,.12)" }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(241,235,222,.3)" }}>
+        <div style={{ display: "flex", alignItems: "center", paddingRight: 20, marginRight: 4, flexShrink: 0, borderRight: "1px solid rgba(250,250,250,.12)" }}>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(250,250,250,.3)" }}>
             Type
           </span>
         </div>
@@ -959,14 +959,14 @@ function FilterBar({
                 background: "transparent",
                 fontFamily: GROT, fontWeight: isActive ? 800 : 600,
                 fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase",
-                color: isActive ? YEL : "rgba(241,235,222,.48)",
+                color: isActive ? YEL : "rgba(250,250,250,.48)",
                 borderBottom: isActive ? `2px solid ${YEL}` : "2px solid transparent",
                 marginBottom: -2, whiteSpace: "nowrap",
                 transition: "color 0.12s, border-color 0.12s",
               }}
             >
               {tab.label}
-              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.06em", color: isActive ? YEL : "rgba(241,235,222,.22)" }}>
+              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.06em", color: isActive ? YEL : "rgba(250,250,250,.22)" }}>
                 {cnt}
               </span>
             </button>
@@ -976,7 +976,7 @@ function FilterBar({
 
       {/* Row 2 — Topic pills */}
       <div style={{ display: "flex", alignItems: "center", padding: "7px 20px", gap: 7, overflowX: "auto" }}>
-        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(241,235,222,.28)", flexShrink: 0, marginRight: 4 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(250,250,250,.28)", flexShrink: 0, marginRight: 4 }}>
           Topic
         </span>
         {TOPIC_PILLS.map((topic) => {
@@ -987,9 +987,9 @@ function FilterBar({
               onClick={() => toggleTopic(topic.id)}
               style={{
                 padding: "5px 12px 6px",
-                border: `1px solid ${isActive ? YEL : "rgba(241,235,222,.18)"}`,
+                border: `1px solid ${isActive ? YEL : "rgba(250,250,250,.18)"}`,
                 background: isActive ? YEL : "transparent",
-                color: isActive ? INK : "rgba(241,235,222,.5)",
+                color: isActive ? INK : "rgba(250,250,250,.5)",
                 fontFamily: GROT, fontWeight: isActive ? 800 : 600,
                 fontSize: 9.5, letterSpacing: "0.14em", textTransform: "uppercase",
                 cursor: "pointer", whiteSpace: "nowrap",
@@ -1006,7 +1006,7 @@ function FilterBar({
             style={{
               marginLeft: 4, padding: "4px 10px",
               background: "transparent", border: "none",
-              color: "rgba(241,235,222,.4)",
+              color: "rgba(250,250,250,.4)",
               fontFamily: GROT, fontWeight: 700, fontSize: 9,
               letterSpacing: "0.16em", textTransform: "uppercase",
               cursor: "pointer", flexShrink: 0,
@@ -1015,7 +1015,7 @@ function FilterBar({
             ✕ Clear
           </button>
         )}
-        <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(241,235,222,.22)" }}>
+        <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(250,250,250,.22)" }}>
           {count}
         </span>
       </div>
@@ -1142,12 +1142,12 @@ function PodcastTeaser() {
             The show<br />
             <span style={{ fontStyle: "italic" }}><Mark>on the air.</Mark></span>
           </h2>
-          <p style={{ marginTop: 22, fontFamily: SERIF, fontSize: 19, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 480 }}>
+          <p style={{ marginTop: 22, fontFamily: SERIF, fontSize: 19, color: "rgba(250,250,250,.72)", lineHeight: 1.55, maxWidth: 480 }}>
             39 episodes on earned media, SEO-PR, content marketing, and building a brand that gets found.
           </p>
         </div>
         <div>
-          <div style={{ border: "1px solid rgba(241,235,222,.2)", padding: 32, marginBottom: 16 }}>
+          <div style={{ border: "1px solid rgba(250,250,250,.2)", padding: 32, marginBottom: 16 }}>
             <SCaps size={10.5} ls="0.18em" color={YEL}>Browse the archive</SCaps>
             <p style={{ margin: "14px 0 24px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, lineHeight: 1.25, letterSpacing: "-0.01em" }}>
               All 39 episodes — tactics, case studies, and conversations with marketing leaders.
@@ -1159,7 +1159,7 @@ function PodcastTeaser() {
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             {[{ name: "Apple Podcasts", href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" }, { name: "Spotify", href: "#" }].map((p) => (
               <a key={p.name} href={p.href} target={p.href !== "#" ? "_blank" : undefined} rel={p.href !== "#" ? "noopener noreferrer" : undefined}
-                style={{ padding: "10px 16px", border: "1px solid rgba(241,235,222,.25)", color: "rgba(241,235,222,.6)", textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+                style={{ padding: "10px 16px", border: "1px solid rgba(250,250,250,.25)", color: "rgba(250,250,250,.6)", textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase" }}>
                 {p.name} ↗
               </a>
             ))}

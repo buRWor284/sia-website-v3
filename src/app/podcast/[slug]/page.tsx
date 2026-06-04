@@ -101,7 +101,7 @@ export default async function EpisodePage({
             ls="0.16em"
             color={
               ep.featured_image_url
-                ? "rgba(241,235,222,.6)"
+                ? "rgba(250,250,250,.6)"
                 : INK55
             }
           >
@@ -112,7 +112,7 @@ export default async function EpisodePage({
             ls="0.14em"
             color={
               ep.featured_image_url
-                ? "rgba(241,235,222,.5)"
+                ? "rgba(250,250,250,.5)"
                 : INK35
             }
           >
@@ -145,7 +145,7 @@ export default async function EpisodePage({
               lineHeight: 1.45,
               fontStyle: "italic",
               color: ep.featured_image_url
-                ? "rgba(241,235,222,.75)"
+                ? "rgba(250,250,250,.75)"
                 : INK70,
               maxWidth: 700,
             }}
@@ -159,7 +159,7 @@ export default async function EpisodePage({
             <SCaps
               size={11}
               ls="0.18em"
-              color={ep.featured_image_url ? "rgba(241,235,222,.7)" : INK55}
+              color={ep.featured_image_url ? "rgba(250,250,250,.7)" : INK55}
             >
               Guest · {ep.guest}
               {ep.guest_role ? ` — ${ep.guest_role}` : ""}

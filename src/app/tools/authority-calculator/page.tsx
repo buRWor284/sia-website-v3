@@ -510,7 +510,7 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
                 </div>
                 <div style={{
                   fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5, marginTop: 6,
-                  color: on ? "rgba(241,235,222,.7)" : INK55,
+                  color: on ? "rgba(250,250,250,.7)" : INK55,
                 }}>{t.blurb}</div>
               </div>
               <div style={{ textAlign: "right", flexShrink: 0 }}>
@@ -518,7 +518,7 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
                   {fmt(t.fee)}
                 </div>
                 <SCaps size={9} ls="0.14em"
-                  color={on ? "rgba(241,235,222,.65)" : INK55}
+                  color={on ? "rgba(250,250,250,.65)" : INK55}
                   style={{ display: "block", marginTop: 6 }}>
                   {on ? "Selected ✓" : "one-time"}
                 </SCaps>
@@ -556,7 +556,7 @@ const Result = ({ st }: { st: CalcState }) => {
           </div>
           <p style={{
             margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic",
-            fontSize: 16.5, color: "rgba(241,235,222,.72)", maxWidth: 620, lineHeight: 1.45,
+            fontSize: 16.5, color: "rgba(250,250,250,.72)", maxWidth: 620, lineHeight: 1.45,
           }}>
             Even a partial lift to 2.5% conversion matches the revenue of doubling your traffic budget —
             this is the conservative full case.
@@ -569,14 +569,14 @@ const Result = ({ st }: { st: CalcState }) => {
               [paybackStr(c.fee, c.monthlyGain), "Payback period"],
               [fmt(c.monthlyGain),               "Average monthly gain"],
             ] as [string, string][]).map(([big, lab]) => (
-              <div key={lab} style={{ border: "1px solid rgba(241,235,222,.25)", padding: "18px 20px" }}>
+              <div key={lab} style={{ border: "1px solid rgba(250,250,250,.25)", padding: "18px 20px" }}>
                 <div style={{
                   fontFamily: SERIF, fontWeight: 700,
                   fontSize: "clamp(28px,4vw,40px)", color: PAPER,
                   lineHeight: 1, letterSpacing: "-0.02em",
                 }}>{big}</div>
                 <SCaps size={10} ls="0.14em"
-                  color={"rgba(241,235,222,.6)"}
+                  color={"rgba(250,250,250,.6)"}
                   style={{ display: "block", marginTop: 9 }}>{lab}</SCaps>
               </div>
             ))}
@@ -658,7 +658,7 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
               </h2>
               <p style={{
                 margin: "22px 0 0", fontFamily: SERIF, fontSize: 19,
-                color: "rgba(241,235,222,.85)", lineHeight: 1.55, maxWidth: 600,
+                color: "rgba(250,250,250,.85)", lineHeight: 1.55, maxWidth: 600,
               }}>
                 The system, the contacts, and the live placements — all in one cohort.
                 Alumni have gone on to land Forbes, HBR, HuffPost, and 50+ publications
@@ -675,7 +675,7 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
                   <span>Submit Your Application</span>
                   <span style={{ fontFamily: SERIF, fontSize: "clamp(22px,3vw,28px)", fontWeight: 400 }}>→</span>
                 </a>
-                <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(241,235,222,.6)" }}>
+                <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(250,250,250,.6)" }}>
                   5 minutes · Decision within 48 hours · 5 seats per cohort
                 </p>
               </div>

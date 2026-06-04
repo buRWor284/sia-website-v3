@@ -702,7 +702,7 @@ const BookCall = () => (
             marginTop: 22,
             fontFamily: SERIF,
             fontSize: 17.5,
-            color: "rgba(241,235,222,.72)",
+            color: "rgba(250,250,250,.72)",
             lineHeight: 1.55,
             maxWidth: 520,
           }}
@@ -759,7 +759,7 @@ const BookCall = () => (
           <span style={{ fontFamily: SERIF, fontSize: 22 }}>↗</span>
         </a>
         <div style={{ marginTop: 10 }}>
-          <SCaps size={10.5} ls="0.16em" color="rgba(241,235,222,.55)">
+          <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
             Reply within one working day. Time zone: GMT+5.
           </SCaps>
         </div>

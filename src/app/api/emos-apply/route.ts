@@ -77,24 +77,24 @@ export async function POST(req: NextRequest) {
       <hr style="border: none; border-top: 2px solid #f5b81f; margin: 24px 0;" />
       <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
         <tr>
-          <td style="padding: 10px 12px; font-weight: bold; width: 180px; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Name</td>
-          <td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${first_name} ${last_name}</td>
+          <td style="padding: 10px 12px; font-weight: bold; width: 180px; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Name</td>
+          <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${first_name} ${last_name}</td>
         </tr>
         <tr>
-          <td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Email</td>
-          <td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;"><a href="mailto:${email}">${email}</a></td>
+          <td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Email</td>
+          <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;"><a href="mailto:${email}">${email}</a></td>
         </tr>
-        ${company ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Company</td><td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${company}</td></tr>` : ""}
+        ${company ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Company</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${company}</td></tr>` : ""}
         <tr>
-          <td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Tier</td>
-          <td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${tierLabel}</td>
+          <td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Tier</td>
+          <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${tierLabel}</td>
         </tr>
-        ${arr_range ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">ARR Range</td><td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${arr_range}</td></tr>` : ""}
-        ${timeline_to_raise ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Timeline to Raise</td><td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${timeline_to_raise}</td></tr>` : ""}
-        ${current_press ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Current Press</td><td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${current_press}</td></tr>` : ""}
-        ${what_tried ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">What They've Tried</td><td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${what_tried}</td></tr>` : ""}
-        ${why_now ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Why Now</td><td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${why_now}</td></tr>` : ""}
-        ${message ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #e8e0cc;">Message</td><td style="padding: 10px 12px; border-bottom: 1px solid #e8e0cc;">${message}</td></tr>` : ""}
+        ${arr_range ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">ARR Range</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${arr_range}</td></tr>` : ""}
+        ${timeline_to_raise ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Timeline to Raise</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${timeline_to_raise}</td></tr>` : ""}
+        ${current_press ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Current Press</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${current_press}</td></tr>` : ""}
+        ${what_tried ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">What They've Tried</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${what_tried}</td></tr>` : ""}
+        ${why_now ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Why Now</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${why_now}</td></tr>` : ""}
+        ${message ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Message</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${message}</td></tr>` : ""}
       </table>
       <p style="margin-top: 24px; font-size: 13px; color: #888;">Reply directly to reach the applicant at ${email}.</p>
     </div>

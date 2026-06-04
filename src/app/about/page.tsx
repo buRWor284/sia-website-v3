@@ -428,7 +428,7 @@ const PressArchive = () => (
           <span style={{ background: YEL, color: INK, padding: "0 6px" }}>Quoted in.</span>
         </span>
       </h2>
-      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.65)", lineHeight: 1.55, maxWidth: 520 }}>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(250,250,250,.65)", lineHeight: 1.55, maxWidth: 520 }}>
         100+ bylines and citations across global business, technology, marketing,
         and development — including a print spread in Forbes Middle East.
       </p>
@@ -442,7 +442,7 @@ const PressArchive = () => (
         gap: 20,
         padding: 14,
         background: "#111",
-        border: `1px solid rgba(241,235,222,.18)`,
+        border: `1px solid rgba(250,250,250,.18)`,
         marginBottom: 36,
       }}
       className="forbes-spread"
@@ -456,18 +456,18 @@ const PressArchive = () => (
             &ldquo;How Qatar Can Become The Silicon Valley<br />
             <span style={{ fontStyle: "italic", fontWeight: 600 }}>Of The Arab World.&rdquo;</span>
           </h3>
-          <p style={{ marginTop: 14, fontFamily: SERIF, fontSize: 15.5, color: "rgba(241,235,222,.65)", lineHeight: 1.55, maxWidth: 520 }}>
+          <p style={{ marginTop: 14, fontFamily: SERIF, fontSize: 15.5, color: "rgba(250,250,250,.65)", lineHeight: 1.55, maxWidth: 520 }}>
             Published in the Forbes Middle East Guide print edition, in collaboration
             with Arab Publisher House (APH). One of a small handful of in-print Forbes
             ME bylines by a Pakistani author.
           </p>
         </div>
-        <div style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid rgba(241,235,222,.12)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
-          <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.45)">Forbes ME Guide · 2017 · Print edition</SCaps>
+        <div style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid rgba(250,250,250,.12)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.45)">Forbes ME Guide · 2017 · Print edition</SCaps>
           <SCaps size={10.5} ls="0.16em" color={PAPER}>Featured byline</SCaps>
         </div>
       </div>
-      <figure style={{ margin: 0, padding: 8, background: "#0a0a0a", border: `1px solid rgba(241,235,222,.12)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <figure style={{ margin: 0, padding: 8, background: "#0a0a0a", border: `1px solid rgba(250,250,250,.12)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/personal/forbes-me-print.jpg"
@@ -484,7 +484,7 @@ const PressArchive = () => (
           key={name}
           style={{
             padding: "8px 16px",
-            border: `1px solid rgba(241,235,222,.2)`,
+            border: `1px solid rgba(250,250,250,.2)`,
             fontFamily: SERIF,
             fontWeight: 700,
             fontSize: "clamp(13px, 1.5vw, 16px)",
@@ -498,11 +498,11 @@ const PressArchive = () => (
       <span
         style={{
           padding: "8px 16px",
-          background: "rgba(241,235,222,.08)",
+          background: "rgba(250,250,250,.08)",
           fontFamily: MONO,
           fontSize: 12,
           fontWeight: 700,
-          color: "rgba(241,235,222,.5)",
+          color: "rgba(250,250,250,.5)",
           letterSpacing: "0.1em",
           whiteSpace: "nowrap",
         }}
@@ -775,12 +775,12 @@ const Outro = () => (
       background: INK,
       paddingTop: 90,
       paddingBottom: 90,
-      borderTop: `1px solid rgba(241,235,222,.12)`,
+      borderTop: `1px solid rgba(250,250,250,.12)`,
       borderBottom: `3px solid ${YEL}`,
     }}
   >
     <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
-      <SCaps size={11} ls="0.22em" color="rgba(241,235,222,.5)">A note to close</SCaps>
+      <SCaps size={11} ls="0.22em" color="rgba(250,250,250,.5)">A note to close</SCaps>
       <h2
         className="h2-sm"
         style={{
@@ -815,7 +815,7 @@ const Outro = () => (
           href={CALENDLY}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(241,235,222,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
+          style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(250,250,250,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
           Fractional CMO →
         </a>

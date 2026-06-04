@@ -606,7 +606,7 @@ const EmosCTA = ({
           )}
         </h2>
         <p style={{
-          marginTop: 22, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)",
+          marginTop: 22, fontFamily: SERIF, fontSize: 18, color: "rgba(250,250,250,.72)",
           lineHeight: 1.55, maxWidth: 540,
         }}>
           {body ?? (
@@ -626,7 +626,7 @@ const EmosCTA = ({
           <span>Explore EMOS</span>
           <span style={{ fontFamily: SERIF, fontSize: 20 }}>↗</span>
         </a>
-        <SCaps size={10.5} ls="0.16em" color="rgba(241,235,222,.55)">
+        <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
           dmr.agency/earnedmediaos/
         </SCaps>
       </div>

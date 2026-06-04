@@ -359,8 +359,8 @@ const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
       background: INK, border: `1px solid ${INK}`,
     }}>
       {/* Left: reel list */}
-      <div style={{ borderRight: "1px solid rgba(241,235,222,.18)", display: "flex", flexDirection: "column" }}>
-        <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid rgba(241,235,222,.18)" }}>
+      <div style={{ borderRight: "1px solid rgba(250,250,250,.18)", display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "16px 16px 12px", borderBottom: "1px solid rgba(250,250,250,.18)" }}>
           <h3 style={{
             margin: 0, fontFamily: SERIF, fontWeight: 700,
             fontSize: "clamp(22px, 3vw, 32px)", color: PAPER, lineHeight: 1.0, letterSpacing: "-0.02em",
@@ -368,7 +368,7 @@ const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
             Six reels<br />
             <span style={{ fontStyle: "italic", color: YEL }}>from the road.</span>
           </h3>
-          <p style={{ marginTop: 10, fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.6)", lineHeight: 1.45 }}>
+          <p style={{ marginTop: 10, fontFamily: SERIF, fontSize: 13.5, color: "rgba(250,250,250,.6)", lineHeight: 1.45 }}>
             Click any reel to play.
           </p>
         </div>
@@ -381,13 +381,13 @@ const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
                 display: "grid", gridTemplateColumns: "80px 1fr",
                 gap: 10, padding: "10px 12px", textAlign: "left",
                 background: isActive ? "rgba(245,184,31,.14)" : "transparent",
-                borderBottom: "1px solid rgba(241,235,222,.12)",
+                borderBottom: "1px solid rgba(250,250,250,.12)",
                 borderTop: "none", borderLeft: isActive ? `3px solid ${YEL}` : "3px solid transparent",
                 borderRight: "none",
                 cursor: "pointer", color: PAPER, font: "inherit",
                 transition: "background 0.12s",
               }}>
-                <div style={{ width: 80, height: 50, background: "#000", position: "relative", overflow: "hidden", border: "1px solid rgba(241,235,222,.22)", flexShrink: 0 }}>
+                <div style={{ width: 80, height: 50, background: "#000", position: "relative", overflow: "hidden", border: "1px solid rgba(250,250,250,.22)", flexShrink: 0 }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={`https://i.ytimg.com/vi/${r.id}/hqdefault.jpg`} alt={r.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   {isActive && (
@@ -398,20 +398,20 @@ const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
                 </div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 13, lineHeight: 1.25, color: PAPER, overflow: "hidden", textOverflow: "ellipsis" }}>{r.title}</div>
-                  <div style={{ marginTop: 4 }}><SCaps size={8.5} ls="0.14em" color="rgba(241,235,222,.5)">{r.where}</SCaps></div>
+                  <div style={{ marginTop: 4 }}><SCaps size={8.5} ls="0.14em" color="rgba(250,250,250,.5)">{r.where}</SCaps></div>
                 </div>
               </button>
             );
           })}
         </div>
 
-        <div style={{ padding: 12, borderTop: "1px solid rgba(241,235,222,.18)" }}>
+        <div style={{ padding: 12, borderTop: "1px solid rgba(250,250,250,.18)" }}>
           <a href={PLAYLIST} target="_blank" rel="noopener noreferrer" style={{
             display: "inline-flex", alignItems: "center", gap: 8,
             padding: "10px 16px", background: "transparent", color: PAPER,
             textDecoration: "none", fontFamily: GROT, fontWeight: 700,
             fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase",
-            border: `1px solid rgba(241,235,222,.3)`,
+            border: `1px solid rgba(250,250,250,.3)`,
           }}>
             Full playlist on YouTube ↗
           </a>
@@ -422,16 +422,16 @@ const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
       <div style={{ padding: 14 }}>
         <div style={{
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          padding: "4px 4px 12px", borderBottom: "1px solid rgba(241,235,222,.25)", marginBottom: 12,
+          padding: "4px 4px 12px", borderBottom: "1px solid rgba(250,250,250,.25)", marginBottom: 12,
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: YEL }} />
-            <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.85)">
+            <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.85)">
               Now playing · Reel № {String(active + 1).padStart(2, "0")}
             </SCaps>
           </div>
         </div>
-        <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(241,235,222,.25)", overflow: "hidden" }}>
+        <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(250,250,250,.25)", overflow: "hidden" }}>
           <iframe
             key={v.id}
             src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
@@ -441,9 +441,9 @@ const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
             style={{ width: "100%", height: "100%", border: 0, display: "block" }}
           />
         </div>
-        <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(241,235,222,.25)" }}>
+        <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(250,250,250,.25)" }}>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(16px, 2.5vw, 22px)", color: PAPER, lineHeight: 1.2 }}>{v.title}</div>
-          <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(241,235,222,.75)", lineHeight: 1.4 }}>{v.where}</div>
+          <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(250,250,250,.75)", lineHeight: 1.4 }}>{v.where}</div>
         </div>
       </div>
     </div>

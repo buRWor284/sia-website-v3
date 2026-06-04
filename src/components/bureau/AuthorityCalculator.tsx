@@ -9,8 +9,8 @@ const C = {
   INK55: "rgba(26,20,16,.55)",
   INK35: "rgba(26,20,16,.32)",
   INK15: "rgba(26,20,16,.15)",
-  PAPER: "#f1ebde",
-  PAP2: "#e8e0cc",
+  PAPER: "#FAFAFA",
+  PAP2: "#F0F0EE",
   YEL: "#f5b81f",
   GREEN: "#3e6b45",
   RED: "#c14a32",
@@ -190,7 +190,7 @@ export default function AuthorityCalculator() {
                 }}>
                   <div style={{ fontFamily: C.SERIF, fontWeight: 700, fontSize: 17, lineHeight: 1.1, letterSpacing: "-0.01em" }}>{t.name}</div>
                   <div style={{ fontFamily: C.SERIF, fontWeight: 700, fontSize: 26, color: tier === t.id ? C.YEL : C.INK, lineHeight: 1, letterSpacing: "-0.02em", marginTop: 6 }}>{fmtUSD(t.fee)}</div>
-                  <div style={{ fontFamily: C.GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: tier === t.id ? "rgba(241,235,222,.55)" : C.INK55, marginTop: 6 }}>
+                  <div style={{ fontFamily: C.GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: tier === t.id ? "rgba(250,250,250,.55)" : C.INK55, marginTop: 6 }}>
                     {t.sub}{tier === t.id ? " · selected ✓" : ""}
                   </div>
                 </button>
@@ -236,20 +236,20 @@ export default function AuthorityCalculator() {
 
           {/* Result card (dark) */}
           <div style={{ background: C.INK, padding: "28px 24px", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", right: -10, bottom: -20, fontFamily: C.SERIF, fontWeight: 700, fontSize: 110, lineHeight: 1, letterSpacing: "-0.04em", color: "rgba(241,235,222,.04)", userSelect: "none", pointerEvents: "none" }}>ROI</div>
-            <span style={{ fontFamily: C.GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.50)", display: "block", marginBottom: 6 }}>Your 12-month net improvement</span>
+            <div style={{ position: "absolute", right: -10, bottom: -20, fontFamily: C.SERIF, fontWeight: 700, fontSize: 110, lineHeight: 1, letterSpacing: "-0.04em", color: "rgba(250,250,250,.04)", userSelect: "none", pointerEvents: "none" }}>ROI</div>
+            <span style={{ fontFamily: C.GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,250,250,.50)", display: "block", marginBottom: 6 }}>Your 12-month net improvement</span>
             <div style={{ fontFamily: C.MONO, fontWeight: 700, fontSize: 52, lineHeight: 1, letterSpacing: "-0.025em", color: c.diff >= 0 ? "#7bbf86" : C.RED, marginBottom: 20 }}>
               {fmtUSD(c.diff)}
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", borderTop: "1px solid rgba(241,235,222,.15)" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", borderTop: "1px solid rgba(250,250,250,.15)" }}>
               {([
                 [Math.round(c.roi).toLocaleString() + "%", "ROI on fee"],
                 [fmtPayback(c.fee, c.moGain), "Payback"],
                 [fmtUSDk(c.moGain) + "/mo", "Monthly gain"],
               ] as const).map(([big, lab], i) => (
-                <div key={lab} style={{ padding: "12px 14px", borderRight: i < 2 ? "1px solid rgba(241,235,222,.15)" : "none" }}>
-                  <div style={{ fontFamily: C.MONO, fontWeight: 700, fontSize: 20, color: "#f1ebde", lineHeight: 1 }}>{big}</div>
-                  <div style={{ fontFamily: C.GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(241,235,222,.50)", marginTop: 7 }}>{lab}</div>
+                <div key={lab} style={{ padding: "12px 14px", borderRight: i < 2 ? "1px solid rgba(250,250,250,.15)" : "none" }}>
+                  <div style={{ fontFamily: C.MONO, fontWeight: 700, fontSize: 20, color: "#FAFAFA", lineHeight: 1 }}>{big}</div>
+                  <div style={{ fontFamily: C.GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(250,250,250,.50)", marginTop: 7 }}>{lab}</div>
                 </div>
               ))}
             </div>

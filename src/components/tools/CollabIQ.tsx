@@ -99,7 +99,7 @@ function parsePartners(raw: string): AiPartner[] {
 }
 
 // ── Shared style helpers ──────────────────────────────────────
-const monoLabel = (color = "rgba(241,235,222,0.45)"): React.CSSProperties => ({
+const monoLabel = (color = "rgba(250,250,250,0.45)"): React.CSSProperties => ({
   fontFamily: MONO, fontSize: 9, fontWeight: 700,
   letterSpacing: "0.2em", textTransform: "uppercase" as const,
   color, marginBottom: 12, display: "block",
@@ -269,7 +269,7 @@ export function CollabIQ() {
     const tc=(...c: number[])=>doc.setTextColor(...c);
     const fc=(...c: number[])=>doc.setFillColor(...c);
     const dc=(...c: number[])=>doc.setDrawColor(...c);
-    const BLK=[26,20,16],YELC=[245,184,31],DRK=[14,13,10],PAP=[241,235,222],MID=[107,96,84],MID2=[160,148,130],BDR=[220,210,195],AMB=[168,80,0],BLU=[30,77,128];
+    const BLK=[26,20,16],YELC=[245,184,31],DRK=[14,13,10],PAP=[250,250,250],MID=[107,96,84],MID2=[160,148,130],BDR=[220,210,195],AMB=[168,80,0],BLU=[30,77,128];
     function phdr(){fc(...DRK);doc.rect(0,0,W,11,"F");fc(...YELC);doc.rect(0,0,W,2,"F");tc(...YELC);doc.setFont("helvetica","bold");doc.setFontSize(7);doc.text("COLLABIQ  ·  PARTNERSHIP INTELLIGENCE  ·  SIA WIRE",M,7.5);tc(...MID2);doc.setFont("helvetica","normal");doc.setFontSize(7);doc.text("syedirfanajmal.com",W-M,7.5,{align:"right"});}
     function np(){doc.addPage();phdr();return 22;}
     function need(cy: number,h: number){return cy+h>H-18?np():cy;}
@@ -344,7 +344,7 @@ export function CollabIQ() {
           <div style={{ fontFamily: SERIF, fontSize: 26, fontWeight: 700, color: PAPER, letterSpacing: "-0.025em", lineHeight: 1 }}>
             Collab<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
           </div>
-          <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,0.22)", marginTop: 8, lineHeight: 1.7 }}>
+          <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(250,250,250,0.22)", marginTop: 8, lineHeight: 1.7 }}>
             Partnership intelligence<br />by Syed Irfan Ajmal · SIA Wire
           </div>
         </div>
@@ -363,7 +363,7 @@ export function CollabIQ() {
               const isSel = industry === i && !customInd;
               return (
                 <span key={i} onClick={() => { setIndustry(i); setCustomInd(""); setAiPartners([]); setHasTriggered(false); prevKey.current = ""; }}
-                  style={{ padding: "5px 9px", border: `1px solid ${isSel ? YEL : DARK_BORDER}`, fontSize: 11, fontWeight: 600, cursor: "pointer", background: isSel ? YEL : "transparent", color: isSel ? DARK : "rgba(241,235,222,0.38)", transition: "all 0.1s", userSelect: "none" }}>
+                  style={{ padding: "5px 9px", border: `1px solid ${isSel ? YEL : DARK_BORDER}`, fontSize: 11, fontWeight: 600, cursor: "pointer", background: isSel ? YEL : "transparent", color: isSel ? DARK : "rgba(250,250,250,0.38)", transition: "all 0.1s", userSelect: "none" }}>
                   {i}
                 </span>
               );
@@ -377,7 +377,7 @@ export function CollabIQ() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${DARK_BORDER}` }}>
             {(["discount","institution","badge"] as Strategy[]).map((s, i) => (
               <button key={s} onClick={() => { setStrategy(s); setAiPartners([]); setHasTriggered(false); prevKey.current = ""; }}
-                style={{ padding: "13px 6px", border: "none", borderRight: i < 2 ? `1px solid ${DARK_BORDER}` : "none", background: strategy === s ? YEL : "transparent", cursor: "pointer", fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: strategy === s ? DARK : "rgba(241,235,222,0.3)", lineHeight: 1.6, transition: "all 0.12s" }}>
+                style={{ padding: "13px 6px", border: "none", borderRight: i < 2 ? `1px solid ${DARK_BORDER}` : "none", background: strategy === s ? YEL : "transparent", cursor: "pointer", fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: strategy === s ? DARK : "rgba(250,250,250,0.3)", lineHeight: 1.6, transition: "all 0.12s" }}>
                 <span style={{ fontSize: 8, opacity: 0.5, display: "block", marginBottom: 2 }}>0{i+1}</span>
                 {s === "discount" ? "Discount" : s === "institution" ? "Institution" : "Expert"}<br />
                 {s === "discount" ? "Partnership" : s === "institution" ? "Rebate" : "Roundup"}
@@ -410,7 +410,7 @@ export function CollabIQ() {
             <input style={{ ...lpInput, marginBottom: 0, flex: 1 }} placeholder="Company or category…" value={customInput} onChange={e => setCustomInput(e.target.value)}
               onKeyDown={e => { if(e.key==="Enter"){const v=customInput.trim();if(v&&!customPartners.includes(v)){setCustomPartners(p=>[...p,v]);setSelNiches(n=>[...n,v]);}setCustomInput("");}}} />
             <button onClick={() => {const v=customInput.trim();if(v&&!customPartners.includes(v)){setCustomPartners(p=>[...p,v]);setSelNiches(n=>[...n,v]);}setCustomInput("");}}
-              style={{ padding:"10px 12px",background:"transparent",border:`1px solid ${DARK_BORDER}`,color:"rgba(241,235,222,0.4)",fontFamily:MONO,fontSize:10,fontWeight:700,cursor:"pointer" }}>
+              style={{ padding:"10px 12px",background:"transparent",border:`1px solid ${DARK_BORDER}`,color:"rgba(250,250,250,0.4)",fontFamily:MONO,fontSize:10,fontWeight:700,cursor:"pointer" }}>
               Add
             </button>
           </div>
@@ -493,21 +493,21 @@ export function CollabIQ() {
                     <div style={{ fontFamily: SERIF, fontSize: 20, fontWeight: 700, color: PAPER, lineHeight: 1.2, letterSpacing: "-0.02em", marginBottom: 10 }}>
                       {LOADING_MSGS[loadingMsgIdx].h}
                     </div>
-                    <div style={{ fontFamily: GROT, fontSize: 13, fontWeight: 300, color: "rgba(241,235,222,0.45)", lineHeight: 1.6 }}>
+                    <div style={{ fontFamily: GROT, fontSize: 13, fontWeight: 300, color: "rgba(250,250,250,0.45)", lineHeight: 1.6 }}>
                       {LOADING_MSGS[loadingMsgIdx].s}
                     </div>
                   </div>
 
                   {/* Progress ticker */}
-                  <div style={{ marginTop: 22, paddingTop: 18, borderTop: "1px solid rgba(241,235,222,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(241,235,222,0.22)" }}>
+                  <div style={{ marginTop: 22, paddingTop: 18, borderTop: "1px solid rgba(250,250,250,0.08)", display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(250,250,250,0.22)" }}>
                       Analysing {ind}
                     </span>
-                    <span style={{ color: "rgba(241,235,222,0.12)", fontSize: 10 }}>·</span>
-                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(241,235,222,0.22)" }}>
+                    <span style={{ color: "rgba(250,250,250,0.12)", fontSize: 10 }}>·</span>
+                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(250,250,250,0.22)" }}>
                       {["Discount Partnership","Institution Rebate","Expert Roundup + Badge"].find((_,i) => ["discount","institution","badge"][i] === strategy) || "Strategy"}
                     </span>
-                    <span style={{ color: "rgba(241,235,222,0.12)", fontSize: 10 }}>·</span>
+                    <span style={{ color: "rgba(250,250,250,0.12)", fontSize: 10 }}>·</span>
                     <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "rgba(245,184,31,0.35)" }}>
                       Powered by Claude
                     </span>
@@ -657,11 +657,11 @@ export function CollabIQ() {
             <div style={{ background:DARK,padding:"24px 28px",marginTop:20,display:"flex",alignItems:"center",gap:24,flexWrap:"wrap" as const }}>
               <div style={{ textAlign:"center" as const,flexShrink:0 }}>
                 <span style={{ fontFamily:SERIF,fontSize:56,fontWeight:700,color:YEL,lineHeight:1,display:"block",letterSpacing:"-0.03em" }}>{scorePct}%</span>
-                <span style={{ fontFamily:MONO,fontSize:8,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase" as const,color:"rgba(241,235,222,0.25)",marginTop:5,display:"block" }}>Fit Score</span>
+                <span style={{ fontFamily:MONO,fontSize:8,fontWeight:700,letterSpacing:"0.16em",textTransform:"uppercase" as const,color:"rgba(250,250,250,0.25)",marginTop:5,display:"block" }}>Fit Score</span>
               </div>
               <div style={{ flex:1,minWidth:160 }}>
                 <div style={{ height:3,background:"#1e1c17",marginBottom:14 }}><div style={{ height:"100%",background:YEL,width:`${scorePct}%`,transition:"width 0.5s ease" }}/></div>
-                <div style={{ fontSize:12,color:scorePct>=70?"#7ad4a0":scorePct>=45?"#f0c060":scorePct>0?"#e08080":"rgba(241,235,222,0.4)",lineHeight:1.65 }}>
+                <div style={{ fontSize:12,color:scorePct>=70?"#7ad4a0":scorePct>=45?"#f0c060":scorePct>0?"#e08080":"rgba(250,250,250,0.4)",lineHeight:1.65 }}>
                   {scoreVerdict || "Answer the questions above to score this partner."}
                 </div>
               </div>
@@ -798,7 +798,7 @@ export function CollabIQ() {
             <div>
               <span style={{ fontFamily:MONO,fontSize:9,fontWeight:700,letterSpacing:"0.2em",textTransform:"uppercase" as const,color:"rgba(245,184,31,0.45)",marginBottom:8,display:"block" }}>Ready to execute?</span>
               <div style={{ fontFamily:SERIF,fontSize:20,fontWeight:700,color:PAPER,marginBottom:8,letterSpacing:"-0.015em" }}>Earned Media OS</div>
-              <p style={{ fontSize:12,color:"rgba(241,235,222,0.45)",lineHeight:1.65,maxWidth:380 }}>The step-by-step system for pre-Series A founders who want press coverage that makes investors take notice — without a PR agency retainer.</p>
+              <p style={{ fontSize:12,color:"rgba(250,250,250,0.45)",lineHeight:1.65,maxWidth:380 }}>The step-by-step system for pre-Series A founders who want press coverage that makes investors take notice — without a PR agency retainer.</p>
             </div>
             <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer"
               style={{ display:"inline-block",background:YEL,color:DARK,textDecoration:"none",fontFamily:GROT,fontSize:10,fontWeight:800,letterSpacing:"0.1em",textTransform:"uppercase" as const,padding:"13px 20px",border:`2px solid ${YEL}`,whiteSpace:"nowrap" as const,flexShrink:0 }}>

@@ -347,10 +347,10 @@ const Featured = () => (
           {FEATURED.title}
         </h2>
         <div style={{ marginTop: 22, display: "flex", gap: 24, alignItems: "baseline" }}>
-          <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.65)">
+          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.65)">
             Guest · {FEATURED.guest}
           </SCaps>
-          <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.65)">
+          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.65)">
             Run time · {FEATURED.duration}
           </SCaps>
         </div>
@@ -362,7 +362,7 @@ const Featured = () => (
             margin: 0,
             fontFamily: SERIF,
             fontSize: 19,
-            color: "rgba(241,235,222,.85)",
+            color: "rgba(250,250,250,.85)",
             lineHeight: 1.55,
             fontStyle: "italic",
           }}

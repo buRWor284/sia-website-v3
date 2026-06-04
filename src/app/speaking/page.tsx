@@ -338,11 +338,11 @@ const WatchTheWork = () => {
             Six reels<br />
             <span style={{ fontStyle: "italic", color: YEL }}>from the road.</span>
           </h2>
-          <p style={{ marginTop: 16, fontFamily: SERIF, fontSize: 15.5, color: "rgba(241,235,222,.7)", lineHeight: 1.5, maxWidth: 360 }}>
+          <p style={{ marginTop: 16, fontFamily: SERIF, fontSize: 15.5, color: "rgba(250,250,250,.7)", lineHeight: 1.5, maxWidth: 360 }}>
             Click any reel to play. Four cities, three formats, one consistent point: earned media beats almost anything you can buy.
           </p>
 
-          <div style={{ marginTop: 22, maxHeight: 520, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8, border: "1px solid rgba(241,235,222,.18)", padding: 10 }}>
+          <div style={{ marginTop: 22, maxHeight: 520, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8, border: "1px solid rgba(250,250,250,.18)", padding: 10 }}>
             {REELS.map((r, i) => {
               const isActive = i === active;
               return (
@@ -350,10 +350,10 @@ const WatchTheWork = () => {
                   display: "grid", gridTemplateColumns: "90px 1fr",
                   gap: 12, padding: 10, textAlign: "left",
                   background: isActive ? "rgba(245,184,31,.14)" : "transparent",
-                  border: `1px solid ${isActive ? YEL : "rgba(241,235,222,.18)"}`,
+                  border: `1px solid ${isActive ? YEL : "rgba(250,250,250,.18)"}`,
                   cursor: "pointer", color: PAPER, font: "inherit",
                 }}>
-                  <div style={{ width: 90, height: 56, background: "#000", position: "relative", overflow: "hidden", border: "1px solid rgba(241,235,222,.22)" }}>
+                  <div style={{ width: 90, height: 56, background: "#000", position: "relative", overflow: "hidden", border: "1px solid rgba(250,250,250,.22)" }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={`https://i.ytimg.com/vi/${r.id}/hqdefault.jpg`} alt={r.title} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     {isActive && (
@@ -370,7 +370,7 @@ const WatchTheWork = () => {
                   <div>
                     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, lineHeight: 1.25, color: PAPER }}>{r.title}</div>
                     <div style={{ marginTop: 5 }}><SCaps size={9.5} ls="0.16em" color={YEL}>{r.city}, {r.region}</SCaps></div>
-                    <div style={{ marginTop: 2 }}><SCaps size={9} ls="0.10em" color="rgba(241,235,222,.55)">{r.venue}</SCaps></div>
+                    <div style={{ marginTop: 2 }}><SCaps size={9} ls="0.10em" color="rgba(250,250,250,.55)">{r.venue}</SCaps></div>
                   </div>
                 </button>
               );
@@ -388,17 +388,17 @@ const WatchTheWork = () => {
 
         {/* Right — main player */}
         <div>
-          <div style={{ background: "#000", border: "1px solid rgba(241,235,222,.25)", padding: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 4px 12px", borderBottom: "1px solid rgba(241,235,222,.25)", marginBottom: 12, flexWrap: "wrap", gap: 6 }}>
+          <div style={{ background: "#000", border: "1px solid rgba(250,250,250,.25)", padding: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 4px 12px", borderBottom: "1px solid rgba(250,250,250,.25)", marginBottom: 12, flexWrap: "wrap", gap: 6 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: YEL }} />
-                <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.85)">
+                <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.85)">
                   Now playing · Reel № {String(active + 1).padStart(2, "0")}
                 </SCaps>
               </div>
-              <SCaps size={10} ls="0.18em" color="rgba(241,235,222,.55)">{v.city}, {v.region}</SCaps>
+              <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.55)">{v.city}, {v.region}</SCaps>
             </div>
-            <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(241,235,222,.25)", overflow: "hidden" }}>
+            <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(250,250,250,.25)", overflow: "hidden" }}>
               <iframe
                 key={v.id}
                 src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
@@ -409,9 +409,9 @@ const WatchTheWork = () => {
                 style={{ width: "100%", height: "100%", border: 0, display: "block" }}
               />
             </div>
-            <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(241,235,222,.25)" }}>
+            <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(250,250,250,.25)" }}>
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(16px, 2.5vw, 22px)", color: PAPER, lineHeight: 1.2 }}>{v.title}</div>
-              <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(241,235,222,.75)", lineHeight: 1.4 }}>
+              <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(250,250,250,.75)", lineHeight: 1.4 }}>
                 {v.venue} · {v.city}, {v.region} · {v.note}
               </div>
             </div>
@@ -507,7 +507,7 @@ const MPSStrip = () => (
             backgroundImage: "url('/assets/gallery/mps-banner.jpg')",
             backgroundSize: "200% auto",
             backgroundPosition: "left center",
-            border: "1px solid rgba(241,235,222,.25)",
+            border: "1px solid rgba(250,250,250,.25)",
           }}
           role="img"
           aria-label="Syed Irfan Ajmal on stage at MPS2016, Dubai"
@@ -519,17 +519,17 @@ const MPSStrip = () => (
             backgroundImage: "url('/assets/gallery/mps-audience.jpg')",
             backgroundSize: "cover",
             backgroundPosition: "center 30%",
-            border: "1px solid rgba(241,235,222,.25)",
+            border: "1px solid rgba(250,250,250,.25)",
           }}
           role="img"
           aria-label="MPS2016 audience, Dubai"
         />
       </div>
       <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
-        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#f1ebde", lineHeight: 1.4 }}>
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#FAFAFA", lineHeight: 1.4 }}>
           MPS2016, Dubai · &ldquo;How Startup Founders Can Use Personal Branding to Attract the Right Opportunities.&rdquo;
         </div>
-        <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.55)">Photo by hafeezsaeed.com</SCaps>
+        <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo by hafeezsaeed.com</SCaps>
       </figcaption>
     </figure>
   </section>
@@ -728,13 +728,13 @@ const DMSSStrip = () => (
       <img
         src="/assets/speaking/dmss-irfan-large-audience.jpg"
         alt="Syed Irfan Ajmal speaking to a large audience at DMSS Conference, Bali"
-        style={{ width: "100%", height: "auto", display: "block", border: "1px solid rgba(241,235,222,.25)", maxHeight: 360, objectFit: "cover", objectPosition: "center 30%" }}
+        style={{ width: "100%", height: "auto", display: "block", border: "1px solid rgba(250,250,250,.25)", maxHeight: 360, objectFit: "cover", objectPosition: "center 30%" }}
       />
       <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
-        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#f1ebde", lineHeight: 1.4 }}>
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#FAFAFA", lineHeight: 1.4 }}>
           DMSS Conference, Bali · Presenting &ldquo;Media Hacks&rdquo; to 500+ attendees.
         </div>
-        <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.55)">Photo by dmss.io</SCaps>
+        <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo by dmss.io</SCaps>
       </figcaption>
     </figure>
   </section>
@@ -749,7 +749,7 @@ const BottomBookingCTA = () => (
       <h2 style={{ margin: "14px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 5vw, 48px)", color: PAPER, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
         Let&rsquo;s put a talk on your stage.
       </h2>
-      <p style={{ margin: "14px auto 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: "rgba(241,235,222,.7)", lineHeight: 1.5, maxWidth: 520 }}>
+      <p style={{ margin: "14px auto 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: "rgba(250,250,250,.7)", lineHeight: 1.5, maxWidth: 520 }}>
         Send a brief, get a response inside a working day. No salesy follow-up.
       </p>
       <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>

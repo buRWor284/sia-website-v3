@@ -128,7 +128,7 @@ export default function RefundPolicyPage() {
           <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(17px, 2.2vw, 22px)", color: PAPER, lineHeight: 1.5 }}>
             🛡 <strong style={{ color: YEL }}>1 verified media placement in 60 days</strong>, or every dollar back.
             <br />
-            <span style={{ fontWeight: 400, fontSize: "0.85em", color: "rgba(241,235,222,0.75)" }}>No negotiation. No hoops. See eligibility below.</span>
+            <span style={{ fontWeight: 400, fontSize: "0.85em", color: "rgba(250,250,250,0.75)" }}>No negotiation. No hoops. See eligibility below.</span>
           </p>
         </div>
       </section>

@@ -66,7 +66,7 @@ const EpisodeCard = ({ ep }: { ep: PodcastEp }) => (
       <div style={{ alignSelf: "flex-start" }}>
         <span
           style={{
-            background: ep.accent ?? "rgba(241,235,222,.15)",
+            background: ep.accent ?? "rgba(250,250,250,.15)",
             padding: "4px 10px",
             fontFamily: GROT,
             fontWeight: 800,
@@ -86,7 +86,7 @@ const EpisodeCard = ({ ep }: { ep: PodcastEp }) => (
           fontWeight: 700,
           fontStyle: "italic",
           fontSize: "clamp(17px, 2.5vw, 21px)",
-          color: "rgba(241,235,222,0.92)",
+          color: "rgba(250,250,250,0.92)",
           lineHeight: 1.25,
           letterSpacing: "-0.01em",
         }}
@@ -95,7 +95,7 @@ const EpisodeCard = ({ ep }: { ep: PodcastEp }) => (
       </div>
       {ep.guest && (
         <div>
-          <SCaps size={9.5} ls="0.16em" color="rgba(241,235,222,.5)">
+          <SCaps size={9.5} ls="0.16em" color="rgba(250,250,250,.5)">
             w/ {ep.guest}
           </SCaps>
         </div>
@@ -108,7 +108,7 @@ const EpisodeCard = ({ ep }: { ep: PodcastEp }) => (
           left: 0,
           right: 0,
           height: 3,
-          background: ep.accent ?? `rgba(241,235,222,.12)`,
+          background: ep.accent ?? `rgba(250,250,250,.12)`,
         }}
       />
     </div>

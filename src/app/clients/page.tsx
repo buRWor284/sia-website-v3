@@ -208,7 +208,7 @@ const Tier1Card = ({ c, open, onToggle }: Tier1CardProps) => {
           style={{
             background: PAPER,
             padding: "10px 14px",
-            border: `1px solid ${open ? "rgba(241,235,222,.4)" : INK15}`,
+            border: `1px solid ${open ? "rgba(250,250,250,.4)" : INK15}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -261,8 +261,8 @@ const Tier1Card = ({ c, open, onToggle }: Tier1CardProps) => {
       {/* Headline result */}
       <div
         style={{
-          borderTop: `1px solid ${open ? "rgba(241,235,222,.4)" : INK}`,
-          borderBottom: `1px solid ${open ? "rgba(241,235,222,.4)" : INK}`,
+          borderTop: `1px solid ${open ? "rgba(250,250,250,.4)" : INK}`,
+          borderBottom: `1px solid ${open ? "rgba(250,250,250,.4)" : INK}`,
           padding: "12px 0",
         }}
       >
@@ -286,7 +286,7 @@ const Tier1Card = ({ c, open, onToggle }: Tier1CardProps) => {
             fontWeight: 700,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
-            color: open ? "rgba(241,235,222,.65)" : INK55,
+            color: open ? "rgba(250,250,250,.65)" : INK55,
             lineHeight: 1.35,
           }}
         >
@@ -317,7 +317,7 @@ const Tier1Card = ({ c, open, onToggle }: Tier1CardProps) => {
             fontWeight: 700,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
-            color: open ? "rgba(241,235,222,.6)" : INK55,
+            color: open ? "rgba(250,250,250,.6)" : INK55,
           }}
         >
           {c.sector} &nbsp;·&nbsp; {countryName}
@@ -333,7 +333,7 @@ const Tier1Card = ({ c, open, onToggle }: Tier1CardProps) => {
               fontFamily: SERIF,
               fontSize: 17,
               lineHeight: 1.55,
-              color: "rgba(241,235,222,.88)",
+              color: "rgba(250,250,250,.88)",
             }}
           >
             {c.blurb}
@@ -377,8 +377,8 @@ const Tier1Card = ({ c, open, onToggle }: Tier1CardProps) => {
               <span
                 style={{
                   padding: "10px 16px",
-                  border: "1px solid rgba(241,235,222,.4)",
-                  color: "rgba(241,235,222,.65)",
+                  border: "1px solid rgba(250,250,250,.4)",
+                  color: "rgba(250,250,250,.65)",
                   fontFamily: GROT,
                   fontWeight: 700,
                   fontSize: 11,

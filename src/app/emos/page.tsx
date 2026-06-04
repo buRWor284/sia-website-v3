@@ -250,7 +250,7 @@ export default function EmosPage() {
             <div className="max">
               <SectionMast n="D" label="The Numbers · Independent Research" dark />
               <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>Authority isn&#39;t a vibe. It&#39;s how the buying decision happens now.</h2>
-              <p className="sec-sub" style={{ marginBottom: 48, color: "rgba(241,235,222,.55)" }}>Three numbers that explain why earned authority outperforms paid acquisition on the metrics that matter to a founder under fundraising pressure.</p>
+              <p className="sec-sub" style={{ marginBottom: 48, color: "rgba(250,250,250,.55)" }}>Three numbers that explain why earned authority outperforms paid acquisition on the metrics that matter to a founder under fundraising pressure.</p>
               <div className="emos-numbers-grid">
                 <div className="emos-num-card"><div className="emos-num-big">83%</div><div className="emos-num-label">B2B decisions before first contact</div><p className="emos-num-body">Prospects and investors research independently. If you&#39;re not credible where they look, you&#39;re not on the list.</p><div className="emos-num-source">Gartner / Edelman-LinkedIn B2B Report</div></div>
                 <div className="emos-num-card"><div className="emos-num-big">3×</div><div className="emos-num-label">More likely to take a meeting</div><p className="emos-num-body">B2B buyers trust thought leadership over marketing materials. A journalist quoting you does what no landing page ever can.</p><div className="emos-num-source">Edelman-LinkedIn 2024/2025</div></div>
@@ -350,7 +350,7 @@ export default function EmosPage() {
             <div className="max">
               <SectionMast n="H" label="The 5-Return Framework · One Placement, Five Returns" dark />
               <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>One placement. Five returns.</h2>
-              <p className="sec-sub" style={{ marginBottom: 44, color: "rgba(241,235,222,.55)" }}>Most founders treat a press placement as a one-off win. EMOS extracts five compounding returns from every single one. Which is why one Forbes citation can keep paying for years.</p>
+              <p className="sec-sub" style={{ marginBottom: 44, color: "rgba(250,250,250,.55)" }}>Most founders treat a press placement as a one-off win. EMOS extracts five compounding returns from every single one. Which is why one Forbes citation can keep paying for years.</p>
               <div className="emos-returns-grid">
                 {[
                   ["01 · SEO Authority","Backlink equity","A high-DA backlink lifts your domain rating; target pages rank higher for the keywords your buyers use."],
@@ -466,7 +466,7 @@ export default function EmosPage() {
                 </div>
                 <div className="emos-fit-col emos-fit-col-good">
                   <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: "0.20em", textTransform: "uppercase", color: YEL, marginBottom: 20 }}>✓ This IS for you</div>
-                  <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(241,235,222,.72)", marginBottom: 32 }}>
+                  <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(250,250,250,.72)", marginBottom: 32 }}>
                     This is for founders <strong style={{ color: PAPER }}>3 to 12 months from a raise</strong> who are willing to do the work, or have a team member or VA willing to do it under your direction.
                   </p>
                   <a href="#apply" className="emos-cta-yellow" style={{ display: "flex", justifyContent: "center" }}>Submit Your Application →</a>
@@ -492,10 +492,10 @@ export default function EmosPage() {
               <div className="emos-pricing-outer">
                 <div className="emos-pricing-math">
                   <h2 className="sec-h2" style={{ marginBottom: 24, color: PAPER }}>Two tracks. One-time investment. Capability you keep forever.</h2>
-                  <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(241,235,222,.60)", marginBottom: 16 }}>A mid-tier PR agency: <strong style={{ color: PAPER }}>$24K to $60K per year</strong>, every year, knowledge walks out when the contract ends.</p>
-                  <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(241,235,222,.60)" }}>EMOS: <strong style={{ color: YEL }}>$2,000 to $3,500 one-time</strong>. The capability stays. Forever.</p>
+                  <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(250,250,250,.60)", marginBottom: 16 }}>A mid-tier PR agency: <strong style={{ color: PAPER }}>$24K to $60K per year</strong>, every year, knowledge walks out when the contract ends.</p>
+                  <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(250,250,250,.60)" }}>EMOS: <strong style={{ color: YEL }}>$2,000 to $3,500 one-time</strong>. The capability stays. Forever.</p>
                   <p style={{ marginTop: 24, fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: PAPER, lineHeight: 1.4, borderLeft: `3px solid ${YEL}`, paddingLeft: 16 }}>One placement on a DA 80+ site is worth more than the program.</p>
-                  <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 16, color: "rgba(241,235,222,.60)" }}>Use the <a href="#calculator" className="emos-tool-link">Authority Cost Calculator ↑</a> to run the numbers for your business.</p>
+                  <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 16, color: "rgba(250,250,250,.60)" }}>Use the <a href="#calculator" className="emos-tool-link">Authority Cost Calculator ↑</a> to run the numbers for your business.</p>
                 </div>
                 <div className="emos-price-cards">
                   <div className="emos-price-card">
@@ -505,8 +505,8 @@ export default function EmosPage() {
                       <div className="emos-price-feat"><span className="emos-price-feat-check">✓</span>30-day Slack access</div>
                       <div className="emos-price-feat"><span className="emos-price-feat-check">✓</span>1 placement guaranteed in 60 days</div>
                       <div className="emos-price-feat"><span className="emos-price-feat-check">✓</span>Journo Tracker [Beta]</div>
-                      <div className="emos-price-feat"><span className="emos-price-feat-check" style={{ color: "rgba(241,235,222,.2)" }}>·</span><span className="emos-price-feat-no">Done-with-you placements</span></div>
-                      <div className="emos-price-feat"><span className="emos-price-feat-check" style={{ color: "rgba(241,235,222,.2)" }}>·</span><span className="emos-price-feat-no">Linkable asset build</span></div>
+                      <div className="emos-price-feat"><span className="emos-price-feat-check" style={{ color: "rgba(250,250,250,.2)" }}>·</span><span className="emos-price-feat-no">Done-with-you placements</span></div>
+                      <div className="emos-price-feat"><span className="emos-price-feat-check" style={{ color: "rgba(250,250,250,.2)" }}>·</span><span className="emos-price-feat-no">Linkable asset build</span></div>
                     </div>
                     <a href="#apply" className="emos-cta-ghost" style={{ marginTop: 24, justifyContent: "center", width: "100%" }}>Apply →</a>
                   </div>
@@ -529,12 +529,12 @@ export default function EmosPage() {
                 </div>
               </div>
               <div id="apply" className="emos-apply-block">
-                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.60)", marginBottom: 16 }}>Apply for Cohort 1</div>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,250,250,.60)", marginBottom: 16 }}>Apply for Cohort 1</div>
                 <div className="emos-apply-grid">
                   <div>
                     <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: PAPER, lineHeight: 1.1, marginBottom: 16 }}>5 seats. June 22, 2026.<br />Here&#39;s how to claim one.</h3>
-                    <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: "rgba(241,235,222,.60)" }}>One short application. I review every submission personally within 48 hours. If it&#39;s a fit, I&#39;ll send a Calendly link to talk through the details.</p>
-                    <p style={{ marginTop: 14, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.40)" }}>Both tracks include lifetime access to every future EMOS cohort</p>
+                    <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: "rgba(250,250,250,.60)" }}>One short application. I review every submission personally within 48 hours. If it&#39;s a fit, I&#39;ll send a Calendly link to talk through the details.</p>
+                    <p style={{ marginTop: 14, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(250,250,250,.40)" }}>Both tracks include lifetime access to every future EMOS cohort</p>
                   </div>
                   <div>
                     {[["1","Submit your application","5 minutes"],["2","Personal review by Syed","within 48 hours"],["3","15-minute call to confirm fit","qualified applicants only"],["4","Decision and onboarding",""]].map(([n,text,sub]) => (
@@ -542,7 +542,7 @@ export default function EmosPage() {
                     ))}
                     <div style={{ marginTop: 24, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
                       <a href="/emos/apply/" className="emos-cta-yellow">Submit Your Application →</a>
-                      <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.45)" }}>5 minutes. Decision within 48 hours.</span>
+                      <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(250,250,250,.45)" }}>5 minutes. Decision within 48 hours.</span>
                     </div>
                   </div>
                 </div>
@@ -604,15 +604,15 @@ export default function EmosPage() {
           <section className="sy bg-ink sx" style={{ textAlign: "center" }}>
             <div className="max" style={{ maxWidth: 800, marginInline: "auto" }}>
               <h2 className="emos-final-cta-headline">Stop renting authority.<br /><em>Start owning it.</em></h2>
-              <p style={{ fontFamily: SERIF, fontSize: "clamp(16px,1.8vw,19px)", lineHeight: 1.7, color: "rgba(241,235,222,.60)", marginBottom: 40, maxWidth: 620, marginInline: "auto" }}>
+              <p style={{ fontFamily: SERIF, fontSize: "clamp(16px,1.8vw,19px)", lineHeight: 1.7, color: "rgba(250,250,250,.60)", marginBottom: 40, maxWidth: 620, marginInline: "auto" }}>
                 This time next year, your team owns the system. Your name lives in the publications your buyers and investors already trust. The coverage compounds long after the program ends.
               </p>
-              <p style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "rgba(241,235,222,.40)", marginBottom: 28 }}>
+              <p style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "rgba(250,250,250,.40)", marginBottom: 28 }}>
                 Cohort 1 opens June 22 &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
               </p>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                 <a href="/emos/apply/" className="emos-cta-yellow" style={{ fontSize: 13, padding: "18px 36px" }}>Submit Your Application →</a>
-                <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(241,235,222,.40)" }}>5 minutes. Decision within 48 hours.</span>
+                <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(250,250,250,.40)" }}>5 minutes. Decision within 48 hours.</span>
               </div>
             </div>
           </section>
