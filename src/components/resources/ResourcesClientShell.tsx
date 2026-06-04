@@ -11,7 +11,6 @@ import { GROT, INK, INK15, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib
 type ContentType =
   | "kit"
   | "tool"
-  | "calculator"
   | "quiz"
   | "playbook"
   | "article"
@@ -41,7 +40,7 @@ interface ContentBase {
 }
 
 interface InteractiveContent extends ContentBase {
-  type: "kit" | "tool" | "calculator" | "quiz";
+  type: "kit" | "tool" | "quiz";
   sub: string;
   blurb: string;
   href: string;
@@ -130,7 +129,7 @@ const CONTENT: ContentItem[] = [
   // ── CALCULATORS ─────────────────────────────────────────────────────────
   {
     id: "calc-authority",
-    type: "calculator",
+    type: "tool",
     badge: "Calculator",
     beta: true,
     topics: ["pr", "strategy"],
@@ -362,7 +361,6 @@ const TYPE_TABS: { key: "all" | ContentType; label: string }[] = [
   { key: "all",           label: "All Resources" },
   { key: "kit",           label: "Kits" },
   { key: "tool",          label: "Tools" },
-  { key: "calculator",    label: "Calculators" },
   { key: "quiz",          label: "Quizzes" },
   { key: "playbook",      label: "Playbooks" },
   { key: "article",       label: "Articles" },
@@ -381,13 +379,12 @@ const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
 ];
 
 const GROUP_ORDER: ContentType[] = [
-  "kit", "tool", "calculator", "quiz", "playbook", "article", "visual-essay",
+  "kit", "tool", "quiz", "playbook", "article", "visual-essay",
 ];
 
 const GROUP_LABEL: Record<ContentType, string> = {
   "kit":           "Kits · Interactive tools & checklists",
   "tool":          "Tools · Use them right now",
-  "calculator":    "Calculators · Run the numbers",
   "quiz":          "Quizzes · Score your position",
   "playbook":      "Playbooks · Deep-dive guides",
   "article":       "Articles · From the archives",
@@ -397,7 +394,6 @@ const GROUP_LABEL: Record<ContentType, string> = {
 const TYPE_ACCENT: Record<ContentType, string> = {
   "kit":           "#f5b81f",
   "tool":          "#C17817",
-  "calculator":    "#5B8A72",
   "quiz":          "#8B6B99",
   "playbook":      INK,
   "article":       INK55,
@@ -492,7 +488,7 @@ function getCardCta(item: ContentItem): string {
 }
 
 function isComingSoon(item: ContentItem): boolean {
-  if (item.type === "kit" || item.type === "tool" || item.type === "calculator" || item.type === "quiz") {
+  if (item.type === "kit" || item.type === "tool" || item.type === "quiz") {
     return !!(item as InteractiveContent).comingSoon;
   }
   return false;
@@ -501,7 +497,7 @@ function isComingSoon(item: ContentItem): boolean {
 function isExternal(item: ContentItem): boolean {
   if (item.type === "visual-essay") return true;
   if (item.type === "article") return !!(item as ArticleContent).external;
-  if (item.type === "kit" || item.type === "tool" || item.type === "calculator" || item.type === "quiz") {
+  if (item.type === "kit" || item.type === "tool" || item.type === "quiz") {
     return (item as InteractiveContent).href.startsWith("http");
   }
   return false;
