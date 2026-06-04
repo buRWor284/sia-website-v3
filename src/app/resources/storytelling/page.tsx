@@ -39,7 +39,7 @@ export default function StorytellingGuidePage() {
       {/* ── Header ─────────────────────────────────────────────── */}
       <section style={{ padding: "80px 56px 64px" }}>
         <SectionMast n="00" label="Guide III · Storytelling" />
-        <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 64, alignItems: "start" }}>
+        <div className="grid-dark-card" style={{ alignItems: "start" }}>
           <div>
             <Pill size={10.5} ls="0.18em">For Business & Brand</Pill>
             <h1 style={{ margin: "16px 0 24px", fontWeight: 700, fontSize: 72, lineHeight: 0.96, letterSpacing: "-0.03em" }}>

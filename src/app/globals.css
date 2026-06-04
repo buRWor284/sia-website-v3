@@ -946,6 +946,31 @@ body > * { position: relative; z-index: 2; }
   .gallery-grid-photos { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* ---- Gallery · featured photo card (image + caption side by side) ------ */
+.gallery-featured-card {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .gallery-featured-card { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---- Gallery · reel player (sidebar list + embed) ---------------------- */
+.gallery-reel-player {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  .gallery-reel-player {
+    grid-template-columns: 300px 1fr;
+  }
+}
+@media (min-width: 1024px) {
+  .gallery-reel-player {
+    grid-template-columns: 340px 1fr;
+  }
+}
+
 /* ---- Gallery · 2-col video grid ---------------------------------------- */
 .gallery-grid-videos {
   display: grid;
@@ -1889,4 +1914,203 @@ body > * { position: relative; z-index: 2; }
   .site-header__wire  { display: none !important; }
   .site-header__bar   { display: none !important; }
   .site-header__hamburger { display: flex !important; }
+  /* Hide announcement links — they appear in the mobile dropdown instead */
+  .site-header__announce { display: none !important; }
+}
+
+/* =========================================================================
+   COLOPHON — responsive footer padding
+   ========================================================================= */
+.colophon-footer {
+  padding: 36px 20px 24px;
+}
+@media (min-width: 640px) {
+  .colophon-footer { padding: 44px 32px 28px; }
+}
+@media (min-width: 1024px) {
+  .colophon-footer { padding: 56px 56px 28px; }
+}
+
+/* =========================================================================
+   MOBILE OPTIMIZATION PASS — global inline-style overrides + missing breakpoints
+   All rules use max-width (mobile-last) to override existing desktop layouts.
+   !important is required because inline style="" attributes take precedence
+   over external stylesheet rules.
+   ========================================================================= */
+
+/* ── Press logos: 4-col → 2-col on small mobile ──────────────────────────── */
+@media (max-width: 480px) {
+  .press-logos {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ── Speaking row: 2-col is fine at 640px, force 1-col at very small ──────── */
+@media (max-width: 479px) {
+  .speaking-row {
+    grid-template-columns: 1fr !important;
+    gap: 4px;
+  }
+}
+
+/* ── Steps grid: 2-col is OK at ≥480px, force 1-col below ───────────────── */
+@media (max-width: 479px) {
+  .grid-steps-4 {
+    grid-template-columns: 1fr !important;
+  }
+  /* Reset border overrides for single col */
+  .step-card:nth-child(odd) { border-right: none; }
+  .step-card { border-bottom: 1px solid var(--color-ink); border-right: none; }
+  .step-card:last-child { border-bottom: none; }
+}
+
+/* ── EMOS grids: missing mobile breakpoints ──────────────────────────────── */
+@media (max-width: 640px) {
+  .emos-proof-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .emos-proof-cell {
+    border-right: none !important;
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .emos-proof-cell:last-child { border-bottom: none; }
+
+  .emos-testi-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .emos-stats-strip {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .emos-stats-strip {
+    grid-template-columns: 1fr !important;
+  }
+  .emos-stat-cell { border-right: none !important; border-bottom: 1px solid var(--color-ink); }
+  .emos-stat-cell:last-child { border-bottom: none; }
+}
+
+/* ── Global: override inline multi-col grids that lack media-query override ─ */
+/* These attribute selectors match inline style="" values.                     */
+/* Note: These require !important to override inline specificity.              */
+
+@media (max-width: 640px) {
+  /* 4-col layouts (footer-like content grids, stats bars) */
+  [style*="grid-template-columns: 1.4fr 1fr 1fr 1fr"],
+  [style*="gridTemplateColumns: 1.4fr 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 3-col inline grids (guest cards, venture cards, resource articles) */
+  [style*="grid-template-columns: repeat(3, 1fr)"],
+  [style*="grid-template-columns: 1fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Podcast stats bar 4-col */
+  [style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Podcast/resource 2fr 1fr sidebar layouts → single col */
+  [style*="grid-template-columns: 2fr 1fr"],
+  [style*="grid-template-columns: 1.7fr 1fr"],
+  [style*="grid-template-columns: 1.4fr 1fr"],
+  [style*="grid-template-columns: 1.5fr 1fr"],
+  [style*="grid-template-columns: 1.1fr 1fr"],
+  [style*="grid-template-columns: 1.4fr 1.3fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Fixed-pixel column layouts that overflow */
+  [style*="grid-template-columns: 340px"],
+  [style*="grid-template-columns: 1fr 320px"],
+  [style*="grid-template-columns: 1fr 260px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Ventures broken clamp */
+  [style*="grid-template-columns: clamp(300px"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 1fr 1.4fr (infographics) */
+  [style*="grid-template-columns: 1fr 1.4fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Podcast episode list rows — replace 4-col with condensed 2-col */
+  [style*="grid-template-columns: 90px 1fr 160px 60px"] {
+    grid-template-columns: 56px 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* Checklist item rows (108px label + flex + auto) → single col */
+  [style*="grid-template-columns: 108px 1fr auto"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Multi-col prose → single col on mobile */
+  [style*="column-count: 2"] {
+    column-count: 1 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Remaining 1fr 1fr inline grids */
+  [style*="grid-template-columns: 1fr 1fr"],
+  [style*="grid-template-columns: 1.4fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── text-align: justify — switch to left on mobile (uneven word spacing) ── */
+@media (max-width: 768px) {
+  [style*="text-align: justify"] {
+    text-align: left !important;
+  }
+  /* Also catch the column-count drop-cap sections */
+  [style*="textAlign: justify"] {
+    text-align: left !important;
+  }
+}
+
+/* ── Section horizontal padding — override hardcoded 56px on mobile ─────── */
+/* Sections with padding: "Xpx 56px" render 56px side padding — too tight    */
+/* on 375px screens (only 263px of content). Cap to 20px on mobile.          */
+@media (max-width: 640px) {
+  section[style*="56px"] {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+  /* Also fix non-section containers with explicit 56px side padding */
+  .emos-hero,
+  .emos-apply-block {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+@media (min-width: 641px) and (max-width: 1023px) {
+  section[style*="56px"] {
+    padding-left: 32px !important;
+    padding-right: 32px !important;
+  }
+}
+
+/* ── Prevent any element causing horizontal scroll ──────────────────────── */
+@media (max-width: 640px) {
+  /* Ensure images never overflow */
+  img { max-width: 100% !important; height: auto !important; }
+
+  /* Ensure no fixed-width element causes body scroll */
+  .emos-curr-table {
+    overflow-x: auto;
+    display: block;
+  }
+  .emos-lens-table {
+    overflow-x: auto;
+    display: block;
+  }
 }

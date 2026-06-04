@@ -285,14 +285,7 @@ export default async function EpisodePage({
       {/* ── Episode summary ──────────────────────────────────── */}
       <section style={{ padding: "72px 56px 60px" }}>
         <SectionMast n="02" label="About this episode" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "2fr 1fr",
-            gap: 64,
-            alignItems: "start",
-          }}
-        >
+        <div className="grid-dark-card" style={{ alignItems: "start" }}>
           <p
             style={{
               margin: 0,

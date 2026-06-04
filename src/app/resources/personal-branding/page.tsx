@@ -78,14 +78,7 @@ export default function PersonalBrandingGuidePage() {
       {/* ── Header ─────────────────────────────────────────────── */}
       <section style={{ padding: "80px 56px 64px" }}>
         <SectionMast n="00" label="Guide I · Personal Branding" />
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.4fr 1fr",
-            gap: 64,
-            alignItems: "start",
-          }}
-        >
+        <div className="grid-dark-card" style={{ alignItems: "start" }}>
           <div>
             <Pill size={10.5} ls="0.18em">The Complete Playbook</Pill>
             <h1

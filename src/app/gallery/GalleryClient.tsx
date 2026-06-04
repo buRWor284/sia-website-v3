@@ -281,9 +281,8 @@ const FilterBar = ({
 
 // Featured photo: side-by-side layout (image left, caption right)
 const FeaturedPhotoCard = ({ p }: { p: PhotoItem }) => (
-  <div style={{
+  <div className="gallery-featured-card" style={{
     background: PAPER2, border: `1px solid ${INK}`, padding: 10,
-    display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0,
   }}>
     <div style={{
       aspectRatio: "4/3",
@@ -354,8 +353,7 @@ const VideoReelPlayer = ({ videos }: { videos: VideoItem[] }) => {
   const v = videos[active];
 
   return (
-    <div style={{
-      display: "grid", gridTemplateColumns: "340px 1fr", gap: 0,
+    <div className="gallery-reel-player" style={{
       background: INK, border: `1px solid ${INK}`,
     }}>
       {/* Left: reel list */}

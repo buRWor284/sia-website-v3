@@ -183,7 +183,7 @@ const PodcastLead = () => (
     <DoubleRule style={{ margin: "0 0 36px" }} />
 
     {/* Lead — 2-col: about the show + listen-on aside */}
-    <div style={{ display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: 64, alignItems: "start" }}>
+    <div className="grid-hero-2col" style={{ alignItems: "start" }}>
       <div
         style={{
           columnCount: 2,
@@ -270,7 +270,7 @@ const PodcastLead = () => (
 
     {/* Stats strip */}
     <DoubleRule style={{ margin: "52px 0 0" }} />
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
+    <div className="grid-stats">
       {STATS.map(([n, l], i) => (
         <div
           key={n}
@@ -299,14 +299,11 @@ const Featured = () => (
     <SectionMast n="01" label="Featured episode · Most-played" />
 
     <div
+      className="grid-featured-dark"
       style={{
         background: INK,
         color: PAPER,
         padding: "48px 48px",
-        display: "grid",
-        gridTemplateColumns: "1fr 1.3fr",
-        gap: 56,
-        alignItems: "center",
         position: "relative",
         border: `1px solid ${INK}`,
       }}
@@ -403,15 +400,7 @@ const Guests = () => (
   <section style={{ background: PAPER, padding: "60px 56px 90px" }}>
     <SectionMast n="02" label="Notable guests · From the desk" />
 
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 1.4fr",
-        gap: 60,
-        alignItems: "baseline",
-        marginBottom: 40,
-      }}
-    >
+    <div className="grid-intro" style={{ marginBottom: 40 }}>
       <h2
         style={{
           margin: 0,
@@ -446,12 +435,8 @@ const Guests = () => (
     </div>
 
     <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 0,
-        border: `1px solid ${INK}`,
-      }}
+      className="grid-cards-3"
+      style={{ gap: 0, border: `1px solid ${INK}` }}
     >
       {NOTABLE_GUESTS.map((g, i) => (
         <div
@@ -562,14 +547,8 @@ const AllEpisodes = () => (
           {s.episodes.map((ep) => (
             <li
               key={ep[0]}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "90px 1fr 160px 60px",
-                gap: 20,
-                padding: "18px 0",
-                borderBottom: `1px solid ${INK15}`,
-                alignItems: "baseline",
-              }}
+              className="episode-row"
+              style={{ borderBottom: `1px solid ${INK15}` }}
             >
               <div
                 style={{
@@ -607,6 +586,7 @@ const AllEpisodes = () => (
                 {ep[1]}
               </a>
               <div
+                className="episode-guest"
                 style={{
                   fontFamily: SERIF,
                   fontStyle: "italic",
@@ -616,7 +596,7 @@ const AllEpisodes = () => (
               >
                 {ep[2]}
               </div>
-              <div style={{ textAlign: "right" }}>
+              <div className="episode-listen" style={{ textAlign: "right" }}>
                 <a
                   href={`/podcast/${ep[3]}`}
                   style={{

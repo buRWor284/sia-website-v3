@@ -81,8 +81,8 @@ export const SiteHeader = () => {
           </div>
         </div>
 
-        {/* Right: availability CTAs — one row with gap */}
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
+        {/* Right: availability CTAs — hidden on mobile (shown in hamburger menu) */}
+        <div className="site-header__announce" style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <a href="/fractional-cmo" style={{
             fontFamily: GROT, fontWeight: 700, fontSize: 9,
             letterSpacing: ".14em", textTransform: "uppercase",
@@ -183,6 +183,23 @@ export const SiteHeader = () => {
             {label}
           </Link>
         ))}
+        {/* Availability announcements — mobile only */}
+        <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid rgba(250,250,250,.10)`, display: "flex", flexDirection: "column", gap: 8 }}>
+          <a href="/fractional-cmo" onClick={() => setMenuOpen(false)} style={{
+            fontFamily: GROT, fontWeight: 700, fontSize: 10,
+            letterSpacing: ".14em", textTransform: "uppercase",
+            color: "#2e90c3", textDecoration: "none",
+          }}>
+            ● 2 FRACTIONAL CMO SPOTS · Q3 2026
+          </a>
+          <a href="/emos" onClick={() => setMenuOpen(false)} style={{
+            fontFamily: GROT, fontWeight: 700, fontSize: 10,
+            letterSpacing: ".14em", textTransform: "uppercase",
+            color: "#2e90c3", textDecoration: "none",
+          }}>
+            ● EMOS FOUNDING CLASS · APPLY NOW
+          </a>
+        </div>
         <a
           href={CALENDLY}
           target="_blank"

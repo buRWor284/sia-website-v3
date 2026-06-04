@@ -56,14 +56,10 @@ const LEGAL = [
 const S = {
   footer: {
     background: "#f5f0e8",
-    padding: "56px 56px 28px",
     borderTop: "2px solid #0e0d0a",
     fontFamily: "'Archivo', 'Helvetica Neue', Arial, sans-serif",
   } as React.CSSProperties,
   grid: {
-    display: "grid",
-    gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
-    gap: 40,
     paddingBottom: 40,
     borderBottom: "2px solid #0e0d0a",
   } as React.CSSProperties,
@@ -149,9 +145,9 @@ const S = {
 };
 
 export const Colophon = () => (
-  <footer style={S.footer}>
+  <footer className="colophon-footer" style={S.footer}>
     {/* Grid */}
-    <div style={S.grid}>
+    <div className="grid-colophon" style={S.grid}>
       {/* Brand block */}
       <div>
         <div style={S.wordmark}>Syed Irfan Ajmal</div>

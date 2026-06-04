@@ -1020,6 +1020,18 @@ export default function AuthorityCalculatorPage() {
     <>
       <style>{PAGE_STYLES}</style>
       <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+        {/* Back to site */}
+        <div style={{ padding: "12px clamp(22px,5vw,56px)", borderBottom: `1px solid ${INK15}`, background: PAPER }}>
+          <a href="/" style={{
+            display: "inline-flex", alignItems: "center", gap: 7,
+            fontFamily: GROT, fontWeight: 700, fontSize: 11,
+            letterSpacing: "0.12em", textTransform: "uppercase",
+            color: INK55, textDecoration: "none",
+          }}>
+            <span style={{ fontSize: 14, lineHeight: 1 }}>←</span>
+            syedirfanajmal.com
+          </a>
+        </div>
         <Hero />
         <ViewToggle view={view} setView={setView} />
 

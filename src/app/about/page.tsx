@@ -436,16 +436,13 @@ const PressArchive = () => (
 
     {/* Forbes ME print feature — text left, photo right */}
     <div
+      className="forbes-spread"
       style={{
-        display: "grid",
-        gridTemplateColumns: "1fr 260px",
-        gap: 20,
         padding: 14,
         background: "#111",
         border: `1px solid rgba(250,250,250,.18)`,
         marginBottom: 36,
       }}
-      className="forbes-spread"
     >
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "4px 4px" }}>
         <div>

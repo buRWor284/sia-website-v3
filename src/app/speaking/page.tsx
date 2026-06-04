@@ -284,7 +284,7 @@ const SpeakingLead = () => (
         </div>
 
         {/* Compact stat row */}
-        <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, borderTop: `2px solid ${INK}`, paddingTop: 16 }}>
+        <div className="grid-stats" style={{ marginTop: 20, gap: 8, borderTop: `2px solid ${INK}`, paddingTop: 16 }}>
           {STATS.map(([n, l]) => (
             <div key={n} style={{ textAlign: "center" }}>
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px, 3vw, 36px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{n}</div>

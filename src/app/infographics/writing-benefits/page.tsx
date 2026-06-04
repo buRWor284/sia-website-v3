@@ -280,9 +280,8 @@ const Hero = () => (
       </p>
     </div>
 
-    <div style={{
+    <div className="grid-stats" style={{
       marginTop: 40,
-      display: "grid", gridTemplateColumns: "repeat(4, 1fr)",
       gap: 0, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}`,
     }}>
       {([
@@ -668,10 +667,7 @@ const Findings = () => {
     <section style={{ background: PAPER, padding: "0 56px 64px" }}>
       <SectionMast n="02" label="The Findings · Eleven, click to expand" />
 
-      <div style={{
-        display: "grid", gridTemplateColumns: "1fr 320px",
-        gap: 36, alignItems: "flex-start",
-      }}>
+      <div className="grid-dark-card" style={{ gap: 36, alignItems: "flex-start" }}>
         <div>
           <FilterBar
             activeCats={cats}

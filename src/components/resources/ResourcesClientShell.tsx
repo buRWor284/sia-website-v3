@@ -1105,7 +1105,7 @@ function ComingBackSection({ items }: { items: ContentItem[] }) {
           {items.length} {items.length === 1 ? "item" : "items"}
         </span>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
+      <div className="grid-stats" style={{ gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
         {items.map((item) => (
           <div key={item.id} style={{ background: PAPER, padding: "16px 18px 14px", opacity: 0.55, borderLeft: `3px solid ${TYPE_ACCENT[item.type]}` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>

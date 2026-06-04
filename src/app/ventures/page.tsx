@@ -243,7 +243,7 @@ function VenturesLead() {
       <DoubleRule style={{ marginBottom: 0 }} />
 
       {/* Lead + SIA aside */}
-      <div style={{ display: "grid", gridTemplateColumns: "clamp(300px, 60%, 1fr) 1fr", gap: 64, alignItems: "start", marginTop: 40 }}>
+      <div className="grid-hero-2col" style={{ alignItems: "start", marginTop: 40 }}>
         {/* Drop-cap lead */}
         <div style={{ columnCount: 2, columnGap: 28, fontFamily: SERIF, fontSize: 17.5, color: INK, lineHeight: 1.55, textAlign: "justify" }}>
           <p style={{ margin: 0 }}>
@@ -487,13 +487,7 @@ function CurrentVenturesSection() {
   return (
     <section style={{ background: PAPER2, padding: "80px 56px" }}>
       <SectionMast n="01" label="Current Ventures · Operating Now" />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 24,
-        }}
-      >
+      <div className="grid-cards-3" style={{ gap: 24 }}>
         {CURRENT.map((v, i) => (
           <VentureCard
             key={v.name}
