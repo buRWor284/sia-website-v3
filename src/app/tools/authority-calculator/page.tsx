@@ -1001,7 +1001,7 @@ const DEFAULTS: CalcState = {
   spend: SPEND.def, traffic: TRAFFIC.def,
   aov: AOV.def, tier: "sprint",
 };
-const STORE_KEY = "sia.emos.roi.v2";
+const STORE_KEY = "sia.emos.roi.v3";
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function AuthorityCalculatorPage() {
