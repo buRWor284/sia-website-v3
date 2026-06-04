@@ -259,9 +259,11 @@ const Inputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => vo
                 Conversion assumption used in this model
               </SCaps>
               <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.4 }}>
-                Baseline <strong>1% CVR</strong> → projected <strong>3% CVR</strong> after earned media compounds.
-                Based on ConversionXL research: "As seen in Forbes" lifts conversion 15–30%; editorial backlinks
-                raise branded search, which converts 5–10× generic traffic.
+                Baseline <strong>1% CVR</strong> to projected <strong>3% CVR</strong> after earned media compounds.
+                This is the conservative end of the research: &ldquo;As seen in Forbes&rdquo; lifts conversion 15 to 30% on
+                its own (ConversionXL). Add editorial backlinks driving higher-intent traffic, branded search converting
+                5 to 10x generic traffic, and repeat exposure from media mentions, and getting from 1% to 3% is the
+                floor, not the ceiling. Real-world results often run higher.
               </p>
             </div>
           </div>
@@ -862,9 +864,11 @@ const SimpleInputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>)
     }}>
       <span style={{ width: 7, height: 7, background: AMBER, flexShrink: 0, marginTop: 5 }} />
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.4 }}>
-        <strong>Conversion assumption:</strong> baseline <strong>1% CVR</strong> → projected <strong>3% CVR</strong> after
-        earned media compounds. Based on ConversionXL: editorial trust lifts conversion 15–30%; branded search
-        converts 5–10× generic traffic.
+        <strong>Conversion assumption:</strong> baseline <strong>1% CVR</strong> to projected <strong>3% CVR</strong> after
+        earned media compounds. This is the conservative end of the research: &ldquo;As seen in Forbes&rdquo; lifts
+        conversion 15 to 30% on its own (ConversionXL). Add editorial backlinks driving higher-intent traffic,
+        branded search converting 5 to 10x generic traffic, and repeat exposure from media mentions, and getting
+        from 1% to 3% is the floor, not the ceiling. Real-world results often run higher.
       </p>
     </div>
 
@@ -997,7 +1001,7 @@ const DEFAULTS: CalcState = {
   spend: SPEND.def, traffic: TRAFFIC.def,
   aov: AOV.def, tier: "sprint",
 };
-const STORE_KEY = "sia.emos.roi.v1";
+const STORE_KEY = "sia.emos.roi.v2";
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function AuthorityCalculatorPage() {
