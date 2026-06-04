@@ -14,3 +14,4 @@ export { CredibilityTicker } from "./CredibilityTicker";
 export { CTATicker } from "./CTATicker";
 export { Subscriptions } from "./Subscriptions";
 export { Colophon } from "./Colophon";
+export { ToolHeader, ToolFooter } from "./ToolChrome";

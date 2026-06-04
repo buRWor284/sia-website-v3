@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { CollabIQ } from "@/components/tools/CollabIQ";
+import { ToolHeader, ToolFooter } from "@/components/bureau";
 
 export const metadata: Metadata = {
   title: "CollabIQ — Partnership Intelligence Tool · SIA",
@@ -17,7 +18,10 @@ export default function CollabIQPage() {
         src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
         strategy="lazyOnload"
       />
+      {/* Slim tool header — non-sticky so it doesn't conflict with WizardProgress (position:fixed) */}
+      <ToolHeader toolName="CollabIQ — Partnership Intelligence" sticky={false} />
       <CollabIQ />
+      <ToolFooter />
     </>
   );
 }

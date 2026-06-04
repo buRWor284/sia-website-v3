@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
-import { Colophon, Subscriptions } from "@/components/bureau";
+import { Subscriptions, ToolHeader, ToolFooter } from "@/components/bureau";
 import {
   DoubleRule,
   Mark,
@@ -1019,19 +1019,8 @@ export default function AuthorityCalculatorPage() {
   return (
     <>
       <style>{PAGE_STYLES}</style>
+      <ToolHeader toolName="Authority Cost Calculator" />
       <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-        {/* Back to site */}
-        <div style={{ padding: "12px clamp(22px,5vw,56px)", borderBottom: `1px solid ${INK15}`, background: PAPER }}>
-          <a href="/" style={{
-            display: "inline-flex", alignItems: "center", gap: 7,
-            fontFamily: GROT, fontWeight: 700, fontSize: 11,
-            letterSpacing: "0.12em", textTransform: "uppercase",
-            color: INK55, textDecoration: "none",
-          }}>
-            <span style={{ fontSize: 14, lineHeight: 1 }}>←</span>
-            syedirfanajmal.com
-          </a>
-        </div>
         <Hero />
         <ViewToggle view={view} setView={setView} />
 
@@ -1052,7 +1041,7 @@ export default function AuthorityCalculatorPage() {
             <BelowFold />
             <CTABlock st={st} variant="close" />
             <Subscriptions sectionNumber="05" />
-            <Colophon />
+            <ToolFooter />
           </>
         )}
         <ScrollButtons />
