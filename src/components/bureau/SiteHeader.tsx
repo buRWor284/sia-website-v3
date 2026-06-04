@@ -30,6 +30,9 @@ export const SiteHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  // Tools get their own chrome — suppress site header
+  if (pathname.startsWith("/tools/")) return null;
+
   return (
     <header style={{
       background: INK,

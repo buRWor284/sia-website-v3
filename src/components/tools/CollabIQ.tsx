@@ -875,10 +875,10 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled, theme }: 
     <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:90,
       background:t.BG0, borderTop:`1px solid ${t.BDS}`, padding:"14px 32px",
       display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-      {step>0
-        ? <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px" }}>← Back</button>
-        : <a href="https://www.syedirfanajmal.com" style={{ fontFamily:MF, fontSize:9, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:TX3, textDecoration:"none" }}>← Home</a>
-      }
+      <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+        {step>0 && <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px" }}>← Back</button>}
+        <a href="https://www.syedirfanajmal.com" style={{ fontFamily:MF, fontSize:9, letterSpacing:"0.1em", textTransform:"uppercase", color:t.TX4, textDecoration:"none" }}>syedirfanajmal.com ↗</a>
+      </div>
       <span style={{ fontFamily:MF, fontSize:9, color:t.TX4, letterSpacing:"0.1em" }}>{step+1} of 5</span>
       {nextLabel
         ? <button onClick={onNext} disabled={nextDisabled}

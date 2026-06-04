@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 export const CredibilityTicker = () => {
   const pathname = usePathname();
   if (pathname.startsWith("/emos")) return null;
+  if (pathname.startsWith("/tools/")) return null;
 
   return (
   <div className="sia-ticker" aria-label="Publications · Speaking · Podcast">
