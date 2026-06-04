@@ -1068,6 +1068,11 @@ export default function HomePage() {
             <a href="/fractional-cmo" className="footer__open">● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
             <a href="/emos" className="footer__open">● EMOS FOUNDING CLASS · APPLY NOW</a>
           </div>
+          <div className="footer__contact">
+            <a href="/privacy" className="footer__link">PRIVACY POLICY</a>
+            <a href="/terms" className="footer__link">TERMS</a>
+            <a href="/refund-policy" className="footer__link">REFUND POLICY</a>
+          </div>
         </div>
       </footer>
     </>

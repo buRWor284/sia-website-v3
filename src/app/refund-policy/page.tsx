@@ -50,7 +50,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "How to request a refund",
     body: (
       <p>
-        Email <a href="mailto:syedirfanajmal@gmail.com" style={{ color: INK, textDecoration: "underline" }}>syedirfanajmal@gmail.com</a> from the email address used at checkout. Include your order number and a brief summary of outreach activity completed. We review refund requests within <strong>5 business days</strong> and confirm by email.
+        Email <a href="mailto:sia@syedirfanajmal.com" style={{ color: INK, textDecoration: "underline" }}>sia[@]syedirfanajmal[dot]com</a> from the email address used at checkout. Include your order number and a brief summary of outreach activity completed. We review refund requests within <strong>5 business days</strong> and confirm by email.
       </p>
     ),
   },
@@ -74,7 +74,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "Contact",
     body: (
       <p>
-        Questions about a refund? Email <a href="mailto:syedirfanajmal@gmail.com" style={{ color: INK, textDecoration: "underline" }}>syedirfanajmal@gmail.com</a>.
+        Questions about a refund? Email <a href="mailto:sia@syedirfanajmal.com" style={{ color: INK, textDecoration: "underline" }}>sia[@]syedirfanajmal[dot]com</a>.
       </p>
     ),
   },

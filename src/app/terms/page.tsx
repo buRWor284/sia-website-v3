@@ -106,7 +106,7 @@ const sections: { n: string; heading: string; body: React.ReactNode }[] = [
     body: (
       <p>
         SIA Enterprises (sole proprietorship) · Pakistan<br />
-        Email: <a href="mailto:syedirfanajmal@gmail.com" style={{ color: INK, textDecoration: "underline" }}>syedirfanajmal@gmail.com</a>
+        Email: <a href="mailto:sia@syedirfanajmal.com" style={{ color: INK, textDecoration: "underline" }}>sia[@]syedirfanajmal[dot]com</a>
       </p>
     ),
   },
