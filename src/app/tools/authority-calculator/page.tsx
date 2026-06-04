@@ -690,12 +690,12 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
 // ── Below the fold ────────────────────────────────────────────────────────────
 // Aligned with the EMOS 5-Return Framework from dmr.agency/earnedmediaos/
 const BENEFITS: [string, string][] = [
+  ["AI / LLM citations",
+   "ChatGPT, Perplexity, and Google AI Overviews cite credible publications. Cited brands surface in AI answers about their space — a channel growing faster than any other."],
   ["Investor proof",
    "VCs Google you before the first meeting. A Tier 1 citation answers the credibility question before it's asked — and shapes the conversation before you're in the room."],
   ["SEO authority",
    "A DA 80+ backlink lifts your domain rating; target pages rank higher for the keywords your buyers use. The agency invoice stops; the domain authority stays."],
-  ["AI / LLM citations",
-   "ChatGPT, Perplexity, and Google AI Overviews cite credible publications. Cited brands surface in AI answers about their space — a channel growing faster than any other."],
   ["Permanent sales collateral",
    "\"As seen in Forbes\" on your homepage, deck, and email signature. Bought once, used indefinitely — in investor materials, sales calls, and conference bios."],
   ["Social signal & referral traffic",
@@ -744,6 +744,47 @@ const BelowFold = () => (
     {/* benefit cards */}
     <div style={{ marginTop: 48 }}>
       <SectionMast n="04" label="What the calculator can't count · and still counts" />
+
+      {/* LLM Visibility spotlight — fastest-growing channel, not in the math */}
+      <div style={{
+        border: `2px solid ${BLUE}`, background: hexA(BLUE, 0.04),
+        padding: "clamp(20px,3vw,32px) clamp(20px,3vw,36px)", marginBottom: 32,
+      }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 28, flexWrap: "wrap" }}>
+          <div style={{ flex: "1 1 320px" }}>
+            <SCaps size={11} ls="0.22em" color={BLUE} style={{ display: "block", marginBottom: 12 }}>
+              GEO · AI / LLM Visibility — fastest-growing channel
+            </SCaps>
+            <h3 style={{
+              margin: 0, fontFamily: SERIF, fontWeight: 700,
+              fontSize: "clamp(22px,3vw,32px)", color: INK, lineHeight: 1.05, letterSpacing: "-0.018em",
+            }}>
+              ChatGPT cites Forbes.<br />Does it cite <em>you</em>?
+            </h3>
+            <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 17, color: INK70, lineHeight: 1.5, maxWidth: 580 }}>
+              ChatGPT, Perplexity, and Google AI Overviews pull from credible publications when answering buyer questions.
+              Earned media placements put your brand in those answers — before a prospect ever reaches your site.
+            </p>
+            <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
+              The calculator above counts only financial ROI. It cannot measure the deal that starts because an AI cited you first.
+            </p>
+          </div>
+          <div style={{
+            flexShrink: 0, border: `1px solid ${hexA(BLUE, 0.35)}`,
+            background: hexA(BLUE, 0.07), padding: "16px 20px", alignSelf: "flex-start",
+          }}>
+            <SCaps size={10} ls="0.14em" color={BLUE} style={{ display: "block", marginBottom: 10 }}>
+              AI sources that cite publications
+            </SCaps>
+            {["ChatGPT / GPT-4o", "Perplexity AI", "Google AI Overviews", "Claude · Gemini · Copilot"].map((ai) => (
+              <div key={ai} style={{
+                padding: "6px 0", borderBottom: `1px solid ${hexA(BLUE, 0.2)}`,
+                fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.3,
+              }}>{ai}</div>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="calc-benefits">
         {BENEFITS.map(([h, b], i) => (
           <div key={h} style={{
@@ -785,6 +826,175 @@ const BelowFold = () => (
   </section>
 );
 
+// ── View Toggle ───────────────────────────────────────────────────────────────
+const ViewToggle = ({ view, setView }: { view: "simple" | "extended"; setView: (v: "simple" | "extended") => void }) => (
+  <div style={{ background: PAPER, padding: "0 clamp(22px,5vw,56px) 32px", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+    <div style={{ display: "flex", border: `1.5px solid ${INK}` }}>
+      {(["simple", "extended"] as const).map((v, i) => (
+        <button
+          key={v}
+          onClick={() => setView(v)}
+          style={{
+            padding: "11px 24px",
+            background: view === v ? INK : PAPER,
+            color: view === v ? PAPER : INK,
+            border: "none",
+            borderLeft: i ? `1.5px solid ${INK}` : "none",
+            fontFamily: GROT, fontWeight: 800, fontSize: 11,
+            letterSpacing: "0.12em", textTransform: "uppercase" as const,
+            cursor: "pointer",
+          }}
+        >
+          {v === "simple" ? "Quick View" : "Full Analysis"}
+        </button>
+      ))}
+    </div>
+    <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
+      {view === "simple"
+        ? "Your numbers → your result, in one view."
+        : "Full rent-vs-own breakdown with all assumptions."}
+    </p>
+  </div>
+);
+
+// ── Simple Inputs (compact layout for Quick View mode) ────────────────────────
+const SimpleInputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => void }) => {
+  const cfg = SPEND[st.mode];
+  return (
+    <section style={{ background: PAPER, padding: "0 clamp(22px,5vw,56px) 36px" }}>
+      {/* Mode toggle */}
+      <div style={{ marginBottom: 28 }}>
+        <SCaps size={11} ls="0.16em" color={INK} style={{ display: "block", marginBottom: 10 }}>
+          How you currently earn links
+        </SCaps>
+        <div style={{ display: "flex", border: `1.5px solid ${INK}`, maxWidth: 480 }}>
+          {(Object.entries(SPEND) as [string, SpendOption][]).map(([key, opt], i) => (
+            <button
+              key={key}
+              onClick={() => set({ mode: key as "agency" | "links" })}
+              style={{
+                flex: 1, cursor: "pointer", border: "none",
+                borderLeft: i ? `1.5px solid ${INK}` : "none",
+                background: st.mode === key ? INK : PAPER,
+                color: st.mode === key ? PAPER : INK,
+                padding: "12px 14px",
+                fontFamily: GROT, fontWeight: 800, fontSize: 11,
+                letterSpacing: "0.06em", lineHeight: 1.2,
+              }}
+            >{opt.label}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* 3 sliders in a row */}
+      <div className="simple-inputs-grid" style={{ marginBottom: 28 }}>
+        <Slider
+          label={cfg.costLabel + " / mo"}
+          min={cfg.min} max={cfg.max} step={cfg.step}
+          value={st.mode === "agency" ? st.retainer : st.linkSpend}
+          onChange={(v) => set(st.mode === "agency" ? { retainer: v } : { linkSpend: v })}
+          format={fmt} accent={RED}
+        />
+        <Slider
+          label="Monthly visitors"
+          min={TRAFFIC.min} max={TRAFFIC.max} step={TRAFFIC.step}
+          value={st.traffic} onChange={(v) => set({ traffic: v })}
+          format={(n) => n.toLocaleString("en-US")}
+        />
+        <Slider
+          label="Avg deal / order value"
+          min={AOV.min} max={AOV.max} step={AOV.step}
+          value={st.aov} onChange={(v) => set({ aov: v })} format={fmt}
+        />
+      </div>
+
+      {/* Compact tier selector */}
+      <div>
+        <SCaps size={11} ls="0.16em" color={INK} style={{ display: "block", marginBottom: 10 }}>
+          EMOS track — updates your result below
+        </SCaps>
+        <div className="simple-tier-grid">
+          {TIERS.map((t) => {
+            const on = st.tier === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => set({ tier: t.id })}
+                style={{
+                  cursor: "pointer", textAlign: "left",
+                  border: `1.5px solid ${INK}`,
+                  background: on ? INK : PAPER,
+                  color: on ? PAPER : INK,
+                  padding: "14px 20px", flex: 1,
+                  display: "flex", justifyContent: "space-between",
+                  alignItems: "center", gap: 16,
+                }}
+              >
+                <div>
+                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, lineHeight: 1.1 }}>{t.name}</div>
+                  <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, marginTop: 4,
+                    color: on ? "rgba(250,250,250,.65)" : INK55 }}>{t.blurb}</div>
+                </div>
+                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, color: on ? YEL : INK, flexShrink: 0 }}>
+                  {fmt(t.fee)}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ── LLM Visibility Callout ────────────────────────────────────────────────────
+// Surfaces the fastest-growing channel — not counted in the ROI math
+const LLMCallout = () => (
+  <section style={{ background: PAPER, padding: "0 clamp(22px,5vw,56px) 36px" }}>
+    <div style={{
+      border: `2px solid ${BLUE}`, background: hexA(BLUE, 0.04),
+      padding: "clamp(20px,3vw,32px) clamp(20px,3vw,36px)",
+    }}>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 28, flexWrap: "wrap" }}>
+        <div style={{ flex: "1 1 320px" }}>
+          <SCaps size={11} ls="0.22em" color={BLUE} style={{ display: "block", marginBottom: 12 }}>
+            GEO · AI / LLM Visibility — not in the ROI above
+          </SCaps>
+          <h3 style={{
+            margin: 0, fontFamily: SERIF, fontWeight: 700,
+            fontSize: "clamp(22px,3vw,32px)", color: INK, lineHeight: 1.05, letterSpacing: "-0.018em",
+          }}>
+            ChatGPT cites Forbes.<br />Does it cite <em>you</em>?
+          </h3>
+          <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 16.5, color: INK70, lineHeight: 1.5 }}>
+            ChatGPT, Perplexity, and Google AI Overviews pull from credible publications when answering buyer questions.
+            Earned media placements put your brand in those answers — before a prospect ever reaches your site.
+          </p>
+          <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
+            The ROI above is purely financial. It can't measure the deal that starts because an AI cited you first.
+          </p>
+        </div>
+        <div style={{ flexShrink: 0 }}>
+          <SCaps size={10} ls="0.14em" color={INK55} style={{ display: "block", marginBottom: 10 }}>
+            Also not counted above
+          </SCaps>
+          {[
+            "Investor credibility (VCs Google you first)",
+            "Permanent sales collateral",
+            "Compounding journalist relationships",
+          ].map((b) => (
+            <div key={b} style={{
+              padding: "8px 14px", marginBottom: 6,
+              border: `1px solid ${INK15}`, background: PAPER,
+              fontFamily: SERIF, fontSize: 13.5, color: INK70, lineHeight: 1.35,
+            }}>{b}</div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
 // ── Page styles (scoped via className) ───────────────────────────────────────
 const PAGE_STYLES = `
   .emos-range {
@@ -805,15 +1015,20 @@ const PAGE_STYLES = `
   .calc-herostats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .calc-benefits { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #1a1410; }
   .calc-snap { display: grid; grid-template-columns: 1fr 1fr 1fr; }
+  .simple-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .simple-tier-grid { display: flex; gap: 14px; }
   @media (max-width: 820px) {
     .calc-grid2 { grid-template-columns: 1fr; }
     .calc-herostats { grid-template-columns: 1fr 1fr; }
+    .simple-inputs-grid { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 640px) {
     .calc-grid3 { grid-template-columns: 1fr; }
     .calc-herostats { grid-template-columns: 1fr; }
     .calc-benefits { grid-template-columns: 1fr; }
     .calc-snap { grid-template-columns: 1fr 1fr; }
+    .simple-inputs-grid { grid-template-columns: 1fr; }
+    .simple-tier-grid { flex-direction: column; }
   }
   @media print { .emos-range { display: none; } }
 `;
@@ -829,6 +1044,7 @@ const STORE_KEY = "sia.emos.roi.v1";
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function AuthorityCalculatorPage() {
   const [st, setSt] = useState<CalcState>(DEFAULTS);
+  const [view, setView] = useState<"simple" | "extended">("simple");
 
   useEffect(() => {
     try {
@@ -848,16 +1064,29 @@ export default function AuthorityCalculatorPage() {
       <style>{PAGE_STYLES}</style>
       <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
         <Hero />
-        <Inputs st={st} set={set} />
-        <Comparison st={st} />
-        <EMOSReveal st={st} set={set} />
-        <Result st={st} />
-        <CTABlock st={st} variant="mid" />
-        <BelowFold />
-        <CTABlock st={st} variant="close" />
-        <Subscriptions sectionNumber="05" />
-        <Colophon />
-      <ScrollButtons />
+        <ViewToggle view={view} setView={setView} />
+
+        {view === "simple" ? (
+          <>
+            <SimpleInputs st={st} set={set} />
+            <Result st={st} />
+            <LLMCallout />
+            <CTABlock st={st} variant="mid" />
+          </>
+        ) : (
+          <>
+            <Inputs st={st} set={set} />
+            <Comparison st={st} />
+            <EMOSReveal st={st} set={set} />
+            <Result st={st} />
+            <CTABlock st={st} variant="mid" />
+            <BelowFold />
+            <CTABlock st={st} variant="close" />
+            <Subscriptions sectionNumber="05" />
+            <Colophon />
+          </>
+        )}
+        <ScrollButtons />
       </div>
     </>
   );
