@@ -20,8 +20,8 @@ const css = `
     --I15:  rgba(14,13,10,.15);
     --RED:  #2e90c3;
     --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
-    --BG:  #f5f0e8;
-    --BG2: #ece7da;
+    --BG:  #FAFAFA;
+    --BG2: #F0F0EE;
     --mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
   }
 
