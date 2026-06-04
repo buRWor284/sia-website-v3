@@ -1072,8 +1072,11 @@ export function CollabIQ() {
     const date = new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
     const bizName = state.biz||"Your Business";
     const strat = V2_STRATEGIES[state.strategy]?.label||"Discount Partnership";
+    const pList = partners.length>0?partners:V2_GENERIC;
+    const totalPages = aiBrief ? 5 : 4;
 
-    function pageFooter(page:number, total:number, dark=false) {
+    // ── Helpers ────────────────────────────────────────────────────
+    function pageFooter(page:number, dark=false) {
       const footY = H-8;
       if(dark){
         doc.setFillColor(...INK); doc.rect(0,H-16,W,16,"F");
@@ -1082,6 +1085,7 @@ export function CollabIQ() {
         doc.text("CollabIQ",M,footY);
         doc.setFont("helvetica","normal"); doc.setTextColor(80,70,60);
         doc.text("  ·  syedirfanajmal.com/tools/collabiq  ·  Syed Irfan Ajmal  ·  DMR.agency",M+18,footY);
+        doc.setTextColor(80,70,60);
       } else {
         doc.setFillColor(...CREAM); doc.rect(0,H-16,W,16,"F");
         doc.setDrawColor(220,215,205); doc.setLineWidth(0.3); doc.line(0,H-16,W,H-16);
@@ -1089,10 +1093,23 @@ export function CollabIQ() {
         doc.text("CollabIQ",M,footY);
         doc.setFont("helvetica","normal"); doc.setTextColor(...GREY);
         doc.text("  ·  syedirfanajmal.com/tools/collabiq  ·  Syed Irfan Ajmal  ·  DMR.agency",M+18,footY);
+        doc.setTextColor(...GREY);
       }
       doc.setFont("helvetica","normal"); doc.setFontSize(6);
-      doc.setTextColor(...(dark?[80,70,60] as [number,number,number]:GREY));
-      doc.text(`Page ${page} of 4`, W-M, footY, {align:"right"});
+      doc.text(`Page ${page} of ${totalPages}`, W-M, footY, {align:"right"});
+    }
+    function lightHeader(rightLabel:string) {
+      doc.setFillColor(...CREAM); doc.rect(0,0,W,H,"F");
+      doc.setFillColor(...GOLD); doc.rect(0,0,W,3,"F");
+      doc.setDrawColor(...INK); doc.setLineWidth(1.5); doc.line(0,15,W,15);
+      doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...INK);
+      doc.text("Collab",M,12);
+      const cw=doc.getTextWidth("Collab");
+      doc.setTextColor(...GOLD); doc.text("IQ",M+cw,12);
+      doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
+      doc.text("  ·  "+bizName.substring(0,30), M+cw+8, 12);
+      doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GREY);
+      doc.text(rightLabel.toUpperCase(), W-M, 12, {align:"right"});
     }
     function sectionNum(num:string, title:string, yp:number):number {
       doc.setFillColor(...INK); doc.rect(M,yp-5,13,11,"F");
@@ -1102,12 +1119,19 @@ export function CollabIQ() {
       doc.text(title, M+18, yp+2);
       return yp+16;
     }
+    // Fit single line of text to maxW, append ellipsis if truncated
+    function fitLine(text:string, maxW:number, fs:number):string {
+      doc.setFontSize(fs);
+      if(doc.getTextWidth(text)<=maxW) return text;
+      let out=text;
+      while(out.length>1 && doc.getTextWidth(out+"…")>maxW) out=out.slice(0,-1);
+      return out+"…";
+    }
     const tierRGB = (t:string):[number,number,number] => t==="A"?TAUR:t==="B"?TBLUE:GREY;
 
-    // ════ PAGE 1: DARK COVER ═══════════════════════════════════════
+    // ════ PAGE 1: DARK COVER ════════════════════════════════════════
     doc.setFillColor(...INK); doc.rect(0,0,W,H,"F");
     doc.setFillColor(...GOLD); doc.rect(0,0,W,6,"F");
-    // Header
     doc.setFillColor(40,32,24); doc.rect(M,15,12,12,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...INK);
     doc.text("SIA", M+6, 22.5, {align:"center"});
@@ -1115,126 +1139,122 @@ export function CollabIQ() {
     doc.text("Syed Irfan Ajmal  ·  DMR.agency", M+16, 22);
     doc.setTextColor(70,60,50); doc.setFontSize(7);
     doc.text("syedirfanajmal.com", W-M, 22, {align:"right"});
-    // Gold line + overline
     let y=68;
     doc.setFillColor(...GOLD); doc.rect(M,y,22,1.5,"F");
     doc.setFillColor(40,32,24); doc.rect(M+24,y,W-M*2-24,1.5,"F");
     y+=9; doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...GOLD);
     doc.text("PARTNERSHIP INTELLIGENCE REPORT", M, y); y+=13;
-    // Title
     doc.setFont("helvetica","bold"); doc.setFontSize(50); doc.setTextColor(...CREAM);
     doc.text("Collab", M, y);
     doc.setTextColor(...GOLD); doc.text("IQ", M+doc.getTextWidth("Collab"), y); y+=13;
     doc.setFont("helvetica","normal"); doc.setFontSize(17); doc.setTextColor(180,165,145);
     doc.text("Your personalised partnership", M, y); y+=7;
     doc.text("campaign brief", M, y); y+=16;
-    // Dividers
     doc.setFillColor(...GOLD); doc.rect(M,y,46,1.5,"F");
     doc.setFillColor(40,32,24); doc.rect(M+48,y,W-M*2-48,1.5,"F"); y+=14;
-    // Business grid 2x3
-    const summaryRows:[string,string,boolean][] = [
-      ["Business", bizName, true],["Website", state.domain||"—", false],
-      ["Industry", ind||"—", false],["Strategy", strat, true],
-      ["Audience", state.audType||"—", false],["Geography", state.geo||"—", false],
-    ];
+    // Business summary grid
     const cW2=(W-M*2)/2;
+    const summaryRows:[string,string,boolean][]=[
+      ["Business",bizName,true],["Website",state.domain||"—",false],
+      ["Industry",ind||"—",false],["Strategy",strat,true],
+      ["Audience",state.audType||"—",false],["Geography",state.geo||"—",false],
+    ];
     summaryRows.forEach(([label,val,accent],i)=>{
-      const cx=M+(i%2)*cW2, cy=y+Math.floor(i/2)*24;
+      const cx=M+(i%2)*cW2, cy=y+Math.floor(i/2)*22;
       doc.setDrawColor(50,42,32); doc.setFillColor(0,0,0,0); doc.setLineWidth(0.3);
-      doc.rect(cx,cy-6,cW2,24);
+      doc.rect(cx,cy-5,cW2,22);
       doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(120,105,85);
-      doc.text(label.toUpperCase(), cx+8, cy);
-      doc.setFont("helvetica", accent?"bold":"normal"); doc.setFontSize(13);
+      doc.text(label.toUpperCase(), cx+7, cy);
+      doc.setFont("helvetica",accent?"bold":"normal"); doc.setFontSize(12);
       doc.setTextColor(...(accent?GOLD:([180,165,145] as [number,number,number])));
-      doc.text((val).substring(0,30), cx+8, cy+9);
+      doc.text(fitLine(val, cW2-16, 12), cx+7, cy+9);
     });
-    y+=3*24+14;
+    y+=3*22+10;
+    // Selected partners
+    if(state.selNiches.length>0){
+      doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(100,88,70);
+      doc.text("SELECTED PARTNERS", M, y); y+=6;
+      let chipX=M;
+      state.selNiches.slice(0,8).forEach(name=>{
+        doc.setFont("helvetica","normal"); doc.setFontSize(7.5);
+        const chipW=doc.getTextWidth(name)+8;
+        if(chipX+chipW>W-M){ chipX=M; y+=9; }
+        doc.setDrawColor(70,58,42); doc.setLineWidth(0.3); doc.setFillColor(0,0,0,0);
+        doc.rect(chipX,y-5,chipW,8);
+        doc.setTextColor(170,155,130); doc.text(name,chipX+4,y);
+        chipX+=chipW+4;
+      });
+      y+=10;
+    }
     doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(70,60,50);
     doc.text(date, W-M, y, {align:"right"});
-    pageFooter(1,4,true);
+    pageFooter(1,true);
 
-    // ════ PAGE 2: PARTNER INTELLIGENCE ════════════════════════════
+    // ════ PAGE 2: PARTNER INTELLIGENCE — ALL 8 ═════════════════════
     doc.addPage();
-    doc.setFillColor(...CREAM); doc.rect(0,0,W,H,"F");
-    doc.setFillColor(...GOLD); doc.rect(0,0,W,3,"F");
-    // Page header bar
-    doc.setDrawColor(...INK); doc.setLineWidth(1.5); doc.line(0,15,W,15);
-    doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...INK);
-    doc.text("Collab",M,12);
-    const cw2a=doc.getTextWidth("Collab");
-    doc.setTextColor(...GOLD); doc.text("IQ",M+cw2a,12);
-    doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
-    doc.text("  ·  "+bizName, M+cw2a+8, 12);
-    doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GREY);
-    doc.text("PARTNER INTELLIGENCE", W-M, 12, {align:"right"});
+    lightHeader("Partner Intelligence");
     y=28;
-    y=sectionNum("01", `${partners.length||6} Partnership Targets Identified`, y);
-    // Partner cards 2-col
-    const pList=partners.length>0?partners:V2_GENERIC;
-    const cW=(W-M*2-8)/2, cH=40;
-    pList.slice(0,6).forEach((p,i)=>{
-      const cx=M+(i%2)*(cW+8), cy=y+Math.floor(i/2)*(cH+5);
+    y=sectionNum("01", `${pList.length} Partnership Targets Identified`, y);
+    // Smaller cards (4 rows x 2 cols = 8 partners)
+    const cW=(W-M*2-8)/2, cH=32;
+    pList.slice(0,8).forEach((p,i)=>{
+      const cx=M+(i%2)*(cW+8), cy=y+Math.floor(i/2)*(cH+4);
       doc.setDrawColor(210,205,195); doc.setFillColor(255,255,255); doc.setLineWidth(0.4);
       doc.rect(cx,cy,cW,cH);
-      // Tier
+      // Tier badge
       const [tr,tg,tb]=tierRGB(p.tier);
       doc.setDrawColor(tr,tg,tb); doc.setLineWidth(0.5);
-      doc.rect(cx+cW-22,cy+4,20,8);
-      doc.setFont("helvetica","bold"); doc.setFontSize(6.5); doc.setTextColor(tr,tg,tb);
-      doc.text(`Tier ${p.tier}`,cx+cW-12,cy+9.5,{align:"center"});
-      // Name
-      doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(...INK);
-      doc.text(p.name.substring(0,18),cx+6,cy+11);
-      doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
-      doc.text(p.url.substring(0,24),cx+6,cy+17);
-      // Why blurb
-      doc.setFontSize(8); doc.setTextColor(...DGREY);
-      const why=doc.splitTextToSize(p.why,cW-14) as string[];
-      doc.text(why.slice(0,2),cx+6,cy+23);
-      // Meta
-      doc.setFontSize(7); doc.setTextColor(...TAUR); doc.setFont("helvetica","bold");
-      doc.text(p.seoNote.substring(0,16),cx+6,cy+36);
+      doc.rect(cx+cW-20,cy+3,18,7);
+      doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(tr,tg,tb);
+      doc.text(`Tier ${p.tier}`,cx+cW-11,cy+8,{align:"center"});
+      // Name — fit to available width (exclude tier badge area)
+      const nameMaxW=cW-26;
+      doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...INK);
+      doc.text(fitLine(p.name, nameMaxW, 10), cx+5, cy+9);
+      // URL
+      doc.setFont("helvetica","normal"); doc.setFontSize(6.5); doc.setTextColor(...GREY);
+      doc.text(fitLine(p.url, cW-10, 6.5), cx+5, cy+15);
+      // Why — 1 line max at this card height
+      doc.setFontSize(7.5); doc.setTextColor(...DGREY);
+      const why=doc.splitTextToSize(p.why.replace(/[—–]/g,"-"), cW-10) as string[];
+      doc.text(why[0]||"", cx+5, cy+21);
+      // SEO + Contact footer row
+      const halfW=cW/2-6;
+      doc.setFontSize(6.5); doc.setTextColor(...TAUR); doc.setFont("helvetica","bold");
+      doc.text(fitLine(p.seoNote, halfW, 6.5), cx+5, cy+28);
       doc.setTextColor(...GREY); doc.setFont("helvetica","normal");
-      doc.text(p.contact.substring(0,22),cx+cW/2+2,cy+36);
+      doc.text(fitLine(p.contact, halfW, 6.5), cx+cW/2+2, cy+28);
     });
-    pageFooter(2,4);
+    pageFooter(2);
 
-    // ════ PAGE 3: OUTREACH + 90-DAY ROADMAP ═══════════════════════
+    // ════ PAGE 3: OUTREACH + 90-DAY ROADMAP ════════════════════════
     doc.addPage();
-    doc.setFillColor(...CREAM); doc.rect(0,0,W,H,"F");
-    doc.setFillColor(...GOLD); doc.rect(0,0,W,3,"F");
-    doc.setDrawColor(...INK); doc.setLineWidth(1.5); doc.line(0,15,W,15);
-    doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...INK);
-    doc.text("Collab",M,12);
-    const cw3a=doc.getTextWidth("Collab");
-    doc.setTextColor(...GOLD); doc.text("IQ",M+cw3a,12);
-    doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
-    doc.text("  ·  "+bizName, M+cw3a+8, 12);
-    doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GREY);
-    doc.text("STRATEGY & OUTREACH", W-M, 12, {align:"right"});
+    lightHeader("Strategy & Outreach");
     y=28;
-    y=sectionNum("03","Outreach Template",y);
-    // Dark template box
+    // Section 02 — Outreach Template (fixed numbering)
+    y=sectionNum("02","Outreach Template",y);
+    // Fix template: avoid "We [desc]" duplication — use desc as standalone sentence
+    const descText=state.desc
+      ? (state.desc.endsWith(".")?state.desc:state.desc+".")
+      : "[Briefly describe what you do and who you help.]";
     const tplMap:{[k:string]:string}={
-      discount:`Subject: Partnership idea — [THEIR BRAND] x ${bizName}\n\nHi [FIRST NAME],\n\nI'm [YOUR NAME] from ${bizName} — we ${state.desc||"[what you do]"}.\n\nI noticed you serve the same audience — [SHARED AUDIENCE] — from a different angle.\n\nProposal: we offer your clients an exclusive [X]% discount on ${bizName}. You mention us on your partner page with a link.\n\nThree-way win.\n\n15 minutes to explore this?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
-      institution:`Subject: Exclusive discount for [INSTITUTION] members\n\nHi [CONTACT],\n\nI'm [YOUR NAME] from ${bizName}. We ${state.desc||"[what you do]"}.\n\nWe'd love to offer [INSTITUTION] members an exclusive [X]% discount.\nAll we'd ask: a mention on your rebate page with a link.\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
-      badge:`Subject: Featured in our [GUIDE TITLE]\n\nHi [EXPERT], I'm building a guide: [GUIDE TITLE] featuring [EXPERT TYPE].\n\nYou'd get: a feature, a badge for your site, and promotion to [AUDIENCE].\n\nInterested?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
+      discount:`Subject: Partnership idea — [THEIR BRAND] x ${bizName}\n\nHi [FIRST NAME],\n\nI'm [YOUR NAME] from ${bizName}. ${descText}\n\nI noticed you serve the same audience from a different angle — and there's a natural fit.\n\nProposal: we offer your clients an exclusive [X]% discount on ${bizName}. You mention us on your partner page with a link.\n\nThree-way win.\n\n15 minutes to explore this?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
+      institution:`Subject: Exclusive discount for [INSTITUTION] members\n\nHi [CONTACT],\n\nI'm [YOUR NAME] from ${bizName}. ${descText}\n\nWe'd love to offer [INSTITUTION] members an exclusive [X]% discount. All we'd ask: a mention on your rebate page with a link.\n\nNo strings, no fees.\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
+      badge:`Subject: Featured in our [GUIDE TITLE]\n\nHi [EXPERT],\n\nI'm building a guide: [GUIDE TITLE] featuring [EXPERT TYPE]. You'd get a feature with credentials, a badge for your site, and promotion to [AUDIENCE].\n\nInterested?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
     };
     const tplText=tplMap[state.strategy]||tplMap.discount;
-    doc.setFillColor(...INK); doc.rect(M,y,W-M*2,52,"F");
-    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(190,178,158);
+    doc.setFillColor(...INK); doc.rect(M,y,W-M*2,54,"F");
+    doc.setFont("helvetica","normal"); doc.setFontSize(7.5); doc.setTextColor(190,178,158);
     const tlines=doc.splitTextToSize(tplText,W-M*2-14) as string[];
-    doc.text(tlines.slice(0,12),M+7,y+7);
-    y+=56;
+    doc.text(tlines.slice(0,14),M+7,y+7);
+    y+=58;
     doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
-    doc.text("Replace [BRACKETED] text before sending. Personalise for each partner.", M, y); y+=12;
-    // Section 04
-    y=sectionNum("04","90-Day Campaign Roadmap",y);
-    // AI badge
+    doc.text("Replace [BRACKETED] text before sending. Personalise for each specific partner.", M, y); y+=10;
+    // Section 03 — 90-Day Roadmap (fixed numbering)
+    y=sectionNum("03","90-Day Campaign Roadmap",y);
     doc.setFillColor(...GOLD); doc.rect(M+130,y-19,10,8,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...INK);
     doc.text("AI",M+135,y-13,{align:"center"});
-    // 4-phase grid
     const phases:[string,string,string,string[]][]=[
       ["01","Foundation","DAYS 1-14",["Audit backlink profile","Identify 20-30 target partners","Create discount codes per tier","Personalise top 10 outreach"]],
       ["02","Outreach","DAYS 15-45",["Send to Tier A partners first","Follow up after 5-7 days","Begin Tier B in parallel","Track in spreadsheet"]],
@@ -1252,11 +1272,10 @@ export function CollabIQ() {
       doc.text(title.toUpperCase(),cx+22,cy+10);
       doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
       doc.text(days,cx+22,cy+16);
-      doc.setFontSize(8); doc.setTextColor(...DGREY);
+      doc.setFontSize(7.5); doc.setTextColor(...DGREY);
       bullets.forEach((b,bi)=>doc.text(`- ${b}`,cx+6,cy+23+bi*5.5));
     });
     y+=2*(phH+5)+10;
-    // Methodology callout
     doc.setFillColor(252,250,244); doc.rect(M,y,W-M*2,20,"F");
     doc.setFillColor(...GOLD); doc.rect(M,y,2.5,20,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GREY);
@@ -1264,36 +1283,65 @@ export function CollabIQ() {
     doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...DGREY);
     const mtext=doc.splitTextToSize("The Collab Link Building method was developed by Syed Irfan Ajmal and executed by DMR.agency. It finds non-competing companies with overlapping audiences to create mutual-value partnerships generating referral traffic, brand authority, and high-quality backlinks.",W-M*2-14) as string[];
     doc.text(mtext,M+7,y+12);
-    pageFooter(3,4);
+    pageFooter(3);
 
-    // ════ PAGE 4: EMOS CTA (DARK) ══════════════════════════════════
+    // ════ PAGE 4 (optional): AI-GENERATED BRIEF ════════════════════
+    if(aiBrief){
+      doc.addPage();
+      lightHeader("AI-Generated Brief");
+      y=28;
+      doc.setFillColor(...INK); doc.rect(M,y-5,12,8,"F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GOLD);
+      doc.text("AI",M+6,y,{align:"center"});
+      doc.setFontSize(17); doc.setTextColor(...INK);
+      doc.text("Your 90-Day AI Campaign Brief",M+17,y); y+=14;
+      const briefLines=aiBrief.split("\n");
+      for(const line of briefLines){
+        if(y>H-22){ pageFooter(4); doc.addPage(); lightHeader("AI-Generated Brief"); y=28; }
+        if(line.startsWith("# ")){
+          doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...INK);
+          doc.text(line.replace("# ",""),M,y); y+=9;
+        } else if(line.startsWith("## ")){
+          doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...INK);
+          const hLines=doc.splitTextToSize(line.replace("## ",""),W-M*2) as string[];
+          doc.text(hLines,M,y); y+=hLines.length*6+2;
+        } else if(line.startsWith("- ")){
+          doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...DGREY);
+          const bLines=doc.splitTextToSize("- "+line.replace("- ",""),W-M*2-6) as string[];
+          doc.text(bLines,M+4,y); y+=bLines.length*5;
+        } else if(line.trim()){
+          doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...DGREY);
+          const pLines=doc.splitTextToSize(line,W-M*2) as string[];
+          doc.text(pLines,M,y); y+=pLines.length*5+2;
+        } else { y+=4; }
+      }
+      pageFooter(4);
+    }
+
+    // ════ FINAL PAGE: EMOS CTA (DARK) ══════════════════════════════
     doc.addPage();
+    const lastPage=aiBrief?5:4;
     doc.setFillColor(...INK); doc.rect(0,0,W,H,"F");
     doc.setFillColor(...GOLD); doc.rect(0,0,W,6,"F");
     let cy=52;
-    // SIA mark
     doc.setFillColor(...GOLD); doc.rect(W/2-18,cy,36,36,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...INK);
     doc.text("SIA",W/2,cy+21,{align:"center"});
     cy+=48;
-    // Overline
     doc.setFillColor(...GOLD); doc.rect(M,cy,18,1,"F"); doc.rect(W-M-18,cy,18,1,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GOLD);
     doc.text("WANT RESULTS LIKE THESE AT SCALE?",W/2,cy+1,{align:"center"});
     cy+=12;
-    // Headline
     doc.setFont("helvetica","bold"); doc.setFontSize(34); doc.setTextColor(...CREAM);
     doc.text("Earned Media",W/2,cy,{align:"center"}); cy+=12;
     doc.setTextColor(...GOLD); doc.text("Operating System",W/2,cy,{align:"center"}); cy+=14;
-    // Subtitle
     doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(140,128,110);
     const sub=doc.splitTextToSize("The step-by-step system for founders who want press, partnerships, and authority before their Series A.",120) as string[];
-    doc.text(sub,W/2,cy,{align:"center"}); cy+=sub.length*7+16;
-    // Inclusions box
-    doc.setDrawColor(50,42,32); doc.setLineWidth(0.4);
+    doc.text(sub,W/2,cy,{align:"center"}); cy+=sub.length*7+14;
     const inclusions=["Step-by-step earned media playbooks","Weekly office hours with Syed Irfan Ajmal","Journalist & editor contact database","Collab link building templates & frameworks","Cohort-based training programme"];
-    const boxH=16+inclusions.length*10+8;
-    doc.rect(W/2-52,cy,104,boxH);
+    const inclBoxH=16+inclusions.length*10+8;
+    doc.setDrawColor(50,42,32); doc.setLineWidth(0.4);
+    doc.rect(W/2-52,cy,104,inclBoxH);
     doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(90,80,65);
     doc.text("WHAT YOU GET",W/2-44,cy+8);
     inclusions.forEach((inc,i)=>{
@@ -1301,17 +1349,17 @@ export function CollabIQ() {
       doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(170,158,138);
       doc.text(inc,W/2-38,cy+17+i*10);
     });
-    cy+=boxH+14;
-    // CTA button
+    cy+=inclBoxH+14;
     doc.setFillColor(...GOLD); doc.rect(W/2-54,cy,108,14,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...INK);
     doc.text("Learn more at syedirfanajmal.com/emos",W/2,cy+9,{align:"center"});
     cy+=18;
     doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(70,62,50);
     doc.text("Founding class open  ·  Limited spots",W/2,cy,{align:"center"});
+    // Attribution well above footer zone — no overlap
     doc.setFontSize(7); doc.setTextColor(55,46,36);
-    doc.text(`Generated via CollabIQ  ·  ${date}`,W/2,H-26,{align:"center"});
-    pageFooter(4,4,true);
+    doc.text(`Generated via CollabIQ  ·  ${date}`,W/2,H-24,{align:"center"});
+    pageFooter(lastPage,true);
 
     doc.save(`CollabIQ-Playbook-${bizName.replace(/\s+/g,"-")}.pdf`);
   }
