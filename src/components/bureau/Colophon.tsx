@@ -1,14 +1,10 @@
 import Link from "next/link";
-import { GROT, INK, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { availabilityLabel } from "@/lib/site-config";
-import { DoubleRule, Pill, SCaps } from "./primitives";
 
 type FooterLink = {
   label: string;
   href: string;
   external?: boolean;
-  strikePart?: string;
-  suffix?: string;
 };
 
 type FooterCol = {
@@ -42,160 +38,167 @@ const COLS: ReadonlyArray<FooterCol> = [
   {
     head: "Elsewhere",
     items: [
-      { label: "Twitter / X",   href: "https://x.com/syedirfanajmal",                                                    external: true },
-      { label: "LinkedIn",      href: "https://www.linkedin.com/in/syedirfanajmal/",                                     external: true },
-      { label: "YouTube",       href: "https://youtube.com/@syedirfanajmal/",                                             external: true },
-      { label: "Apple Podcasts",href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466", external: true },
+      { label: "Twitter / X ↗",    href: "https://x.com/syedirfanajmal",                                    external: true },
+      { label: "LinkedIn ↗",       href: "https://www.linkedin.com/in/syedirfanajmal/",                     external: true },
+      { label: "YouTube ↗",        href: "https://youtube.com/@syedirfanajmal/",                             external: true },
+      { label: "Apple Podcasts ↗", href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466", external: true },
     ],
   },
 ];
 
 const LEGAL = [
-  { label: "Privacy Policy", href: "/privacy" },
-  { label: "Terms",          href: "/terms" },
-  { label: "Refund Policy",  href: "/refund-policy" },
+  { label: "PRIVACY POLICY", href: "/privacy" },
+  { label: "TERMS",          href: "/terms" },
+  { label: "REFUND POLICY",  href: "/refund-policy" },
 ];
 
-export const Colophon = () => (
-  <footer className="sx" style={{ background: PAPER, paddingTop: 60, paddingBottom: 36 }}>
-    <DoubleRule style={{ marginBottom: 36 }} />
+const S = {
+  footer: {
+    background: "#f5f0e8",
+    padding: "56px 56px 28px",
+    borderTop: "2px solid #0e0d0a",
+    fontFamily: "'Archivo', 'Helvetica Neue', Arial, sans-serif",
+  } as React.CSSProperties,
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "1.4fr 1fr 1fr 1fr",
+    gap: 40,
+    paddingBottom: 40,
+    borderBottom: "2px solid #0e0d0a",
+  } as React.CSSProperties,
+  wordmark: {
+    fontFamily: "'Archivo', 'Helvetica Neue', Arial, sans-serif",
+    fontStyle: "italic",
+    fontWeight: 900,
+    fontSize: 56,
+    color: "#0e0d0a",
+    lineHeight: 1,
+    letterSpacing: "-0.02em",
+  } as React.CSSProperties,
+  about: {
+    marginTop: 14,
+    fontFamily: "'Archivo', 'Helvetica Neue', Arial, sans-serif",
+    fontSize: 15,
+    color: "rgba(14,13,10,.72)",
+    lineHeight: 1.5,
+    maxWidth: 320,
+  } as React.CSSProperties,
+  colHead: {
+    fontFamily: "'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace",
+    fontSize: 11,
+    color: "rgba(14,13,10,.72)",
+    letterSpacing: "0.18em",
+    fontWeight: 700,
+    marginBottom: 16,
+    textTransform: "uppercase",
+  } as React.CSSProperties,
+  linkList: {
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  } as React.CSSProperties,
+  link: {
+    fontFamily: "'Archivo', 'Helvetica Neue', Arial, sans-serif",
+    fontSize: 14,
+    color: "#0e0d0a",
+    fontWeight: 600,
+    textDecoration: "none",
+  } as React.CSSProperties,
+  bottom: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 22,
+    gap: 32,
+    flexWrap: "wrap",
+  } as React.CSSProperties,
+  mono: {
+    fontFamily: "'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace",
+    fontSize: 11,
+    color: "rgba(14,13,10,.72)",
+    letterSpacing: "0.12em",
+  } as React.CSSProperties,
+  monoFlex: {
+    fontFamily: "'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace",
+    fontSize: 11,
+    color: "rgba(14,13,10,.72)",
+    letterSpacing: "0.04em",
+    display: "flex",
+    gap: 24,
+    flexWrap: "wrap",
+  } as React.CSSProperties,
+  open: {
+    color: "#2e90c3",
+    fontWeight: 700,
+    textDecoration: "none",
+    fontFamily: "'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace",
+    fontSize: 11,
+    letterSpacing: "0.04em",
+  } as React.CSSProperties,
+  legalLink: {
+    fontFamily: "'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace",
+    fontSize: 11,
+    color: "rgba(14,13,10,.72)",
+    letterSpacing: "0.12em",
+    textDecoration: "none",
+  } as React.CSSProperties,
+};
 
-    <div className="grid-colophon">
+export const Colophon = () => (
+  <footer style={S.footer}>
+    {/* Grid */}
+    <div style={S.grid}>
       {/* Brand block */}
       <div>
-        <div
-          style={{
-            fontFamily: SERIF,
-            fontWeight: 700,
-            fontSize: "clamp(28px, 5vw, 42px)",
-            color: INK,
-            lineHeight: 1,
-            letterSpacing: "-0.02em",
-          }}
-        >
-          Syed Irfan Ajmal
-        </div>
-        <p
-          style={{
-            marginTop: 18,
-            marginBottom: 0,
-            fontFamily: SERIF,
-            fontSize: 15.5,
-            color: INK70,
-            lineHeight: 1.55,
-            maxWidth: 360,
-            fontStyle: "italic",
-          }}
-        >
-          Serial entrepreneur. Fractional CMO. CEO of DMR.agency. Founder @ EMOS. Bylines &amp; citations: Forbes, HBR, SEMrush, SEJ &amp; more.
+        <div style={S.wordmark}>SIA.</div>
+        <p style={S.about}>
+          Syed Irfan Ajmal — award-winning marketing consultant, author, speaker, and CEO of <strong>DMR.agency</strong>.
         </p>
       </div>
 
       {/* Link columns */}
       {COLS.map(({ head, items }) => (
         <div key={head}>
-          <Pill size={11} ls="0.22em">{head}</Pill>
-          <ul
-            style={{
-              listStyle: "none",
-              margin: "14px 0 0",
-              padding: 0,
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-            }}
-          >
-            {items.map((item) => {
-              const linkStyle = {
-                fontFamily: SERIF,
-                fontSize: 16,
-                color: INK,
-                textDecoration: "none",
-                fontWeight: 500,
-              } as const;
-              const inner = (
-                <>
-                  {item.label}
-                  {item.strikePart && (
-                    <> <s style={{ opacity: 0.55 }}>{item.strikePart}</s></>
-                  )}
-                  {item.suffix}
-                  {item.external && (
-                    <span style={{ fontSize: 11, marginLeft: 3, opacity: 0.5 }}>↗</span>
-                  )}
-                </>
-              );
-              return (
+          <div style={S.colHead}>{head}</div>
+          <ul style={S.linkList}>
+            {items.map((item) =>
+              item.external ? (
                 <li key={item.label}>
-                  {item.external ? (
-                    <a href={item.href} target="_blank" rel="noopener noreferrer" style={linkStyle}>
-                      {inner}
-                    </a>
-                  ) : (
-                    <Link href={item.href} style={linkStyle}>
-                      {inner}
-                    </Link>
-                  )}
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" style={S.link}>
+                    {item.label}
+                  </a>
                 </li>
-              );
-            })}
+              ) : (
+                <li key={item.label}>
+                  <Link href={item.href} style={S.link}>{item.label}</Link>
+                </li>
+              )
+            )}
           </ul>
         </div>
       ))}
     </div>
 
-    <DoubleRule />
-
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingTop: 18,
-        flexWrap: "wrap",
-        gap: 12,
-      }}
-    >
-      <SCaps size={10.5} ls="0.16em" color={INK70}>
-        © MMXXVI · Syed Irfan Ajmal · SIA Enterprises Inc · Wyoming C-Corp
-      </SCaps>
-
-      <div style={{ display: "flex", gap: 20, alignItems: "center" }}>
-        {LEGAL.map((link) => (
-          <Link
-            key={link.label}
-            href={link.href}
-            style={{
-              fontFamily: GROT,
-              fontSize: 10.5,
-              color: INK70,
-              textDecoration: "none",
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              fontWeight: 700,
-            }}
-          >
-            {link.label}
-          </Link>
-        ))}
+    {/* Bottom bar */}
+    <div style={S.bottom}>
+      <div style={S.mono}>
+        © 2026 SYED IRFAN AJMAL · SIA ENTERPRISES (PK SOLE PROP.) · SIA ENTERPRISES INC (WY C-CORP)
       </div>
 
-      <SCaps size={10.5} ls="0.16em" color={INK70}>
-        sia[@]syedirfanajmal[dot]com &nbsp;·&nbsp;
-        <span
-          style={{
-            display: "inline-block",
-            width: 8,
-            height: 8,
-            borderRadius: 999,
-            background: YEL,
-            marginRight: 6,
-            verticalAlign: "middle",
-            border: `1px solid ${INK}`,
-          }}
-        />
-        {availabilityLabel}
-      </SCaps>
+      <div style={S.monoFlex}>
+        <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
+        <a href="/fractional-cmo" style={S.open}>● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
+        <a href="/emos" style={S.open}>● EMOS FOUNDING CLASS · APPLY NOW</a>
+      </div>
+
+      <div style={{ ...S.monoFlex, gap: 20 }}>
+        {LEGAL.map((l) => (
+          <Link key={l.label} href={l.href} style={S.legalLink}>{l.label}</Link>
+        ))}
+      </div>
     </div>
   </footer>
 );

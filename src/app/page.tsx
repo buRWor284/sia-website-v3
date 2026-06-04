@@ -1062,16 +1062,16 @@ export default function HomePage() {
           </div>
         </div>
         <div className="footer__bottom">
-          <div className="footer__copy">© 2026 SYED IRFAN AJMAL · SIA ENTERPRISES INC · WYOMING C-CORP</div>
+          <div className="footer__copy">© 2026 SYED IRFAN AJMAL · SIA ENTERPRISES (PK SOLE PROP.) · SIA ENTERPRISES INC (WY C-CORP)</div>
           <div className="footer__contact">
             <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
             <a href="/fractional-cmo" className="footer__open">● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
             <a href="/emos" className="footer__open">● EMOS FOUNDING CLASS · APPLY NOW</a>
           </div>
           <div className="footer__contact">
-            <a href="/privacy" className="footer__link">PRIVACY POLICY</a>
-            <a href="/terms" className="footer__link">TERMS</a>
-            <a href="/refund-policy" className="footer__link">REFUND POLICY</a>
+            <a href="/privacy" className="footer__copy" style={{ textDecoration: "none" }}>PRIVACY POLICY</a>
+            <a href="/terms" className="footer__copy" style={{ textDecoration: "none" }}>TERMS</a>
+            <a href="/refund-policy" className="footer__copy" style={{ textDecoration: "none" }}>REFUND POLICY</a>
           </div>
         </div>
       </footer>
