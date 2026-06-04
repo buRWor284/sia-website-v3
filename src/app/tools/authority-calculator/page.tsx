@@ -168,7 +168,10 @@ const Line = ({
 const Hero = () => (
   <section style={{ background: PAPER, padding: "clamp(32px,5vw,52px) clamp(22px,5vw,56px) 26px" }}>
     <div style={{ textAlign: "center", marginBottom: 16 }}>
-      <SCaps color={INK70} size={12} ls="0.30em">Authority ROI Calculator · Rent vs. Own</SCaps>
+      <SCaps color={INK70} size={12} ls="0.30em">SIA Authority ROI Calculator · Rent vs. Own</SCaps>
+      <p style={{ margin: "8px 0 0", fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>
+        SIA: Spotlight · Influence · Authority
+      </p>
     </div>
     <h1 style={{
       margin: 0, textAlign: "center", fontFamily: SERIF, fontWeight: 700, color: INK,

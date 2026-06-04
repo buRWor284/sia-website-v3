@@ -134,7 +134,7 @@ const CONTENT: ContentItem[] = [
     badge: "Calculator",
     beta: true,
     topics: ["pr", "strategy"],
-    title: "Authority ROI Calculator",
+    title: "SIA Authority ROI Calculator",
     sub: "Renting credibility vs. owning it. The real numbers.",
     blurb:
       "What do agency retainers, bought links, and sponsored placements actually cost over a year? Calculate your ROI versus owning authority through earned media.",
