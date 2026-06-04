@@ -47,7 +47,7 @@ export const SiteHeader = () => {
         padding: "16px 56px 14px",
         borderBottom: `1px solid ${CREAM12}`,
       }} className="site-header__top">
-        {/* Logo + wordmark */}
+        {/* Logo + wordmark + Est. */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <Link href="/" style={{ textDecoration: "none" }}>
             <div style={{
@@ -73,34 +73,23 @@ export const SiteHeader = () => {
               letterSpacing: ".22em", textTransform: "uppercase",
               color: CREAM45, marginTop: 3,
             }}>
-              GEO &nbsp;·&nbsp; SEO-PR &nbsp;·&nbsp; Content Marketing
+              Est. 2004 &nbsp;·&nbsp; GEO &nbsp;·&nbsp; SEO-PR &nbsp;·&nbsp; Content Marketing
             </div>
           </div>
         </div>
 
-        {/* Centre: est. only */}
-        <div style={{ textAlign: "center" }} className="site-header__wire">
-          <div style={{
-            fontFamily: GROT, fontWeight: 700, fontSize: 9,
-            letterSpacing: ".22em", textTransform: "uppercase",
-            color: CREAM50,
-          }}>
-            Est. 2004
-          </div>
-        </div>
-
-        {/* Right: availability CTAs */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-end" }}>
+        {/* Right: availability CTAs — one row with gap */}
+        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <a href="/fractional-cmo" style={{
-            fontFamily: GROT, fontWeight: 700, fontSize: 9,
-            letterSpacing: ".16em", textTransform: "uppercase",
+            fontFamily: GROT, fontWeight: 700, fontSize: 11,
+            letterSpacing: ".14em", textTransform: "uppercase",
             color: YEL, textDecoration: "none", whiteSpace: "nowrap",
           }}>
             ● 2 FRACTIONAL CMO SPOTS · Q3 2026
           </a>
           <a href="/emos" style={{
-            fontFamily: GROT, fontWeight: 700, fontSize: 9,
-            letterSpacing: ".16em", textTransform: "uppercase",
+            fontFamily: GROT, fontWeight: 700, fontSize: 11,
+            letterSpacing: ".14em", textTransform: "uppercase",
             color: YEL, textDecoration: "none", whiteSpace: "nowrap",
           }}>
             ● EMOS FOUNDING CLASS · APPLY NOW
