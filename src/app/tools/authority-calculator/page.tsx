@@ -65,13 +65,6 @@ const fmtK = (n: number): string => {
   if (v >= 1e3) return s + (v / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
   return s + Math.round(v);
 };
-const paybackStr = (fee: number, gain: number): string => {
-  if (gain <= 0) return "n/a";
-  const mo = fee / gain;
-  if (mo < 1)  { const w = Math.max(1, Math.round(mo * 4.345)); return w + (w === 1 ? " week" : " weeks"); }
-  if (mo < 12) { const m = Math.max(1, Math.round(mo));          return m + (m === 1 ? " month" : " months"); }
-  const y = mo / 12; return (y < 10 ? y.toFixed(1) : Math.round(y)) + " years";
-};
 
 // ── Compute ───────────────────────────────────────────────────────────────────
 interface CalcState {
@@ -541,9 +534,8 @@ const Result = ({ st }: { st: CalcState }) => {
           {/* stat cards */}
           <div className="calc-herostats" style={{ marginTop: 30 }}>
             {([
-              [roiStr,                           "Return on the EMOS fee"],
-              [paybackStr(c.fee, c.monthlyGain), "Payback period"],
-              [fmt(c.monthlyGain),               "Average monthly gain"],
+              [roiStr,             "Return on the EMOS fee"],
+              [fmt(c.monthlyGain), "Average monthly gain"],
             ] as [string, string][]).map(([big, lab]) => (
               <div key={lab} style={{ border: "1px solid rgba(250,250,250,.25)", padding: "18px 20px" }}>
                 <div style={{
