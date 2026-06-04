@@ -240,7 +240,7 @@ export default function EmosPage() {
                 </tbody>
               </table>
               <p style={{ marginTop: 22, fontFamily: SERIF, fontSize: 16, color: INK70 }}>
-                Want to see where you stand? Use the <a href="#calculator" className="emos-tool-link-ink">Authority Cost Calculator ↓</a> to calculate what renting vs. owning authority costs you.
+                Want to see where you stand? Use the <a href="#calculator" className="emos-tool-link-ink">Authority ROI Calculator ↓</a> to calculate what renting vs. owning authority costs you.
               </p>
             </div>
           </section>
@@ -478,7 +478,7 @@ export default function EmosPage() {
           {/* ── § L: THE MATH / CALCULATOR ──────────────────────────────── */}
           <section id="calculator" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast n="L" label="The Math · Authority Cost Calculator" />
+              <SectionMast n="L" label="The Math · Authority ROI Calculator" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Find out how much EMOS will save you<br />in financial costs alone.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Let alone the benefits of doing things in-house: investor credibility, AI citations, sales proof, and compounding reach. Adjust to your real numbers.</p>
               <AuthorityCalculator />
@@ -495,7 +495,7 @@ export default function EmosPage() {
                   <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(250,250,250,.60)", marginBottom: 16 }}>A mid-tier PR agency: <strong style={{ color: PAPER }}>$24K to $60K per year</strong>, every year, knowledge walks out when the contract ends.</p>
                   <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(250,250,250,.60)" }}>EMOS: <strong style={{ color: YEL }}>$2,000 to $3,500 one-time</strong>. The capability stays. Forever.</p>
                   <p style={{ marginTop: 24, fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: PAPER, lineHeight: 1.4, borderLeft: `3px solid ${YEL}`, paddingLeft: 16 }}>One placement on a DA 80+ site is worth more than the program.</p>
-                  <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 16, color: "rgba(250,250,250,.60)" }}>Use the <a href="#calculator" className="emos-tool-link">Authority Cost Calculator ↑</a> to run the numbers for your business.</p>
+                  <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 16, color: "rgba(250,250,250,.60)" }}>Use the <a href="#calculator" className="emos-tool-link">Authority ROI Calculator ↑</a> to run the numbers for your business.</p>
                 </div>
                 <div className="emos-price-cards">
                   <div className="emos-price-card">

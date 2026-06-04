@@ -134,10 +134,10 @@ const CONTENT: ContentItem[] = [
     badge: "Calculator",
     beta: true,
     topics: ["pr", "strategy"],
-    title: "The Authority Cost Calculator",
-    sub: "Renting credibility vs. owning it — the real numbers.",
+    title: "Authority ROI Calculator",
+    sub: "Renting credibility vs. owning it. The real numbers.",
     blurb:
-      "What do agency retainers, bought links, and sponsored placements actually cost over a year? Calculate your number versus owning authority through earned media.",
+      "What do agency retainers, bought links, and sponsored placements actually cost over a year? Calculate your ROI versus owning authority through earned media.",
     href: "/tools/authority-calculator",
     y: "2025",
     newsHeadline: "Renting vs. Owning",

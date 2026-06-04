@@ -39,7 +39,7 @@ const hexA  = (hex: string, a: number): string => {
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const SPEND   = { min: 0, max: 10000, step: 500, def: 2000,
-  hint: "Agency retainer, link-buying, or any combination — boutique SEO from $2K/mo · mid-market $3K–$5K/mo." };
+  hint: "Agency retainer, link-buying, or any combination. Boutique SEO from $2K/mo, mid-market $3K to $5K/mo." };
 const TRAFFIC = { min: 200, max: 50000, step: 200, def: 1500 };
 const AOV     = { min: 50,  max: 10000, step: 50,  def: 300  };
 interface Tier { id: string; name: string; fee: number; blurb: string }
@@ -168,7 +168,7 @@ const Line = ({
 const Hero = () => (
   <section style={{ background: PAPER, padding: "clamp(32px,5vw,52px) clamp(22px,5vw,56px) 26px" }}>
     <div style={{ textAlign: "center", marginBottom: 16 }}>
-      <SCaps color={INK70} size={12} ls="0.30em">The Authority Cost Calculator · Rent vs. Own</SCaps>
+      <SCaps color={INK70} size={12} ls="0.30em">Authority ROI Calculator · Rent vs. Own</SCaps>
     </div>
     <h1 style={{
       margin: 0, textAlign: "center", fontFamily: SERIF, fontWeight: 700, color: INK,
@@ -185,7 +185,7 @@ const Hero = () => (
     }}>
       Every month you pay an agency or buy links, you&rsquo;re renting credibility.
       The moment you stop paying, the authority stops.
-      Enter your numbers to see exactly what that costs — and what you gain by owning it instead.
+      Enter your numbers to see exactly what that costs, and what you gain by owning it instead.
     </p>
     <DoubleRule style={{ margin: "32px 0 0" }} />
   </section>
@@ -209,7 +209,7 @@ const Inputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => vo
           />
           <Slider
             label="All-channel monthly visitors"
-            hint="Organic, paid, direct, referral — every channel combined."
+            hint="Organic, paid, direct, referral, every channel combined."
             min={TRAFFIC.min} max={TRAFFIC.max} step={TRAFFIC.step}
             value={st.traffic} onChange={(v) => set({ traffic: v })}
             format={(n) => n.toLocaleString("en-US")}
@@ -297,13 +297,13 @@ const Comparison = ({ st }: { st: CalcState }) => {
 
       <div style={{ border: `1.5px solid ${INK}`, background: PAPER2, padding: "20px 24px", marginBottom: 26 }}>
         <NetBar
-          label="Renting authority — keep paying marketing spend"
+          label="Renting authority: keep paying marketing spend"
           value={c.netWithout} max={maxAbs}
           color={c.netWithout < 0 ? RED : INK}
           sub={`${fmtK(c.revNowYr)} revenue − ${fmtK(c.currentSpendYr)} spend, every year you keep renting`}
         />
         <NetBar
-          label="Owning the capability — one-time investment"
+          label="Owning the capability: one-time investment"
           value={c.netWith} max={maxAbs}
           color={GREEN}
           sub={`${fmtK(c.revWithYr)} revenue + ${fmtK(LINK_EQUITY_YR)} link equity − one-time fee`}
@@ -311,7 +311,7 @@ const Comparison = ({ st }: { st: CalcState }) => {
         <p style={{ margin: "4px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.5 }}>
           The leap is the conversion lift shown working, not asserted:{" "}
           <strong>{fmtK(c.revNowYr)}</strong> today at a 1% rate →{" "}
-          <strong>{fmtK(c.revWithYr)}</strong> at 3% — the conservative end of what editorial trust signals support.
+          <strong>{fmtK(c.revWithYr)}</strong> at 3%, the conservative end of what editorial trust signals support.
         </p>
       </div>
 
@@ -321,7 +321,7 @@ const Comparison = ({ st }: { st: CalcState }) => {
           <div style={{ padding: "16px 0 4px" }}>
             <SCaps size={11} ls="0.16em" color={INK}>Renting authority</SCaps>
             <p style={{ margin: "4px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
-              Paying indefinitely — owning nothing
+              Paying indefinitely, owning nothing
             </p>
           </div>
           <Line label="Revenue from traffic"  value={fmt(c.revNowYr)} />
@@ -364,15 +364,15 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
             fontSize: "clamp(28px, 4vw, 48px)",
             color: INK, lineHeight: 0.97, letterSpacing: "-0.028em",
           }}>
-            EMOS — The Earned<br />Media Operating System
+            EMOS: The Earned<br />Media Operating System
           </h2>
           <p style={{
             margin: "16px 0 0", fontFamily: SERIF,
             fontSize: 18, color: INK70, lineHeight: 1.55, maxWidth: 580,
           }}>
-            A <strong>guided implementation system for founders 3–12 months from a raise</strong>.
+            A <strong>guided implementation system for founders 3 to 12 months from a raise</strong>.
             Gives you the exact process, journalist contacts, and pitch system used to land
-            features in Forbes, HBR, HuffPost, and 50+ publications — in-house, permanently.
+            features in Forbes, HBR, HuffPost, and 50+ publications, in-house, permanently.
             No retainer. No ongoing spend.
           </p>
           <p style={{
@@ -388,7 +388,7 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
           }}>
             <span style={{ fontFamily: GROT, fontSize: 14 }}>🛡</span>
             <span style={{ fontFamily: SERIF, fontSize: 14, color: INK }}>
-              <strong>1 verified placement in 60 days</strong> — or every dollar back.
+              <strong>1 verified placement in 60 days</strong>, or every dollar back.
             </span>
           </div>
         </div>
@@ -430,7 +430,7 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
         <div className="calc-grid3" style={{ border: `1px solid ${INK}`, background: PAPER }}>
           {([
             ["The system",   "The exact 7-step pitch process used to land coverage in tier-one and mid-tier outlets. Yours to run internally, forever, with no agency in the loop."],
-            ["The contacts", "A curated journalist database — updated each cohort, sorted by niche and beat. No cold-guessing who to pitch or what they cover."],
+            ["The contacts", "A curated journalist database, updated each cohort, sorted by niche and beat. No cold-guessing who to pitch or what they cover."],
             ["Live results", "You earn your first real media placements during the cohort itself. Results before it ends, not months after you've paid and waited."],
           ] as [string, string][]).map(([h, b], i) => (
             <div key={h} style={{
@@ -455,7 +455,7 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
 
       {/* tier selector */}
       <SCaps size={11} ls="0.18em" color={INK} style={{ display: "block", marginBottom: 14 }}>
-        Choose your EMOS investment — see your number update below
+        Choose your EMOS investment. Your number updates below.
       </SCaps>
       <div className="calc-grid2">
         {TIERS.map((t) => {
@@ -527,7 +527,7 @@ const Result = ({ st }: { st: CalcState }) => {
             margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic",
             fontSize: 16.5, color: "rgba(250,250,250,.72)", maxWidth: 620, lineHeight: 1.45,
           }}>
-            The model uses 3% as the target CVR — a conservative estimate. Even a partial lift to 2% matches
+            The model uses 3% as the target CVR, a conservative estimate. Even a partial lift to 2% matches
             the revenue impact of doubling your traffic budget.
           </p>
 
@@ -587,7 +587,7 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
               margin: "18px 0 32px", fontFamily: SERIF, fontSize: 18,
               color: INK70, lineHeight: 1.55, maxWidth: 620,
             }}>
-              That figure is yours — built from your traffic, your spend, your deal value.
+              That figure is yours, built from your traffic, your spend, your deal value.
               EMOS is the one-time investment that gets you there.
               Cohorts are small and run on a fixed calendar. Apply now to hold your spot.
             </p>
@@ -628,7 +628,7 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
                 margin: "22px 0 0", fontFamily: SERIF, fontSize: 19,
                 color: "rgba(250,250,250,.85)", lineHeight: 1.55, maxWidth: 600,
               }}>
-                The system, the contacts, and the live placements — all in one cohort.
+                The system, the contacts, and the live placements, all in one cohort.
                 Alumni have gone on to land Forbes, HBR, HuffPost, and 50+ publications
                 without ever paying an agency again.
               </p>
@@ -659,17 +659,17 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
 // Aligned with the EMOS 5-Return Framework from dmr.agency/earnedmediaos/
 const BENEFITS: [string, string][] = [
   ["AI / LLM citations",
-   "ChatGPT, Perplexity, and Google AI Overviews cite credible publications. Cited brands surface in AI answers about their space — a channel growing faster than any other."],
+   "ChatGPT, Perplexity, and Google AI Overviews cite credible publications. Cited brands surface in AI answers about their space, a channel growing faster than any other."],
   ["Investor proof",
-   "VCs Google you before the first meeting. A Tier 1 citation answers the credibility question before it's asked — and shapes the conversation before you're in the room."],
+   "VCs Google you before the first meeting. A Tier 1 citation answers the credibility question before it's asked, and shapes the conversation before you're in the room."],
   ["SEO authority",
    "A DA 80+ backlink lifts your domain rating; target pages rank higher for the keywords your buyers use. The agency invoice stops; the domain authority stays."],
   ["Permanent sales collateral",
-   "\"As seen in Forbes\" on your homepage, deck, and email signature. Bought once, used indefinitely — in investor materials, sales calls, and conference bios."],
+   "\"As seen in Forbes\" on your homepage, deck, and email signature. Bought once, used indefinitely in investor materials, sales calls, and conference bios."],
   ["Social signal & referral traffic",
    "Each placement is shareable content for LinkedIn and X, and sends direct visitors for years at zero cost-per-click. The agency invoice never stops; the referral traffic never bills."],
   ["Compounding credentials",
-   "Mid-tier placements open tier-one doors. Acceptance rates rise, cost-per-placement falls, and the momentum — the journalist relationships, the byline history — is yours to keep."],
+   "Mid-tier placements open tier-one doors. Acceptance rates rise, cost-per-placement falls, and the momentum, the journalist relationships, the byline history, is yours to keep."],
 ];
 
 const BelowFold = () => (
@@ -677,13 +677,13 @@ const BelowFold = () => (
     <SectionMast n="03" label="Why conversion climbs · 1% → 3%" />
     <p style={{ margin: 0, maxWidth: 880, fontFamily: SERIF, fontSize: "clamp(18px,2.4vw,24px)", lineHeight: 1.45, color: INK }}>
       Blended conversion improves as editorial trust signals compound across every channel.
-      The model uses a conservative 3% target — real-world uplifts regularly run higher.
+      The model uses a conservative 3% target. Real-world uplifts regularly run higher.
     </p>
     <div className="calc-grid3" style={{ marginTop: 24, border: `1px solid ${INK}` }}>
       {([
-        ["Trust badges",           '"As seen in Forbes" lifts conversion 15–30% (ConversionXL).'],
+        ["Trust badges",           '"As seen in Forbes" lifts conversion 15 to 30% (ConversionXL).'],
         ["Higher-intent visitors", "Backlinks build rankings that bring readers already looking to buy."],
-        ["Branded search",         "Coverage raises branded searches, which convert 5–10× generic traffic."],
+        ["Branded search",         "Coverage raises branded searches, which convert 5 to 10x generic traffic."],
       ] as [string, string][]).map(([h, b], i) => (
         <div key={h} style={{ padding: "20px 22px", borderLeft: i ? `1px solid ${INK15}` : "none" }}>
           <SCaps size={10.5} ls="0.14em" color={INK}>{h}</SCaps>
@@ -692,7 +692,7 @@ const BelowFold = () => (
       ))}
     </div>
     <p style={{ margin: "18px 0 0", maxWidth: 880, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK55 }}>
-      Even a partial improvement to 2% matches doubling your traffic budget —
+      Even a partial improvement to 2% matches doubling your traffic budget,
       and organic leads cost roughly 50% less per acquisition than paid.
     </p>
 
@@ -702,7 +702,7 @@ const BelowFold = () => (
         The locked assumptions behind every figure
       </SCaps>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-        <Badge>2 linked placements / month — 24 a year</Badge>
+        <Badge>2 linked placements / month, 24 a year</Badge>
         <Badge>$600 link-equity value per placement</Badge>
         <Badge>Conversion 1% → 3%</Badge>
         <Badge>12-month horizon</Badge>
@@ -721,7 +721,7 @@ const BelowFold = () => (
         <div style={{ display: "flex", alignItems: "flex-start", gap: 28, flexWrap: "wrap" }}>
           <div style={{ flex: "1 1 320px" }}>
             <SCaps size={11} ls="0.22em" color={BLUE} style={{ display: "block", marginBottom: 12 }}>
-              GEO · AI / LLM Visibility — fastest-growing channel
+              GEO · AI / LLM Visibility, fastest-growing channel
             </SCaps>
             <h3 style={{
               margin: 0, fontFamily: SERIF, fontWeight: 700,
@@ -731,7 +731,7 @@ const BelowFold = () => (
             </h3>
             <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 17, color: INK70, lineHeight: 1.5, maxWidth: 580 }}>
               ChatGPT, Perplexity, and Google AI Overviews pull from credible publications when answering buyer questions.
-              Earned media placements put your brand in those answers — before a prospect ever reaches your site.
+              Earned media placements put your brand in those answers, before a prospect ever reaches your site.
             </p>
             <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
               The calculator above counts only financial ROI. It cannot measure the deal that starts because an AI cited you first.
@@ -780,7 +780,7 @@ const BelowFold = () => (
       <SCaps size={10} ls="0.16em" color={INK55}>On the numbers</SCaps>
       <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: INK55 }}>
         The 1% blended conversion baseline is a conservative floor across most industries. The 3% target
-        reflects the aggregate effect of editorial trust signals across all channels — not a paid-ad figure
+        reflects the aggregate effect of editorial trust signals across all channels, not a paid-ad figure
         (paid search averages ~7%, Keywords Everywhere 2024). The argument here is about cost-per-acquisition
         and compounding authority, not raw rate. $600 per placement reflects conservative mid-market link rates.
         Sources: Nielsen Global Trust in Advertising · ConversionXL CRO research · Keywords Everywhere 2024.
@@ -867,7 +867,7 @@ const SimpleInputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>)
     {/* Compact tier selector */}
     <div>
       <SCaps size={11} ls="0.16em" color={INK} style={{ display: "block", marginBottom: 10 }}>
-        EMOS track — updates your result below
+        EMOS track. Your result updates below.
       </SCaps>
       <div className="simple-tier-grid">
         {TIERS.map((t) => {
@@ -913,7 +913,7 @@ const LLMCallout = () => (
       <div style={{ display: "flex", alignItems: "flex-start", gap: 28, flexWrap: "wrap" }}>
         <div style={{ flex: "1 1 320px" }}>
           <SCaps size={11} ls="0.22em" color={BLUE} style={{ display: "block", marginBottom: 12 }}>
-            GEO · AI / LLM Visibility — not in the ROI above
+            GEO · AI / LLM Visibility, not in the ROI above
           </SCaps>
           <h3 style={{
             margin: 0, fontFamily: SERIF, fontWeight: 700,
@@ -923,7 +923,7 @@ const LLMCallout = () => (
           </h3>
           <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 16.5, color: INK70, lineHeight: 1.5 }}>
             ChatGPT, Perplexity, and Google AI Overviews pull from credible publications when answering buyer questions.
-            Earned media placements put your brand in those answers — before a prospect ever reaches your site.
+            Earned media placements put your brand in those answers, before a prospect ever reaches your site.
           </p>
           <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
             The ROI above is purely financial. It can't measure the deal that starts because an AI cited you first.
