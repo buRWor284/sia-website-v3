@@ -1041,9 +1041,9 @@ export default function AuthorityCalculatorPage() {
             <BelowFold />
             <CTABlock st={st} variant="close" />
             <Subscriptions sectionNumber="05" />
-            <ToolFooter />
           </>
         )}
+        <ToolFooter />
         <ScrollButtons />
       </div>
     </>

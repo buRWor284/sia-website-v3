@@ -43,7 +43,7 @@ html, body {
   margin: 0;
   padding: 0;
   background: var(--color-paper);
-  overflow-x: hidden;
+  overflow-x: clip; /* clip (not hidden) so position:sticky still works */
   max-width: 100vw;
 }
 
