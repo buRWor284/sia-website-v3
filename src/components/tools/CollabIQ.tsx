@@ -968,11 +968,21 @@ export function CollabIQ() {
         body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy } }),
       });
       if (res.ok) {
-        const json = await res.json();
-        const list = Array.isArray(json) ? json : (json.partners||[]);
-        if (list.length>0) { setPartners(list.slice(0,6)); setLoading(false); return; }
+        const json = await res.json() as { result?: string };
+        // API returns { result: "<JSON array string>" }
+        if (json.result) {
+          // Strip markdown fences if present
+          const cleaned = json.result.replace(/^```json?\s*/i,"").replace(/```\s*$/,"").trim();
+          const list = JSON.parse(cleaned) as AiPartner[];
+          if (Array.isArray(list) && list.length > 0) {
+            setPartners(list.slice(0, 8));
+            setLoading(false);
+            return;
+          }
+        }
       }
     } catch { /* fall through to mock */ }
+    // Fallback mock — only reached if API key is missing or Claude returns invalid JSON
     setTimeout(()=>{ setPartners(V2_MOCK[ind]||V2_GENERIC); setLoading(false); }, 3000);
   }
 
@@ -1055,8 +1065,18 @@ export function CollabIQ() {
   async function generateAiEmail() {
     setAiEmailLoading(true);
     try {
-      const res = await fetch("/api/collab-ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"email-writer",data:{biz:state.biz,domain:state.domain,desc:state.desc,industry:ind,strategy:state.strategy,scPartner:state.scPartner}})});
-      if(res.ok){const j=await res.json();setAiEmail(j.email||j.content||"");setAiEmailLoading(false);return;}
+      const scoreTotal = Object.values(state.scores).reduce((a,b)=>a+b,0);
+      const scorePct   = Math.round((scoreTotal / (V2_SCORECARD.length * 2)) * 100);
+      const res = await fetch("/api/collab-ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+        type:"email-writer",
+        data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind,
+               audType:state.audType, audDesc:state.audDesc, geo:state.geo,
+               strategy:state.strategy,
+               partner:state.scPartner,       // field name the API prompt expects
+               partnerCat:state.scCat,
+               scorePct },
+      })});
+      if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiEmail(j.result);setAiEmailLoading(false);return;}}
     } catch { /* fallback */ }
     setAiEmail(`Subject: Partnership idea — [PARTNER] × ${state.biz}\n\nHi [FIRST NAME],\n\nI'm reaching out from ${state.biz} — we ${state.desc||"[what you do]"}.\n\nI came across [PARTNER] while researching companies that serve the same audience, and there's a natural fit.\n\nProposal: we create an exclusive offer for your customers — [SPECIFIC OFFER]. In return, a mention on your partner page with a link.\n\nThree-way win:\n→ Your customers get exclusive value\n→ You deepen loyalty\n→ We get warm referral traffic\n\n15 minutes this week?\n\nBest,\n[YOUR NAME]\n${state.biz} · ${state.domain||"[website]"}`);
     setAiEmailLoading(false);
@@ -1065,8 +1085,19 @@ export function CollabIQ() {
   async function generateAiBrief() {
     setAiBriefLoading(true);
     try {
-      const res = await fetch("/api/collab-ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:"campaign-brief",data:{biz:state.biz,domain:state.domain,desc:state.desc,industry:ind,strategy:state.strategy,selNiches:state.selNiches,audType:state.audType,geo:state.geo}})});
-      if(res.ok){const j=await res.json();setAiBrief(j.brief||j.content||"");setAiBriefLoading(false);return;}
+      const scoreTotal  = Object.values(state.scores).reduce((a,b)=>a+b,0);
+      const scorePct    = Math.round((scoreTotal / (V2_SCORECARD.length * 2)) * 100);
+      const verdictText = scorePct >= 70 ? "Strong prospect. Prioritise." : scorePct >= 45 ? "Moderate fit. Review weak areas." : scorePct > 0 ? "Low fit. Find a better target." : "Not yet scored";
+      const res = await fetch("/api/collab-ai",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+        type:"campaign-brief",
+        data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind,
+               audType:state.audType, audDesc:state.audDesc, geo:state.geo,
+               strategy:state.strategy, stratLabel:V2_STRATEGIES[state.strategy]?.label,
+               selNiches:state.selNiches,
+               partner:state.scPartner, partnerCat:state.scCat,
+               scorePct, verdictText },
+      })});
+      if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiBrief(j.result);setAiBriefLoading(false);return;}}
     } catch { /* fallback */ }
     setAiBrief(`# 90-Day Collab Link Building Brief\n\n## Executive Summary\nA 90-day campaign for ${state.biz} using ${V2_STRATEGIES[state.strategy]?.label} in ${ind}.\n\n## Phase 1: Foundation (Days 1–14)\n- Audit backlink profile (Ahrefs/SEMrush)\n- Identify 20–30 target partners across 3–4 categories\n- Create landing pages or discount codes per tier\n- Personalise outreach for top 10 targets\n\n## Phase 2: Outreach (Days 15–45)\n- Send to Tier A partners first\n- Follow up after 5–7 business days\n- Begin Tier B outreach in parallel\n- Track in spreadsheet\n\n## Phase 3: Execution (Days 46–75)\n- Negotiate link placements\n- Provide assets (codes, badges, content)\n- Monitor new backlinks in Ahrefs\n- Begin Tier C for volume\n\n## Phase 4: Optimisation (Days 76–90)\n- Review metrics: links, DA, referral traffic\n- Share performance data with partners\n- Identify top categories for expansion\n- Document playbook`);
     setAiBriefLoading(false);
