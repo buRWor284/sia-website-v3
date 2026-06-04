@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { CollabIQ } from "@/components/tools/CollabIQ";
-import { ToolHeader, ToolFooter } from "@/components/bureau";
+import { ToolHeader } from "@/components/bureau";
 
 export const metadata: Metadata = {
   title: "CollabIQ — Partnership Intelligence Tool · SIA",
@@ -9,6 +9,9 @@ export const metadata: Metadata = {
     "AI-powered partnership intelligence. Discover non-obvious collab link building partners, " +
     "score them, generate personalised outreach, and export a 90-day campaign brief — in minutes.",
 };
+
+// ToolHeader height: 28px logo + 13px top + 13px bottom padding = 54px
+export const TOOL_HEADER_H = 54;
 
 export default function CollabIQPage() {
   return (
@@ -18,10 +21,10 @@ export default function CollabIQPage() {
         src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
         strategy="lazyOnload"
       />
-      {/* Slim tool header — non-sticky so it doesn't conflict with WizardProgress (position:fixed) */}
-      <ToolHeader toolName="CollabIQ — Partnership Intelligence" sticky={false} />
-      <CollabIQ />
-      <ToolFooter />
+      {/* Sticky tool header — WizardProgress is offset by TOOL_HEADER_H so they stack */}
+      <ToolHeader toolName="CollabIQ — Partnership Intelligence" />
+      <CollabIQ toolHeaderHeight={TOOL_HEADER_H} />
+      {/* No ToolFooter — WizardFooter already has the syedirfanajmal.com back link */}
     </>
   );
 }

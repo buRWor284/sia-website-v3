@@ -839,15 +839,16 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
 }
 
 // ── Progress Bar ───────────────────────────────────────────────────────────────
-function WizardProgress({ step, theme, onThemeChange, onLogoClick }: {
+function WizardProgress({ step, theme, onThemeChange, onLogoClick, topOffset = 0 }: {
   step: number; theme: Theme;
   onThemeChange: (t: Theme) => void;
   onLogoClick: () => void;
+  topOffset?: number;
 }) {
   const t = theme === "dark" ? DARK_T : LIGHT_T;
   const STEPS = ["Business","Strategy","Partners","Outreach","90-Day Playbook"];
   return (
-    <div style={{ position:"fixed", top:0, left:0, right:0, zIndex:90, background:t.BG0, borderBottom:`1px solid ${t.BDS}` }}>
+    <div style={{ position:"fixed", top:topOffset, left:0, right:0, zIndex:90, background:t.BG0, borderBottom:`1px solid ${t.BDS}` }}>
       <div style={{ height:3, background:t.BDS }}>
         <div style={{ height:"100%", background:ACC, width:`${((step+1)/STEPS.length)*100}%`, transition:"width 0.5s ease" }} />
       </div>
@@ -963,7 +964,7 @@ function EmailGate({ show, onClose, onSubscribe }: { show: boolean; onClose: ()=
 }
 
 // ── Main export ────────────────────────────────────────────────────────────────
-export function CollabIQ() {
+export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }) {
   const [state, dispatch]           = useReducer(reducer, null, initState);
   const [partners, setPartners]     = useState<AiPartner[]>([]);
   const [loading, setLoading]       = useState(false);
@@ -1435,7 +1436,7 @@ export function CollabIQ() {
     <>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <div className="v2-collabiq" style={{ background:t.BG1, color:t.TX, minHeight:"100vh" }}>
-        {step>0 && <WizardProgress step={step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:0})} />}
+        {step>0 && <WizardProgress step={step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:0})} topOffset={toolHeaderHeight} />}
 
         <div key={`stage-${step}`}>
           {step===0 && <Stage0 onStart={()=>dispatch({type:"GO",step:1})} />}
