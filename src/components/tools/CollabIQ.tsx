@@ -129,6 +129,7 @@ type Action =
   | { type: "SET_CUSTOM_IND"; val: string }
   | { type: "SET_SCORE"; idx: number; val: number }
   | { type: "TOGGLE_NICHE"; val: string }
+  | { type: "SET_NICHES"; val: string[] }
   | { type: "SCORE_PARTNER"; name: string; cat: string }
   | { type: "GO"; step: number };
 
@@ -153,6 +154,7 @@ function reducer(state: CollabState, action: Action): CollabState {
     case "SET_CUSTOM_IND": return { ...state, customInd: action.val, industry: action.val ? "" : state.industry, selNiches: [] };
     case "SET_SCORE": return { ...state, scores: { ...state.scores, [action.idx]: action.val } };
     case "TOGGLE_NICHE": { const has = state.selNiches.includes(action.val); return { ...state, selNiches: has ? state.selNiches.filter(x => x !== action.val) : [...state.selNiches, action.val] }; }
+    case "SET_NICHES": return { ...state, selNiches: action.val };
     case "SCORE_PARTNER": return { ...state, scPartner: action.name, scCat: action.cat, step: 4 };
     case "GO": return { ...state, step: action.step };
     default: return state;
@@ -671,126 +673,149 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
   );
 }
 
-// ── Stage 4: Toolkit ───────────────────────────────────────────────────────────
-function Stage4({ state, dispatch, onGated, aiEmail, aiBrief, aiEmailLoading, aiBriefLoading, partners }: {
+// ── Stage 4: Outreach ─────────────────────────────────────────────────────────
+function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }: {
   state: CollabState; dispatch: React.Dispatch<Action>;
-  onGated: (action: string) => void;
-  aiEmail: string; aiBrief: string;
-  aiEmailLoading: boolean; aiBriefLoading: boolean;
   partners: AiPartner[];
+  onGated: (action: string) => void;
+  aiEmail: string; aiEmailLoading: boolean;
 }) {
-  const [tab, setTab] = useState<"outreach"|"brief">("outreach");
-  const { strategy, biz, domain, desc, industry, customInd, selNiches, audType, geo } = state;
-  const ind    = customInd || industry;
-  const strat  = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
+  const { strategy, biz, domain, desc } = state;
+  const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
 
-  const TABS = [{id:"outreach",label:"Outreach"},{id:"brief",label:"Brief & Export"}] as const;
-
-  const templates: Record<Strategy,string> = {
+  const templates: Record<Strategy, string> = {
     discount:    `Subject: Partnership idea — [THEIR BRAND] × ${biz||"[YOUR BRAND]"}\n\nHi [FIRST NAME],\n\nI'm [YOUR NAME] from ${biz||"[BRAND]"} — we ${desc||"[DESCRIPTION]"}.\n\nI noticed you serve the same audience — [SHARED AUDIENCE] — from a different angle.\n\nProposal: we offer your clients an exclusive [X]% discount. You mention us on your partner page with a link.\n\nThree-way win.\n\n15 minutes to explore this?\n\n[YOUR NAME]\n${biz||"[BRAND]"} · ${domain||"[WEBSITE]"}`,
     institution: `Subject: Exclusive discount for [INSTITUTION] members\n\nHi [CONTACT],\n\nI'm [YOUR NAME] from ${biz||"[BRAND]"}. We ${desc||"[DESCRIPTION]"}.\n\nWe'd love to offer [INSTITUTION] members an exclusive [X]% discount.\n\nAll we'd ask: a mention on your rebate page with a link.\n\nNo strings, no fees.\n\n[YOUR NAME]\n${biz||"[BRAND]"} · ${domain||"[WEBSITE]"}`,
     badge:       `Subject: Featured in our [GUIDE TITLE]\n\nHi [EXPERT],\n\nI'm building a guide: [GUIDE TITLE] — featuring [EXPERT TYPE] ranked by [CRITERIA].\n\nYou'd get:\n→ Feature with credentials + link\n→ "[AWARD]" badge for your site\n→ Promotion to [AUDIENCE]\n\nInterested?\n\n[YOUR NAME]\n${biz||"[BRAND]"} · ${domain||"[WEBSITE]"}`,
   };
 
   return (
-    <StageWrapper title="Your toolkit." subtitle="Score partners, grab outreach templates, and export your campaign brief.">
-      <div style={{ display:"flex", borderBottom:`1px solid ${BD}`, marginBottom:28 }}>
-        {TABS.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)}
-            style={{ padding:"12px 20px", background:"transparent", border:"none", fontFamily:MF,
-              fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase",
-              color:tab===t.id?ACC:TX3, cursor:"pointer", borderRadius:0,
-              borderBottom:`2px solid ${tab===t.id?ACC:"transparent"}`, marginBottom:-1 }}>
-            {t.label}
-          </button>
-        ))}
+    <StageWrapper title="Reach out." subtitle="Pick your target partner, use the template as a starting point, or let AI write a bespoke email.">
+      {/* Partner picker */}
+      <div style={{ marginBottom: 32 }}>
+        <label style={lbl(TX2)}>Who are you emailing?</label>
+        <select style={inp()} value={state.scPartner} onChange={e => dispatch({ type: "SET", key: "scPartner", val: e.target.value })}>
+          <option value="">Select a partner…</option>
+          {partners.map(p => <option key={p.name} value={p.name}>{p.name} (Tier {p.tier}) — {p.url}</option>)}
+        </select>
       </div>
 
-      {/* Outreach */}
-      {tab==="outreach" && (
-        <div>
-          <label style={lbl(TX2)}>{strat.label} Template</label>
-          <pre id="v2-tpl" style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:20, fontSize:13, fontFamily:GF, lineHeight:1.8, whiteSpace:"pre-wrap", color:TX2, marginBottom:12, overflowX:"auto" }}>
-            {templates[strategy as Strategy]}
-          </pre>
-          <button onClick={()=>{const el=document.getElementById("v2-tpl");if(el)navigator.clipboard.writeText(el.textContent||"");}}
-            style={{ ...ghostBtn(), fontSize:9, padding:"8px 14px", marginBottom:32 }}>Copy template</button>
-          <div style={{ borderTop:`1px solid ${BD}`, paddingTop:24 }}>
-            <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-              <span style={{ background:ACC, fontFamily:MF, fontSize:8, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", padding:"3px 8px", color:BG0 }}>AI</span>
-              <span style={lbl(TX2)}>Personalised Email</span>
+      {/* Template */}
+      <div style={{ marginBottom: 32 }}>
+        <label style={lbl(TX2)}>{strat.label} — outreach template</label>
+        <pre id="v2-tpl" style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:20, fontSize:13, fontFamily:GF, lineHeight:1.8, whiteSpace:"pre-wrap", color:TX2, marginBottom:10, overflowX:"auto" }}>
+          {templates[strategy as Strategy]}
+        </pre>
+        <button onClick={()=>{ const el=document.getElementById("v2-tpl"); if(el) navigator.clipboard.writeText(el.textContent||""); }}
+          style={{ ...ghostBtn(), fontSize:9, padding:"8px 14px" }}>Copy template</button>
+      </div>
+
+      {/* AI email */}
+      <div style={{ borderTop:`1px solid ${BD}`, paddingTop:28 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+          <span style={{ background:ACC, fontFamily:MF, fontSize:8, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", padding:"3px 8px", color:BG0 }}>AI</span>
+          <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, letterSpacing:"-0.01em" }}>Personalised email</span>
+        </div>
+        <p style={{ fontSize:14, color:TX3, marginBottom:20, fontFamily:GF, lineHeight:1.6 }}>
+          Claude writes a fully personalised email for your chosen partner — tailored to their audience, your offer, and your strategy.
+        </p>
+        <button onClick={()=>onGated("email")} disabled={aiEmailLoading||!biz||!state.scPartner}
+          style={{ ...primaryBtn(), opacity:(!biz||aiEmailLoading||!state.scPartner)?0.4:1, cursor:(!biz||!state.scPartner)?"not-allowed":"pointer", fontSize:13, padding:"14px 28px" }}>
+          {aiEmailLoading ? "Writing…" : state.scPartner ? `Write email for ${state.scPartner} →` : "Select a partner above first"}
+        </button>
+        {aiEmail && (
+          <div style={{ marginTop:24 }}>
+            <pre style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:20, fontSize:13, lineHeight:1.8, color:TX2, whiteSpace:"pre-wrap", fontFamily:GF }}>
+              {aiEmail}
+            </pre>
+            <button onClick={()=>navigator.clipboard.writeText(aiEmail)}
+              style={{ ...ghostBtn(), fontSize:9, padding:"8px 14px", marginTop:10 }}>Copy email</button>
+          </div>
+        )}
+      </div>
+    </StageWrapper>
+  );
+}
+
+// ── Stage 5: Campaign Brief ────────────────────────────────────────────────────
+function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
+  state: CollabState;
+  onGated: (action: string) => void;
+  aiBrief: string; aiBriefLoading: boolean;
+}) {
+  const { biz, domain, strategy, industry, customInd, selNiches, audType, geo } = state;
+  const ind   = customInd || industry;
+  const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
+
+  return (
+    <StageWrapper title="Your campaign brief." subtitle="Generate your 90-day partnership playbook. Download or copy it when you're done.">
+
+      {/* Campaign at a glance */}
+      <div style={{ background:BG2, border:`1px solid ${BD}`, padding:24, marginBottom:32 }}>
+        <span style={{ ...lbl(TX4), marginBottom:16 }}>Campaign at a glance</span>
+        {([["Business",biz],["Website",domain],["Industry",ind],["Strategy",strat.label],["Audience type",audType],["Geography",geo]] as [string,string][]).map(([k,v])=>(
+          <div key={k} style={{ display:"flex", gap:12, padding:"7px 0", borderBottom:`1px solid ${BDS}` }}>
+            <span style={{ fontFamily:MF, fontSize:10, color:TX4, width:110, flexShrink:0 }}>{k}</span>
+            <span style={{ fontSize:13, color:TX, fontFamily:GF }}>{v||"—"}</span>
+          </div>
+        ))}
+        {selNiches.length > 0 && (
+          <div style={{ marginTop:14 }}>
+            <span style={{ ...lbl(TX4), marginBottom:8 }}>Target partners ({selNiches.length})</span>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
+              {selNiches.map(n=>(
+                <span key={n} style={{ background:"rgba(245,184,31,0.08)", border:"1px solid rgba(245,184,31,0.25)", padding:"4px 12px", fontSize:12, fontWeight:600, color:ACC, fontFamily:GF }}>{n}</span>
+              ))}
             </div>
-            <p style={{ fontSize:13, color:TX3, marginBottom:14, fontFamily:GF }}>Claude writes a bespoke email for your target partner.</p>
-            <button onClick={()=>onGated("email")} disabled={aiEmailLoading||!biz}
-              style={{ ...primaryBtn(), opacity:(!biz||aiEmailLoading)?0.4:1 }}>
-              {aiEmailLoading?"Generating…":"Generate AI email"}
-            </button>
-            {aiEmail && (
-              <pre style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:20, fontSize:13, lineHeight:1.8, color:TX2, whiteSpace:"pre-wrap", fontFamily:GF, marginTop:16 }}>
-                {aiEmail}
-              </pre>
-            )}
+          </div>
+        )}
+      </div>
+
+      {/* Generate brief */}
+      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
+        <span style={{ background:ACC, fontFamily:MF, fontSize:8, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", padding:"3px 8px", color:BG0 }}>AI</span>
+        <span style={{ fontFamily:SF, fontSize:22, fontWeight:700, color:TX, letterSpacing:"-0.02em" }}>90-Day campaign brief</span>
+      </div>
+      <p style={{ fontFamily:GF, fontSize:14, color:TX3, lineHeight:1.6, marginBottom:20 }}>
+        Claude builds a full 90-day execution plan: phased outreach, success metrics, partner categories, and risk mitigation — tailored to your business and strategy.
+      </p>
+      <button onClick={()=>onGated("brief")} disabled={aiBriefLoading||!biz}
+        style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32 }}>
+        {aiBriefLoading ? "Generating your brief…" : "Generate 90-day brief →"}
+      </button>
+
+      {/* Brief output */}
+      {aiBrief && (
+        <div style={{ marginBottom:32 }}>
+          <div style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:28, fontSize:13, lineHeight:1.9, color:TX2, fontFamily:GF, marginBottom:16 }}>
+            {aiBrief.split("\n").map((line,i)=>{
+              if(line.startsWith("## ")) return <div key={i} style={{ fontFamily:SF, fontSize:17, fontWeight:700, color:TX, marginTop:20, marginBottom:8, letterSpacing:"-0.01em" }}>{line.replace("## ","")}</div>;
+              if(line.startsWith("# "))  return <div key={i} style={{ fontFamily:SF, fontSize:20, fontWeight:700, color:TX, marginBottom:10, letterSpacing:"-0.02em" }}>{line.replace("# ","")}</div>;
+              if(line.startsWith("- "))  return <div key={i} style={{ display:"flex", gap:10, marginBottom:4 }}><span style={{ color:ACC, flexShrink:0 }}>→</span><span>{line.replace("- ","")}</span></div>;
+              if(!line.trim())           return <div key={i} style={{ height:8 }} />;
+              return <p key={i} style={{ marginBottom:6, color:TX2 }}>{line}</p>;
+            })}
+          </div>
+          {/* Download / copy — right below the brief */}
+          <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+            <button onClick={()=>onGated("pdf")} style={{ ...primaryBtn(), fontSize:13, padding:"13px 28px" }}>Download PDF report</button>
+            <button onClick={()=>onGated("copy")} style={{ ...ghostBtn(), fontSize:13, padding:"13px 20px" }}>Copy to clipboard</button>
           </div>
         </div>
       )}
 
-      {/* Brief & Export */}
-      {tab==="brief" && (
+      {/* EMOS CTA */}
+      <div style={{ marginTop:aiBrief?0:16, padding:"24px 28px", background:BG2, border:`1px solid ${BD}`, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
         <div>
-          <div style={{ background:BG2, border:`1px solid ${BD}`, padding:22, marginBottom:24 }}>
-            <span style={{ ...lbl(TX4), marginBottom:16 }}>Campaign Brief · Auto-populated</span>
-            {([["Business",biz],["Website",domain],["Industry",ind],["Strategy",strat.label],["Audience",audType],["Geography",geo]] as [string,string][]).map(([k,v])=>(
-              <div key={k} style={{ display:"flex", gap:12, padding:"6px 0", borderBottom:`1px solid ${BDS}` }}>
-                <span style={{ fontFamily:MF, fontSize:10, color:TX4, width:100, flexShrink:0 }}>{k}</span>
-                <span style={{ fontSize:13, color:TX, fontFamily:GF }}>{v||"—"}</span>
-              </div>
-            ))}
-            {selNiches.length>0 && (
-              <div style={{ marginTop:12 }}>
-                <span style={{ ...lbl(TX4), marginBottom:8 }}>Selected Partners</span>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
-                  {selNiches.map(n=><span key={n} style={{ background:"rgba(245,184,31,0.08)", border:"1px solid rgba(245,184,31,0.25)", padding:"4px 10px", fontSize:11, fontWeight:600, color:ACC, fontFamily:GF }}>{n}</span>)}
-                </div>
-              </div>
-            )}
-          </div>
-          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-            <span style={{ background:ACC, fontFamily:MF, fontSize:8, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", padding:"3px 8px", color:BG0 }}>AI</span>
-            <span style={lbl(TX2)}>90-Day Campaign Brief</span>
-          </div>
-          <button onClick={()=>onGated("brief")} disabled={aiBriefLoading||!biz}
-            style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, marginBottom:4 }}>
-            {aiBriefLoading?"Generating…":"Generate AI brief"}
-          </button>
-          <p style={{ fontFamily:MF, fontSize:9, color:TX4, marginBottom:16, letterSpacing:"0.06em" }}>Generates inline below — no email required</p>
-          {aiBrief && (
-            <div style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:20, fontSize:13, lineHeight:1.8, color:TX2, fontFamily:GF, marginBottom:20 }}>
-              {aiBrief.split("\n").map((line,i)=>{
-                if(line.startsWith("## ")) return <div key={i} style={{ fontFamily:SF, fontSize:16, fontWeight:700, color:TX, marginTop:14, marginBottom:6 }}>{line.replace("## ","")}</div>;
-                if(line.startsWith("# "))  return <div key={i} style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, marginBottom:8 }}>{line.replace("# ","")}</div>;
-                if(line.startsWith("- "))  return <div key={i} style={{ display:"flex", gap:8, marginBottom:3 }}><span style={{ color:ACC }}>→</span><span>{line.replace("- ","")}</span></div>;
-                if(!line.trim())            return <div key={i} style={{ height:6 }} />;
-                return <p key={i} style={{ marginBottom:4, color:TX3 }}>{line}</p>;
-              })}
-            </div>
-          )}
-          <div style={{ display:"flex", gap:8, paddingTop:16, borderTop:`1px solid ${BD}` }}>
-            <button onClick={()=>onGated("pdf")}  style={primaryBtn()}>Download PDF</button>
-            <button onClick={()=>onGated("copy")} style={ghostBtn()}>Copy brief</button>
-          </div>
-          <div style={{ marginTop:32, padding:20, background:BG2, border:`1px solid ${BD}`, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
-            <div>
-              <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.12em", textTransform:"uppercase", display:"block", marginBottom:4 }}>Ready to execute at scale?</span>
-              <span style={{ fontFamily:SF, fontSize:16, fontWeight:700, color:TX, fontStyle:"italic" }}>Earned Media OS</span>
-              <span style={{ fontSize:13, color:TX3, marginLeft:8, fontFamily:GF }}>— press before your Series A.</span>
-            </div>
-            <a href="https://www.syedirfanajmal.com/emos/" target="_blank" rel="noopener noreferrer"
-              style={{ ...primaryBtn(), textDecoration:"none", fontSize:10, padding:"10px 18px" }}>
-              Explore ↗
-            </a>
-          </div>
+          <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.14em", textTransform:"uppercase", display:"block", marginBottom:6 }}>Want someone to execute this for you?</span>
+          <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, fontStyle:"italic", letterSpacing:"-0.01em" }}>Earned Media OS</span>
+          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>— the full partnership system, done with you.</span>
         </div>
-      )}
+        <a href="https://www.syedirfanajmal.com/emos/" target="_blank" rel="noopener noreferrer"
+          style={{ ...primaryBtn(), textDecoration:"none", fontSize:11, padding:"12px 22px" }}>
+          Learn more ↗
+        </a>
+      </div>
     </StageWrapper>
   );
 }
@@ -802,7 +827,7 @@ function WizardProgress({ step, theme, onThemeChange, onLogoClick }: {
   onLogoClick: () => void;
 }) {
   const t = theme === "dark" ? DARK_T : LIGHT_T;
-  const STEPS = ["Business","Strategy","Partners","Toolkit"];
+  const STEPS = ["Business","Strategy","Partners","Outreach","Campaign Brief"];
   return (
     <div style={{ position:"fixed", top:0, left:0, right:0, zIndex:90, background:t.BG0, borderBottom:`1px solid ${t.BDS}` }}>
       <div style={{ height:3, background:t.BDS }}>
@@ -854,11 +879,14 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled, theme }: 
         ? <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px" }}>← Back</button>
         : <a href="https://www.syedirfanajmal.com" style={{ fontFamily:MF, fontSize:9, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:TX3, textDecoration:"none" }}>← Home</a>
       }
-      <span style={{ fontFamily:MF, fontSize:9, color:t.TX4, letterSpacing:"0.1em" }}>{step+1} of 4</span>
-      <button onClick={onNext} disabled={nextDisabled}
-        style={{ ...primaryBtn(), padding:"10px 24px", opacity:nextDisabled?0.4:1, cursor:nextDisabled?"not-allowed":"pointer" }}>
-        {nextLabel||"Continue →"}
-      </button>
+      <span style={{ fontFamily:MF, fontSize:9, color:t.TX4, letterSpacing:"0.1em" }}>{step+1} of 5</span>
+      {nextLabel
+        ? <button onClick={onNext} disabled={nextDisabled}
+            style={{ ...primaryBtn(), padding:"10px 24px", opacity:nextDisabled?0.4:1, cursor:nextDisabled?"not-allowed":"pointer" }}>
+            {nextLabel}
+          </button>
+        : <div />
+      }
     </div>
   );
 }
@@ -968,7 +996,11 @@ export function CollabIQ() {
           const cleaned = json.result.replace(/^```json?\s*/i,"").replace(/```\s*$/,"").trim();
           const list = JSON.parse(cleaned) as AiPartner[];
           if (Array.isArray(list) && list.length > 0) {
-            setPartners(list.slice(0, 8));
+            const sliced = list.slice(0, 8);
+            setPartners(sliced);
+            // Auto-select all + clear stale email target from previous session
+            dispatch({ type: "SET_NICHES", val: sliced.map(p => p.name) });
+            dispatch({ type: "SET", key: "scPartner", val: sliced[0]?.name || "" });
             setLoading(false);
             return;
           }
@@ -976,7 +1008,13 @@ export function CollabIQ() {
       }
     } catch { /* fall through to mock */ }
     // Fallback mock — only reached if API key is missing or Claude returns invalid JSON
-    setTimeout(()=>{ setPartners(V2_MOCK[ind]||V2_GENERIC); setLoading(false); }, 3000);
+    setTimeout(()=>{
+      const mock = V2_MOCK[ind] || V2_GENERIC;
+      setPartners(mock);
+      dispatch({ type: "SET_NICHES", val: mock.map(p => p.name) });
+      dispatch({ type: "SET", key: "scPartner", val: mock[0]?.name || "" });
+      setLoading(false);
+    }, 3000);
   }
 
   function handleGated(action: string) {
@@ -1156,14 +1194,15 @@ export function CollabIQ() {
     ()=>true,
     ()=>partners.length>0&&!loading,
     ()=>true,
+    ()=>true,
   ];
   function goNext() {
     if(step===2){dispatch({type:"GO",step:3});generatePartners();}
-    else if(step<4) dispatch({type:"GO",step:step+1});
+    else if(step<5) dispatch({type:"GO",step:step+1});
   }
   function goBack() { if(step>0) dispatch({type:"GO",step:step-1}); }
 
-  const nextLabels = ["","Continue →","Generate partners →","Build toolkit →",""];
+  const nextLabels = ["","Continue →","Generate partners →","Continue to outreach →","Generate brief →",""];
   const t = theme==="dark"?DARK_T:LIGHT_T;
 
   return (
@@ -1177,10 +1216,11 @@ export function CollabIQ() {
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
           {step===3 && <Stage3 partners={partners} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} />}
-          {step===4 && <Stage4 state={state} dispatch={dispatch} onGated={handleGated} aiEmail={aiEmail} aiBrief={aiBrief} aiEmailLoading={aiEmailLoading} aiBriefLoading={aiBriefLoading} partners={partners} />}
+          {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
+          {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} />}
         </div>
 
-        {step>0&&step<4 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} theme={theme} />}
+        {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} theme={theme} />}
 
         <EmailGate show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>

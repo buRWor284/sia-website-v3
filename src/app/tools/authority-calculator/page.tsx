@@ -38,35 +38,19 @@ const hexA  = (hex: string, a: number): string => {
 };
 
 // ── Config ────────────────────────────────────────────────────────────────────
-interface SpendOption {
-  label: string; short: string; costLabel: string;
-  min: number; max: number; step: number; def: number;
-  hint: string;
-}
-const SPEND: Record<"agency" | "links", SpendOption> = {
-  agency: {
-    label: "I pay a monthly agency retainer",
-    short: "Agency retainer", costLabel: "Agency retainer",
-    min: 0, max: 10000, step: 500, def: 2000,
-    hint: "HARO helpers from $1,500/mo · boutique SEO from $2,000/mo · mid-market agencies $3,000–$5,000/mo.",
-  },
-  links: {
-    label: "I buy links individually",
-    short: "Link-buying spend", costLabel: "Link-buying spend",
-    min: 0, max: 10000, step: 200, def: 1200,
-    hint: "Typically $300–$800 per link by DR & niche. $1,200/mo ≈ two links a month at $600 each.",
-  },
-};
+const SPEND   = { min: 0, max: 10000, step: 500, def: 2000,
+  hint: "Agency retainer, link-buying, or any combination — boutique SEO from $2K/mo · mid-market $3K–$5K/mo." };
 const TRAFFIC = { min: 200, max: 50000, step: 200, def: 1500 };
-const AOV     = { min: 50,  max: 10000, step: 50,  def: 200  };
+const AOV     = { min: 50,  max: 10000, step: 50,  def: 300  };
 interface Tier { id: string; name: string; fee: number; blurb: string }
 const TIERS: Tier[] = [
   { id: "sprint", name: "Sprint Cohort",        fee: 2000, blurb: "Four live sessions · cohort format" },
   { id: "accel",  name: "Sprint + Accelerator", fee: 3500, blurb: "Everything + 1-on-1 calls · lifetime access" },
 ];
 
-// Locked assumptions (shown as badge pills, not adjustable)
-const A = { placements: 2, equityPer: 600, cvrFrom: 0.01, cvrTo: 0.05, horizon: 12 };
+// Locked assumptions (shown as visible badges in the UI, not adjustable)
+// CVR baseline: conservative 1% floor; target: 3% (editorial trust compounds across all channels)
+const A = { placements: 2, equityPer: 600, cvrFrom: 0.01, cvrTo: 0.03, horizon: 12 };
 const LINK_EQUITY_YR = A.placements * A.equityPer * A.horizon; // $14,400
 
 // ── Formatting ────────────────────────────────────────────────────────────────
@@ -91,9 +75,7 @@ const paybackStr = (fee: number, gain: number): string => {
 
 // ── Compute ───────────────────────────────────────────────────────────────────
 interface CalcState {
-  mode: "agency" | "links";
-  retainer: number;
-  linkSpend: number;
+  spend: number;
   traffic: number;
   aov: number;
   tier: string;
@@ -105,10 +87,10 @@ interface CalcResult {
   roi: number; monthlyGain: number;
 }
 
-// Validated defaults: $180,400 net improvement · 9,020% ROI · 1-week payback
-const compute = ({ mode, retainer, linkSpend, traffic, aov, tier }: CalcState): CalcResult => {
+// Default output (AOV $300, 1,500 visitors, $2K/mo spend, CVR 1%→3%): ~$117K net improvement
+const compute = ({ spend, traffic, aov, tier }: CalcState): CalcResult => {
   const fee            = TIERS.find(t => t.id === tier)!.fee;
-  const spendMo        = mode === "agency" ? retainer : linkSpend;
+  const spendMo        = spend;
   const currentSpendYr = spendMo * 12;
   const custNow        = traffic * A.cvrFrom;
   const revNowYr       = custNow * aov * 12;
@@ -218,43 +200,18 @@ const Hero = () => (
 
 // ── §01 Inputs ────────────────────────────────────────────────────────────────
 const Inputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => void }) => {
-  const cfg = SPEND[st.mode];
-  const c   = compute(st);
+  const c = compute(st);
   return (
     <section style={{ background: PAPER, padding: "8px clamp(22px,5vw,56px) 0" }}>
       <SectionMast n="01" label="Your numbers · Adjust to your reality" />
 
-      <SCaps size={11} ls="0.16em" color={INK} style={{ display: "block", marginBottom: 10 }}>
-        How you currently earn links
-      </SCaps>
-      {/* spend mode toggle */}
-      <div style={{ display: "flex", border: `1.5px solid ${INK}`, maxWidth: 560 }}>
-        {(Object.entries(SPEND) as [string, SpendOption][]).map(([key, opt], i) => (
-          <button
-            key={key}
-            onClick={() => set({ mode: key as "agency" | "links" })}
-            style={{
-              flex: 1, cursor: "pointer", border: "none",
-              borderLeft: i ? `1.5px solid ${INK}` : "none",
-              background: st.mode === key ? INK : PAPER,
-              color: st.mode === key ? PAPER : INK,
-              padding: "13px 14px", fontFamily: GROT, fontWeight: 800,
-              fontSize: 12, letterSpacing: "0.06em", lineHeight: 1.2,
-            }}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-
       {/* sliders + live snapshot */}
-      <div className="calc-grid2" style={{ marginTop: 26 }}>
+      <div className="calc-grid2" style={{ marginTop: 10 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 26 }}>
           <Slider
-            label={cfg.costLabel + " / month"} hint={cfg.hint}
-            min={cfg.min} max={cfg.max} step={cfg.step}
-            value={st.mode === "agency" ? st.retainer : st.linkSpend}
-            onChange={(v) => set(st.mode === "agency" ? { retainer: v } : { linkSpend: v })}
+            label="Monthly marketing spend" hint={SPEND.hint}
+            min={SPEND.min} max={SPEND.max} step={SPEND.step}
+            value={st.spend} onChange={(v) => set({ spend: v })}
             format={fmt} accent={RED}
           />
           <Slider
@@ -278,9 +235,9 @@ const Inputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => vo
             </div>
             <div className="calc-snap">
               {([
-                ["1%",                                         "Conversion rate", "conservative baseline"],
+                ["1%",                                           "Conversion rate", "your baseline CVR"],
                 [Math.round(c.custNow).toLocaleString("en-US"), "Customers / mo",  "traffic × 1%"],
-                [fmtK(c.revNowYr),                             "Annual revenue",   "at 1% CVR"],
+                [fmtK(c.revNowYr),                              "Annual revenue",  "at 1% CVR"],
               ] as [string, string, string][]).map(([big, lab, sub], i) => (
                 <div key={lab} style={{ padding: 14, borderLeft: i ? `1px solid ${INK15}` : "none" }}>
                   <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{big}</div>
@@ -288,6 +245,24 @@ const Inputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => vo
                   <p style={{ margin: "3px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>{sub}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* CVR assumption badge — visible, not buried in footnotes */}
+          <div style={{
+            border: `1px solid ${AMBER}`, background: hexA(AMBER, 0.07),
+            padding: "10px 14px", display: "flex", alignItems: "flex-start", gap: 10,
+          }}>
+            <span style={{ width: 7, height: 7, background: AMBER, flexShrink: 0, marginTop: 5 }} />
+            <div>
+              <SCaps size={9.5} ls="0.12em" color={AMBER} style={{ display: "block", marginBottom: 4 }}>
+                Conversion assumption used in this model
+              </SCaps>
+              <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.4 }}>
+                Baseline <strong>1% CVR</strong> → projected <strong>3% CVR</strong> after earned media compounds.
+                Based on ConversionXL research: "As seen in Forbes" lifts conversion 15–30%; editorial backlinks
+                raise branded search, which converts 5–10× generic traffic.
+              </p>
             </div>
           </div>
         </div>
@@ -320,7 +295,6 @@ const NetBar = ({ label, value, max, color, sub }: {
 
 const Comparison = ({ st }: { st: CalcState }) => {
   const c      = compute(st);
-  const cfg    = SPEND[st.mode];
   const maxAbs = Math.max(Math.abs(c.netWith), Math.abs(c.netWithout), 1);
   return (
     <section style={{ background: PAPER, padding: "64px clamp(22px,5vw,56px) 0" }}>
@@ -328,7 +302,7 @@ const Comparison = ({ st }: { st: CalcState }) => {
 
       <div style={{ border: `1.5px solid ${INK}`, background: PAPER2, padding: "20px 24px", marginBottom: 26 }}>
         <NetBar
-          label={`Renting authority — keep paying ${cfg.short.toLowerCase()}`}
+          label="Renting authority — keep paying marketing spend"
           value={c.netWithout} max={maxAbs}
           color={c.netWithout < 0 ? RED : INK}
           sub={`${fmtK(c.revNowYr)} revenue − ${fmtK(c.currentSpendYr)} spend, every year you keep renting`}
@@ -342,7 +316,7 @@ const Comparison = ({ st }: { st: CalcState }) => {
         <p style={{ margin: "4px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.5 }}>
           The leap is the conversion lift shown working, not asserted:{" "}
           <strong>{fmtK(c.revNowYr)}</strong> today at a 1% rate →{" "}
-          <strong>{fmtK(c.revWithYr)}</strong> at 5%, the level editorial trust signals support across every channel.
+          <strong>{fmtK(c.revWithYr)}</strong> at 3% — the conservative end of what editorial trust signals support.
         </p>
       </div>
 
@@ -355,8 +329,8 @@ const Comparison = ({ st }: { st: CalcState }) => {
               Paying indefinitely — owning nothing
             </p>
           </div>
-          <Line label="Revenue from traffic" value={fmt(c.revNowYr)} />
-          <Line label={cfg.costLabel}         value={fmt(-c.currentSpendYr)} color={RED} />
+          <Line label="Revenue from traffic"  value={fmt(c.revNowYr)} />
+          <Line label="Marketing spend"       value={fmt(-c.currentSpendYr)} color={RED} />
           <Line label="Net position / year"   value={fmt(c.netWithout)} color={c.netWithout < 0 ? RED : INK} strong />
         </div>
         {/* owning column */}
@@ -367,8 +341,8 @@ const Comparison = ({ st }: { st: CalcState }) => {
               One investment. Yours permanently.
             </p>
           </div>
-          <Line label="Revenue at 5% conversion" value={fmt(c.revWithYr)}          color={GREEN} />
-          <Line label={cfg.costLabel}             value="$0"                         color={BLUE}  />
+          <Line label="Revenue at 3% conversion" value={fmt(c.revWithYr)}          color={GREEN} />
+          <Line label="Marketing spend"           value="$0"                         color={BLUE}  />
           <Line label="Link equity earned"        value={"+" + fmt(LINK_EQUITY_YR)} color={AMBER} tag="asset, not spend" />
           <Line label="One-time investment"       value={fmt(-c.fee)}               color={RED}   />
           <Line label="Net position / year"       value={fmt(c.netWith)}            color={GREEN} strong />
@@ -558,8 +532,8 @@ const Result = ({ st }: { st: CalcState }) => {
             margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic",
             fontSize: 16.5, color: "rgba(250,250,250,.72)", maxWidth: 620, lineHeight: 1.45,
           }}>
-            Even a partial lift to 2.5% conversion matches the revenue of doubling your traffic budget —
-            this is the conservative full case.
+            The model uses 3% as the target CVR — a conservative estimate. Even a partial lift to 2% matches
+            the revenue impact of doubling your traffic budget.
           </p>
 
           {/* stat cards */}
@@ -706,10 +680,10 @@ const BENEFITS: [string, string][] = [
 
 const BelowFold = () => (
   <section style={{ background: PAPER, padding: "64px clamp(22px,5vw,56px) 8px" }}>
-    <SectionMast n="03" label="Why conversion climbs · 1% → 5%" />
+    <SectionMast n="03" label="Why conversion climbs · 1% → 3%" />
     <p style={{ margin: 0, maxWidth: 880, fontFamily: SERIF, fontSize: "clamp(18px,2.4vw,24px)", lineHeight: 1.45, color: INK }}>
-      Blended conversion improves as editorial trust signals compound across every channel —
-      not a paid-ad-specific claim.
+      Blended conversion improves as editorial trust signals compound across every channel.
+      The model uses a conservative 3% target — real-world uplifts regularly run higher.
     </p>
     <div className="calc-grid3" style={{ marginTop: 24, border: `1px solid ${INK}` }}>
       {([
@@ -724,7 +698,7 @@ const BelowFold = () => (
       ))}
     </div>
     <p style={{ margin: "18px 0 0", maxWidth: 880, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK55 }}>
-      Even a partial improvement to 2.5% matches doubling your traffic budget —
+      Even a partial improvement to 2% matches doubling your traffic budget —
       and organic leads cost roughly 50% less per acquisition than paid.
     </p>
 
@@ -736,7 +710,7 @@ const BelowFold = () => (
       <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
         <Badge>2 linked placements / month — 24 a year</Badge>
         <Badge>$600 link-equity value per placement</Badge>
-        <Badge>Conversion 1% → 5%</Badge>
+        <Badge>Conversion 1% → 3%</Badge>
         <Badge>12-month horizon</Badge>
       </div>
     </div>
@@ -811,11 +785,11 @@ const BelowFold = () => (
     <div style={{ marginTop: 40, borderTop: `3px solid ${INK}`, paddingTop: 18, maxWidth: 980 }}>
       <SCaps size={10} ls="0.16em" color={INK55}>On the numbers</SCaps>
       <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: INK55 }}>
-        The 1% blended conversion baseline is a conservative floor. The 1%→5% range reflects the aggregate
-        effect of editorial trust signals across all channels, not a paid-ad-specific figure (paid search
-        averages ~7%, Keywords Everywhere 2024 — the organic argument is about cost-per-acquisition, not
-        raw conversion rate). $600 per placement reflects conservative mid-market link rates. Sources:
-        Nielsen Global Trust in Advertising · ConversionXL CRO research · Keywords Everywhere 2024.
+        The 1% blended conversion baseline is a conservative floor across most industries. The 3% target
+        reflects the aggregate effect of editorial trust signals across all channels — not a paid-ad figure
+        (paid search averages ~7%, Keywords Everywhere 2024). The argument here is about cost-per-acquisition
+        and compounding authority, not raw rate. $600 per placement reflects conservative mid-market link rates.
+        Sources: Nielsen Global Trust in Advertising · ConversionXL CRO research · Keywords Everywhere 2024.
       </p>
     </div>
 
@@ -858,94 +832,79 @@ const ViewToggle = ({ view, setView }: { view: "simple" | "extended"; setView: (
 );
 
 // ── Simple Inputs (compact layout for Quick View mode) ────────────────────────
-const SimpleInputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => void }) => {
-  const cfg = SPEND[st.mode];
-  return (
-    <section style={{ background: PAPER, padding: "0 clamp(22px,5vw,56px) 36px" }}>
-      {/* Mode toggle */}
-      <div style={{ marginBottom: 28 }}>
-        <SCaps size={11} ls="0.16em" color={INK} style={{ display: "block", marginBottom: 10 }}>
-          How you currently earn links
-        </SCaps>
-        <div style={{ display: "flex", border: `1.5px solid ${INK}`, maxWidth: 480 }}>
-          {(Object.entries(SPEND) as [string, SpendOption][]).map(([key, opt], i) => (
+const SimpleInputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => void }) => (
+  <section style={{ background: PAPER, padding: "0 clamp(22px,5vw,56px) 36px" }}>
+    {/* 3 sliders in a row */}
+    <div className="simple-inputs-grid" style={{ marginBottom: 22 }}>
+      <Slider
+        label="Monthly marketing spend" hint={SPEND.hint}
+        min={SPEND.min} max={SPEND.max} step={SPEND.step}
+        value={st.spend} onChange={(v) => set({ spend: v })}
+        format={fmt} accent={RED}
+      />
+      <Slider
+        label="Monthly visitors"
+        min={TRAFFIC.min} max={TRAFFIC.max} step={TRAFFIC.step}
+        value={st.traffic} onChange={(v) => set({ traffic: v })}
+        format={(n) => n.toLocaleString("en-US")}
+      />
+      <Slider
+        label="Avg deal / order value"
+        min={AOV.min} max={AOV.max} step={AOV.step}
+        value={st.aov} onChange={(v) => set({ aov: v })} format={fmt}
+      />
+    </div>
+
+    {/* CVR assumption — visible, not buried */}
+    <div style={{
+      border: `1px solid ${AMBER}`, background: hexA(AMBER, 0.07),
+      padding: "10px 14px", display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 24,
+    }}>
+      <span style={{ width: 7, height: 7, background: AMBER, flexShrink: 0, marginTop: 5 }} />
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.4 }}>
+        <strong>Conversion assumption:</strong> baseline <strong>1% CVR</strong> → projected <strong>3% CVR</strong> after
+        earned media compounds. Based on ConversionXL: editorial trust lifts conversion 15–30%; branded search
+        converts 5–10× generic traffic.
+      </p>
+    </div>
+
+    {/* Compact tier selector */}
+    <div>
+      <SCaps size={11} ls="0.16em" color={INK} style={{ display: "block", marginBottom: 10 }}>
+        EMOS track — updates your result below
+      </SCaps>
+      <div className="simple-tier-grid">
+        {TIERS.map((t) => {
+          const on = st.tier === t.id;
+          return (
             <button
-              key={key}
-              onClick={() => set({ mode: key as "agency" | "links" })}
+              key={t.id}
+              onClick={() => set({ tier: t.id })}
               style={{
-                flex: 1, cursor: "pointer", border: "none",
-                borderLeft: i ? `1.5px solid ${INK}` : "none",
-                background: st.mode === key ? INK : PAPER,
-                color: st.mode === key ? PAPER : INK,
-                padding: "12px 14px",
-                fontFamily: GROT, fontWeight: 800, fontSize: 11,
-                letterSpacing: "0.06em", lineHeight: 1.2,
+                cursor: "pointer", textAlign: "left",
+                border: `1.5px solid ${INK}`,
+                background: on ? INK : PAPER,
+                color: on ? PAPER : INK,
+                padding: "14px 20px", flex: 1,
+                display: "flex", justifyContent: "space-between",
+                alignItems: "center", gap: 16,
               }}
-            >{opt.label}</button>
-          ))}
-        </div>
+            >
+              <div>
+                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, lineHeight: 1.1 }}>{t.name}</div>
+                <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, marginTop: 4,
+                  color: on ? "rgba(250,250,250,.65)" : INK55 }}>{t.blurb}</div>
+              </div>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, color: on ? YEL : INK, flexShrink: 0 }}>
+                {fmt(t.fee)}
+              </div>
+            </button>
+          );
+        })}
       </div>
-
-      {/* 3 sliders in a row */}
-      <div className="simple-inputs-grid" style={{ marginBottom: 28 }}>
-        <Slider
-          label={cfg.costLabel + " / mo"}
-          min={cfg.min} max={cfg.max} step={cfg.step}
-          value={st.mode === "agency" ? st.retainer : st.linkSpend}
-          onChange={(v) => set(st.mode === "agency" ? { retainer: v } : { linkSpend: v })}
-          format={fmt} accent={RED}
-        />
-        <Slider
-          label="Monthly visitors"
-          min={TRAFFIC.min} max={TRAFFIC.max} step={TRAFFIC.step}
-          value={st.traffic} onChange={(v) => set({ traffic: v })}
-          format={(n) => n.toLocaleString("en-US")}
-        />
-        <Slider
-          label="Avg deal / order value"
-          min={AOV.min} max={AOV.max} step={AOV.step}
-          value={st.aov} onChange={(v) => set({ aov: v })} format={fmt}
-        />
-      </div>
-
-      {/* Compact tier selector */}
-      <div>
-        <SCaps size={11} ls="0.16em" color={INK} style={{ display: "block", marginBottom: 10 }}>
-          EMOS track — updates your result below
-        </SCaps>
-        <div className="simple-tier-grid">
-          {TIERS.map((t) => {
-            const on = st.tier === t.id;
-            return (
-              <button
-                key={t.id}
-                onClick={() => set({ tier: t.id })}
-                style={{
-                  cursor: "pointer", textAlign: "left",
-                  border: `1.5px solid ${INK}`,
-                  background: on ? INK : PAPER,
-                  color: on ? PAPER : INK,
-                  padding: "14px 20px", flex: 1,
-                  display: "flex", justifyContent: "space-between",
-                  alignItems: "center", gap: 16,
-                }}
-              >
-                <div>
-                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, lineHeight: 1.1 }}>{t.name}</div>
-                  <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, marginTop: 4,
-                    color: on ? "rgba(250,250,250,.65)" : INK55 }}>{t.blurb}</div>
-                </div>
-                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, color: on ? YEL : INK, flexShrink: 0 }}>
-                  {fmt(t.fee)}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 // ── LLM Visibility Callout ────────────────────────────────────────────────────
 // Surfaces the fastest-growing channel — not counted in the ROI math
@@ -1035,8 +994,7 @@ const PAGE_STYLES = `
 
 // ── Page defaults & localStorage ─────────────────────────────────────────────
 const DEFAULTS: CalcState = {
-  mode: "agency", retainer: SPEND.agency.def,
-  linkSpend: SPEND.links.def, traffic: TRAFFIC.def,
+  spend: SPEND.def, traffic: TRAFFIC.def,
   aov: AOV.def, tier: "sprint",
 };
 const STORE_KEY = "sia.emos.roi.v1";
