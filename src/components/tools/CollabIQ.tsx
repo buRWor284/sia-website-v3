@@ -356,7 +356,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
               &ldquo;Can not thank Syed Irfan Ajmal and the team enough for getting it ranked — they are getting 100s of keywords for this site ranked. Exceptional professionalism.&rdquo;
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ width: 24, height: 24, background: ACC, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GF, fontWeight: 900, fontSize: 10, color: "#0c0b09" }}>A</div>
+              <img src="/assets/testimonials/Azzam_Sheikh_NTA_Testimonial_LinkedIn.png" alt="Azzam Sheikh" style={{ width: 32, height: 32, objectFit: "cover", objectPosition: "top", flexShrink: 0 }} />
               <span style={{ fontFamily: GF, fontSize: 11, fontWeight: 700, color: cTx }}>Azzam Sheikh</span>
               <span style={{ fontFamily: MF, fontSize: 8, color: cTx3, marginLeft: 4 }}>Client · LinkedIn</span>
             </div>
