@@ -125,6 +125,22 @@ const CONTENT: ContentItem[] = [
     newsDeck: "Co-marketing, distribution, and link opportunities across every industry, mapped",
     cta: "Use the Tool",
   },
+  {
+    id: "tool-pressiq",
+    type: "tool",
+    badge: "Interactive Tool",
+    beta: true,
+    topics: ["pr", "personal-branding", "neuromarketing"],
+    title: "PressIQ — Journalist Pitch Score",
+    sub: "Will a journalist actually paste your pitch in?",
+    blurb:
+      "Paste a HARO, Qwoted, or Featured pitch and score it against a 34-point system and the EMOS framework — storytelling, neuromarketing, and authority — with the three fixes that move it most. Backed by published journalist research.",
+    href: "/tools/pressiq",
+    y: "2026",
+    newsHeadline: "The Pitch Desk",
+    newsDeck: "Score any media pitch against the system that earns the placement",
+    cta: "Score a Pitch",
+  },
 
   // ── CALCULATORS ─────────────────────────────────────────────────────────
   {
