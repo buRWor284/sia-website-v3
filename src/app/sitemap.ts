@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getAllEpisodes } from "@/lib/podcast";
 
 const BASE = "https://www.syedirfanajmal.com";
 
@@ -34,10 +35,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/tools/authority-calculator",   changeFrequency: "yearly"  as const, priority: 0.5 },
   ];
 
-  return pages.map(({ url, changeFrequency, priority }) => ({
+  const staticEntries = pages.map(({ url, changeFrequency, priority }) => ({
     url: `${BASE}${url}`,
     lastModified: now,
     changeFrequency,
     priority,
   }));
+
+  // Podcast episode pages
+  const episodes = getAllEpisodes().map((ep) => ({
+    url: `${BASE}/podcast/${ep.slug}`,
+    lastModified: now,
+    changeFrequency: "yearly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticEntries, ...episodes];
 }
