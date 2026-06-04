@@ -19,7 +19,7 @@ const CARDS: ReadonlyArray<Card> = [
 
 export const Wire = () => (
   <section id="wire" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="05" label="The Wire · Latest dispatches" />
+    <SectionMast n="05" label="Latest Dispatches" />
 
     <div className="grid-intro">
       <h2
@@ -46,7 +46,7 @@ export const Wire = () => (
           lineHeight: 1.55,
         }}
       >
-        Podcasts, essays, infographics, talks. What the bureau has shipped
+        Podcasts, essays, infographics, talks. What I.ve shipped
         over the last twenty-two years, with the latest at the top.
       </p>
     </div>

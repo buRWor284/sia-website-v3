@@ -67,7 +67,7 @@ const CURRENT: ReadonlyArray<CurrentVenture> = [
   },
   {
     tag: "Personal Brand + Speaking",
-    name: "The SIA Bureau",
+    name: "Syed Irfan Ajmal",
     role: "Editor-in-Chief",
     status: "Active",
     tagline: "Teaching earned media to founders who refuse to stay invisible.",
@@ -187,7 +187,7 @@ function Hero() {
             <em style={{ fontStyle: "italic", fontWeight: 600 }}>behind the bylines.</em>
           </h1>
           <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
-            From DMR.agency to EMOS — the enterprises that power the bureau.
+            From DMR.agency to EMOS — my ventures.
           </p>
         </div>
 
@@ -195,7 +195,7 @@ function Hero() {
         <div className="res-hero-right">
           {[
             { label: "DMR.agency",    sub: "Digital PR & SEO bureau" },
-            { label: "The SIA Bureau", sub: "Speaking & publishing" },
+            { label: "Syed Irfan Ajmal", sub: "Speaking & publishing" },
             { label: "EMOS",          sub: "Earned media OS" },
           ].map(t => (
             <div key={t.label}>
@@ -213,7 +213,7 @@ function Hero() {
 function VenturesLead() {
   const TICKER = [
     "Founder · DMR.agency",
-    "The SIA Bureau",
+    "Syed Irfan Ajmal",
     "Earned Media OS",
     "Digital PR",
     "GEO · SEO · Content Marketing",
@@ -254,7 +254,7 @@ function VenturesLead() {
             compounds. Paid reach rents your audience. Owned media, editorial
             credibility, and genuine authority — these are the assets that
             appreciate. DMR.agency executes it for clients. EMOS systemises it
-            into a repeatable framework. The SIA Bureau teaches it to founders
+            into a repeatable framework. I teach it to founders
             who want to own their distribution, not lease it.
           </p>
           <p style={{ marginTop: "0.7em" }}>

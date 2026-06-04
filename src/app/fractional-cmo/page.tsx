@@ -218,7 +218,7 @@ const Scope = () => (
         }}
       >
         Fractional CMO is a phrase that has been used to mean almost anything
-        in the last two years. Here is what it means at this bureau,
+        in the last two years. Here is what it means in my work,
         specifically.
       </p>
     </div>
@@ -328,7 +328,7 @@ const Timeline = () => (
         }}
       >
         Most fractional engagements drift in the first quarter. To avoid that,
-        every retainer at this bureau follows the same opening shape — and we
+        every retainer follows the same opening shape — and we
         calibrate from there.
       </p>
     </div>

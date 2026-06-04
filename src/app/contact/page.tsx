@@ -48,7 +48,7 @@ function Hero() {
             CONTACT
           </div>
           <SCaps size={10} ls="0.24em" color={INK55}>
-            The Bureau &nbsp;·&nbsp; Open door
+            Syed Irfan Ajmal · Open door
           </SCaps>
           <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
             Let&rsquo;s talk about<br />
@@ -342,7 +342,7 @@ export default function ContactPage() {
             >
               Whether you want to discuss an EMOS engagement, a speaking
               invitation, a fractional CMO arrangement, or just want to share
-              what you&rsquo;re working on — the bureau is open.
+              what you&rsquo;re working on — get in touch.
             </p>
 
             <DoubleRule />
@@ -416,7 +416,7 @@ export default function ContactPage() {
                   maxWidth: 360,
                 }}
               >
-                The Bureau is published from Peshawar, Pakistan.
+                Published from Peshawar, Pakistan.
                 SIA Enterprises Inc. is incorporated in Wyoming, USA.
                 Response time: 1–2 business days.
               </p>

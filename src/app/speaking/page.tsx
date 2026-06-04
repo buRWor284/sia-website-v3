@@ -580,7 +580,7 @@ const ClientStripSpeaking = () => {
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", padding: "20px 0 10px", gap: 16, flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
           <Pill size={11} ls="0.22em">From the consulting roster →</Pill>
-          <SCaps size={11} ls="0.22em" color={INK70}>The same companies trust the bureau when they hire the speaker</SCaps>
+          <SCaps size={11} ls="0.22em" color={INK70}>The same companies trust my work when they hire me as speaker</SCaps>
         </div>
         <a href="/clients" style={{ fontFamily: GROT, fontSize: 11, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK}`, paddingBottom: 2 }}>
           The full roster →

@@ -434,7 +434,7 @@ function NewspaperSnippet({ headline, deck }: { headline: string; deck: string }
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
         <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 6, letterSpacing: "0.28em", textTransform: "uppercase", color: INK55 }}>
-          Bureau Gazette
+          Irfan Ajmal
         </span>
         <span style={{ fontFamily: GROT, fontSize: 6, color: "rgba(26,20,16,.32)", letterSpacing: "0.12em" }}>
           MMXXVI
@@ -448,7 +448,7 @@ function NewspaperSnippet({ headline, deck }: { headline: string; deck: string }
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 7px", borderTop: "0.5px solid rgba(26,20,16,.2)", paddingTop: 4 }}>
         <div style={{ fontFamily: SERIF, fontSize: 7, color: INK55, lineHeight: 1.5 }}>{deck}</div>
         <div style={{ fontFamily: SERIF, fontSize: 7, color: "rgba(26,20,16,.3)", lineHeight: 1.5 }}>
-          The SIA Bureau · Research desk · syedirfanajmal.com
+          syedirfanajmal.com
         </div>
       </div>
     </div>

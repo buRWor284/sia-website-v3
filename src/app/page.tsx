@@ -740,13 +740,13 @@ export default function HomePage() {
             <div className="kit-card__badge">INTERACTIVE KIT</div>
             <div className="kit-card__paper">
               <div className="kit-card__paper-header">
-                <span className="kit-card__gazette">BUREAU GAZETTE</span>
+                <span className="kit-card__gazette">IRFAN AJMAL</span>
                 <span className="kit-card__date">MMXXVI</span>
               </div>
               <div className="kit-card__paper-title">PITCH PERFECT</div>
               <div className="kit-card__paper-cols">
                 <div className="kit-card__paper-col">The seven-step system that gets reporters to say yes</div>
-                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
+                <div className="kit-card__paper-col">syedirfanajmal.com</div>
               </div>
             </div>
             <h3 className="kit-card__title">The Journo Outreach<br/>Checklist</h3>
@@ -760,13 +760,13 @@ export default function HomePage() {
             <div className="kit-card__badge">AI-POWERED TOOL</div>
             <div className="kit-card__paper">
               <div className="kit-card__paper-header">
-                <span className="kit-card__gazette">BUREAU GAZETTE</span>
+                <span className="kit-card__gazette">IRFAN AJMAL</span>
                 <span className="kit-card__date">MMXXVI</span>
               </div>
               <div className="kit-card__paper-title">COLLAB LINK BUILDER</div>
               <div className="kit-card__paper-cols">
                 <div className="kit-card__paper-col">AI finds your best link-building partners in minutes, not weeks</div>
-                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
+                <div className="kit-card__paper-col">syedirfanajmal.com</div>
               </div>
             </div>
             <h3 className="kit-card__title">CollabIQ</h3>
@@ -1056,8 +1056,9 @@ export default function HomePage() {
             <ul className="footer__links">
               <li><a href="https://x.com/syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">Twitter / X ↗</a></li>
               <li><a href="https://www.linkedin.com/in/syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn ↗</a></li>
-              <li><a href="https://youtube.com/@syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>
+              <li><a href="https://www.youtube.com/watch?v=9Zn9TE6Nz6Y&list=PLY3hQIOPokONs4kpRS0d9rLQ6gjv6Hlij" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>
               <li><a href="https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" target="_blank" rel="noopener noreferrer" className="footer__link">Apple Podcasts ↗</a></li>
+              <li><a href="https://creators.spotify.com/pod/profile/syedirfanajmal/episodes/" target="_blank" rel="noopener noreferrer" className="footer__link">Spotify ↗</a></li>
             </ul>
           </div>
         </div>

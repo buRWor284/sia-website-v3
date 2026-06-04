@@ -779,7 +779,7 @@ export default function JournoOutreachChecklistPage() {
             alignItems: "baseline", flexWrap: "wrap", gap: 12,
           }}>
             <SCaps size={10.5} ls="0.16em" color={INK55}>
-              Produced by SIA Media · The Sunday Bureau
+              Produced by Syed Irfan Ajmal
             </SCaps>
             <SCaps size={10.5} ls="0.16em" color={INK55}>
               Works for HARO · Qwoted · Source of Sources · Featured · Help a B2B Writer

@@ -94,7 +94,7 @@ export const SiteHeader = () => {
             letterSpacing: ".22em", textTransform: "uppercase",
             color: CREAM50,
           }}>
-            The SIA Wire
+            syedirfanajmal.com
           </div>
           <div style={{
             fontFamily: SERIF, fontStyle: "italic",

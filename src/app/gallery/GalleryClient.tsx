@@ -54,7 +54,7 @@ const ALL_ITEMS: ReadonlyArray<GalleryItem> = [
   { format:"video", type:"speaking", country:null,        id:"zBUeBo4srpA", title:"Writing Your Way to Success",                      where:"20-min webinar · 3 case studies" },
 ];
 
-const PLAYLIST    = "https://www.youtube.com/playlist?list=PLY3hQIOPokON_uNiEcWBJXBf43FSswXtY";
+const PLAYLIST    = "https://www.youtube.com/watch?v=9Zn9TE6Nz6Y&list=PLY3hQIOPokONs4kpRS0d9rLQ6gjv6Hlij";
 const TOTAL_PHOTOS = ALL_ITEMS.filter(i => i.format === "photo").length;
 const TOTAL_VIDEOS = ALL_ITEMS.filter(i => i.format === "video").length;
 const TOTAL_ITEMS  = ALL_ITEMS.length;

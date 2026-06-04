@@ -50,7 +50,7 @@ const Hero = () => (
           CLIENTS
         </div>
         <SCaps size={10} ls="0.24em" color={INK55}>
-          The Bureau Portfolio &nbsp;·&nbsp; Filed clients &nbsp;·&nbsp; Edition of {new Date().getFullYear()}
+          My Clients &nbsp;·&nbsp; Filed clients &nbsp;·&nbsp; Edition of {new Date().getFullYear()}
         </SCaps>
         <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
           Selected<br />
@@ -339,7 +339,7 @@ const Tier1Card = ({ c, open, onToggle }: Tier1CardProps) => {
             {c.blurb}
           </p>
           <div style={{ marginTop: 18 }}>
-            <SCaps size={10.5} ls="0.22em" color={YEL}>Role · the bureau</SCaps>
+            <SCaps size={10.5} ls="0.22em" color={YEL}>Role · Irfan Ajmal</SCaps>
             <div
               style={{
                 marginTop: 6,
