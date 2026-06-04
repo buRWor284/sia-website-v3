@@ -1025,8 +1025,7 @@ export default function HomePage() {
           <div>
             <div className="footer__wordmark">Syed Irfan Ajmal</div>
             <p className="footer__about">
-              Syed Irfan Ajmal award-winning marketing consultant, author,
-              speaker, and CEO of <strong>DMR.agency</strong>.
+              Syed Irfan Ajmal is a serial entrepreneur, marketing maverick, author, int&apos;l speaker, and CEO of <strong>DMR.agency</strong>.
             </p>
           </div>
           <div>
