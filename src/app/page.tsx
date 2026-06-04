@@ -103,7 +103,7 @@ const css = `
   }
   .hero-h1 .strike {
     text-decoration: line-through;
-    text-decoration-color: var(--RED);
+    text-decoration-color: var(--Y);
     text-decoration-thickness: 4px;
   }
   .hero-h1 .earn {
