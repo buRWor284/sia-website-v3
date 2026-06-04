@@ -54,7 +54,7 @@ export const ToolHeader = ({
       </span>
     </div>
 
-    <Link href="/" style={{
+    <Link href="/" className="tool-back-link" style={{
       fontFamily: GROT, fontWeight: 700, fontSize: 9,
       letterSpacing: ".16em", textTransform: "uppercase",
       color: CREAM45, textDecoration: "none", whiteSpace: "nowrap",

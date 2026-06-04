@@ -1,3 +1,14 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "100+ Writing Tips to Become a Better Writer · Syed Irfan Ajmal",
+  description: "Over 100 practical writing tips covering clarity, structure, editing, voice and persuasion — for marketers, founders and anyone who communicates in writing.",
+  openGraph: {
+    title: "100+ Writing Tips to Become a Better Writer",
+    description: "Practical writing tips on clarity, structure, editing and voice for marketers and founders.",
+  },
+};
+
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {

@@ -206,6 +206,8 @@ export default async function EpisodePage({
             <iframe
               src={`https://www.youtube.com/embed/${ep.embeds.youtube_id}`}
               title={ep.title}
+              width="560"
+              height="315"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               style={{

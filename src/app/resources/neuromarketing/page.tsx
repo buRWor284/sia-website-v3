@@ -1,3 +1,14 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Neuromarketing: How Brains Make Buying Decisions · Syed Irfan Ajmal",
+  description: "A research-backed primer on neuromarketing — how colour, framing, social proof and cognitive biases influence purchase decisions and how to apply them ethically.",
+  openGraph: {
+    title: "Neuromarketing: How Brains Make Buying Decisions",
+    description: "Research-backed insights on cognitive biases, social proof and how the brain processes marketing messages.",
+  },
+};
+
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {

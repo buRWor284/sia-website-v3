@@ -1,3 +1,14 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Personal Branding: The Complete Playbook · Syed Irfan Ajmal",
+  description: "A complete guide to building your personal brand — covering strategy, positioning, storytelling, content and the real examples behind 7-figure personal brands.",
+  openGraph: {
+    title: "Personal Branding: The Complete Playbook",
+    description: "Strategy, positioning, storytelling and real examples for building a 7-figure personal brand.",
+  },
+};
+
 import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,

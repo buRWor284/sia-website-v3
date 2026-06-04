@@ -141,6 +141,23 @@ export const SiteHeader = () => {
         </a>
       </div>
 
+      {/* ── Mobile announcement bar — visible only when hamburger is shown */}
+      <a
+        href="/emos"
+        className="site-header__mobile-announce"
+        style={{
+          display: "none",
+          background: YEL,
+          color: INK,
+          padding: "8px 20px",
+          fontFamily: GROT, fontWeight: 800, fontSize: 10,
+          letterSpacing: ".14em", textTransform: "uppercase",
+          textDecoration: "none", textAlign: "center",
+        }}
+      >
+        ● EMOS Founding Class — Apply Now →
+      </a>
+
       {/* ── Mobile hamburger ─────────────────────────────────────────── */}
       <button
         className="site-header__hamburger"

@@ -1,3 +1,14 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Brand Storytelling: A Guide to Earning Attention · Syed Irfan Ajmal",
+  description: "How to use narrative, emotion and science-backed storytelling techniques to build brand awareness, deepen loyalty and drive measurable business results.",
+  openGraph: {
+    title: "Brand Storytelling: A Guide to Earning Attention",
+    description: "Narrative, emotion and science-backed storytelling techniques that build brand awareness and drive results.",
+  },
+};
+
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
 import {

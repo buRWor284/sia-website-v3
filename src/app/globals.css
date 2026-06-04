@@ -1914,8 +1914,10 @@ body > * { position: relative; z-index: 2; }
   .site-header__wire  { display: none !important; }
   .site-header__bar   { display: none !important; }
   .site-header__hamburger { display: flex !important; }
-  /* Hide announcement links — they appear in the mobile dropdown instead */
+  /* Hide desktop announcement links — moved to mobile dropdown + condensed bar */
   .site-header__announce { display: none !important; }
+  /* Show condensed yellow mobile CTA bar */
+  .site-header__mobile-announce { display: block !important; }
 }
 
 /* =========================================================================
@@ -2113,4 +2115,43 @@ body > * { position: relative; z-index: 2; }
     overflow-x: auto;
     display: block;
   }
+}
+
+/* =========================================================================
+   FORM ACCESSIBILITY — Checkbox tap targets & label UX
+   Native checkboxes render at 13×13px — well below the 44×44px tap minimum.
+   This expands the visual size and wraps labels to be fully clickable.
+   ========================================================================= */
+
+/* Larger checkbox hit area */
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  cursor: pointer;
+  accent-color: var(--color-ink);
+  flex-shrink: 0;
+}
+
+/* Make the label itself a tap target */
+label:has(input[type="checkbox"]),
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 4px 0;
+}
+
+/* =========================================================================
+   TOOL PAGES — Back-to-site link tap target
+   The "← SYEDIRFANAJMAL.COM" back link on tool pages is styled as tiny caps.
+   Boost the tap target to ≥44px on mobile.
+   ========================================================================= */
+.tool-back-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 4px;
 }
