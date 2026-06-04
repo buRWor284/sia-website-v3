@@ -1023,7 +1023,7 @@ export default function HomePage() {
       <footer className="footer">
         <div className="footer__grid">
           <div>
-            <div className="footer__wordmark">SIA.</div>
+            <div className="footer__wordmark">Syed Irfan Ajmal</div>
             <p className="footer__about">
               Syed Irfan Ajmal award-winning marketing consultant, author,
               speaker, and CEO of <strong>DMR.agency</strong>.

@@ -153,7 +153,7 @@ export const Colophon = () => (
     <div style={S.grid}>
       {/* Brand block */}
       <div>
-        <div style={S.wordmark}>SIA.</div>
+        <div style={S.wordmark}>Syed Irfan Ajmal</div>
         <p style={S.about}>
           Syed Irfan Ajmal — award-winning marketing consultant, author, speaker, and CEO of <strong>DMR.agency</strong>.
         </p>

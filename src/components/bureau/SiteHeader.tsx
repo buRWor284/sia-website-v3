@@ -4,13 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CALENDLY, GROT, INK, SERIF, YEL, YEL2 } from "@/lib/tokens";
-import { availabilityLabel } from "@/lib/site-config";
 
 /* ─── Token aliases matching homepage design ──────────────────────────────── */
 const CREAM   = "#FAFAFA";
 const CREAM50 = "rgba(250,250,250,.50)";
 const CREAM45 = "rgba(250,250,250,.45)";
-const CREAM40 = "rgba(250,250,250,.40)";
 const CREAM12 = "rgba(250,250,250,.12)";
 
 const NAV: ReadonlyArray<{ label: string; href: string; matchPrefix?: string }> = [
@@ -22,13 +20,6 @@ const NAV: ReadonlyArray<{ label: string; href: string; matchPrefix?: string }> 
   { label: "Resources",     href: "/resources"      },
   { label: "Contact",       href: "/contact"        },
 ];
-
-function getDateline(): string {
-  const d = new Date();
-  const days  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-  return `Est. 2004 · Global · ${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-}
 
 function isActive(href: string, pathname: string): boolean {
   if (href === "/") return pathname === "/";
@@ -87,30 +78,33 @@ export const SiteHeader = () => {
           </div>
         </div>
 
-        {/* Centre: SIA Wire */}
+        {/* Centre: est. only */}
         <div style={{ textAlign: "center" }} className="site-header__wire">
           <div style={{
             fontFamily: GROT, fontWeight: 700, fontSize: 9,
             letterSpacing: ".22em", textTransform: "uppercase",
             color: CREAM50,
           }}>
-            syedirfanajmal.com
-          </div>
-          <div style={{
-            fontFamily: SERIF, fontStyle: "italic",
-            fontSize: 13, color: CREAM40, marginTop: 3,
-          }}>
-            {getDateline()}
+            Est. 2004
           </div>
         </div>
 
-        {/* Right: availability */}
-        <div style={{
-          fontFamily: GROT, fontWeight: 700, fontSize: 9,
-          letterSpacing: ".16em", textTransform: "uppercase",
-          color: CREAM40, textAlign: "right",
-        }}>
-          {availabilityLabel}
+        {/* Right: availability CTAs */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-end" }}>
+          <a href="/fractional-cmo" style={{
+            fontFamily: GROT, fontWeight: 700, fontSize: 9,
+            letterSpacing: ".16em", textTransform: "uppercase",
+            color: YEL, textDecoration: "none", whiteSpace: "nowrap",
+          }}>
+            ● 2 FRACTIONAL CMO SPOTS · Q3 2026
+          </a>
+          <a href="/emos" style={{
+            fontFamily: GROT, fontWeight: 700, fontSize: 9,
+            letterSpacing: ".16em", textTransform: "uppercase",
+            color: YEL, textDecoration: "none", whiteSpace: "nowrap",
+          }}>
+            ● EMOS FOUNDING CLASS · APPLY NOW
+          </a>
         </div>
       </div>
 
