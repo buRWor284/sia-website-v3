@@ -259,7 +259,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
               <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: cTx3, textTransform: "uppercase" }}>Syed Irfan Ajmal · DMR.agency</span>
             </div>,
             <h2 key="h" style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,36px)", fontWeight: 700, color: cTx, textAlign: "center", lineHeight: 1.1, letterSpacing: "-0.025em", maxWidth: 520, margin: "0 0 20px" }}>
-              What if growth wasn&rsquo;t about competing — but <em style={{ color: ACC, fontStyle: "italic" }}>collaborating</em>?
+              What if growth wasn&rsquo;t about competing, but <em style={{ color: ACC, fontStyle: "italic" }}>collaborating</em>?
             </h2>,
             <div key="bar" style={{ width: 40, height: 2, background: ACC }} />,
           ], vis(0), 200)}
@@ -309,7 +309,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
             </div>
           </div>
           <p style={{ fontFamily: SF, fontSize: 13, fontStyle: "italic", color: cTx3, textAlign: "center", maxWidth: 420, marginTop: 16, lineHeight: 1.5 }}>
-            DMR.agency identified companies serving the same UK car owners — then offered their customers exclusive discounts.
+            DMR.agency identified companies serving the same UK car owners, then offered their customers exclusive discounts.
           </p>
         </div>
 
@@ -384,7 +384,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
               Collab<em style={{ color: ACC, fontStyle: "italic" }}>IQ</em>
             </div>,
             <p key="sub" style={{ fontFamily: GF, fontSize: 14, color: cTx2, textAlign: "center", lineHeight: 1.6, maxWidth: 380, marginBottom: 20 }}>
-              AI-powered partnership intelligence. Find non-obvious partners, score them, and get your campaign brief — in minutes.
+              AI-powered partnership intelligence. Find non-obvious partners, score them, and get your campaign brief in minutes.
             </p>,
             <div key="btns" style={{ display: "flex", gap: 10 }}>
               <button onClick={play} style={{ ...ghostBtn(), fontSize: 10, padding: "10px 16px", color: cTx3, borderColor: cBd }}>Replay</button>
@@ -441,7 +441,7 @@ function StageWrapper({ title, subtitle, children }: { title: string; subtitle?:
 function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispatch<Action> }) {
   const { biz, domain, desc, industry, customInd } = state;
   return (
-    <StageWrapper title="Find the partners hiding in plain sight." subtitle="CollabIQ uses AI to surface non-obvious companies that share your audience but don't compete with you — then gives you the strategy, outreach templates, and campaign brief to close the deal.">
+    <StageWrapper title="Find the partners hiding in plain sight." subtitle="CollabIQ surfaces non-obvious companies that share your audience but don't compete with you, then gives you the strategy, outreach templates, and campaign brief to close the deal.">
       <div style={{ marginBottom: 48 }}>
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
@@ -554,10 +554,10 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
   if (loading) {
     const msg = V2_LOADING[loadingIdx % V2_LOADING.length];
     return (
-      <StageWrapper title="Finding your partners…" subtitle="Claude is analysing your industry and generating tailored partnership targets.">
+      <StageWrapper title="Finding your partners…" subtitle="CollabIQ is analysing your industry and generating tailored partnership targets.">
         <div style={{ background: BG2, border: `1px solid ${BD}`, padding: 28, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(245,184,31,0.6)" }}>Claude · Live Research</span>
+            <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(245,184,31,0.6)" }}>CollabIQ · Live Research</span>
             <span style={{ fontFamily: MF, fontSize: 9, color: TX4 }}>Step {(loadingIdx % V2_LOADING.length) + 1}/{V2_LOADING.length}</span>
           </div>
           <div className="v2-stage-animate">
@@ -589,10 +589,10 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
     <StageWrapper title="Your partner intelligence." subtitle={`${partners.length} targets found for ${industry} using ${strat.label}. Select the partners you want in your campaign brief.`}>
       <div style={{ background: "rgba(245,184,31,0.06)", border: `1px solid rgba(245,184,31,0.2)`, padding: "10px 14px", marginBottom: 16, display: "flex", gap: 10, alignItems: "center" }}>
         <span style={{ background: ACC, fontFamily: MF, fontSize: 8, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px", color: BG0, flexShrink: 0 }}>AI</span>
-        <span style={{ fontFamily: GF, fontSize: 12, color: TX2 }}>Each suggestion has been scored by Claude against 8 partnership criteria: audience overlap, non-competition, domain authority, link placement availability, value exchange potential, existing linking behaviour, contact findability, and brand quality.</span>
+        <span style={{ fontFamily: GF, fontSize: 12, color: TX2 }}>Each suggestion has been scored by CollabIQ against 8 partnership criteria: audience overlap, non-competition, domain authority, link placement availability, value exchange potential, existing linking behaviour, contact findability, and brand quality.</span>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${BD}`, marginBottom: 4, gap: 12, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: MF, fontSize: 10, color: TX3, letterSpacing: "0.1em" }}>Generated by Claude · Personalised to {biz}</span>
+        <span style={{ fontFamily: MF, fontSize: 10, color: TX3, letterSpacing: "0.1em" }}>Generated by CollabIQ · Personalised to {biz}</span>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {selCount > 0 && <span style={{ fontFamily: MF, fontSize: 10, fontWeight: 700, color: ACC, letterSpacing: "0.1em" }}>{selCount} selected</span>}
           <button onClick={onGatedCsv} style={{ ...ghostBtn(), fontSize: 9, padding: "6px 12px" }}>↓ Download list (CSV)</button>
@@ -635,7 +635,7 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
                       boxShadow: "0 4px 16px rgba(0,0,0,0.3)"
                     }}>
                       <div style={{ fontFamily: GF, fontSize: 11, color: "#f1ebde", lineHeight: 1.55, marginBottom: 6 }}>
-                        Contact data is AI-suggested from training knowledge — not verified in real time. Names and LinkedIn URLs may be outdated or inaccurate. Always verify before outreach.
+                        Contact data is AI-suggested from training knowledge. Not verified in real time. Names and LinkedIn URLs may be outdated or inaccurate. Always verify before outreach.
                       </div>
                       <div style={{ fontFamily: MF, fontSize: 9, color: AMB2, letterSpacing: "0.04em" }}>
                         ✦ Verified real-time contacts coming soon
@@ -696,13 +696,13 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
         <label style={lbl(TX2)}>Who are you emailing?</label>
         <select style={inp()} value={state.scPartner} onChange={e => dispatch({ type: "SET", key: "scPartner", val: e.target.value })}>
           <option value="">Select a partner…</option>
-          {partners.map(p => <option key={p.name} value={p.name}>{p.name} (Tier {p.tier}) — {p.url}</option>)}
+          {partners.map(p => <option key={p.name} value={p.name}>{p.name} (Tier {p.tier}) · {p.url}</option>)}
         </select>
       </div>
 
       {/* Template */}
       <div style={{ marginBottom: 32 }}>
-        <label style={lbl(TX2)}>{strat.label} — outreach template</label>
+        <label style={lbl(TX2)}>{strat.label} outreach template</label>
         <pre id="v2-tpl" style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:20, fontSize:13, fontFamily:GF, lineHeight:1.8, whiteSpace:"pre-wrap", color:TX2, marginBottom:10, overflowX:"auto" }}>
           {templates[strategy as Strategy]}
         </pre>
@@ -717,7 +717,7 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
           <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, letterSpacing:"-0.01em" }}>Personalised email</span>
         </div>
         <p style={{ fontSize:14, color:TX3, marginBottom:20, fontFamily:GF, lineHeight:1.6 }}>
-          Claude writes a fully personalised email for your chosen partner — tailored to their audience, your offer, and your strategy.
+          CollabIQ writes a fully personalised email for your chosen partner, tailored to their audience, your offer, and your strategy.
         </p>
         <button onClick={()=>onGated("email")} disabled={aiEmailLoading||!biz||!state.scPartner}
           style={{ ...primaryBtn(), opacity:(!biz||aiEmailLoading||!state.scPartner)?0.4:1, cursor:(!biz||!state.scPartner)?"not-allowed":"pointer", fontSize:13, padding:"14px 28px" }}>
@@ -737,7 +737,7 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
   );
 }
 
-// ── Stage 5: Campaign Brief ────────────────────────────────────────────────────
+// ── Stage 5: 90-Day Playbook ───────────────────────────────────────────────────
 function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
   state: CollabState;
   onGated: (action: string) => void;
@@ -748,7 +748,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
   const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
 
   return (
-    <StageWrapper title="Your campaign brief." subtitle="Generate your 90-day partnership playbook. Download or copy it when you're done.">
+    <StageWrapper title="Your 90-day playbook." subtitle="Generate your full partnership execution plan. Download or copy it when you're done.">
 
       {/* Campaign at a glance */}
       <div style={{ background:BG2, border:`1px solid ${BD}`, padding:24, marginBottom:32 }}>
@@ -777,7 +777,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         <span style={{ fontFamily:SF, fontSize:22, fontWeight:700, color:TX, letterSpacing:"-0.02em" }}>90-Day campaign brief</span>
       </div>
       <p style={{ fontFamily:GF, fontSize:14, color:TX3, lineHeight:1.6, marginBottom:20 }}>
-        Claude builds a full 90-day execution plan: phased outreach, success metrics, partner categories, and risk mitigation — tailored to your business and strategy.
+        CollabIQ builds a full 90-day execution plan: phased outreach, success metrics, partner categories, and risk mitigation, tailored to your business and strategy.
       </p>
       <button onClick={()=>onGated("brief")} disabled={aiBriefLoading||!biz}
         style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32 }}>
@@ -809,7 +809,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         <div>
           <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.14em", textTransform:"uppercase", display:"block", marginBottom:6 }}>Want someone to execute this for you?</span>
           <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, fontStyle:"italic", letterSpacing:"-0.01em" }}>Earned Media OS</span>
-          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>— the full partnership system, done with you.</span>
+          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>the full partnership system, done with you.</span>
         </div>
         <a href="https://www.syedirfanajmal.com/emos/" target="_blank" rel="noopener noreferrer"
           style={{ ...primaryBtn(), textDecoration:"none", fontSize:11, padding:"12px 22px" }}>
@@ -827,7 +827,7 @@ function WizardProgress({ step, theme, onThemeChange, onLogoClick }: {
   onLogoClick: () => void;
 }) {
   const t = theme === "dark" ? DARK_T : LIGHT_T;
-  const STEPS = ["Business","Strategy","Partners","Outreach","Campaign Brief"];
+  const STEPS = ["Business","Strategy","Partners","Outreach","90-Day Playbook"];
   return (
     <div style={{ position:"fixed", top:0, left:0, right:0, zIndex:90, background:t.BG0, borderBottom:`1px solid ${t.BDS}` }}>
       <div style={{ height:3, background:t.BDS }}>
@@ -926,7 +926,7 @@ function EmailGate({ show, onClose, onSubscribe }: { show: boolean; onClose: ()=
             <span style={{ ...lbl(TX4), marginBottom:14 }}>One step to download</span>
             <h3 style={{ fontFamily:SF, fontSize:24, fontWeight:700, color:TX, marginBottom:8, letterSpacing:"-0.02em" }}>Join 2,400+ marketers.</h3>
             <p style={{ fontFamily:GF, fontSize:14, color:TX3, marginBottom:24, lineHeight:1.6 }}>
-              Subscribe to unlock your PDF download. Real case studies, zero filler — one or two emails a month.
+              Subscribe to unlock your PDF download. Real case studies, zero filler. One or two emails a month.
             </p>
             <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com"
               style={{ ...inp(), borderBottom:`1px solid ${BD}`, marginBottom:18, fontSize:15 }} />
@@ -1041,7 +1041,7 @@ export function CollabIQ() {
   function generatePDF() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const jsPDF = (window as any).jspdf?.jsPDF;
-    if (!jsPDF) { alert("PDF library still loading — try again in a moment."); return; }
+    if (!jsPDF) { alert("PDF library still loading. Try again in a moment."); return; }
     const doc = new jsPDF({ unit:"mm", format:"a4" });
     const W=210, M=20, CW=W-M*2;
     let y=20;
@@ -1175,7 +1175,7 @@ export function CollabIQ() {
       })});
       if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiBrief(j.result);setAiBriefLoading(false);return;}}
     } catch { /* fallback */ }
-    setAiBrief(`# 90-Day Collab Link Building Brief\n\n## Executive Summary\nA 90-day campaign for ${state.biz} using ${V2_STRATEGIES[state.strategy]?.label} in ${ind}.\n\n## Phase 1: Foundation (Days 1–14)\n- Audit backlink profile (Ahrefs/SEMrush)\n- Identify 20–30 target partners across 3–4 categories\n- Create landing pages or discount codes per tier\n- Personalise outreach for top 10 targets\n\n## Phase 2: Outreach (Days 15–45)\n- Send to Tier A partners first\n- Follow up after 5–7 business days\n- Begin Tier B outreach in parallel\n- Track in spreadsheet\n\n## Phase 3: Execution (Days 46–75)\n- Negotiate link placements\n- Provide assets (codes, badges, content)\n- Monitor new backlinks in Ahrefs\n- Begin Tier C for volume\n\n## Phase 4: Optimisation (Days 76–90)\n- Review metrics: links, DA, referral traffic\n- Share performance data with partners\n- Identify top categories for expansion\n- Document playbook`);
+    setAiBrief(`# 90-Day Collab Link Building Brief\n\n## Executive Summary\nA 90-day campaign for ${state.biz} using ${V2_STRATEGIES[state.strategy]?.label} in ${ind}.\n\n## Phase 1: Foundation (Days 1-14)\n- Audit backlink profile (Ahrefs/SEMrush)\n- Identify 20-30 target partners across 3-4 categories\n- Create landing pages or discount codes per tier\n- Personalise outreach for top 10 targets\n\n## Phase 2: Outreach (Days 15-45)\n- Send to Tier A partners first\n- Follow up after 5-7 business days\n- Begin Tier B outreach in parallel\n- Track in spreadsheet\n\n## Phase 3: Execution (Days 46-75)\n- Negotiate link placements\n- Provide assets (codes, badges, content)\n- Monitor new backlinks in Ahrefs\n- Begin Tier C for volume\n\n## Phase 4: Optimisation (Days 76-90)\n- Review metrics: links, DA, referral traffic\n- Share performance data with partners\n- Identify top categories for expansion\n- Document playbook`);
     setAiBriefLoading(false);
   }
 
@@ -1202,7 +1202,7 @@ export function CollabIQ() {
   }
   function goBack() { if(step>0) dispatch({type:"GO",step:step-1}); }
 
-  const nextLabels = ["","Continue →","Generate partners →","Continue to outreach →","Generate brief →",""];
+  const nextLabels = ["","Continue →","Generate partners →","Continue to outreach →","Build your playbook →",""];
   const t = theme==="dark"?DARK_T:LIGHT_T;
 
   return (
