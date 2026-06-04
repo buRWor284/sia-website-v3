@@ -896,7 +896,7 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled, theme }: 
       display:"flex", justifyContent:"space-between", alignItems:"center" }}>
       <div style={{ display:"flex", alignItems:"center", gap:16 }}>
         {step>0 && <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px" }}>← Back</button>}
-        <a href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX3, textDecoration:"none", fontWeight:600 }}>syedirfanajmal.com ↗</a>
+        <a href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX3, textDecoration:"none", fontWeight:600 }}>A free tool by Syed Irfan Ajmal · syedirfanajmal.com ↗</a>
       </div>
       <span style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em" }}>{`${step + 1} of 5`}</span>
       {nextLabel
@@ -1144,7 +1144,7 @@ export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }
     doc.setFillColor(...GOLD); doc.rect(M,y,22,1.5,"F");
     doc.setFillColor(40,32,24); doc.rect(M+24,y,W-M*2-24,1.5,"F");
     y+=9; doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...GOLD);
-    doc.text("PARTNERSHIP INTELLIGENCE REPORT", M, y); y+=13;
+    doc.text("PARTNERSHIP INTELLIGENCE REPORT", M, y); y+=20;
     doc.setFont("helvetica","bold"); doc.setFontSize(50); doc.setTextColor(...CREAM);
     doc.text("Collab", M, y);
     doc.setTextColor(...GOLD); doc.text("IQ", M+doc.getTextWidth("Collab"), y); y+=13;
@@ -1296,27 +1296,54 @@ export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }
       doc.text("AI",M+6,y,{align:"center"});
       doc.setFontSize(17); doc.setTextColor(...INK);
       doc.text("Your 90-Day AI Campaign Brief",M+17,y); y+=14;
+
+      // Inline markdown renderer — handles **bold** spans with word-wrap
+      function renderInlineMd(text: string, lx: number, ly: number, maxW: number, fs: number): number {
+        const LH = fs * 0.38;
+        const parts = text.split("**");
+        let cx = lx, cy = ly;
+        doc.setFontSize(fs);
+        for (let pi = 0; pi < parts.length; pi++) {
+          const part = parts[pi];
+          if (!part) continue;
+          doc.setFont("helvetica", pi % 2 === 1 ? "bold" : "normal");
+          const words = part.split(/(\s+)/);
+          for (const w of words) {
+            if (!w) continue;
+            const isWs = /^\s+$/.test(w);
+            const wW = doc.getTextWidth(w);
+            if (!isWs && cx + wW > lx + maxW && cx > lx) { cx = lx; cy += LH; }
+            if (isWs && cx === lx) continue;
+            doc.text(w, cx, cy);
+            cx += wW;
+          }
+        }
+        return cy;
+      }
+
+      let briefPage = 4;
       const briefLines=aiBrief.split("\n");
       for(const line of briefLines){
-        if(y>H-22){ pageFooter(4); doc.addPage(); lightHeader("AI-Generated Brief"); y=28; }
+        if(y>H-22){ pageFooter(briefPage); briefPage++; doc.addPage(); lightHeader("AI-Generated Brief"); y=28; }
         if(line.startsWith("# ")){
           doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...INK);
           doc.text(line.replace("# ",""),M,y); y+=9;
         } else if(line.startsWith("## ")){
           doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...INK);
-          const hLines=doc.splitTextToSize(line.replace("## ",""),W-M*2) as string[];
+          const hLines=doc.splitTextToSize(line.replace("## ","").replace(/\*\*/g,""),W-M*2) as string[];
           doc.text(hLines,M,y); y+=hLines.length*6+2;
         } else if(line.startsWith("- ")){
           doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...DGREY);
-          const bLines=doc.splitTextToSize("- "+line.replace("- ",""),W-M*2-6) as string[];
-          doc.text(bLines,M+4,y); y+=bLines.length*5;
+          const bullet = "- " + line.replace(/^-\s*/,"");
+          const endY = renderInlineMd(bullet, M+4, y, W-M*2-6, 8);
+          y = endY + 5;
         } else if(line.trim()){
-          doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...DGREY);
-          const pLines=doc.splitTextToSize(line,W-M*2) as string[];
-          doc.text(pLines,M,y); y+=pLines.length*5+2;
+          doc.setTextColor(...DGREY);
+          const endY = renderInlineMd(line.trim(), M, y, W-M*2, 8);
+          y = endY + 5;
         } else { y+=4; }
       }
-      pageFooter(4);
+      pageFooter(briefPage);
     }
 
     // ════ FINAL PAGE: EMOS CTA (DARK) ══════════════════════════════
