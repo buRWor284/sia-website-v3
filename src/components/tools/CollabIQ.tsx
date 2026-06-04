@@ -108,7 +108,7 @@ type Theme    = "light" | "dark";
 
 interface AiPartner {
   name: string; url: string; why: string;
-  linkPage: string; contact: string; seoNote: string;
+  linkPage: string; contact: string; contactLinkedIn?: string; seoNote: string;
   tier: "A" | "B" | "C";
 }
 
@@ -620,12 +620,22 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
             <div className="v2-meta-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px 16px", marginBottom: 12 }}>
               <div><span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Link placement</span><span style={{ fontSize: 12, color: INFO, fontWeight: 600, fontFamily: GF }}>{p.linkPage}</span></div>
               <div>
-                <span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Contact role</span>
-                <span style={{ fontSize: 12, color: TX2, fontFamily: GF }}>{p.contact}</span>
+                <span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Contact</span>
+                <span style={{ fontSize: 12, color: TX2, fontFamily: GF, display: "block" }}>{p.contact}</span>
                 <div style={{ marginTop: 4 }}>
-                  <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(p.contact + " " + p.name)}`} target="_blank" rel="noopener noreferrer"
-                    style={{ fontFamily: MF, fontSize: 8, color: INFO, textDecoration: "none", letterSpacing: "0.04em" }}>Search LinkedIn ↗</a>
-                  <span style={{ fontFamily: MF, fontSize: 8, color: TX4, marginLeft: 6 }}>· searches by role + company; results vary</span>
+                  {p.contactLinkedIn ? (
+                    <>
+                      <a href={`https://${p.contactLinkedIn.replace(/^https?:\/\//,"")}`} target="_blank" rel="noopener noreferrer"
+                        style={{ fontFamily: MF, fontSize: 8, color: INFO, textDecoration: "none", letterSpacing: "0.04em" }}>View LinkedIn profile ↗</a>
+                      <span style={{ fontFamily: MF, fontSize: 8, color: TX4, marginLeft: 6 }}>· AI-suggested, verify before outreach</span>
+                    </>
+                  ) : (
+                    <>
+                      <a href={`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(p.contact + " " + p.name)}`} target="_blank" rel="noopener noreferrer"
+                        style={{ fontFamily: MF, fontSize: 8, color: INFO, textDecoration: "none", letterSpacing: "0.04em" }}>Search LinkedIn ↗</a>
+                      <span style={{ fontFamily: MF, fontSize: 8, color: TX4, marginLeft: 6 }}>· searches by role + company; results vary</span>
+                    </>
+                  )}
                 </div>
               </div>
               <div><span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>SEO</span><span style={{ fontSize: 12, color: AMB2, fontWeight: 600, fontFamily: GF }}>{p.seoNote}</span></div>
@@ -965,7 +975,7 @@ export function CollabIQ() {
     if (isSub) { downloadCsv(); } else { setGatedAction("csv"); setShowGate(true); }
   }
   function downloadCsv() {
-    const rows = [["Name","URL","Tier","Why","Link Placement","Contact Role","SEO"],...partners.map(p=>[p.name,p.url,p.tier,p.why,p.linkPage,p.contact,p.seoNote])];
+    const rows = [["Name","URL","Tier","Why","Link Placement","Contact","LinkedIn","SEO"],...partners.map(p=>[p.name,p.url,p.tier,p.why,p.linkPage,p.contact,p.contactLinkedIn||"",p.seoNote])];
     const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
     const blob = new Blob([csv],{type:"text/csv"});
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);

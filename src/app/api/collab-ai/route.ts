@@ -44,7 +44,8 @@ Return ONLY a valid JSON array — no text before or after, no markdown fences. 
     "url": "their domain e.g. brex.com (or empty string if unknown)",
     "why": "2-3 sentences: why their audience overlaps exactly with this business, and why this partnership makes sense for both sides",
     "linkPage": "The specific page where the link would live, e.g. Brex Perks page, Student discounts section, Partner ecosystem page",
-    "contact": "Exact LinkedIn job title to search for, e.g. Head of Startup Partnerships, Student Services Officer",
+    "contact": "A real named person at this company likely to handle partnerships — use your training knowledge to suggest a plausible name and title, e.g. 'Emma Stratton · VP Marketing' or 'Alex Kracov · Head of Marketing'. If you don't know a specific name, use the most likely job title only.",
+    "contactLinkedIn": "LinkedIn profile URL for the named contact if known, e.g. linkedin.com/in/emmastratton — or empty string if unknown",
     "seoNote": "Estimated domain authority range and why this link matters — e.g. DA 70+, contextual link from a startup financial tool trusted by investors",
     "tier": "A or B or C — A = highest priority, must approach first"
   }
