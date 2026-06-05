@@ -102,16 +102,16 @@ export function composeScore(
     ]);
   }
 
-  // ── radar axes (display order) ────────────────────────────────────────────────
+  // ── radar axes (display order; SHORT labels so the SVG never clips) ────────────
   const radar: RadarAxis[] = [];
   if (relevanceAssessed && areas.relevance) radar.push({ label: "Relevance", score: areas.relevance.score });
   radar.push(
     { label: "Mechanics", score: areas.objective.score },
-    { label: "34-pt system", score: areas.checklist.score },
-    { label: "Storytelling", score: areas.emos.storytelling.score },
-    { label: "Neuromarketing", score: areas.emos.neuromarketing.score },
-    { label: "Personal brand", score: areas.emos.personalBrand.score },
-    { label: "Newsroom-ready", score: areas.newsroomReady.score },
+    { label: "SIA 7-step", score: areas.checklist.score },
+    { label: "Story", score: areas.emos.storytelling.score },
+    { label: "Neuro", score: areas.emos.neuromarketing.score },
+    { label: "Personal", score: areas.emos.personalBrand.score },
+    { label: "Newsroom", score: areas.newsroomReady.score },
   );
 
   return {
@@ -132,7 +132,7 @@ export function composeScore(
 function buildTopFixes(l1: Layer1Scored, ai: AiScore, relevanceAssessed: boolean): ScoreResponse["topFixes"] {
   const candidates: { area: string; dim: Parameters<typeof emosFrame>[0]; score: number; weight: number; aiFix?: string }[] = [
     { area: "Mechanics", dim: "objective", score: l1.score, weight: WEIGHTS_V2.objective },
-    { area: "The SIA system", dim: "checklist", score: ai.checklist.score, weight: WEIGHTS_V2.checklist, aiFix: firstStepFix(ai) },
+    { area: "SIA 7-step checklist", dim: "checklist", score: ai.checklist.score, weight: WEIGHTS_V2.checklist, aiFix: firstStepFix(ai) },
     { area: "Storytelling", dim: "storytelling", score: ai.storytelling.score, weight: WEIGHTS_V2.storytelling, aiFix: ai.storytelling.topFix },
     { area: "Neuromarketing", dim: "neuromarketing", score: ai.neuromarketing.score, weight: WEIGHTS_V2.neuromarketing, aiFix: ai.neuromarketing.topFix },
     { area: "Personal brand", dim: "personalBrand", score: ai.personalBrand.score, weight: WEIGHTS_V2.personalBrand, aiFix: ai.personalBrand.topFix },

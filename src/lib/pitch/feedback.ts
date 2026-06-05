@@ -88,17 +88,17 @@ export const FEEDBACK: Record<string, FrameMap> = {
   },
   checklist: {
     strong: {
-      mechanism: "The SIA 7-step system",
+      mechanism: "SIA 7-step journo-outreach checklist",
       learn: ESSAYS.checklist,
       text: "You're hitting most of the 34-point system. Tighten the few remaining steps and this is a pitch a journalist can paste in.",
     },
     weak: {
-      mechanism: "The SIA 7-step system",
+      mechanism: "SIA 7-step journo-outreach checklist",
       learn: ESSAYS.checklist,
       text: "Several steps of the proven 7-step system are missing. Each one is a documented reason journalists ignore or accept a pitch — close the gaps flagged below.",
     },
     missing: {
-      mechanism: "The SIA 7-step system",
+      mechanism: "SIA 7-step journo-outreach checklist",
       learn: ESSAYS.checklist,
       text: "Most of the 34-point system is missing. Work the checklist top to bottom — research, subject, intro, the answer, the close, the signature.",
     },
