@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * JournoCollabIQ v2 — 5-Stage Partnership Intelligence Wizard
+ * JournoCollabIQ v2 — 5-Stage Journalist Beat-Matcher Wizard
  * Design: design_handoff_collabiq/README.md
  * Route: /tools/journocollabiq
  */
@@ -51,28 +51,28 @@ const V2_INDUSTRIES = [
 ];
 
 const V2_STRATEGIES: Record<string, { label: string; brief: string; icon: string }> = {
-  discount:    { label: "Discount Partnership",   brief: "Offer your partner's customers a deal. They link to you from their partner page. Three-way win.", icon: "01" },
-  institution: { label: "Institution Rebate",     brief: "Earn .edu, .gov, and .org backlinks by offering exclusive discounts to institutions.", icon: "02" },
-  badge:       { label: "Expert Roundup",         brief: "Feature experts in a guide. Award each a badge with your URL embedded. Scalable backlink engine.", icon: "03" },
+  discount:    { label: "Expert Commentary",  brief: "Offer a quotable expert take for a story they're already writing. The classic reactive source pitch.", icon: "01" },
+  institution: { label: "Exclusive Data",     brief: "Offer original data or research as an exclusive or embargo. The path to Tier-1 features.", icon: "02" },
+  badge:       { label: "Trend Reaction",     brief: "Offer a timely reaction tied to a breaking trend or news hook. Newsjacking, done right.", icon: "03" },
 };
 
 const V2_SCORECARD = [
-  { q: "Do they serve the same target audience?",           sub: "Would their ideal customer also buy from you?" },
-  { q: "Are they genuinely non-competing?",                  sub: "Choosing them doesn't mean skipping you." },
-  { q: "Do they have real domain authority?",                sub: "Content + backlinks (check Ahrefs/SEMrush)." },
-  { q: "Is there a page where a link could live?",           sub: "Partner page, deals page, resources section." },
-  { q: "Can you offer a clear value exchange?",              sub: "Discount, listing, badge — something concrete." },
-  { q: "Do they already link to other brands?",              sub: "Check blog, resources, or footer." },
-  { q: "Can you find a specific named contact?",             sub: "Named person on LinkedIn, not info@." },
-  { q: "Is their brand quality solid?",                      sub: "You'll be associated with them." },
+  { q: "Do they cover this beat?",                           sub: "Is this squarely in the topics they write about?" },
+  { q: "Have they written about it recently?",               sub: "A relevant article in the last few months." },
+  { q: "Does the outlet have real authority?",               sub: "Reach and domain strength (check the outlet)." },
+  { q: "Is your angle genuinely newsworthy to them?",        sub: "A story their readers need — not an ad." },
+  { q: "Can you offer something specific?",                  sub: "Expert take, exclusive data, or a timely hook." },
+  { q: "Are they open to pitches?",                          sub: "Some reporters say how to pitch them." },
+  { q: "Can you find a public contact?",                     sub: "X handle or section desk, not a guessed email." },
+  { q: "Is the outlet brand-safe for you?",                  sub: "You'll be associated with it." },
 ];
 
 const V2_LOADING = [
-  { h: "Scanning for your perfect partners…",               s: "Cross-referencing industry, audience, and strategy." },
-  { h: "Finding companies that want your audience…",         s: "Identifying non-competing businesses with overlap." },
-  { h: "Cross-referencing DA scores…",                       s: "Only surfacing links worth your time." },
-  { h: "Profiling who to contact…",                          s: "Finding the right inbox at each company." },
-  { h: "Almost there.",                                      s: "Compiling a report that would take an agency a week." },
+  { h: "Scanning coverage on your beat…",                    s: "Finding who's writing about this topic now." },
+  { h: "Matching reporters to your story…",                  s: "Ranking by beat fit and recent coverage." },
+  { h: "Checking outlet authority & reach…",                 s: "Only surfacing journalists worth your time." },
+  { h: "Profiling how to reach them…",                       s: "Handles and section desks — verified emails coming soon." },
+  { h: "Almost there.",                                      s: "Compiling a media list that would take an agency a week." },
 ];
 
 const V2_MOCK: Record<string, AiPartner[]> = {
@@ -245,7 +245,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
       <div style={{ textAlign: "center", marginBottom: 20 }}>
-        <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TX4 }}>JournoCollabIQ · Partnership Intelligence</span>
+        <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TX4 }}>JournoCollabIQ · Journalist Beat Matcher</span>
       </div>
 
       {/* Cinema viewport */}
@@ -384,7 +384,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
               Collab<em style={{ color: ACC, fontStyle: "italic" }}>IQ</em>
             </div>,
             <p key="sub" style={{ fontFamily: GF, fontSize: 14, color: cTx2, textAlign: "center", lineHeight: 1.6, maxWidth: 380, marginBottom: 20 }}>
-              AI-powered partnership intelligence. Find non-obvious partners, score them, and get your campaign brief in minutes.
+              AI-powered journalist beat matching. Find the reporters writing about your story right now, score them by fit, and get a media targeting brief in minutes.
             </p>,
             <div key="btns" style={{ display: "flex", gap: 10 }}>
               <button onClick={play} style={{ ...ghostBtn(), fontSize: 10, padding: "10px 16px", color: cTx3, borderColor: cBd }}>Replay</button>
@@ -441,7 +441,7 @@ function StageWrapper({ title, subtitle, children }: { title: string; subtitle?:
 function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispatch<Action> }) {
   const { biz, domain, desc, industry, customInd } = state;
   return (
-    <StageWrapper title="Find the partners hiding in plain sight." subtitle="JournoCollabIQ surfaces non-obvious companies that share your audience but don't compete with you, then gives you the strategy, outreach templates, and campaign brief to close the deal.">
+    <StageWrapper title="Find the journalists who'll actually cover this." subtitle="JournoCollabIQ surfaces the reporters who cover your beat — grounded in their recent work — then gives you the angle, a media list, and a targeting brief to land the story.">
       <div style={{ marginBottom: 48 }}>
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
@@ -491,9 +491,9 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
 function Stage2({ state, dispatch }: { state: CollabState; dispatch: React.Dispatch<Action> }) {
   const { strategy, audType, geo, audDesc } = state;
   return (
-    <StageWrapper title="How do you want to earn links?" subtitle="Each approach earns backlinks differently. Pick the strategy that fits your business, then tell us about your audience.">
+    <StageWrapper title="What are you offering the journalist?" subtitle="Each angle lands differently. Pick the offer that fits your story, then tell us about the beat and your target tier.">
       <div style={{ marginBottom: 48 }}>
-        <label style={lbl(TX2)}>Collab strategy</label>
+        <label style={lbl(TX2)}>What are you offering the journalist?</label>
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8 }}>
           {(["discount","institution","badge"] as Strategy[]).map(s => {
             const sel  = strategy === s;
@@ -554,7 +554,7 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
   if (loading) {
     const msg = V2_LOADING[loadingIdx % V2_LOADING.length];
     return (
-      <StageWrapper title="Finding your partners…" subtitle="JournoCollabIQ is analysing your industry and generating tailored partnership targets.">
+      <StageWrapper title="Finding your journalists…" subtitle="JournoCollabIQ is matching your beat and angle to the reporters covering it.">
         <div style={{ background: BG2, border: `1px solid ${BD}`, padding: 28, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(245,184,31,0.6)" }}>JournoCollabIQ · Live Research</span>
@@ -586,10 +586,10 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
   const selCount = selNiches.length;
 
   return (
-    <StageWrapper title="Your partner intelligence." subtitle={`${partners.length} targets found for ${industry} using ${strat.label}. Select the partners you want in your campaign brief.`}>
+    <StageWrapper title="Your journalist shortlist." subtitle={`${partners.length} journalists found for ${industry} using ${strat.label}. Select the ones you want in your media brief.`}>
       <div style={{ background: "rgba(245,184,31,0.06)", border: `1px solid rgba(245,184,31,0.2)`, padding: "10px 14px", marginBottom: 16, display: "flex", gap: 10, alignItems: "center" }}>
         <span style={{ background: ACC, fontFamily: MF, fontSize: 8, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px", color: BG0, flexShrink: 0 }}>AI</span>
-        <span style={{ fontFamily: GF, fontSize: 12, color: TX2 }}>Each suggestion has been scored by JournoCollabIQ against 8 partnership criteria: audience overlap, non-competition, domain authority, link placement availability, value exchange potential, existing linking behaviour, contact findability, and brand quality.</span>
+        <span style={{ fontFamily: GF, fontSize: 12, color: TX2 }}>Each journalist is scored by JournoCollabIQ against 8 fit criteria: beat match, recent relevant coverage, publication authority, audience fit, responsiveness, exclusivity fit, contact findability, and brand-safety fit.</span>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${BD}`, marginBottom: 4, gap: 12, flexWrap: "wrap" }}>
         <span style={{ fontFamily: MF, fontSize: 10, color: TX3, letterSpacing: "0.1em" }}>Generated by JournoCollabIQ · Personalised to {biz}</span>
@@ -622,7 +622,7 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
               <p style={{ fontSize: 13, color: TX2, lineHeight: 1.65, margin: 0, fontFamily: GF }}>{p.why}</p>
             </div>
             <div className="v2-meta-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px 16px", marginBottom: 12 }}>
-              <div><span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Link placement</span><span style={{ fontSize: 12, color: INFO, fontWeight: 600, fontFamily: GF }}>{p.linkPage}</span></div>
+              <div><span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Recent article</span>{p.linkPage ? <a href={p.linkPage.startsWith("http") ? p.linkPage : `https://${p.linkPage}`} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: INFO, fontWeight: 600, fontFamily: GF, textDecoration: "none" }}>{p.linkPage.replace(/^https?:\/\//, "")} ↗</a> : <span style={{ fontSize: 12, color: INFO, fontWeight: 600, fontFamily: GF }}>—</span>}</div>
               <div>
                 <span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Contact</span>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -653,7 +653,7 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
                   )}
                 </div>
               </div>
-              <div><span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>SEO</span><span style={{ fontSize: 12, color: AMB2, fontWeight: 600, fontFamily: GF }}>{p.seoNote}</span></div>
+              <div><span style={{ ...lbl(TX4), fontSize: 8, marginBottom: 4 }}>Authority</span><span style={{ fontSize: 12, color: AMB2, fontWeight: 600, fontFamily: GF }}>{p.seoNote}</span></div>
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button onClick={() => onToggle(p.name)} style={{ ...(sel ? primaryBtn() : ghostBtn()), fontSize: 9, padding: "7px 14px" }}>{sel ? "Selected ✓" : "Select for brief"}</button>
@@ -690,12 +690,12 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
   };
 
   return (
-    <StageWrapper title="Reach out." subtitle="Pick your target partner, use the template as a starting point, or let AI write a bespoke email.">
-      {/* Partner picker */}
+    <StageWrapper title="Your angle." subtitle="Pick a journalist, then let AI draft a tailored angle. Score the final pitch in PressIQ before you send.">
+      {/* Journalist picker */}
       <div style={{ marginBottom: 32 }}>
-        <label style={lbl(TX2)}>Who are you emailing?</label>
+        <label style={lbl(TX2)}>Who are you pitching?</label>
         <select style={inp()} value={state.scPartner} onChange={e => dispatch({ type: "SET", key: "scPartner", val: e.target.value })}>
-          <option value="">Select a partner…</option>
+          <option value="">Select a journalist…</option>
           {partners.map(p => <option key={p.name} value={p.name}>{p.name} (Tier {p.tier}) · {p.url}</option>)}
         </select>
       </div>
@@ -714,10 +714,10 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
       <div style={{ borderTop:`1px solid ${BD}`, paddingTop:28 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
           <span style={{ background:ACC, fontFamily:MF, fontSize:8, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", padding:"3px 8px", color:BG0 }}>AI</span>
-          <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, letterSpacing:"-0.01em" }}>Personalised email</span>
+          <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, letterSpacing:"-0.01em" }}>Tailored angle</span>
         </div>
         <p style={{ fontSize:14, color:TX3, marginBottom:20, fontFamily:GF, lineHeight:1.6 }}>
-          JournoCollabIQ writes a fully personalised email for your chosen partner, tailored to their audience, your offer, and your strategy.
+          JournoCollabIQ drafts a tailored angle for your chosen journalist — built on their beat and recent work. Score the final pitch in PressIQ before you send.
         </p>
         <button onClick={()=>onGated("email")} disabled={aiEmailLoading||!biz||!state.scPartner}
           style={{ ...primaryBtn(), opacity:(!biz||aiEmailLoading||!state.scPartner)?0.4:1, cursor:(!biz||!state.scPartner)?"not-allowed":"pointer", fontSize:13, padding:"14px 28px" }}>
@@ -748,7 +748,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
   const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
 
   return (
-    <StageWrapper title="Your 90-day playbook." subtitle="Generate your full partnership execution plan. Download or copy it when you're done.">
+    <StageWrapper title="Your media targeting brief." subtitle="Generate your tiered journalist list, outreach sequence, and per-journalist angles. Download or copy it when you're done.">
 
       {/* Campaign at a glance */}
       <div style={{ background:BG2, border:`1px solid ${BD}`, padding:24, marginBottom:32 }}>
@@ -761,7 +761,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         ))}
         {selNiches.length > 0 && (
           <div style={{ marginTop:14 }}>
-            <span style={{ ...lbl(TX4), marginBottom:8 }}>Target partners ({selNiches.length})</span>
+            <span style={{ ...lbl(TX4), marginBottom:8 }}>Selected journalists ({selNiches.length})</span>
             <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
               {selNiches.map(n=>(
                 <span key={n} style={{ background:"rgba(245,184,31,0.08)", border:"1px solid rgba(245,184,31,0.25)", padding:"4px 12px", fontSize:12, fontWeight:600, color:ACC, fontFamily:GF }}>{n}</span>
@@ -774,10 +774,10 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
       {/* Generate brief */}
       <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
         <span style={{ background:ACC, fontFamily:MF, fontSize:8, fontWeight:800, letterSpacing:"0.1em", textTransform:"uppercase", padding:"3px 8px", color:BG0 }}>AI</span>
-        <span style={{ fontFamily:SF, fontSize:22, fontWeight:700, color:TX, letterSpacing:"-0.02em" }}>90-Day campaign brief</span>
+        <span style={{ fontFamily:SF, fontSize:22, fontWeight:700, color:TX, letterSpacing:"-0.02em" }}>Media targeting brief</span>
       </div>
       <p style={{ fontFamily:GF, fontSize:14, color:TX3, lineHeight:1.6, marginBottom:20 }}>
-        JournoCollabIQ builds a full 90-day execution plan: phased outreach, success metrics, partner categories, and risk mitigation, tailored to your business and strategy.
+        JournoCollabIQ builds your media brief: a tiered journalist list, an outreach sequence (exclusive → embargo → wide), per-journalist angles, and a verify-before-you-send checklist.
       </p>
       <button onClick={()=>onGated("brief")} disabled={aiBriefLoading||!biz}
         style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32 }}>
@@ -846,7 +846,7 @@ function WizardProgress({ step, theme, onThemeChange, onLogoClick, topOffset = 0
   topOffset?: number;
 }) {
   const t = theme === "dark" ? DARK_T : LIGHT_T;
-  const STEPS = ["Business","Strategy","Partners","Outreach","90-Day Playbook"];
+  const STEPS = ["Story","Offer","Journalists","Angle","Media Brief"];
   return (
     <div style={{ position:"fixed", top:topOffset, left:0, right:0, zIndex:90, background:t.BG0, borderBottom:`1px solid ${t.BDS}` }}>
       <div style={{ height:3, background:t.BDS }}>

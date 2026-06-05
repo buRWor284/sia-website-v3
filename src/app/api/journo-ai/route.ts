@@ -1,10 +1,16 @@
 /**
- * /api/journo-ai
+ * /api/journo-ai  —  JournoCollabIQ (Journalist Beat Matcher)
  *
  * Calls the Anthropic Messages API directly via fetch — no SDK required.
  * Requires ANTHROPIC_API_KEY in .env.local
  *
  * POST body: { type: "partner-suggestions" | "email-writer" | "campaign-brief", data: {...} }
+ *   (request-type keys are kept identical to the CollabIQ clone so the wizard keeps working;
+ *    they now mean: journalist-suggestions | angle-writer | media-plan.)
+ *
+ * v1 generates journalists from the model's knowledge and asks for a recent article per name
+ * (to be VERIFIED in the UI). v2 grounds this in LIVE coverage via the SignalIQ GDELT layer —
+ * real recent articles → real current bylines. See JournoCollabIQ-Retargeting-Plan.md.
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -12,127 +18,119 @@ import { NextRequest, NextResponse } from "next/server";
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
 
+// Angle types. Internal keys are inherited from the clone (discount/institution/badge).
+const ANGLE_LABEL: Record<string, string> = {
+  discount: "Expert commentary — a quotable expert take for a story they're already writing",
+  institution: "Exclusive data — original data/research offered as an exclusive or embargo",
+  badge: "Trend reaction — a timely reaction tied to a breaking trend or news hook",
+};
+
 // ─────────────────────────────────────────────────────────────
 // Prompt builders
 // ─────────────────────────────────────────────────────────────
 
-function buildPartnerPrompt(d: Record<string, unknown>): string {
-  const stratLabel: Record<string, string> = {
-    discount: "Discount Partnership — offer a discount to a partner's customers; they link from their partner/deals/perks page",
-    institution: "Institution Rebate — offer a discount to universities/associations/.edu/.gov bodies; they list you on their rebate or resources page",
-    badge: "Expert Roundup + Badge — create a guide featuring experts/coaches; award a badge with an embedded backlink in the embed code",
-  };
-  return `You are an expert link building strategist specialising in collab (partnership) link building. Your task is to generate highly specific, actionable partner suggestions for the business below.
+function buildJournalistPrompt(d: Record<string, unknown>): string {
+  return `You are an expert digital-PR and media-relations strategist who places founders and brands in earned editorial coverage. Your task is to find the JOURNALISTS most likely to cover the story below.
 
-BUSINESS DETAILS:
-- Business name: ${d.biz || "Not provided"}
+STORY & SOURCE:
+- Business / brand: ${d.biz || "Not provided"}
 - Website: ${d.domain || "Not provided"}
 - What they do: ${d.desc || "Not provided"}
-- Industry: ${d.industry || "Not provided"}
-- Audience type: ${d.audType || "Not provided"}
-- Audience description: ${d.audDesc || "Not provided"}
+- Beat / topic: ${d.industry || "Not provided"}
+- The story / angle being pitched: ${d.audDesc || d.audType || "Not provided"}
+- Target tier: ${d.audType || "Not specified"}
 - Geography: ${d.geo || "Not provided"}
-- Strategy: ${stratLabel[d.strategy as string] || String(d.strategy)}
+- What the source is offering: ${ANGLE_LABEL[d.strategy as string] || String(d.strategy)}
 
-Generate 8 partner suggestions. Name REAL, SPECIFIC companies where possible (not generic categories). Tailor every suggestion to the exact business, geography, and strategy above.
+Generate 8 REAL, NAMED journalists who genuinely cover this beat. Prefer reporters who have published on this topic recently. Do NOT invent people. If you are not confident a person currently covers this beat at this outlet, choose someone you ARE confident about, or fall back to the relevant section/desk.
+
+CRITICAL HONESTY RULES:
+- Never fabricate a personal email address. For contact, give a public handle (X/Twitter) or the outlet section/desk only.
+- Treat every journalist as "verify before pitching" — people and beats change.
+- For the recent article, give a real, specific article by that journalist on this beat if you know one; otherwise give their author/section page. Never invent a URL.
 
 Return ONLY a valid JSON array — no text before or after, no markdown fences. Each object must have exactly these fields:
 
 [
   {
-    "name": "Exact company name (e.g. Brex, PureGym, Shopify)",
-    "url": "their domain e.g. brex.com (or empty string if unknown)",
-    "why": "2-3 sentences: why their audience overlaps exactly with this business, and why this partnership makes sense for both sides",
-    "linkPage": "The specific page where the link would live, e.g. Brex Perks page, Student discounts section, Partner ecosystem page",
-    "contact": "A real named person at this company likely to handle partnerships — use your training knowledge to suggest a plausible name and title, e.g. 'Emma Stratton · VP Marketing' or 'Alex Kracov · Head of Marketing'. If you don't know a specific name, use the most likely job title only.",
-    "contactLinkedIn": "LinkedIn profile URL for the named contact if known, e.g. linkedin.com/in/emmastratton — or empty string if unknown",
-    "seoNote": "Estimated domain authority range and why this link matters — e.g. DA 70+, contextual link from a startup financial tool trusted by investors",
-    "tier": "A or B or C — A = highest priority, must approach first"
+    "name": "Journalist full name (e.g. Kara Swisher)",
+    "url": "their outlet's domain, e.g. forbes.com",
+    "why": "2-3 sentences: which beat they cover, why this story fits their recent coverage, and the angle that would land with them",
+    "linkPage": "URL of a recent relevant article BY this journalist (the proof they cover this) — or their author/section page if no specific article URL is known. Never invent a URL.",
+    "contact": "Public contact only: an X/Twitter handle (e.g. @karaswisher) or the outlet desk/section. NEVER a guessed personal email.",
+    "contactLinkedIn": "Muck Rack or X profile URL if known, else empty string",
+    "seoNote": "Outlet authority + reach and tier, e.g. 'DA 94 · national business desk · very high reach · Tier 1'",
+    "tier": "A or B or C — A = highest-fit, approach first"
   }
 ]`;
 }
 
-function buildEmailPrompt(d: Record<string, unknown>): string {
-  const stratContext: Record<string, string> = {
-    discount: "Discount Partnership — offer a discount to the partner's customers in exchange for a link from their partner/deals page.",
-    institution: "Institution Rebate — offer a discount for their students or members in exchange for a listing on their rebate/resources page.",
-    badge: "Expert Roundup + Badge — invite them to be featured in an expert guide; award them a badge with embedded backlink code.",
-  };
-  return `You are an expert B2B copywriter specialising in partnership outreach emails.
+function buildAnglePrompt(d: Record<string, unknown>): string {
+  return `You are an expert media-relations strategist. Write a tight, tailored PITCH ANGLE for approaching ONE specific journalist. This is the angle plus a starter draft only — the final pitch will be scored separately in PressIQ, so do not over-polish or pad.
 
-Write a fully personalised, ready-to-send collab link building outreach email using these details:
-
-SENDER:
+SOURCE:
 - Business: ${d.biz || "Not provided"}
 - Website: ${d.domain || "Not provided"}
 - What they do: ${d.desc || "Not provided"}
-- Industry: ${d.industry || "Not provided"}
-- Audience: ${d.audType || ""} — ${d.audDesc || "Not provided"}
+- Beat / topic: ${d.industry || "Not provided"}
+- The story being pitched: ${d.audDesc || "Not provided"}
+- What the source is offering: ${ANGLE_LABEL[d.strategy as string] || String(d.strategy)}
 - Geography: ${d.geo || "Not provided"}
 
-TARGET PARTNER:
-- Company: ${d.partner || "the target company"}
-- Category: ${d.partnerCat || "a complementary business"}
-- Qualification score: ${(d.scorePct as number) > 0 ? `${d.scorePct}% fit` : "not yet scored"}
+TARGET JOURNALIST:
+- Name: ${d.partner || "the journalist"}
+- Outlet / beat: ${d.partnerCat || "their beat"}
+- Fit score: ${(d.scorePct as number) > 0 ? `${d.scorePct}% fit` : "not yet scored"}
 
-STRATEGY:
-${stratContext[d.strategy as string] || String(d.strategy)}
+Write:
+1. A one-line ANGLE — why THIS journalist, on THIS beat, would want THIS story now (tie it to the kind of thing they cover).
+2. A short starter pitch (under 150 words) they could adapt: a specific subject line, an opening that references the journalist's beat or recent work, the news hook or data on offer, and a single low-friction ask.
 
-Write a concise, high-converting outreach email that:
-- Has a compelling, specific subject line (no generic "Partnership opportunity" lines)
-- Opens by referencing something specific about the recipient's business
-- Clearly explains the three-way value: sender gets link/referrals, partner gives their audience a perk, audience saves money or gains value
-- Has a single, low-friction call to action (e.g. "15 minutes to explore this?")
-- Sounds like a real person wrote it — warm, direct, not salesy
-- Is under 200 words in the body (subject line excluded)
+Keep it warm, specific, and non-salesy. End with one line: "Verify the journalist's name, outlet, and contact before sending — then score the final pitch in PressIQ."
 
 Format:
+Angle: [one line]
+
 Subject: [subject line]
 
-[email body]
-
-Sign-off with placeholder: [Your Name] | [Role] · [Brand] · [Website]`;
+[pitch body]`;
 }
 
-function buildBriefPrompt(d: Record<string, unknown>): string {
-  const niches = Array.isArray(d.selNiches) ? (d.selNiches as string[]).join(", ") : "Not yet selected";
-  return `You are a senior SEO strategist writing a collab link building campaign brief for a client.
+function buildMediaPlanPrompt(d: Record<string, unknown>): string {
+  const beats = Array.isArray(d.selNiches) ? (d.selNiches as string[]).join(", ") : "Not yet selected";
+  return `You are a senior digital-PR strategist writing a MEDIA TARGETING BRIEF for a client's outreach campaign.
 
-Write a polished, professional campaign strategy brief using these inputs:
+Write a polished, executive-ready brief using these inputs:
 
-BUSINESS:
+SOURCE:
 - Name: ${d.biz || "Not provided"}
 - Website: ${d.domain || "Not provided"}
-- Description: ${d.desc || "Not provided"}
-- Industry: ${d.industry || "Not provided"}
-- Audience: ${d.audType || ""} — ${d.audDesc || "Not provided"}
+- What they do: ${d.desc || "Not provided"}
+- Beat / topic: ${d.industry || "Not provided"}
+- The story / angle: ${d.audDesc || "Not provided"}
 - Geography: ${d.geo || "Not provided"}
 
 CAMPAIGN:
-- Strategy: ${d.stratLabel || d.strategy}
-- Target partner categories: ${niches}
-- First scored partner: ${d.partner || "Not yet scored"} (${d.partnerCat || ""})${(d.scorePct as number) > 0 ? ` — ${d.scorePct}% fit score` : ""}
-- Score verdict: ${d.verdictText || "Not yet assessed"}
+- Offer to journalists: ${d.stratLabel || ANGLE_LABEL[d.strategy as string] || d.strategy}
+- Selected journalists / outlets: ${beats}
+- First scored target: ${d.partner || "Not yet scored"} (${d.partnerCat || ""})${(d.scorePct as number) > 0 ? ` — ${d.scorePct}% fit` : ""}
 
-Write a clear, executive-ready campaign brief structured as:
+Structure the brief as:
 
-## Campaign Overview
-2–3 sentences on why this strategy makes sense for this specific business.
+## Targeting Overview
+2–3 sentences on the beat, the angle, and why this set of journalists is the right target.
 
-## Strategic Rationale
-Why collab link building (specifically the chosen model) is the right approach.
+## The Tiered Media List
+Group the selected journalists into Tier A / B / C with a one-line rationale each.
 
-## Priority Partner Categories
-Expand on the selected categories with specific reasoning for each.
+## Outreach Sequence
+A phased plan: Tier-1 exclusive (48-hour window) → embargo / simultaneous Tier-2 → wider release. Include follow-up cadence.
 
-## 90-Day Execution Plan
-Phased plan: weeks 1–4 (research & prep), weeks 5–8 (outreach), weeks 9–12 (follow-up & scale).
+## Per-Journalist Angles
+For the top targets, one line each on the specific angle to lead with.
 
-## Success Metrics
-3–5 specific KPIs to track.
-
-## Risk & Mitigation
-2–3 common pitfalls for this strategy and how to avoid them.
+## Verify Before You Send
+A short checklist: confirm the journalist still covers the beat, the outlet, and the contact channel; then score each pitch in PressIQ before sending.
 
 Write in plain, direct prose — no fluff. Tone: expert consultant. Length: 400–600 words.`;
 }
@@ -161,9 +159,9 @@ export async function POST(request: NextRequest) {
 
   let prompt: string;
   switch (type) {
-    case "partner-suggestions": prompt = buildPartnerPrompt(data); break;
-    case "email-writer":        prompt = buildEmailPrompt(data);   break;
-    case "campaign-brief":      prompt = buildBriefPrompt(data);   break;
+    case "partner-suggestions": prompt = buildJournalistPrompt(data); break; // journalist suggestions
+    case "email-writer":        prompt = buildAnglePrompt(data);      break; // tailored angle
+    case "campaign-brief":      prompt = buildMediaPlanPrompt(data);  break; // media targeting brief
     default:
       return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });
   }
