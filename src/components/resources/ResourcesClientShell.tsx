@@ -90,24 +90,6 @@ type ContentItem =
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CONTENT: ContentItem[] = [
-  // ── KITS ────────────────────────────────────────────────────────────────
-  {
-    id: "kit-journo",
-    type: "kit",
-    badge: "Interactive Kit",
-    beta: true,
-    topics: ["pr", "seo"],
-    title: "The Journo Outreach Checklist",
-    sub: "Seven steps to a pitch reporters actually use.",
-    blurb:
-      "The SIA system for HARO, Qwoted, Source of Sources, Featured, and Help a B2B Writer — with copy-clip snippets, a progress meter, and print mode.",
-    href: "/infographics/journo-outreach-checklist",
-    y: "2026",
-    newsHeadline: "Pitch Perfect",
-    newsDeck: "The seven-step system that gets reporters to say yes",
-    cta: "Open the Kit",
-  },
-
   // ── TOOLS ────────────────────────────────────────────────────────────────
   {
     id: "tool-pressiq",
@@ -175,6 +157,24 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Renting vs. Owning",
     newsDeck: "Calculate what credibility really costs you over twelve months",
     cta: "Run the Calculator",
+  },
+
+  // ── KITS ────────────────────────────────────────────────────────────────
+  {
+    id: "kit-journo",
+    type: "kit",
+    badge: "Interactive Kit",
+    beta: true,
+    topics: ["pr", "seo"],
+    title: "The Journo Outreach Checklist",
+    sub: "Seven steps to a pitch reporters actually use.",
+    blurb:
+      "The SIA system for HARO, Qwoted, Source of Sources, Featured, and Help a B2B Writer — with copy-clip snippets, a progress meter, and print mode.",
+    href: "/infographics/journo-outreach-checklist",
+    y: "2026",
+    newsHeadline: "Pitch Perfect",
+    newsDeck: "The seven-step system that gets reporters to say yes",
+    cta: "Open the Kit",
   },
 
   {

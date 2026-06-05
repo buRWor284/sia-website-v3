@@ -18,13 +18,17 @@ export const CTATicker = ({ topOnly = false }: CTATickerProps) => (
       <span key={i} className="sia-ticker-track" aria-hidden={i > 0 ? true : undefined}>
         <span className="sia-ticker__dot">●</span>
         <span className="sia-ticker__bold">
-          <a href="/fractional-cmo">1 FRACTIONAL CMO SPOT · Q3 2026</a>
+          <a href="/fractional-cmo">2 FRACTIONAL CMO SPOTS · Q3 2026</a>
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>
           <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer">
             GET CITED BEFORE YOUR SERIES A · EMOS FOUNDING CLASS
           </a>
+        </span>
+        <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
+        <span>
+          <a href="/resources">NEW TOOLS: PRESSIQ · SIGNALIQ · JOURNOCOLLABIQ — FREE TO USE</a>
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>
