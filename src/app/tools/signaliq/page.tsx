@@ -46,6 +46,60 @@ import type {
   ScanResponse,
 } from "@/lib/signaliq/types";
 
+// ── sources metadata ─────────────────────────────────────────────────────────
+const SOURCES_DATA = [
+  {
+    id: "sec",
+    name: "SEC EDGAR",
+    type: "Federal Filings",
+    credibility: 0.95,
+    badge: "Highest credibility",
+    benefit: "Detects corporate disclosure surges before mainstream press picks up the story. Federal-grade, primary-source receipts.",
+    url: "https://efts.sec.gov",
+    role: "Signal",
+  },
+  {
+    id: "gdelt",
+    name: "GDELT DOC 2.0",
+    type: "Global News Monitor",
+    credibility: 0.80,
+    badge: "Coverage denominator",
+    benefit: "Measures what % of all global news already covers your topic. The gap between signal and coverage is your opportunity window.",
+    url: "https://gdeltproject.org",
+    role: "Denominator",
+  },
+  {
+    id: "arxiv",
+    name: "arXiv",
+    type: "Academic Preprints",
+    credibility: 0.80,
+    badge: "Early signal",
+    benefit: "Academic preprint volume precedes mainstream coverage by weeks to months. Research that hasn't hit the press yet.",
+    url: "https://arxiv.org",
+    role: "Signal",
+  },
+  {
+    id: "wikipedia",
+    name: "Wikipedia",
+    type: "Edit-Surge Detector",
+    credibility: 0.65,
+    badge: "Research signal",
+    benefit: "Edit-frequency spikes reveal when a topic is being actively researched en masse — often weeks before journalist interest peaks.",
+    url: "https://en.wikipedia.org",
+    role: "Signal",
+  },
+  {
+    id: "hackernews",
+    name: "Hacker News",
+    type: "Tech Forum Velocity",
+    credibility: 0.55,
+    badge: "Attention radar",
+    benefit: "Points and comment velocity reveals which tech, SaaS, and AI stories are gaining momentum right now — before they break wide.",
+    url: "https://news.ycombinator.com",
+    role: "Signal",
+  },
+] as const;
+
 // ── spot colours ──────────────────────────────────────────────────────────────
 const GREEN = "#3e6b45";
 const AMBER = "#d99211";
@@ -159,6 +213,101 @@ function CompBar({ label, value }: { label: string; value: number }) {
         <div style={{ height: "100%", width: `${pct}%`, background: c, transition: "width .5s ease" }} />
       </div>
     </div>
+  );
+}
+
+// ── wire-feed ticker ─────────────────────────────────────────────────────────
+
+function SourcesTicker() {
+  // Duplicate items for seamless infinite loop
+  const items = [...SOURCES_DATA, ...SOURCES_DATA];
+  return (
+    <div className="siq-ticker-wrap" aria-label="Live data sources">
+      <div className="siq-ticker-label">
+        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7.5, letterSpacing: ".18em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
+          Live feeds
+        </span>
+      </div>
+      <div className="siq-ticker-overflow">
+        <div className="siq-ticker-track">
+          {items.map((src, i) => (
+            <span key={i} className="siq-ticker-item">
+              <span className="siq-ticker-dot" />
+              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.35)" }}>
+                {src.type}
+              </span>
+              <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12, color: "rgba(241,235,222,.8)", letterSpacing: "-0.01em" }}>
+                {src.name}
+              </span>
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: "rgba(241,235,222,.45)" }}>
+                {src.benefit.split(" — ")[0]}
+              </span>
+              <span className="siq-ticker-sep">·····</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── sources sidebar ───────────────────────────────────────────────────────────
+
+function SourcesSidebar() {
+  return (
+    <aside className="siq-sources-sidebar">
+      <div style={{ paddingBottom: 10, marginBottom: 14, borderBottom: `1px solid ${INK15}` }}>
+        <SCaps size={8.5} ls="0.20em" color={INK55}>Live data feeds</SCaps>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {SOURCES_DATA.map((src) => {
+          const credPct = Math.round(src.credibility * 100);
+          const credColor = src.credibility >= 0.8 ? GREEN : src.credibility >= 0.6 ? AMBER : INK55;
+          return (
+            <div key={src.id} className="siq-source-card">
+              {/* live pulse + name */}
+              <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 4 }}>
+                <span className="siq-pulse" />
+                <a
+                  href={src.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 13, color: INK, textDecoration: "none", lineHeight: 1.2 }}
+                >
+                  {src.name} ↗
+                </a>
+              </div>
+              {/* type + role badge */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
+                <SCaps size={8} ls="0.12em" color={INK55}>{src.type}</SCaps>
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7, letterSpacing: ".14em", textTransform: "uppercase", color: src.role === "Denominator" ? AMBER : GREEN, border: `1px solid ${src.role === "Denominator" ? AMBER : GREEN}`, padding: "1px 4px" }}>
+                  {src.role}
+                </span>
+              </div>
+              {/* credibility bar */}
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                  <SCaps size={7.5} ls="0.10em" color={INK55}>Credibility</SCaps>
+                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 10, color: credColor }}>{credPct}%</span>
+                </div>
+                <div style={{ height: 3, background: INK15 }}>
+                  <div style={{ height: "100%", width: `${credPct}%`, background: credColor, transition: "width .5s ease" }} />
+                </div>
+              </div>
+              {/* benefit */}
+              <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, lineHeight: 1.45 }}>
+                {src.benefit}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+      <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${INK15}` }}>
+        <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, lineHeight: 1.5 }}>
+          All feeds are free, no API key. Every signal links back to its primary-source URL — click through to verify.
+        </p>
+      </div>
+    </aside>
   );
 }
 
@@ -911,6 +1060,9 @@ export default function SignalIQPage() {
         {/* ── Hero ─────────────────────────────────────────────────────── */}
         <SIQHero />
 
+        {/* ── Wire-feed ticker ──────────────────────────────────────────── */}
+        <SourcesTicker />
+
         {/* ── Detail view (step 3) ──────────────────────────────────────── */}
         {selected && (
           <DetailView
@@ -947,7 +1099,7 @@ export default function SignalIQPage() {
             {scan && scan.opportunities.length > 0 && (
               <div style={{ padding: "0 clamp(22px,5vw,56px)" }}>
                 {/* Results header */}
-                <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+                <div style={{ maxWidth: 1400, margin: "0 auto" }}>
                   <DoubleRule style={{ marginTop: 24 }} />
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "8px 0 12px", flexWrap: "wrap", gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
@@ -962,11 +1114,16 @@ export default function SignalIQPage() {
                   </div>
                   <HRule style={{ marginBottom: 20 }} />
                 </div>
-                {/* Card grid */}
-                <div className="siq-cards">
-                  {scan.opportunities.map((opp) => (
-                    <OppCard key={opp.id} opp={opp} onGenerate={() => generatePack(opp)} />
-                  ))}
+                {/* Cards + sidebar */}
+                <div className="siq-results-wrap">
+                  <div className="siq-cards-col">
+                    <div className="siq-cards">
+                      {scan.opportunities.map((opp) => (
+                        <OppCard key={opp.id} opp={opp} onGenerate={() => generatePack(opp)} />
+                      ))}
+                    </div>
+                  </div>
+                  <SourcesSidebar />
                 </div>
               </div>
             )}
@@ -1205,5 +1362,109 @@ const PAGE_CSS = `
     .siq-cards { grid-template-columns: 1fr; }
     .siq-step { padding: 10px 12px; font-size: 8.5px; }
     .siq-hide-sm { display: none; }
+  }
+
+  /* ── wire-feed ticker ───────────────────────────────────────────── */
+  .siq-ticker-wrap {
+    display: flex;
+    align-items: stretch;
+    background: ${HDR_BG};
+    border-bottom: 1px solid ${HDR_BORDER};
+    overflow: hidden;
+    height: 34px;
+  }
+  .siq-ticker-label {
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    border-right: 1px solid rgba(241,235,222,.08);
+    flex-shrink: 0;
+    background: rgba(241,235,222,.03);
+  }
+  .siq-ticker-overflow {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  @keyframes siq-crawl {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .siq-ticker-track {
+    display: flex;
+    align-items: center;
+    width: max-content;
+    animation: siq-crawl 42s linear infinite;
+    white-space: nowrap;
+  }
+  .siq-ticker-track:hover { animation-play-state: paused; }
+  .siq-ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 6px;
+  }
+  .siq-ticker-dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: ${YEL};
+    flex-shrink: 0;
+    animation: siq-pulse 2s ease-in-out infinite;
+  }
+  .siq-ticker-sep {
+    font-family: ${MONO};
+    font-size: 8px;
+    color: rgba(241,235,222,.15);
+    letter-spacing: .18em;
+    padding: 0 4px;
+  }
+
+  /* ── sources sidebar ────────────────────────────────────────────── */
+  .siq-results-wrap {
+    display: flex;
+    gap: 32px;
+    align-items: flex-start;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .siq-cards-col {
+    flex: 1;
+    min-width: 0;
+  }
+  .siq-sources-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 108px;
+    border: 1px solid ${INK15};
+    background: ${PAPER2};
+    padding: 16px 14px;
+  }
+  .siq-source-card {
+    padding-bottom: 16px;
+    border-bottom: 1px solid ${INK15};
+  }
+  .siq-source-card:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  @keyframes siq-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: .45; transform: scale(.75); }
+  }
+  .siq-pulse {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${GREEN};
+    flex-shrink: 0;
+    animation: siq-pulse 2.2s ease-in-out infinite;
+  }
+  @media (max-width: 1100px) {
+    .siq-sources-sidebar { display: none; }
   }
 `;
