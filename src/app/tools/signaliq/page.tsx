@@ -233,13 +233,13 @@ function SourcesTicker() {
           {items.map((src, i) => (
             <span key={i} className="siq-ticker-item">
               <span className="siq-ticker-dot" />
-              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.35)" }}>
+              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.6)" }}>
                 {src.type}
               </span>
-              <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12, color: "rgba(241,235,222,.8)", letterSpacing: "-0.01em" }}>
+              <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: "rgba(241,235,222,.95)", letterSpacing: "-0.01em" }}>
                 {src.name}
               </span>
-              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: "rgba(241,235,222,.45)" }}>
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.72)" }}>
                 {src.benefit.split(" — ")[0]}
               </span>
               <span className="siq-ticker-sep">·····</span>
@@ -385,35 +385,86 @@ function StepBar({ step, onGoStep }: { step: 1 | 2 | 3; onGoStep: (n: 1 | 2 | 3)
 // ── footer ────────────────────────────────────────────────────────────────────
 
 function SIQFooter() {
-  const TOOLS = [
-    { label: "PressIQ", href: "/tools/pressiq" },
-    { label: "CollabIQ", href: "/tools/collabiq" },
-    { label: "SignalIQ", href: "/tools/signaliq", active: true },
+  const ECOSYSTEM = [
+    {
+      step: "01",
+      tool: "SignalIQ",
+      href: "/tools/signaliq",
+      active: true,
+      role: "Find the story",
+      desc: "Scan 5 live open-data feeds. Rank opportunities by signal-vs-coverage gap. Get in before the press does.",
+      badge: "You are here",
+    },
+    {
+      step: "02",
+      tool: "PressIQ",
+      href: "/tools/pressiq",
+      active: false,
+      role: "Score the pitch",
+      desc: "Paste your pitch angle. PressIQ scores it on 8 factors — specificity, credibility, timeliness — before you send it.",
+      badge: "Next step",
+    },
+    {
+      step: "03",
+      tool: "CollabIQ",
+      href: "/tools/collabiq",
+      active: false,
+      role: "Find the journalist",
+      desc: "Search 50,000+ journalist contact records by beat, outlet, and recency. Pitch the right reporter, not a cold list.",
+      badge: "Then this",
+    },
+    {
+      step: "04",
+      tool: "EMOS",
+      href: "/emos",
+      active: false,
+      role: "Run the full system",
+      desc: "The Earned Media Operating System wraps all three tools with playbooks, cadence, and a coverage guarantee.",
+      badge: "The system",
+    },
   ];
+
   return (
     <footer style={{ padding: "0 clamp(22px,5vw,56px) 36px", marginTop: 60 }}>
-      <DoubleRule style={{ marginBottom: 14 }} />
-      <div style={{
-        display: "flex", alignItems: "center", gap: 18,
-        paddingBottom: 14, borderBottom: `1px solid ${INK15}`, marginBottom: 14,
-        flexWrap: "wrap",
-      }}>
-        <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: INK35 }}>
-          SIA Tools
-        </span>
-        {TOOLS.map((t) => (
-          <Link key={t.label} href={t.href} style={{
-            fontFamily: GROT, fontSize: 10, fontWeight: 700, letterSpacing: ".14em",
-            textTransform: "uppercase", color: t.active ? INK : INK55, textDecoration: "none",
-          }}>
-            {t.active ? <Mark>{t.label}</Mark> : t.label}
+      <DoubleRule style={{ marginBottom: 20 }} />
+
+      {/* Ecosystem step-flow */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
+          <SCaps size={9} ls="0.22em" color={INK55}>The SIA earned-media pipeline</SCaps>
+          <div style={{ flex: 1, height: 1, background: INK15, minWidth: 20 }} />
+          <Link href="/emos" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55, textDecoration: "none" }}>
+            How they fit together ↗
           </Link>
-        ))}
-        <Link href="/emos" style={{ fontFamily: SERIF, fontSize: 12, fontWeight: 700, fontStyle: "italic", color: INK55, textDecoration: "none", letterSpacing: "-0.01em" }}>
-          EMOS ↗
-        </Link>
+        </div>
+
+        <div className="siq-ecosystem-grid">
+          {ECOSYSTEM.map((item, idx) => (
+            <Link key={item.tool} href={item.href} style={{ textDecoration: "none" }} className={`siq-eco-card${item.active ? " active" : ""}`}>
+              {/* connector arrow between cards */}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: item.active ? YEL : INK35, letterSpacing: "-0.02em", lineHeight: 1 }}>{item.step}</span>
+                <span style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: item.active ? YEL : INK35 }}>{item.badge}</span>
+              </div>
+              <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".06em", textTransform: "uppercase", color: item.active ? INK : INK55, marginBottom: 3 }}>
+                {item.active ? <Mark>{item.tool}</Mark> : item.tool}
+              </div>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase", color: item.active ? INK70 : INK35, marginBottom: 8 }}>
+                {item.role}
+              </div>
+              <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: item.active ? INK70 : INK55, lineHeight: 1.45 }}>
+                {item.desc}
+              </p>
+              {idx < ECOSYSTEM.length - 1 && (
+                <div className="siq-eco-arrow">→</div>
+              )}
+            </Link>
+          ))}
+        </div>
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+
+      {/* Copyright row */}
+      <div style={{ paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
         <SCaps size={10} ls="0.16em" color={INK55}>
           © MMXXVI · Syed Irfan Ajmal · SIA Enterprises Inc
         </SCaps>
@@ -448,22 +499,48 @@ function SIQHero() {
       <SCaps color={INK55} size={10.5} ls="0.24em">
         {PRODUCT} · Proactive-PR Radar · SIA Wire
       </SCaps>
-      <div style={{ marginTop: 16, paddingBottom: "clamp(20px,3vw,36px)", maxWidth: 680 }}>
-        <h1 className="siq-h1">
-          See the story<br />
-          <em style={{ fontStyle: "italic", fontWeight: 600 }}>
-            <Mark>before it breaks.</Mark>
-          </em>
-        </h1>
-        <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(15px,1.8vw,20px)", color: INK70, lineHeight: 1.5, maxWidth: 520 }}>
-          {PRODUCT} scans open, primary-source data — filings, research, search and
-          forum surges — and ranks the stories rising fastest before the press has
-          caught up. Then it drafts the pitch.
-        </p>
-        <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 13, color: INK55, lineHeight: 1.5 }}>
-          Early signals, not predictions — every opportunity links back to its source.
-        </p>
+
+      {/* 2-col hero grid */}
+      <div className="siq-hero-grid">
+        {/* Left: headline + body */}
+        <div style={{ paddingBottom: "clamp(20px,3vw,36px)" }}>
+          <h1 className="siq-h1">
+            See the story<br />
+            <em style={{ fontStyle: "italic", fontWeight: 600 }}>
+              <Mark>before it breaks.</Mark>
+            </em>
+          </h1>
+          <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(15px,1.8vw,20px)", color: INK70, lineHeight: 1.5 }}>
+            {PRODUCT} scans open, primary-source data — filings, research, search and
+            forum surges — and ranks the stories rising fastest before the press has
+            caught up. Then it drafts the pitch.
+          </p>
+          <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 13, color: INK55, lineHeight: 1.5 }}>
+            Early signals, not predictions — every opportunity links back to its source.
+          </p>
+        </div>
+
+        {/* Right: "How it works" editorial panel */}
+        <div className="siq-hero-panel">
+          <SCaps size={9} ls="0.20em" color={INK55}>How it works</SCaps>
+          <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 0 }}>
+            {([
+              ["01", "Pick a beat", "Choose your industry vertical — SaaS, Fintech, Health, Climate, or AI."],
+              ["02", "Scan the radar", "5 live open-data sources scanned in seconds. No API key. No cost."],
+              ["03", "Get an asset pack", "Pitch angle, data brief, journalist list — ready to send."],
+            ] as [string, string, string][]).map(([n, title, desc], idx, arr) => (
+              <div key={n} style={{ display: "flex", gap: 14, paddingBottom: 16, marginBottom: idx < arr.length - 1 ? 16 : 0, borderBottom: idx < arr.length - 1 ? `1px solid ${INK15}` : "none" }}>
+                <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: YEL, lineHeight: 1, flexShrink: 0, letterSpacing: "-0.02em" }}>{n}</span>
+                <div>
+                  <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".10em", textTransform: "uppercase", color: INK, marginBottom: 4 }}>{title}</div>
+                  <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.45 }}>{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
       <DoubleRule />
     </section>
   );
@@ -1351,7 +1428,26 @@ const PAGE_CSS = `
   }
   .siq-input:focus { border-color: ${YEL}; box-shadow: 0 0 0 2px rgba(245,184,31,.25); }
 
+  /* hero 2-col grid */
+  .siq-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(28px,4vw,56px);
+    margin-top: 16px;
+    align-items: start;
+  }
+  .siq-hero-panel {
+    border: 1px solid ${INK15};
+    background: ${PAPER2};
+    padding: 20px 22px;
+    position: relative;
+  }
+
   /* responsive */
+  @media (max-width: 860px) {
+    .siq-hero-grid { grid-template-columns: 1fr; }
+    .siq-hero-panel { display: none; }
+  }
   @media (max-width: 720px) {
     .siq-detail-cols { grid-template-columns: 1fr; }
   }
@@ -1371,7 +1467,7 @@ const PAGE_CSS = `
     background: ${HDR_BG};
     border-bottom: 1px solid ${HDR_BORDER};
     overflow: hidden;
-    height: 34px;
+    height: 42px;
   }
   .siq-ticker-label {
     display: flex;
@@ -1395,7 +1491,7 @@ const PAGE_CSS = `
     display: flex;
     align-items: center;
     width: max-content;
-    animation: siq-crawl 42s linear infinite;
+    animation: siq-crawl 110s linear infinite;
     white-space: nowrap;
   }
   .siq-ticker-track:hover { animation-play-state: paused; }
@@ -1466,5 +1562,58 @@ const PAGE_CSS = `
   }
   @media (max-width: 1100px) {
     .siq-sources-sidebar { display: none; }
+  }
+
+  /* ecosystem pipeline grid */
+  .siq-ecosystem-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    position: relative;
+  }
+  .siq-eco-card {
+    border: 1px solid ${INK15};
+    border-right: none;
+    padding: 16px 18px 20px;
+    position: relative;
+    background: ${PAPER};
+    transition: background 0.12s ease;
+  }
+  .siq-eco-card:last-child { border-right: 1px solid ${INK15}; }
+  .siq-eco-card:hover { background: ${PAPER2}; }
+  .siq-eco-card.active { background: ${PAPER2}; border-color: ${INK35}; }
+  .siq-eco-arrow {
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: ${PAPER};
+    border: 1px solid ${INK15};
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: ${SERIF};
+    font-size: 10px;
+    color: ${INK35};
+    z-index: 1;
+  }
+  .siq-eco-card.active .siq-eco-arrow {
+    background: ${PAPER2};
+    border-color: ${INK35};
+    color: ${INK55};
+  }
+  @media (max-width: 860px) {
+    .siq-ecosystem-grid { grid-template-columns: 1fr 1fr; }
+    .siq-eco-card:nth-child(2) { border-right: 1px solid ${INK15}; }
+    .siq-eco-card:nth-child(3) { border-top: none; }
+    .siq-eco-card:nth-child(4) { border-top: none; border-right: 1px solid ${INK15}; }
+    .siq-eco-arrow { display: none; }
+  }
+  @media (max-width: 540px) {
+    .siq-ecosystem-grid { grid-template-columns: 1fr; }
+    .siq-eco-card { border-right: 1px solid ${INK15}; border-bottom: none; }
+    .siq-eco-card:last-child { border-bottom: 1px solid ${INK15}; }
   }
 `;
