@@ -52,6 +52,13 @@ const ra = (hex: string, alpha: number) => {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
 };
 function bandColor(s: number) { return s >= 75 ? GREEN : s >= 45 ? AMBER : RED; }
+// Tier thresholds that match the 4-tier design system (85/65/40/0)
+function tierForScore(s: number) {
+  if (s >= 85) return { color: GREEN, label: "Filed",           badge: "FILED"   };
+  if (s >= 65) return { color: BLUE,  label: "Competitive",     badge: "LIVE"    };
+  if (s >= 40) return { color: AMBER, label: "Needs work",      badge: "WARMING" };
+  return             { color: RED,   label: "Will be ignored",  badge: "COLD"    };
+}
 
 // ── Lazy-load jsPDF (avoids next/script in "use client") ─────────────────────
 function loadJsPDF(): Promise<new (opts: object) => object> {
@@ -166,36 +173,32 @@ function Gauge({ score, color }: { score: number; color: string }) {
   );
 }
 
-// ── SVG Radar ─────────────────────────────────────────────────────────────────
-function Radar({ scores, dims }: { scores: Record<string, number>; dims: readonly typeof DIMS[number][] }) {
-  const n = dims.length, cx = 150, cy = 150, R = 110;
-  const pt = (frac: number, i: number): [number, number] => {
-    const a = (2 * Math.PI * i) / n - Math.PI / 2;
-    return [cx + frac * R * Math.cos(a), cy + frac * R * Math.sin(a)];
-  };
+// ── Dimension bar chart (Score tab — handoff v2) ─────────────────────────────
+function DimBarChart({ scores, dims }: { scores: Record<string, number>; dims: readonly typeof DIMS[number][] }) {
   return (
-    <svg viewBox="0 0 300 300" style={{ width: "100%", maxWidth: 300 }}>
-      {[0.25, 0.5, 0.75, 1].map(f => (
-        <polygon key={f} points={dims.map((_, i) => pt(f, i).map(v => v.toFixed(1)).join(",")).join(" ")}
-          fill="none" stroke={ra(INK, 0.08)} strokeWidth="1" />
-      ))}
-      {dims.map((_, i) => { const [x, y] = pt(1, i); return <line key={i} x1={cx} y1={cy} x2={x.toFixed(1)} y2={y.toFixed(1)} stroke={ra(INK, 0.08)} strokeWidth="1" />; })}
-      <polygon points={dims.map((d, i) => pt((scores[d.key] ?? 0) / 100, i).map(v => v.toFixed(1)).join(",")).join(" ")}
-        fill={ra(BLUE, 0.12)} stroke={BLUE} strokeWidth="2" />
-      {dims.map((d, i) => {
-        const s = scores[d.key] ?? 0, [x, y] = pt(s / 100, i), [lx, ly] = pt(1.18, i);
-        const a = (2 * Math.PI * i) / n - Math.PI / 2;
-        const anchor = Math.abs(Math.cos(a)) < 0.15 ? "middle" : Math.cos(a) > 0 ? "start" : "end";
-        const tc = bandColor(s);
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      {dims.map((dim, i) => {
+        const s = scores[dim.key] ?? 0;
+        const t = tierForScore(s);
         return (
-          <g key={d.key}>
-            <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="4" fill={tc} />
-            <text x={lx.toFixed(1)} y={(ly + 3).toFixed(1)} textAnchor={anchor} fontFamily={GROT} fontSize="8.5" fontWeight="700" letterSpacing=".06em" fill={ra(INK, 0.5)}>{d.short}</text>
-            <text x={lx.toFixed(1)} y={(ly + 14).toFixed(1)} textAnchor={anchor} fontFamily={MONO} fontSize="9" fontWeight="700" fill={tc}>{s}</text>
-          </g>
+          <div key={dim.key} style={{
+            display: "grid", gridTemplateColumns: "140px 42px 1fr", alignItems: "center",
+            gap: 12, padding: "11px 0", borderBottom: `1px solid ${ra(INK, 0.06)}`,
+            ...(i === 0 ? { borderTop: `1px solid ${ra(INK, 0.06)}` } : {}),
+          }}>
+            <div style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 600, color: INK }}>{dim.name}</div>
+            <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, color: t.color, textAlign: "right" }}>{s}</div>
+            <div style={{ position: "relative", height: 18, background: ra(INK, 0.04) }}>
+              <div style={{ position: "absolute", inset: 0, width: `${s}%`, background: t.color, opacity: 0.18 }} />
+              <div style={{ position: "absolute", inset: 0, width: `${s}%`, borderRight: `2px solid ${t.color}` }} />
+              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontFamily: GROT, fontSize: 7, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.25) }}>
+                {t.label.toUpperCase()}
+              </div>
+            </div>
+          </div>
         );
       })}
-    </svg>
+    </div>
   );
 }
 
@@ -398,6 +401,37 @@ function EmailGate({ show, onClose, onUnlock, result }: {
   );
 }
 
+// ── Per-tab step navigation ───────────────────────────────────────────────────
+function TabNav({ current, setTab, onReset }: { current: Tab; setTab: (t: Tab) => void; onReset: () => void }) {
+  const idx = TABS.findIndex(t => t.id === current);
+  const next = idx < TABS.length - 1 ? TABS[idx + 1] : null;
+  function goNext(id: Tab) {
+    setTab(id);
+    document.querySelector(".piq-right")?.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  return (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 28, paddingTop: 18, borderTop: `1px solid ${ra(INK, 0.1)}` }}>
+      <div style={{ display: "flex", gap: 5 }}>
+        {TABS.map((t, i) => (
+          <div key={t.id} style={{ width: t.id === current ? 24 : 8, height: 4, background: (t.id === current || i < idx) ? INK : ra(INK, 0.12), transition: "all .15s" }} />
+        ))}
+      </div>
+      {next ? (
+        <button
+          onClick={() => goNext(next.id)}
+          style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}
+          onMouseOver={e => (e.currentTarget.style.opacity = ".85")} onMouseOut={e => (e.currentTarget.style.opacity = "1")}>
+          {next.label} →
+        </button>
+      ) : (
+        <button onClick={onReset} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "transparent", border: `1px solid ${ra(INK, 0.2)}`, color: ra(INK, 0.5), fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer" }}>
+          ← Score another pitch
+        </button>
+      )}
+    </div>
+  );
+}
+
 // ── Pre-score panel ───────────────────────────────────────────────────────────
 function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }) {
   const [tickIdx, setTickIdx] = useState(0);
@@ -457,29 +491,34 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
         </div>
       </div>
 
-      {/* BUILT ON — ticker and source pills separated */}
-      <div style={{ padding: "24px 32px 28px" }}>
+      {/* WHAT JOURNALISTS SAY — rotating ticker */}
+      <div style={{ padding: "24px 32px 0" }}>
         <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.32), marginBottom: 16 }}>
-          BUILT ON
+          WHAT JOURNALISTS SAY
         </div>
-
-        {/* Rotating stat */}
         <div style={{ opacity: tickOp, transition: "opacity .2s ease", minHeight: 78 }}>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 32, color: YEL, letterSpacing: "-.02em", lineHeight: 1, marginBottom: 6 }}>{t.stat}</div>
           <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.55), lineHeight: 1.4, marginBottom: 4 }}>{t.text}</div>
           <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.25) }}>{t.src}</div>
         </div>
+      </div>
 
-        {/* Separator + source pills */}
-        <div style={{ marginTop: 20, paddingTop: 16, borderTop: `1px solid ${ra(INK, 0.08)}` }}>
-          <div style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: ra(INK, 0.22), marginBottom: 8 }}>
-            DATA SOURCES
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-            {["Cision 2026", "Muck Rack 2026", "Propel", "Backlinko", "Fractl", "Boomerang"].map(s => (
-              <span key={s} style={{ padding: "4px 8px", border: `1px solid ${ra(INK, 0.08)}`, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(INK, 0.28) }}>{s}</span>
-            ))}
-          </div>
+      {/* SCORED AGAINST — source pills */}
+      <div style={{ padding: "20px 32px 28px", borderTop: `1px solid ${ra(INK, 0.08)}`, marginTop: 20 }}>
+        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.32), marginBottom: 10 }}>
+          SCORED AGAINST
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+          {[
+            "Cision State of the Media 2026",
+            "Muck Rack State of Journalism 2026",
+            "Propel Media Barometer Q1 2024",
+            "Backlinko Journalist Outreach Study",
+            "Fractl Journalist Survey (n≈500)",
+            "Boomerang Email Response Study (40M)",
+          ].map(s => (
+            <span key={s} style={{ padding: "4px 8px", border: `1px solid ${ra(INK, 0.08)}`, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.28) }}>{s}</span>
+          ))}
         </div>
       </div>
     </div>
@@ -490,34 +529,19 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
 function LoadingPanel() {
   return (
     <div style={{ padding: "80px 32px 60px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 22, color: ra(INK, 0.4), marginBottom: 20, textAlign: "center" }}>
-        Reviewing your pitch…
+      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: ra(INK, 0.35), marginBottom: 24, textAlign: "center" }}>
+        Scoring against 32 factors across 7 dimensions…
       </div>
-
-      {/* Dimension list */}
-      <div style={{ border: `1px solid ${ra(INK, 0.1)}`, padding: "16px 24px", marginBottom: 24, maxWidth: 440, width: "100%" }}>
-        <div style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: ra(INK, 0.25), marginBottom: 12 }}>
-          SCORING ACROSS 7 DIMENSIONS
-        </div>
-        {DIMS.map((d, i) => (
-          <div key={d.key} style={{ display: "flex", alignItems: "center", gap: 10, padding: "5px 0", borderBottom: i < DIMS.length - 1 ? `1px solid ${ra(INK, 0.06)}` : "none" }}>
-            <div style={{ width: 6, height: 6, background: YEL, flexShrink: 0, opacity: 0.6 }} />
-            <span style={{ fontFamily: SERIF, fontSize: 14, color: ra(INK, 0.55) }}>{d.name}</span>
-          </div>
-        ))}
+      <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.2), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
+        Cision State of the Media 2026 (n≈1,800)<br />
+        Muck Rack State of Journalism 2026 (n≈900)<br />
+        Propel Media Barometer Q1 2024 (425k+ pitches)<br />
+        Backlinko · Fractl · Boomerang (40M emails)
       </div>
-
-      {/* Pulsing dots */}
-      <div style={{ display: "flex", gap: 6, marginBottom: 22 }}>
+      <div style={{ display: "flex", gap: 6 }}>
         {[0, 0.2, 0.4].map((delay, i) => (
           <span key={i} className="piq-dot" style={{ animationDelay: `${delay}s` }} />
         ))}
-      </div>
-
-      <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.2), textAlign: "center", lineHeight: 1.8 }}>
-        Benchmarked against published journalist research<br />
-        Cision 2026 (n≈1,800) · Muck Rack 2026 (n≈900) · Propel (425k+ pitches)<br />
-        Backlinko (12M emails) · Boomerang (40M emails)
       </div>
     </div>
   );
@@ -525,12 +549,12 @@ function LoadingPanel() {
 
 // ── Post-score panel ──────────────────────────────────────────────────────────
 function PostScorePanel({
-  result, tab, setTab, email, setEmail, emailDone, setEmailDone, onDownload,
+  result, tab, setTab, email, setEmail, emailDone, setEmailDone, onDownload, onReset,
 }: {
   result: ScoreResponse; tab: Tab; setTab: (t: Tab) => void;
   email: string; setEmail: (v: string) => void;
   emailDone: boolean; setEmailDone: (v: boolean) => void;
-  onDownload: () => void;
+  onDownload: () => void; onReset: () => void;
 }) {
   const [expanded, setExpanded] = useState<Set<DimKey>>(new Set());
   const { composite, tier, areas, relevanceAssessed, strongestLine, topFixes, authenticityRisk } = result;
@@ -621,20 +645,29 @@ function PostScorePanel({
           )}
 
           <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 22, marginTop: 22 }}>
-            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 14 }}>YOUR PITCH, BY DIMENSION</div>
-            <div style={{ display: "flex", justifyContent: "center" }}><Radar scores={scoreMap} dims={radarDims} /></div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35) }}>YOUR PITCH, BY DIMENSION</div>
+              <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.28) }}>Full breakdown in 03 →</div>
+            </div>
+            <DimBarChart scores={scoreMap} dims={radarDims} />
           </div>
 
-          {/* Download report CTA */}
-          <div style={{ marginTop: 22, padding: "16px 18px", border: `1px solid ${ra(INK, 0.15)}`, background: PAPER2, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-            <div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK, marginBottom: 3 }}>Download PDF report</div>
-              <div style={{ fontFamily: SERIF, fontSize: 13, color: ra(INK, 0.55) }}>Cover, score, top fixes, full breakdown, EMOS recommendations.</div>
+          {/* Scored Against */}
+          <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 20, marginTop: 22 }}>
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 10 }}>SCORED AGAINST</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 6 }}>
+              {["SIA 7-STEP CHECKLIST", "SIA 32-FACTOR SCORING SYSTEM", "EMOS FRAMEWORK"].map(s => (
+                <span key={s} style={{ padding: "3px 7px", background: INK, fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: YEL }}>{s}</span>
+              ))}
             </div>
-            <button onClick={onDownload} style={{ padding: "10px 18px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", border: "none", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
-              Download report ↓
-            </button>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+              {["Cision State of the Media 2026", "Muck Rack State of Journalism 2026", "Propel Media Barometer", "Backlinko Journalist Outreach", "Fractl Journalist Survey", "Boomerang Email Study (40M)"].map(s => (
+                <span key={s} style={{ padding: "3px 7px", border: `1px solid ${ra(INK, 0.1)}`, fontFamily: MONO, fontSize: 7, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.3) }}>{s}</span>
+              ))}
+            </div>
           </div>
+
+          <TabNav current={tab} setTab={setTab} onReset={onReset} />
 
           {/* EMOS CTA */}
           <div style={{ background: INK, padding: 22, marginTop: 22 }}>
@@ -664,6 +697,7 @@ function PostScorePanel({
         <div style={{ padding: "24px 32px 28px" }}>
           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 18 }}>THE 3 FIXES THAT MOVE YOUR SCORE MOST</div>
           {topFixes.map((f, i) => <FixCard key={i} rank={i + 1} fix={f} />)}
+          <TabNav current={tab} setTab={setTab} onReset={onReset} />
         </div>
       )}
 
@@ -675,6 +709,7 @@ function PostScorePanel({
             const area = areaFor(dim.key);
             return <DimBlock key={dim.key} dim={dim} score={area.score} analysis={area.analysis} subSignals={area.subSignals} evidenceKeys={area.evidence} expanded={expanded.has(dim.key)} onToggle={() => toggleDim(dim.key)} />;
           })}
+          <TabNav current={tab} setTab={setTab} onReset={onReset} />
         </div>
       )}
 
@@ -689,8 +724,21 @@ function PostScorePanel({
           <div style={{ fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 24 }}>
             In an AI-answer world you don&rsquo;t just rank — you get cited. AI engines lean on earned media (Muck Rack: ~82% of AI citations come from earned coverage), and brand mentions out-predict backlinks for AI-Overview visibility ~3× (Ahrefs, 75k brands). The placement this pitch is aiming for is exactly that kind of citation — so a stronger pitch compounds.
           </div>
+
+          {/* PDF report download (value-add beyond design spec) */}
+          <div style={{ padding: "16px 18px", border: `1px solid ${ra(INK, 0.15)}`, background: PAPER2, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
+            <div>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK, marginBottom: 3 }}>Download PDF report</div>
+              <div style={{ fontFamily: SERIF, fontSize: 13, color: ra(INK, 0.55) }}>Cover, score, top fixes, full breakdown, EMOS recommendations.</div>
+            </div>
+            <button onClick={onDownload} style={{ padding: "10px 18px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", border: "none", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
+              Download report ↓
+            </button>
+          </div>
+
+          {/* Email unlock */}
           {!emailDone ? (
-            <form onSubmit={unlockEmail} style={{ border: `1px solid ${INK}`, padding: 18, marginTop: 18 }}>
+            <form onSubmit={unlockEmail} style={{ border: `1px solid ${INK}`, padding: 18 }}>
               <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 8 }}>UNLOCK {EMAIL_LIMIT} SCORES / MONTH</div>
               <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.55), marginBottom: 12 }}>Add your email to raise your monthly limit and get SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.</div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -699,8 +747,10 @@ function PostScorePanel({
               </div>
             </form>
           ) : (
-            <div style={{ fontFamily: SERIF, fontSize: 14.5, color: GREEN, fontWeight: 600, marginTop: 18 }}>✓ Unlocked — you now have {EMAIL_LIMIT} scores a month. Check your inbox.</div>
+            <div style={{ fontFamily: SERIF, fontSize: 14.5, color: GREEN, fontWeight: 600 }}>✓ Unlocked — you now have {EMAIL_LIMIT} scores a month. Check your inbox.</div>
           )}
+
+          <TabNav current={tab} setTab={setTab} onReset={onReset} />
         </div>
       )}
     </div>
@@ -982,11 +1032,6 @@ export default function PressIQPage() {
     doc.save(`PressIQ-Report-${date.replace(/ /g,"-")}.pdf`);
   }, [result, pitch, subject]);
 
-  // Tab navigation helpers
-  const tabIdx = TABS.findIndex(t => t.id === tab);
-  const prevTab = tabIdx > 0 ? TABS[tabIdx - 1] : null;
-  const nextTab = tabIdx < TABS.length - 1 ? TABS[tabIdx + 1] : null;
-
   return (
     <>
       <style>{PAGE_CSS}</style>
@@ -1028,14 +1073,17 @@ export default function PressIQPage() {
             </div>
 
             <div style={LSEC}>
-              <span style={LSEC_LBL}>Your pitch <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· subject + body, as you&rsquo;d send it</span></span>
-              <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
-              <div style={{ marginTop: 6 }}><button onClick={loadSample} className="piq-ghost">↻ Load a sample pitch</button></div>
+              <em style={{ fontFamily: SERIF, fontSize: 13, fontStyle: "italic", color: ra(PAPER, 0.30), lineHeight: 1.5, display: "block", marginBottom: 12 }}>
+                For reactive PR — score your response to a journalist query posted on HARO, Qwoted, Featured, or similar platforms.
+              </em>
+              <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
+              <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted / Featured query here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
             </div>
 
             <div style={LSEC}>
-              <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· strongly recommended</span></span>
-              <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted source request you're answering…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 60 }} />
+              <span style={LSEC_LBL}>Your pitch</span>
+              <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
+              <div style={{ marginTop: 6 }}><button onClick={loadSample} className="piq-ghost">↻ Load a sample pitch</button></div>
             </div>
 
             <div style={LSEC}>
@@ -1083,38 +1131,16 @@ export default function PressIQPage() {
             {view === "post"    && result && (
               <PostScorePanel result={result} tab={tab} setTab={setTab}
                 email={email} setEmail={setEmail} emailDone={emailDone} setEmailDone={setEmailDone}
-                onDownload={() => setShowGate(true)} />
+                onDownload={() => setShowGate(true)} onReset={reset} />
             )}
           </main>
         </div>
 
-        {/* ── Footer (CollabIQ-style) ──────────────────────────────── */}
+        {/* ── Footer ───────────────────────────────────────────────── */}
         <footer className="piq-footer">
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {view === "post" && prevTab && (
-              <button onClick={() => { setTab(prevTab.id); rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }} className="piq-foot-ghost">
-                ← {prevTab.short}
-              </button>
-            )}
-            {view === "post" && (
-              <button onClick={reset} className="piq-foot-ghost">← Score another pitch</button>
-            )}
-            <a href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" className="piq-foot-link">
-              A free tool by Syed Irfan Ajmal · syedirfanajmal.com ↗
-            </a>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-            {view === "post" && (
-              <span style={{ fontFamily: MONO, fontSize: 10, color: ra(INK, 0.3), letterSpacing: ".08em" }}>
-                {tabIdx + 1} of {TABS.length}
-              </span>
-            )}
-            {view === "post" && nextTab && (
-              <button onClick={() => { setTab(nextTab.id); rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }} className="piq-foot-next">
-                {nextTab.short} →
-              </button>
-            )}
-          </div>
+          <a href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" className="piq-foot-link">
+            A free tool by Syed Irfan Ajmal · syedirfanajmal.com ↗
+          </a>
         </footer>
 
       </div>
