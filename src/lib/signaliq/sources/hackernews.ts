@@ -47,7 +47,7 @@ export async function hnSignal(seed: string): Promise<Signal | null> {
       source: "hackernews",
       topic: seed,
       title: top.title,
-      url: top.url || `https://news.ycombinator.com/item?id=${top.objectID}`,
+      url: `https://news.ycombinator.com/item?id=${top.objectID}`,
       observedAt: new Date().toISOString(),
       magnitude,
       velocity,

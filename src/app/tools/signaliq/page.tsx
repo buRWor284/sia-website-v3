@@ -118,10 +118,10 @@ const bandColor = (b: OppBand): string =>
 // Source display labels
 const SRC_LABEL: Record<string, string> = {
   gdelt: "GDELT",
-  hackernews: "HN",
-  sec: "SEC",
-  wikipedia: "WIKIPEDIA",
-  arxiv: "ARXIV",
+  hackernews: "Hacker News",
+  sec: "SEC EDGAR",
+  wikipedia: "Wikipedia",
+  arxiv: "arXiv",
 };
 
 const EMOS_URL = "/emos";
