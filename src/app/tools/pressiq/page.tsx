@@ -14,12 +14,14 @@ import {
   EMAIL_LIMIT,
   EMOS_APPLY,
   EMOS_URL,
+  EVIDENCE,
   FREE_LIMIT,
   PLATFORMS,
   PRODUCT_NAME,
 } from "@/lib/pitch/config";
 import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
-import { EMPTY_BRAND, type BrandSignals, type Platform, type ScoreResponse } from "@/lib/pitch/types";
+import { emosFrame } from "@/lib/pitch/feedback";
+import { EMPTY_BRAND, type BrandSignals, type Platform, type RadarAxis, type ScoreResponse, type SubSignal } from "@/lib/pitch/types";
 
 // ── spot colours ────────────────────────────────────────────────────────────────
 const GREEN = "#3e6b45";
@@ -109,8 +111,76 @@ function ScoreMeter({ score, color }: { score: number; color: string }) {
   );
 }
 
-function AreaBar({ label, score, note, fix }: { label: string; score: number; note?: string; fix?: string }) {
+function Chip({ label, met }: { label: string; met: boolean }) {
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 9px", border: `1px solid ${met ? GREEN : INK15}`, background: met ? hexA(GREEN, 0.06) : PAPER, color: met ? INK : INK55, fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.02em", lineHeight: 1.3 }}>
+      <span style={{ color: met ? GREEN : RED, fontWeight: 800 }}>{met ? "✓" : "✗"}</span>
+      {label}
+    </span>
+  );
+}
+
+function EvidenceCards({ keys }: { keys?: string[] }) {
+  const items = (keys ?? []).map((k) => EVIDENCE[k]).filter(Boolean).slice(0, 3);
+  if (!items.length) return null;
+  return (
+    <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
+      {items.map((e, i) => (
+        <a key={i} href={e.url} target="_blank" rel="noopener noreferrer" style={{ display: "block", padding: "10px 12px", border: `1px solid ${INK15}`, background: PAPER, textDecoration: "none" }}>
+          <div style={{ fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.4 }}>{e.figure}</div>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.08em", textTransform: "uppercase", color: INK55, marginTop: 4 }}>{e.source}</div>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+function Radar({ axes }: { axes: RadarAxis[] }) {
+  const n = axes.length;
+  if (n < 3) return null;
+  const cx = 160, cy = 150, R = 96;
+  const pt = (r: number, i: number): [number, number] => {
+    const a = ((i * 360) / n - 90) * (Math.PI / 180);
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  };
+  const polyAt = (r: number) => axes.map((_, i) => pt(r, i).join(",")).join(" ");
+  const dataPts = axes.map((ax, i) => pt((Math.max(0, Math.min(100, ax.score)) / 100) * R, i));
+  const band = (s: number) => (s >= 75 ? GREEN : s >= 45 ? AMBER : RED);
+  return (
+    <svg viewBox="0 0 320 300" width="100%" style={{ maxWidth: 360 }} role="img" aria-label="Score by dimension">
+      {[25, 50, 75, 100].map((lvl) => (
+        <polygon key={lvl} points={polyAt((lvl / 100) * R)} fill="none" stroke={INK15} strokeWidth={1} />
+      ))}
+      {axes.map((_, i) => {
+        const [x, y] = pt(R, i);
+        return <line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke={INK15} strokeWidth={1} />;
+      })}
+      <polygon points={dataPts.map((p) => p.join(",")).join(" ")} fill={hexA(BLUE, 0.16)} stroke={BLUE} strokeWidth={2} />
+      {dataPts.map((p, i) => (
+        <circle key={i} cx={p[0]} cy={p[1]} r={3.5} fill={band(axes[i].score)} />
+      ))}
+      {axes.map((ax, i) => {
+        const [x, y] = pt(R + 16, i);
+        const anchor = x < cx - 4 ? "end" : x > cx + 4 ? "start" : "middle";
+        return (
+          <text key={i} x={x} y={y} textAnchor={anchor} dominantBaseline="middle" fontSize="9.5" fill={INK55} style={{ fontFamily: GROT, letterSpacing: "0.04em" }}>
+            {ax.label} {ax.score}
+          </text>
+        );
+      })}
+    </svg>
+  );
+}
+
+function AreaBlock({ dim, label, score, analysis, note, fix, subSignals, evidence }: {
+  dim: Parameters<typeof emosFrame>[0];
+  label: string; score: number; analysis?: string; note?: string; fix?: string;
+  subSignals?: SubSignal[]; evidence?: string[];
+}) {
+  const [open, setOpen] = useState(false);
   const c = score >= 75 ? GREEN : score >= 45 ? AMBER : RED;
+  const frame = emosFrame(dim, score);
+  const body = analysis || note;
   return (
     <div style={{ padding: "16px 0", borderTop: `1px solid ${INK15}` }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8, gap: 12 }}>
@@ -120,11 +190,23 @@ function AreaBar({ label, score, note, fix }: { label: string; score: number; no
       <div style={{ height: 8, background: PAPER2, border: `1px solid ${INK15}`, marginBottom: 10 }}>
         <div style={{ height: "100%", width: `${score}%`, background: c, transition: "width .6s ease" }} />
       </div>
-      {note && <p style={{ margin: "0 0 6px", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.5, color: INK70 }}>{note}</p>}
-      {fix && (
-        <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, lineHeight: 1.45, color: INK55 }}>
-          Fix: {fix}
-        </p>
+      {body && <p style={{ margin: "0 0 8px", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.55, color: INK70 }}>{body}</p>}
+      {subSignals && subSignals.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 2 }}>
+          {subSignals.map((s, i) => <Chip key={i} label={s.label} met={s.met} />)}
+        </div>
+      )}
+      <button onClick={() => setOpen((o) => !o)} className="ps-link" style={{ marginTop: 10 }}>
+        {open ? "− Hide why this matters" : "+ Why this matters & the evidence"}
+      </button>
+      {open && (
+        <div style={{ marginTop: 10, padding: "12px 14px", background: PAPER2, border: `1px solid ${INK15}` }}>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: BLUE }}>{frame.mechanism}</span>
+          <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: INK70 }}>{frame.text}</p>
+          {fix && <p style={{ margin: "8px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK55 }}>Fix: {fix}</p>}
+          <EvidenceCards keys={evidence} />
+          {frame.learn && <a href={frame.learn} style={{ display: "inline-block", marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.1em", textTransform: "uppercase", color: INK }}>Learn the mechanism →</a>}
+        </div>
       )}
     </div>
   );
@@ -148,6 +230,7 @@ export default function PitchScorePage() {
 
   // restore inputs
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time restore of saved inputs on mount */
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
@@ -159,6 +242,7 @@ export default function PitchScorePage() {
         if (d.brand) setBrand({ ...EMPTY_BRAND, ...d.brand });
       }
     } catch { /* ignore */ }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
     try { localStorage.setItem(STORE_KEY, JSON.stringify({ pitch, query, subject, platform, brand })); } catch { /* ignore */ }
@@ -348,7 +432,7 @@ function Result({
   unlockEmail: (e: React.FormEvent) => void;
   onReset: () => void;
 }) {
-  const { composite, tier, areas, relevanceAssessed, strongestLine, topFixes } = result;
+  const { composite, tier, areas, relevanceAssessed, strongestLine, topFixes, radar, authenticityRisk } = result;
   const shareText = encodeURIComponent(`My PR pitch scored ${composite}/100 (${tier.label}) on ${PRODUCT_NAME} by @syedirfanajmal. Score yours:`);
 
   return (
@@ -364,7 +448,7 @@ function Result({
           </h2>
           {!relevanceAssessed && (
             <p style={{ margin: "12px 0 0", padding: "8px 12px", background: hexA(AMBER, 0.1), border: `1px solid ${AMBER}`, fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.4 }}>
-              Scored without the journalist's query, so relevance — the #1 driver of placement — wasn't assessed. Add it for a real score.
+              Scored without the journalist&rsquo;s query, so relevance — the #1 driver of placement — wasn&rsquo;t assessed. Add it for a real score.
             </p>
           )}
         </div>
@@ -374,6 +458,22 @@ function Result({
         <div style={{ maxWidth: 760, margin: "20px auto 0", padding: "14px 18px", borderLeft: `3px solid ${GREEN}`, background: hexA(GREEN, 0.05) }}>
           <SCaps size={10} ls="0.16em" color={GREEN}>Your strongest line</SCaps>
           <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK, lineHeight: 1.5 }}>“{strongestLine}”</p>
+        </div>
+      )}
+
+      {authenticityRisk?.flagged && (
+        <div style={{ maxWidth: 760, margin: "18px auto 0", padding: "10px 14px", border: `1px solid ${AMBER}`, background: hexA(AMBER, 0.08), display: "flex", gap: 11, alignItems: "flex-start" }}>
+          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: AMBER, whiteSpace: "nowrap", paddingTop: 2 }}>Reads templated</span>
+          <span style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.5 }}>
+            {authenticityRisk.note || "This reads like a template anyone could send. Add a first-hand detail or a number only you have — 53% of journalists distrust generic, AI-sounding pitches."}
+          </span>
+        </div>
+      )}
+
+      {radar && radar.length >= 3 && (
+        <div style={{ maxWidth: 760, margin: "22px auto 0", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <SCaps size={11} ls="0.18em" color={INK}>Your pitch, by dimension</SCaps>
+          <div style={{ marginTop: 6, width: "100%", display: "flex", justifyContent: "center" }}><Radar axes={radar} /></div>
         </div>
       )}
 
@@ -400,12 +500,13 @@ function Result({
       {/* full breakdown */}
       <div style={{ maxWidth: 760, margin: "30px auto 0" }}>
         <SCaps size={11} ls="0.18em" color={INK}>Full breakdown</SCaps>
-        {relevanceAssessed && areas.relevance && <AreaBar label="Answering the brief" score={areas.relevance.score} note={areas.relevance.note} fix={areas.relevance.topFix} />}
-        <AreaBar label="Mechanics" score={areas.objective.score} note={areas.objective.note} />
-        <AreaBar label="The SIA 34-point system" score={areas.checklist.score} note={areas.checklist.note} fix={areas.checklist.topFix} />
-        <AreaBar label="Storytelling" score={areas.emos.storytelling.score} note={areas.emos.storytelling.note} fix={areas.emos.storytelling.topFix} />
-        <AreaBar label="Neuromarketing" score={areas.emos.neuromarketing.score} note={areas.emos.neuromarketing.note} fix={areas.emos.neuromarketing.topFix} />
-        <AreaBar label="Personal brand" score={areas.emos.personalBrand.score} note={areas.emos.personalBrand.note} fix={areas.emos.personalBrand.topFix} />
+        {relevanceAssessed && areas.relevance && <AreaBlock dim="relevance" label="Answering the brief" score={areas.relevance.score} analysis={areas.relevance.analysis} note={areas.relevance.note} fix={areas.relevance.topFix} subSignals={areas.relevance.subSignals} evidence={areas.relevance.evidence} />}
+        <AreaBlock dim="objective" label="Mechanics" score={areas.objective.score} analysis={areas.objective.analysis} note={areas.objective.note} subSignals={areas.objective.subSignals} evidence={areas.objective.evidence} />
+        <AreaBlock dim="checklist" label="The SIA 34-point system" score={areas.checklist.score} analysis={areas.checklist.analysis} note={areas.checklist.note} fix={areas.checklist.topFix} subSignals={areas.checklist.subSignals} evidence={areas.checklist.evidence} />
+        <AreaBlock dim="newsroomReady" label="Newsroom-ready — publishable material" score={areas.newsroomReady.score} analysis={areas.newsroomReady.analysis} note={areas.newsroomReady.note} fix={areas.newsroomReady.topFix} subSignals={areas.newsroomReady.subSignals} evidence={areas.newsroomReady.evidence} />
+        <AreaBlock dim="storytelling" label="Storytelling" score={areas.emos.storytelling.score} analysis={areas.emos.storytelling.analysis} note={areas.emos.storytelling.note} fix={areas.emos.storytelling.topFix} subSignals={areas.emos.storytelling.subSignals} evidence={areas.emos.storytelling.evidence} />
+        <AreaBlock dim="neuromarketing" label="Neuromarketing" score={areas.emos.neuromarketing.score} analysis={areas.emos.neuromarketing.analysis} note={areas.emos.neuromarketing.note} fix={areas.emos.neuromarketing.topFix} subSignals={areas.emos.neuromarketing.subSignals} evidence={areas.emos.neuromarketing.evidence} />
+        <AreaBlock dim="personalBrand" label="Personal brand" score={areas.emos.personalBrand.score} analysis={areas.emos.personalBrand.analysis} note={areas.emos.personalBrand.note} fix={areas.emos.personalBrand.topFix} subSignals={areas.emos.personalBrand.subSignals} evidence={areas.emos.personalBrand.evidence} />
       </div>
 
       {/* email unlock */}
@@ -425,6 +526,20 @@ function Result({
           ✓ Unlocked — you now have {EMAIL_LIMIT} scores a month. Check your inbox.
         </div>
       )}
+
+      {/* research + GEO positioning (D-D — outside the score) */}
+      <div style={{ maxWidth: 760, margin: "30px auto 0", padding: "18px 20px", border: `1px solid ${INK15}`, background: PAPER2 }}>
+        <SCaps size={10.5} ls="0.16em" color={INK}>The research behind your score</SCaps>
+        <p style={{ margin: "8px 0 0", fontFamily: SERIF, fontSize: 13.5, color: INK70, lineHeight: 1.5 }}>
+          Scored against published journalist research — Cision &amp; Muck Rack 2026, Propel, Backlinko, Fractl, Boomerang. Open any dimension above to see the exact figures and sources.
+        </p>
+        <div style={{ marginTop: 13, paddingTop: 13, borderTop: `1px solid ${INK15}` }}>
+          <SCaps size={10} ls="0.14em" color={BLUE}>Why this is worth more in 2026</SCaps>
+          <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 13.5, color: INK70, lineHeight: 1.55 }}>
+            In an AI-answer world you don&rsquo;t just rank — you get cited. AI engines lean on earned media (Muck Rack: ~82% of AI citations come from earned coverage), and brand mentions out-predict backlinks for AI-Overview visibility ~3&times; (Ahrefs, 75k brands). The placement this pitch is aiming for is exactly that kind of citation — so a stronger pitch compounds. That whole pipeline is what EMOS builds.
+          </p>
+        </div>
+      </div>
 
       {/* EMOS CTA */}
       <div style={{ maxWidth: 760, margin: "28px auto 0", background: INK, color: PAPER, padding: "clamp(24px,4vw,40px)", position: "relative", overflow: "hidden" }}>

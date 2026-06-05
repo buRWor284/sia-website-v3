@@ -32,6 +32,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/infographics/journo-outreach-checklist", changeFrequency: "yearly" as const, priority: 0.6 },
     // Tools
     { url: "/tools/collabiq",              changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: "/tools/pressiq",               changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: "/tools/signaliq",              changeFrequency: "monthly" as const, priority: 0.7 },
     { url: "/tools/authority-calculator",   changeFrequency: "yearly"  as const, priority: 0.5 },
   ];
 

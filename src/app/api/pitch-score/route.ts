@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: PITCH_MODEL,
-        max_tokens: 2000,
+        max_tokens: 3500,
         temperature: 0.2,
         system: SYSTEM_PROMPT,
         tools: [SCORE_TOOL],

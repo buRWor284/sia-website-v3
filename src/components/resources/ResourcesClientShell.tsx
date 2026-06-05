@@ -141,6 +141,22 @@ const CONTENT: ContentItem[] = [
     newsDeck: "Score any media pitch against the system that earns the placement",
     cta: "Score a Pitch",
   },
+  {
+    id: "tool-signaliq",
+    type: "tool",
+    badge: "Interactive Tool",
+    beta: true,
+    topics: ["pr", "strategy", "neuromarketing"],
+    title: "SignalIQ — Proactive PR Radar",
+    sub: "See the story before it breaks, then pitch it first.",
+    blurb:
+      "Scans open, primary-source signals — SEC filings, research preprints, and search, forum, and news-coverage data — and ranks the stories rising fastest before the press catches up, then drafts the brief, the pitch angle, and who to send it to.",
+    href: "/tools/signaliq",
+    y: "2026",
+    newsHeadline: "The Foresight Desk",
+    newsDeck: "Find the data story the press hasn't written yet — and arrive first",
+    cta: "Open the Radar",
+  },
 
   // ── CALCULATORS ─────────────────────────────────────────────────────────
   {
@@ -1254,10 +1270,247 @@ function ResponsiveGridStyle() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// GUIDED PIPELINE VIEW (default) — "The Earned-Media Pipeline"
+// ─────────────────────────────────────────────────────────────────────────────
+
+type StepStatus = "live" | "free" | "soon" | "method";
+
+interface PipeStep {
+  n: string;
+  label: string;
+  tool: string;
+  cap: string;
+  status: StepStatus;
+  contentId?: string;
+  href?: string;
+  week: string;
+}
+
+const GP_GREEN = "#3e6b45";
+const GP_AMBER = "#d99211";
+
+const STATUS_META: Record<StepStatus, { label: string; bg: string; fg: string; border: string }> = {
+  live: { label: "Live", bg: GP_GREEN, fg: "#fff", border: GP_GREEN },
+  free: { label: "Free", bg: "transparent", fg: INK, border: INK },
+  soon: { label: "Coming soon", bg: GP_AMBER, fg: "#fff", border: GP_AMBER },
+  method: { label: "Method", bg: "transparent", fg: INK55, border: INK15 },
+};
+
+function StatusPill({ status }: { status: StepStatus }) {
+  const m = STATUS_META[status];
+  return (
+    <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", padding: "2px 7px", background: m.bg, color: m.fg, border: `1px solid ${m.border}`, whiteSpace: "nowrap" }}>
+      {m.label}
+    </span>
+  );
+}
+
+const PHASE1: PipeStep[] = [
+  { n: "1", label: "Catch the right query", tool: "QuerySniper", cap: "Real-time monitoring of journalist queries that match your expertise.", status: "soon", week: "EMOS Wk 1 + 4" },
+  { n: "2", label: "Write to the method", tool: "Journo Outreach Checklist", cap: "QA your pitch against the 7-step method + 34-point checklist.", status: "free", contentId: "kit-journo", week: "EMOS Wk 2" },
+  { n: "3", label: "Score & sharpen", tool: "PressIQ", cap: "Automated pitch score on the 34-point + EMOS rubric — the 3 fixes that move it most.", status: "free", contentId: "tool-pressiq", week: "EMOS Wk 2" },
+  { n: "4", label: "Track to coverage", tool: "CoverageIQ", cap: "Log every pitch, follow-up, and outcome. The tracking spreadsheet, productized.", status: "soon", week: "EMOS Wk 3" },
+];
+
+const PHASE2: PipeStep[] = [
+  { n: "5", label: "Find the story first", tool: "SignalIQ", cap: "Surfaces breaking stories and coverage gaps before the press piles in.", status: "free", contentId: "tool-signaliq", week: "EMOS Wk 4 → P2" },
+  { n: "6", label: "Build the linkable asset", tool: "Infographics · Quizzes · Data reports", cap: "Your own newsworthy asset. The kits and quizzes here are live demos of this step.", status: "free", href: "/infographics", week: "EMOS Wk 5–6" },
+  { n: "7", label: "Target named journalists", tool: "JournoCollabIQ", cap: "Journalist Beat Matcher — who covers your topic and is most likely to bite.", status: "soon", week: "EMOS Wk 7" },
+  { n: "8", label: "Launch & compound", tool: "Publish + pitch Tier 1", cap: "Dedicated page, Tier-1 exclusive then Tier-2 release, then fold back into the loop.", status: "method", href: "/emos", week: "EMOS Wk 8" },
+];
+
+const FOUNDATION_SCIENCE = [
+  { name: "Personal Branding 101", id: "play-personal-branding" },
+  { name: "Storytelling 101", id: "play-storytelling" },
+  { name: "Neuromarketing 101", id: "play-neuromarketing" },
+];
+const FOUNDATION_CASE = [
+  { name: "Authority ROI Calculator", id: "calc-authority" },
+  { name: "Founder Press Readiness", id: "quiz-founder-press" },
+  { name: "Personal Brand Strength", id: "quiz-personal-brand" },
+];
+
+function resolveStepHref(step: PipeStep): string | null {
+  if (step.contentId) {
+    const item = CONTENT.find((c) => c.id === step.contentId);
+    if (item) return getCardHref(item);
+  }
+  return step.href ?? null;
+}
+
+function PipeStepRow({ step, accent }: { step: PipeStep; accent: "ink" | "yel" }) {
+  const href = resolveStepHref(step);
+  const inner = (
+    <>
+      <div className="gp-num" style={{ background: accent === "yel" ? YEL : "transparent" }}>{step.n}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="gp-step-label">{step.label}</div>
+        <div className="gp-step-tool">{step.tool}{href ? <span className="gp-arrow"> ↗</span> : null}</div>
+        <div className="gp-step-cap">{step.cap}</div>
+        <div className="gp-step-meta"><StatusPill status={step.status} /><span className="gp-week">{step.week}</span></div>
+      </div>
+    </>
+  );
+  return href
+    ? <a className="gp-step gp-step-link" href={href}>{inner}</a>
+    : <div className="gp-step">{inner}</div>;
+}
+
+function FoundationChip({ name, id }: { name: string; id: string }) {
+  const item = CONTENT.find((c) => c.id === id);
+  const href = item ? getCardHref(item) : null;
+  const soon = item ? isComingSoon(item) : false;
+  const body = (
+    <>
+      <span>{name}</span>
+      <span className="gp-chip-tag">{soon ? "Soon" : href ? "Open ↗" : ""}</span>
+    </>
+  );
+  return href
+    ? <a className="gp-chip gp-chip-link" href={href}>{body}</a>
+    : <div className="gp-chip">{body}</div>;
+}
+
+function GuidedPipeline() {
+  return (
+    <section className="sx" style={{ background: PAPER }}>
+      <style>{`
+        .gp-wrap{ max-width:1200px; margin:0 auto; padding:40px clamp(20px,5vw,64px) 8px; }
+        .gp-head{ border-bottom:2px solid ${INK}; padding-bottom:18px; margin-bottom:24px; }
+        .gp-kicker{ font-family:${GROT}; font-weight:800; font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:${INK55}; }
+        .gp-title{ font-family:${SERIF}; font-weight:700; font-size:clamp(30px,4vw,44px); line-height:1.02; margin:8px 0 6px; letter-spacing:-.015em; color:${INK}; }
+        .gp-sub{ font-family:${SERIF}; font-size:16px; color:${INK70}; margin:0; max-width:62ch; }
+        .gp-ladder{ margin-top:16px; background:${PAPER2}; border-left:3px solid ${YEL}; padding:9px 14px; font-family:${GROT}; font-size:11px; letter-spacing:.03em; color:${INK70}; }
+        .gp-ladder b{ color:${INK}; }
+        .gp-ladder span{ color:${INK}; font-weight:700; border-bottom:2px solid ${YEL}; }
+        .gp-foundation{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
+        .gp-found-grp{ background:${PAPER2}; border:1px solid ${INK15}; padding:14px 16px; }
+        .gp-found-label{ font-family:${GROT}; font-weight:800; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:${INK55}; margin-bottom:6px; }
+        .gp-chips{ display:flex; flex-direction:column; }
+        .gp-chip{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-family:${SERIF}; font-size:15px; padding:7px 0; border-bottom:1px dotted ${INK15}; color:${INK}; text-decoration:none; }
+        .gp-chip:last-child{ border-bottom:none; }
+        .gp-chip-link:hover .gp-chip-tag{ text-decoration:underline; }
+        .gp-chip-tag{ font-family:${GROT}; font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:${INK55}; white-space:nowrap; }
+        .gp-phases{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .gp-panel{ border:1px solid ${INK}; background:${PAPER}; }
+        .gp-panel-head{ padding:12px 16px; border-bottom:1px solid ${INK}; }
+        .gp-panel-reactive .gp-panel-head{ background:${INK}; }
+        .gp-panel-reactive .gp-panel-n, .gp-panel-reactive .gp-panel-t{ color:${PAPER}; }
+        .gp-panel-reactive .gp-panel-w{ color:rgba(250,250,250,.6); }
+        .gp-panel-proactive .gp-panel-head{ background:${YEL}; }
+        .gp-panel-n{ font-family:${GROT}; font-weight:800; font-size:9px; letter-spacing:.24em; text-transform:uppercase; opacity:.75; }
+        .gp-panel-t{ font-family:${SERIF}; font-weight:700; font-size:20px; line-height:1.05; margin-top:2px; color:${INK}; }
+        .gp-panel-w{ font-family:${GROT}; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; margin-top:5px; color:${INK55}; }
+        .gp-panel-body{ padding:4px 16px 12px; }
+        .gp-step{ display:flex; gap:12px; padding:13px 0; border-bottom:1px solid ${INK15}; text-decoration:none; color:${INK}; }
+        .gp-step:last-child{ border-bottom:none; }
+        .gp-step-link{ cursor:pointer; }
+        .gp-step-link:hover .gp-step-tool{ text-decoration:underline; }
+        .gp-num{ flex-shrink:0; width:26px; height:26px; border:1px solid ${INK}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:${GROT}; font-weight:800; font-size:12px; color:${INK}; }
+        .gp-step-label{ font-family:${GROT}; font-weight:800; font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; color:${INK55}; }
+        .gp-step-tool{ font-family:${SERIF}; font-weight:700; font-size:17px; line-height:1.15; margin:1px 0 4px; color:${INK}; }
+        .gp-arrow{ font-family:${GROT}; font-size:12px; color:${INK55}; }
+        .gp-step-cap{ font-family:${SERIF}; font-size:13px; color:${INK70}; line-height:1.3; }
+        .gp-step-meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:7px; }
+        .gp-week{ font-family:${GROT}; font-size:9.5px; letter-spacing:.04em; color:${INK55}; border:1px solid ${INK15}; padding:1px 5px; }
+        .gp-loop{ margin-top:20px; border:1px dashed ${INK}; background:${PAPER2}; padding:12px 16px; font-family:${GROT}; font-size:11px; letter-spacing:.04em; color:${INK70}; }
+        .gp-loop b{ color:${INK}; }
+        .gp-cta{ margin-top:14px; background:${INK}; color:${PAPER}; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; text-decoration:none; }
+        .gp-cta .gp-cta-txt{ font-family:${SERIF}; font-size:18px; font-weight:700; }
+        .gp-cta em{ color:${YEL}; font-style:italic; }
+        .gp-cta-btn{ font-family:${GROT}; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; background:${YEL}; color:${INK}; padding:11px 18px; white-space:nowrap; }
+        .gp-aside{ margin-top:14px; font-family:${GROT}; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:${INK55}; }
+        .gp-aside b{ color:${INK70}; }
+        @media (max-width:880px){ .gp-foundation{ grid-template-columns:1fr; } .gp-phases{ grid-template-columns:1fr; } }
+      `}</style>
+
+      <div className="gp-wrap">
+        <div className="gp-head">
+          <div className="gp-kicker">The Pipeline · Start here</div>
+          <h2 className="gp-title">From pitch to placement</h2>
+          <p className="gp-sub">Every tool below is one step in the same earned-media lifecycle — Reactive first, then Proactive. Each one is a self-serve taste of a single EMOS module.</p>
+          <div className="gp-ladder"><b>Access</b> — every tool gives a taste <span>free</span>, more when you <span>join the newsletter</span>, and the full tool <span>inside EMOS</span>.</div>
+        </div>
+
+        <div className="gp-foundation">
+          <div className="gp-found-grp">
+            <div className="gp-found-label">Foundation · The science</div>
+            <div className="gp-chips">{FOUNDATION_SCIENCE.map((c) => <FoundationChip key={c.id} name={c.name} id={c.id} />)}</div>
+          </div>
+          <div className="gp-found-grp">
+            <div className="gp-found-label">Foundation · Make the case</div>
+            <div className="gp-chips">{FOUNDATION_CASE.map((c) => <FoundationChip key={c.id} name={c.name} id={c.id} />)}</div>
+          </div>
+        </div>
+
+        <div className="gp-phases">
+          <div className="gp-panel gp-panel-reactive">
+            <div className="gp-panel-head">
+              <div className="gp-panel-n">Phase 1</div>
+              <div className="gp-panel-t">Reactive — Get Quoted</div>
+              <div className="gp-panel-w">Sprint · Weeks 1–4 · respond to journalists</div>
+            </div>
+            <div className="gp-panel-body">{PHASE1.map((s) => <PipeStepRow key={s.n} step={s} accent="ink" />)}</div>
+          </div>
+          <div className="gp-panel gp-panel-proactive">
+            <div className="gp-panel-head">
+              <div className="gp-panel-n">Phase 2</div>
+              <div className="gp-panel-t">Proactive — Make the News</div>
+              <div className="gp-panel-w">Intensive · Weeks 5–8 · create the story</div>
+            </div>
+            <div className="gp-panel-body">{PHASE2.map((s) => <PipeStepRow key={s.n} step={s} accent="yel" />)}</div>
+          </div>
+        </div>
+
+        <div className="gp-loop">↻ &nbsp;<b>The compounding loop</b> — every placement becomes credibility that makes the next pitch easier.</div>
+
+        <a className="gp-cta" href="/emos">
+          <span className="gp-cta-txt">Try the pieces free. <em>Want the whole sequence, done with you?</em></span>
+          <span className="gp-cta-btn">Explore EMOS →</span>
+        </a>
+
+        <div className="gp-aside">Not a public step: <b>PartnerCollabIQ</b> (partnership / co-marketing) is kept internal for now.</div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VIEW TOGGLE
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v: "guided" | "browse") => void }) {
+  const tabs: { key: "guided" | "browse"; label: string }[] = [
+    { key: "guided", label: "Guided Path" },
+    { key: "browse", label: "Browse All" },
+  ];
+  return (
+    <div style={{ background: PAPER, borderBottom: `1px solid ${INK15}` }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "18px clamp(20px,5vw,64px)", display: "flex", gap: 10, alignItems: "center" }}>
+        <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".2em", textTransform: "uppercase", color: INK55, marginRight: 4 }}>View</span>
+        {tabs.map((t) => {
+          const on = view === t.key;
+          return (
+            <button
+              key={t.key}
+              onClick={() => setView(t.key)}
+              style={{ cursor: "pointer", background: on ? INK : "transparent", color: on ? PAPER : INK, border: `1px solid ${INK}`, padding: "9px 16px", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase" }}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // MAIN EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ResourcesClientShell() {
+  const [view, setView] = useState<"guided" | "browse">("guided");
   const [activeType, setActiveType] = useState<"all" | ContentType>("all");
   const [activeTopics, setActiveTopics] = useState<Set<TopicKey>>(new Set());
   const [openId, setOpenId] = useState<string | null>(null);
@@ -1294,20 +1547,27 @@ export function ResourcesClientShell() {
   return (
     <>
       <ResponsiveGridStyle />
-      <FilterBar
-        activeType={activeType}
-        setActiveType={handleSetType}
-        activeTopics={activeTopics}
-        toggleTopic={toggleTopic}
-        clearTopics={clearTopics}
-        count={filtered.length}
-      />
-      <ContentGrid
-        filtered={filtered}
-        activeType={activeType}
-        openId={openId}
-        setOpenId={setOpenId}
-      />
+      <ViewToggle view={view} setView={setView} />
+      {view === "guided" ? (
+        <GuidedPipeline />
+      ) : (
+        <>
+          <FilterBar
+            activeType={activeType}
+            setActiveType={handleSetType}
+            activeTopics={activeTopics}
+            toggleTopic={toggleTopic}
+            clearTopics={clearTopics}
+            count={filtered.length}
+          />
+          <ContentGrid
+            filtered={filtered}
+            activeType={activeType}
+            openId={openId}
+            setOpenId={setOpenId}
+          />
+        </>
+      )}
       <PodcastTeaser />
       <PressSection />
     </>

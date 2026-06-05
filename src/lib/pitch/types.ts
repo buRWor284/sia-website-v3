@@ -70,10 +70,21 @@ export interface Layer1Scored {
   score: number; // 0..100
 }
 
+export interface SubSignal {
+  label: string;
+  met: boolean;
+}
+
 export interface AreaScore {
   score: number; // 0..100
   note?: string;
   topFix?: string;
+  /** v2: a 2–4 sentence specific read of THIS pitch (the depth). */
+  analysis?: string;
+  /** v2: ✓/✗ checks, surfaced as chips in the UI. */
+  subSignals?: SubSignal[];
+  /** v2: EVIDENCE keys backing this dimension (drives evidence cards). */
+  evidence?: string[];
 }
 
 /** Strict shape returned by the model via tool-use. */
@@ -81,6 +92,7 @@ export interface AiScore {
   relevance: (AreaScore & { answersExactQuestion?: boolean }) | null;
   checklist: {
     score: number;
+    analysis?: string;
     steps: Record<string, { met: number; of: number; topFix?: string }>;
   };
   storytelling: AreaScore & { hasArc?: boolean; hasCharacter?: boolean };
@@ -90,6 +102,15 @@ export interface AiScore {
     subjectTwoSecond?: boolean;
   };
   personalBrand: AreaScore & { reflectsAuthority?: boolean };
+  /** v2: the new 7th dimension — publishable raw material. */
+  newsroomReady: AreaScore & {
+    originalData?: boolean;
+    sourceAccess?: boolean;
+    assets?: boolean;
+    timeliness?: boolean;
+  };
+  /** v2 (D-C): soft, non-scored flag when a pitch reads templated/generic. */
+  authenticityRisk?: { flagged: boolean; note?: string };
   strongestLine?: string;
   overallNote?: string;
 }
@@ -104,11 +125,18 @@ export interface CompositeAreas {
   relevance?: AreaScore;
   objective: AreaScore;
   checklist: AreaScore;
+  newsroomReady: AreaScore;
   emos: {
     storytelling: AreaScore;
     neuromarketing: AreaScore;
     personalBrand: AreaScore;
   };
+}
+
+/** A single spoke of the radar chart (one per scored dimension). */
+export interface RadarAxis {
+  label: string;
+  score: number;
 }
 
 export interface ScoreResponse {
@@ -117,6 +145,10 @@ export interface ScoreResponse {
   relevanceAssessed: boolean;
   metrics: Layer1Metrics;
   areas: CompositeAreas;
+  /** v2: dimensions for the radar chart, in display order. */
+  radar: RadarAxis[];
+  /** v2 (D-C): soft authenticity nudge, shown above the breakdown when flagged. */
+  authenticityRisk?: { flagged: boolean; note?: string };
   strongestLine?: string;
   topFixes: { area: string; mechanism?: string; learn?: string; text: string }[];
   usage: { remaining: number; tier: "anonymous" | "email" };

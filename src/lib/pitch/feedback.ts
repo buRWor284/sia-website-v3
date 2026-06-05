@@ -22,12 +22,12 @@ export const FEEDBACK: Record<string, FrameMap> = {
     strong: {
       mechanism: "Relevance — the #1 filter",
       learn: ESSAYS.checklist,
-      text: "You answered the actual question. Relevance is the single biggest driver of placement — ~86% of journalists reject anything off-beat — and you cleared the bar most pitches fail.",
+      text: "You answered the actual question. Relevance is the single biggest driver of placement — 88% of journalists delete anything off-beat (Muck Rack 2026) — and you cleared the bar most pitches fail.",
     },
     weak: {
       mechanism: "Relevance — the #1 filter",
       learn: ESSAYS.checklist,
-      text: "Your pitch is good but drifts from what the journalist actually asked. ~86% of journalists reject off-beat pitches (Cision, Muck Rack). Mirror the query's exact angle, format, and constraints in your first two lines.",
+      text: "Your pitch is good but drifts from what the journalist actually asked. 82–88% of journalists reject off-beat pitches (Cision 2026; Muck Rack 2026). Mirror the query's exact angle, format, and constraints in your first two lines.",
     },
     missing: {
       mechanism: "Relevance — the #1 filter",
@@ -120,6 +120,31 @@ export const FEEDBACK: Record<string, FrameMap> = {
       text: "The basics are off — length, readability, or the closing question. These are the cheapest points to win; fix the meters first.",
     },
   },
+  newsroomReady: {
+    strong: {
+      mechanism: "Newsroom-ready — publishable raw material",
+      learn: ESSAYS.checklist,
+      text: "You handed the journalist something they can actually run — original data, a named source, an asset, or a timely hook. After relevance, this is the #1 thing journalists ask for: 47% want more data/research (Cision 2026) and 58% want source access (Muck Rack 2026).",
+    },
+    weak: {
+      mechanism: "Newsroom-ready — publishable raw material",
+      learn: ESSAYS.checklist,
+      text: "Competent, but thin on publishable material. Add one thing a journalist can't get elsewhere — a proprietary number, an exclusive, a named expert for interview, or a ready-to-use chart. 40% of journalists specifically value original data (Muck Rack 2026).",
+    },
+    missing: {
+      mechanism: "Newsroom-ready — publishable raw material",
+      learn: ESSAYS.checklist,
+      text: "There's nothing here a journalist can build a story on — no original data, no source to interview, no asset, no timely hook. A clean pitch with no raw material is the 'competitive but forgettable' one that gets ignored. Lead with something exclusive — data/research is journalists' #1 want (Cision 2026).",
+    },
+  },
+};
+
+/** D-C: a soft, non-scored nudge shown when a pitch reads templated/generic.
+ *  Deliberately frames it as "reads templated", never "this is AI" (PressIQ is itself AI). */
+export const AUTHENTICITY_NUDGE: EmosFrame = {
+  mechanism: "Reads templated",
+  learn: ESSAYS.writingTips,
+  text: "This reads like a template a hundred others could send. Add a first-hand detail or a number only you have — 53% of journalists distrust generic, AI-sounding pitches (Cision 2026), so one specific, human line is what sets you apart.",
 };
 
 export function bandFor(score: number): Band {
