@@ -15,6 +15,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Subscriptions } from "@/components/bureau";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import {
   DoubleRule,
   HRule,
@@ -382,100 +383,8 @@ function StepBar({ step, onGoStep }: { step: 1 | 2 | 3; onGoStep: (n: 1 | 2 | 3)
   );
 }
 
-// ── footer ────────────────────────────────────────────────────────────────────
-
-function SIQFooter() {
-  const ECOSYSTEM = [
-    {
-      step: "01",
-      tool: "SignalIQ",
-      href: "/tools/signaliq",
-      active: true,
-      role: "Find the story",
-      desc: "Scan 5 live open-data feeds. Rank opportunities by signal-vs-coverage gap. Get in before the press does.",
-      badge: "You are here",
-    },
-    {
-      step: "02",
-      tool: "PressIQ",
-      href: "/tools/pressiq",
-      active: false,
-      role: "Score the pitch",
-      desc: "Paste your pitch angle. PressIQ scores it on 8 factors — specificity, credibility, timeliness — before you send it.",
-      badge: "Next step",
-    },
-    {
-      step: "03",
-      tool: "CollabIQ",
-      href: "/tools/collabiq",
-      active: false,
-      role: "Find the journalist",
-      desc: "Search 50,000+ journalist contact records by beat, outlet, and recency. Pitch the right reporter, not a cold list.",
-      badge: "Then this",
-    },
-    {
-      step: "04",
-      tool: "EMOS",
-      href: "/emos",
-      active: false,
-      role: "Run the full system",
-      desc: "The Earned Media Operating System wraps all three tools with playbooks, cadence, and a coverage guarantee.",
-      badge: "The system",
-    },
-  ];
-
-  return (
-    <footer style={{ padding: "0 clamp(22px,5vw,56px) 36px", marginTop: 60 }}>
-      <DoubleRule style={{ marginBottom: 20 }} />
-
-      {/* Ecosystem step-flow */}
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
-          <SCaps size={9} ls="0.22em" color={INK55}>The SIA earned-media pipeline</SCaps>
-          <div style={{ flex: 1, height: 1, background: INK15, minWidth: 20 }} />
-          <Link href="/emos" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55, textDecoration: "none" }}>
-            How they fit together ↗
-          </Link>
-        </div>
-
-        <div className="siq-ecosystem-grid">
-          {ECOSYSTEM.map((item, idx) => (
-            <Link key={item.tool} href={item.href} style={{ textDecoration: "none" }} className={`siq-eco-card${item.active ? " active" : ""}`}>
-              {/* connector arrow between cards */}
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: item.active ? YEL : INK35, letterSpacing: "-0.02em", lineHeight: 1 }}>{item.step}</span>
-                <span style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: item.active ? YEL : INK35 }}>{item.badge}</span>
-              </div>
-              <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".06em", textTransform: "uppercase", color: item.active ? INK : INK55, marginBottom: 3 }}>
-                {item.active ? <Mark>{item.tool}</Mark> : item.tool}
-              </div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase", color: item.active ? INK70 : INK35, marginBottom: 8 }}>
-                {item.role}
-              </div>
-              <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: item.active ? INK70 : INK55, lineHeight: 1.45 }}>
-                {item.desc}
-              </p>
-              {idx < ECOSYSTEM.length - 1 && (
-                <div className="siq-eco-arrow">→</div>
-              )}
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Copyright row */}
-      <div style={{ paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-        <SCaps size={10} ls="0.16em" color={INK55}>
-          © MMXXVI · Syed Irfan Ajmal · SIA Enterprises Inc
-        </SCaps>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ display: "inline-block", width: 8, height: 8, borderRadius: 999, background: YEL, border: `1px solid ${INK}` }} />
-          <SCaps size={10} ls="0.16em" color={INK55}>Open for projects, Q3 2026</SCaps>
-        </div>
-      </div>
-    </footer>
-  );
-}
+// ── footer: now a shared component ───────────────────────────────────────────
+// SIQFooter removed; use <ToolPipelineFooter currentTool="signaliq" /> below.
 
 // ── hero ──────────────────────────────────────────────────────────────────────
 
@@ -1207,7 +1116,7 @@ export default function SignalIQPage() {
           </section>
         )}
 
-        <SIQFooter />
+        <ToolPipelineFooter currentTool="signaliq" />
       </div>
     </>
   );
@@ -1564,56 +1473,5 @@ const PAGE_CSS = `
     .siq-sources-sidebar { display: none; }
   }
 
-  /* ecosystem pipeline grid */
-  .siq-ecosystem-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0;
-    position: relative;
-  }
-  .siq-eco-card {
-    border: 1px solid ${INK15};
-    border-right: none;
-    padding: 16px 18px 20px;
-    position: relative;
-    background: ${PAPER};
-    transition: background 0.12s ease;
-  }
-  .siq-eco-card:last-child { border-right: 1px solid ${INK15}; }
-  .siq-eco-card:hover { background: ${PAPER2}; }
-  .siq-eco-card.active { background: ${PAPER2}; border-color: ${INK35}; }
-  .siq-eco-arrow {
-    position: absolute;
-    right: -10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: ${PAPER};
-    border: 1px solid ${INK15};
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: ${SERIF};
-    font-size: 10px;
-    color: ${INK35};
-    z-index: 1;
-  }
-  .siq-eco-card.active .siq-eco-arrow {
-    background: ${PAPER2};
-    border-color: ${INK35};
-    color: ${INK55};
-  }
-  @media (max-width: 860px) {
-    .siq-ecosystem-grid { grid-template-columns: 1fr 1fr; }
-    .siq-eco-card:nth-child(2) { border-right: 1px solid ${INK15}; }
-    .siq-eco-card:nth-child(3) { border-top: none; }
-    .siq-eco-card:nth-child(4) { border-top: none; border-right: 1px solid ${INK15}; }
-    .siq-eco-arrow { display: none; }
-  }
-  @media (max-width: 540px) {
-    .siq-ecosystem-grid { grid-template-columns: 1fr; }
-    .siq-eco-card { border-right: 1px solid ${INK15}; border-bottom: none; }
-    .siq-eco-card:last-child { border-bottom: 1px solid ${INK15}; }
-  }
+  /* ecosystem grid CSS moved to ToolPipelineFooter shared component */
 `;

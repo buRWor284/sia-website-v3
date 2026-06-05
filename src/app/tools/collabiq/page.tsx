@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { PartnerCollabIQ } from "@/components/tools/CollabIQ";
 import { ToolHeader } from "@/components/bureau";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 
 export const metadata: Metadata = {
   title: "Partner Collab IQ — Partnership Intelligence Tool · SIA",
@@ -24,7 +25,7 @@ export default function CollabIQPage() {
       {/* Sticky tool header — WizardProgress is offset by TOOL_HEADER_H so they stack */}
       <ToolHeader toolName="Partner Collab IQ — Partnership Intelligence" />
       <PartnerCollabIQ toolHeaderHeight={TOOL_HEADER_H} />
-      {/* No ToolFooter — WizardFooter already has the syedirfanajmal.com back link */}
+      <ToolPipelineFooter currentTool="collabiq" />
     </>
   );
 }

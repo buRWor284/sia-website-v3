@@ -9,6 +9,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import {
   DIMENSION_EVIDENCE,
   EMAIL_LIMIT,
@@ -1144,6 +1145,10 @@ export default function PressIQPage() {
         </footer>
 
       </div>
+
+      {/* Pipeline footer — below the app shell */}
+      <ToolPipelineFooter currentTool="pressiq" />
+
     </>
   );
 }

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Colophon, Subscriptions } from "@/components/bureau";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import {
   DoubleRule,
   Mark,
@@ -25,7 +26,7 @@ import {
 // =========================================================================
 // CONSTANTS
 // =========================================================================
-const EMOS_URL  = "https://dmr.agency/earnedmediaos/";
+const EMOS_URL  = "/emos";
 const STORE_KEY = "sia.reactivepr.checklist.v1";
 
 const PLATFORMS = ["HARO", "Qwoted", "Source of Sources", "Featured", "Help a B2B Writer"];
@@ -618,7 +619,7 @@ const EmosCTA = ({
         </p>
       </div>
       <div style={{ position: "relative", display: "flex", flexDirection: "column", gap: 12 }}>
-        <a href={EMOS_URL} target="_blank" rel="noopener noreferrer" style={{
+        <a href={EMOS_URL} style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "22px 26px", background: YEL, color: INK, textDecoration: "none",
           fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.10em", textTransform: "uppercase",
@@ -627,7 +628,7 @@ const EmosCTA = ({
           <span style={{ fontFamily: SERIF, fontSize: 20 }}>↗</span>
         </a>
         <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
-          dmr.agency/earnedmediaos/
+          syedirfanajmal.com/emos
         </SCaps>
       </div>
     </div>
@@ -821,6 +822,9 @@ export default function JournoOutreachChecklistPage() {
         <Subscriptions sectionNumber="13" />
         <Colophon />
       </div>
+
+      {/* Pipeline footer — pairs this checklist with PressIQ, shows the full pipeline */}
+      <ToolPipelineFooter currentTool="journochecklist" />
     </>
   );
 }
