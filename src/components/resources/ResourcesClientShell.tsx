@@ -142,6 +142,23 @@ const CONTENT: ContentItem[] = [
     cta: "Open the Radar",
   },
 
+  {
+    id: "tool-journocollabiq",
+    type: "tool",
+    badge: "Interactive Tool",
+    beta: true,
+    topics: ["pr", "strategy"],
+    title: "JournoCollabIQ — Journalist Beat Matcher",
+    sub: "Find the reporters most likely to cover your story.",
+    blurb:
+      "Enter your business, beat, and story angle — JournoCollabIQ surfaces the journalists who actively cover your topic, scores their fit, and drafts a tailored pitch angle for each. Built on the same EMOS logic as PressIQ.",
+    href: "/tools/journocollabiq",
+    y: "2026",
+    newsHeadline: "The Media List",
+    newsDeck: "Who covers your beat — and how to land in their inbox",
+    cta: "Find Journalists",
+  },
+
   // ── CALCULATORS ─────────────────────────────────────────────────────────
   {
     id: "calc-authority",
@@ -1316,7 +1333,7 @@ const PHASE1: PipeStep[] = [
 const PHASE2: PipeStep[] = [
   { n: "5", label: "Find the story first", tool: "SignalIQ", cap: "Surfaces breaking stories and coverage gaps before the press piles in.", status: "free", contentId: "tool-signaliq", week: "EMOS Wk 4 → P2" },
   { n: "6", label: "Build the linkable asset", tool: "Infographics · Quizzes · Data reports", cap: "Your own newsworthy asset. The kits and quizzes here are live demos of this step.", status: "free", href: "/infographics", week: "EMOS Wk 5–6" },
-  { n: "7", label: "Target named journalists", tool: "JournoCollabIQ", cap: "Journalist Beat Matcher — who covers your topic and is most likely to bite.", status: "soon", week: "EMOS Wk 7" },
+  { n: "7", label: "Target named journalists", tool: "JournoCollabIQ", cap: "Journalist Beat Matcher — who covers your topic and is most likely to bite.", status: "free", contentId: "tool-journocollabiq", week: "EMOS Wk 7" },
   { n: "8", label: "Launch & compound", tool: "Publish + pitch Tier 1", cap: "Dedicated page, Tier-1 exclusive then Tier-2 release, then fold back into the loop.", status: "method", href: "/emos", week: "EMOS Wk 8" },
 ];
 
