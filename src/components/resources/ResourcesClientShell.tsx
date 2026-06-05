@@ -1426,9 +1426,9 @@ function GuidedPipeline() {
 
       <div className="gp-wrap">
         <div className="gp-head">
-          <div className="gp-kicker">The Pipeline · Start here</div>
-          <h2 className="gp-title">From pitch to placement</h2>
-          <p className="gp-sub">Every tool below is one step in the same earned-media lifecycle — Reactive first, then Proactive. Each one is a self-serve taste of a single EMOS module.</p>
+          <div className="gp-kicker">A guided view · Organised by the EMOS curriculum</div>
+          <h2 className="gp-title">The EMOS curriculum, tool by tool</h2>
+          <p className="gp-sub">This view maps the free tools to the <b>EMOS</b> curriculum, so you can see how they fit together. Start with the <b>Foundation</b> — the science first, then the case for earned media — then work the <b>Reactive</b> and <b>Proactive</b> phases below. Each tool is a free, self-serve taste of one EMOS module; the full program sequences them with you. Just want the tools on their own? Switch to <b>Browse All</b> above.</p>
           <div className="gp-ladder"><b>Access</b> — every tool gives a taste <span>free</span>, more when you <span>join the newsletter</span>, and the full tool <span>inside EMOS</span>.</div>
         </div>
 
@@ -1481,8 +1481,8 @@ function GuidedPipeline() {
 
 function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v: "guided" | "browse") => void }) {
   const tabs: { key: "guided" | "browse"; label: string }[] = [
-    { key: "guided", label: "Guided Path" },
     { key: "browse", label: "Browse All" },
+    { key: "guided", label: "EMOS Curriculum" },
   ];
   return (
     <div style={{ background: PAPER, borderBottom: `1px solid ${INK15}` }}>
@@ -1510,7 +1510,7 @@ function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v:
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ResourcesClientShell() {
-  const [view, setView] = useState<"guided" | "browse">("guided");
+  const [view, setView] = useState<"guided" | "browse">("browse");
   const [activeType, setActiveType] = useState<"all" | ContentType>("all");
   const [activeTopics, setActiveTopics] = useState<Set<TopicKey>>(new Set());
   const [openId, setOpenId] = useState<string | null>(null);
