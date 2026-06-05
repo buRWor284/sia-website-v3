@@ -207,7 +207,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
     { dur: 5500, label: "Strategy" },
     { dur: 5000, label: "Result" },
     { dur: 5000, label: "Proof" },
-    { dur: 0,    label: "CollabIQ" },
+    { dur: 0,    label: "Partner Collab IQ" },
   ];
   const [scene, setScene] = useState(-1);
   const [playing, setPlaying] = useState(false);
@@ -245,7 +245,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
       <div style={{ textAlign: "center", marginBottom: 20 }}>
-        <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TX4 }}>CollabIQ · Partnership Intelligence</span>
+        <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TX4 }}>Partner Collab IQ · Partnership Intelligence</span>
       </div>
 
       {/* Cinema viewport */}
@@ -414,7 +414,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
 
       {/* CTA below cinema */}
       <div style={{ textAlign: "center", marginTop: 28 }}>
-        <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 14, padding: "16px 40px" }}>Try CollabIQ free →</button>
+        <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 14, padding: "16px 40px" }}>Try Partner Collab IQ free →</button>
         <p style={{ fontFamily: MF, fontSize: 9, color: TX4, marginTop: 10, letterSpacing: "0.1em" }}>No signup required · Results in under 2 minutes</p>
       </div>
       <div style={{ textAlign: "center", marginTop: 20 }}>
@@ -441,7 +441,7 @@ function StageWrapper({ title, subtitle, children }: { title: string; subtitle?:
 function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispatch<Action> }) {
   const { biz, domain, desc, industry, customInd } = state;
   return (
-    <StageWrapper title="Find the partners hiding in plain sight." subtitle="CollabIQ surfaces non-obvious companies that share your audience but don't compete with you, then gives you the strategy, outreach templates, and campaign brief to close the deal.">
+    <StageWrapper title="Find the partners hiding in plain sight." subtitle="Partner Collab IQ surfaces non-obvious companies that share your audience but don't compete with you, then gives you the strategy, outreach templates, and campaign brief to close the deal.">
       <div style={{ marginBottom: 48 }}>
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
@@ -554,10 +554,10 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
   if (loading) {
     const msg = V2_LOADING[loadingIdx % V2_LOADING.length];
     return (
-      <StageWrapper title="Finding your partners…" subtitle="CollabIQ is analysing your industry and generating tailored partnership targets.">
+      <StageWrapper title="Finding your partners…" subtitle="Partner Collab IQ is analysing your industry and generating tailored partnership targets.">
         <div style={{ background: BG2, border: `1px solid ${BD}`, padding: 28, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(245,184,31,0.6)" }}>CollabIQ · Live Research</span>
+            <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(245,184,31,0.6)" }}>Partner Collab IQ · Live Research</span>
             <span style={{ fontFamily: MF, fontSize: 9, color: TX4 }}>Step {(loadingIdx % V2_LOADING.length) + 1}/{V2_LOADING.length}</span>
           </div>
           <div className="v2-stage-animate">
@@ -589,10 +589,10 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
     <StageWrapper title="Your partner intelligence." subtitle={`${partners.length} targets found for ${industry} using ${strat.label}. Select the partners you want in your campaign brief.`}>
       <div style={{ background: "rgba(245,184,31,0.06)", border: `1px solid rgba(245,184,31,0.2)`, padding: "10px 14px", marginBottom: 16, display: "flex", gap: 10, alignItems: "center" }}>
         <span style={{ background: ACC, fontFamily: MF, fontSize: 8, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px", color: BG0, flexShrink: 0 }}>AI</span>
-        <span style={{ fontFamily: GF, fontSize: 12, color: TX2 }}>Each suggestion has been scored by CollabIQ against 8 partnership criteria: audience overlap, non-competition, domain authority, link placement availability, value exchange potential, existing linking behaviour, contact findability, and brand quality.</span>
+        <span style={{ fontFamily: GF, fontSize: 12, color: TX2 }}>Each suggestion has been scored by Partner Collab IQ against 8 partnership criteria: audience overlap, non-competition, domain authority, link placement availability, value exchange potential, existing linking behaviour, contact findability, and brand quality.</span>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 0", borderBottom: `1px solid ${BD}`, marginBottom: 4, gap: 12, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: MF, fontSize: 10, color: TX3, letterSpacing: "0.1em" }}>Generated by CollabIQ · Personalised to {biz}</span>
+        <span style={{ fontFamily: MF, fontSize: 10, color: TX3, letterSpacing: "0.1em" }}>Generated by Partner Collab IQ · Personalised to {biz}</span>
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           {selCount > 0 && <span style={{ fontFamily: MF, fontSize: 10, fontWeight: 700, color: ACC, letterSpacing: "0.1em" }}>{selCount} selected</span>}
           <button onClick={onGatedCsv} style={{ ...ghostBtn(), fontSize: 9, padding: "6px 12px" }}>↓ Download list (CSV)</button>
@@ -717,7 +717,7 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
           <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, letterSpacing:"-0.01em" }}>Personalised email</span>
         </div>
         <p style={{ fontSize:14, color:TX3, marginBottom:20, fontFamily:GF, lineHeight:1.6 }}>
-          CollabIQ writes a fully personalised email for your chosen partner, tailored to their audience, your offer, and your strategy.
+          Partner Collab IQ writes a fully personalised email for your chosen partner, tailored to their audience, your offer, and your strategy.
         </p>
         <button onClick={()=>onGated("email")} disabled={aiEmailLoading||!biz||!state.scPartner}
           style={{ ...primaryBtn(), opacity:(!biz||aiEmailLoading||!state.scPartner)?0.4:1, cursor:(!biz||!state.scPartner)?"not-allowed":"pointer", fontSize:13, padding:"14px 28px" }}>
@@ -777,7 +777,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         <span style={{ fontFamily:SF, fontSize:22, fontWeight:700, color:TX, letterSpacing:"-0.02em" }}>90-Day campaign brief</span>
       </div>
       <p style={{ fontFamily:GF, fontSize:14, color:TX3, lineHeight:1.6, marginBottom:20 }}>
-        CollabIQ builds a full 90-day execution plan: phased outreach, success metrics, partner categories, and risk mitigation, tailored to your business and strategy.
+        Partner Collab IQ builds a full 90-day execution plan: phased outreach, success metrics, partner categories, and risk mitigation, tailored to your business and strategy.
       </p>
       <button onClick={()=>onGated("brief")} disabled={aiBriefLoading||!biz}
         style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32 }}>
@@ -964,7 +964,7 @@ function EmailGate({ show, onClose, onSubscribe }: { show: boolean; onClose: ()=
 }
 
 // ── Main export ────────────────────────────────────────────────────────────────
-export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }) {
+export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }) {
   const [state, dispatch]           = useReducer(reducer, null, initState);
   const [partners, setPartners]     = useState<AiPartner[]>([]);
   const [loading, setLoading]       = useState(false);
@@ -1049,7 +1049,7 @@ export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }
     const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
     const blob = new Blob([csv],{type:"text/csv"});
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = `CollabIQ-Partners-${state.biz||"List"}.csv`; a.click();
+    a.download = `PartnerCollabIQ-Partners-${state.biz||"List"}.csv`; a.click();
   }
   function handleSub(email: string) {
     try { localStorage.setItem(V2_SUB, JSON.stringify({ email, ts:Date.now() })); } catch { /* noop */ }
@@ -1083,7 +1083,7 @@ export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }
         doc.setFillColor(...INK); doc.rect(0,H-16,W,16,"F");
         doc.setDrawColor(50,42,32); doc.setLineWidth(0.3); doc.line(0,H-16,W,H-16);
         doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...CREAM);
-        doc.text("CollabIQ",M,footY);
+        doc.text("Partner Collab IQ",M,footY);
         doc.setFont("helvetica","normal"); doc.setTextColor(80,70,60);
         doc.text("  ·  syedirfanajmal.com/tools/collabiq  ·  Syed Irfan Ajmal  ·  DMR.agency",M+18,footY);
         doc.setTextColor(80,70,60);
@@ -1091,7 +1091,7 @@ export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }
         doc.setFillColor(...CREAM); doc.rect(0,H-16,W,16,"F");
         doc.setDrawColor(220,215,205); doc.setLineWidth(0.3); doc.line(0,H-16,W,H-16);
         doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...INK);
-        doc.text("CollabIQ",M,footY);
+        doc.text("Partner Collab IQ",M,footY);
         doc.setFont("helvetica","normal"); doc.setTextColor(...GREY);
         doc.text("  ·  syedirfanajmal.com/tools/collabiq  ·  Syed Irfan Ajmal  ·  DMR.agency",M+18,footY);
         doc.setTextColor(...GREY);
@@ -1386,10 +1386,10 @@ export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }
     doc.text("Founding class open  ·  Limited spots",W/2,cy,{align:"center"});
     // Attribution well above footer zone — no overlap
     doc.setFontSize(7); doc.setTextColor(55,46,36);
-    doc.text(`Generated via CollabIQ  ·  ${date}`,W/2,H-24,{align:"center"});
+    doc.text(`Generated via Partner Collab IQ  ·  ${date}`,W/2,H-24,{align:"center"});
     pageFooter(lastPage,true);
 
-    doc.save(`CollabIQ-Playbook-${bizName.replace(/\s+/g,"-")}.pdf`);
+    doc.save(`PartnerCollabIQ-Playbook-${bizName.replace(/\s+/g,"-")}.pdf`);
   }
 
   async function generateAiEmail() {
@@ -1435,7 +1435,7 @@ export function CollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }
 
   function perform(action: string) {
     if (action==="copy") {
-      navigator.clipboard.writeText(`CollabIQ Brief\nBusiness: ${state.biz}\nIndustry: ${ind}\nStrategy: ${V2_STRATEGIES[state.strategy]?.label}\n\nSelected Partners:\n${state.selNiches.join(", ")||"None"}\n\n${aiBrief||""}`);
+      navigator.clipboard.writeText(`Partner Collab IQ Brief\nBusiness: ${state.biz}\nIndustry: ${ind}\nStrategy: ${V2_STRATEGIES[state.strategy]?.label}\n\nSelected Partners:\n${state.selNiches.join(", ")||"None"}\n\n${aiBrief||""}`);
     } else if (action==="pdf")   { generatePDF(); }
     else if (action==="email")   { generateAiEmail(); }
     else if (action==="brief")   { generateAiBrief(); }

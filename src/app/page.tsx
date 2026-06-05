@@ -769,8 +769,8 @@ export default function HomePage() {
                 <div className="kit-card__paper-col">syedirfanajmal.com</div>
               </div>
             </div>
-            <h3 className="kit-card__title">CollabIQ</h3>
-            <p className="kit-card__body">Go beyond links. Drop in your niche and CollabIQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
+            <h3 className="kit-card__title">Partner Collab IQ</h3>
+            <p className="kit-card__body">Go beyond links. Drop in your niche and Partner Collab IQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
             <div className="kit-card__footer">
               <span className="kit-card__year">2026</span>
               <a href="/tools/collabiq" className="kit-card__cta">OPEN THE TOOL ↗</a>

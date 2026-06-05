@@ -110,22 +110,6 @@ const CONTENT: ContentItem[] = [
 
   // ── TOOLS ────────────────────────────────────────────────────────────────
   {
-    id: "tool-collabiq",
-    type: "tool",
-    badge: "Interactive Tool",
-    beta: true,
-    topics: ["backlinks", "seo", "strategy"],
-    title: "CollabIQ — Partnership Intelligence Tool",
-    sub: "Find partnership, co-marketing, and distribution opportunities by industry.",
-    blurb:
-      "Go beyond link building. Surface co-marketing allies, content collaborators, referral networks, and distribution partners — with qualification scoring and outreach templates. 15+ industries mapped.",
-    href: "/tools/collabiq",
-    y: "2026",
-    newsHeadline: "The Partnership Desk",
-    newsDeck: "Co-marketing, distribution, and link opportunities across every industry, mapped",
-    cta: "Use the Tool",
-  },
-  {
     id: "tool-pressiq",
     type: "tool",
     badge: "Interactive Tool",
@@ -174,6 +158,23 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Renting vs. Owning",
     newsDeck: "Calculate what credibility really costs you over twelve months",
     cta: "Run the Calculator",
+  },
+
+  {
+    id: "tool-collabiq",
+    type: "tool",
+    badge: "Interactive Tool",
+    beta: true,
+    topics: ["backlinks", "seo", "strategy"],
+    title: "Partner Collab IQ — Partnership Intelligence Tool",
+    sub: "Find co-marketing and distribution opportunities by industry.",
+    blurb:
+      "Surface co-marketing allies, content collaborators, referral networks, and distribution partners — with qualification scoring and outreach templates. 15+ industries mapped.",
+    href: "/tools/collabiq",
+    y: "2026",
+    newsHeadline: "The Partnership Desk",
+    newsDeck: "Co-marketing, distribution, and link opportunities across every industry, mapped",
+    cta: "Use the Tool",
   },
 
   // ── QUIZZES ─────────────────────────────────────────────────────────────
@@ -1469,7 +1470,6 @@ function GuidedPipeline() {
           <span className="gp-cta-btn">Explore EMOS →</span>
         </a>
 
-        <div className="gp-aside">Not a public step: <b>PartnerCollabIQ</b> (partnership / co-marketing) is kept internal for now.</div>
       </div>
     </section>
   );

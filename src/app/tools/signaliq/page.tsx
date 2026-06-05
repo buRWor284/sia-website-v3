@@ -470,8 +470,8 @@ function PackView({
               </div>
             ))}
           </div>
-          <a href="/tools/collabiq" style={{ display: "inline-block", marginTop: 12, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: INK, textDecoration: "underline", textDecorationColor: INK35 }}>
-            Find the actual reporters in CollabIQ →
+          <a href="/tools/journocollabiq" style={{ display: "inline-block", marginTop: 12, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: INK, textDecoration: "underline", textDecorationColor: INK35 }}>
+            Find the actual reporters in JournoCollabIQ →
           </a>
         </div>
       )}
