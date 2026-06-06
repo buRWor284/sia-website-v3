@@ -1137,17 +1137,10 @@ export default function PressIQPage() {
           </main>
         </div>
 
-        {/* ── Footer ───────────────────────────────────────────────── */}
-        <footer className="piq-footer">
-          <a href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" className="piq-foot-link">
-            A free tool by Syed Irfan Ajmal · syedirfanajmal.com ↗
-          </a>
-        </footer>
+        {/* ── Pipeline footer — inside shell so it's always visible ── */}
+        <ToolPipelineFooter currentTool="pressiq" compact />
 
       </div>
-
-      {/* Pipeline footer — below the app shell */}
-      <ToolPipelineFooter currentTool="pressiq" />
 
     </>
   );
@@ -1160,7 +1153,6 @@ const PAGE_CSS = `
   .piq-body{display:flex;flex:1;overflow:hidden;min-height:0}
   .piq-left{width:360px;flex-shrink:0;background:${DARK2};border-right:1px solid ${DARK_BD};overflow-y:auto;height:100%}
   .piq-right{flex:1;background:${PAPER};overflow-y:auto;height:100%}
-  .piq-footer{background:${PAPER2};border-top:1px solid ${ra(INK,0.1)};padding:0 28px;height:50px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:16px}
   .piq-left::-webkit-scrollbar{width:6px}
   .piq-left::-webkit-scrollbar-track{background:${DARK}}
   .piq-left::-webkit-scrollbar-thumb{background:${DARK_BD}}
@@ -1177,8 +1169,6 @@ const PAGE_CSS = `
   .piq-tab-active{color:${INK} !important;border-bottom-color:${INK} !important;background:${ra(INK,0.05)}}
   .piq-foot-ghost{background:none;border:1px solid ${ra(INK,0.2)};cursor:pointer;font-family:${GROT};font-weight:700;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${ra(INK,0.5)};padding:6px 12px;transition:all .1s}
   .piq-foot-ghost:hover{border-color:${INK};color:${INK}}
-  .piq-foot-link{font-family:${MONO};font-size:11px;letter-spacing:.08em;color:${ra(INK,0.45)};text-decoration:none;font-weight:600}
-  .piq-foot-link:hover{color:${INK}}
   .piq-foot-next{background:${INK};border:none;cursor:pointer;font-family:${GROT};font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${PAPER};padding:8px 16px;transition:opacity .1s}
   .piq-foot-next:hover{opacity:.85}
   @keyframes piq-pulse{0%,80%,100%{opacity:.15}40%{opacity:1}}

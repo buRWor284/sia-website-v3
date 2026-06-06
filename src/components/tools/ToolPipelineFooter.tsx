@@ -108,9 +108,11 @@ function getBadge(card: PipelineCard, currentTool: ToolId | undefined): string {
 
 interface Props {
   currentTool?: ToolId;
+  /** Remove the top margin — use when the footer is inside a fixed-height shell */
+  compact?: boolean;
 }
 
-export function ToolPipelineFooter({ currentTool }: Props) {
+export function ToolPipelineFooter({ currentTool, compact }: Props) {
   const css = `
     .tpf-grid {
       display: grid;
@@ -168,7 +170,7 @@ export function ToolPipelineFooter({ currentTool }: Props) {
   `;
 
   return (
-    <footer style={{ padding: "0 clamp(22px,5vw,56px) 36px", marginTop: 60 }}>
+    <footer style={{ padding: "0 clamp(22px,5vw,56px) 36px", marginTop: compact ? 0 : 60 }}>
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
       <DoubleRule style={{ marginBottom: 20 }} />
