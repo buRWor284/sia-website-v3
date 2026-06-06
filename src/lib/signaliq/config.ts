@@ -77,31 +77,56 @@ export const BEATS: Beat[] = [
   {
     id: "saas",
     label: "SaaS & startups",
-    seeds: ["product-led growth", "developer tools", "B2B software pricing", "vertical SaaS", "startup layoffs"],
+    seeds: [
+      "product-led growth", "developer tools", "B2B software pricing", "vertical SaaS", "startup layoffs",
+      "SaaS churn", "no-code platform", "API economy", "enterprise software consolidation", "cloud cost optimization",
+      "platform engineering", "open source monetization", "SaaS valuation", "developer experience", "startup funding",
+      "B2B marketplace", "software security breach", "subscription fatigue", "AI productivity software", "startup acquisition",
+    ],
     blurb: "Software, product, and go-to-market stories.",
   },
   {
     id: "fintech",
     label: "Fintech",
-    seeds: ["earned wage access", "buy now pay later", "stablecoin", "neobank", "payments fraud"],
+    seeds: [
+      "earned wage access", "buy now pay later", "stablecoin", "neobank", "payments fraud",
+      "embedded finance", "open banking", "crypto regulation", "financial inclusion", "credit scoring AI",
+      "insurtech", "remittance", "banking as a service", "BNPL regulation", "central bank digital currency",
+      "fraud detection", "payroll fintech", "wealth management AI", "debit card startup", "lending discrimination",
+    ],
     blurb: "Payments, lending, crypto-adjacent, and consumer-finance stories.",
   },
   {
     id: "health",
     label: "Health & wellness",
-    seeds: ["GLP-1 drugs", "telehealth", "digital therapeutics", "health insurance denial", "longevity"],
+    seeds: [
+      "GLP-1 drugs", "telehealth", "digital therapeutics", "health insurance denial", "longevity",
+      "chronic disease management", "mental health app", "wearable health", "FDA approval", "hospital consolidation",
+      "drug pricing", "clinical AI", "remote patient monitoring", "health data privacy", "obesity treatment",
+      "clinical trial", "biosensor", "patient engagement", "preventive care", "personalized medicine",
+    ],
     blurb: "Care delivery, digital health, and consumer-health stories.",
   },
   {
     id: "climate",
     label: "Climate & energy",
-    seeds: ["grid battery storage", "carbon removal", "heat pump adoption", "EV charging", "data center power"],
+    seeds: [
+      "grid battery storage", "carbon removal", "heat pump adoption", "EV charging", "data center power",
+      "offshore wind", "nuclear energy", "green hydrogen", "carbon credit", "ESG investing",
+      "climate risk", "circular economy", "sustainable packaging", "water technology", "solar panel",
+      "grid modernization", "clean transportation", "methane reduction", "biodiversity loss", "climate litigation",
+    ],
     blurb: "Energy, sustainability, and the physical economy (great for mapographics).",
   },
   {
     id: "ai",
     label: "AI",
-    seeds: ["AI agents", "open-source LLM", "AI regulation", "AI in hiring", "AI energy use"],
+    seeds: [
+      "AI agents", "open-source LLM", "AI regulation", "AI in hiring", "AI energy use",
+      "foundation model", "AI safety", "generative AI copyright", "AI bias", "autonomous vehicles",
+      "AI chip shortage", "enterprise AI adoption", "AI governance", "RAG retrieval", "AI in healthcare",
+      "AI hallucination", "model fine-tuning", "AI in education", "AI surveillance", "AI product liability",
+    ],
     blurb: "Models, applications, and the policy fight around them.",
   },
 ];

@@ -12,7 +12,7 @@
  * Honesty: scores are a lead/whitespace measure, never a prediction. Said so on-page.
  */
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import {
@@ -472,49 +472,15 @@ function BeatPicker({
   setBeat,
   onScan,
   scanning,
-  companyContext,
-  setCompanyContext,
 }: {
   beat: BeatId;
   setBeat: (b: BeatId) => void;
   onScan: () => void;
   scanning: boolean;
-  companyContext: string;
-  setCompanyContext: (v: string) => void;
 }) {
   const currentBeat = BEATS.find((b) => b.id === beat);
   return (
     <section style={{ padding: "clamp(16px,3vw,28px) clamp(22px,5vw,56px) 0" }}>
-
-      {/* Company context — personalises the asset pack pitch angle */}
-      <div style={{ marginBottom: 20 }}>
-        <label style={{
-          display: "block", fontFamily: MONO, fontSize: 9, fontWeight: 700,
-          letterSpacing: ".16em", textTransform: "uppercase", color: INK55, marginBottom: 6,
-        }}>
-          Your startup context <span style={{ color: INK35, fontWeight: 400 }}>(optional — personalises the pitch angle)</span>
-        </label>
-        <textarea
-          value={companyContext}
-          onChange={e => setCompanyContext(e.target.value)}
-          maxLength={400}
-          rows={2}
-          placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital — we have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
-          style={{
-            width: "100%", boxSizing: "border-box",
-            fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK,
-            background: PAPER2, border: `1px solid ${INK15}`,
-            padding: "10px 12px", resize: "vertical", outline: "none",
-            lineHeight: 1.5,
-          }}
-        />
-        {companyContext.trim() && (
-          <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
-            {companyContext.trim().length}/400 · This will be used when you generate an asset pack
-          </p>
-        )}
-      </div>
-
       <div className="siq-beat-tabs">
         {BEATS.map((b, i) => (
           <button
@@ -1134,6 +1100,31 @@ export default function SignalIQPage() {
   // Derived step
   const step: 1 | 2 | 3 = selected ? 3 : scan ? 2 : 1;
 
+  // Option 3: re-rank opportunities by relevance to company context (client-side, instant)
+  const rankedOpps = useMemo(() => {
+    if (!scan) return [];
+    if (!companyContext.trim()) return scan.opportunities;
+    const words = companyContext
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 3)
+      .slice(0, 40);
+    if (words.length === 0) return scan.opportunities;
+    return [...scan.opportunities]
+      .map((opp) => {
+        const haystack = [
+          opp.headline,
+          ...opp.signals.map((s) => s.title),
+          ...opp.signals.map((s) => s.detail ?? ""),
+        ].join(" ").toLowerCase();
+        const matches = words.filter((w) => haystack.includes(w)).length;
+        return { opp, adjusted: opp.score + matches * 8 };
+      })
+      .sort((a, b) => b.adjusted - a.adjusted)
+      .map((s) => s.opp);
+  }, [scan, companyContext]);
+
   function handleGoStep(n: 1 | 2 | 3) {
     if (n === 1) { setSelected(null); setPack(null); setPackError(null); setScan(null); }
     if (n === 2) { setSelected(null); setPack(null); setPackError(null); }
@@ -1227,7 +1218,7 @@ export default function SignalIQPage() {
         {/* ── Radar (steps 1 & 2) ───────────────────────────────────────── */}
         {!selected && (
           <section style={{ padding: "0 0 40px" }}>
-            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); }} onScan={runScan} scanning={scanning} companyContext={companyContext} setCompanyContext={setCompanyContext} />
+            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); }} onScan={runScan} scanning={scanning} />
 
             {scanError && (
               <div style={{ maxWidth: 620, margin: "20px auto 0", padding: "12px 14px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
@@ -1259,11 +1250,58 @@ export default function SignalIQPage() {
                   </div>
                   <HRule style={{ marginBottom: 20 }} />
                 </div>
+
+                {/* Company context — moved here so users see results first, then personalise */}
+                <div style={{ maxWidth: 1400, margin: "0 auto 24px" }}>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
+                    <label style={{
+                      fontFamily: MONO, fontSize: 9, fontWeight: 700,
+                      letterSpacing: ".16em", textTransform: "uppercase", color: INK55,
+                    }}>
+                      Your startup context <span style={{ color: INK35, fontWeight: 400 }}>(optional)</span>
+                    </label>
+                    {/* (i) tooltip */}
+                    <span
+                      title={
+                        "Context re-ranks these results by relevance and personalises your pitch pack — it does not change what signals are scanned. " +
+                        "Making the scan itself company-specific would require an AI to generate custom search terms before scanning: " +
+                        "that adds 4-10s of latency, costs more per scan, and risks hallucinated search terms that return misleading or empty results."
+                      }
+                      style={{
+                        display: "inline-flex", alignItems: "center", justifyContent: "center",
+                        width: 14, height: 14, borderRadius: 999,
+                        border: `1px solid ${INK35}`,
+                        fontFamily: SERIF, fontStyle: "italic", fontSize: 9,
+                        color: INK55, cursor: "help", userSelect: "none", flexShrink: 0,
+                      }}
+                    >i</span>
+                  </div>
+                  <textarea
+                    value={companyContext}
+                    onChange={e => setCompanyContext(e.target.value)}
+                    maxLength={400}
+                    rows={2}
+                    placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital — we have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
+                    style={{
+                      width: "100%", boxSizing: "border-box",
+                      fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK,
+                      background: PAPER2, border: `1px solid ${INK15}`,
+                      padding: "10px 12px", resize: "vertical", outline: "none",
+                      lineHeight: 1.5,
+                    }}
+                  />
+                  {companyContext.trim() && (
+                    <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
+                      {companyContext.trim().length}/400 · Results re-ranked by relevance · Used when you generate a pack
+                    </p>
+                  )}
+                </div>
+
                 {/* Cards + sidebar */}
                 <div className="siq-results-wrap">
                   <div className="siq-cards-col">
                     <div className="siq-cards">
-                      {scan.opportunities.map((opp) => (
+                      {rankedOpps.map((opp) => (
                         <OppCard key={opp.id} opp={opp} onGenerate={() => generatePack(opp)} />
                       ))}
                     </div>
