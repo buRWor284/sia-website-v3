@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Colophon, Subscriptions } from "@/components/bureau";
-import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import {
   DoubleRule,
   Mark,
@@ -822,9 +821,6 @@ export default function JournoOutreachChecklistPage() {
         <Subscriptions sectionNumber="13" />
         <Colophon />
       </div>
-
-      {/* Pipeline footer — pairs this checklist with PressIQ, shows the full pipeline */}
-      <ToolPipelineFooter currentTool="journochecklist" />
     </>
   );
 }

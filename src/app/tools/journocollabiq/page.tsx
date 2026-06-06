@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { JournoCollabIQ } from "@/components/tools/JournoCollabIQ";
 import { ToolHeader } from "@/components/bureau";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 
 export const metadata: Metadata = {
   title: "JournoCollabIQ — Journalist Beat Matcher · SIA",
@@ -24,7 +25,7 @@ export default function JournoCollabIQPage() {
       {/* Sticky tool header — WizardProgress is offset by TOOL_HEADER_H so they stack */}
       <ToolHeader toolName="JournoCollabIQ — Journalist Beat Matcher" />
       <JournoCollabIQ toolHeaderHeight={TOOL_HEADER_H} />
-      {/* No ToolFooter — WizardFooter already has the syedirfanajmal.com back link */}
+      <ToolPipelineFooter currentTool="journocollabiq" />
     </>
   );
 }

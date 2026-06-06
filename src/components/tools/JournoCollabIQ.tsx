@@ -145,10 +145,10 @@ const V2_THEME = "collabiq_v2_theme";
 function initState(): CollabState {
   try {
     const s = localStorage.getItem(V2_STORE);
-    if (s) { const p = JSON.parse(s) as CollabState; p.step = 0; return p; }
+    if (s) { const p = JSON.parse(s) as CollabState; p.step = Math.max(1, p.step); return p; }
   } catch { /* noop */ }
   return { biz:"",domain:"",desc:"",industry:"",customInd:"",strategy:"discount",
-    audType:"",geo:"",audDesc:"",selNiches:[],scPartner:"",scCat:"",scores:{},step:0 };
+    audType:"",geo:"",audDesc:"",selNiches:[],scPartner:"",scCat:"",scores:{},step:1 };
 }
 
 function reducer(state: CollabState, action: Action): CollabState {
@@ -1467,7 +1467,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     <>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <div className="v2-collabiq" style={{ background:t.BG1, color:t.TX, minHeight:"100vh" }}>
-        {step>0 && <WizardProgress step={step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:0})} topOffset={toolHeaderHeight} />}
+        {step>0 && <WizardProgress step={step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:1})} topOffset={toolHeaderHeight} />}
 
         <div key={`stage-${step}`}>
           {step===0 && <Stage0 onStart={()=>dispatch({type:"GO",step:1})} />}

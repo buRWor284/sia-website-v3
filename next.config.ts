@@ -71,11 +71,13 @@ const nextConfig: NextConfig = {
       { source: "/contacting-syed-irfan-ajmal",  destination: "/contact", permanent: p },
       { source: "/contacting-syed-irfan-ajmal/", destination: "/contact", permanent: p },
 
-      // CollabIQ — canonical URL is /tools/collabiq; retire stale routes
-      { source: "/tools/collab-link-building",     destination: "/tools/collabiq", permanent: p },
-      { source: "/tools/collab-link-building/",    destination: "/tools/collabiq", permanent: p },
-      { source: "/resources/collab-link-building",  destination: "/tools/collabiq", permanent: p },
-      { source: "/resources/collab-link-building/", destination: "/tools/collabiq", permanent: p },
+      // PartnerCollabIQ — renamed from CollabIQ; canonical URL is /tools/partnercollabiq
+      { source: "/tools/collabiq",                  destination: "/tools/partnercollabiq", permanent: p },
+      { source: "/tools/collabiq/",                 destination: "/tools/partnercollabiq", permanent: p },
+      { source: "/tools/collab-link-building",      destination: "/tools/partnercollabiq", permanent: p },
+      { source: "/tools/collab-link-building/",     destination: "/tools/partnercollabiq", permanent: p },
+      { source: "/resources/collab-link-building",  destination: "/tools/partnercollabiq", permanent: p },
+      { source: "/resources/collab-link-building/", destination: "/tools/partnercollabiq", permanent: p },
     ];
   },
   turbopack: {
