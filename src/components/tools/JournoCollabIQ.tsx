@@ -146,7 +146,15 @@ const V2_THEME = "collabiq_v2_theme";
 function initState(): CollabState {
   try {
     const s = localStorage.getItem(V2_STORE);
-    if (s) { const p = JSON.parse(s) as CollabState; p.step = Math.max(1, p.step); return p; }
+    if (s) {
+      const p = JSON.parse(s) as CollabState;
+      // Always restart at step 1 — partners/results aren't persisted,
+      // so resuming mid-wizard leaves the Continue button permanently disabled.
+      // Form fields (biz, industry, strategy etc.) are preserved so the user
+      // doesn't have to retype them.
+      p.step = 1;
+      return p;
+    }
   } catch { /* noop */ }
   return { biz:"",domain:"",desc:"",industry:"",customInd:"",strategy:"discount",
     audType:"",geo:"",audDesc:"",selNiches:[],scPartner:"",scCat:"",scores:{},step:1 };
