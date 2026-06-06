@@ -14,7 +14,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Subscriptions } from "@/components/bureau";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import {
   DoubleRule,
@@ -1106,19 +1105,9 @@ function DetailView({
           {pack && !packing && <PackView pack={pack} />}
         </div>
 
-        {/* Email gate */}
+        {/* Email gate — primary CTA */}
         <div style={{ marginTop: 32 }}>
           <EmailGate email={email} setEmail={setEmail} done={emailDone} onUnlock={unlockEmail} />
-        </div>
-
-        {/* EMOS CTA */}
-        <div style={{ marginTop: 32 }}>
-          <EmosCTA />
-        </div>
-
-        {/* Subscriptions */}
-        <div style={{ marginTop: 30 }}>
-          <Subscriptions sectionNumber="—" />
         </div>
       </div>
     </section>
@@ -1280,6 +1269,31 @@ export default function SignalIQPage() {
                         <OppCard key={opp.id} opp={opp} onGenerate={() => generatePack(opp)} />
                       ))}
                     </div>
+                    {/* Compact newsletter CTA — after results */}
+                    {!emailDone && (
+                      <form onSubmit={unlockEmail} style={{ marginTop: 28, maxWidth: 1100, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
+                        <span style={{ fontFamily: SERIF, fontSize: 14, color: INK70, flex: 1, minWidth: 220 }}>
+                          Get <strong>{EMAIL_SCANS} scans/month</strong> + the full earned-media playbook — free.
+                        </span>
+                        <input
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@company.com"
+                          className="siq-input"
+                          style={{ flex: 1, minWidth: 200, fontSize: 13 }}
+                        />
+                        <button type="submit" className="siq-scan-btn" style={{ fontSize: 12, padding: "12px 20px" }}>
+                          Unlock →
+                        </button>
+                      </form>
+                    )}
+                    {emailDone && (
+                      <div style={{ marginTop: 28, maxWidth: 1100, padding: "12px 18px", border: `1px solid ${GREEN}`, background: hexA(GREEN, 0.05), fontFamily: SERIF, fontSize: 14, color: INK }}>
+                        ✓ Unlocked — {EMAIL_SCANS} scans/month. Check your inbox.
+                      </div>
+                    )}
                   </div>
                   <SourcesSidebar />
                 </div>
