@@ -1489,7 +1489,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} theme={theme} />}
 
         {/* Pipeline footer — shown only on the final step as a "what's next?" prompt */}
-        {step===5 && <div style={{ paddingBottom: 80 }}><ToolPipelineFooter currentTool="journocollabiq" /></div>}
+        {step===5 && <div style={{ paddingBottom: 72 }}><ToolPipelineFooter currentTool="journocollabiq" compact /></div>}
 
         <EmailGate show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>

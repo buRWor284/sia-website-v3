@@ -28,8 +28,8 @@ interface PipelineCard {
 
 const PIPELINE: PipelineCard[] = [
   { step: "01", tool: "SignalIQ",        href: "/tools/signaliq",        toolId: "signaliq",        role: "Find the story" },
-  { step: "02", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
-  { step: "03", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
+  { step: "02", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
+  { step: "03", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
   { step: "04", tool: "CoverageIQ",      href: null,                     toolId: "coverageiq",      role: "Track the placement", comingSoon: true },
   { step: "05", tool: "EMOS",            href: "/emos",                  toolId: "emos",            role: "Run the full system" },
 ];
@@ -39,7 +39,7 @@ function getBadge(card: PipelineCard, currentTool: ToolId | undefined): string {
   if (card.toolId === currentTool) return "You are here";
 
   if (currentTool) {
-    const order: (ToolId | "emos")[] = ["signaliq", "pressiq", "journocollabiq", "coverageiq", "emos"];
+    const order: (ToolId | "emos")[] = ["signaliq", "journocollabiq", "pressiq", "coverageiq", "emos"];
     const ci = order.indexOf(currentTool);
     const ki = order.indexOf(card.toolId);
     if (ci !== -1 && ki !== -1) {

@@ -56,7 +56,7 @@ const SOURCES_DATA = [
     credibility: 0.95,
     badge: "Highest credibility",
     benefit: "Detects corporate disclosure surges before mainstream press picks up the story. Federal-grade, primary-source receipts.",
-    url: "https://efts.sec.gov",
+    url: "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-K&dateb=&owner=include&count=40",
     role: "Signal",
   },
   {
@@ -113,8 +113,19 @@ const hexA = (hex: string, a: number): string => {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 };
+// On-dark versions for use on the INK card header
+const bandColorLight = (b: OppBand): string =>
+  b === "hot" ? "#6ecf7a" : b === "look" ? "#7ea8e8" : b === "early" ? "#f0c05a" : "rgba(241,235,222,.4)";
 const bandColor = (b: OppBand): string =>
   b === "hot" ? GREEN : b === "look" ? BLUE : b === "early" ? AMBER : INK55;
+
+/** Tooltip copy explaining what each band means */
+const BAND_TOOLTIP: Record<OppBand, string> = {
+  hot:   "Hot lead — Score ≥ 80. High signal volume vs. thin press coverage. Pitch now before the press catches up.",
+  look:  "Worth a look — Score 60–79. A real gap exists. Investigate the angle before committing to a pitch.",
+  early: "Early — Score 40–59. Signal is emerging but coverage is still low. First-mover window if the story develops.",
+  noise: "Noise / late — Score < 40. Either very low signal or already heavily covered. Low opportunity.",
+};
 
 // Source display labels
 const SRC_LABEL: Record<string, string> = {
@@ -512,7 +523,28 @@ function OppCard({
     <div className="siq-card">
       {/* INK header strip */}
       <div className="siq-card-head">
-        <Pill size={9} ls="0.14em">{opp.bandLabel}</Pill>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+          <span style={{
+            fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em",
+            textTransform: "uppercase",
+            color: bandColorLight(opp.band),
+            border: `1px solid ${hexA(bandColorLight(opp.band), 0.45)}`,
+            background: hexA(bandColorLight(opp.band), 0.12),
+            padding: "2px 6px",
+          }}>
+            {opp.bandLabel}
+          </span>
+          <span
+            title={BAND_TOOLTIP[opp.band]}
+            style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              width: 13, height: 13, borderRadius: 999,
+              border: `1px solid rgba(241,235,222,.25)`,
+              fontFamily: SERIF, fontStyle: "italic", fontSize: 8,
+              color: "rgba(241,235,222,.45)", cursor: "help", userSelect: "none", flexShrink: 0,
+            }}
+          >i</span>
+        </span>
         <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginLeft: "auto" }}>
           <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, letterSpacing: "-0.02em" }}>
             {opp.score}
@@ -527,17 +559,30 @@ function OppCard({
         </h3>
         <GapBar value={opp.components.coverageGap} />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {opp.signals.map((s, i) => (
-            <a
-              key={i}
-              href={s.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="siq-chip"
-            >
-              {SRC_LABEL[s.source] ?? s.source.toUpperCase()} ↗
-            </a>
-          ))}
+          {opp.signals.map((s, i) =>
+            s.source === "sec" ? (
+              // EDGAR EFTS is a JSON-only API — no human-readable URL exists.
+              // Show as a non-link chip with a tooltip pointing to sec.gov instead.
+              <span
+                key={i}
+                className="siq-chip"
+                title="SEC EDGAR data — visit sec.gov to search filings directly"
+                style={{ cursor: "default", opacity: 0.75 }}
+              >
+                {SRC_LABEL[s.source]} · sec.gov
+              </span>
+            ) : (
+              <a
+                key={i}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="siq-chip"
+              >
+                {SRC_LABEL[s.source] ?? s.source.toUpperCase()} ↗
+              </a>
+            )
+          )}
         </div>
         {opp.sensitive && (
           <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: RED, lineHeight: 1.4 }}>
@@ -896,7 +941,29 @@ function DetailView({
         <div style={{ display: "flex", gap: "clamp(16px,3vw,32px)", flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
           <ScoreRing score={opp.score} color={c} size={110} />
           <div style={{ flex: 1, minWidth: 260 }}>
-            <Pill size={10} ls="0.14em">{opp.bandLabel} · {opp.beat}</Pill>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <span style={{
+                fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".14em",
+                textTransform: "uppercase", color: c,
+                border: `1px solid ${hexA(c, 0.4)}`,
+                background: hexA(c, 0.08), padding: "2px 7px",
+              }}>
+                {opp.bandLabel}
+              </span>
+              <span
+                title={BAND_TOOLTIP[opp.band]}
+                style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 14, height: 14, borderRadius: 999,
+                  border: `1px solid ${INK35}`,
+                  fontFamily: SERIF, fontStyle: "italic", fontSize: 9,
+                  color: INK55, cursor: "help", userSelect: "none",
+                }}
+              >i</span>
+              <span style={{ fontFamily: MONO, fontSize: 8, color: INK55, letterSpacing: ".10em", textTransform: "uppercase" }}>
+                · {opp.beat}
+              </span>
+            </span>
             <h2 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3.5vw,38px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: INK }}>
               {opp.headline}
             </h2>
