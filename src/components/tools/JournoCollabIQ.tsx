@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useReducer, useRef, useCallback } from "react";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const BG0  = "#F0F0EE";
@@ -900,7 +901,6 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled, theme }: 
       display:"flex", justifyContent:"space-between", alignItems:"center" }}>
       <div style={{ display:"flex", alignItems:"center", gap:16 }}>
         {step>0 && <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px" }}>← Back</button>}
-        <a href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX3, textDecoration:"none", fontWeight:600 }}>A free tool by Syed Irfan Ajmal · syedirfanajmal.com ↗</a>
       </div>
       <span style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em" }}>{`${step + 1} of 5`}</span>
       {nextLabel
@@ -1479,6 +1479,9 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         </div>
 
         {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} theme={theme} />}
+
+        {/* Pipeline footer — shown only on the final step as a "what's next?" prompt */}
+        {step===5 && <div style={{ paddingBottom: 80 }}><ToolPipelineFooter currentTool="journocollabiq" /></div>}
 
         <EmailGate show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>
