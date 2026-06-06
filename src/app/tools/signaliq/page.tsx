@@ -527,6 +527,14 @@ function BeatPicker({
           </button>
         ))}
       </div>
+
+      {/* Beat selection tip */}
+      <p style={{ maxWidth: 800, marginTop: 10, marginBottom: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, lineHeight: 1.6 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontStyle: "normal", fontSize: 9.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK70 }}>Tip:</span>{" "}
+        Pick the vertical your <em>target journalists</em> cover — not just your industry category.
+        A health-AI company should pick <strong>Health &amp; Wellness</strong> (reporters at STAT News, Health Affairs, and general science desks cover GLP-1 surges, digital therapeutics, and chronic-condition research — not the SaaS beat).
+        Only choose <strong>SaaS &amp; Startups</strong> if the story you&rsquo;re pitching is the startup itself — a funding round, a product launch to tech press like TechCrunch or The Verge.
+      </p>
       <div style={{ textAlign: "center", margin: "24px 0" }}>
         <button
           onClick={onScan}
@@ -677,8 +685,10 @@ function OppCard({
                 );
               })}
 
-              <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: INK35, lineHeight: 1.4 }}>
-                Badge = composite opportunity score. Coverage bar = GDELT denominator only.
+              <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: INK35, lineHeight: 1.5 }}>
+                <strong style={{ fontStyle: "normal" }}>Score</strong> = weighted composite across all signal sources above.{" "}
+                <strong style={{ fontStyle: "normal" }}>Coverage Gap bar</strong> uses GDELT alone as its denominator — it measures what % of global news already covers this topic.
+                A wide gap means the story is surging in primary sources but hasn&rsquo;t landed in mainstream press yet: your window to pitch first.
               </p>
             </div>
           )}
@@ -1118,7 +1128,7 @@ function DetailView({
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function SignalIQPage() {
-  const [beat, setBeat] = useState<BeatId>("fintech");
+  const [beat, setBeat] = useState<BeatId>("saas");
   const [companyContext, setCompanyContext] = useState("");
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
