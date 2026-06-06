@@ -63,7 +63,7 @@ export const PACK_TOOL = {
   },
 } as const;
 
-export function buildPackPrompt(opp: Opportunity): string {
+export function buildPackPrompt(opp: Opportunity, companyContext?: string): string {
   const signalLines =
     opp.signals.map((s) => `- [${s.source}] ${s.title}${s.detail ? ` (${s.detail})` : ""} — ${s.url}`).join("\n") ||
     "(no individual signals)";
@@ -73,18 +73,22 @@ export function buildPackPrompt(opp: Opportunity): string {
       }${(opp.coverage.trend * 100).toFixed(0)}%). Lower = bigger gap = more headroom.`
     : "Press coverage so far: unknown.";
 
+  const contextBlock = companyContext?.trim()
+    ? `\nCOMPANY CONTEXT (from the founder — use this to personalise the angle, voice, and credibility hook):\n${companyContext.trim()}\n`
+    : "";
+
   return `EARLY SIGNAL TO WORK FROM
 Beat: ${opp.beat}
 Topic: ${opp.topic}
 Working headline from the data: ${opp.headline}
 Opportunity score: ${opp.score}/100 (${opp.bandLabel}) — a lead/whitespace measure, not a probability.
-
+${contextBlock}
 SIGNAL DATA (the receipts — ground everything here):
 ${signalLines}
 
 ${cov}
 
-Produce the asset pack via the emit_asset_pack tool. Keep it specific to THIS topic and honest about what the data does and does not show.`;
+Produce the asset pack via the emit_asset_pack tool. Keep it specific to THIS topic and honest about what the data does and does not show.${companyContext?.trim() ? " Tailor the pitch angle, journalist targets, and linkable asset idea to fit the company context above." : ""}`;
 }
 
 interface ToolUseBlock {

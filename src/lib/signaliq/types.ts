@@ -91,6 +91,8 @@ export interface ScanResponse {
 export interface AssetPackInput {
   /** The opportunity is re-sent so generation stays stateless (no DB in MVP). */
   opportunity: Opportunity;
+  /** Optional company context — tailor the pitch angle and journalist targets. */
+  companyContext?: string;
   store?: boolean;
   turnstileToken?: string;
 }

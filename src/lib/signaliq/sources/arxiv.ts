@@ -42,7 +42,10 @@ export async function arxivSignal(seed: string): Promise<Signal | null> {
       source: "arxiv",
       topic: seed,
       title: `${recent30} new arXiv papers on "${seed}" in 30 days`,
-      url: id || "https://arxiv.org/list",
+      // Link to arXiv search results page, not a specific paper — avoids
+      // showing an irrelevant paper abstract (e.g. "battery longevity" when
+      // the user searched for health longevity).
+      url: `https://arxiv.org/search/?query=${encodeURIComponent(`"${seed}"`)}&searchtype=all&order=-announced_date_first`,
       observedAt: new Date().toISOString(),
       magnitude,
       velocity,

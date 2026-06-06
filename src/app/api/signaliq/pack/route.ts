@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
   if (!opp) {
     return NextResponse.json({ error: "Missing or invalid opportunity." }, { status: 400 });
   }
+  const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 500) : undefined;
 
   const ip = clientIp(req);
   const token = typeof raw.turnstileToken === "string" ? raw.turnstileToken : undefined;
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
         system: PACK_SYSTEM,
         tools: [PACK_TOOL],
         tool_choice: { type: "tool", name: PACK_TOOL.name },
-        messages: [{ role: "user", content: buildPackPrompt(opp) }],
+        messages: [{ role: "user", content: buildPackPrompt(opp, companyContext) }],
       }),
     });
 

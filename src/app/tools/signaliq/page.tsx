@@ -473,15 +473,49 @@ function BeatPicker({
   setBeat,
   onScan,
   scanning,
+  companyContext,
+  setCompanyContext,
 }: {
   beat: BeatId;
   setBeat: (b: BeatId) => void;
   onScan: () => void;
   scanning: boolean;
+  companyContext: string;
+  setCompanyContext: (v: string) => void;
 }) {
   const currentBeat = BEATS.find((b) => b.id === beat);
   return (
     <section style={{ padding: "clamp(16px,3vw,28px) clamp(22px,5vw,56px) 0" }}>
+
+      {/* Company context — personalises the asset pack pitch angle */}
+      <div style={{ marginBottom: 20 }}>
+        <label style={{
+          display: "block", fontFamily: MONO, fontSize: 9, fontWeight: 700,
+          letterSpacing: ".16em", textTransform: "uppercase", color: INK55, marginBottom: 6,
+        }}>
+          Your startup context <span style={{ color: INK35, fontWeight: 400 }}>(optional — personalises the pitch angle)</span>
+        </label>
+        <textarea
+          value={companyContext}
+          onChange={e => setCompanyContext(e.target.value)}
+          maxLength={400}
+          rows={2}
+          placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital — we have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
+          style={{
+            width: "100%", boxSizing: "border-box",
+            fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK,
+            background: PAPER2, border: `1px solid ${INK15}`,
+            padding: "10px 12px", resize: "vertical", outline: "none",
+            lineHeight: 1.5,
+          }}
+        />
+        {companyContext.trim() && (
+          <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
+            {companyContext.trim().length}/400 · This will be used when you generate an asset pack
+          </p>
+        )}
+      </div>
+
       <div className="siq-beat-tabs">
         {BEATS.map((b, i) => (
           <button
@@ -511,6 +545,13 @@ function BeatPicker({
 
 // ── opportunity card ──────────────────────────────────────────────────────────
 
+const SIGNAL_SOURCES: Array<{ id: "sec" | "arxiv" | "wikipedia" | "hackernews"; label: string }> = [
+  { id: "sec",        label: "SEC EDGAR" },
+  { id: "arxiv",      label: "arXiv" },
+  { id: "wikipedia",  label: "Wikipedia" },
+  { id: "hackernews", label: "Hacker News" },
+];
+
 function OppCard({
   opp,
   onGenerate,
@@ -518,7 +559,9 @@ function OppCard({
   opp: Opportunity;
   onGenerate: () => void;
 }) {
+  const [showSources, setShowSources] = useState(false);
   const c = bandColor(opp.band);
+  const signalBySource = Object.fromEntries(opp.signals.map(s => [s.source, s]));
   return (
     <div className="siq-card">
       {/* INK header strip */}
@@ -589,6 +632,57 @@ function OppCard({
             Sensitive topic — handle with care.
           </p>
         )}
+
+        {/* Sources checked — toggle */}
+        <div style={{ borderTop: `1px solid ${INK15}`, marginTop: 12, paddingTop: 10 }}>
+          <button
+            onClick={() => setShowSources(v => !v)}
+            style={{
+              background: "none", border: "none", cursor: "pointer", padding: 0,
+              fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".13em",
+              textTransform: "uppercase", color: INK35,
+              display: "flex", alignItems: "center", gap: 5,
+            }}
+          >
+            <span>{showSources ? "▲" : "▼"}</span>
+            Sources checked ({opp.signals.length + 1} of 5 returned data)
+          </button>
+
+          {showSources && (
+            <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 7 }}>
+              {/* GDELT — always the coverage denominator */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: AMBER }}>
+                  GDELT · Coverage baseline
+                </span>
+                <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, textAlign: "right" }}>
+                  {opp.coverage
+                    ? `${opp.coverage.articleCount.toLocaleString()} news articles · ${(opp.coverage.volume * 100).toFixed(0)}% saturated`
+                    : "Coverage data unavailable"}
+                </span>
+              </div>
+
+              {/* Signal sources */}
+              {SIGNAL_SOURCES.map(({ id, label }) => {
+                const sig = signalBySource[id];
+                return (
+                  <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: sig ? GREEN : INK35 }}>
+                      {label}
+                    </span>
+                    <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: sig ? INK55 : INK35, textAlign: "right" }}>
+                      {sig ? (sig.detail || sig.title) : "No signal detected"}
+                    </span>
+                  </div>
+                );
+              })}
+
+              <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: INK35, lineHeight: 1.4 }}>
+                Badge = composite opportunity score. Coverage bar = GDELT denominator only.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
       <button onClick={onGenerate} className="siq-gen-btn">
         Generate asset pack →
@@ -1025,6 +1119,7 @@ function DetailView({
 
 export default function SignalIQPage() {
   const [beat, setBeat] = useState<BeatId>("fintech");
+  const [companyContext, setCompanyContext] = useState("");
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);
@@ -1077,7 +1172,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/pack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ opportunity: opp, store: true }),
+        body: JSON.stringify({ opportunity: opp, store: true, companyContext: companyContext.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setPackError(data.error || "Could not generate the pack.");
@@ -1135,7 +1230,7 @@ export default function SignalIQPage() {
         {/* ── Radar (steps 1 & 2) ───────────────────────────────────────── */}
         {!selected && (
           <section style={{ padding: "0 0 40px" }}>
-            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); }} onScan={runScan} scanning={scanning} />
+            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); }} onScan={runScan} scanning={scanning} companyContext={companyContext} setCompanyContext={setCompanyContext} />
 
             {scanError && (
               <div style={{ maxWidth: 620, margin: "20px auto 0", padding: "12px 14px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
