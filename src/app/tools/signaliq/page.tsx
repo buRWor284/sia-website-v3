@@ -715,7 +715,7 @@ function ReceiptsPanel({ opp }: { opp: Opportunity }) {
 
 // ── pack view ─────────────────────────────────────────────────────────────────
 
-function PackView({ pack }: { pack: AssetPack }) {
+function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownloadPDF: () => void; emailDone: boolean }) {
   const copy = (text: string) => {
     try { navigator.clipboard?.writeText(text); } catch { /* noop */ }
   };
@@ -885,6 +885,30 @@ function PackView({ pack }: { pack: AssetPack }) {
           ))}
         </div>
       </div>
+
+      {/* PDF download — email gated */}
+      <div style={{ marginTop: 20, padding: "16px 20px", border: `1px solid ${INK15}`, background: PAPER2, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+        <div>
+          <SCaps size={10} ls="0.14em" color={INK}>Download full report</SCaps>
+          <p style={{ margin: "4px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.4 }}>
+            PDF covering all three steps — opportunities, asset pack, sources, and pitch angle.
+            {!emailDone && " Requires newsletter subscription."}
+          </p>
+        </div>
+        {emailDone ? (
+          <button
+            onClick={onDownloadPDF}
+            className="siq-scan-btn"
+            style={{ fontSize: 12, padding: "12px 22px", whiteSpace: "nowrap" }}
+          >
+            Download PDF →
+          </button>
+        ) : (
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase", color: INK35 }}>
+            Unlock with email above ↑
+          </span>
+        )}
+      </div>
     </div>
   );
 }
@@ -981,6 +1005,7 @@ function DetailView({
   setEmail,
   emailDone,
   unlockEmail,
+  onDownloadPDF,
 }: {
   opp: Opportunity;
   pack: AssetPack | null;
@@ -992,6 +1017,7 @@ function DetailView({
   setEmail: (v: string) => void;
   emailDone: boolean;
   unlockEmail: (e: React.FormEvent) => void;
+  onDownloadPDF: () => void;
 }) {
   const c = bandColor(opp.band);
   return (
@@ -1059,7 +1085,7 @@ function DetailView({
               </button>
             </div>
           )}
-          {pack && !packing && <PackView pack={pack} />}
+          {pack && !packing && <PackView pack={pack} emailDone={emailDone} onDownloadPDF={onDownloadPDF} />}
         </div>
 
         {/* Email gate — primary CTA */}
@@ -1174,6 +1200,39 @@ export default function SignalIQPage() {
     }
   }
 
+  async function downloadPDF() {
+    if (!emailDone || !selected) return;
+    try {
+      const res = await fetch("/api/signaliq/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          beat,
+          companyContext: companyContext.trim() || undefined,
+          opportunities: scan?.opportunities ?? [],
+          opportunity: selected,
+          pack,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Could not generate PDF.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `signaliq-report-${Date.now()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("Network error — could not generate PDF.");
+    }
+  }
+
   async function unlockEmail(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
@@ -1245,6 +1304,7 @@ export default function SignalIQPage() {
             setEmail={setEmail}
             emailDone={emailDone}
             unlockEmail={unlockEmail}
+            onDownloadPDF={downloadPDF}
           />
         )}
 
