@@ -163,16 +163,16 @@ function InfoTooltip({ text, dark = false, width = 270 }: { text: string; dark?:
         <span style={{
           position: "absolute", top: "calc(100% + 8px)", left: "50%",
           transform: "translateX(-50%)",
-          width, padding: "8px 11px",
-          background: bg, color: fg,
-          fontFamily: SERIF, fontStyle: "italic", fontSize: 10, lineHeight: 1.5,
+          width, padding: "10px 13px",
+          background: PAPER, color: INK55,
+          fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, lineHeight: 1.6,
           zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,.2)",
-          border: `1px solid ${dark ? "rgba(241,235,222,.1)" : INK15}`,
+          border: `1px solid ${INK15}`,
           pointerEvents: "none",
           whiteSpace: "normal",
         }}>
           {text}
-          <span style={{ position: "absolute", top: -5, left: "50%", transform: "translateX(-50%)", width: 8, height: 8, background: bg, border: `1px solid ${dark ? "rgba(241,235,222,.1)" : INK15}`, borderBottom: "none", borderRight: "none", rotate: "45deg" }} />
+          <span style={{ position: "absolute", top: -5, left: "50%", transform: "translateX(-50%)", width: 8, height: 8, background: PAPER, border: `1px solid ${INK15}`, borderBottom: "none", borderRight: "none", rotate: "45deg" }} />
         </span>
       )}
     </span>
