@@ -140,7 +140,7 @@ const EMOS_URL = "/emos";
 const EMOS_APPLY = "/emos/apply";
 
 // ── info tooltip (click + hover, works on mobile) ─────────────────────────────
-function InfoTooltip({ text, dark = false, width = 270 }: { text: string; dark?: boolean; width?: number }) {
+function InfoTooltip({ text, dark = false, width = 270 }: { text: React.ReactNode; dark?: boolean; width?: number }) {
   const [open, setOpen] = useState(false);
   const bg = dark ? PAPER : INK;
   const fg = dark ? INK : PAPER;
@@ -166,6 +166,7 @@ function InfoTooltip({ text, dark = false, width = 270 }: { text: string; dark?:
           width, padding: "10px 13px",
           background: PAPER, color: INK55,
           fontFamily: SERIF, fontStyle: "italic", fontSize: 8, lineHeight: 1.6,
+          textTransform: "none", letterSpacing: "normal",
           zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,.2)",
           border: `1px solid ${INK15}`,
           pointerEvents: "none",
@@ -491,7 +492,15 @@ function BeatPicker({
       <div className="siq-beat-tabs">
         {BEATS.map((b, i) => {
           const isActive = b.id === beat;
-          const seedsText = `${b.blurb}\n\nSeeds scanned: ${b.seeds.join(" · ")}`;
+          const seedsNode = (
+            <span>
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", color: INK55 }}>{b.blurb}</span>
+              <br /><br />
+              <span style={{ fontFamily: GROT, fontWeight: 700, fontStyle: "normal", fontSize: 7, letterSpacing: ".12em", textTransform: "uppercase", color: INK }}>Seed Phrases:</span>
+              <br />
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", color: INK55 }}>{b.seeds.join(" · ")}</span>
+            </span>
+          );
           return (
             <button
               key={b.id}
@@ -501,7 +510,7 @@ function BeatPicker({
               <span style={{ display: "flex", alignItems: "center", gap: 5, justifyContent: "center" }}>
                 <span className="siq-tab-no">0{i + 1}</span>
                 <span>{b.label}</span>
-                <InfoTooltip text={seedsText} dark={isActive} width={320} />
+                <InfoTooltip text={seedsNode} dark={isActive} width={320} />
               </span>
             </button>
           );
