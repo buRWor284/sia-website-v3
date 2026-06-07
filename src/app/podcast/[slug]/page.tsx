@@ -74,7 +74,7 @@ export default async function EpisodePage({
           overflow: "hidden",
           ...(ep.featured_image_url
             ? {
-                backgroundImage: `linear-gradient(rgba(20,16,12,.82), rgba(20,16,12,.82)), url(${ep.featured_image_url})`,
+                backgroundImage: `linear-gradient(rgba(20,16,12,.55) 0%, rgba(20,16,12,.38) 50%, rgba(20,16,12,.60) 100%), url(${ep.featured_image_url})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
               }
