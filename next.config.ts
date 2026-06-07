@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 import path from "node:path";
 
 const nextConfig: NextConfig = {
+  // pdfkit is a native Node.js module — tell Next.js not to bundle it with webpack
+  serverExternalPackages: ["pdfkit"],
   async redirects() {
     const p = true; // permanent: true shorthand
     return [
