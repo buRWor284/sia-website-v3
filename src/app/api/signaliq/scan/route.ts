@@ -20,7 +20,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
-const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai"];
+const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity"];
 
 function clientIp(req: NextRequest): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
