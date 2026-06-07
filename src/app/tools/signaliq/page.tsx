@@ -165,7 +165,7 @@ function InfoTooltip({ text, dark = false, width = 270 }: { text: string; dark?:
           transform: "translateX(-50%)",
           width, padding: "10px 13px",
           background: PAPER, color: INK55,
-          fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, lineHeight: 1.6,
+          fontFamily: SERIF, fontStyle: "italic", fontSize: 8, lineHeight: 1.6,
           zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,.2)",
           border: `1px solid ${INK15}`,
           pointerEvents: "none",
