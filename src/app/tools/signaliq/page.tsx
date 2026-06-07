@@ -139,6 +139,46 @@ const SRC_LABEL: Record<string, string> = {
 const EMOS_URL = "/emos";
 const EMOS_APPLY = "/emos/apply";
 
+// ── info tooltip (click + hover, works on mobile) ─────────────────────────────
+function InfoTooltip({ text, dark = false }: { text: string; dark?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const bg = dark ? PAPER : INK;
+  const fg = dark ? INK : PAPER;
+  return (
+    <span style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}>
+      <span
+        onClick={(e) => { e.stopPropagation(); setOpen(v => !v); }}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          width: 14, height: 14, borderRadius: 999,
+          border: `1px solid ${dark ? "rgba(241,235,222,.3)" : INK35}`,
+          fontFamily: SERIF, fontStyle: "italic", fontSize: 9,
+          color: dark ? "rgba(241,235,222,.55)" : INK55,
+          cursor: "pointer", userSelect: "none",
+        }}
+      >i</span>
+      {open && (
+        <span style={{
+          position: "absolute", bottom: "calc(100% + 8px)", left: "50%",
+          transform: "translateX(-50%)",
+          width: 270, padding: "10px 13px",
+          background: bg, color: fg,
+          fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, lineHeight: 1.55,
+          zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,.2)",
+          border: `1px solid ${dark ? "rgba(241,235,222,.1)" : INK15}`,
+          pointerEvents: "none",
+          whiteSpace: "normal",
+        }}>
+          {text}
+          <span style={{ position: "absolute", bottom: -5, left: "50%", transform: "translateX(-50%)", width: 8, height: 8, background: bg, border: `1px solid ${dark ? "rgba(241,235,222,.1)" : INK15}`, borderTop: "none", borderLeft: "none", rotate: "45deg" }} />
+        </span>
+      )}
+    </span>
+  );
+}
+
 // ── atoms ─────────────────────────────────────────────────────────────────────
 
 function ScoreRing({
@@ -330,7 +370,9 @@ function SourcesSidebar() {
 
 // ── step bar ──────────────────────────────────────────────────────────────────
 
-function StepBar({ step, onGoStep }: { step: 1 | 2 | 3; onGoStep: (n: 1 | 2 | 3) => void }) {
+function StepBar({ step, onGoStep }: { step: 0 | 1 | 2 | 3; onGoStep: (n: 0 | 1 | 2 | 3) => void }) {
+  // Step 0 (intro) — show just a minimal "back to start" bar; full bar appears at steps 1-3
+  if (step === 0) return null;
   const STEPS: { n: 1 | 2 | 3; label: string }[] = [
     { n: 1, label: "Pick your beat" },
     { n: 2, label: "Scan the radar" },
@@ -338,6 +380,9 @@ function StepBar({ step, onGoStep }: { step: 1 | 2 | 3; onGoStep: (n: 1 | 2 | 3)
   ];
   return (
     <nav className="siq-step-bar">
+      <button className="siq-step past" onClick={() => onGoStep(0)} style={{ maxWidth: 48, fontSize: 8 }}>
+        ←
+      </button>
       {STEPS.map((s) => {
         const active = s.n === step;
         const past = s.n < step;
@@ -512,16 +557,7 @@ function OppCard({
           }}>
             {opp.bandLabel}
           </span>
-          <span
-            title={BAND_TOOLTIP[opp.band]}
-            style={{
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              width: 13, height: 13, borderRadius: 999,
-              border: `1px solid rgba(241,235,222,.25)`,
-              fontFamily: SERIF, fontStyle: "italic", fontSize: 8,
-              color: "rgba(241,235,222,.45)", cursor: "help", userSelect: "none", flexShrink: 0,
-            }}
-          >i</span>
+          <InfoTooltip text={BAND_TOOLTIP[opp.band]} dark />
         </span>
         <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginLeft: "auto" }}>
           <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, letterSpacing: "-0.02em" }}>
@@ -960,9 +996,14 @@ function DetailView({
   const c = bandColor(opp.band);
   return (
     <section style={{ padding: "10px clamp(22px,5vw,56px) 32px" }}>
-      <button onClick={onBack} className="siq-back" style={{ marginBottom: 16 }}>
-        ← Back to the radar
-      </button>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+        <button onClick={onBack} className="siq-back">
+          ← Back to the radar
+        </button>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+          Step 3 — Asset pack
+        </span>
+      </div>
 
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
         {/* Opportunity header */}
@@ -978,16 +1019,7 @@ function DetailView({
               }}>
                 {opp.bandLabel}
               </span>
-              <span
-                title={BAND_TOOLTIP[opp.band]}
-                style={{
-                  display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  width: 14, height: 14, borderRadius: 999,
-                  border: `1px solid ${INK35}`,
-                  fontFamily: SERIF, fontStyle: "italic", fontSize: 9,
-                  color: INK55, cursor: "help", userSelect: "none",
-                }}
-              >i</span>
+              <InfoTooltip text={BAND_TOOLTIP[opp.band]} />
               <span style={{ fontFamily: MONO, fontSize: 8, color: INK55, letterSpacing: ".10em", textTransform: "uppercase" }}>
                 · {opp.beat}
               </span>
@@ -1056,8 +1088,14 @@ export default function SignalIQPage() {
   const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
 
+  // Step 0: intro/landing screen (click-through before step 1)
+  const [intro, setIntro] = useState(true);
+  // Step 2: opportunities hidden until user adds context or clicks skip
+  const [oppsRevealed, setOppsRevealed] = useState(false);
+  const [usedContext, setUsedContext] = useState(false); // whether context was provided when revealing
+
   // Derived step
-  const step: 1 | 2 | 3 = selected ? 3 : scan ? 2 : 1;
+  const step: 0 | 1 | 2 | 3 = intro ? 0 : selected ? 3 : scan ? 2 : 1;
 
   // Option 3: re-rank opportunities by relevance to company context (client-side, instant)
   const rankedOpps = useMemo(() => {
@@ -1084,8 +1122,9 @@ export default function SignalIQPage() {
       .map((s) => s.opp);
   }, [scan, companyContext]);
 
-  function handleGoStep(n: 1 | 2 | 3) {
-    if (n === 1) { setSelected(null); setPack(null); setPackError(null); setScan(null); }
+  function handleGoStep(n: 0 | 1 | 2 | 3) {
+    if (n === 0) { setIntro(true); setSelected(null); setPack(null); setPackError(null); setScan(null); }
+    if (n === 1) { setIntro(false); setSelected(null); setPack(null); setPackError(null); setScan(null); }
     if (n === 2) { setSelected(null); setPack(null); setPackError(null); }
   }
 
@@ -1095,6 +1134,8 @@ export default function SignalIQPage() {
     setScan(null);
     setSelected(null);
     setPack(null);
+    setOppsRevealed(false);
+    setUsedContext(false);
     try {
       const res = await fetch("/api/signaliq/scan", {
         method: "POST",
@@ -1162,9 +1203,34 @@ export default function SignalIQPage() {
       <StepBar step={step} onGoStep={handleGoStep} />
 
       <div style={{ background: PAPER, color: INK, fontFamily: SERIF, minHeight: "100vh" }}>
-        {/* ── Hero + ticker — hidden in asset-pack view (step 3) ───────── */}
-        {step < 3 && <SIQHero />}
-        {step < 3 && <SourcesTicker />}
+
+        {/* ── Step 0: Intro / landing ───────────────────────────────────── */}
+        {step === 0 && (
+          <>
+            <SIQHero />
+            <SourcesTicker />
+            <div style={{ textAlign: "center", padding: "clamp(28px,4vw,48px) clamp(22px,5vw,56px)" }}>
+              <button
+                onClick={() => { setIntro(false); }}
+                style={{
+                  padding: "16px 40px", border: "none", background: INK, color: PAPER,
+                  fontFamily: GROT, fontWeight: 800, fontSize: 15, letterSpacing: ".10em",
+                  textTransform: "uppercase", cursor: "pointer",
+                }}
+              >
+                Start scanning →
+              </button>
+              <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+                {FREE_SCANS} free scans / month · {EMAIL_SCANS} with your email · no API key needed
+              </p>
+              <p style={{ margin: "8px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".10em" }}>
+                <Link href="/tools/signaliq/about" style={{ color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
+                  About the data & methodology →
+                </Link>
+              </p>
+            </div>
+          </>
+        )}
 
         {/* ── Detail view (step 3) ──────────────────────────────────────── */}
         {selected && (
@@ -1183,9 +1249,22 @@ export default function SignalIQPage() {
         )}
 
         {/* ── Radar (steps 1 & 2) ───────────────────────────────────────── */}
-        {!selected && (
+        {!intro && !selected && (
           <section style={{ padding: "0 0 40px" }}>
-            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); }} onScan={runScan} scanning={scanning} />
+            {/* Concise step header */}
+            <div style={{ padding: "20px clamp(22px,5vw,56px) 0" }}>
+              {step === 1 && (
+                <p style={{ margin: 0, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+                  Step 1 — Pick your beat, then scan the live radar
+                </p>
+              )}
+              {step === 2 && (
+                <p style={{ margin: 0, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+                  Step 2 — {oppsRevealed ? (usedContext ? "Results personalised to your startup" : "Full radar results") : "Tell us about your startup to personalise your results"}
+                </p>
+              )}
+            </div>
+            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); setOppsRevealed(false); }} onScan={runScan} scanning={scanning} />
 
             {scanError && (
               <div style={{ maxWidth: 620, margin: "20px auto 0", padding: "12px 14px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
@@ -1201,70 +1280,93 @@ export default function SignalIQPage() {
 
             {scan && scan.opportunities.length > 0 && (
               <div style={{ padding: "0 clamp(22px,5vw,56px)" }}>
-                {/* Results header */}
+                <DoubleRule style={{ marginTop: 24, maxWidth: 1400, margin: "24px auto 0" }} />
+
+                {/* Context gate — shown until user reveals opps */}
+                {!oppsRevealed && (
+                  <div style={{ maxWidth: 700, margin: "32px auto 0", textAlign: "center" }}>
+                    <h2 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px,3vw,32px)", lineHeight: 1.1, color: INK }}>
+                      {scan.opportunities.length} opportunities found
+                    </h2>
+                    <p style={{ margin: "0 0 24px", fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
+                      Add your startup context to personalise the results and your pitch pack — or skip straight to the full radar.
+                    </p>
+                    <div style={{ textAlign: "left", marginBottom: 16 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                        <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+                          Your startup context
+                        </label>
+                        <InfoTooltip text="Context re-ranks results by relevance to your company and personalises your pitch pack angle. It does not change what signals are scanned. Making the scan itself company-specific would add latency, cost more, and risk hallucinated search terms." />
+                      </div>
+                      <textarea
+                        value={companyContext}
+                        onChange={e => setCompanyContext(e.target.value)}
+                        maxLength={400}
+                        rows={4}
+                        placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital — we have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
+                        style={{
+                          width: "100%", boxSizing: "border-box",
+                          fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK,
+                          background: PAPER2, border: `1px solid ${INK15}`,
+                          padding: "12px 14px", resize: "vertical", outline: "none",
+                          lineHeight: 1.6,
+                        }}
+                      />
+                      {companyContext.trim() && (
+                        <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
+                          {companyContext.trim().length}/400
+                        </p>
+                      )}
+                    </div>
+                    <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
+                      <button
+                        onClick={() => { setOppsRevealed(true); setUsedContext(!!companyContext.trim()); }}
+                        className="siq-scan-btn"
+                        style={{ fontSize: 13 }}
+                      >
+                        {companyContext.trim() ? "Show my personalised results →" : "Show results →"}
+                      </button>
+                      <button
+                        onClick={() => { setOppsRevealed(true); setUsedContext(false); }}
+                        style={{
+                          padding: "14px 20px", border: `1px solid ${INK15}`, background: "transparent",
+                          fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".08em",
+                          textTransform: "uppercase", color: INK55, cursor: "pointer",
+                        }}
+                      >
+                        Just browsing →
+                      </button>
+                    </div>
+                    <p style={{ margin: "14px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".08em", textAlign: "center" }}>
+                      {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left ·{" "}
+                      <Link href="/tools/signaliq/about" style={{ color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>About the data</Link>
+                    </p>
+                  </div>
+                )}
+
+                {/* Cards + sidebar — revealed after context gate */}
+                {oppsRevealed && (
+                <>
                 <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-                  <DoubleRule style={{ marginTop: 24 }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "8px 0 12px", flexWrap: "wrap", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "16px 0 12px", flexWrap: "wrap", gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
                       <Pill size={10} ls="0.14em">Radar</Pill>
                       <SCaps size={11} ls="0.14em" color={INK}>
                         {scan.opportunities.length} opportunities · ranked by signal-vs-coverage
+                        {usedContext && <span style={{ color: INK55 }}> · personalised to your startup</span>}
                       </SCaps>
                     </div>
-                    <SCaps size={10} ls="0.14em" color={INK55}>
-                      {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left
-                    </SCaps>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <SCaps size={10} ls="0.14em" color={INK55}>
+                        {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left
+                      </SCaps>
+                      <Link href="/tools/signaliq/about" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
+                        About the data
+                      </Link>
+                    </div>
                   </div>
                   <HRule style={{ marginBottom: 20 }} />
                 </div>
-
-                {/* Company context — moved here so users see results first, then personalise */}
-                <div style={{ maxWidth: 1400, margin: "0 auto 24px" }}>
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-                    <label style={{
-                      fontFamily: MONO, fontSize: 9, fontWeight: 700,
-                      letterSpacing: ".16em", textTransform: "uppercase", color: INK55,
-                    }}>
-                      Your startup context <span style={{ color: INK35, fontWeight: 400 }}>(optional)</span>
-                    </label>
-                    {/* (i) tooltip */}
-                    <span
-                      title={
-                        "Context re-ranks these results by relevance and personalises your pitch pack — it does not change what signals are scanned. " +
-                        "Making the scan itself company-specific would require an AI to generate custom search terms before scanning: " +
-                        "that adds 4-10s of latency, costs more per scan, and risks hallucinated search terms that return misleading or empty results."
-                      }
-                      style={{
-                        display: "inline-flex", alignItems: "center", justifyContent: "center",
-                        width: 14, height: 14, borderRadius: 999,
-                        border: `1px solid ${INK35}`,
-                        fontFamily: SERIF, fontStyle: "italic", fontSize: 9,
-                        color: INK55, cursor: "help", userSelect: "none", flexShrink: 0,
-                      }}
-                    >i</span>
-                  </div>
-                  <textarea
-                    value={companyContext}
-                    onChange={e => setCompanyContext(e.target.value)}
-                    maxLength={400}
-                    rows={2}
-                    placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital — we have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
-                    style={{
-                      width: "100%", boxSizing: "border-box",
-                      fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK,
-                      background: PAPER2, border: `1px solid ${INK15}`,
-                      padding: "10px 12px", resize: "vertical", outline: "none",
-                      lineHeight: 1.5,
-                    }}
-                  />
-                  {companyContext.trim() && (
-                    <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
-                      {companyContext.trim().length}/400 · Results re-ranked by relevance · Used when you generate a pack
-                    </p>
-                  )}
-                </div>
-
-                {/* Cards + sidebar */}
                 <div className="siq-results-wrap">
                   <div className="siq-cards-col">
                     <div className="siq-cards">
@@ -1300,6 +1402,8 @@ export default function SignalIQPage() {
                   </div>
                   <SourcesSidebar />
                 </div>
+                </>
+                )}
               </div>
             )}
           </section>
