@@ -1,8 +1,8 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-// Only /emos/dashboard and everything under it requires auth.
-// /emos (marketing page), /emos/apply, /emos/pay stay public.
-const isProtectedRoute = createRouteMatcher(['/emos/dashboard(.*)'])
+// /emostool and everything under it requires auth.
+// /emos (course landing page) stays completely public and untouched.
+const isProtectedRoute = createRouteMatcher(['/emostool(.*)'])
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
