@@ -1556,20 +1556,18 @@ const PAGE_CSS = `
     color: ${INK};
   }
 
-  /* beat tabs */
+  /* beat tabs — 2-row grid (3 per row) */
   .siq-beat-tabs {
-    display: flex;
-    max-width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     border: 1px solid ${INK15};
-    overflow-x: auto;
   }
   .siq-tab {
-    flex: 1;
-    min-width: 0;
     padding: 10px 12px;
     background: transparent;
     border: none;
     border-right: 1px solid ${INK15};
+    border-bottom: 1px solid ${INK15};
     font-family: ${GROT};
     font-weight: 700;
     font-size: 10px;
@@ -1580,7 +1578,8 @@ const PAGE_CSS = `
     transition: background 0.12s ease, color 0.12s ease;
     white-space: nowrap;
   }
-  .siq-tab:last-child { border-right: none; }
+  .siq-tab:nth-child(3n)       { border-right: none; }
+  .siq-tab:nth-last-child(-n+3) { border-bottom: none; }
   .siq-tab.active { background: ${INK}; color: ${PAPER}; }
   .siq-tab-no {
     font-family: ${SERIF};
@@ -1731,9 +1730,11 @@ const PAGE_CSS = `
     .siq-detail-cols { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) {
-    .siq-beat-tabs { flex-direction: column; }
-    .siq-tab { border-right: none; border-bottom: 1px solid ${INK15}; }
-    .siq-tab:last-child { border-bottom: none; }
+    .siq-beat-tabs { grid-template-columns: repeat(2, 1fr); }
+    .siq-tab:nth-child(3n)        { border-right: 1px solid ${INK15}; }
+    .siq-tab:nth-last-child(-n+3) { border-bottom: 1px solid ${INK15}; }
+    .siq-tab:nth-child(2n)        { border-right: none; }
+    .siq-tab:nth-last-child(-n+2) { border-bottom: none; }
     .siq-cards { grid-template-columns: 1fr; }
     .siq-step { padding: 10px 12px; font-size: 8.5px; }
     .siq-hide-sm { display: none; }
