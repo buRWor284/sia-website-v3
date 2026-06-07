@@ -172,9 +172,21 @@ export interface CreatePitchInput {
 export async function createPitch(input: CreatePitchInput): Promise<{ id: string } | null> {
   const db = await getAuthenticatedClient();
 
+  // org_id is NOT NULL — fetch it first (same pattern that works in the dashboard)
+  const { data: org, error: orgError } = await db
+    .from("organizations")
+    .select("id")
+    .single();
+
+  if (orgError || !org) {
+    console.error("createPitch: could not resolve org_id", orgError?.message);
+    return null;
+  }
+
   const { data, error } = await db
     .from("coverageiq_pitches")
     .insert({
+      org_id: org.id,
       subject: input.subject,
       journalist_id: input.journalist_id ?? null,
       client: input.client ?? null,

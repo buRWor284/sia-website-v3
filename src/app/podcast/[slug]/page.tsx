@@ -67,122 +67,113 @@ export default async function EpisodePage({
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section
         style={{
-          background: ep.featured_image_url ? INK : PAPER2,
-          color: ep.featured_image_url ? PAPER : INK,
+          background: INK,
+          color: PAPER,
           padding: "80px 56px 72px",
           position: "relative",
           overflow: "hidden",
-          ...(ep.featured_image_url
-            ? {
-                backgroundImage: `linear-gradient(rgba(20,16,12,.72) 0%, rgba(20,16,12,.62) 50%, rgba(20,16,12,.75) 100%), url(${ep.featured_image_url})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center top",
-              }
-            : {}),
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 48,
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "baseline",
-            gap: 16,
-            marginBottom: 32,
-          }}
-        >
-          <SCaps
-            size={11}
-            ls="0.20em"
-            color={ep.featured_image_url ? YEL : YEL}
-          >
-            {ep.episode_code}
-          </SCaps>
-          <SCaps
-            size={10.5}
-            ls="0.16em"
-            color={
-              ep.featured_image_url
-                ? "rgba(250,250,250,.6)"
-                : INK55
-            }
-          >
-            Season {ep.season} · {ep.season_year}
-          </SCaps>
-          <SCaps
-            size={10.5}
-            ls="0.14em"
-            color={
-              ep.featured_image_url
-                ? "rgba(250,250,250,.5)"
-                : INK35
-            }
-          >
-            {new Date(ep.publication_date).toLocaleDateString("en-GB", {
-              month: "short",
-              year: "numeric",
-            })}
-          </SCaps>
-        </div>
-
-        <h1
-          style={{
-            margin: "0 0 24px",
-            fontWeight: 700,
-            fontSize: 64,
-            lineHeight: 1.02,
-            letterSpacing: "-0.025em",
-            maxWidth: 900,
-            color: ep.featured_image_url ? PAPER : INK,
-          }}
-        >
-          {heroText}
-        </h1>
-
-        {ep.hero_text_extracted && ep.hero_text_extracted !== ep.title && (
-          <p
-            style={{
-              margin: "0 0 20px",
-              fontSize: 20,
-              lineHeight: 1.45,
-              fontStyle: "italic",
-              color: ep.featured_image_url
-                ? "rgba(250,250,250,.75)"
-                : INK70,
-              maxWidth: 700,
-            }}
-          >
-            {ep.title}
-          </p>
-        )}
-
-        {ep.guest && (
-          <div style={{ marginTop: 16 }}>
-            <SCaps
-              size={11}
-              ls="0.18em"
-              color={ep.featured_image_url ? "rgba(250,250,250,.7)" : INK55}
-            >
-              Guest · {ep.guest}
-              {ep.guest_role ? ` — ${ep.guest_role}` : ""}
-            </SCaps>
-          </div>
-        )}
-
-        {ep.is_featured && (
+        {/* Text column */}
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
-              display: "inline-block",
-              marginTop: 20,
-              padding: "6px 14px",
-              background: YEL,
-              color: INK,
-              fontFamily: GROT,
-              fontWeight: 800,
-              fontSize: 10.5,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
+              display: "flex",
+              alignItems: "baseline",
+              gap: 16,
+              marginBottom: 32,
             }}
           >
-            Most-played episode
+            <SCaps size={11} ls="0.20em" color={YEL}>
+              {ep.episode_code}
+            </SCaps>
+            <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.6)">
+              Season {ep.season} · {ep.season_year}
+            </SCaps>
+            <SCaps size={10.5} ls="0.14em" color="rgba(250,250,250,.5)">
+              {new Date(ep.publication_date).toLocaleDateString("en-GB", {
+                month: "short",
+                year: "numeric",
+              })}
+            </SCaps>
+          </div>
+
+          <h1
+            style={{
+              margin: "0 0 24px",
+              fontWeight: 700,
+              fontSize: 64,
+              lineHeight: 1.02,
+              letterSpacing: "-0.025em",
+              color: PAPER,
+            }}
+          >
+            {heroText}
+          </h1>
+
+          {ep.hero_text_extracted && ep.hero_text_extracted !== ep.title && (
+            <p
+              style={{
+                margin: "0 0 20px",
+                fontSize: 20,
+                lineHeight: 1.45,
+                fontStyle: "italic",
+                color: "rgba(250,250,250,.75)",
+              }}
+            >
+              {ep.title}
+            </p>
+          )}
+
+          {ep.guest && (
+            <div style={{ marginTop: 16 }}>
+              <SCaps size={11} ls="0.18em" color="rgba(250,250,250,.7)">
+                Guest · {ep.guest}
+                {ep.guest_role ? ` — ${ep.guest_role}` : ""}
+              </SCaps>
+            </div>
+          )}
+
+          {ep.is_featured && (
+            <div
+              style={{
+                display: "inline-block",
+                marginTop: 20,
+                padding: "6px 14px",
+                background: YEL,
+                color: INK,
+                fontFamily: GROT,
+                fontWeight: 800,
+                fontSize: 10.5,
+                letterSpacing: "0.18em",
+                textTransform: "uppercase",
+              }}
+            >
+              Most-played episode
+            </div>
+          )}
+        </div>
+
+        {/* Episode thumbnail */}
+        {ep.featured_image_url && (
+          <div
+            style={{
+              flexShrink: 0,
+              width: 260,
+              alignSelf: "center",
+              border: `1px solid rgba(255,255,255,.12)`,
+              overflow: "hidden",
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={ep.featured_image_url}
+              alt={ep.title}
+              style={{ display: "block", width: "100%", height: "auto" }}
+            />
           </div>
         )}
       </section>
