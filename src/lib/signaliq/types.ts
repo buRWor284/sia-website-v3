@@ -8,7 +8,7 @@
  * will break. Every signal carries its primary-source `url` (receipts).
  */
 
-export type BeatId = "saas" | "fintech" | "health" | "climate" | "ai";
+export type BeatId = "saas" | "fintech" | "health" | "climate" | "ai" | "cybersecurity";
 
 export interface Beat {
   id: BeatId;

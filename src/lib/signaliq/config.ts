@@ -129,6 +129,18 @@ export const BEATS: Beat[] = [
     ],
     blurb: "Models, applications, and the policy fight around them.",
   },
+  {
+    id: "cybersecurity",
+    label: "Cybersecurity & Privacy",
+    seeds: [
+      "SIM swap attack", "SS7 vulnerability", "telecom data breach", "account takeover fraud",
+      "eSIM security", "phone number hijacking", "two-factor authentication bypass", "mobile identity theft",
+      "AI voice scam", "identity verification bypass", "cryptocurrency theft hack", "zero trust mobile",
+      "mobile carrier fraud", "data broker privacy", "cybersecurity insurance", "biometric authentication",
+      "social engineering attack", "digital privacy regulation", "MVNO market growth", "password manager breach",
+    ],
+    blurb: "Mobile security, identity fraud, privacy, and the policy fight around them.",
+  },
 ];
 
 export function beatById(id: BeatId): Beat {
