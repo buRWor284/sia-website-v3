@@ -140,7 +140,7 @@ const EMOS_URL = "/emos";
 const EMOS_APPLY = "/emos/apply";
 
 // ── info tooltip (click + hover, works on mobile) ─────────────────────────────
-function InfoTooltip({ text, dark = false }: { text: string; dark?: boolean }) {
+function InfoTooltip({ text, dark = false, width = 270 }: { text: string; dark?: boolean; width?: number }) {
   const [open, setOpen] = useState(false);
   const bg = dark ? PAPER : INK;
   const fg = dark ? INK : PAPER;
@@ -163,7 +163,7 @@ function InfoTooltip({ text, dark = false }: { text: string; dark?: boolean }) {
         <span style={{
           position: "absolute", bottom: "calc(100% + 8px)", left: "50%",
           transform: "translateX(-50%)",
-          width: 270, padding: "10px 13px",
+          width, padding: "10px 13px",
           background: bg, color: fg,
           fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, lineHeight: 1.55,
           zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,.2)",
@@ -489,15 +489,23 @@ function BeatPicker({
   return (
     <section style={{ padding: "clamp(16px,3vw,28px) clamp(22px,5vw,56px) 0" }}>
       <div className="siq-beat-tabs">
-        {BEATS.map((b, i) => (
-          <button
-            key={b.id}
-            onClick={() => setBeat(b.id)}
-            className={`siq-tab${b.id === beat ? " active" : ""}`}
-          >
-            <span className="siq-tab-no">0{i + 1}</span> {b.label}
-          </button>
-        ))}
+        {BEATS.map((b, i) => {
+          const isActive = b.id === beat;
+          const seedsText = `${b.blurb}\n\nSeeds scanned: ${b.seeds.join(" · ")}`;
+          return (
+            <button
+              key={b.id}
+              onClick={() => setBeat(b.id)}
+              className={`siq-tab${isActive ? " active" : ""}`}
+            >
+              <span style={{ display: "flex", alignItems: "center", gap: 5, justifyContent: "center" }}>
+                <span className="siq-tab-no">0{i + 1}</span>
+                <span>{b.label}</span>
+                <InfoTooltip text={seedsText} dark={isActive} width={320} />
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Beat selection tip */}
@@ -1551,19 +1559,21 @@ const PAGE_CSS = `
   /* beat tabs */
   .siq-beat-tabs {
     display: flex;
-    max-width: 800px;
+    max-width: 100%;
     border: 1px solid ${INK15};
+    overflow-x: auto;
   }
   .siq-tab {
     flex: 1;
-    padding: 11px 18px;
+    min-width: 0;
+    padding: 10px 12px;
     background: transparent;
     border: none;
     border-right: 1px solid ${INK15};
     font-family: ${GROT};
     font-weight: 700;
-    font-size: 11px;
-    letter-spacing: .08em;
+    font-size: 10px;
+    letter-spacing: .07em;
     text-transform: uppercase;
     color: rgba(26,20,16,.45);
     cursor: pointer;
