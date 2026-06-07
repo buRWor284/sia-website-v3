@@ -160,13 +160,11 @@ function InfoTooltip({ text, dark = false, width = 270 }: { text: React.ReactNod
         }}
       >i</span>
       {open && (
-        <span style={{
+        <span className="siq-tooltip-popup" style={{
           position: "absolute", top: "calc(100% + 8px)", left: "50%",
           transform: "translateX(-50%)",
           width, padding: "10px 13px",
           background: PAPER, color: INK55,
-          fontFamily: SERIF, fontStyle: "italic", fontSize: 8, lineHeight: 1.6,
-          textTransform: "none", letterSpacing: "normal",
           zIndex: 9999, boxShadow: "0 4px 16px rgba(0,0,0,.2)",
           border: `1px solid ${INK15}`,
           pointerEvents: "none",
@@ -494,11 +492,7 @@ function BeatPicker({
           const isActive = b.id === beat;
           const seedsNode = (
             <span>
-              <span style={{ fontFamily: SERIF, fontStyle: "italic", color: INK55 }}>{b.blurb}</span>
-              <br /><br />
-              <span style={{ fontFamily: GROT, fontWeight: 700, fontStyle: "normal", fontSize: 7, letterSpacing: ".12em", textTransform: "uppercase", color: INK }}>Seed Phrases:</span>
-              <br />
-              <span style={{ fontFamily: SERIF, fontStyle: "italic", color: INK55 }}>{b.seeds.join(" · ")}</span>
+              <span style={{ fontStyle: "normal", fontWeight: 700 }}>Seed Phrases: </span>{b.seeds.join(", ")}
             </span>
           );
           return (
@@ -1851,6 +1845,18 @@ const PAGE_CSS = `
   }
   @media (max-width: 1100px) {
     .siq-sources-sidebar { display: none; }
+  }
+
+  /* tooltip popup — hard-reset inherited uppercase from tab buttons */
+  .siq-tooltip-popup,
+  .siq-tooltip-popup * {
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    font-family: ${SERIF} !important;
+    font-style: italic !important;
+    font-size: 8px !important;
+    line-height: 1.6 !important;
+    color: ${INK55} !important;
   }
 
   /* ecosystem grid CSS moved to ToolPipelineFooter shared component */
