@@ -15,6 +15,7 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
   DoubleRule,
   HRule,
@@ -25,6 +26,8 @@ import {
   SiaLogo,
 } from "@/components/bureau/primitives";
 import {
+  DARK,
+  DARK_BD,
   GROT,
   INK,
   INK15,
@@ -105,8 +108,6 @@ const GREEN = "#3e6b45";
 const AMBER = "#d99211";
 const RED = "#c14a32";
 const BLUE = "#2d5393";
-const HDR_BG = "#0e0d0a";
-const HDR_BORDER = "#2a2318";
 
 const hexA = (hex: string, a: number): string => {
   const n = parseInt(hex.slice(1), 16);
@@ -324,47 +325,8 @@ function SourcesSidebar() {
 
 // ── header ────────────────────────────────────────────────────────────────────
 
-function SIQHeader() {
-  const DIM = "rgba(241,235,222,.25)";
-  return (
-    <header
-      style={{
-        background: HDR_BG,
-        borderBottom: `1px solid ${HDR_BORDER}`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 clamp(20px,4vw,28px)",
-        height: 52,
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-          <div style={{
-            width: 28, height: 28, background: YEL,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: GROT, fontWeight: 900, fontSize: 11, color: INK,
-          }}>
-            SIA
-          </div>
-        </Link>
-        <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: PAPER, letterSpacing: "-0.01em" }}>
-          Signal<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
-        </span>
-        <div style={{ width: 1, height: 18, background: "rgba(241,235,222,.12)", margin: "0 2px" }} />
-        <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: DIM }}>
-          Story Radar · SIA Wire
-        </span>
-      </div>
-      <span className="siq-hide-sm" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: DIM }}>
-        syedirfanajmal.com
-      </span>
-    </header>
-  );
-}
+// ── Header: now a shared component ───────────────────────────────────────────
+// SIQHeader removed; rendered inline with <ToolHeader> in the page return.
 
 // ── step bar ──────────────────────────────────────────────────────────────────
 
@@ -743,7 +705,7 @@ function PackView({ pack }: { pack: AssetPack }) {
             </div>
             {([
               ["01", "Score the pitch angle in PressIQ before you send it"],
-              ["02", "Find the actual reporters in CollabIQ's journalist contact book"],
+              ["02", "Use the journalist shortlist in this pack — personalise your outreach to each one before sending"],
               ["03", "Build the linkable asset using the EMOS playbook and cadence"],
               ["04", "Run the full earned-media play — EMOS handles the system around it"],
             ] as [string, string][]).map(([n, t]) => (
@@ -793,9 +755,9 @@ function PackView({ pack }: { pack: AssetPack }) {
         <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: INK, whiteSpace: "pre-wrap" }}>
           {pack.angle}
         </p>
-        <Link href="/tools/pressiq" className="siq-cross-link">
+        <a href="/tools/pressiq" className="siq-cross-link">
           Score this pitch in PressIQ →
-        </Link>
+        </a>
       </div>
 
       {/* Linkable asset idea */}
@@ -844,9 +806,6 @@ function PackView({ pack }: { pack: AssetPack }) {
               </div>
             ))}
           </div>
-          <Link href="/tools/collabiq" className="siq-cross-link">
-            Find the actual reporters in CollabIQ →
-          </Link>
         </div>
       )}
 
@@ -1191,7 +1150,15 @@ export default function SignalIQPage() {
   return (
     <>
       <style>{PAGE_CSS}</style>
-      <SIQHeader />
+      <ToolHeader
+        toolPrefix="Signal"
+        subtitle="Story Radar · SIA Wire"
+        rightContent={
+          <span className="siq-hide-sm" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}>
+            syedirfanajmal.com
+          </span>
+        }
+      />
       <StepBar step={step} onGoStep={handleGoStep} />
 
       <div style={{ background: PAPER, color: INK, fontFamily: SERIF, minHeight: "100vh" }}>
@@ -1595,8 +1562,8 @@ const PAGE_CSS = `
   .siq-ticker-wrap {
     display: flex;
     align-items: stretch;
-    background: ${HDR_BG};
-    border-bottom: 1px solid ${HDR_BORDER};
+    background: ${DARK};
+    border-bottom: 1px solid ${DARK_BD};
     overflow: hidden;
     height: 42px;
   }

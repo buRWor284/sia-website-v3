@@ -159,14 +159,18 @@ export function buildUserPrompt(input: PitchInput, m: Layer1Metrics): string {
 
   const newsroomText = NEWSROOM_SIGNALS.map((s) => `   - ${s.label}`).join("\n");
 
+  const isStandalone = input.pitchMode !== "query";
+  const queryBlock = isStandalone
+    ? (input.query?.trim()
+        ? `JOURNALIST'S BEAT / FOCUS AREA (this is NOT a specific query — assess how well this pitch fits a journalist who covers this beat, not whether it answers a particular ask):\n<beat>\n${input.query.trim()}\n</beat>`
+        : `JOURNALIST'S BEAT / FOCUS AREA:\n<beat>\n[NOT PROVIDED — set relevance.assessed=false]\n</beat>`)
+    : `JOURNALIST'S QUERY / SOURCE REQUEST:\n<query>\n${input.query?.trim() ? input.query.trim() : "[NOT PROVIDED — set relevance.assessed=false and do not penalise; score the other dimensions normally.]"}\n</query>`;
+
   return `Evaluate the following pitch.
 
 PLATFORM: ${platform?.label ?? input.platform}${platform && !platform.formal ? " (casual — light tone and an emoji are acceptable)" : " (formal)"}
 
-JOURNALIST'S QUERY / SOURCE REQUEST:
-<query>
-${input.query?.trim() ? input.query.trim() : "[NOT PROVIDED — set relevance.assessed=false and do not penalise; score the other dimensions normally.]"}
-</query>
+${queryBlock}
 
 SELF-REPORTED AUTHORITY SIGNALS (for the Personal Branding dimension): ${brand}
 Judge personalBrand on whether the PITCH actually surfaces this authority — not on the list itself.
@@ -189,7 +193,7 @@ ${input.pitch.trim()}
 </pitch>
 
 Scoring guidance:
-- relevance: ONLY if a query was provided. Does the pitch answer the EXACT question, match the beat, and respect stated constraints (deadline, format, region, word limit)? The single biggest driver of placement.
+- relevance: ONLY if journalist context was provided. In QUERY MODE: does the pitch answer the EXACT question, match the beat, and respect stated constraints (deadline, format, region, word limit)? In STANDALONE MODE (beat provided): does this pitch fit the journalist's known coverage area — would a journalist who covers this beat find it on-point for their readership? Either way, relevance is the single biggest driver of placement.
 - checklist: for each of the 7 steps return met/of and the one highest-leverage fix.
 - storytelling: reward a problem -> insight -> resolution arc with a real protagonist; penalise credential dumps.
 - neuromarketing: COGNITIVE PACKAGING ONLY — a subject that passes a 2-second read, loss framing, specificity, curiosity. Do NOT credit original data here; that belongs to newsroomReady.

@@ -10,8 +10,8 @@ import { useState, useEffect, useReducer, useRef, useCallback } from "react";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
-const BG0  = "#F0F0EE";
-const BG1  = "#FAFAFA";
+const BG0  = "#f1ebde";   // warm cream — matches tokens.PAPER
+const BG1  = "#e8e0cc";   // warm cream 2 — matches tokens.PAPER2
 const BG2  = "#FFFFFF";
 const BD   = "rgba(26,20,16,0.15)";
 const BDS  = "rgba(26,20,16,0.08)";
@@ -1489,7 +1489,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} theme={theme} />}
 
         {/* Pipeline footer — shown only on the final step as a "what's next?" prompt */}
-        {step===5 && <div style={{ paddingBottom: 72 }}><ToolPipelineFooter currentTool="journocollabiq" compact /></div>}
+        {step > 0 && <div style={{ paddingBottom: 72 }}><ToolPipelineFooter currentTool="journocollabiq" compact /></div>}
 
         <EmailGate show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>

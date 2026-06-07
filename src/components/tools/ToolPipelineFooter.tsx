@@ -2,7 +2,7 @@
 
 /**
  * ToolPipelineFooter — shared earned-media pipeline footer.
- * Used on SignalIQ, PressIQ, JournoCollabIQ, CoverageIQ (coming soon).
+ * Used on SignalIQ, PressIQ, JournoCollabIQ, CoverageIQ.
  * NOT used on PartnerCollabIQ (separate tool, outside EMOS workflow).
  *
  * Pass `currentTool` to highlight "You are here".
@@ -30,7 +30,7 @@ const PIPELINE: PipelineCard[] = [
   { step: "01", tool: "SignalIQ",        href: "/tools/signaliq",        toolId: "signaliq",        role: "Find the story" },
   { step: "02", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
   { step: "03", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
-  { step: "04", tool: "CoverageIQ",      href: null,                     toolId: "coverageiq",      role: "Track the placement", comingSoon: true },
+  { step: "04", tool: "CoverageIQ",      href: "/tools/coverageiq",      toolId: "coverageiq",      role: "Track the placement" },
   { step: "05", tool: "EMOS",            href: "/emos",                  toolId: "emos",            role: "Run the full system" },
 ];
 

@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
       : "haro") as PitchInput["platform"],
     brandSignals: raw.brandSignals ? coerceBrand(raw.brandSignals) : EMPTY_BRAND,
     store: raw.store !== false,
+    pitchMode: raw.pitchMode === "query" ? "query" : "standalone",
     turnstileToken: typeof raw.turnstileToken === "string" ? raw.turnstileToken : undefined,
   };
 

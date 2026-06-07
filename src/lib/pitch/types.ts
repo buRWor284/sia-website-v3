@@ -31,6 +31,8 @@ export interface PitchInput {
   brandSignals: BrandSignals;
   /** D-13: store the pitch for the outcome flywheel. Default true; user can opt out. */
   store?: boolean;
+  /** "standalone" = proactive outreach scored against journalist's beat; "query" = reactive HARO-style response. Default = standalone. */
+  pitchMode?: "standalone" | "query";
   /** Cloudflare Turnstile token (optional in dev). */
   turnstileToken?: string;
 }

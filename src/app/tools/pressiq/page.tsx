@@ -8,8 +8,8 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
   DIMENSION_EVIDENCE,
   EMAIL_LIMIT,
@@ -28,24 +28,18 @@ import {
   type ScoreResponse,
 } from "@/lib/pitch/types";
 
-// ── Colour palette (handoff warm-cream spec) ──────────────────────────────────
-const PAPER   = "#f1ebde";
-const PAPER2  = "#e8e0cc";
-const INK     = "#1a1410";
-const YEL     = "#f5b81f";
-const DARK    = "#0e0d0a";
-const DARK2   = "#181510";
+// ── Tokens from lib/tokens ─────────────────────────────────────────────────────
+import {
+  DARK, DARK_BD, DARK2,
+  GROT, INK, MONO, PAPER, PAPER2, SERIF, YEL,
+} from "@/lib/tokens";
+
+// ── Tool-specific colours (not in shared tokens) ───────────────────────────────
 const DARK3   = "#221e17";
-const DARK_BD = "#2a2318";
 const GREEN   = "#3e6b45";
 const AMBER   = "#d99211";
 const RED     = "#c14a32";
 const BLUE    = "#2d5393";
-
-// ── Typography ────────────────────────────────────────────────────────────────
-const SERIF = "var(--font-serif)";
-const GROT  = "var(--font-grot)";
-const MONO  = "var(--font-mono)";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const ra = (hex: string, alpha: number) => {
@@ -125,6 +119,8 @@ Priya Raman — Founder, Tilt · tilt.example.com
 priya@tilt.example.com · @priyaraman · linkedin.com/in/priyaraman`;
 
 const SAMPLE_QUERY = `Looking for founders / HR leads who have implemented a 4-day work week for at least 6 months and can share real performance data (retention, output, revenue impact). Especially interested in anyone who tried it and reversed course. For a feature in The Future of Work series. Requirements: Named source, must be available for a 15-min phone interview.`;
+
+const SAMPLE_BEAT = `Covers the future of work, distributed teams, and workplace productivity. Writes the Future of Work series — regular features on 4-day weeks, remote-first culture, async practices, and workforce wellbeing data. Prefers named sources with real numbers from their own operations, not thought-leader takes.`;
 
 const STORE_KEY = "sia.pressiq.v2";
 
@@ -463,7 +459,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
           <em style={{ fontStyle: "italic" }}><span style={{ background: YEL, color: INK, padding: "0 .12em" }}>paste this in?</span></em>
         </h1>
         <p style={{ fontFamily: SERIF, fontSize: 15.5, color: ra(INK, 0.5), lineHeight: 1.6, maxWidth: 540, margin: 0 }}>
-          Score your HARO / Qwoted / Featured pitch against a 34-point system and the EMOS framework — and get the three fixes that move it most. No signup for your first {FREE_LIMIT}.
+          Score any PR pitch — standalone outreach or a query response — against a 34-point system and the EMOS framework. Get the three fixes that move it most. No signup for your first {FREE_LIMIT}.
         </p>
       </div>
 
@@ -550,12 +546,13 @@ function LoadingPanel() {
 
 // ── Post-score panel ──────────────────────────────────────────────────────────
 function PostScorePanel({
-  result, tab, setTab, email, setEmail, emailDone, setEmailDone, onDownload, onReset,
+  result, tab, setTab, email, setEmail, emailDone, setEmailDone, onDownload, onReset, pitchMode,
 }: {
   result: ScoreResponse; tab: Tab; setTab: (t: Tab) => void;
   email: string; setEmail: (v: string) => void;
   emailDone: boolean; setEmailDone: (v: boolean) => void;
   onDownload: () => void; onReset: () => void;
+  pitchMode: "standalone" | "query";
 }) {
   const [expanded, setExpanded] = useState<Set<DimKey>>(new Set());
   const { composite, tier, areas, relevanceAssessed, strongestLine, topFixes, authenticityRisk } = result;
@@ -628,7 +625,9 @@ function PostScorePanel({
 
           {!relevanceAssessed && (
             <div style={{ padding: "13px 16px", marginBottom: 18, border: `1px solid ${AMBER}`, background: "rgba(217,146,17,.05)", fontFamily: SERIF, fontSize: 13.5, fontStyle: "italic", color: ra(INK, 0.65) }}>
-              Scored without the journalist&rsquo;s query, so relevance — the #1 driver of placement — wasn&rsquo;t assessed. Add it for a real score.
+              {pitchMode === "query"
+                ? "Scored without the journalist’s query, so relevance — the #1 driver of placement — wasn’t assessed. Add it for a full score."
+                : "No journalist beat was provided, so relevance — the #1 driver of placement — wasn’t assessed. Add the journalist’s beat for a fuller score."}
             </div>
           )}
           {authenticityRisk?.flagged && (
@@ -766,6 +765,8 @@ export default function PressIQPage() {
   const [platform, setPlatform] = useState<Platform>("haro");
   const [brand,    setBrand]    = useState<BrandSignals>(EMPTY_BRAND);
   const [store,    setStore]    = useState(true);
+  const [pitchMode, setPitchMode] = useState<"standalone" | "query">("standalone");
+  const [journalistBeat, setJournalistBeat] = useState("");
   const [view,     setView]     = useState<"pre" | "loading" | "post">("pre");
   const [result,   setResult]   = useState<ScoreResponse | null>(null);
   const [error,    setError]    = useState<string | null>(null);
@@ -788,13 +789,15 @@ export default function PressIQPage() {
         if (typeof d.subject  === "string") setSubject(d.subject);
         if (typeof d.platform === "string") setPlatform(d.platform as Platform);
         if (d.brand && typeof d.brand === "object") setBrand({ ...EMPTY_BRAND, ...(d.brand as Partial<BrandSignals>) });
+        if (d.pitchMode === "standalone" || d.pitchMode === "query") setPitchMode(d.pitchMode as "standalone" | "query");
+        if (typeof d.journalistBeat === "string") setJournalistBeat(d.journalistBeat);
       }
     } catch { /* ignore */ }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ pitch, query, subject, platform, brand })); } catch { /* ignore */ }
-  }, [pitch, query, subject, platform, brand]);
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ pitch, query, subject, platform, brand, pitchMode, journalistBeat })); } catch { /* ignore */ }
+  }, [pitch, query, subject, platform, brand, pitchMode, journalistBeat]);
 
   const live = useMemo(() => {
     if (pitch.trim().length < 15) return null;
@@ -805,7 +808,9 @@ export default function PressIQPage() {
   const canAnalyze = pitch.trim().length >= 40 && view !== "loading";
 
   function loadSample() {
-    setPitch(SAMPLE_PITCH); setQuery(SAMPLE_QUERY);
+    setPitch(SAMPLE_PITCH);
+    if (pitchMode === "query") setQuery(SAMPLE_QUERY);
+    else setJournalistBeat(SAMPLE_BEAT);
     const fl = SAMPLE_PITCH.split("\n")[0];
     if (fl.startsWith("Subject: ")) setSubject(fl.replace("Subject: ", ""));
   }
@@ -814,7 +819,7 @@ export default function PressIQPage() {
     if (!canAnalyze) return;
     setError(null); setView("loading"); setResult(null); setTab("score");
     try {
-      const res = await fetch("/api/pitch-score", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pitch, query, subject, platform, brandSignals: brand, store }) });
+      const res = await fetch("/api/pitch-score", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pitch, query: pitchMode === "standalone" ? journalistBeat : query, subject, platform, brandSignals: brand, store, pitchMode }) });
       const data = (await res.json()) as { error?: string } & ScoreResponse;
       if (!res.ok) { setError(data.error || "Something went wrong scoring your pitch."); setView("pre"); }
       else { setResult(data); setView("post"); setTimeout(() => rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }), 50); }
@@ -831,158 +836,257 @@ export default function PressIQPage() {
     try { JsPDF = await loadJsPDF(); } catch { alert("PDF library failed to load. Check your connection and try again."); return; }
 
     const doc = new JsPDF({ unit: "mm", format: "a4" });
-    const W = 210, H = 297, M = 24;
-    const iINK:  [number,number,number] = [26,20,16];
-    const iGOLD: [number,number,number] = [245,184,31];
-    const iCREAM:[number,number,number] = [241,235,222];
-    const iGREY: [number,number,number] = [130,120,108];
-    const iDGREY:[number,number,number] = [80,72,62];
+    const W = 210, H = 297;
+    const ML = 22, MR = 22;          // left / right margin
+    const CW = W - ML - MR;          // content width = 166mm
+    const iINK:   [number,number,number] = [26, 20, 16];
+    const iGOLD:  [number,number,number] = [245, 184, 31];
+    const iCREAM: [number,number,number] = [241, 235, 222];
+    const iCREAM2:[number,number,number] = [232, 224, 204]; // PAPER2
+    const iMID:   [number,number,number] = [130, 120, 108];
+    const iDIM:   [number,number,number] = [80, 72, 62];
+    const iDARK:  [number,number,number] = [14, 13, 10];
+    const iDARKBD:[number,number,number] = [42, 35, 24];
+
     const tierRGB = (color: string): [number,number,number] => {
       const n = parseInt(color.slice(1), 16);
       return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
     };
     const [tR,tG,tB] = tierRGB(result.tier.color);
     const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-    const pitchSubject = (subject || resolveSubject(pitch, subject) || "Pitch Review").substring(0, 60);
+    const pitchSubject = (subject || resolveSubject(pitch, subject) || "Pitch Review").substring(0, 72);
 
-    function footer(page: number, dark = false) {
-      const footY = H - 8;
+    // ── Shared helpers ────────────────────────────────────────────────────────
+    function pgFooter(page: number, dark = false) {
+      const FOOT_H = 14, footY = H - 5;
       if (dark) {
-        doc.setFillColor(...iINK); doc.rect(0, H - 16, W, 16, "F");
-        doc.setDrawColor(50,42,32); doc.setLineWidth(0.3); doc.line(0, H - 16, W, H - 16);
-        doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...iGOLD);
-        doc.text("PressIQ", M, footY);
-        doc.setFont("helvetica","normal"); doc.setTextColor(80,70,60);
-        doc.text("  ·  syedirfanajmal.com/tools/pressiq  ·  Syed Irfan Ajmal", M + 14, footY);
+        doc.setFillColor(...iDARK); doc.rect(0, H - FOOT_H, W, FOOT_H, "F");
+        doc.setDrawColor(...iDARKBD); doc.setLineWidth(0.4); doc.line(0, H - FOOT_H, W, H - FOOT_H);
+        doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iGOLD);
+        doc.text("PRESSIQ", ML, footY);
+        doc.setFont("helvetica","normal"); doc.setTextColor(70, 62, 50);
+        doc.text("  ·  EMOS TOOL SUITE  ·  SYEDIRFANAJMAL.COM", ML + 13, footY);
       } else {
-        doc.setFillColor(...iCREAM); doc.rect(0, H - 16, W, 16, "F");
-        doc.setDrawColor(210,205,195); doc.setLineWidth(0.3); doc.line(0, H - 16, W, H - 16);
-        doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...iINK);
-        doc.text("PressIQ", M, footY);
-        doc.setFont("helvetica","normal"); doc.setTextColor(...iGREY);
-        doc.text("  ·  syedirfanajmal.com/tools/pressiq  ·  Syed Irfan Ajmal", M + 14, footY);
+        doc.setFillColor(...iCREAM2); doc.rect(0, H - FOOT_H, W, FOOT_H, "F");
+        doc.setDrawColor(210, 204, 190); doc.setLineWidth(0.4); doc.line(0, H - FOOT_H, W, H - FOOT_H);
+        doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iINK);
+        doc.text("PRESSIQ", ML, footY);
+        doc.setFont("helvetica","normal"); doc.setTextColor(...iMID);
+        doc.text("  ·  EMOS TOOL SUITE  ·  SYEDIRFANAJMAL.COM", ML + 13, footY);
       }
-      doc.setFont("helvetica","normal"); doc.setFontSize(6); doc.setTextColor(dark ? 80 : 130, dark ? 70 : 120, dark ? 60 : 108);
-      doc.text(`Page ${page}`, W - M, footY, { align: "right" });
+      doc.setFont("helvetica","normal"); doc.setFontSize(5.5);
+      doc.setTextColor(dark ? 70 : 130, dark ? 62 : 120, dark ? 50 : 108);
+      doc.text(`${page}`, W - MR, footY, { align: "right" });
     }
 
-    function lightHeader(right: string) {
+    function innerPageSetup(sectionLabel: string) {
+      // Full warm-cream background
       doc.setFillColor(...iCREAM); doc.rect(0, 0, W, H, "F");
+      // Gold top rule (3mm)
       doc.setFillColor(...iGOLD); doc.rect(0, 0, W, 3, "F");
-      doc.setDrawColor(...iINK); doc.setLineWidth(1.2); doc.line(0, 14, W, 14);
-      doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(...iINK);
-      doc.text("Press", M, 11);
+      // Header row
+      const hY = 13;
+      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...iINK);
+      doc.text("Press", ML, hY);
       const pw = doc.getTextWidth("Press");
-      doc.setTextColor(...iGOLD); doc.text("IQ", M + pw, 11);
-      doc.setFont("helvetica","normal"); doc.setFontSize(6); doc.setTextColor(...iGREY);
-      doc.text(right.toUpperCase(), W - M, 11, { align: "right" });
+      doc.setTextColor(...iGOLD); doc.text("IQ", ML + pw, hY);
+      doc.setFont("helvetica","normal"); doc.setFontSize(5.5); doc.setTextColor(...iMID);
+      doc.text(sectionLabel.toUpperCase(), W - MR, hY, { align: "right" });
+      // Full-width hairline under header
+      doc.setDrawColor(...iINK); doc.setLineWidth(0.6); doc.line(0, 16, W, 16);
+      return 24; // starting Y for content
     }
 
-    // ── PAGE 1: DARK COVER ──────────────────────────────────────────
-    doc.setFillColor(...iINK); doc.rect(0, 0, W, H, "F");
+    // ── PAGE 1: DARK COVER ────────────────────────────────────────────────────
+    // Full dark background
+    doc.setFillColor(...iDARK); doc.rect(0, 0, W, H, "F");
+    // Gold top bar (5mm) + bottom bar (5mm)
     doc.setFillColor(...iGOLD); doc.rect(0, 0, W, 5, "F");
-    // SIA mark
-    doc.setFillColor(...iGOLD); doc.rect(M, 14, 12, 12, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...iINK);
-    doc.text("SIA", M + 6, 21.5, { align: "center" });
-    doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...iCREAM);
-    doc.text("Syed Irfan Ajmal  ·  syedirfanajmal.com", M + 16, 21);
-    // Wordmark
-    let y = 68;
-    doc.setFillColor(...iGOLD); doc.rect(M, y, 20, 1.5, "F");
-    doc.setFillColor(40,32,24); doc.rect(M + 22, y, W - M * 2 - 22, 1.5, "F");
-    y += 8; doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...iGOLD);
-    doc.text("JOURNALIST PITCH SCORE REPORT", M, y); y += 18;
-    doc.setFont("helvetica","bold"); doc.setFontSize(48); doc.setTextColor(...iCREAM);
-    doc.text("Press", M, y);
-    doc.setTextColor(...iGOLD); doc.text("IQ", M + doc.getTextWidth("Press"), y); y += 12;
-    doc.setFont("helvetica","normal"); doc.setFontSize(14); doc.setTextColor(160,148,130);
-    doc.text("Your personalised pitch analysis", M, y); y += 22;
-    // Score circle
-    const cx = M + 28, cy2 = y + 22, rs = 20;
-    doc.setDrawColor(...iGOLD); doc.setLineWidth(2); doc.circle(cx, cy2, rs);
-    doc.setFont("helvetica","bold"); doc.setFontSize(28); doc.setTextColor(...iGOLD);
-    doc.text(String(result.composite), cx, cy2 + 5, { align: "center" });
-    doc.setFontSize(7); doc.setTextColor(120,110,95); doc.text("/ 100", cx, cy2 + 12, { align: "center" });
-    doc.setFillColor(tR, tG, tB); doc.rect(cx - 20, cy2 + 17, 40, 8, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(6.5); doc.setTextColor(255,255,255);
-    doc.text(result.tier.label.toUpperCase(), cx, cy2 + 23, { align: "center" });
-    doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(180,168,150);
-    const headText = result.composite >= 85 ? "Placement-grade." : result.composite >= 65 ? "Competitive — tighten it." : result.composite >= 40 ? "Real material, missing the system." : "This will get ignored.";
-    doc.text(headText, M + 56, cy2 - 4);
-    doc.setFontSize(8.5); doc.setTextColor(120,110,95);
-    const wrapSubject = doc.splitTextToSize(pitchSubject, W - M * 2 - 60) as string[];
-    doc.text(wrapSubject, M + 56, cy2 + 6);
-    y = cy2 + 30;
-    doc.setFontSize(7); doc.setTextColor(70,62,50);
-    doc.text(date, W - M, y, { align: "right" });
-    footer(1, true);
+    doc.setFillColor(...iGOLD); doc.rect(0, H - 5, W, 5, "F");
+    // Subtle vertical gold accent strip (left edge)
+    doc.setFillColor(40, 32, 20); doc.rect(0, 5, 4, H - 10, "F");
 
-    // ── PAGE 2: SCORE SUMMARY ───────────────────────────────────────
-    doc.addPage(); lightHeader("Score Summary"); y = 26;
-    // Radar-style dimension table
-    doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...iINK);
-    doc.text("Score by Dimension", M, y); y += 10;
+    // SIA mark (top-left)
+    doc.setFillColor(...iGOLD); doc.rect(ML, 14, 14, 14, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(7.5); doc.setTextColor(...iINK);
+    doc.text("SIA", ML + 7, 23, { align: "center" });
+    doc.setFont("helvetica","normal"); doc.setFontSize(6.5); doc.setTextColor(100, 90, 72);
+    doc.text("Syed Irfan Ajmal  ·  syedirfanajmal.com", ML + 18, 21);
+
+    // Eyebrow
+    let y = 72;
+    doc.setFillColor(...iGOLD); doc.rect(ML, y, 18, 1.2, "F");
+    doc.setFillColor(38, 30, 20); doc.rect(ML + 20, y, CW - 20, 1.2, "F");
+    y += 7;
+    doc.setFont("helvetica","bold"); doc.setFontSize(6.5); doc.setTextColor(...iGOLD);
+    doc.text("JOURNALIST PITCH SCORE REPORT", ML, y);
+
+    // Wordmark
+    y += 14;
+    doc.setFont("helvetica","bold"); doc.setFontSize(52); doc.setTextColor(...iCREAM);
+    doc.text("Press", ML, y);
+    const pressW = doc.getTextWidth("Press");
+    doc.setTextColor(...iGOLD); doc.text("IQ", ML + pressW, y);
+
+    // Tagline
+    y += 9;
+    doc.setFont("helvetica","normal"); doc.setFontSize(12); doc.setTextColor(150, 138, 118);
+    doc.text("Your personalised pitch analysis", ML, y);
+
+    // ── Score block ───────────────────────────────────────────────────────────
+    y += 20;
+    // Score number (large)
+    const scoreX = ML + 2;
+    doc.setFont("helvetica","bold"); doc.setFontSize(72); doc.setTextColor(...iGOLD);
+    doc.text(String(result.composite), scoreX, y + 22);
+    const scoreNumW = doc.getTextWidth(String(result.composite));
+    // "/100" next to score
+    doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(80, 72, 58);
+    doc.text("/ 100", scoreX + scoreNumW + 2, y + 18);
+    // Tier badge pill
+    doc.setFillColor(tR, tG, tB); doc.rect(scoreX, y + 26, 38, 7, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(255, 255, 255);
+    doc.text(result.tier.label.toUpperCase(), scoreX + 19, y + 31, { align: "center" });
+
+    // Verdict + subject (right of score)
+    const vX = scoreX + 56;
+    const vW = W - MR - vX;
+    doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...iCREAM);
+    const headText = result.composite >= 85 ? "Placement-grade." : result.composite >= 65 ? "Competitive — tighten it." : result.composite >= 40 ? "Real material, missing the system." : "This will get ignored.";
+    const headLines = doc.splitTextToSize(headText, vW) as string[];
+    headLines.forEach((l, i) => doc.text(l, vX, y + 6 + i * 8));
+
+    doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(100, 90, 72);
+    const subjLines = doc.splitTextToSize(pitchSubject, vW) as string[];
+    let subjY = y + 6 + headLines.length * 8 + 5;
+    subjLines.slice(0, 3).forEach(l => { doc.text(l, vX, subjY); subjY += 5.5; });
+
+    // Thin horizontal rule below score block
+    y += 40;
+    doc.setDrawColor(38, 30, 20); doc.setLineWidth(0.4); doc.line(ML, y, W - MR, y);
+
+    // Date
+    y += 5;
+    doc.setFont("helvetica","normal"); doc.setFontSize(6.5); doc.setTextColor(70, 62, 50);
+    doc.text(date, W - MR, y, { align: "right" });
+
+    pgFooter(1, true);
+
+    // ── PAGE 2: SCORE SUMMARY ─────────────────────────────────────────────────
+    doc.addPage(); y = innerPageSetup("Score Summary");
+
     const dimOrder = (result.relevanceAssessed ? DIMS : DIMS.filter(d => d.key !== "relevance")) as typeof DIMS[number][];
     const scoreMap2: Record<string, number> = {};
     if (result.areas.relevance) scoreMap2.relevance = result.areas.relevance.score;
-    scoreMap2.objective = result.areas.objective.score; scoreMap2.checklist = result.areas.checklist.score;
-    scoreMap2.newsroomReady = result.areas.newsroomReady.score; scoreMap2.storytelling = result.areas.emos.storytelling.score;
-    scoreMap2.neuromarketing = result.areas.emos.neuromarketing.score; scoreMap2.personalBrand = result.areas.emos.personalBrand.score;
+    scoreMap2.objective = result.areas.objective.score;
+    scoreMap2.checklist = result.areas.checklist.score;
+    scoreMap2.newsroomReady = result.areas.newsroomReady.score;
+    scoreMap2.storytelling = result.areas.emos.storytelling.score;
+    scoreMap2.neuromarketing = result.areas.emos.neuromarketing.score;
+    scoreMap2.personalBrand = result.areas.emos.personalBrand.score;
 
+    // Section heading
+    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...iINK);
+    doc.text("Score by Dimension", ML, y); y += 4;
+    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iMID);
+    doc.text("How your pitch performs across each scoring area.", ML, y); y += 10;
+
+    // Dimension rows
+    const BAR_X = ML + 90, BAR_W = CW - 90, ROW_H = 14;
     dimOrder.forEach((d, i) => {
       const s = scoreMap2[d.key] ?? 0;
       const [dr,dg,db] = tierRGB(s >= 75 ? GREEN : s >= 45 ? AMBER : RED);
-      const rowY = y + i * 13;
-      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...iINK);
-      doc.text(d.name, M, rowY);
-      doc.setFont("helvetica","bold"); doc.setTextColor(dr,dg,db);
-      doc.text(String(s), W - M - 30, rowY, { align: "right" });
-      doc.setFillColor(220,215,205); doc.rect(W - M - 28, rowY - 4, 28, 4, "F");
-      doc.setFillColor(dr,dg,db); doc.rect(W - M - 28, rowY - 4, 28 * s / 100, 4, "F");
-      if (i < dimOrder.length - 1) { doc.setDrawColor(220,215,205); doc.setLineWidth(0.2); doc.line(M, rowY + 4, W - M, rowY + 4); }
+      const rowY = y + i * ROW_H;
+      // Alternating row tint
+      if (i % 2 === 0) { doc.setFillColor(236, 229, 213); doc.rect(ML - 2, rowY - 4, CW + 4, ROW_H, "F"); }
+      // Dimension name
+      doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(...iINK);
+      doc.text(d.name, ML, rowY + 4);
+      // Score number
+      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(dr,dg,db);
+      doc.text(String(s), BAR_X - 6, rowY + 4, { align: "right" });
+      // Bar track
+      doc.setFillColor(210, 204, 190); doc.rect(BAR_X, rowY, BAR_W, 5, "F");
+      // Bar fill
+      doc.setFillColor(dr,dg,db); doc.rect(BAR_X, rowY, BAR_W * s / 100, 5, "F");
     });
-    y += dimOrder.length * 13 + 8;
+    y += dimOrder.length * ROW_H + 10;
 
+    // Composite score callout
+    doc.setFillColor(...iINK); doc.rect(ML, y, CW, 18, "F");
+    doc.setFillColor(...iGOLD); doc.rect(ML, y, 3, 18, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(22); doc.setTextColor(...iGOLD);
+    doc.text(String(result.composite), ML + 10, y + 13);
+    const compNumW = doc.getTextWidth(String(result.composite));
+    doc.setFontSize(7); doc.setTextColor(100, 90, 72);
+    doc.text("/ 100", ML + 11 + compNumW, y + 10);
+    doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...iCREAM);
+    doc.text("COMPOSITE SCORE", ML + 50, y + 7);
+    doc.setFont("helvetica","normal"); doc.setFontSize(7.5); doc.setTextColor(160, 148, 130);
+    doc.text(result.tier.label, ML + 50, y + 14);
+    y += 26;
+
+    // Strongest line callout
     if (result.strongestLine) {
-      doc.setFillColor(245,184,31); doc.rect(M, y, 2.5, 14, "F");
-      doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...iGREY);
-      doc.text("YOUR STRONGEST LINE", M + 6, y + 5);
-      doc.setFont("helvetica","italic"); doc.setFontSize(9); doc.setTextColor(...iDGREY);
-      const sLines = doc.splitTextToSize(`"${result.strongestLine}"`, W - M * 2 - 12) as string[];
-      doc.text(sLines[0] || "", M + 6, y + 11); y += 20;
+      doc.setFillColor(...iCREAM2); doc.rect(ML, y, CW, 18, "F");
+      doc.setFillColor(...iGOLD); doc.rect(ML, y, 3, 18, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iMID);
+      doc.text("YOUR STRONGEST LINE", ML + 7, y + 5);
+      doc.setFont("helvetica","italic"); doc.setFontSize(8.5); doc.setTextColor(...iDIM);
+      const sLine = doc.splitTextToSize(`"${result.strongestLine}"`, CW - 10) as string[];
+      doc.text(sLine[0] || "", ML + 7, y + 13);
     }
-    footer(2);
 
-    // ── PAGE 3: TOP FIXES ────────────────────────────────────────────
-    doc.addPage(); lightHeader("Top 3 Fixes"); y = 26;
-    doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...iINK);
-    doc.text("The 3 Fixes That Move Your Score Most", M, y); y += 12;
+    pgFooter(2);
+
+    // ── PAGE 3: TOP FIXES ─────────────────────────────────────────────────────
+    doc.addPage(); y = innerPageSetup("Top 3 Fixes");
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...iINK);
+    doc.text("The 3 Fixes That Move Your Score Most", ML, y); y += 4;
+    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iMID);
+    doc.text("Address these in order — each one compounds the next.", ML, y); y += 12;
+
     result.topFixes.slice(0, 3).forEach((f, i) => {
-      doc.setFillColor(...iINK); doc.rect(M, y, W - M * 2, 10, "F");
-      doc.setFillColor(...iGOLD); doc.rect(M, y, 10, 10, "F");
+      // Fix header bar (dark)
+      doc.setFillColor(...iINK); doc.rect(ML, y, CW, 12, "F");
+      // Gold rank square
+      doc.setFillColor(...iGOLD); doc.rect(ML, y, 12, 12, "F");
       doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...iINK);
-      doc.text(String(i + 1), M + 5, y + 7, { align: "center" });
-      doc.setTextColor(...iCREAM); doc.setFontSize(9);
-      doc.text(f.area, M + 14, y + 7);
-      if (f.mechanism) { doc.setFont("helvetica","normal"); doc.setFontSize(6); doc.setTextColor(120,110,95); doc.text(f.mechanism.toUpperCase(), W - M, y + 7, { align: "right" }); }
+      doc.text(String(i + 1), ML + 6, y + 8.5, { align: "center" });
+      // Fix name
+      doc.setFontSize(9.5); doc.setTextColor(...iCREAM);
+      doc.text(f.area, ML + 16, y + 8.5);
+      // Mechanism tag (right-aligned)
+      if (f.mechanism) {
+        doc.setFont("helvetica","normal"); doc.setFontSize(5.5); doc.setTextColor(100, 90, 72);
+        doc.text(f.mechanism.toUpperCase(), ML + CW, y + 8.5, { align: "right" });
+      }
       y += 12;
-      doc.setFillColor(248,245,238); doc.rect(M, y, W - M * 2, 0.5, "F");
-      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...iDGREY);
-      const fLines = doc.splitTextToSize(f.text, W - M * 2 - 8) as string[];
-      const fH = fLines.length * 5 + 8;
-      doc.setFillColor(248,245,238); doc.rect(M, y, W - M * 2, fH, "F");
-      doc.text(fLines, M + 4, y + 5); y += fH + 6;
+      // Fix body
+      doc.setFillColor(...iCREAM2); doc.rect(ML, y, CW, 0.4, "F");
+      doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...iDIM);
+      const fLines = doc.splitTextToSize(f.text, CW - 6) as string[];
+      const fH = fLines.length * 5.2 + 10;
+      doc.setFillColor(236, 229, 213); doc.rect(ML, y, CW, fH, "F");
+      doc.text(fLines, ML + 4, y + 6);
+      y += fH + 8;
     });
-    footer(3);
 
-    // ── PAGE 4: BREAKDOWN ─────────────────────────────────────────────
-    doc.addPage(); lightHeader("Full Breakdown"); y = 26;
-    doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...iINK);
-    doc.text("Dimension-by-Dimension Analysis", M, y); y += 10;
+    pgFooter(3);
+
+    // ── PAGE 4: FULL BREAKDOWN ────────────────────────────────────────────────
+    doc.addPage(); y = innerPageSetup("Full Breakdown");
+    let breakdownPage = 4;
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...iINK);
+    doc.text("Dimension-by-Dimension Analysis", ML, y); y += 4;
+    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iMID);
+    doc.text("Every scoring dimension explained, with AI-generated improvement guidance.", ML, y); y += 12;
+
     for (const d of dimOrder) {
       const area = (() => {
-        if (d.key === "relevance")      return result.areas.relevance ?? { score: 0 };
+        if (d.key === "relevance")      return result.areas.relevance ?? { score: 0, analysis: "" };
         if (d.key === "objective")      return result.areas.objective;
         if (d.key === "checklist")      return result.areas.checklist;
         if (d.key === "newsroomReady")  return result.areas.newsroomReady;
@@ -992,43 +1096,73 @@ export default function PressIQPage() {
       })();
       const s = area.score;
       const [dr,dg,db] = tierRGB(s >= 75 ? GREEN : s >= 45 ? AMBER : RED);
-      if (y > H - 50) { footer(4); doc.addPage(); lightHeader("Full Breakdown"); y = 26; }
-      doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...iINK);
-      doc.text(d.name, M, y);
-      doc.setTextColor(dr,dg,db); doc.text(String(s), W - M, y, { align: "right" }); y += 5;
-      doc.setFillColor(220,215,205); doc.rect(M, y, W - M * 2, 3, "F");
-      doc.setFillColor(dr,dg,db); doc.rect(M, y, (W - M * 2) * s / 100, 3, "F"); y += 7;
-      if (area.analysis) {
-        doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iDGREY);
-        const aLines = doc.splitTextToSize(area.analysis, W - M * 2) as string[];
-        aLines.slice(0, 3).forEach(l => { if (y > H - 30) return; doc.text(l, M, y); y += 5; });
-      }
-      y += 4;
-    }
-    footer(4);
+      const aLines = area.analysis ? doc.splitTextToSize(area.analysis, CW - 4) as string[] : [];
+      const blockH = 8 + 5 + (aLines.length > 0 ? aLines.slice(0,4).length * 4.8 + 4 : 0) + 4;
 
-    // ── PAGE 5: EMOS CTA (DARK) ──────────────────────────────────────
+      if (y + blockH > H - 24) {
+        pgFooter(breakdownPage); doc.addPage(); breakdownPage++;
+        y = innerPageSetup("Full Breakdown (cont.)");
+      }
+
+      // Dim heading row
+      doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(...iINK);
+      doc.text(d.name, ML, y);
+      doc.setTextColor(dr,dg,db); doc.text(String(s), ML + CW, y, { align: "right" }); y += 4;
+      // Progress bar (6mm tall, full width)
+      doc.setFillColor(210, 204, 190); doc.rect(ML, y, CW, 4, "F");
+      doc.setFillColor(dr,dg,db); doc.rect(ML, y, CW * s / 100, 4, "F"); y += 7;
+      // Analysis text
+      if (aLines.length > 0) {
+        doc.setFont("helvetica","normal"); doc.setFontSize(7.5); doc.setTextColor(...iDIM);
+        aLines.slice(0, 4).forEach(l => { doc.text(l, ML, y); y += 4.8; });
+      }
+      // Hairline separator
+      doc.setDrawColor(210, 204, 190); doc.setLineWidth(0.2); doc.line(ML, y + 2, ML + CW, y + 2);
+      y += 8;
+    }
+    pgFooter(breakdownPage);
+
+    // ── PAGE 5: EMOS CTA (DARK) ───────────────────────────────────────────────
     doc.addPage();
-    doc.setFillColor(...iINK); doc.rect(0, 0, W, H, "F");
+    doc.setFillColor(...iDARK); doc.rect(0, 0, W, H, "F");
     doc.setFillColor(...iGOLD); doc.rect(0, 0, W, 5, "F");
-    y = 55;
-    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 16, y, 32, 32, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.setTextColor(...iINK);
-    doc.text("SIA", W / 2, y + 19, { align: "center" }); y += 44;
-    doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...iGOLD);
-    doc.text("WANT RESULTS LIKE THESE AT SCALE?", W / 2, y, { align: "center" }); y += 12;
-    doc.setFont("helvetica","bold"); doc.setFontSize(30); doc.setTextColor(...iCREAM);
-    doc.text("Earned Media", W / 2, y, { align: "center" }); y += 10;
+    doc.setFillColor(...iGOLD); doc.rect(0, H - 5, W, 5, "F");
+    doc.setFillColor(22, 18, 12); doc.rect(0, 5, 4, H - 10, "F");
+
+    // SIA mark (centred)
+    y = 60;
+    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 18, y, 36, 36, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...iINK);
+    doc.text("SIA", W / 2, y + 22, { align: "center" }); y += 48;
+
+    // Eyebrow
+    doc.setFont("helvetica","bold"); doc.setFontSize(6.5); doc.setTextColor(...iGOLD);
+    doc.text("WANT RESULTS LIKE THESE AT SCALE?", W / 2, y, { align: "center" }); y += 5;
+    // Gold rule
+    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 20, y, 40, 0.8, "F"); y += 10;
+
+    // Headline
+    doc.setFont("helvetica","bold"); doc.setFontSize(28); doc.setTextColor(...iCREAM);
+    doc.text("Earned Media", W / 2, y, { align: "center" }); y += 9;
     doc.setTextColor(...iGOLD); doc.text("Operating System", W / 2, y, { align: "center" }); y += 14;
-    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(140,128,110);
-    const sub = doc.splitTextToSize("The step-by-step system for founders who want press, partnerships, and authority before their Series A.", 120) as string[];
-    doc.text(sub, W / 2, y, { align: "center" }); y += sub.length * 6.5 + 12;
-    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 52, y, 104, 12, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(...iINK);
-    doc.text("syedirfanajmal.com/emos", W / 2, y + 8, { align: "center" }); y += 18;
-    doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(70,62,50);
-    doc.text(`Generated via PressIQ  ·  ${date}`, W / 2, H - 24, { align: "center" });
-    footer(5, true);
+
+    // Body copy
+    doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(140, 128, 110);
+    const ctaBody = doc.splitTextToSize(
+      "The step-by-step system for founders who want press, partnerships, and authority — before their Series A.",
+      110
+    ) as string[];
+    ctaBody.forEach(l => { doc.text(l, W / 2, y, { align: "center" }); y += 6; });
+    y += 8;
+
+    // CTA button (gold pill)
+    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 56, y, 112, 14, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...iINK);
+    doc.text("syedirfanajmal.com/emos", W / 2, y + 9.5, { align: "center" });
+
+    // Generated credit (bottom)
+    doc.setFont("helvetica","normal"); doc.setFontSize(6); doc.setTextColor(60, 52, 40);
+    doc.text(`Generated via PressIQ  ·  ${date}`, W / 2, H - 12, { align: "center" });
 
     doc.save(`PressIQ-Report-${date.replace(/ /g,"-")}.pdf`);
   }, [result, pitch, subject]);
@@ -1040,24 +1174,16 @@ export default function PressIQPage() {
 
       <div className="piq-shell">
 
-        {/* ── Header (CollabIQ-style) ──────────────────────────────── */}
-        <header className="piq-header">
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-              <div style={{ width: 28, height: 28, background: YEL, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 11, color: DARK }}>SIA</div>
-            </Link>
-            <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: PAPER, letterSpacing: "-.01em" }}>
-              Press<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
-            </span>
-            <span style={{ width: 1, height: 18, background: ra(PAPER, 0.12), margin: "0 6px" }} />
-            <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: ra(PAPER, 0.25) }}>
-              Journalist Pitch Score · SIA Wire
-            </span>
-          </div>
-          <Link href="/" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: ra(PAPER, 0.30), textDecoration: "none" }}>
-            ← syedirfanajmal.com
-          </Link>
-        </header>
+        {/* ── Header ───────────────────────────────────────────────── */}
+        <ToolHeader
+          toolPrefix="Press"
+          subtitle="Journalist Pitch Score · SIA Wire"
+          rightContent={
+            <a href="/" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
+              ← syedirfanajmal.com
+            </a>
+          }
+        />
 
         {/* ── Body ─────────────────────────────────────────────────── */}
         <div className="piq-body">
@@ -1073,12 +1199,33 @@ export default function PressIQPage() {
               </div>
             </div>
 
+            {/* ── Pitch type toggle ──────────────────────────────── */}
             <div style={LSEC}>
-              <em style={{ fontFamily: SERIF, fontSize: 13, fontStyle: "italic", color: ra(PAPER, 0.30), lineHeight: 1.5, display: "block", marginBottom: 12 }}>
-                For reactive PR — score your response to a journalist query posted on HARO, Qwoted, Featured, or similar platforms.
+              <span style={LSEC_LBL}>Pitch type</span>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                <button onClick={() => setPitchMode("standalone")} style={chipStyle(pitchMode === "standalone")}>Standalone outreach</button>
+                <button onClick={() => setPitchMode("query")} style={chipStyle(pitchMode === "query")}>Answering a query</button>
+              </div>
+              <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.28), lineHeight: 1.5, display: "block", marginTop: 10 }}>
+                {pitchMode === "standalone"
+                  ? "Proactive pitch to a journalist you’ve targeted. Relevance is scored against their known beat."
+                  : "Response to a HARO / Qwoted / Featured source request. Relevance is scored against their specific ask."}
               </em>
-              <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
-              <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted / Featured query here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
+            </div>
+
+            {/* ── Journalist context (beat or query) ────────────── */}
+            <div style={LSEC}>
+              {pitchMode === "standalone" ? (
+                <>
+                  <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional — what topics they cover</span></span>
+                  <textarea value={journalistBeat} onChange={e => setJournalistBeat(e.target.value)} placeholder="e.g. Covers SaaS growth, founder stories, and future-of-work data. Writes for TechCrunch’s Startups desk." className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
+                </>
+              ) : (
+                <>
+                  <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
+                  <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted / Featured query here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
+                </>
+              )}
             </div>
 
             <div style={LSEC}>
@@ -1132,7 +1279,7 @@ export default function PressIQPage() {
             {view === "post"    && result && (
               <PostScorePanel result={result} tab={tab} setTab={setTab}
                 email={email} setEmail={setEmail} emailDone={emailDone} setEmailDone={setEmailDone}
-                onDownload={() => setShowGate(true)} onReset={reset} />
+                onDownload={() => setShowGate(true)} onReset={reset} pitchMode={pitchMode} />
             )}
           </main>
         </div>
@@ -1149,7 +1296,6 @@ export default function PressIQPage() {
 // ── Scoped CSS ────────────────────────────────────────────────────────────────
 const PAGE_CSS = `
   .piq-shell{display:flex;flex-direction:column;height:100dvh;background:${DARK};overflow:hidden}
-  .piq-header{background:${DARK};border-bottom:1px solid ${DARK_BD};display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:52px;flex-shrink:0}
   .piq-body{display:flex;flex:1;overflow:hidden;min-height:0}
   .piq-left{width:360px;flex-shrink:0;background:${DARK2};border-right:1px solid ${DARK_BD};overflow-y:auto;height:100%}
   .piq-right{flex:1;background:${PAPER};overflow-y:auto;height:100%}

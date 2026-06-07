@@ -10,14 +10,12 @@
  */
 
 import { useState, useMemo, useCallback } from "react";
-import Link from "next/link";
 import {
   PAPER, PAPER2, INK, INK70, INK55, INK35, INK15,
-  YEL, SERIF, GROT, MONO,
+  YEL, YEL2, SERIF, GROT, MONO,
 } from "@/lib/tokens";
-
-// ── Extra tokens not in lib/tokens ────────────────────────────────────────────
-const YEL2 = "#ffc83a";
+import { ToolHeader } from "@/components/tools/ToolHeader";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 
 // ── Data model ─────────────────────────────────────────────────────────────────
 
@@ -96,21 +94,21 @@ const JOURNALISTS: Journalist[] = [
 ];
 
 const PITCHES: Pitch[] = [
-  { id:"p1",  subject:"Data study: 73% of earned links outperform paid in 12 months",          journalist:"j1",  client:"Avidon Marketing Group", stage:"placed",    peso:"Earned", sentDate:"2026-05-10", placedDate:"2026-05-28", url:"https://techcrunch.com/2026/05/earned-media-study/",           anchorText:"earned media ROI",           dr:93, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:460 },
+  { id:"p1",  subject:"Data study: 73% of earned links outperform paid in 12 months",          journalist:"j1",  client:"DMR.agency", stage:"placed",    peso:"Earned", sentDate:"2026-05-10", placedDate:"2026-05-28", url:"https://techcrunch.com/2026/05/earned-media-study/",           anchorText:"earned media ROI",           dr:93, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:460 },
   { id:"p2",  subject:"Expert quote: Why fractional CMOs are the future for Series A",          journalist:"j2",  client:"SIA Enterprises",       stage:"replied",   peso:"Earned", sentDate:"2026-06-01", placedDate:null,         url:null,                                                           anchorText:"fractional CMO",             dr:95, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:"2026-06-06", points:null },
   { id:"p3",  subject:"Guest post: The PESO framework for modern link building",                journalist:"j3",  client:"DMR.agency",             stage:"placed",    peso:"Earned", sentDate:"2026-04-20", placedDate:"2026-05-15", url:"https://searchenginejournal.com/peso-link-building/",          anchorText:"PESO media model",           dr:82, linkType:"Do Follow", contentType:"Original",   team:"Nirvana",      dataSource:"PressIQ", followUpDue:null,         points:380 },
   { id:"p4",  subject:"Founder story: From 0 to 1.5M organic traffic in one year",             journalist:"j4",  client:"Ridester",               stage:"sent",      peso:"Earned", sentDate:"2026-06-03", placedDate:null,         url:null,                                                           anchorText:null,                         dr:91, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-08", points:null },
-  { id:"p5",  subject:"How-to: Building a content engine that earns 50+ links/quarter",        journalist:"j5",  client:"Avidon Marketing Group", stage:"amplified", peso:"Earned", sentDate:"2026-04-01", placedDate:"2026-04-18", url:"https://blog.hubspot.com/content-engine-links/",               anchorText:"content marketing strategy", dr:88, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:420 },
+  { id:"p5",  subject:"How-to: Building a content engine that earns 50+ links/quarter",        journalist:"j5",  client:"DMR.agency", stage:"amplified", peso:"Earned", sentDate:"2026-04-01", placedDate:"2026-04-18", url:"https://blog.hubspot.com/content-engine-links/",               anchorText:"content marketing strategy", dr:88, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:420 },
   { id:"p6",  subject:"Data pitch: Link building ROI benchmarks by industry",                  journalist:"j6",  client:"DMR.agency",             stage:"opened",    peso:"Earned", sentDate:"2026-06-02", placedDate:null,         url:null,                                                           anchorText:null,                         dr:79, linkType:null,         contentType:null,          team:"Nirvana",      dataSource:"PressIQ", followUpDue:"2026-06-07", points:null },
   { id:"p7",  subject:"Expert roundup contribution: Top SEO predictions for 2027",             journalist:"j7",  client:"SIA Enterprises",       stage:"placed",    peso:"Earned", sentDate:"2026-05-12", placedDate:"2026-05-30", url:"https://inc.com/seo-predictions-2027/",                        anchorText:"SEO-PR strategy",            dr:92, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:450 },
   { id:"p8",  subject:"Case study: Earned media vs paid backlinks — 18 month analysis",        journalist:"j8",  client:"DMR.agency",             stage:"replied",   peso:"Earned", sentDate:"2026-05-28", placedDate:null,         url:null,                                                           anchorText:"earned media analysis",      dr:85, linkType:"Do Follow", contentType:"Original",   team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-05", points:null },
   { id:"p9",  subject:"Thought leadership: The death of transactional link building",          journalist:"j9",  client:"SIA Enterprises",       stage:"amplified", peso:"Earned", sentDate:"2026-03-15", placedDate:"2026-04-02", url:"https://contentmarketinginstitute.com/death-transactional-links/", anchorText:"earned media operating system", dr:80, linkType:"Do Follow", contentType:"Original", team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:360 },
-  { id:"p10", subject:"Newsjacking: Google March 2026 core update — earned media angle",       journalist:"j10", client:"Avidon Marketing Group", stage:"drafted",   peso:"Earned", sentDate:null,         placedDate:null,         url:null,                                                           anchorText:null,                         dr:76, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:null,         points:null },
+  { id:"p10", subject:"Newsjacking: Google March 2026 core update — earned media angle",       journalist:"j10", client:"DMR.agency", stage:"drafted",   peso:"Earned", sentDate:null,         placedDate:null,         url:null,                                                           anchorText:null,                         dr:76, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:null,         points:null },
   { id:"p11", subject:"LinkedIn article: 5 PESO lessons from 200+ earned placements",         journalist:null,  client:"SIA Enterprises",       stage:"amplified", peso:"Shared", sentDate:"2026-05-20", placedDate:"2026-05-20", url:"https://linkedin.com/pulse/peso-lessons/",                     anchorText:null,                         dr:null,linkType:null,         contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:200 },
   { id:"p12", subject:"Blog post: How CoverageIQ tracks your earned media pipeline",           journalist:null,  client:"DMR.agency",             stage:"placed",    peso:"Owned",  sentDate:"2026-05-25", placedDate:"2026-05-25", url:"https://dmr.agency/blog/coverageiq-pipeline/",                 anchorText:null,                         dr:null,linkType:null,         contentType:"Original",   team:"Nirvana",      dataSource:"Manual",  followUpDue:null,         points:150 },
   { id:"p13", subject:"Sponsored feature: Earned Media OS for in-house teams",                journalist:"j2",  client:"SIA Enterprises",       stage:"sent",      peso:"Paid",   sentDate:"2026-06-04", placedDate:null,         url:null,                                                           anchorText:"EMOS",                       dr:95, linkType:null,         contentType:null,          team:"Firestarters", dataSource:"Manual",  followUpDue:"2026-06-09", points:null },
   { id:"p14", subject:"HARO response: Best practices for digital PR measurement",              journalist:"j3",  client:"DMR.agency",             stage:"placed",    peso:"Earned", sentDate:"2026-05-05", placedDate:"2026-05-22", url:"https://searchenginejournal.com/digital-pr-measurement/",      anchorText:"digital PR metrics",         dr:82, linkType:"Do Follow", contentType:"Original",   team:"Nirvana",      dataSource:"PressIQ", followUpDue:null,         points:380 },
-  { id:"p15", subject:"Infographic pitch: The anatomy of a successful media pitch",            journalist:"j5",  client:"Avidon Marketing Group", stage:"opened",    peso:"Earned", sentDate:"2026-06-03", placedDate:null,         url:null,                                                           anchorText:null,                         dr:88, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-08", points:null },
+  { id:"p15", subject:"Infographic pitch: The anatomy of a successful media pitch",            journalist:"j5",  client:"DMR.agency", stage:"opened",    peso:"Earned", sentDate:"2026-06-03", placedDate:null,         url:null,                                                           anchorText:null,                         dr:88, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-08", points:null },
   { id:"p16", subject:"Expert quote: Neuromarketing meets earned media",                       journalist:"j7",  client:"SIA Enterprises",       stage:"drafted",   peso:"Earned", sentDate:null,         placedDate:null,         url:null,                                                           anchorText:null,                         dr:92, linkType:null,         contentType:null,          team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:null },
 ];
 
@@ -1075,7 +1073,7 @@ function NewPitchModal({ onClose }: { onClose: () => void }) {
               </select>
             </MField>
             <MField label="Client">
-              <input type="text" value={form.client} onChange={e => set("client", e.target.value)} placeholder="e.g., Avidon Marketing Group" style={inp} />
+              <input type="text" value={form.client} onChange={e => set("client", e.target.value)} placeholder="e.g., DMR.agency" style={inp} />
             </MField>
           </div>
 
@@ -1188,28 +1186,14 @@ export default function CoverageIQ() {
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <header style={{ borderBottom: `1px solid ${INK}`, background: PAPER, position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", maxWidth: 1240, marginInline: "auto", padding: "14px clamp(20px,4vw,56px)" }}>
-          {/* Left: logo + name */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <Link href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
-              <div style={{ width: 30, height: 30, background: YEL, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 13, color: INK, letterSpacing: "0.02em" }}>
-                SIA
-              </div>
-            </Link>
-            <div>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, letterSpacing: "-0.02em", lineHeight: 1.1 }}>CoverageIQ</div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, marginTop: 2 }}>
-                EMOS TOOL SUITE · PITCH TRACKING CRM
-              </div>
-            </div>
-          </div>
-
-          {/* Right: actions */}
-          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+      <ToolHeader
+        toolPrefix="Coverage"
+        subtitle="Pitch Tracking CRM · EMOS Tool Suite"
+        rightContent={
+          <>
             <button
               onClick={() => setShowModal(true)}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", background: INK, color: YEL, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}
               onMouseOver={e => (e.currentTarget.style.opacity = "0.85")}
               onMouseOut={e => (e.currentTarget.style.opacity = "1")}
             >
@@ -1218,22 +1202,22 @@ export default function CoverageIQ() {
             {followUpCount > 0 && (
               <button
                 onClick={() => setActiveTab("followups")}
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: YEL, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, cursor: "pointer", border: "none" }}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: YEL, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, cursor: "pointer" }}
               >
                 <span style={{ width: 6, height: 6, background: INK, display: "inline-block" }} />
                 {followUpCount} ACTION{followUpCount !== 1 ? "S" : ""} DUE
               </button>
             )}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
-              <span style={{ width: 8, height: 8, background: YEL, border: `1px solid ${INK}`, display: "inline-block" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}>
+              <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%", display: "inline-block" }} />
               LIVE
             </div>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       {/* ── Tab nav ─────────────────────────────────────────────────────── */}
-      <div style={{ borderBottom: `1px solid ${INK}`, background: PAPER, position: "sticky", top: 58, zIndex: 49 }}>
+      <div style={{ borderBottom: `1px solid ${INK35}`, background: PAPER, position: "sticky", top: 52, zIndex: 49 }}>
         <div style={{ display: "flex", maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)", overflowX: "auto" }}>
           {tabs.map(tab => {
             const active = activeTab === tab.id;
@@ -1283,25 +1267,7 @@ export default function CoverageIQ() {
       {showModal && <NewPitchModal onClose={() => setShowModal(false)} />}
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
-      <footer style={{ borderTop: `1px solid ${INK}`, padding: "20px 0" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)", flexWrap: "wrap", gap: 12 }}>
-          <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
-            CoverageIQ · EMOS Tool Suite · SIA Enterprises Inc · MMXXVI
-          </span>
-          <div style={{ display: "flex", gap: 20 }}>
-            {(["PressIQ", "AuthorityIQ", "CoverageIQ", "EMOS"] as const).map(tool => (
-              <span key={tool} style={{
-                fontFamily: GROT, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase",
-                color: tool === "CoverageIQ" ? INK : INK35,
-                borderBottom: tool === "CoverageIQ" ? `2px solid ${YEL}` : "none",
-                paddingBottom: 2,
-              }}>
-                {tool}
-              </span>
-            ))}
-          </div>
-        </div>
-      </footer>
+      <ToolPipelineFooter currentTool="coverageiq" />
     </div>
   );
 }
