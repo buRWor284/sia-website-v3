@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Newsreader, Archivo, JetBrains_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
+import { ClerkProvider } from "@clerk/nextjs";
 import { SiteHeader, CredibilityTicker } from "@/components/bureau";
 import "./globals.css";
 
@@ -58,6 +59,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
+    <ClerkProvider>
     <html
       lang="en"
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
@@ -87,5 +89,6 @@ export default function RootLayout({
         var $mcj = jQuery.noConflict(true);
       `}</Script>
     </html>
+    </ClerkProvider>
   );
 }
