@@ -1,5 +1,13 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 // Only this user ID can access the dashboard during development.
 const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
