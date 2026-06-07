@@ -45,7 +45,14 @@ export default async function EmosDashboardPage() {
       )}
 
       <hr style={{ margin: "1.5rem 0" }} />
-      <p>Phase 1 complete. CoverageIQ coming next.</p>
+      <h2 style={{ marginBottom: "0.75rem" }}>EMOS Tools</h2>
+      <ul style={{ lineHeight: 2 }}>
+        <li>
+          <a href="/emostool/dashboard/coverageiq" style={{ fontWeight: 600, fontSize: "1.05rem" }}>
+            CoverageIQ — Pitch Tracking CRM →
+          </a>
+        </li>
+      </ul>
     </main>
   );
 }
