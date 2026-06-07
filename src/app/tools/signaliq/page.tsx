@@ -407,7 +407,7 @@ function StepBar({ step, onGoStep }: { step: 0 | 1 | 2 | 3; onGoStep: (n: 0 | 1 
 
 function SIQHero() {
   return (
-    <section style={{ padding: "clamp(24px,4vw,48px) clamp(22px,5vw,56px) 0", position: "relative", overflow: "hidden" }}>
+    <section style={{ padding: "clamp(12px,2vw,24px) clamp(22px,5vw,56px) 0", position: "relative", overflow: "hidden" }}>
       <div
         aria-hidden="true"
         style={{
@@ -1267,15 +1267,22 @@ export default function SignalIQPage() {
         {step === 0 && (
           <>
             <SIQHero />
-            <SourcesTicker />
-            <div style={{ textAlign: "center", padding: "clamp(28px,4vw,48px) clamp(22px,5vw,56px)" }}>
+            {/* Ticker sits tight below the hero, above the CTA */}
+            <div style={{ marginTop: 12 }}>
+              <SourcesTicker />
+            </div>
+            <div style={{ textAlign: "center", padding: "clamp(20px,3vw,36px) clamp(22px,5vw,56px)" }}>
               <button
                 onClick={() => { setIntro(false); }}
                 style={{
-                  padding: "16px 40px", border: "none", background: INK, color: PAPER,
-                  fontFamily: GROT, fontWeight: 800, fontSize: 15, letterSpacing: ".10em",
+                  padding: "18px 52px", border: "none", background: YEL, color: INK,
+                  fontFamily: GROT, fontWeight: 900, fontSize: 17, letterSpacing: ".10em",
                   textTransform: "uppercase", cursor: "pointer",
+                  boxShadow: "0 4px 20px rgba(245,184,31,.35)",
+                  transition: "opacity 0.15s ease",
                 }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
               >
                 Start scanning →
               </button>
@@ -1535,7 +1542,7 @@ const PAGE_CSS = `
     margin: 0;
     font-family: ${SERIF};
     font-weight: 700;
-    font-size: clamp(36px,6vw,72px);
+    font-size: clamp(28px,4.5vw,54px);
     line-height: 0.96;
     letter-spacing: -0.03em;
     color: ${INK};
