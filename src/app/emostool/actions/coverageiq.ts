@@ -4,6 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
+import { recordStageEvent } from "./stage";
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
 const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
@@ -205,6 +206,8 @@ export async function createPitch(input: CreatePitchInput): Promise<{ id: string
   }
 
   revalidatePath("/emostool/dashboard/coverageiq");
+  // Stage progression: pitch_logged event
+  void recordStageEvent("pitch_logged");
   return data as { id: string };
 }
 
@@ -227,17 +230,73 @@ export async function updatePitchStage(pitchId: string, stage: Stage): Promise<b
 
 export async function updateAlertStatus(alertId: string, status: AlertStatus): Promise<boolean> {
   const db = await getAuthenticatedClient();
+  const { error } = await db.from("coverageiq_alerts").update({ status }).eq("id", alertId);
+  if (error) { console.error("updateAlertStatus error:", error.message); return false; }
+  revalidatePath("/emostool/dashboard/coverageiq");
+  return true;
+}
 
+// ─── Journalist management (Phase 4) ─────────────────────────────────────────
+
+export interface CreateJournalistInput {
+  name: string;
+  outlet?: string | null;
+  beat?: string | null;
+  email?: string | null;
+  twitter_handle?: string | null;
+  domain_rating?: number | null;
+  notes?: string | null;
+  tags?: string[];
+}
+
+export async function createJournalist(input: CreateJournalistInput): Promise<{ id: string } | null> {
+  const db = await getAuthenticatedClient();
+
+  const { data: org, error: orgError } = await db.from("organizations").select("id").single();
+  if (orgError || !org) { console.error("createJournalist: no org", orgError?.message); return null; }
+
+  const { data, error } = await db
+    .from("journalists")
+    .insert({
+      org_id:         org.id,
+      name:           input.name,
+      outlet:         input.outlet ?? null,
+      beat:           input.beat ?? null,
+      email:          input.email ?? null,
+      twitter_handle: input.twitter_handle ?? null,
+      domain_rating:  input.domain_rating ?? null,
+      notes:          input.notes ?? null,
+      tags:           input.tags ?? [],
+      data_source:    "manual",
+    })
+    .select("id")
+    .single();
+
+  if (error) { console.error("createJournalist error:", error.message); return null; }
+
+  revalidatePath("/emostool/dashboard/coverageiq");
+  void recordStageEvent("journalist_saved");
+  return data as { id: string };
+}
+
+export async function updateJournalist(
+  journalistId: string,
+  input: Partial<CreateJournalistInput>,
+): Promise<boolean> {
+  const db = await getAuthenticatedClient();
   const { error } = await db
-    .from("coverageiq_alerts")
-    .update({ status })
-    .eq("id", alertId);
+    .from("journalists")
+    .update({ ...input, updated_at: new Date().toISOString() })
+    .eq("id", journalistId);
+  if (error) { console.error("updateJournalist error:", error.message); return false; }
+  revalidatePath("/emostool/dashboard/coverageiq");
+  return true;
+}
 
-  if (error) {
-    console.error("updateAlertStatus error:", error.message);
-    return false;
-  }
-
+export async function deleteJournalist(journalistId: string): Promise<boolean> {
+  const db = await getAuthenticatedClient();
+  const { error } = await db.from("journalists").delete().eq("id", journalistId);
+  if (error) { console.error("deleteJournalist error:", error.message); return false; }
   revalidatePath("/emostool/dashboard/coverageiq");
   return true;
 }

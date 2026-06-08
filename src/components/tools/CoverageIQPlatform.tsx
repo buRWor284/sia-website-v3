@@ -19,10 +19,13 @@ import {
   createPitch,
   updatePitchStage,
   updateAlertStatus,
+  createJournalist,
+  deleteJournalist,
   type DbPitch,
   type DbJournalist,
   type DbAlert,
   type Stage,
+  type CreateJournalistInput,
   type PesoType,
   type LinkType,
   type DataSource,
@@ -705,9 +708,18 @@ function logCell(border: boolean): React.CSSProperties {
 
 type ContactKey = keyof DbJournalist;
 
-function ContactsView({ journalists }: { journalists: DbJournalist[] }) {
+function ContactsView({
+  journalists,
+  onAddJournalist,
+  onDeleteJournalist,
+}: {
+  journalists: DbJournalist[];
+  onAddJournalist: (input: CreateJournalistInput) => Promise<void>;
+  onDeleteJournalist: (id: string) => Promise<void>;
+}) {
   const [sortBy, setSortBy] = useState<ContactKey>("last_contact");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const sorted = useMemo(() => {
     return [...journalists].sort((a, b) => {
@@ -737,8 +749,18 @@ function ContactsView({ journalists }: { journalists: DbJournalist[] }) {
 
   return (
     <div>
+      {/* Add Contact button */}
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 16 }}>
+        <button
+          onClick={() => setShowAddModal(true)}
+          style={{ padding: "8px 18px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}
+        >
+          + Add Contact
+        </button>
+      </div>
+
       {journalists.length === 0 ? (
-        <EmptyState message="No journalists yet. Add contacts via the Journalist CRM." />
+        <EmptyState message="No journalists yet. Click '+ Add Contact' to start building your media list." />
       ) : (
         <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
@@ -798,6 +820,102 @@ function ContactsView({ journalists }: { journalists: DbJournalist[] }) {
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
         {journalists.length} contacts · Click column headers to sort
       </div>
+
+      {/* Add Contact Modal */}
+      {showAddModal && (
+        <AddContactModal
+          onClose={() => setShowAddModal(false)}
+          onSubmit={async (input) => { await onAddJournalist(input); setShowAddModal(false); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function AddContactModal({
+  onClose,
+  onSubmit,
+}: {
+  onClose: () => void;
+  onSubmit: (input: CreateJournalistInput) => Promise<void>;
+}) {
+  const [form, setForm] = useState<CreateJournalistInput>({ name: "", outlet: "", beat: "", email: "", twitter_handle: "", domain_rating: null, notes: "" });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const set = (k: keyof CreateJournalistInput, v: string | number | null) =>
+    setForm(prev => ({ ...prev, [k]: v }));
+
+  const inp: React.CSSProperties = {
+    width: "100%", padding: "10px 12px", background: PAPER,
+    border: `1px solid ${INK}`, fontFamily: SERIF, fontSize: 15, color: INK,
+    outline: "none", boxSizing: "border-box",
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim()) return;
+    setSaving(true);
+    await onSubmit({ ...form, name: form.name.trim() });
+    setSaved(true); setSaving(false);
+  };
+
+  if (saved) {
+    return (
+      <div style={{ position: "fixed", inset: 0, background: "rgba(26,20,16,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }} onClick={onClose}>
+        <div style={{ background: PAPER, border: `1px solid ${INK}`, padding: 48, maxWidth: 440, textAlign: "center" }} onClick={e => e.stopPropagation()}>
+          <div style={{ width: 40, height: 40, background: YEL, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 18 }}>→</div>
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Contact added</div>
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK55, marginBottom: 24 }}>{form.name} saved to your journalist database.</div>
+          <button onClick={onClose} style={{ padding: "12px 28px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>Done</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(26,20,16,.6)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 200, paddingTop: 60, overflowY: "auto" }} onClick={onClose}>
+      <form onSubmit={handleSubmit} style={{ background: PAPER, border: `1px solid ${INK}`, width: "100%", maxWidth: 580, marginBottom: 60 }} onClick={e => e.stopPropagation()}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", background: INK, color: PAPER }}>
+          <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: "0.18em", textTransform: "uppercase" }}>Add Journalist</span>
+          <button type="button" onClick={onClose} style={{ background: "none", border: "none", color: PAPER, fontFamily: GROT, fontWeight: 900, fontSize: 16, cursor: "pointer", padding: "4px 8px" }}>×</button>
+        </div>
+        <div style={{ padding: 24 }}>
+          <MField label="Name *">
+            <input required value={form.name} onChange={e => set("name", e.target.value)} placeholder="e.g., Sarah Chen" style={inp} />
+          </MField>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <MField label="Outlet">
+              <input value={form.outlet ?? ""} onChange={e => set("outlet", e.target.value)} placeholder="e.g., TechCrunch" style={inp} />
+            </MField>
+            <MField label="Beat">
+              <input value={form.beat ?? ""} onChange={e => set("beat", e.target.value)} placeholder="e.g., SaaS / Startups" style={inp} />
+            </MField>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16 }}>
+            <MField label="Email">
+              <input type="email" value={form.email ?? ""} onChange={e => set("email", e.target.value)} placeholder="journalist@outlet.com" style={inp} />
+            </MField>
+            <MField label="Twitter / X">
+              <input value={form.twitter_handle ?? ""} onChange={e => set("twitter_handle", e.target.value)} placeholder="@handle" style={inp} />
+            </MField>
+            <MField label="Domain Rating">
+              <input type="number" min={0} max={100} value={form.domain_rating ?? ""} onChange={e => set("domain_rating", e.target.value ? parseInt(e.target.value) : null)} placeholder="0–100" style={inp} />
+            </MField>
+          </div>
+          <MField label="Notes">
+            <textarea value={form.notes ?? ""} onChange={e => set("notes", e.target.value)} rows={3} placeholder="Beat interests, preferred pitch format, previous interactions…" style={{ ...inp, resize: "vertical", lineHeight: 1.5 }} />
+          </MField>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", borderTop: `1px solid ${INK15}` }}>
+          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>Saved to your journalist database</span>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button type="button" onClick={onClose} style={{ padding: "10px 20px", background: "transparent", border: `1px solid ${INK35}`, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, cursor: "pointer" }}>Cancel</button>
+            <button type="submit" disabled={saving} style={{ padding: "10px 20px", background: saving ? INK55 : YEL, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, cursor: saving ? "default" : "pointer" }}>
+              {saving ? "Saving…" : "Add Contact →"}
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }
@@ -1167,6 +1285,16 @@ export default function CoverageIQPlatform({
     });
   }, [router]);
 
+  const handleAddJournalist = useCallback(async (input: CreateJournalistInput) => {
+    await createJournalist(input);
+    startTransition(() => { router.refresh(); });
+  }, [router]);
+
+  const handleDeleteJournalist = useCallback(async (id: string) => {
+    await deleteJournalist(id);
+    startTransition(() => { router.refresh(); });
+  }, [router]);
+
   const tabs: { id: TabId; label: string; count: number | null; highlight?: boolean }[] = [
     { id: "pipeline",  label: "Pipeline",      count: initialPitches.length },
     { id: "followups", label: "Follow-ups",    count: followUpCount, highlight: followUpCount > 0 },
@@ -1274,7 +1402,7 @@ export default function CoverageIQPlatform({
         {activeTab === "pipeline"  && <PipelineView  pitches={initialPitches} onStageChange={handleStageChange} />}
         {activeTab === "followups" && <FollowUpsView pitches={initialPitches} />}
         {activeTab === "coverage"  && <CoverageLogView pitches={initialPitches} />}
-        {activeTab === "contacts"  && <ContactsView journalists={initialJournalists} />}
+        {activeTab === "contacts"  && <ContactsView journalists={initialJournalists} onAddJournalist={handleAddJournalist} onDeleteJournalist={handleDeleteJournalist} />}
         {activeTab === "peso"      && <PESODashboard pitches={initialPitches} alerts={initialAlerts} onAlertStatusChange={handleAlertStatusChange} />}
       </main>
 

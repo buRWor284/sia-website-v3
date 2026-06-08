@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { EMAIL_LIMIT, FREE_LIMIT, PITCH_MODEL } from "@/lib/pitch/config";
@@ -150,8 +151,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not parse the score. Please try again." }, { status: 502 });
   }
 
-  // Flywheel (non-blocking).
-  void logPitch(input, result);
+  // Flywheel (non-blocking) — pass Clerk user ID if session present so score gets org-scoped.
+  const { userId: clerkUserId } = await auth();
+  void logPitch(input, result, clerkUserId ?? undefined);
 
   return NextResponse.json(result);
 }

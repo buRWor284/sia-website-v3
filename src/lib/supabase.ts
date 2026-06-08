@@ -19,3 +19,19 @@ export function createSupabaseServerClient(clerkToken: string) {
     },
   })
 }
+
+// ─── Service-role client (bypasses RLS) ───────────────────────────────────────
+// Use ONLY in server-side code (API routes, Server Actions) where you need to
+// write data that isn't tied to a specific user session (e.g., background jobs,
+// API routes that run before the user has a full Clerk org context).
+// Requires SUPABASE_SERVICE_ROLE_KEY in environment (never expose to the browser).
+export function createSupabaseServiceClient() {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!serviceKey) {
+    console.warn('[supabase] SUPABASE_SERVICE_ROLE_KEY not set — falling back to anon key (RLS will apply)')
+    return createClient(supabaseUrl, supabaseAnonKey)
+  }
+  return createClient(supabaseUrl, serviceKey, {
+    auth: { persistSession: false },
+  })
+}
