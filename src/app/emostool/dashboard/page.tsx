@@ -1,7 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { getOrgStage, STAGE_META, type EmosStage } from "@/app/emostool/actions/stage";
+import { getOrgStage, type EmosStage } from "@/app/emostool/actions/stage";
+import { STAGE_META, STAGE_ORDER } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,8 +22,6 @@ const YEL     = "#f5b81f";
 const GROT    = "var(--font-grot)";
 const SERIF   = "var(--font-serif)";
 const MONO    = "var(--font-mono)";
-
-const STAGE_ORDER: EmosStage[] = ["signal", "press", "collab", "coverage", "full"];
 
 const TOOLS: {
   id: EmosStage;
