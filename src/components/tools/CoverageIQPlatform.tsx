@@ -20,6 +20,7 @@ import {
   updatePitchStage,
   updateAlertStatus,
   createJournalist,
+  updateJournalist,
   deleteJournalist,
   type DbPitch,
   type DbJournalist,
@@ -234,6 +235,50 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+// ── Stage Legend ──────────────────────────────────────────────────────────────
+
+const STAGE_DESCRIPTIONS: Record<Stage, { short: string; when: string }> = {
+  drafted:   { short: "Written but not yet sent.",         when: "You've prepared the pitch but haven't emailed it." },
+  sent:      { short: "Pitch emailed to the journalist.",  when: "You hit send — waiting for any response." },
+  opened:    { short: "Journalist opened your email.",     when: "Tracked via email open pixel or confirmed manually." },
+  replied:   { short: "Journalist replied.",               when: "Any reply — even a rejection or request for more info." },
+  placed:    { short: "Coverage confirmed and published.", when: "The piece is live. Add the URL and DR in the expanded view." },
+  amplified: { short: "Placement shared and promoted.",    when: "You've shared it on social, in newsletters, or via outreach." },
+};
+
+function StageLegend() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}
+      >
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55 }}>
+          {open ? "▲" : "▼"} What do these stages mean?
+        </span>
+      </button>
+      {open && (
+        <div style={{ marginTop: 8, border: `1px solid ${INK15}`, background: PAPER2, display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
+          {PIPELINE_STAGES.map((s, i) => (
+            <div key={s.id} style={{ padding: "12px 16px", borderRight: i % 3 < 2 ? `1px solid ${INK15}` : "none", borderBottom: i < 3 ? `1px solid ${INK15}` : "none" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                <StageBadge stage={s.id} />
+              </div>
+              <div style={{ fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.45, marginTop: 6 }}>
+                {STAGE_DESCRIPTIONS[s.id].short}
+              </div>
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, marginTop: 3, lineHeight: 1.4 }}>
+                {STAGE_DESCRIPTIONS[s.id].when}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Pipeline View ──────────────────────────────────────────────────────────────
 
 function PipelineView({
@@ -302,6 +347,9 @@ function PipelineView({
         })}
       </div>
 
+      {/* Stage legend */}
+      <StageLegend />
+
       {pitches.length === 0 ? (
         <EmptyState message="No pitches yet. Add your first pitch to get started." />
       ) : (
@@ -343,7 +391,7 @@ function PipelineView({
                   <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 3, overflow: "hidden", minWidth: 0 }}>
                     <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: INK }}>{pitch.subject}</span>
                     <span style={{ fontFamily: GROT, fontSize: 10, color: INK55, letterSpacing: "0.08em" }}>
-                      {pitch.client ?? "—"}{pitch.sent_date ? ` · ${fmt(pitch.sent_date)}` : " · Not sent"}
+                      {pitch.client ?? "—"}{pitch.sent_date ? ` · ${fmt(pitch.sent_date)}` : ["drafted"].includes(pitch.stage) ? " · Not sent" : ""}
                     </span>
                   </div>
                   <div style={{ padding: "14px 12px", borderLeft: `1px solid ${INK15}`, display: "flex", flexDirection: "column", justifyContent: "center", gap: 2, overflow: "hidden", minWidth: 0 }}>
@@ -711,15 +759,19 @@ type ContactKey = keyof DbJournalist;
 function ContactsView({
   journalists,
   onAddJournalist,
+  onUpdateJournalist,
   onDeleteJournalist,
 }: {
   journalists: DbJournalist[];
   onAddJournalist: (input: CreateJournalistInput) => Promise<void>;
+  onUpdateJournalist: (id: string, input: CreateJournalistInput) => Promise<void>;
   onDeleteJournalist: (id: string) => Promise<void>;
 }) {
   const [sortBy, setSortBy] = useState<ContactKey>("last_contact");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const sorted = useMemo(() => {
     return [...journalists].sort((a, b) => {
@@ -778,47 +830,110 @@ function ContactsView({
 
           {sorted.map((j, idx) => {
             const rate = j.pitches_sent > 0 ? Math.round((j.placements / j.pitches_sent) * 100) : 0;
+            const isExpanded = expandedId === j.id;
             return (
-              <div key={j.id} style={{ display: "grid", gridTemplateColumns: grid, borderBottom: idx < sorted.length - 1 ? `1px solid ${INK15}` : "none" }}>
-                <div style={cc(false)}>
-                  <div style={{ overflow: "hidden", minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                      <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, whiteSpace: "nowrap" }}>{j.name}</span>
-                      {j.outlet && <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: INK55, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{j.outlet}</span>}
+              <div key={j.id}>
+                {/* Main row — click to expand */}
+                <div
+                  onClick={() => { setExpandedId(isExpanded ? null : j.id); setEditingId(null); }}
+                  style={{ display: "grid", gridTemplateColumns: grid, borderBottom: !isExpanded && idx < sorted.length - 1 ? `1px solid ${INK15}` : "none", cursor: "pointer", background: isExpanded ? PAPER2 : "transparent", transition: "background 0.12s" }}
+                >
+                  <div style={cc(false)}>
+                    <div style={{ overflow: "hidden", minWidth: 0 }}>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                        <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, whiteSpace: "nowrap" }}>{j.name}</span>
+                        {j.outlet && <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: INK55, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{j.outlet}</span>}
+                      </div>
+                      {j.email && <div style={{ fontFamily: MONO, fontSize: 11, color: INK35, marginTop: 2 }}>{j.email}</div>}
                     </div>
-                    {j.email && <div style={{ fontFamily: MONO, fontSize: 11, color: INK35, marginTop: 2 }}>{j.email}</div>}
+                  </div>
+                  <div style={cc(true)}><span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.08em", color: INK70, lineHeight: 1.3 }}>{j.beat ?? "—"}</span></div>
+                  <div style={{ ...cc(true), justifyContent: "center" }}>
+                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, color: (j.domain_rating ?? 0) >= 80 ? INK : INK70 }}>{j.domain_rating ?? "—"}</span>
+                  </div>
+                  <div style={{ ...cc(true), justifyContent: "center" }}>
+                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14 }}>{j.pitches_sent}</span>
+                  </div>
+                  <div style={{ ...cc(true), justifyContent: "center" }}>
+                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14 }}>{j.placements}</span>
+                  </div>
+                  <div style={{ ...cc(true), justifyContent: "center" }}>
+                    <span style={{ fontFamily: GROT, fontSize: 10, fontWeight: 800, letterSpacing: "0.06em", color: rate >= 50 ? INK : INK55, background: rate >= 50 ? YEL : "transparent", padding: rate >= 50 ? "2px 6px" : 0 }}>
+                      {rate}%
+                    </span>
+                  </div>
+                  <div style={cc(true)}>
+                    {j.last_contact ? (
+                      <div>
+                        <div style={{ fontFamily: MONO, fontSize: 12, whiteSpace: "nowrap" }}>{fmt(j.last_contact)}</div>
+                        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, marginTop: 1, whiteSpace: "nowrap" }}>{daysAgoLabel(j.last_contact)}</div>
+                      </div>
+                    ) : <span style={{ color: INK35, fontFamily: MONO, fontSize: 12 }}>—</span>}
                   </div>
                 </div>
-                <div style={cc(true)}><span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.08em", color: INK70, lineHeight: 1.3 }}>{j.beat ?? "—"}</span></div>
-                <div style={{ ...cc(true), justifyContent: "center" }}>
-                  <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, color: (j.domain_rating ?? 0) >= 80 ? INK : INK70 }}>{j.domain_rating ?? "—"}</span>
-                </div>
-                <div style={{ ...cc(true), justifyContent: "center" }}>
-                  <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14 }}>{j.pitches_sent}</span>
-                </div>
-                <div style={{ ...cc(true), justifyContent: "center" }}>
-                  <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14 }}>{j.placements}</span>
-                </div>
-                <div style={{ ...cc(true), justifyContent: "center" }}>
-                  <span style={{ fontFamily: GROT, fontSize: 10, fontWeight: 800, letterSpacing: "0.06em", color: rate >= 50 ? INK : INK55, background: rate >= 50 ? YEL : "transparent", padding: rate >= 50 ? "2px 6px" : 0 }}>
-                    {rate}%
-                  </span>
-                </div>
-                <div style={cc(true)}>
-                  {j.last_contact ? (
-                    <div>
-                      <div style={{ fontFamily: MONO, fontSize: 12, whiteSpace: "nowrap" }}>{fmt(j.last_contact)}</div>
-                      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, marginTop: 1, whiteSpace: "nowrap" }}>{daysAgoLabel(j.last_contact)}</div>
-                    </div>
-                  ) : <span style={{ color: INK35, fontFamily: MONO, fontSize: 12 }}>—</span>}
-                </div>
+
+                {/* Expanded panel */}
+                {isExpanded && (
+                  <div style={{ background: PAPER2, borderBottom: idx < sorted.length - 1 ? `1px solid ${INK15}` : "none", padding: "16px 20px" }}>
+                    {editingId === j.id ? (
+                      <EditJournalistForm
+                        journalist={j}
+                        onSave={async (input) => { await onUpdateJournalist(j.id, input); setEditingId(null); }}
+                        onCancel={() => setEditingId(null)}
+                        onDelete={async () => { await onDeleteJournalist(j.id); setExpandedId(null); }}
+                      />
+                    ) : (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
+                        <div>
+                          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>Contact</div>
+                          {[["Email", j.email], ["Twitter", j.twitter_handle], ["DR", j.domain_rating?.toString()]].map(([label, value]) => (
+                            <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${INK15}` }}>
+                              <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: INK55 }}>{label}</span>
+                              <span style={{ fontFamily: SERIF, fontSize: 14, color: INK }}>{value ?? "—"}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div>
+                          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>Beats</div>
+                          <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.6 }}>
+                            {j.beat ? j.beat.split(/[,/]/).map(b => b.trim()).filter(Boolean).map(b => (
+                              <span key={b} style={{ display: "inline-block", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.1em", padding: "2px 8px 3px", marginRight: 4, marginBottom: 4 }}>{b}</span>
+                            )) : <span style={{ color: INK35, fontStyle: "italic" }}>No beats added</span>}
+                          </div>
+                          {j.tags && j.tags.length > 0 && (
+                            <div style={{ marginTop: 10 }}>
+                              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>Tags</div>
+                              <div>{j.tags.map(t => <span key={t} style={{ display: "inline-block", border: `1px solid ${INK35}`, fontFamily: GROT, fontSize: 8, letterSpacing: "0.1em", padding: "2px 7px 3px", marginRight: 4, marginBottom: 4, color: INK55 }}>{t}</span>)}</div>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>Notes</div>
+                          {j.notes
+                            ? <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK70, lineHeight: 1.6, margin: 0 }}>{j.notes}</p>
+                            : <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK35, margin: 0 }}>No notes yet.</p>}
+                        </div>
+                      </div>
+                    )}
+                    {editingId !== j.id && (
+                      <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
+                        <button onClick={e => { e.stopPropagation(); setEditingId(j.id); }} style={{ padding: "7px 16px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>
+                          Edit Contact
+                        </button>
+                        <button onClick={e => { e.stopPropagation(); if (confirm(`Delete ${j.name}?`)) onDeleteJournalist(j.id); }} style={{ padding: "7px 16px", background: "transparent", color: INK55, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", border: `1px solid ${INK35}`, cursor: "pointer" }}>
+                          Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
       )}
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-        {journalists.length} contacts · Click column headers to sort
+        {journalists.length} contacts · Click a row to expand · Click column headers to sort
       </div>
 
       {/* Add Contact Modal */}
@@ -828,6 +943,84 @@ function ContactsView({
           onSubmit={async (input) => { await onAddJournalist(input); setShowAddModal(false); }}
         />
       )}
+    </div>
+  );
+}
+
+function EditJournalistForm({
+  journalist,
+  onSave,
+  onCancel,
+  onDelete,
+}: {
+  journalist: DbJournalist;
+  onSave: (input: CreateJournalistInput) => Promise<void>;
+  onCancel: () => void;
+  onDelete: () => Promise<void>;
+}) {
+  const [form, setForm] = useState<CreateJournalistInput>({
+    name: journalist.name,
+    outlet: journalist.outlet ?? "",
+    beat: journalist.beat ?? "",
+    email: journalist.email ?? "",
+    twitter_handle: journalist.twitter_handle ?? "",
+    domain_rating: journalist.domain_rating ?? null,
+    notes: journalist.notes ?? "",
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k: keyof CreateJournalistInput, v: string | number | null) =>
+    setForm(prev => ({ ...prev, [k]: v }));
+
+  const inp: React.CSSProperties = {
+    width: "100%", padding: "8px 10px", background: PAPER,
+    border: `1px solid ${INK35}`, fontFamily: SERIF, fontSize: 14, color: INK,
+    outline: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <div onClick={e => e.stopPropagation()}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
+        <div>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Name</label>
+          <input value={form.name} onChange={e => set("name", e.target.value)} style={inp} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Outlet</label>
+          <input value={form.outlet ?? ""} onChange={e => set("outlet", e.target.value)} style={inp} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Beat(s) — separate with commas</label>
+          <input value={form.beat ?? ""} onChange={e => set("beat", e.target.value)} placeholder="e.g. Health, Startups, AI" style={inp} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Email</label>
+          <input value={form.email ?? ""} onChange={e => set("email", e.target.value)} style={inp} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Twitter / X</label>
+          <input value={form.twitter_handle ?? ""} onChange={e => set("twitter_handle", e.target.value)} style={inp} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Domain Rating</label>
+          <input type="number" min={0} max={100} value={form.domain_rating ?? ""} onChange={e => set("domain_rating", e.target.value ? parseInt(e.target.value) : null)} style={inp} />
+        </div>
+      </div>
+      <div style={{ marginBottom: 14 }}>
+        <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Notes</label>
+        <textarea value={form.notes ?? ""} onChange={e => set("notes", e.target.value)} rows={3} style={{ ...inp, resize: "vertical", lineHeight: 1.5 }} />
+      </div>
+      <div style={{ display: "flex", gap: 10 }}>
+        <button
+          disabled={saving}
+          onClick={async () => { setSaving(true); await onSave(form); setSaving(false); }}
+          style={{ padding: "7px 18px", background: saving ? INK55 : YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: saving ? "default" : "pointer" }}
+        >
+          {saving ? "Saving…" : "Save Changes"}
+        </button>
+        <button onClick={onCancel} style={{ padding: "7px 14px", background: "transparent", color: INK55, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", border: `1px solid ${INK35}`, cursor: "pointer" }}>
+          Cancel
+        </button>
+      </div>
     </div>
   );
 }
@@ -1290,6 +1483,11 @@ export default function CoverageIQPlatform({
     startTransition(() => { router.refresh(); });
   }, [router]);
 
+  const handleUpdateJournalist = useCallback(async (id: string, input: CreateJournalistInput) => {
+    await updateJournalist(id, input);
+    startTransition(() => { router.refresh(); });
+  }, [router]);
+
   const handleDeleteJournalist = useCallback(async (id: string) => {
     await deleteJournalist(id);
     startTransition(() => { router.refresh(); });
@@ -1402,7 +1600,7 @@ export default function CoverageIQPlatform({
         {activeTab === "pipeline"  && <PipelineView  pitches={initialPitches} onStageChange={handleStageChange} />}
         {activeTab === "followups" && <FollowUpsView pitches={initialPitches} />}
         {activeTab === "coverage"  && <CoverageLogView pitches={initialPitches} />}
-        {activeTab === "contacts"  && <ContactsView journalists={initialJournalists} onAddJournalist={handleAddJournalist} onDeleteJournalist={handleDeleteJournalist} />}
+        {activeTab === "contacts"  && <ContactsView journalists={initialJournalists} onAddJournalist={handleAddJournalist} onUpdateJournalist={handleUpdateJournalist} onDeleteJournalist={handleDeleteJournalist} />}
         {activeTab === "peso"      && <PESODashboard pitches={initialPitches} alerts={initialAlerts} onAlertStatusChange={handleAlertStatusChange} />}
       </main>
 

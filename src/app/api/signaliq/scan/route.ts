@@ -8,20 +8,12 @@
  * POST body: { beat, turnstileToken? }   (see src/lib/signaliq/types.ts)
  */
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { EMAIL_SCANS, FREE_SCANS } from "@/lib/signaliq/config";
 import { scanBeat } from "@/lib/signaliq/scan";
 import { logScan } from "@/lib/signaliq/log";
-import { saveSignalFromOpportunity } from "@/app/emostool/actions/signaliq";
 import type { BeatId, ScanResponse, UsageTier } from "@/lib/signaliq/types";
-
-// Beat label map for display
-const BEAT_LABELS: Record<string, string> = {
-  saas: "SaaS / Startups", fintech: "Fintech", health: "Health",
-  climate: "Climate", ai: "AI / ML", cybersecurity: "Cybersecurity",
-};
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -81,16 +73,6 @@ export async function POST(req: NextRequest) {
       partial,
       notes,
     };
-
-    // Auto-save top 3 signals when user is authenticated (non-blocking)
-    const { userId: clerkUserId } = await auth();
-    if (clerkUserId && opportunities.length > 0) {
-      const beatLabel = BEAT_LABELS[beat] ?? beat;
-      const top = opportunities.slice(0, 3);
-      void Promise.allSettled(
-        top.map(opp => saveSignalFromOpportunity(opp, beatLabel, { clerkUserId }))
-      );
-    }
 
     return NextResponse.json(body);
   } catch (e) {
