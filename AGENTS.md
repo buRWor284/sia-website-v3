@@ -3,3 +3,96 @@
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+# Project: syedirfanajmal.com + EMOS Platform
+
+**Repo:** github.com/buRWor284/sia-website-v3
+**Live site:** www.syedirfanajmal.com (Next.js App Router, React, Tailwind v4, Vercel)
+**Full spec:** `EMOS-Platform-RFP.md` (workspace root — read this first)
+
+---
+
+## Two parallel tracks
+
+### Track 1 — Public marketing site
+Largely complete. Remaining: ~39 podcast episodes to publish, Resources section content pages.
+
+### Track 2 — EMOS Platform
+Multi-tenant SaaS at `/emostool/*`. Authenticated via Clerk. Data in Supabase.
+
+---
+
+## EMOS workflow (5-stage, updated June 2026)
+
+```
+SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
+```
+
+1. **SignalIQ** — detect newsworthy story gaps from open data
+2. **AssetIQ** — build a linkable asset (report, calculator, quiz, mini-SaaS) around the signal
+3. **JournoCollabIQ** — research journalists who'd care about this asset
+4. **PressIQ** — score and craft the pitch, informed by asset + journalist context
+5. **CoverageIQ** — track pitches from drafted → amplified, log placements
+
+**Two-track model:** Public tools at `/tools/*` are free lead magnets (rate-limited, no persistence). Platform tools at `/emostool/dashboard/*` are authenticated clones with full persistence, cross-tool data flow, and no rate limits.
+
+**Soft progression:** All tools always accessible. Stage bar on dashboard shows progress and recommended next steps. No hard gating.
+
+---
+
+## What's built (as of June 2026)
+
+### Auth + DB (Phase 1 ✅)
+- Clerk auth protecting `/emostool/*`
+- Supabase with full schema, RLS, `get_current_org_id()` with Clerk sub fallback
+- SIA org + Irfan's user seeded
+- `SUPABASE_SERVICE_ROLE_KEY` env var required in Vercel for server-side writes
+
+### Platform tools (Phases 2–4 ✅)
+- `/emostool/dashboard` — stage progress bar, stats, tool cards with soft gating
+- `/emostool/dashboard/coverageiq` — full CoverageIQ platform clone (pitches, contacts, coverage log, PESO dashboard, alerts)
+- `/emostool/dashboard/signaliq` — saved signals viewer (not yet full scan interface)
+- `/emostool/dashboard/pressiq` — score history viewer (not yet full scoring interface)
+
+### Server actions
+- `src/app/emostool/actions/coverageiq.ts` — createPitch, updatePitchStage, createJournalist, updateJournalist, deleteJournalist, getAlerts, updateAlertStatus
+- `src/app/emostool/actions/signaliq.ts` — saveSignalFromOpportunity, getSignals, updateSignalStatus
+- `src/app/emostool/actions/stage.ts` — recordStageEvent, getOrgStage (async functions only — no object exports)
+- `src/lib/emos-stage-config.ts` — STAGE_META, STAGE_ORDER, EmosStage type (plain file, safe to import anywhere)
+
+### Key files
+- `src/lib/supabase.ts` — createSupabaseServerClient (Clerk JWT), createSupabaseServiceClient (service role)
+- `src/lib/pitch/log.ts` — saves PressIQ scores to Supabase on every analysis
+- `supabase/fix-rls-function.sql` — run this in Supabase if RLS isn't resolving
+- `supabase/seed-coverageiq.sql` — seed data for SIA org
+
+---
+
+## What's next (Phase 5+)
+
+### Phase 5 — Platform tool clones
+Build full authenticated versions (not just history viewers):
+- Platform SignalIQ: full scan + explicit save buttons per signal + "Build asset →" CTA
+- Platform PressIQ: full scorer + auto-save + "Track this pitch →" CTA to CoverageIQ
+- Platform JournoCollabIQ: dedicated journalist CRM (move from CoverageIQ Contacts tab)
+
+### Phase 6 — AssetIQ (new module)
+- Planning/tracking: create asset, track status, link to signal + pitches
+- AI-assisted creation: draft survey questions, report outlines, calculator specs based on signal
+- `linkable_assets` + `linkable_asset_components` tables already exist in DB schema
+
+### Phase 7 — Cross-tool connections
+Wire the "→ next tool" CTAs between all platform tools.
+
+---
+
+## Git workflow
+- Single maintainer. Commit directly to main.
+- Sandbox environment cannot push (proxy restriction) — always provide exact git commands for user to run locally.
+- Stale `.git/index.lock` / `.git/HEAD.lock` files appear frequently — user deletes manually with `rm`.
+
+## Critical rules
+- `"use server"` files may ONLY export async functions. No object exports, no type re-exports. Types live in `src/lib/emos-stage-config.ts`.
+- Always fetch `org_id` from the `organizations` table before any INSERT — never rely on RLS to inject it.
+- Use `createSupabaseServiceClient()` in API routes and background jobs. Use `createSupabaseServerClient(token)` in Server Actions with Clerk JWT.
+- Do NOT make unsolicited UI/UX changes to public tools at `/tools/*`. They are lead magnets and should stay as-is.
