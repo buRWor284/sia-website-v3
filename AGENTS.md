@@ -48,21 +48,27 @@ SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
 - SIA org + Irfan's user seeded
 - `SUPABASE_SERVICE_ROLE_KEY` env var required in Vercel for server-side writes
 
-### Platform tools (Phases 2–4 ✅)
+### Platform tools (Phases 2–5 ✅)
 - `/emostool/dashboard` — stage progress bar, stats, tool cards with soft gating
 - `/emostool/dashboard/coverageiq` — full CoverageIQ platform clone (pitches, contacts, coverage log, PESO dashboard, alerts)
-- `/emostool/dashboard/signaliq` — saved signals viewer (not yet full scan interface)
-- `/emostool/dashboard/pressiq` — score history viewer (not yet full scoring interface)
+- `/emostool/dashboard/signaliq` — full scan interface: beat picker, authenticated scan (no rate limit), "Save to EMOS →" per result, saved signals library with "Build asset →" CTA
+- `/emostool/dashboard/pressiq` — full scoring UI: pitch textarea, platform selector, journalist beat input, score result with top fixes + breakdown, "Track this pitch →" creates CoverageIQ draft, score history below
+- `/emostool/dashboard/journocollabiq` — journalist CRM: table with DR/pitches/placements, inline add/edit/delete, "Score a pitch →" per journalist
 
 ### Server actions
 - `src/app/emostool/actions/coverageiq.ts` — createPitch, updatePitchStage, createJournalist, updateJournalist, deleteJournalist, getAlerts, updateAlertStatus
-- `src/app/emostool/actions/signaliq.ts` — saveSignalFromOpportunity, getSignals, updateSignalStatus
+- `src/app/emostool/actions/signaliq.ts` — saveSignalFromOpportunity, saveSignalFromScan, getSignals, updateSignalStatus
 - `src/app/emostool/actions/stage.ts` — recordStageEvent, getOrgStage (async functions only — no object exports)
 - `src/lib/emos-stage-config.ts` — STAGE_META, STAGE_ORDER, EmosStage type (plain file, safe to import anywhere)
+
+### Authenticated API routes (platform-only, no rate limit)
+- `src/app/api/emostool/signaliq/scan/route.ts` — Clerk auth, no Turnstile, same scanBeat() as public
+- `src/app/api/emostool/pitch-score/route.ts` — Clerk auth, no rate limit, always stores, same scoring logic as public
 
 ### Key files
 - `src/lib/supabase.ts` — createSupabaseServerClient (Clerk JWT), createSupabaseServiceClient (service role)
 - `src/lib/pitch/log.ts` — saves PressIQ scores to Supabase on every analysis
+- `src/components/emostool/` — platform client components (SignalIQPlatformClient, PressIQPlatformClient, JournoCollabIQClient)
 - `supabase/fix-rls-function.sql` — run this in Supabase if RLS isn't resolving
 - `supabase/seed-coverageiq.sql` — seed data for SIA org
 
@@ -70,11 +76,8 @@ SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
 
 ## What's next (Phase 5+)
 
-### Phase 5 — Platform tool clones
-Build full authenticated versions (not just history viewers):
-- Platform SignalIQ: full scan + explicit save buttons per signal + "Build asset →" CTA
-- Platform PressIQ: full scorer + auto-save + "Track this pitch →" CTA to CoverageIQ
-- Platform JournoCollabIQ: dedicated journalist CRM (move from CoverageIQ Contacts tab)
+### Phase 5 — Platform tool clones ✅
+All done. Full authenticated versions built for SignalIQ, PressIQ, JournoCollabIQ.
 
 ### Phase 6 — AssetIQ (new module)
 - Planning/tracking: create asset, track status, link to signal + pitches
