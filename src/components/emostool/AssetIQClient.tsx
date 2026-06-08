@@ -340,14 +340,56 @@ export default function AssetIQClient({
   prefillTitle,
   signalId,
   signalHeadline,
+  assetIdea,
+  dataBrief,
+  pitchAngle,
 }: {
   initialAssets: DbAsset[];
   prefillTitle: string;
   signalId: string | null;
   signalHeadline: string | null;
+  assetIdea?: string | null;
+  dataBrief?: string | null;
+  pitchAngle?: string | null;
 }) {
   const [assets, setAssets] = useState<DbAsset[]>(initialAssets);
   const [showForm, setShowForm] = useState(prefillTitle !== "" || signalId !== null);
+
+  const [creationPlan, setCreationPlan] = useState<string | null>(null);
+  const [planLoading, setPlanLoading] = useState(false);
+  const [planError, setPlanError] = useState<string | null>(null);
+  const [planAssetType, setPlanAssetType] = useState<AssetType>("research_report");
+  const [planTitle, setPlanTitle] = useState(prefillTitle);
+
+  const hasPackContext = !!(assetIdea || dataBrief || pitchAngle);
+
+  async function generatePlan() {
+    setPlanError(null);
+    setCreationPlan(null);
+    setPlanLoading(true);
+    try {
+      const res = await fetch("/api/emostool/asset-brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assetType: planAssetType,
+          title: planTitle || signalHeadline || "Untitled asset",
+          signalHeadline: signalHeadline ?? undefined,
+          assetIdea: assetIdea ?? undefined,
+          dataBrief: dataBrief ?? undefined,
+          pitchAngle: pitchAngle ?? undefined,
+          keyword: undefined,
+        }),
+      });
+      const data = await res.json() as { brief?: string; error?: string };
+      if (!res.ok || data.error) { setPlanError(data.error ?? "Failed to generate plan."); return; }
+      setCreationPlan(data.brief ?? null);
+    } catch {
+      setPlanError("Network error — please try again.");
+    } finally {
+      setPlanLoading(false);
+    }
+  }
 
   const draftCount     = assets.filter(a => a.status === "draft").length;
   const publishedCount = assets.filter(a => a.status === "published").length;
@@ -369,7 +411,89 @@ export default function AssetIQClient({
   return (
     <div style={{ fontFamily: SERIF }}>
 
-      {/* Stats strip */}
+      {/* ── Signal / Asset Pack Context ──────────────────────────────────── */}
+      {hasPackContext && (
+        <div style={{ border: `1px solid ${INK}`, marginBottom: 28, overflow: "hidden" }}>
+          {/* Context header */}
+          <div style={{ background: INK, color: PAPER, padding: "10px 18px", display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", background: YEL, color: INK, padding: "2px 7px" }}>Signal pack</span>
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.75)" }}>{signalHeadline}</span>
+          </div>
+
+          {/* Pack data */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 0 }}>
+            {assetIdea && (
+              <div style={{ padding: "14px 18px", borderRight: `1px solid ${INK15}`, borderBottom: `1px solid ${INK15}` }}>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>Linkable asset idea</div>
+                <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK70, lineHeight: 1.55 }}>{assetIdea}</p>
+              </div>
+            )}
+            {dataBrief && (
+              <div style={{ padding: "14px 18px", borderRight: `1px solid ${INK15}`, borderBottom: `1px solid ${INK15}` }}>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>Data brief</div>
+                <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.55 }}>{dataBrief}</p>
+              </div>
+            )}
+            {pitchAngle && (
+              <div style={{ padding: "14px 18px", borderBottom: `1px solid ${INK15}` }}>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>Pitch angle</div>
+                <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.55 }}>{pitchAngle}</p>
+              </div>
+            )}
+          </div>
+
+          {/* AI Creation Plan generator */}
+          <div style={{ padding: "16px 18px", background: PAPER2, borderTop: `1px solid ${INK15}` }}>
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>
+              Generate an AI creation plan for this asset
+            </div>
+            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: planLoading || creationPlan ? 14 : 0 }}>
+              <select
+                value={planAssetType}
+                onChange={e => setPlanAssetType(e.target.value as AssetType)}
+                style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".06em", padding: "8px 12px", outline: "none", cursor: "pointer" }}
+              >
+                {ASSET_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+              </select>
+              <input
+                type="text"
+                value={planTitle}
+                onChange={e => setPlanTitle(e.target.value)}
+                placeholder="Working title…"
+                style={{ flex: 1, minWidth: 200, background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "8px 12px", outline: "none" }}
+              />
+              <button
+                onClick={generatePlan}
+                disabled={planLoading}
+                style={{ padding: "9px 20px", border: "none", background: planLoading ? PAPER2 : INK, color: planLoading ? INK55 : PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase", cursor: planLoading ? "wait" : "pointer" }}
+              >
+                {planLoading ? "Generating…" : "Generate creation plan →"}
+              </button>
+            </div>
+
+            {planError && <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: RED }}>{planError}</p>}
+
+            {creationPlan && (
+              <div style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "16px 18px", marginTop: 14 }}>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 12 }}>
+                  Asset creation plan
+                </div>
+                <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.75, whiteSpace: "pre-wrap" }}>{creationPlan}</div>
+                <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
+                  <a
+                    href={`/emostool/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle)}&story=${encodeURIComponent(pitchAngle ?? assetIdea ?? "")}`}
+                    style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}
+                  >
+                    Find journalists for this asset →
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Stats strip ─────────────────────────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${INK}`, marginBottom: 28 }}>
         {[
           { num: assets.length,  label: "Total assets" },

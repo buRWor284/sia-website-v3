@@ -211,6 +211,13 @@ function ScanCard({
                 ))}
               </div>
             )}
+            {/* Build asset from this pack — passes all context to AssetIQ */}
+            <a
+              href={`/emostool/dashboard/assetiq?headline=${encodeURIComponent(opp.headline)}&assetIdea=${encodeURIComponent(pack.linkableAssetIdea ?? "")}&dataBrief=${encodeURIComponent((pack.brief ?? "").slice(0, 400))}&pitchAngle=${encodeURIComponent((pack.angle ?? "").slice(0, 300))}`}
+              style={{ display: "inline-block", padding: "8px 14px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none", marginTop: 2 }}
+            >
+              Build asset from this pack →
+            </a>
           </div>
         )}
       </div>

@@ -23,14 +23,17 @@ const SERIF  = "var(--font-serif)";
 export default async function AssetIQPage({
   searchParams,
 }: {
-  searchParams: Promise<{ signal?: string; headline?: string }>;
+  searchParams: Promise<{ signal?: string; headline?: string; assetIdea?: string; dataBrief?: string; pitchAngle?: string }>;
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
   if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const params = await searchParams;
-  const signalId = params.signal ?? null;
+  const signalId    = params.signal ?? null;
+  const assetIdea   = params.assetIdea   ? decodeURIComponent(params.assetIdea)   : null;
+  const dataBrief   = params.dataBrief   ? decodeURIComponent(params.dataBrief)   : null;
+  const pitchAngle  = params.pitchAngle  ? decodeURIComponent(params.pitchAngle)  : null;
   const signalHeadlineFromParam = params.headline ? decodeURIComponent(params.headline) : null;
 
   // If signal ID provided, fetch its headline from DB as backup
@@ -43,8 +46,10 @@ export default async function AssetIQPage({
 
   const assets = await getAssets();
 
-  // Pre-fill title from signal headline (stripped to a workable title)
-  const prefillTitle = signalHeadline
+  // Pre-fill title from asset idea (preferred) or signal headline
+  const prefillTitle = assetIdea
+    ? assetIdea.length > 80 ? assetIdea.slice(0, 80) : assetIdea
+    : signalHeadline
     ? signalHeadline.length > 80 ? signalHeadline.slice(0, 80) + "…" : signalHeadline
     : "";
 
@@ -79,6 +84,9 @@ export default async function AssetIQPage({
           prefillTitle={prefillTitle}
           signalId={signalId}
           signalHeadline={signalHeadline}
+          assetIdea={assetIdea}
+          dataBrief={dataBrief}
+          pitchAngle={pitchAngle}
         />
 
         <PipelineNav current="asset" />
