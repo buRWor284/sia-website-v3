@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { getOrgStage, type EmosStage } from "@/app/emostool/actions/stage";
-import { STAGE_META, STAGE_ORDER } from "@/lib/emos-stage-config";
+import { getOrgStage } from "@/app/emostool/actions/stage";
+import { STAGE_META, STAGE_ORDER, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

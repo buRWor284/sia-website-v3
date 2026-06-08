@@ -18,9 +18,6 @@ import {
   type StageEventType,
 } from "@/lib/emos-stage-config";
 
-// Re-export types so existing imports from this file still work
-export type { EmosStage, StageEventType };
-
 const THRESHOLDS: Record<EmosStage, { events: StageEventType[]; count: number }> = {
   signal:   { events: ["signal_saved", "pack_generated"], count: 3 },
   press:    { events: ["pitch_scored"],                   count: 5 },
