@@ -118,10 +118,10 @@ function ScanCard({
     setPack(null);
     setPacking(true);
     try {
-      const res = await fetch("/api/signaliq/pack", {
+      const res = await fetch("/api/emostool/signaliq/pack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ opportunity: opp, store: false, companyContext: companyContext.trim() || undefined }),
+        body: JSON.stringify({ opportunity: opp, companyContext: companyContext.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setPackError(data.error || "Could not generate the pack.");
