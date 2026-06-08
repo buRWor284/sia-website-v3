@@ -1,74 +1,37 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { getOrgStage } from "@/app/emostool/actions/stage";
 import { STAGE_META, STAGE_ORDER, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  title: "EMOS Platform Dashboard",
+  title: "EMOS Platform",
 };
 
 const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 
-const PAPER   = "#f1ebde";
-const PAPER2  = "#e8e0cc";
-const INK     = "#1a1410";
-const INK55   = "rgba(26,20,16,.55)";
-const INK35   = "rgba(26,20,16,.32)";
-const INK15   = "rgba(26,20,16,.15)";
-const YEL     = "#f5b81f";
-const GROT    = "var(--font-grot)";
-const SERIF   = "var(--font-serif)";
-const MONO    = "var(--font-mono)";
+const PAPER  = "#f1ebde";
+const PAPER2 = "#e8e0cc";
+const INK    = "#1a1410";
+const INK55  = "rgba(26,20,16,.55)";
+const INK35  = "rgba(26,20,16,.32)";
+const INK15  = "rgba(26,20,16,.15)";
+const YEL    = "#f5b81f";
+const GREEN  = "#3e6b45";
+const GROT   = "var(--font-grot)";
+const SERIF  = "var(--font-serif)";
+const MONO   = "var(--font-mono)";
 
-const TOOLS: {
-  id: EmosStage;
-  name: string;
-  subtitle: string;
-  path: string;
-  publicPath: string;
-  description: string;
-  icon: string;
-}[] = [
-  {
-    id: "signal",
-    name: "SignalIQ",
-    subtitle: "Story Detection",
-    path: "/emostool/dashboard/signaliq",
-    publicPath: "/tools/signaliq",
-    description: "Scan open data sources for newsworthy signals. Save top opportunities to your EMOS pipeline.",
-    icon: "◎",
-  },
-  {
-    id: "press",
-    name: "PressIQ",
-    subtitle: "Pitch Scoring",
-    path: "/emostool/dashboard/pressiq",
-    publicPath: "/tools/pressiq",
-    description: "Score your pitches against 34-point journalist criteria. Scores auto-save when logged in.",
-    icon: "◈",
-  },
-  {
-    id: "collab",
-    name: "JournoCollabIQ",
-    subtitle: "Journalist CRM",
-    path: "/emostool/dashboard/journocollabiq",
-    publicPath: "/tools/journocollabiq",
-    description: "Build and manage journalist relationships. Track every touchpoint.",
-    icon: "◇",
-  },
-  {
-    id: "coverage",
-    name: "CoverageIQ",
-    subtitle: "Pitch Tracking",
-    path: "/emostool/dashboard/coverageiq",
-    publicPath: "/tools/coverageiq",
-    description: "Track your full pitch pipeline from drafted to amplified. Log placements and coverage.",
-    icon: "◆",
-  },
-];
+// Tool icons in pipeline order
+const TOOL_ICONS: Record<EmosStage, string> = {
+  signal:   "◎",
+  asset:    "◈",
+  collab:   "◇",
+  press:    "◆",
+  coverage: "▣",
+  full:     "★",
+};
 
 export default async function EmosDashboardPage() {
   const { userId, getToken } = await auth();
@@ -78,7 +41,7 @@ export default async function EmosDashboardPage() {
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");
 
-  const { data: org, error } = await db
+  const { data: org } = await db
     .from("organizations")
     .select("id, name, slug, emos_stage, plan")
     .single();
@@ -86,42 +49,49 @@ export default async function EmosDashboardPage() {
   const currentStage = (org?.emos_stage as EmosStage) ?? "signal";
   const stageIdx = STAGE_ORDER.indexOf(currentStage);
 
-  // Fetch quick stats
-  const [pitchRes, signalRes, journalistRes] = await Promise.all([
-    db.from("coverageiq_pitches").select("id", { count: "exact", head: true }),
+  // Fetch stats for each tool card
+  const [signalRes, assetRes, journalistRes, pressRes, pitchRes] = await Promise.all([
     db.from("signaliq_signals").select("id", { count: "exact", head: true }),
+    db.from("linkable_assets").select("id", { count: "exact", head: true }),
     db.from("journalists").select("id", { count: "exact", head: true }),
+    db.from("pressiq_scores").select("id", { count: "exact", head: true }),
+    db.from("coverageiq_pitches").select("id", { count: "exact", head: true }),
   ]);
 
-  const stats = {
-    pitches:     pitchRes.count ?? 0,
-    signals:     signalRes.count ?? 0,
-    journalists: journalistRes.count ?? 0,
+  const toolStats: Record<EmosStage, { count: number; label: string }> = {
+    signal:   { count: signalRes.count ?? 0,    label: "signals saved"        },
+    asset:    { count: assetRes.count ?? 0,     label: "assets"               },
+    collab:   { count: journalistRes.count ?? 0, label: "journalists"          },
+    press:    { count: pressRes.count ?? 0,     label: "pitches scored"       },
+    coverage: { count: pitchRes.count ?? 0,     label: "pitches tracked"      },
+    full:     { count: 0,                       label: ""                     },
   };
+
+  // Active tool = first incomplete stage
+  const activeStage = currentStage;
+  const pipelineTools = STAGE_ORDER.filter(s => s !== "full");
 
   return (
     <div style={{ minHeight: "100vh", background: PAPER, fontFamily: SERIF }}>
 
-      {/* ── Top bar ───────────────────────────────────────────────────────── */}
+      {/* ── Top bar ─────────────────────────────────────────────────────────── */}
       <div style={{ background: INK, color: PAPER, padding: "0 clamp(20px,4vw,56px)" }}>
         <div style={{ maxWidth: 1200, marginInline: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 52 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: "0.18em", textTransform: "uppercase" }}>
-              EMOS
-            </span>
+            <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".18em", textTransform: "uppercase" }}>EMOS</span>
             <span style={{ width: 1, height: 16, background: "rgba(241,235,222,.2)" }} />
-            <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}>
+            <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}>
               Earned Media Operating System
             </span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             {org && (
-              <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}>
-                {org.name} · {org.plan.toUpperCase()}
+              <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase", color: "rgba(241,235,222,.45)" }}>
+                {org.name}
               </span>
             )}
-            <span style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: YEL }}>
-              <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%", display: "inline-block" }} />
+            <span style={{ display: "flex", alignItems: "center", gap: 5, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: YEL }}>
+              <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%" }} />
               LIVE
             </span>
           </div>
@@ -130,146 +100,127 @@ export default async function EmosDashboardPage() {
 
       <div style={{ maxWidth: 1200, marginInline: "auto", padding: "40px clamp(20px,4vw,56px) 80px" }}>
 
-        {error && (
-          <div style={{ padding: "12px 16px", background: "#fff0f0", border: "1px solid #ffcccc", marginBottom: 32, fontFamily: GROT, fontSize: 12 }}>
-            Could not load org: {error.message}
+        {/* ── Current step banner ──────────────────────────────────────────── */}
+        <div style={{ background: INK, color: PAPER, padding: "18px 24px", marginBottom: 40, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".18em", textTransform: "uppercase", color: YEL, marginBottom: 4 }}>
+              You are here
+            </div>
+            <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 16, letterSpacing: ".10em", textTransform: "uppercase" }}>
+              Step {stageIdx + 1} — {STAGE_META[activeStage].label}
+            </div>
+            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.65)", marginTop: 4 }}>
+              {STAGE_META[activeStage].threshold}
+            </div>
           </div>
-        )}
+          <a
+            href={STAGE_META[activeStage].path}
+            style={{ marginLeft: "auto", padding: "12px 24px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}
+          >
+            Open {STAGE_META[activeStage].label} →
+          </a>
+        </div>
 
-        {/* ── Stage progress bar ───────────────────────────────────────── */}
-        <div style={{ marginBottom: 48 }}>
-          <div style={{ borderTop: `3px solid ${INK}`, borderBottom: `1px solid ${INK15}`, paddingTop: 10, paddingBottom: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-              <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", background: YEL, color: INK, padding: "3px 10px 4px" }}>
-                EMOS STAGE
-              </span>
-              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 12, color: INK55 }}>
-                {STAGE_META[currentStage].label}
-              </span>
-              {currentStage !== "full" && (
-                <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, marginLeft: "auto" }}>
-                  {STAGE_META[currentStage].threshold}
-                </span>
-              )}
-            </div>
-
-            {/* Pipeline steps */}
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${STAGE_ORDER.length}, 1fr)`, border: `1px solid ${INK}`, overflow: "hidden" }}>
-              {STAGE_ORDER.map((stage, i) => {
-                const done    = i < stageIdx;
-                const current = i === stageIdx;
-                const locked  = i > stageIdx;
-                return (
-                  <div
-                    key={stage}
-                    style={{
-                      padding: "16px 12px",
-                      borderRight: i < STAGE_ORDER.length - 1 ? `1px solid ${INK}` : "none",
-                      background: current ? INK : done ? YEL : PAPER2,
-                      position: "relative",
-                    }}
-                  >
-                    <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: current ? YEL : done ? INK : INK35, marginBottom: 4 }}>
-                      {done ? "✓ DONE" : current ? "● ACTIVE" : "○ LOCKED"}
-                    </div>
-                    <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: current ? PAPER : done ? INK : INK35 }}>
-                      {STAGE_META[stage].label}
-                    </div>
-                    <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: current ? "rgba(241,235,222,.65)" : done ? "rgba(26,20,16,.65)" : INK35, marginTop: 4, lineHeight: 1.4 }}>
-                      {STAGE_META[stage].tool}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        {/* ── Pipeline tool cards ──────────────────────────────────────────── */}
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ borderTop: "3px solid " + INK, paddingTop: 10, paddingBottom: 16 }}>
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase", background: YEL, color: INK, padding: "3px 10px 4px" }}>
+              THE PIPELINE
+            </span>
           </div>
         </div>
 
-        {/* ── Stats strip ─────────────────────────────────────────────── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}`, marginBottom: 48 }}>
-          {[
-            { num: stats.signals,     label: "Signals Saved" },
-            { num: stats.pitches,     label: "Pitches Tracked" },
-            { num: stats.journalists, label: "Journalist Contacts" },
-          ].map((item, i) => (
-            <div key={i} style={{ padding: "20px 24px", borderRight: i < 2 ? `1px solid ${INK}` : "none" }}>
-              <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 32, lineHeight: 1, letterSpacing: "-0.02em", color: INK }}>{item.num}</div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, marginTop: 6 }}>{item.label}</div>
-            </div>
-          ))}
-        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 1, background: INK, border: `1px solid ${INK}`, marginBottom: 48 }}>
+          {pipelineTools.map((stage, i) => {
+            const meta = STAGE_META[stage];
+            const toolIdx = STAGE_ORDER.indexOf(stage);
+            const isDone    = toolIdx < stageIdx;
+            const isActive  = stage === activeStage;
+            const stats     = toolStats[stage];
 
-        {/* ── Tool cards ──────────────────────────────────────────────── */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ borderTop: `1px solid ${INK}`, paddingTop: 3 }}>
-            <div style={{ borderTop: `3px solid ${INK}`, paddingTop: 10, paddingBottom: 16 }}>
-              <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", background: YEL, color: INK, padding: "3px 10px 4px" }}>
-                TOOLS
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: INK, border: `1px solid ${INK}`, marginBottom: 48 }}>
-          {TOOLS.map(tool => {
-            const toolStageIdx = STAGE_ORDER.indexOf(tool.id);
-            const isCurrent = tool.id === currentStage;
-            const isDone = toolStageIdx < stageIdx;
             return (
               <div
-                key={tool.id}
-                style={{ background: PAPER, padding: "28px 28px 24px", position: "relative" }}
+                key={stage}
+                style={{
+                  background: isActive ? INK : PAPER,
+                  display: "grid",
+                  gridTemplateColumns: "48px 1fr auto auto",
+                  alignItems: "center",
+                  gap: 0,
+                }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: YEL, lineHeight: 1 }}>
-                    {tool.icon}
-                  </span>
-                  <div>
-                    <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK }}>
-                      {tool.name}
-                    </div>
-                    <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, marginTop: 2 }}>
-                      {tool.subtitle}
-                    </div>
-                  </div>
-                  {isCurrent && (
-                    <span style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 8px" }}>
-                      ACTIVE
-                    </span>
-                  )}
-                  {isDone && (
-                    <span style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, background: PAPER2, padding: "3px 8px" }}>
-                      ✓ DONE
-                    </span>
-                  )}
+                {/* Step number */}
+                <div style={{ padding: "20px 0 20px 20px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: isActive ? YEL : isDone ? "rgba(26,20,16,.2)" : INK35, lineHeight: 1 }}>
+                  {TOOL_ICONS[stage]}
                 </div>
 
-                <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.6, color: "rgba(26,20,16,.70)", margin: "0 0 20px" }}>
-                  {tool.description}
-                </p>
+                {/* Tool info */}
+                <div style={{ padding: "20px 20px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                    <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: isActive ? PAPER : isDone ? "rgba(26,20,16,.45)" : INK }}>
+                      {meta.label}
+                    </span>
+                    <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".10em", textTransform: "uppercase", color: isActive ? "rgba(241,235,222,.5)" : INK55 }}>
+                      {meta.tool}
+                    </span>
+                    {isDone && (
+                      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", background: "rgba(62,107,69,.15)", color: GREEN, border: `1px solid ${GREEN}`, padding: "2px 7px" }}>
+                        ✓ DONE
+                      </span>
+                    )}
+                    {isActive && (
+                      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", background: YEL, color: INK, padding: "2px 7px" }}>
+                        ACTIVE
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: isActive ? "rgba(241,235,222,.65)" : isDone ? INK35 : INK55, lineHeight: 1.4 }}>
+                    {meta.description}
+                  </div>
+                </div>
 
-                <a href={tool.path} style={{ display: "inline-block", padding: "8px 18px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>
-                  Open →
-                </a>
+                {/* Stats */}
+                {stats.count > 0 && (
+                  <div style={{ padding: "20px 20px", textAlign: "right" }}>
+                    <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 22, lineHeight: 1, color: isActive ? PAPER : isDone ? INK35 : INK }}>
+                      {stats.count}
+                    </div>
+                    <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: isActive ? "rgba(241,235,222,.45)" : INK55, marginTop: 2 }}>
+                      {stats.label}
+                    </div>
+                  </div>
+                )}
+                {stats.count === 0 && <div style={{ padding: "20px 20px" }} />}
+
+                {/* CTA */}
+                <div style={{ padding: "20px 20px 20px 0" }}>
+                  <a
+                    href={meta.path}
+                    style={{
+                      display: "inline-block",
+                      padding: "8px 18px",
+                      background: isActive ? YEL : "transparent",
+                      color: isActive ? INK : INK55,
+                      border: isActive ? "none" : `1px solid ${INK15}`,
+                      fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none",
+                    }}
+                  >
+                    Open →
+                  </a>
+                </div>
               </div>
             );
           })}
         </div>
 
-        {/* ── Org info ────────────────────────────────────────────────── */}
+        {/* ── Org info ─────────────────────────────────────────────────────── */}
         {org && (
-          <div style={{ border: `1px solid ${INK15}`, padding: "16px 20px", background: PAPER2 }}>
-            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>Organisation</div>
-            <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
-              {[
-                ["Name",  org.name],
-                ["Slug",  org.slug],
-                ["Plan",  org.plan],
-                ["Stage", org.emos_stage],
-                ["ID",    org.id],
-              ].map(([label, value]) => (
+          <div style={{ border: `1px solid ${INK15}`, padding: "14px 18px", background: PAPER2 }}>
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK35, marginBottom: 8 }}>Organisation</div>
+            <div style={{ display: "flex", gap: 28, flexWrap: "wrap" }}>
+              {([ ["Name", org.name], ["Plan", org.plan], ["Stage", org.emos_stage] ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
-                  <div style={{ fontFamily: GROT, fontSize: 8, letterSpacing: "0.12em", textTransform: "uppercase", color: INK35, marginBottom: 2 }}>{label}</div>
+                  <div style={{ fontFamily: GROT, fontSize: 7.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK35, marginBottom: 1 }}>{label}</div>
                   <div style={{ fontFamily: MONO, fontSize: 12, color: INK55 }}>{value}</div>
                 </div>
               ))}

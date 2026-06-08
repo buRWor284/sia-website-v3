@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getSignals } from "@/app/emostool/actions/signaliq";
 import SignalIQPlatformClient from "@/components/emostool/SignalIQPlatformClient";
+import PipelineNav from "@/components/emostool/PipelineNav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -27,6 +28,12 @@ export default async function SignalIQPlatformPage() {
   if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const signals = await getSignals();
+
+  // Build next-tool href: point to AssetIQ with most recent saved signal
+  const latestSignal = signals.find(s => s.status === "saved") ?? signals[0];
+  const assetIQHref = latestSignal
+    ? `/emostool/dashboard/assetiq?signal=${latestSignal.id}&headline=${encodeURIComponent(latestSignal.headline)}`
+    : "/emostool/dashboard/assetiq";
 
   const counts = {
     new:      signals.filter(s => s.status === "new").length,
@@ -67,6 +74,7 @@ export default async function SignalIQPlatformPage() {
         {/* Client shell: scan UI + library */}
         <SignalIQPlatformClient initialSignals={signals} />
 
+        <PipelineNav current="signal" nextHref={assetIQHref} />
       </div>
     </div>
   );

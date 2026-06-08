@@ -362,7 +362,7 @@ function SignalLibrary({
               </span>
               {/* Build asset CTA */}
               <a
-                href={`/emostool/dashboard/assetiq?signal=${sig.id}`}
+                href={`/emostool/dashboard/assetiq?signal=${sig.id}&headline=${encodeURIComponent(sig.headline)}`}
                 style={{
                   fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em",
                   textTransform: "uppercase", color: INK55,

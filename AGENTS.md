@@ -48,12 +48,16 @@ SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
 - SIA org + Irfan's user seeded
 - `SUPABASE_SERVICE_ROLE_KEY` env var required in Vercel for server-side writes
 
-### Platform tools (Phases 2–5 ✅)
-- `/emostool/dashboard` — stage progress bar, stats, tool cards with soft gating
-- `/emostool/dashboard/coverageiq` — full CoverageIQ platform clone (pitches, contacts, coverage log, PESO dashboard, alerts)
-- `/emostool/dashboard/signaliq` — full scan interface: beat picker, authenticated scan (no rate limit), "Save to EMOS →" per result, saved signals library with "Build asset →" CTA
-- `/emostool/dashboard/pressiq` — full scoring UI: pitch textarea, platform selector, journalist beat input, score result with top fixes + breakdown, "Track this pitch →" creates CoverageIQ draft, score history below
-- `/emostool/dashboard/journocollabiq` — journalist CRM: table with DR/pitches/placements, inline add/edit/delete, "Score a pitch →" per journalist
+### Platform tools (Phases 2–6 ✅)
+Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
+
+- `/emostool/dashboard` — unified pipeline view: one card per tool in order, live data counts, "you are here" banner
+- `/emostool/dashboard/signaliq` — full scan, startup context re-ranking, "Save to EMOS →", "Build asset →" → AssetIQ
+- `/emostool/dashboard/assetiq` — linkable asset tracker: create from signal, type/status/keyword, "Find journalists →" → JournoCollabIQ
+- `/emostool/dashboard/journocollabiq` — journalist CRM: table with DR/pitches/placements, add/edit/delete, "Score a pitch →" → PressIQ
+- `/emostool/dashboard/pressiq` — full scorer, reads ?beat= from URL, "Track this pitch →" → CoverageIQ
+- `/emostool/dashboard/coverageiq` — full pipeline (pitches, contacts, coverage log, PESO, alerts)
+- All tools have PipelineNav footer showing position + "Next step" CTA
 
 ### Server actions
 - `src/app/emostool/actions/coverageiq.ts` — createPitch, updatePitchStage, createJournalist, updateJournalist, deleteJournalist, getAlerts, updateAlertStatus

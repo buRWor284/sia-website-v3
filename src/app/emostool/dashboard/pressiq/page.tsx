@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import PressIQPlatformClient from "@/components/emostool/PressIQPlatformClient";
+import PipelineNav from "@/components/emostool/PipelineNav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -36,10 +37,21 @@ interface DbScore {
   scored_at: string;
 }
 
-export default async function PressIQPlatformPage() {
+export default async function PressIQPlatformPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ beat?: string; journalist?: string }>;
+}) {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/sign-in");
   if (userId !== ALLOWED_USER_ID) redirect("/");
+
+  const params = await searchParams;
+  const initialQuery = params.beat
+    ? decodeURIComponent(params.beat)
+    : params.journalist
+    ? decodeURIComponent(params.journalist)
+    : "";
 
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");
@@ -88,8 +100,9 @@ export default async function PressIQPlatformPage() {
           ))}
         </div>
 
-        <PressIQPlatformClient initialScores={rows} />
+        <PressIQPlatformClient initialScores={rows} initialQuery={initialQuery} />
 
+        <PipelineNav current="press" />
       </div>
     </div>
   );

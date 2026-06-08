@@ -3,11 +3,13 @@
 /**
  * EMOS Stage Progression Engine
  *
- * Thresholds (from RFP):
- *   signal  → press    : 3 saved signals OR 1 asset pack generated
- *   press   → collab   : 5 pitches scored
- *   collab  → coverage : 5 journalists saved
- *   coverage→ full     : 10 pitches logged in CoverageIQ
+ * Pipeline: signal → asset → collab → press → coverage → full
+ * Thresholds:
+ *   signal   → asset    : 3 signals saved
+ *   asset    → collab   : 1 asset created
+ *   collab   → press    : 3 journalists saved
+ *   press    → coverage : 5 pitches scored
+ *   coverage → full     : 10 pitches logged
  */
 
 import { auth } from "@clerk/nextjs/server";
@@ -20,8 +22,9 @@ import {
 
 const THRESHOLDS: Record<EmosStage, { events: StageEventType[]; count: number }> = {
   signal:   { events: ["signal_saved", "pack_generated"], count: 3 },
+  asset:    { events: ["asset_created"],                  count: 1 },
+  collab:   { events: ["journalist_saved"],               count: 3 },
   press:    { events: ["pitch_scored"],                   count: 5 },
-  collab:   { events: ["journalist_saved"],               count: 5 },
   coverage: { events: ["pitch_logged", "placement_confirmed"], count: 10 },
   full:     { events: [],                                 count: Infinity },
 };

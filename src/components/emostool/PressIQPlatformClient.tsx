@@ -306,11 +306,13 @@ function ScoreHistory({ scores, newCount }: { scores: DbScore[]; newCount: numbe
 
 export default function PressIQPlatformClient({
   initialScores,
+  initialQuery = "",
 }: {
   initialScores: DbScore[];
+  initialQuery?: string;
 }) {
   const [pitch, setPitch] = useState("");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [platform, setPlatform] = useState<Platform>("haro");
   const [scoring, setScoring] = useState(false);
   const [scoreError, setScoreError] = useState<string | null>(null);

@@ -1619,6 +1619,54 @@ export default function CoverageIQPlatform({
           onSubmit={async (input) => { await handleCreatePitch(input); setShowModal(false); }}
         />
       )}
+
+      {/* Pipeline nav — coverage is the last tool */}
+      <div style={{ maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)" }}>
+        <PipelineNavInline />
+      </div>
+    </div>
+  );
+}
+
+// Inline pipeline nav to avoid "use client" / server component mixing
+function PipelineNavInline() {
+  const PAPER2_LOCAL = "#e8e0cc";
+  const INK_LOCAL    = "#1a1410";
+  const INK15_LOCAL  = "rgba(26,20,16,.15)";
+  const INK55_LOCAL  = "rgba(26,20,16,.55)";
+  const YEL_LOCAL    = "#f5b81f";
+  const GREEN_LOCAL  = "#3e6b45";
+  const GROT_LOCAL   = "var(--font-grot)";
+  const SERIF_LOCAL  = "var(--font-serif)";
+
+  const tools = [
+    { label: "SignalIQ",       path: "/emostool/dashboard/signaliq"      },
+    { label: "AssetIQ",        path: "/emostool/dashboard/assetiq"       },
+    { label: "JournoCollabIQ", path: "/emostool/dashboard/journocollabiq"},
+    { label: "PressIQ",        path: "/emostool/dashboard/pressiq"       },
+    { label: "CoverageIQ",     path: "/emostool/dashboard/coverageiq"    },
+  ];
+
+  return (
+    <div style={{ marginTop: 64, borderTop: `1px solid ${INK15_LOCAL}` }}>
+      <div style={{ display: "flex", overflow: "hidden", borderBottom: `1px solid ${INK15_LOCAL}` }}>
+        {tools.map((t, i) => (
+          <a key={t.path} href={t.path}
+            style={{ flex: 1, padding: "10px 12px", textAlign: "center", background: i === 4 ? INK_LOCAL : "transparent", borderRight: i < 4 ? `1px solid ${INK15_LOCAL}` : "none", textDecoration: "none" }}>
+            <div style={{ fontFamily: GROT_LOCAL, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: i === 4 ? YEL_LOCAL : i < 4 ? GREEN_LOCAL : INK55_LOCAL }}>
+              {i < 4 ? "✓ " : ""}{t.label}
+            </div>
+          </a>
+        ))}
+      </div>
+      <div style={{ background: INK_LOCAL, padding: "20px 24px", textAlign: "center" }}>
+        <div style={{ fontFamily: GROT_LOCAL, fontWeight: 900, fontSize: 13, letterSpacing: ".14em", textTransform: "uppercase", color: YEL_LOCAL }}>
+          Pipeline complete — Full EMOS
+        </div>
+        <div style={{ fontFamily: SERIF_LOCAL, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.65)", marginTop: 4 }}>
+          You&rsquo;ve worked through every stage. Keep tracking placements to compound your results.
+        </div>
+      </div>
     </div>
   );
 }

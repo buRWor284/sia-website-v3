@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getJournalists } from "@/app/emostool/actions/coverageiq";
 import JournoCollabIQClient from "@/components/emostool/JournoCollabIQClient";
+import PipelineNav from "@/components/emostool/PipelineNav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -84,6 +85,7 @@ export default async function JournoCollabIQPage() {
 
         <JournoCollabIQClient initialJournalists={journalists} />
 
+        <PipelineNav current="collab" />
       </div>
     </div>
   );
