@@ -1205,6 +1205,13 @@ function PESODashboard({
       </div>
 
       <SectionMast number="§ A" label="Alerts Feed" vol="GOOGLE ALERTS + MENTION" />
+      {/* TODO: connect to Mention.com API or Google Alerts RSS feed for real-time brand mention tracking */}
+      <div style={{ padding: "10px 14px", background: PAPER2, border: `1px solid ${INK15}`, marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK35, background: INK15, padding: "2px 8px" }}>COMING SOON</span>
+        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+          Will connect to Mention.com and/or Google Alerts RSS for live brand mention tracking.
+        </span>
+      </div>
       <AlertsFeed alerts={alerts} onStatusChange={onAlertStatusChange} />
     </div>
   );
