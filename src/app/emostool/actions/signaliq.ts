@@ -147,6 +147,28 @@ export async function saveSignalFromOpportunity(
   }
 }
 
+// ─── Explicit save from platform scan (called by client component) ────────────
+
+/**
+ * Called when an authenticated platform user clicks "Save to EMOS →" on a
+ * scan result card. Uses the auth() session directly.
+ */
+export async function saveSignalFromScan(
+  opp: Opportunity,
+  beatLabel: string,
+): Promise<{ ok: boolean; id: string | null }> {
+  try {
+    const { userId } = await auth();
+    if (!userId) return { ok: false, id: null };
+
+    const id = await saveSignalFromOpportunity(opp, beatLabel, { clerkUserId: userId });
+    return { ok: !!id, id };
+  } catch (err) {
+    console.error("saveSignalFromScan error:", err);
+    return { ok: false, id: null };
+  }
+}
+
 // ─── Update signal status ─────────────────────────────────────────────────────
 
 export async function updateSignalStatus(
