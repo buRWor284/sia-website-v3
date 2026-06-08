@@ -275,6 +275,7 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
   if (error) { console.error("createJournalist error:", error.message); return null; }
 
   revalidatePath("/emostool/dashboard/coverageiq");
+  revalidatePath("/emostool/dashboard/journocollabiq");
   void recordStageEvent("journalist_saved");
   return data as { id: string };
 }
@@ -290,6 +291,7 @@ export async function updateJournalist(
     .eq("id", journalistId);
   if (error) { console.error("updateJournalist error:", error.message); return false; }
   revalidatePath("/emostool/dashboard/coverageiq");
+  revalidatePath("/emostool/dashboard/journocollabiq");
   return true;
 }
 
@@ -298,5 +300,6 @@ export async function deleteJournalist(journalistId: string): Promise<boolean> {
   const { error } = await db.from("journalists").delete().eq("id", journalistId);
   if (error) { console.error("deleteJournalist error:", error.message); return false; }
   revalidatePath("/emostool/dashboard/coverageiq");
+  revalidatePath("/emostool/dashboard/journocollabiq");
   return true;
 }
