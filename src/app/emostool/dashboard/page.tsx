@@ -54,7 +54,7 @@ const TOOLS: {
     id: "collab",
     name: "JournoCollabIQ",
     subtitle: "Journalist CRM",
-    path: "/emostool/dashboard/coverageiq",
+    path: "/emostool/dashboard/journocollabiq",
     publicPath: "/tools/journocollabiq",
     description: "Build and manage journalist relationships. Track every touchpoint.",
     icon: "◇",
@@ -213,62 +213,44 @@ export default async function EmosDashboardPage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: INK, border: `1px solid ${INK}`, marginBottom: 48 }}>
           {TOOLS.map(tool => {
             const toolStageIdx = STAGE_ORDER.indexOf(tool.id);
-            const unlocked = toolStageIdx <= stageIdx;
+            const isCurrent = tool.id === currentStage;
+            const isDone = toolStageIdx < stageIdx;
             return (
               <div
                 key={tool.id}
-                style={{
-                  background: PAPER,
-                  padding: "28px 28px 24px",
-                  position: "relative",
-                  opacity: unlocked ? 1 : 0.55,
-                }}
+                style={{ background: PAPER, padding: "28px 28px 24px", position: "relative" }}
               >
-                {/* Stage chip */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: unlocked ? YEL : INK35, lineHeight: 1 }}>
+                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: YEL, lineHeight: 1 }}>
                     {tool.icon}
                   </span>
                   <div>
-                    <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: unlocked ? INK : INK35 }}>
+                    <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK }}>
                       {tool.name}
                     </div>
                     <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, marginTop: 2 }}>
                       {tool.subtitle}
                     </div>
                   </div>
-                  {!unlocked && (
-                    <span style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK35, border: `1px solid ${INK35}`, padding: "3px 8px" }}>
-                      LOCKED
-                    </span>
-                  )}
-                  {unlocked && tool.id === currentStage && (
+                  {isCurrent && (
                     <span style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 8px" }}>
                       ACTIVE
                     </span>
                   )}
-                </div>
-
-                <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.6, color: unlocked ? "rgba(26,20,16,.70)" : INK35, margin: "0 0 20px" }}>
-                  {tool.description}
-                </p>
-
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  {unlocked ? (
-                    <>
-                      <a href={tool.path} style={{ display: "inline-block", padding: "8px 18px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>
-                        Open Platform →
-                      </a>
-                      <a href={tool.publicPath} target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", padding: "8px 18px", background: "transparent", color: INK55, border: `1px solid ${INK35}`, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>
-                        Public Tool ↗
-                      </a>
-                    </>
-                  ) : (
-                    <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK35 }}>
-                      {STAGE_META[STAGE_ORDER[toolStageIdx - 1] as EmosStage]?.threshold ?? "Complete earlier stages to unlock"}
+                  {isDone && (
+                    <span style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, background: PAPER2, padding: "3px 8px" }}>
+                      ✓ DONE
                     </span>
                   )}
                 </div>
+
+                <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.6, color: "rgba(26,20,16,.70)", margin: "0 0 20px" }}>
+                  {tool.description}
+                </p>
+
+                <a href={tool.path} style={{ display: "inline-block", padding: "8px 18px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>
+                  Open →
+                </a>
               </div>
             );
           })}

@@ -47,10 +47,6 @@ export default async function SignalIQPlatformPage() {
             <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>Signal<span style={{ color: YEL }}>IQ</span></span>
             <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)" }}>Story Detection</span>
           </div>
-          <a href="/tools/signaliq" target="_blank" rel="noopener noreferrer"
-            style={{ padding: "6px 14px", border: "1px solid rgba(241,235,222,.2)", color: "rgba(241,235,222,.6)", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}>
-            Public tool ↗
-          </a>
         </div>
       </div>
 

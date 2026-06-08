@@ -68,10 +68,6 @@ export default async function PressIQPlatformPage() {
             <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>Press<span style={{ color: YEL }}>IQ</span></span>
             <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)" }}>Pitch Scorer</span>
           </div>
-          <a href="/tools/pressiq" target="_blank" rel="noopener noreferrer"
-            style={{ padding: "6px 14px", border: "1px solid rgba(241,235,222,.2)", color: "rgba(241,235,222,.6)", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}>
-            Public tool ↗
-          </a>
         </div>
       </div>
 

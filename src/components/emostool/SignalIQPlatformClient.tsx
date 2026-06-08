@@ -9,10 +9,10 @@
  *   ③ Saved signals library (server-rendered initial, refreshes after save)
  */
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useMemo } from "react";
 import { BEATS } from "@/lib/signaliq/config";
 import { saveSignalFromScan, updateSignalStatus } from "@/app/emostool/actions/signaliq";
-import type { BeatId, Opportunity, ScanResponse, OppBand } from "@/lib/signaliq/types";
+import type { BeatId, Opportunity, ScanResponse, OppBand, AssetPack } from "@/lib/signaliq/types";
 import type { DbSignal } from "@/app/emostool/actions/signaliq";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
@@ -77,26 +77,60 @@ function GapBar({ value }: { value: number }) {
 function ScanCard({
   opp,
   beatLabel,
+  companyContext,
   savedIds,
   onSaved,
 }: {
   opp: Opportunity;
   beatLabel: string;
+  companyContext: string;
   savedIds: Set<string>;
   onSaved: (oppId: string, dbId: string) => void;
 }) {
   const [saving, startSave] = useTransition();
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [packing, setPacking] = useState(false);
+  const [pack, setPack] = useState<AssetPack | null>(null);
+  const [packError, setPackError] = useState<string | null>(null);
   const alreadySaved = savedIds.has(opp.id);
   const c = bandColor(opp.band);
   const cLight = bandColorLight(opp.band);
 
   function handleSave() {
+    setSaveError(null);
     startSave(async () => {
-      const result = await saveSignalFromScan(opp, beatLabel);
-      if (result.ok && result.id) {
-        onSaved(opp.id, result.id);
+      try {
+        const result = await saveSignalFromScan(opp, beatLabel);
+        if (result.ok && result.id) {
+          onSaved(opp.id, result.id);
+        } else {
+          setSaveError("Save failed — check Vercel logs (likely SUPABASE_SERVICE_ROLE_KEY missing)");
+        }
+      } catch (e) {
+        setSaveError("Network error — please try again");
+        console.error("saveSignalFromScan error:", e);
       }
     });
+  }
+
+  async function handleGeneratePack() {
+    setPackError(null);
+    setPack(null);
+    setPacking(true);
+    try {
+      const res = await fetch("/api/signaliq/pack", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ opportunity: opp, store: false, companyContext: companyContext.trim() || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) setPackError(data.error || "Could not generate the pack.");
+      else setPack(data as AssetPack);
+    } catch {
+      setPackError("Network error — please try again.");
+    } finally {
+      setPacking(false);
+    }
   }
 
   return (
@@ -141,30 +175,88 @@ function ScanCard({
             )
           ))}
         </div>
+
+        {/* Asset pack inline */}
+        {packing && (
+          <div style={{ padding: "10px 12px", background: PAPER, border: `1px solid ${INK15}`, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+            Building asset pack…
+          </div>
+        )}
+        {packError && (
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: RED }}>{packError}</div>
+        )}
+        {pack && !packing && (
+          <div style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>Asset pack</div>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: INK, lineHeight: 1.3 }}>{pack.headline}</div>
+            {pack.linkableAssetIdea && (
+              <div>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 3 }}>Linkable asset to build</div>
+                <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK70, lineHeight: 1.45 }}>{pack.linkableAssetIdea}</p>
+              </div>
+            )}
+            {pack.angle && (
+              <div>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 3 }}>Pitch angle</div>
+                <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.5 }}>{pack.angle.slice(0, 300)}{pack.angle.length > 300 ? "…" : ""}</p>
+              </div>
+            )}
+            {pack.journalists.length > 0 && (
+              <div>
+                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Who to pitch</div>
+                {pack.journalists.slice(0, 3).map((j, i) => (
+                  <div key={i} style={{ fontFamily: SERIF, fontSize: 12, color: INK70, marginBottom: 3 }}>
+                    <strong>{j.name}</strong> · {j.outlet} · {j.beat}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Save button */}
-      <button
-        onClick={handleSave}
-        disabled={saving || alreadySaved}
-        style={{
-          margin: "0 14px 14px",
-          padding: "11px 14px",
-          border: "none",
-          background: alreadySaved ? PAPER2 : YEL,
-          color: alreadySaved ? INK55 : INK,
-          fontFamily: GROT,
-          fontWeight: 800,
-          fontSize: 10,
-          letterSpacing: ".10em",
-          textTransform: "uppercase",
-          cursor: alreadySaved ? "default" : saving ? "wait" : "pointer",
-          borderTop: `1px solid ${INK15}`,
-          transition: "opacity 0.12s ease",
-        }}
-      >
-        {saving ? "Saving…" : alreadySaved ? "✓ Saved to EMOS" : "Save to EMOS →"}
-      </button>
+      {/* Actions */}
+      <div style={{ margin: "0 14px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+        {/* Generate asset pack */}
+        {!pack && (
+          <button
+            onClick={handleGeneratePack}
+            disabled={packing}
+            style={{
+              padding: "9px 14px",
+              border: `1px solid ${INK15}`,
+              background: PAPER,
+              color: packing ? INK55 : INK,
+              fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".10em", textTransform: "uppercase",
+              cursor: packing ? "wait" : "pointer",
+            }}
+          >
+            {packing ? "Building pack…" : "Generate asset pack →"}
+          </button>
+        )}
+
+        {/* Save to EMOS */}
+        <button
+          onClick={handleSave}
+          disabled={saving || alreadySaved}
+          style={{
+            padding: "11px 14px",
+            border: "none",
+            background: alreadySaved ? PAPER2 : YEL,
+            color: alreadySaved ? INK55 : INK,
+            fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase",
+            cursor: alreadySaved ? "default" : saving ? "wait" : "pointer",
+            borderTop: `1px solid ${INK15}`,
+          }}
+        >
+          {saving ? "Saving…" : alreadySaved ? "✓ Saved to EMOS" : "Save to EMOS →"}
+        </button>
+        {saveError && (
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: RED, lineHeight: 1.4 }}>
+            ✗ {saveError}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -296,16 +388,31 @@ export default function SignalIQPlatformClient({
   initialSignals: DbSignal[];
 }) {
   const [beat, setBeat] = useState<BeatId>("saas");
+  const [companyContext, setCompanyContext] = useState("");
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);
 
-  // Track which opp IDs have been saved this session
   const [savedOppIds, setSavedOppIds] = useState<Set<string>>(new Set());
-  // refreshKey bumps after a save to signal library refresh (actual data from server revalidatePath)
   const [refreshKey, setRefreshKey] = useState(0);
 
   const currentBeat = BEATS.find(b => b.id === beat);
+
+  // Re-rank by relevance to company context (client-side, instant — same logic as public tool)
+  const rankedOpps = useMemo(() => {
+    if (!scan) return [];
+    if (!companyContext.trim()) return scan.opportunities;
+    const words = companyContext.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w.length > 3).slice(0, 40);
+    if (words.length === 0) return scan.opportunities;
+    return [...scan.opportunities]
+      .map(opp => {
+        const haystack = [opp.headline, ...opp.signals.map(s => s.title), ...opp.signals.map(s => s.detail ?? "")].join(" ").toLowerCase();
+        const matches = words.filter(w => haystack.includes(w)).length;
+        return { opp, adjusted: opp.score + matches * 8 };
+      })
+      .sort((a, b) => b.adjusted - a.adjusted)
+      .map(s => s.opp);
+  }, [scan, companyContext]);
 
   async function runScan() {
     setScanError(null);
@@ -344,7 +451,7 @@ export default function SignalIQPlatformClient({
         </div>
 
         {/* Beat tabs */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${INK15}`, marginBottom: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${INK15}`, marginBottom: 14 }}>
           {BEATS.map((b, i) => {
             const active = b.id === beat;
             return (
@@ -357,11 +464,7 @@ export default function SignalIQPlatformClient({
                   border: "none",
                   borderRight: (i % 3 !== 2) ? `1px solid ${INK15}` : "none",
                   borderBottom: i < 3 ? `1px solid ${INK15}` : "none",
-                  fontFamily: GROT,
-                  fontWeight: 700,
-                  fontSize: 10,
-                  letterSpacing: ".07em",
-                  textTransform: "uppercase",
+                  fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".07em", textTransform: "uppercase",
                   color: active ? PAPER : "rgba(26,20,16,.45)",
                   cursor: "pointer",
                   transition: "background 0.12s ease, color 0.12s ease",
@@ -373,22 +476,36 @@ export default function SignalIQPlatformClient({
           })}
         </div>
 
+        {/* Startup context */}
+        <div style={{ marginBottom: 14 }}>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>
+            Your startup context <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}>(optional — re-ranks results by relevance to your company)</span>
+          </label>
+          <textarea
+            value={companyContext}
+            onChange={e => setCompanyContext(e.target.value)}
+            maxLength={400}
+            rows={3}
+            placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital. Our founder is a former Goldman analyst with proprietary data on 10,000+ lending decisions.'"
+            style={{
+              width: "100%", boxSizing: "border-box",
+              background: PAPER, border: `1px solid ${INK15}`,
+              color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.6,
+              padding: "10px 13px", resize: "vertical", outline: "none",
+            }}
+          />
+        </div>
+
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <button
             onClick={runScan}
             disabled={scanning}
             style={{
-              padding: "12px 28px",
-              border: "none",
+              padding: "12px 28px", border: "none",
               background: scanning ? "rgba(26,20,16,.15)" : INK,
               color: scanning ? INK55 : PAPER,
-              fontFamily: GROT,
-              fontWeight: 800,
-              fontSize: 13,
-              letterSpacing: ".08em",
-              textTransform: "uppercase",
+              fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase",
               cursor: scanning ? "wait" : "pointer",
-              transition: "opacity 0.12s ease",
             }}
           >
             {scanning ? "Scanning the radar…" : `Scan ${currentBeat?.label ?? ""} →`}
@@ -414,6 +531,7 @@ export default function SignalIQPlatformClient({
             </span>
             <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
               {scan.opportunities.length} opportunities · {currentBeat?.label} beat
+              {companyContext.trim() && " · personalised to your startup"}
             </span>
             {scan.partial && (
               <span style={{ fontFamily: MONO, fontSize: 9, color: AMBER, letterSpacing: ".08em" }}>
@@ -429,11 +547,12 @@ export default function SignalIQPlatformClient({
           )}
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
-            {scan.opportunities.map(opp => (
+            {rankedOpps.map(opp => (
               <ScanCard
                 key={opp.id}
                 opp={opp}
                 beatLabel={currentBeat?.label ?? beat}
+                companyContext={companyContext}
                 savedIds={savedOppIds}
                 onSaved={handleSaved}
               />
