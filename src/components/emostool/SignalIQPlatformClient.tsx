@@ -104,7 +104,7 @@ function ScanCard({
         if (result.ok && result.id) {
           onSaved(opp.id, result.id);
         } else {
-          setSaveError("Save failed — check Vercel logs (likely SUPABASE_SERVICE_ROLE_KEY missing)");
+          setSaveError(result.error ?? "Save failed — check Vercel logs");
         }
       } catch (e) {
         setSaveError("Network error — please try again");

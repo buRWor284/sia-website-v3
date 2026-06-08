@@ -151,21 +151,77 @@ export async function saveSignalFromOpportunity(
 
 /**
  * Called when an authenticated platform user clicks "Save to EMOS →" on a
- * scan result card. Uses the auth() session directly.
+ * scan result card. Uses the JWT client (same as all other platform actions) —
+ * does NOT require SUPABASE_SERVICE_ROLE_KEY.
  */
 export async function saveSignalFromScan(
   opp: Opportunity,
   beatLabel: string,
-): Promise<{ ok: boolean; id: string | null }> {
+): Promise<{ ok: boolean; id: string | null; error?: string }> {
   try {
-    const { userId } = await auth();
-    if (!userId) return { ok: false, id: null };
+    const db = await getAuthenticatedClient();
 
-    const id = await saveSignalFromOpportunity(opp, beatLabel, { clerkUserId: userId });
-    return { ok: !!id, id };
+    // Resolve org_id via RLS-scoped query (same pattern as createPitch)
+    const { data: org, error: orgError } = await db
+      .from("organizations")
+      .select("id")
+      .single();
+    if (orgError || !org) {
+      console.error("saveSignalFromScan: no org", orgError?.message);
+      return { ok: false, id: null, error: "Could not resolve org" };
+    }
+
+    // Upsert beat by name
+    let beatId: string | null = null;
+    const { data: existingBeat } = await db
+      .from("signaliq_beats")
+      .select("id")
+      .eq("org_id", org.id)
+      .eq("name", beatLabel)
+      .maybeSingle();
+
+    if (existingBeat) {
+      beatId = existingBeat.id;
+    } else {
+      const { data: newBeat, error: beatErr } = await db
+        .from("signaliq_beats")
+        .insert({ org_id: org.id, name: beatLabel, keywords: [] })
+        .select("id")
+        .single();
+      if (beatErr) console.error("beat insert error:", beatErr.message);
+      beatId = newBeat?.id ?? null;
+    }
+
+    const summary = opp.signals.map(s => s.title).join(" · ").substring(0, 500);
+    const primarySignal = opp.signals[0];
+
+    const { data: signal, error: sigErr } = await db
+      .from("signaliq_signals")
+      .insert({
+        org_id:       org.id,
+        beat_id:      beatId,
+        headline:     opp.headline,
+        summary,
+        source:       primarySignal?.source ?? "manual",
+        source_url:   primarySignal?.url ?? null,
+        signal_score: opp.score ?? null,
+        coverage_gap: opp.components?.coverageGap ?? null,
+        status:       "saved",
+      })
+      .select("id")
+      .single();
+
+    if (sigErr) {
+      console.error("saveSignalFromScan insert error:", sigErr.message);
+      return { ok: false, id: null, error: sigErr.message };
+    }
+
+    void recordStageEvent("signal_saved");
+    revalidatePath("/emostool/dashboard/signaliq");
+    return { ok: true, id: signal?.id ?? null };
   } catch (err) {
     console.error("saveSignalFromScan error:", err);
-    return { ok: false, id: null };
+    return { ok: false, id: null, error: String(err) };
   }
 }
 
