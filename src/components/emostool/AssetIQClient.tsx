@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useTransition } from "react";
+import { useCompanyContext } from "@/hooks/useCompanyContext";
 import {
   createAsset,
   updateAsset,
@@ -280,7 +281,7 @@ function AssetRow({
         <div style={{ background: PAPER2, borderBottom: `1px solid ${INK15}`, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* Find journalists CTA */}
           <a
-            href={`/emostool/dashboard/journocollabiq?asset=${asset.id}&topic=${encodeURIComponent(asset.target_keyword ?? asset.title)}`}
+            href={`/emostool/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent((asset.description ?? "").slice(0, 200))}`}
             style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}
           >
             Find journalists →
@@ -355,6 +356,7 @@ export default function AssetIQClient({
   const [assets, setAssets] = useState<DbAsset[]>(initialAssets);
   const [showForm, setShowForm] = useState(prefillTitle !== "" || signalId !== null);
 
+  const [companyContext, setCompanyContext] = useCompanyContext();
   const [creationPlan, setCreationPlan] = useState<string | null>(null);
   const [planLoading, setPlanLoading] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
@@ -378,7 +380,7 @@ export default function AssetIQClient({
           assetIdea: assetIdea ?? undefined,
           dataBrief: dataBrief ?? undefined,
           pitchAngle: pitchAngle ?? undefined,
-          keyword: undefined,
+          companyContext: companyContext.trim() || undefined,
         }),
       });
       const data = await res.json() as { brief?: string; error?: string };
@@ -447,6 +449,21 @@ export default function AssetIQClient({
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>
               Generate an AI creation plan for this asset
             </div>
+
+            {/* Company context — persists across all EMOS tools */}
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>
+                Your company context <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}>(saved across all EMOS tools)</span>
+              </label>
+              <textarea
+                value={companyContext}
+                onChange={e => setCompanyContext(e.target.value)}
+                rows={2}
+                placeholder="e.g. We're a B2B SaaS helping SMBs access working capital. Founder is a former Goldman analyst with data on 10,000+ lending decisions."
+                style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.55, padding: "9px 12px", resize: "none", outline: "none" }}
+              />
+            </div>
+
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: planLoading || creationPlan ? 14 : 0 }}>
               <select
                 value={planAssetType}
@@ -481,7 +498,7 @@ export default function AssetIQClient({
                 <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.75, whiteSpace: "pre-wrap" }}>{creationPlan}</div>
                 <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
                   <a
-                    href={`/emostool/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle)}&story=${encodeURIComponent(pitchAngle ?? assetIdea ?? "")}`}
+                    href={`/emostool/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle || signalHeadline || "")}&story=${encodeURIComponent((pitchAngle ?? assetIdea ?? "").slice(0, 300))}&assetTitle=${encodeURIComponent(planTitle)}&assetType=${encodeURIComponent(planAssetType)}&assetIdea=${encodeURIComponent((assetIdea ?? "").slice(0, 200))}`}
                     style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}
                   >
                     Find journalists for this asset →

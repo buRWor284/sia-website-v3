@@ -10,6 +10,7 @@
  */
 
 import React, { useState, useTransition, useMemo } from "react";
+import { useCompanyContext } from "@/hooks/useCompanyContext";
 import { BEATS } from "@/lib/signaliq/config";
 import { saveSignalFromScan, updateSignalStatus } from "@/app/emostool/actions/signaliq";
 import type { BeatId, Opportunity, ScanResponse, OppBand, AssetPack } from "@/lib/signaliq/types";
@@ -395,7 +396,7 @@ export default function SignalIQPlatformClient({
   initialSignals: DbSignal[];
 }) {
   const [beat, setBeat] = useState<BeatId>("saas");
-  const [companyContext, setCompanyContext] = useState("");
+  const [companyContext, setCompanyContext] = useCompanyContext();
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);

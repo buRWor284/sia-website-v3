@@ -10,7 +10,8 @@
  *   ④ Saved journalist CRM list below
  */
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, useEffect } from "react";
+import { useCompanyContext } from "@/hooks/useCompanyContext";
 import {
   createJournalist,
   updateJournalist,
@@ -322,11 +323,18 @@ export default function JournoCollabIQClient({
   initialJournalists,
   prefillBeat,
   prefillStory,
+  prefillAssetTitle,
+  prefillAssetType,
+  prefillAssetIdea,
 }: {
   initialJournalists: DbJournalist[];
   prefillBeat: string;
   prefillStory: string;
+  prefillAssetTitle?: string;
+  prefillAssetType?: string;
+  prefillAssetIdea?: string;
 }) {
+  const [companyContext] = useCompanyContext();
   const [journalists, setJournalists] = useState<DbJournalist[]>(initialJournalists);
   const [results, setResults] = useState<AIJournalist[] | null>(null);
   const [searching, setSearching] = useState(false);
@@ -335,10 +343,37 @@ export default function JournoCollabIQClient({
   const [brief, setBrief] = useState<string | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
   const [lastForm, setLastForm] = useState<Record<string, string> | null>(null);
+  const [formBiz, setFormBiz] = useState("");
+  const [formDesc, setFormDesc] = useState("");
+
+  // Pre-fill brand/desc from persisted company context after hydration
+  useEffect(() => {
+    if (companyContext) {
+      // Extract first sentence as desc, rest as biz (heuristic)
+      const firstSentence = companyContext.split(/[.!?]/)[0]?.trim() ?? "";
+      if (!formBiz && !formDesc) {
+        setFormDesc(companyContext);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [companyContext]);
+
+  // Build enriched story text from asset context
+  const enrichedStory = prefillAssetTitle
+    ? [
+        prefillAssetTitle && `We are building a ${prefillAssetType?.replace(/_/g, " ") ?? "linkable asset"} titled "${prefillAssetTitle}".`,
+        prefillAssetIdea && `The asset: ${prefillAssetIdea}`,
+        prefillStory && `Pitch angle: ${prefillStory}`,
+      ].filter(Boolean).join(" ")
+    : prefillStory;
 
   const defaultForm = {
-    biz: "", desc: "", industry: prefillBeat,
-    audDesc: prefillStory, geo: "", strategy: "institution",
+    biz: formBiz,
+    desc: formDesc || companyContext,
+    industry: prefillBeat,
+    audDesc: enrichedStory,
+    geo: "",
+    strategy: "institution",
   };
 
   async function handleSearch(form: typeof defaultForm) {
@@ -351,7 +386,17 @@ export default function JournoCollabIQClient({
       const res = await fetch("/api/emostool/journo-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "partner-suggestions", data: { ...form, signalContext: prefillStory } }),
+        body: JSON.stringify({
+          type: "partner-suggestions",
+          data: {
+            ...form,
+            signalContext: prefillStory,
+            assetContext: prefillAssetTitle
+              ? `Asset being built: ${prefillAssetType?.replace(/_/g, " ") ?? "linkable asset"} — "${prefillAssetTitle}". ${prefillAssetIdea ?? ""}`
+              : undefined,
+            companyContext: companyContext || undefined,
+          },
+        }),
       });
       const data = await res.json() as { result?: string; error?: string };
       if (!res.ok || data.error) { setSearchError(data.error ?? "Search failed."); return; }

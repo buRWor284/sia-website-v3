@@ -32,7 +32,9 @@ STORY & SOURCE:
 - Target tier: ${d.audType || "Not specified"}
 - Geography: ${d.geo || "Not provided"}
 - What the source is offering: ${ANGLE_LABEL[d.strategy as string] || String(d.strategy || "")}
-- Signal / context: ${d.signalContext || "Not provided"}
+- Signal / news hook context: ${d.signalContext || "Not provided"}
+- Asset being pitched (if applicable): ${d.assetContext || "Not provided"}
+- Company / brand background: ${d.companyContext || "Not provided"}
 
 Generate 8 REAL, NAMED journalists who genuinely cover this beat. Prefer reporters who have published on this topic recently. Do NOT invent people. If you are not confident a person currently covers this beat at this outlet, choose someone you ARE confident about, or fall back to the relevant section/desk.
 

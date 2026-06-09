@@ -32,6 +32,7 @@ ASSET CONTEXT:
 - Asset idea from signal pack: ${d.assetIdea || "Not provided"}
 - Data brief from signal: ${d.dataBrief || "Not provided"}
 - Pitch angle: ${d.pitchAngle || "Not provided"}
+- Company / brand context: ${d.companyContext || "Not provided"}
 
 Write a practical creation plan with these sections:
 

@@ -24,7 +24,7 @@ const MONO   = "var(--font-mono)";
 export default async function JournoCollabIQPage({
   searchParams,
 }: {
-  searchParams: Promise<{ asset?: string; topic?: string; beat?: string; story?: string }>;
+  searchParams: Promise<{ asset?: string; topic?: string; beat?: string; story?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
@@ -33,10 +33,11 @@ export default async function JournoCollabIQPage({
   const params = await searchParams;
 
   // Pre-fill from AssetIQ or SignalIQ context
-  const prefillBeat  = params.topic  ? decodeURIComponent(params.topic)
-                     : params.beat   ? decodeURIComponent(params.beat)
-                     : "";
-  const prefillStory = params.story  ? decodeURIComponent(params.story)  : "";
+  const prefillBeat      = params.topic     ? decodeURIComponent(params.topic)     : params.beat      ? decodeURIComponent(params.beat)      : "";
+  const prefillStory     = params.story     ? decodeURIComponent(params.story)     : "";
+  const prefillAssetTitle = params.assetTitle ? decodeURIComponent(params.assetTitle) : undefined;
+  const prefillAssetType  = params.assetType  ? decodeURIComponent(params.assetType)  : undefined;
+  const prefillAssetIdea  = params.assetIdea  ? decodeURIComponent(params.assetIdea)  : undefined;
 
   const journalists = await getJournalists();
 
@@ -71,11 +72,25 @@ export default async function JournoCollabIQPage({
       <div style={{ maxWidth: 1200, marginInline: "auto", padding: "32px clamp(20px,4vw,56px) 80px" }}>
 
         {/* Context banner */}
-        {(prefillBeat || prefillStory) && (
-          <div style={{ background: "rgba(245,184,31,.10)", border: `1px solid ${YEL}`, padding: "10px 16px", marginBottom: 24, display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", background: YEL, color: INK, padding: "2px 7px" }}>From pipeline</span>
-            {prefillBeat && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}><strong>Beat:</strong> {prefillBeat}</span>}
-            {prefillStory && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}><strong>Story:</strong> {prefillStory.slice(0, 100)}{prefillStory.length > 100 ? "…" : ""}</span>}
+        {(prefillAssetTitle || prefillBeat || prefillStory) && (
+          <div style={{ background: "rgba(245,184,31,.10)", border: `1px solid ${YEL}`, padding: "10px 16px", marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: prefillAssetTitle ? 6 : 0, flexWrap: "wrap" }}>
+              <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", background: YEL, color: INK, padding: "2px 7px", flexShrink: 0 }}>
+                {prefillAssetTitle ? "From AssetIQ" : "From pipeline"}
+              </span>
+              {prefillAssetTitle && (
+                <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14, color: INK }}>{prefillAssetTitle}</span>
+              )}
+              {prefillAssetType && (
+                <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".08em", textTransform: "uppercase", color: INK55 }}>{prefillAssetType.replace(/_/g, " ")}</span>
+              )}
+            </div>
+            {prefillAssetIdea && (
+              <p style={{ margin: "4px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.45 }}>{prefillAssetIdea}</p>
+            )}
+            {!prefillAssetTitle && prefillBeat && (
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}><strong>Beat:</strong> {prefillBeat}</span>
+            )}
           </div>
         )}
 
@@ -107,6 +122,9 @@ export default async function JournoCollabIQPage({
           initialJournalists={journalists}
           prefillBeat={prefillBeat}
           prefillStory={prefillStory}
+          prefillAssetTitle={prefillAssetTitle}
+          prefillAssetType={prefillAssetType}
+          prefillAssetIdea={prefillAssetIdea}
         />
 
         <PipelineNav current="collab" />
