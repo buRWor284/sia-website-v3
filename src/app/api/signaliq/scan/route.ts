@@ -2,10 +2,12 @@
  * /api/signaliq/scan
  *
  * Returns ranked newsjacking opportunities for a beat. Scanning hits free,
- * no-key open data sources (no LLM), so it's cheap — gated only to deter abuse,
- * reusing the repo's rateLimit + Turnstile and the shared `pp_tier` email cookie.
+ * no-key open data sources — gated to deter abuse, reusing the repo's
+ * rateLimit + Turnstile and the shared `pp_tier` email cookie. If the caller
+ * supplies `companyContext`, one LLM call tailors the seeds + relevance scoring
+ * to that company (optional here; always on in the EMOS platform).
  *
- * POST body: { beat, turnstileToken? }   (see src/lib/signaliq/types.ts)
+ * POST body: { beat, companyContext?, turnstileToken? }   (see src/lib/signaliq/types.ts)
  */
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
@@ -17,7 +19,7 @@ import type { BeatId, ScanResponse, UsageTier } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60; // extra headroom when a company profile is expanded
 
 const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity"];
@@ -62,8 +64,10 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 600) : undefined;
+
   try {
-    const { opportunities, partial, notes } = await scanBeat(beat);
+    const { opportunities, partial, notes } = await scanBeat(beat, { companyContext });
     logScan(beat, opportunities.length);
     const body: ScanResponse = {
       beat,

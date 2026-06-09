@@ -35,13 +35,22 @@ export const SOURCE_CREDIBILITY: Record<SourceId, number> = {
  * is the whole differentiator (RFP §6).
  */
 export const WEIGHTS = {
-  magnitude: 0.25,
-  velocity: 0.22,
-  coverageGap: 0.3,
-  fit: 0.13,
+  magnitude: 0.22,   // was .25 — raw SEC filing volume over-rewarded big-industry terms
+  velocity: 0.2,
+  coverageGap: 0.28,
+  fit: 0.06,         // beat fit (minor; startup relevance below does the heavy lifting)
   credibility: 0.1,
-  corroborationBonus: 0.15, // max added on top, scaled by # independent sources
+  corroborationBonus: 0.14, // max added on top, scaled by # independent sources
 } as const;
+
+/**
+ * Startup-relevance multiplier. When a company profile is present, the whole
+ * base score is scaled by:  RELEVANCE_FLOOR + (1 - RELEVANCE_FLOOR) * relevance
+ * …so an industry-loud but off-target signal (e.g. "clinical trial", 1,200+
+ * filings) can't rank as a "Hot lead" for a company it doesn't fit.
+ * With NO profile, relevance is neutral (multiplier = 1) — the public-tool default.
+ */
+export const RELEVANCE_FLOOR = 0.35;
 
 /** Score → band thresholds (honest language: lead/whitespace, not probability). */
 export const BANDS: { min: number; band: OppBand; label: string }[] = [

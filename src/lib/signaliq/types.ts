@@ -58,10 +58,15 @@ export interface Opportunity {
     magnitude: number;     // 0..1
     velocity: number;      // 0..1
     coverageGap: number;   // 0..1
-    fit: number;           // 0..1
+    fit: number;           // 0..1 — beat fit (minor)
+    relevance: number;     // 0..1 — fit to the user's company profile (drives the multiplier)
     credibility: number;   // 0..1
     corroboration: number; // 0..1 (# independent sources)
   };
+  /** Multiplier applied to the base score from company relevance (1 = neutral / no profile). */
+  relevanceMultiplier?: number;
+  /** True when this opportunity's seed was tailored to the company (vs a generic beat seed). */
+  tailored?: boolean;
   coverage: Coverage | null;
   signals: Signal[];       // the receipts
   sensitive: boolean;      // tasteful-newsjacking flag (RFP §11.4)
@@ -70,8 +75,32 @@ export interface Opportunity {
 
 export type UsageTier = "anonymous" | "email";
 
+/**
+ * The founder's company description. When present, it drives the scan:
+ * we expand it into startup-specific seeds and score every opportunity by
+ * how relevant it is to THIS company (not just how loud the industry is).
+ */
+export interface CompanyProfile {
+  name?: string;
+  description: string;
+}
+
+/** LLM expansion of a CompanyProfile — tailored seeds + a relevance lexicon. */
+export interface ProfileExpansion {
+  /** Startup-specific search seeds to scan instead of the generic beat seeds. */
+  seeds: string[];
+  /** Lowercased phrases that signal true relevance to this company. */
+  themes: string[];
+  /** Industry-adjacent terms that look related but are NOT this company's focus. */
+  negatives: string[];
+  /** One-line normalised positioning (for display/debug). */
+  summary?: string;
+}
+
 export interface ScanInput {
   beat: BeatId;
+  /** Founder's company description — tailors seeds + relevance scoring. */
+  companyContext?: string;
   /** Pro/custom keywords (v2). Accepted but preset beats drive the MVP. */
   keywords?: string[];
   turnstileToken?: string;

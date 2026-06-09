@@ -9,10 +9,11 @@
  *   ③ Saved signals library (server-rendered initial, refreshes after save)
  */
 
-import React, { useState, useTransition, useMemo } from "react";
+import React, { useState, useTransition } from "react";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
+import { useCompanyName } from "@/hooks/useCompanyName";
 import { BEATS } from "@/lib/signaliq/config";
-import { saveSignalFromScan, updateSignalStatus } from "@/app/emostool/actions/signaliq";
+import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emostool/actions/signaliq";
 import type { BeatId, Opportunity, ScanResponse, OppBand, AssetPack } from "@/lib/signaliq/types";
 import type { DbSignal } from "@/app/emostool/actions/signaliq";
 
@@ -73,18 +74,35 @@ function GapBar({ value }: { value: number }) {
   );
 }
 
+function CompBar({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
+  const pct = Math.round(Math.max(0, Math.min(1, value)) * 100);
+  return (
+    <div style={{ marginBottom: 7 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".1em", textTransform: "uppercase", color: INK55 }}>{label}</span>
+        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, color: accent ? AMBER : INK }}>{pct}</span>
+      </div>
+      <div style={{ height: 4, background: "rgba(26,20,16,.08)" }}>
+        <div style={{ height: "100%", width: `${pct}%`, background: accent ? AMBER : INK }} />
+      </div>
+    </div>
+  );
+}
+
 // ── Scan result card ───────────────────────────────────────────────────────────
 
 function ScanCard({
   opp,
   beatLabel,
   companyContext,
+  companyName,
   savedIds,
   onSaved,
 }: {
   opp: Opportunity;
   beatLabel: string;
   companyContext: string;
+  companyName: string;
   savedIds: Set<string>;
   onSaved: (oppId: string, dbId: string) => void;
 }) {
@@ -93,6 +111,7 @@ function ScanCard({
   const [packing, setPacking] = useState(false);
   const [pack, setPack] = useState<AssetPack | null>(null);
   const [packError, setPackError] = useState<string | null>(null);
+  const [showDetail, setShowDetail] = useState(false);
   const alreadySaved = savedIds.has(opp.id);
   const c = bandColor(opp.band);
   const cLight = bandColorLight(opp.band);
@@ -101,7 +120,7 @@ function ScanCard({
     setSaveError(null);
     startSave(async () => {
       try {
-        const result = await saveSignalFromScan(opp, beatLabel);
+        const result = await saveSignalFromScan(opp, beatLabel, companyContext, companyName);
         if (result.ok && result.id) {
           onSaved(opp.id, result.id);
         } else {
@@ -176,6 +195,46 @@ function ScanCard({
             )
           ))}
         </div>
+
+        {/* Why this score — expandable breakdown (parity with the public tool) */}
+        <button
+          onClick={() => setShowDetail(v => !v)}
+          style={{ alignSelf: "flex-start", background: "none", border: "none", padding: 0, cursor: "pointer",
+            fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55 }}
+        >
+          {showDetail ? "Hide details ▴" : "Why this score ▾"}
+        </button>
+        {showDetail && (
+          <div style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
+              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>Score breakdown</span>
+              {opp.tailored && (
+                <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".12em", textTransform: "uppercase", color: GREEN, border: `1px solid ${GREEN}`, padding: "1px 5px" }}>Tailored to you</span>
+              )}
+            </div>
+            <CompBar label="Magnitude" value={opp.components.magnitude} />
+            <CompBar label="Velocity" value={opp.components.velocity} />
+            <CompBar label="Coverage gap" value={opp.components.coverageGap} />
+            <CompBar label="Startup relevance" value={opp.components.relevance} accent />
+            <CompBar label="Beat fit" value={opp.components.fit} />
+            <CompBar label="Corroboration" value={opp.components.corroboration} />
+            {opp.relevanceMultiplier != null && opp.relevanceMultiplier < 0.999 && (
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, lineHeight: 1.4 }}>
+                Base score scaled ×{opp.relevanceMultiplier.toFixed(2)} for fit to your company.
+              </div>
+            )}
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: INK55, marginTop: 2 }}>Receipts</div>
+            {opp.signals.map((s, i) => (
+              <div key={i} style={{ fontFamily: SERIF, fontSize: 12, color: INK70, lineHeight: 1.4 }}>
+                <span style={{ fontFamily: MONO, fontSize: 9, color: INK55 }}>{(SRC_LABEL[s.source] ?? s.source).toUpperCase()}</span>{" "}
+                {s.detail || s.title}
+                {s.source !== "sec" && s.url ? (
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ color: INK55, marginLeft: 4 }}>↗</a>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Asset pack inline */}
         {packing && (
@@ -285,7 +344,42 @@ function SignalLibrary({
   signals: DbSignal[];
   refreshKey: number;
 }) {
-  void refreshKey; // used by parent to force re-render cue (actual refresh via revalidatePath)
+  void refreshKey; // parent re-render cue (server refresh via revalidatePath)
+
+  const GRID = "1fr 84px 84px 92px 156px";
+  const [statusFilter, setStatusFilter] = useState<"all" | DbSignal["status"]>("all");
+  const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const [removed, setRemoved] = useState<Set<string>>(new Set());
+  const [localStatus, setLocalStatus] = useState<Record<string, DbSignal["status"]>>({});
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const statusOf = (s: DbSignal): DbSignal["status"] => localStatus[s.id] ?? s.status;
+  const live = signals.filter(s => !removed.has(s.id));
+  const companies = Array.from(new Set(live.map(s => s.company_name).filter(Boolean) as string[]));
+  const counts = {
+    all: live.length,
+    saved: live.filter(s => statusOf(s) === "saved").length,
+    pitched: live.filter(s => statusOf(s) === "pitched").length,
+    archived: live.filter(s => statusOf(s) === "archived").length,
+  };
+  const visible = live.filter(s =>
+    (statusFilter === "all" || statusOf(s) === statusFilter) &&
+    (companyFilter === "all" || s.company_name === companyFilter),
+  );
+
+  async function handleDelete(id: string) {
+    if (typeof window !== "undefined" && !window.confirm("Delete this saved signal? This can't be undone.")) return;
+    setBusyId(id);
+    const ok = await deleteSignal(id);
+    setBusyId(null);
+    if (ok) setRemoved(prev => new Set(prev).add(id));
+  }
+  async function handleArchive(id: string) {
+    setBusyId(id);
+    const ok = await updateSignalStatus(id, "archived");
+    setBusyId(null);
+    if (ok) setLocalStatus(prev => ({ ...prev, [id]: "archived" }));
+  }
 
   if (signals.length === 0) {
     return (
@@ -298,92 +392,136 @@ function SignalLibrary({
   }
 
   return (
-    <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
-      {/* Table header */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 100px 80px 80px 100px 90px", background: INK, color: PAPER }}>
-        {["Signal / Headline", "Beat", "Score", "Gap", "Detected", "Status"].map((h, i) => (
-          <div key={h} style={{ padding: "10px 13px", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", borderRight: i < 5 ? "1px solid rgba(241,235,222,.12)" : "none" }}>
-            {h}
-          </div>
-        ))}
+    <div>
+      {/* Filters */}
+      <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
+        {([["all", "All"], ["saved", "Saved"], ["pitched", "Pitched"], ["archived", "Archived"]] as const).map(([k, label]) => {
+          const active = statusFilter === k;
+          return (
+            <button key={k} onClick={() => setStatusFilter(k)}
+              style={{ padding: "5px 11px", border: `1px solid ${active ? INK : INK15}`, background: active ? INK : "transparent",
+                color: active ? PAPER : INK55, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".1em",
+                textTransform: "uppercase", cursor: "pointer" }}>
+              {label} · {counts[k]}
+            </button>
+          );
+        })}
+        {companies.length > 0 && (
+          <select value={companyFilter} onChange={e => setCompanyFilter(e.target.value)}
+            style={{ marginLeft: "auto", padding: "5px 10px", border: `1px solid ${INK15}`, background: PAPER,
+              color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".06em", textTransform: "uppercase", cursor: "pointer" }}>
+            <option value="all">All companies</option>
+            {companies.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        )}
       </div>
 
-      {signals.map((sig, idx) => {
-        const ss = STATUS_STYLE[sig.status];
-        const scorePct = Math.min(sig.signal_score ?? 0, 100);
-        const gapPct = Math.min((sig.coverage_gap ?? 0) * 100, 100);
-        const scoreColor = scorePct >= 70 ? YEL : scorePct >= 45 ? INK55 : "rgba(26,20,16,.25)";
-        const gapColor = gapPct >= 70 ? GREEN : gapPct >= 40 ? AMBER : RED;
+      <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
+        {/* Table header */}
+        <div style={{ display: "grid", gridTemplateColumns: GRID, background: INK, color: PAPER }}>
+          {["Signal / scanned for", "Score", "Gap", "Detected", "Status"].map((h, i) => (
+            <div key={h} style={{ padding: "10px 13px", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", borderRight: i < 4 ? "1px solid rgba(241,235,222,.12)" : "none" }}>
+              {h}
+            </div>
+          ))}
+        </div>
 
-        return (
-          <div key={sig.id} style={{ display: "grid", gridTemplateColumns: "1fr 100px 80px 80px 100px 90px", borderBottom: idx < signals.length - 1 ? `1px solid ${INK15}` : "none" }}>
-            {/* Headline */}
-            <div style={{ padding: "13px 14px" }}>
-              <div style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: INK }}>{sig.headline}</div>
-              {sig.summary && (
-                <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, marginTop: 3, lineHeight: 1.4 }}>
-                  {sig.summary.length > 120 ? sig.summary.slice(0, 120) + "…" : sig.summary}
-                </div>
-              )}
-            </div>
-            {/* Beat */}
-            <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
-              <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: INK55, textTransform: "uppercase" }}>
-                {sig.beat_name ?? "—"}
-              </span>
-            </div>
-            {/* Score */}
-            <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
-              {sig.signal_score != null ? (
-                <div style={{ width: "100%" }}>
-                  <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, marginBottom: 3 }}>{sig.signal_score}</div>
-                  <div style={{ height: 3, background: "rgba(26,20,16,.08)" }}>
-                    <div style={{ height: "100%", width: `${scorePct}%`, background: scoreColor }} />
-                  </div>
-                </div>
-              ) : <span style={{ fontFamily: MONO, fontSize: 12, color: INK35 }}>—</span>}
-            </div>
-            {/* Gap */}
-            <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
-              {sig.coverage_gap != null ? (
-                <div style={{ width: "100%" }}>
-                  <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, marginBottom: 3 }}>{Math.round(sig.coverage_gap * 100)}</div>
-                  <div style={{ height: 3, background: "rgba(26,20,16,.08)" }}>
-                    <div style={{ height: "100%", width: `${gapPct}%`, background: gapColor }} />
-                  </div>
-                </div>
-              ) : <span style={{ fontFamily: MONO, fontSize: 12, color: INK35 }}>—</span>}
-            </div>
-            {/* Detected */}
-            <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
-              <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".06em", color: INK55 }}>{fmt(sig.detected_at)}</span>
-            </div>
-            {/* Status + actions */}
-            <div style={{ padding: "10px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
-              <span style={{
-                display: "inline-block", padding: "3px 8px 4px",
-                background: ss.bg, color: ss.fg,
-                border: ss.bg === "transparent" ? `1px solid ${INK35}` : "none",
-                fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase",
-              }}>
-                {ss.label}
-              </span>
-              {/* Build asset CTA */}
-              <a
-                href={`/emostool/dashboard/assetiq?signal=${sig.id}&headline=${encodeURIComponent(sig.headline)}`}
-                style={{
-                  fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em",
-                  textTransform: "uppercase", color: INK55,
-                  textDecoration: "none", borderBottom: `1px solid ${INK35}`,
-                  lineHeight: 1,
-                }}
-              >
-                Build asset →
-              </a>
-            </div>
+        {visible.length === 0 ? (
+          <div style={{ padding: "24px", textAlign: "center", fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
+            Nothing matches this filter.
           </div>
-        );
-      })}
+        ) : visible.map((sig, idx) => {
+          const st = statusOf(sig);
+          const ss = STATUS_STYLE[st];
+          const scorePct = Math.min(sig.signal_score ?? 0, 100);
+          const gapPct = Math.min((sig.coverage_gap ?? 0) * 100, 100);
+          const scoreColor = scorePct >= 70 ? YEL : scorePct >= 45 ? INK55 : "rgba(26,20,16,.25)";
+          const gapColor = gapPct >= 70 ? GREEN : gapPct >= 40 ? AMBER : RED;
+
+          return (
+            <div key={sig.id} style={{ display: "grid", gridTemplateColumns: GRID, borderBottom: idx < visible.length - 1 ? `1px solid ${INK15}` : "none", opacity: busyId === sig.id ? 0.45 : 1 }}>
+              {/* Headline + attribution */}
+              <div style={{ padding: "13px 14px" }}>
+                <div style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 600, lineHeight: 1.3, color: INK }}>{sig.headline}</div>
+                {(sig.company_name || sig.scan_category) && (
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 5 }}>
+                    {sig.company_name && (
+                      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".08em", textTransform: "uppercase", color: INK, background: YEL, padding: "2px 6px" }}>
+                        {sig.company_name}
+                      </span>
+                    )}
+                    {sig.scan_category && (
+                      <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: INK55, border: `1px solid ${INK15}`, padding: "2px 6px" }}>
+                        {sig.scan_category}
+                      </span>
+                    )}
+                  </div>
+                )}
+                {sig.summary && (
+                  <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, marginTop: 5, lineHeight: 1.4 }}>
+                    {sig.summary.length > 110 ? sig.summary.slice(0, 110) + "…" : sig.summary}
+                  </div>
+                )}
+              </div>
+              {/* Score */}
+              <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
+                {sig.signal_score != null ? (
+                  <div style={{ width: "100%" }}>
+                    <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, marginBottom: 3 }}>{sig.signal_score}</div>
+                    <div style={{ height: 3, background: "rgba(26,20,16,.08)" }}>
+                      <div style={{ height: "100%", width: `${scorePct}%`, background: scoreColor }} />
+                    </div>
+                  </div>
+                ) : <span style={{ fontFamily: MONO, fontSize: 12, color: INK35 }}>—</span>}
+              </div>
+              {/* Gap */}
+              <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
+                {sig.coverage_gap != null ? (
+                  <div style={{ width: "100%" }}>
+                    <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, marginBottom: 3 }}>{Math.round(sig.coverage_gap * 100)}</div>
+                    <div style={{ height: 3, background: "rgba(26,20,16,.08)" }}>
+                      <div style={{ height: "100%", width: `${gapPct}%`, background: gapColor }} />
+                    </div>
+                  </div>
+                ) : <span style={{ fontFamily: MONO, fontSize: 12, color: INK35 }}>—</span>}
+              </div>
+              {/* Detected */}
+              <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
+                <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".06em", color: INK55 }}>{fmt(sig.detected_at)}</span>
+              </div>
+              {/* Status + actions */}
+              <div style={{ padding: "10px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 7 }}>
+                <span style={{
+                  display: "inline-block", padding: "3px 8px 4px",
+                  background: ss.bg, color: ss.fg,
+                  border: ss.bg === "transparent" ? `1px solid ${INK35}` : "none",
+                  fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase",
+                }}>
+                  {ss.label}
+                </span>
+                <div style={{ display: "flex", gap: 9, flexWrap: "wrap", alignItems: "center" }}>
+                  <a
+                    href={`/emostool/dashboard/assetiq?signal=${sig.id}&headline=${encodeURIComponent(sig.headline)}`}
+                    style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: `1px solid ${INK35}`, lineHeight: 1 }}
+                  >
+                    Build →
+                  </a>
+                  {st !== "archived" && (
+                    <button onClick={() => handleArchive(sig.id)} disabled={busyId === sig.id}
+                      style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, borderBottom: `1px solid ${INK35}`, lineHeight: 1 }}>
+                      Archive
+                    </button>
+                  )}
+                  <button onClick={() => handleDelete(sig.id)} disabled={busyId === sig.id}
+                    style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: RED, borderBottom: `1px solid ${RED}`, lineHeight: 1 }}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -397,6 +535,7 @@ export default function SignalIQPlatformClient({
 }) {
   const [beat, setBeat] = useState<BeatId>("saas");
   const [companyContext, setCompanyContext] = useCompanyContext();
+  const [companyName, setCompanyName] = useCompanyName();
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);
@@ -406,21 +545,9 @@ export default function SignalIQPlatformClient({
 
   const currentBeat = BEATS.find(b => b.id === beat);
 
-  // Re-rank by relevance to company context (client-side, instant — same logic as public tool)
-  const rankedOpps = useMemo(() => {
-    if (!scan) return [];
-    if (!companyContext.trim()) return scan.opportunities;
-    const words = companyContext.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w.length > 3).slice(0, 40);
-    if (words.length === 0) return scan.opportunities;
-    return [...scan.opportunities]
-      .map(opp => {
-        const haystack = [opp.headline, ...opp.signals.map(s => s.title), ...opp.signals.map(s => s.detail ?? "")].join(" ").toLowerCase();
-        const matches = words.filter(w => haystack.includes(w)).length;
-        return { opp, adjusted: opp.score + matches * 8 };
-      })
-      .sort((a, b) => b.adjusted - a.adjusted)
-      .map(s => s.opp);
-  }, [scan, companyContext]);
+  // The server now personalises + ranks by relevance to the company profile,
+  // so we render its ordering directly (no more client-side re-rank).
+  const rankedOpps = scan?.opportunities ?? [];
 
   async function runScan() {
     setScanError(null);
@@ -430,7 +557,7 @@ export default function SignalIQPlatformClient({
       const res = await fetch("/api/emostool/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat }),
+        body: JSON.stringify({ beat, companyContext: companyContext.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setScanError(data.error || "Scan failed.");
@@ -454,12 +581,53 @@ export default function SignalIQPlatformClient({
       <div style={{ background: PAPER2, border: `1px solid ${INK15}`, padding: "20px 24px", marginBottom: 32 }}>
         <div style={{ marginBottom: 16 }}>
           <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase", color: INK55 }}>
-            Run a new scan — no rate limit
+            Run a new scan — personalised to your company
           </span>
         </div>
 
-        {/* Beat tabs */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${INK15}`, marginBottom: 14 }}>
+        {/* Step 1 — company profile (required; drives the scan) */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>
+            Step 1 · Your company <span style={{ color: RED }}>*</span>
+            <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}> — what you do, who you serve, your edge. This tailors what we scan and how we score relevance.</span>
+          </label>
+          <input
+            value={companyName}
+            onChange={e => setCompanyName(e.target.value)}
+            maxLength={80}
+            placeholder="Company name (e.g. SIA Health OS) — saved with each signal"
+            style={{
+              width: "100%", boxSizing: "border-box", marginBottom: 8,
+              background: PAPER, border: `1px solid ${INK15}`,
+              color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 12,
+              padding: "9px 12px", outline: "none",
+            }}
+          />
+          <textarea
+            value={companyContext}
+            onChange={e => setCompanyContext(e.target.value)}
+            maxLength={600}
+            rows={3}
+            placeholder="e.g. 'SIA Health is a journaling app for people with chronic, overlapping conditions — asthma, allergies, CKD, hypertension. Users log symptoms, triggers, meds and sleep, and the app surfaces the patterns connecting them.'"
+            style={{
+              width: "100%", boxSizing: "border-box",
+              background: PAPER, border: `1px solid ${companyContext.trim().length >= 12 ? INK15 : RED}`,
+              color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.6,
+              padding: "10px 13px", resize: "vertical", outline: "none",
+            }}
+          />
+          <div style={{ marginTop: 5, fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: companyContext.trim().length >= 12 ? GREEN : INK55 }}>
+            {companyContext.trim().length >= 12
+              ? "✓ We'll expand this into tailored topics and score every result by fit to your company."
+              : "Add a sentence or two about your company — relevance scoring needs it before you can scan."}
+          </div>
+        </div>
+
+        {/* Step 2 — beat */}
+        <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>
+          Step 2 · Pick a beat <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}> — the general area we explore around your company</span>
+        </label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${INK15}`, marginBottom: 18 }}>
           {BEATS.map((b, i) => {
             const active = b.id === beat;
             return (
@@ -484,42 +652,23 @@ export default function SignalIQPlatformClient({
           })}
         </div>
 
-        {/* Startup context */}
-        <div style={{ marginBottom: 14 }}>
-          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>
-            Your startup context <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}>(optional — re-ranks results by relevance to your company)</span>
-          </label>
-          <textarea
-            value={companyContext}
-            onChange={e => setCompanyContext(e.target.value)}
-            maxLength={400}
-            rows={3}
-            placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital. Our founder is a former Goldman analyst with proprietary data on 10,000+ lending decisions.'"
-            style={{
-              width: "100%", boxSizing: "border-box",
-              background: PAPER, border: `1px solid ${INK15}`,
-              color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.6,
-              padding: "10px 13px", resize: "vertical", outline: "none",
-            }}
-          />
-        </div>
-
+        {/* Step 3 — scan */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <button
             onClick={runScan}
-            disabled={scanning}
+            disabled={scanning || companyContext.trim().length < 12}
             style={{
               padding: "12px 28px", border: "none",
-              background: scanning ? "rgba(26,20,16,.15)" : INK,
-              color: scanning ? INK55 : PAPER,
+              background: (scanning || companyContext.trim().length < 12) ? "rgba(26,20,16,.15)" : INK,
+              color: (scanning || companyContext.trim().length < 12) ? INK55 : PAPER,
               fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase",
-              cursor: scanning ? "wait" : "pointer",
+              cursor: scanning ? "wait" : companyContext.trim().length < 12 ? "not-allowed" : "pointer",
             }}
           >
             {scanning ? "Scanning the radar…" : `Scan ${currentBeat?.label ?? ""} →`}
           </button>
           <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-            Platform scan — unlimited, no Turnstile
+            {scanning ? "Expanding your profile + scanning sources…" : "Platform scan — unlimited, tailored to your company"}
           </span>
         </div>
 
@@ -561,6 +710,7 @@ export default function SignalIQPlatformClient({
                 opp={opp}
                 beatLabel={currentBeat?.label ?? beat}
                 companyContext={companyContext}
+                companyName={companyName}
                 savedIds={savedOppIds}
                 onSaved={handleSaved}
               />

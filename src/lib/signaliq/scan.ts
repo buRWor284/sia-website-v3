@@ -4,24 +4,64 @@
  * and serverless-friendly — runs at request time with bounded parallelism and
  * per-source timeouts, so one slow/failed feed degrades the scan to `partial`
  * rather than breaking it.
+ *
+ * When a company description is supplied we first expand it (profile.ts) into
+ * startup-specific seeds + a relevance lexicon, scan those tailored seeds (plus
+ * a few beat seeds for breadth), and score every opportunity by relevance to
+ * THAT company — so results are genuinely personalised, not just re-ordered.
  */
-import type { BeatId, Opportunity, Signal } from "./types";
+import type { BeatId, Opportunity, ProfileExpansion, Signal } from "./types";
 import { MAX_OPPORTUNITIES, beatById } from "./config";
 import { SIGNAL_SOURCES, gdeltCoverage } from "./sources";
+import { expandCompanyProfile } from "./profile";
 import { rankOpportunities, scoreOpportunity } from "./score";
 
 export interface ScanResult {
   opportunities: Opportunity[];
   partial: boolean;
   notes: string[];
+  /** Surfaced so the UI/library can show what the scan was tuned to. */
+  expansion?: ProfileExpansion | null;
 }
 
-export async function scanBeat(beat: BeatId): Promise<ScanResult> {
-  const seeds = beatById(beat).seeds;
+export interface ScanOptions {
+  /** Founder's company description — tailors seeds + relevance scoring. */
+  companyContext?: string;
+}
+
+/** Max distinct seeds scanned per run (keeps external fan-out bounded). */
+const MAX_SEEDS = 18;
+
+export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<ScanResult> {
+  const beatSeeds = beatById(beat).seeds;
+  const ctx = (opts.companyContext ?? "").trim();
+
+  // 1) Expand the company profile into tailored seeds + relevance lexicon.
+  let expansion: ProfileExpansion | null = null;
+  if (ctx) expansion = await expandCompanyProfile(ctx, beat);
+
+  // 2) Build the seed list: tailored first (flagged), then beat seeds for breadth.
+  const seen = new Set<string>();
+  const seedList: { seed: string; tailored: boolean }[] = [];
+  for (const s of expansion?.seeds ?? []) {
+    const k = s.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    seedList.push({ seed: s, tailored: true });
+    if (seedList.length >= MAX_SEEDS) break;
+  }
+  for (const s of beatSeeds) {
+    if (seedList.length >= MAX_SEEDS) break;
+    const k = s.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    seedList.push({ seed: s, tailored: false });
+  }
+
   let failures = 0;
 
   const perSeed = await Promise.all(
-    seeds.map(async (seed) => {
+    seedList.map(async ({ seed, tailored }) => {
       const [signalResults, coverage] = await Promise.all([
         Promise.allSettled(SIGNAL_SOURCES.map((fn) => fn(seed))),
         gdeltCoverage(seed),
@@ -38,7 +78,7 @@ export async function scanBeat(beat: BeatId): Promise<ScanResult> {
       if (!coverage) failures++;
 
       if (signals.length === 0) return null; // nothing to surface for this seed
-      return scoreOpportunity({ topic: seed, beat, signals, coverage });
+      return scoreOpportunity({ topic: seed, beat, signals, coverage, expansion, tailored });
     }),
   );
 
@@ -48,10 +88,16 @@ export async function scanBeat(beat: BeatId): Promise<ScanResult> {
 
   const notes: string[] = [];
   const partial = failures > 0;
+  if (expansion) {
+    const n = seedList.filter((s) => s.tailored).length;
+    notes.push(`Personalised to your company — scanned ${n} tailored ${n === 1 ? "topic" : "topics"} and scored by relevance to you.`);
+  } else if (ctx) {
+    notes.push("Couldn't tailor topics this time — showing the standard beat. Try again in a moment.");
+  }
   if (partial) notes.push("Some sources were unavailable; this scan may be incomplete.");
   if (opportunities.length === 0) {
     notes.push("No live signals cleared the bar for this beat right now — try again later.");
   }
 
-  return { opportunities, partial, notes };
+  return { opportunities, partial, notes, expansion };
 }

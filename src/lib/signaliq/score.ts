@@ -1,14 +1,18 @@
 /**
  * SignalIQ — opportunity scoring. Pure, deterministic, unit-testable.
  *
- *   opportunity = Σ weighted(magnitude, velocity, coverageGap, fit, credibility)
- *               + corroboration bonus
+ *   base        = Σ weighted(magnitude, velocity, coverageGap, fit, credibility, corroboration)
+ *   opportunity = base × relevanceMultiplier        (multiplier = 1 when no company profile)
  *
  * The score is a *lead/whitespace* measure (how far ahead of coverage you are),
  * NOT a probability that the story breaks. See SignalIQ-RFP.md §6 & §11.1.
+ *
+ * Relevance: when the founder supplies a company profile we expand it (profile.ts)
+ * into themes/negatives and scale the score by how well an opportunity fits THIS
+ * company — so an industry-loud but off-target signal can't rank as a Hot lead.
  */
-import type { BeatId, Coverage, Opportunity, Signal } from "./types";
-import { WEIGHTS, bandFor, beatById, isSensitive } from "./config";
+import type { BeatId, Coverage, Opportunity, ProfileExpansion, Signal } from "./types";
+import { RELEVANCE_FLOOR, WEIGHTS, bandFor, beatById, isSensitive } from "./config";
 
 const clamp01 = (n: number): number => Math.max(0, Math.min(1, Number.isFinite(n) ? n : 0));
 const maxOr0 = (xs: number[]): number => (xs.length ? Math.max(...xs) : 0);
@@ -28,6 +32,27 @@ export function beatFit(topic: string, beat: BeatId): number {
   return clamp01(0.4 + hits * 0.3); // any overlap is meaningful; caps at 1
 }
 
+/**
+ * Company relevance: how well this opportunity fits the founder's company.
+ * Returns a neutral 1 when there is no profile (don't penalise the public default).
+ * With a profile: a tailored seed starts relevant; theme hits raise it; negative
+ * (off-focus industry) terms cut it hard.
+ */
+export function companyRelevance(
+  text: string,
+  expansion: ProfileExpansion | null,
+  tailored: boolean,
+): number {
+  if (!expansion) return 1; // neutral — no profile present
+  const t = ` ${text.toLowerCase()} `;
+  const themeHits = expansion.themes.reduce((n, w) => (w && t.includes(w) ? n + 1 : n), 0);
+  const negHits = expansion.negatives.reduce((n, w) => (w && t.includes(w) ? n + 1 : n), 0);
+  let r = tailored ? 0.65 : 0.0;       // a tailored seed is relevant by construction
+  r += Math.min(themeHits, 4) * 0.2;   // strong theme overlap can carry it to full relevance
+  r -= negHits * 0.3;                  // off-focus industry noise is penalised
+  return clamp01(r);
+}
+
 /** Corroboration: more independent sources → less likely to be noise. */
 export function corroboration(signals: Signal[]): number {
   const distinct = new Set(signals.map((s) => s.source)).size;
@@ -40,10 +65,14 @@ export interface ScoreInputs {
   beat: BeatId;
   signals: Signal[];
   coverage: Coverage | null;
+  /** Company expansion (themes/negatives). Null → relevance is neutral. */
+  expansion?: ProfileExpansion | null;
+  /** True when this opportunity's seed was tailored to the company. */
+  tailored?: boolean;
 }
 
 export function scoreOpportunity(inp: ScoreInputs): Opportunity {
-  const { topic, beat, signals, coverage } = inp;
+  const { topic, beat, signals, coverage, expansion = null, tailored = false } = inp;
 
   const magnitude = clamp01(maxOr0(signals.map((s) => s.magnitude)));
   const velocity = clamp01(maxOr0(signals.map((s) => s.velocity)));
@@ -53,14 +82,21 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
   const fit = beatFit(topic, beat);
   const corr = corroboration(signals);
 
+  const relText = `${topic} ${signals.map((s) => s.title).join(" ")} ${signals
+    .map((s) => s.detail ?? "")
+    .join(" ")}`;
+  const relevance = companyRelevance(relText, expansion, tailored);
+  const relevanceMultiplier = expansion ? RELEVANCE_FLOOR + (1 - RELEVANCE_FLOOR) * relevance : 1;
+
   const base =
     WEIGHTS.magnitude * magnitude +
     WEIGHTS.velocity * velocity +
     WEIGHTS.coverageGap * coverageGap +
     WEIGHTS.fit * fit +
-    WEIGHTS.credibility * credibility;
+    WEIGHTS.credibility * credibility +
+    WEIGHTS.corroborationBonus * corr;
 
-  const score = Math.round(clamp01(base + WEIGHTS.corroborationBonus * corr) * 100);
+  const score = Math.round(clamp01(base * relevanceMultiplier) * 100);
   const band = bandFor(score);
 
   const headline = signals[0]?.title?.trim() || topic;
@@ -74,7 +110,9 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     score,
     band: band.band,
     bandLabel: band.label,
-    components: { magnitude, velocity, coverageGap, fit, credibility, corroboration: corr },
+    components: { magnitude, velocity, coverageGap, fit, relevance, credibility, corroboration: corr },
+    relevanceMultiplier,
+    tailored,
     coverage,
     signals,
     sensitive,

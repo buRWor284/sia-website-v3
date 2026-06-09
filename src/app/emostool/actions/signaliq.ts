@@ -21,6 +21,10 @@ export interface DbSignal {
   coverage_gap: number | null;
   status: "new" | "saved" | "pitched" | "archived";
   detected_at: string;
+  // Attribution — what this signal was scanned for (so it's findable later)
+  company_name: string | null;
+  company_context: string | null;
+  scan_category: string | null;    // the beat label at scan time
 }
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
@@ -40,9 +44,9 @@ export async function getSignals(): Promise<DbSignal[]> {
   const db = await getAuthenticatedClient();
   const { data, error } = await db
     .from("signaliq_signals")
-    .select("id, beat_id, headline, summary, source, source_url, signal_score, coverage_gap, status, detected_at")
+    .select("id, beat_id, headline, summary, source, source_url, signal_score, coverage_gap, status, detected_at, company_name, company_context, scan_category")
     .order("detected_at", { ascending: false })
-    .limit(100);
+    .limit(200);
 
   if (error) { console.error("getSignals error:", error.message); return []; }
 
@@ -57,9 +61,12 @@ export async function getSignals(): Promise<DbSignal[]> {
     coverage_gap: number | null;
     status: string;
     detected_at: string;
+    company_name: string | null;
+    company_context: string | null;
+    scan_category: string | null;
   }) => ({
     ...row,
-    beat_name: null, // enriched below if beat_id present
+    beat_name: row.scan_category, // category doubles as the display beat name
     status: row.status as DbSignal["status"],
   }));
 }
@@ -74,7 +81,7 @@ export async function getSignals(): Promise<DbSignal[]> {
 export async function saveSignalFromOpportunity(
   opp: Opportunity,
   beatLabel: string,
-  options?: { clerkUserId?: string },
+  options?: { clerkUserId?: string; companyContext?: string; companyName?: string },
 ): Promise<string | null> {
   try {
     const db = createSupabaseServiceClient();
@@ -121,15 +128,18 @@ export async function saveSignalFromOpportunity(
     const { data: signal, error } = await db
       .from("signaliq_signals")
       .insert({
-        org_id:       user.org_id,
-        beat_id:      beatId,
-        headline:     opp.headline,
+        org_id:          user.org_id,
+        beat_id:         beatId,
+        headline:        opp.headline,
         summary,
-        source:       primarySignal?.source ?? "manual",
-        source_url:   primarySignal?.url ?? null,
-        signal_score: opp.score ?? null,
-        coverage_gap: opp.components?.coverageGap ?? null,
-        status:       "saved",
+        source:          primarySignal?.source ?? "manual",
+        source_url:      primarySignal?.url ?? null,
+        signal_score:    opp.score ?? null,
+        coverage_gap:    opp.components?.coverageGap ?? null,
+        status:          "saved",
+        company_name:    options?.companyName?.trim() || null,
+        company_context: options?.companyContext?.trim()?.slice(0, 600) || null,
+        scan_category:   beatLabel,
       })
       .select("id")
       .single();
@@ -157,6 +167,8 @@ export async function saveSignalFromOpportunity(
 export async function saveSignalFromScan(
   opp: Opportunity,
   beatLabel: string,
+  companyContext?: string,
+  companyName?: string,
 ): Promise<{ ok: boolean; id: string | null; error?: string }> {
   try {
     const db = await getAuthenticatedClient();
@@ -198,15 +210,18 @@ export async function saveSignalFromScan(
     const { data: signal, error: sigErr } = await db
       .from("signaliq_signals")
       .insert({
-        org_id:       org.id,
-        beat_id:      beatId,
-        headline:     opp.headline,
+        org_id:          org.id,
+        beat_id:         beatId,
+        headline:        opp.headline,
         summary,
-        source:       primarySignal?.source ?? "manual",
-        source_url:   primarySignal?.url ?? null,
-        signal_score: opp.score ?? null,
-        coverage_gap: opp.components?.coverageGap ?? null,
-        status:       "saved",
+        source:          primarySignal?.source ?? "manual",
+        source_url:      primarySignal?.url ?? null,
+        signal_score:    opp.score ?? null,
+        coverage_gap:    opp.components?.coverageGap ?? null,
+        status:          "saved",
+        company_name:    companyName?.trim() || null,
+        company_context: companyContext?.trim()?.slice(0, 600) || null,
+        scan_category:   beatLabel,
       })
       .select("id")
       .single();
@@ -237,6 +252,16 @@ export async function updateSignalStatus(
     .update({ status })
     .eq("id", signalId);
   if (error) { console.error("updateSignalStatus error:", error.message); return false; }
+  revalidatePath("/emostool/dashboard/signaliq");
+  return true;
+}
+
+// ─── Delete a saved signal ────────────────────────────────────────────────────
+
+export async function deleteSignal(signalId: string): Promise<boolean> {
+  const db = await getAuthenticatedClient();
+  const { error } = await db.from("signaliq_signals").delete().eq("id", signalId);
+  if (error) { console.error("deleteSignal error:", error.message); return false; }
   revalidatePath("/emostool/dashboard/signaliq");
   return true;
 }

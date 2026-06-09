@@ -14,7 +14,7 @@ import type { BeatId, ScanResponse } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60; // extra headroom for the company-profile expansion call
 
 const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity"];
@@ -40,8 +40,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unknown beat." }, { status: 400 });
   }
 
+  const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 600) : undefined;
+
   try {
-    const { opportunities, partial, notes } = await scanBeat(beat);
+    const { opportunities, partial, notes } = await scanBeat(beat, { companyContext });
     logScan(beat, opportunities.length);
     const body: ScanResponse = {
       beat,

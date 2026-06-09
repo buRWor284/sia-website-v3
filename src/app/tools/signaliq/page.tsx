@@ -685,6 +685,9 @@ function ScorePanel({ opp }: { opp: Opportunity }) {
         <CompBar label="Magnitude" value={opp.components.magnitude} />
         <CompBar label="Velocity" value={opp.components.velocity} />
         <CompBar label="Coverage gap" value={opp.components.coverageGap} />
+        {opp.relevanceMultiplier != null && opp.relevanceMultiplier < 0.999 && (
+          <CompBar label="Startup fit" value={opp.components.relevance} />
+        )}
         <CompBar label="Beat fit" value={opp.components.fit} />
         <CompBar label="Corroboration" value={opp.components.corroboration} />
       </div>
@@ -1189,6 +1192,30 @@ export default function SignalIQPage() {
     }
   }
 
+  // When the visitor adds context, re-scan WITH it so the engine tailors the
+  // seeds + relevance scoring (not just a client-side re-rank). Opt-in only —
+  // the default "Show results" path is unchanged.
+  async function personalizeAndReveal() {
+    if (!companyContext.trim()) { setUsedContext(false); setOppsRevealed(true); return; }
+    setScanError(null);
+    setScanning(true);
+    try {
+      const res = await fetch("/api/signaliq/scan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ beat, companyContext: companyContext.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok) { setScan(data as ScanResponse); setUsedContext(true); }
+      else setScanError(data.error || "Scan failed.");
+    } catch {
+      setScanError("Network error — please try again.");
+    } finally {
+      setScanning(false);
+      setOppsRevealed(true);
+    }
+  }
+
   async function generatePack(opp: Opportunity) {
     setSelected(opp);
     setPack(null);
@@ -1374,7 +1401,7 @@ export default function SignalIQPage() {
                         <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
                           Your startup context
                         </label>
-                        <InfoTooltip text="Context re-ranks results by relevance to your company and personalises your pitch pack angle. It does not change what signals are scanned. Making the scan itself company-specific would add latency, cost more, and risk hallucinated search terms." />
+                        <InfoTooltip text="Your context now tailors the scan itself — we expand it into company-specific topics and score every result by how well it fits you, then personalise your pitch pack. Takes a few extra seconds." />
                       </div>
                       <textarea
                         value={companyContext}
@@ -1398,11 +1425,12 @@ export default function SignalIQPage() {
                     </div>
                     <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
                       <button
-                        onClick={() => { setOppsRevealed(true); setUsedContext(!!companyContext.trim()); }}
+                        onClick={personalizeAndReveal}
+                        disabled={scanning}
                         className="siq-scan-btn"
                         style={{ fontSize: 13 }}
                       >
-                        {companyContext.trim() ? "Show my personalised results →" : "Show results →"}
+                        {scanning ? "Personalising…" : companyContext.trim() ? "Show my personalised results →" : "Show results →"}
                       </button>
                       <button
                         onClick={() => { setOppsRevealed(true); setUsedContext(false); }}
