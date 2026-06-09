@@ -82,15 +82,23 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
     }),
   );
 
-  const opportunities = rankOpportunities(
-    perSeed.filter((o): o is Opportunity => o !== null),
-  ).slice(0, MAX_OPPORTUNITIES);
+  let ranked = rankOpportunities(perSeed.filter((o): o is Opportunity => o !== null));
+
+  // With a company profile, drop clearly off-topic items (non-tailored, ~zero
+  // relevance — the loud industry noise like "drug pricing") as long as enough
+  // relevant ones remain, so the radar stays focused without going empty.
+  if (expansion) {
+    const relevant = ranked.filter((o) => o.tailored || (o.components.relevance ?? 0) >= 0.15);
+    if (relevant.length >= 5) ranked = relevant;
+  }
+
+  const opportunities = ranked.slice(0, MAX_OPPORTUNITIES);
 
   const notes: string[] = [];
   const partial = failures > 0;
   if (expansion) {
     const n = seedList.filter((s) => s.tailored).length;
-    notes.push(`Personalised to your company — scanned ${n} tailored ${n === 1 ? "topic" : "topics"} and scored by relevance to you.`);
+    notes.push(`Personalised to your company — scored ${opportunities.length} relevant ${opportunities.length === 1 ? "topic" : "topics"} from ${n} tailored to you.`);
   } else if (ctx) {
     notes.push("Couldn't tailor topics this time — showing the standard beat. Try again in a moment.");
   }

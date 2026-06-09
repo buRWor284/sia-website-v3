@@ -2,13 +2,18 @@
  * SignalIQ — company-profile expansion.
  *
  * One structured tool-use call turns the founder's company description into:
- *   • tailored SEEDS    — startup-specific topics to scan (instead of the 20
- *                         generic beat seeds), so the radar looks where THIS
- *                         company can credibly play;
- *   • relevance THEMES  — a lexicon used by score.ts to compute how relevant
- *                         each opportunity is to the company;
+ *   • tailored SEEDS    — topics to scan, chosen mostly by SELECTING from the
+ *                         beat's proven seed list (those reliably return signals
+ *                         from SEC/news/research) plus a few real market terms;
+ *   • relevance THEMES  — a lexicon used by score.ts to rank each opportunity by
+ *                         fit to the company;
  *   • NEGATIVES         — industry-adjacent terms that look related but are not
- *                         this company's focus (penalised in scoring).
+ *                         this company's focus (down-ranked / dropped).
+ *
+ * Why "select from candidates": free-form, product-flavoured seeds (e.g.
+ * "symptom tracking app") have ~zero SEC filings and starve the scan. The beat's
+ * own seeds are proven to return signals, so we let the model pick the relevant
+ * ones and add only a handful of real market/research phrases on top.
  *
  * Server-only (needs ANTHROPIC_API_KEY). Fails soft: on any error returns null
  * and the scan falls back to the generic beat seeds with neutral relevance.
@@ -18,37 +23,44 @@ import { SIGNALIQ_MODEL, beatById } from "./config";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 
-export const EXPAND_SYSTEM = `You are an earned-media strategist. Given a founder's description of their company, you produce the inputs a "newsjacking radar" needs to find PR opportunities that genuinely fit THIS company.
+export const EXPAND_SYSTEM = `You are an earned-media strategist. Given a founder's company description AND a list of candidate industry topics, you produce the inputs a "newsjacking radar" needs to find PR opportunities that genuinely fit THIS company.
 
-You return three things via the emit_profile tool:
+Return, via the emit_profile tool:
 
-1. seeds — 12 to 16 SHORT search phrases (2-4 words) naming topics, trends, or themes this specific company could credibly comment on, attach a story to, or has standing in. These are queried against SEC filings, news, Hacker News, arXiv and Wikipedia, so they must be REAL discourse phrases that show up in corporate filings, research, and the press — NOT the company's brand name, NOT product features no one writes about, NOT generic words like "software" or "health". Favour the company's actual niche over the broad industry (e.g. for a chronic-condition symptom journal: "patient-generated health data", "medication adherence", "remote patient monitoring", "chronic disease management" — NOT "drug pricing" or "clinical trial recruitment").
+1. selectedTopics — copy verbatim the subset of the CANDIDATE topics this specific company could credibly comment on, attach a story to, or has standing in. Pick the genuinely relevant ones and ignore the rest. These are proven to return signals, so they matter most — be generous but honest (usually 6–12).
 
-2. themes — 12 to 20 lowercase keywords/short phrases that signal an opportunity is truly relevant to this company. Include the company's audience, problem space, and adjacent concepts a relevant story would mention.
+2. extraTopics — up to 6 ADDITIONAL short phrases (2–3 words) NOT already in the candidate list that fit this company AND are real market/industry/research terms that appear in SEC filings, news, and research (e.g. "remote patient monitoring", "value-based care", "patient-reported outcomes"). NEVER product features or brand names (NOT "symptom tracker", NOT "journaling app").
 
-3. negatives — 6 to 12 lowercase terms that are in the same broad industry but are NOT this company's focus, so we can down-rank loud-but-irrelevant industry noise.
+3. themes — 12–20 lowercase keywords/phrases that signal an opportunity is relevant to this company (its audience, problem space, and adjacent concepts a relevant story would mention).
 
-Rules: be specific and honest, never invent facts about the company, and keep every phrase something that would plausibly appear in news or filings.`;
+4. negatives — 6–12 lowercase candidate/industry terms that are in the same broad space but are NOT this company's focus, so loud-but-irrelevant noise can be down-ranked.
+
+Rules: be specific and honest, never invent facts about the company, and keep every phrase something that plausibly appears in news or filings.`;
 
 export const EXPAND_TOOL = {
   name: "emit_profile",
-  description: "Return tailored scan seeds and a relevance lexicon for the company.",
+  description: "Return tailored scan topics (selected from candidates + a few new) and a relevance lexicon.",
   input_schema: {
     type: "object",
     properties: {
-      seeds: {
+      selectedTopics: {
         type: "array",
-        description: "12-16 short (2-4 word) searchable topic phrases tailored to this company.",
+        description: "Subset of the provided CANDIDATE topics relevant to this company (copied verbatim).",
+        items: { type: "string" },
+      },
+      extraTopics: {
+        type: "array",
+        description: "Up to 6 NEW real market/research phrases (2–3 words) not in the candidate list. No product features or brand names.",
         items: { type: "string" },
       },
       themes: {
         type: "array",
-        description: "12-20 lowercase keywords/phrases that indicate relevance to this company.",
+        description: "12–20 lowercase keywords/phrases that indicate relevance to this company.",
         items: { type: "string" },
       },
       negatives: {
         type: "array",
-        description: "6-12 lowercase industry-adjacent terms that are NOT this company's focus.",
+        description: "6–12 lowercase industry-adjacent terms that are NOT this company's focus.",
         items: { type: "string" },
       },
       summary: {
@@ -56,18 +68,19 @@ export const EXPAND_TOOL = {
         description: "One-line neutral positioning of the company (max ~20 words).",
       },
     },
-    required: ["seeds", "themes", "negatives"],
+    required: ["selectedTopics", "extraTopics", "themes", "negatives"],
   },
 } as const;
 
 export function buildExpandPrompt(description: string, beat?: BeatId): string {
-  const area = beat ? beatById(beat).label : "their industry";
+  const b = beatById(beat ?? "saas");
   return `COMPANY DESCRIPTION (from the founder):
 ${description.trim()}
 
-General area / beat: ${area}
+CANDIDATE TOPICS for the ${b.label} beat — select the ones that fit this company:
+${b.seeds.join(", ")}
 
-Produce the scan seeds and relevance lexicon via the emit_profile tool. Tailor everything to THIS company's specific niche and audience, not the broad industry.`;
+Produce the topics and relevance lexicon via the emit_profile tool. Selecting the relevant candidates matters most — they reliably return signals. Add new topics only if they are real market/research terms (not product features).`;
 }
 
 interface ToolUseBlock {
@@ -78,30 +91,42 @@ interface ToolUseBlock {
 
 const cleanList = (v: unknown, max: number, lower: boolean): string[] => {
   if (!Array.isArray(v)) return [];
-  const seen = new Set<string>();
   const out: string[] = [];
   for (const item of v) {
     let s = String(item ?? "").trim();
     if (lower) s = s.toLowerCase();
     s = s.replace(/^["'\-•\s]+|["'\s]+$/g, "");
     if (s.length < 2 || s.length > 60) continue;
-    const key = s.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
     out.push(s);
     if (out.length >= max) break;
   }
   return out;
 };
 
+/** Merge selected + extra topics into a single de-duplicated seed list. */
+function mergeSeeds(selected: string[], extra: string[], max: number): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const s of [...selected, ...extra]) {
+    const k = s.toLowerCase();
+    if (seen.has(k)) continue;
+    seen.add(k);
+    out.push(s);
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
 export function parseExpansion(content: ToolUseBlock[]): ProfileExpansion | null {
   const block = content.find((b) => b.type === "tool_use" && b.name === EXPAND_TOOL.name);
   if (!block?.input) return null;
-  const raw = block.input as Partial<ProfileExpansion>;
-  const seeds = cleanList(raw.seeds, 16, false);
+  const raw = block.input as Record<string, unknown>;
+  const selected = cleanList(raw.selectedTopics, 16, false);
+  const extra = cleanList(raw.extraTopics, 8, false);
+  const seeds = mergeSeeds(selected, extra, 16);
   const themes = cleanList(raw.themes, 24, true);
   const negatives = cleanList(raw.negatives, 14, true);
-  if (seeds.length === 0) return null; // nothing usable
+  if (seeds.length === 0) return null; // nothing usable → caller falls back
   return {
     seeds,
     themes,

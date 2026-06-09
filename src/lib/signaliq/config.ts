@@ -50,7 +50,7 @@ export const WEIGHTS = {
  * filings) can't rank as a "Hot lead" for a company it doesn't fit.
  * With NO profile, relevance is neutral (multiplier = 1) — the public-tool default.
  */
-export const RELEVANCE_FLOOR = 0.35;
+export const RELEVANCE_FLOOR = 0.5;
 
 /** Score → band thresholds (honest language: lead/whitespace, not probability). */
 export const BANDS: { min: number; band: OppBand; label: string }[] = [
