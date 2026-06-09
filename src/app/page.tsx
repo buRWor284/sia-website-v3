@@ -773,7 +773,7 @@ export default function HomePage() {
             <p className="kit-card__body">Go beyond links. Drop in your niche and Partner Collab IQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
             <div className="kit-card__footer">
               <span className="kit-card__year">2026</span>
-              <a href="/tools/collabiq" className="kit-card__cta">OPEN THE TOOL ↗</a>
+              <a href="/tools/partnercollabiq" className="kit-card__cta">OPEN THE TOOL ↗</a>
             </div>
           </div>
         </div>

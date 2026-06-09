@@ -30,10 +30,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/infographics",                          changeFrequency: "monthly" as const, priority: 0.6 },
     { url: "/infographics/writing-benefits",         changeFrequency: "yearly"  as const, priority: 0.6 },
     { url: "/infographics/journo-outreach-checklist", changeFrequency: "yearly" as const, priority: 0.6 },
-    // Tools
-    { url: "/tools/collabiq",              changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: "/tools/pressiq",               changeFrequency: "monthly" as const, priority: 0.7 },
+    // Tools (canonical public lead-magnet tools only — redirected /tools/collabiq removed)
     { url: "/tools/signaliq",              changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: "/tools/pressiq",               changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: "/tools/partnercollabiq",       changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: "/tools/coverageiq",            changeFrequency: "monthly" as const, priority: 0.7 },
     { url: "/tools/authority-calculator",   changeFrequency: "yearly"  as const, priority: 0.5 },
   ];
 

@@ -147,7 +147,7 @@ export const ReadingRoom = () => (
         </SCaps>
       </div>
       <a
-        href="/blog"
+        href="/resources"
         style={{
           fontFamily: GROT,
           fontSize: 11,

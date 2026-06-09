@@ -187,7 +187,7 @@ const CONTENT: ContentItem[] = [
     sub: "Find co-marketing and distribution opportunities by industry.",
     blurb:
       "Surface co-marketing allies, content collaborators, referral networks, and distribution partners — with qualification scoring and outreach templates. 15+ industries mapped.",
-    href: "/tools/collabiq",
+    href: "/tools/partnercollabiq",
     y: "2026",
     newsHeadline: "The Partnership Desk",
     newsDeck: "Co-marketing, distribution, and link opportunities across every industry, mapped",
