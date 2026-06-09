@@ -8,8 +8,12 @@
 import type { Signal } from "../types";
 import { SOURCE_CREDIBILITY } from "../config";
 import { clamp01, daysSince, getText } from "./http";
+import { createLimiter } from "./throttle";
 
 const PAPERS_CAP = 20; // new papers/month on a niche topic = strong
+
+// arXiv asks clients to go easy; cap concurrent queries to avoid 429s/timeouts.
+const arxivLimit = createLimiter({ concurrency: 4 });
 
 function tag(entry: string, name: string): string {
   return (entry.match(new RegExp(`<${name}>([\\s\\S]*?)</${name}>`))?.[1] ?? "").trim();
@@ -20,7 +24,7 @@ export async function arxivSignal(seed: string): Promise<Signal | null> {
     `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(`all:"${seed}"`)}` +
     `&sortBy=submittedDate&sortOrder=descending&max_results=50`;
   try {
-    const xml = await getText(url);
+    const xml = await arxivLimit(() => getText(url));
     const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map((m) => m[1]);
     if (!entries.length) return null;
 

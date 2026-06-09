@@ -10,11 +10,16 @@
  */
 import type { Coverage } from "../types";
 import { avg, clamp, clamp01, getJson } from "./http";
+import { createLimiter } from "./throttle";
 
 const BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 
 // ~0.5% of all global coverage = "saturated" for a niche business topic.
 const VOLUME_CAP = 0.5;
+
+// GDELT's timelinevol is slow; too many at once time out and coverage collapses
+// to neutral (every gap shows "Medium"). Cap concurrency so each call lands.
+const gdeltLimit = createLimiter({ concurrency: 4 });
 
 interface TimelineResp {
   timeline?: { series: string; data: { date: string; value: number }[] }[];
@@ -25,7 +30,7 @@ export async function gdeltCoverage(topic: string): Promise<Coverage | null> {
     `${BASE}?query=${encodeURIComponent(`"${topic}"`)}` +
     `&mode=timelinevol&format=json&timespan=3m`;
   try {
-    const json = (await getJson(url)) as TimelineResp;
+    const json = (await gdeltLimit(() => getJson(url))) as TimelineResp;
     const data = json.timeline?.[0]?.data ?? [];
     if (!data.length) {
       return { topic, volume: 0, trend: 0, articleCount: 0, source: "gdelt" };

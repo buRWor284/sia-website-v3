@@ -27,7 +27,7 @@ export const EXPAND_SYSTEM = `You are an earned-media strategist. Given a founde
 
 Return, via the emit_profile tool:
 
-1. selectedTopics — copy verbatim the subset of the CANDIDATE topics this specific company could credibly comment on, attach a story to, or has standing in. Pick the genuinely relevant ones and ignore the rest. These are proven to return signals, so they matter most — be generous but honest (usually 6–12).
+1. selectedTopics — copy verbatim the subset of the CANDIDATE topics this specific company could credibly comment on, attach a story to, or has standing in. Pick the genuinely relevant ones and ignore the rest. These are proven to return signals, so they matter most — be generous but honest (usually 6–12). Match the company's modality: for a software/app/service, prefer care-delivery, patient, data and market terms and skip hardware/device or drug-development terms (e.g. for a journaling app, skip "biosensor", "FDA approval", "clinical trial").
 
 2. extraTopics — up to 6 ADDITIONAL short phrases (2–3 words) NOT already in the candidate list that fit this company AND are real market/industry/research terms that appear in SEC filings, news, and research (e.g. "remote patient monitoring", "value-based care", "patient-reported outcomes"). NEVER product features or brand names (NOT "symptom tracker", NOT "journaling app").
 

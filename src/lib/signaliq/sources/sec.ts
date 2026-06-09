@@ -7,9 +7,14 @@
 import type { Signal } from "../types";
 import { SOURCE_CREDIBILITY } from "../config";
 import { clamp01, getJson, isoDaysAgo } from "./http";
+import { createLimiter } from "./throttle";
 
 const FTS = "https://efts.sec.gov/LATEST/search-index?q=";
 const FILINGS_CAP = 40; // filings/month mentioning a phrase = strong
+
+// SEC EDGAR allows ~10 req/s and we make 2 calls per seed — cap concurrency and
+// space the starts so a wide scan doesn't get throttled into timeouts.
+const secLimit = createLimiter({ concurrency: 4, minIntervalMs: 120 });
 
 interface FtsResp {
   hits?: { total?: { value?: number } };
@@ -17,7 +22,7 @@ interface FtsResp {
 
 async function countFilings(phrase: string, startdt: string, enddt: string): Promise<number> {
   const url = `${FTS}${encodeURIComponent(`"${phrase}"`)}&startdt=${startdt}&enddt=${enddt}`;
-  const json = (await getJson(url)) as FtsResp;
+  const json = (await secLimit(() => getJson(url))) as FtsResp;
   return json.hits?.total?.value ?? 0;
 }
 

@@ -28,7 +28,19 @@ export async function hnSignal(seed: string): Promise<Signal | null> {
     `&numericFilters=created_at_i>${since}&hitsPerPage=30`;
   try {
     const json = (await getJson(url)) as HnResp;
-    const hits = (json.hits ?? []).filter((h) => h.title);
+    const all = (json.hits ?? []).filter((h) => h.title);
+    if (!all.length) return null;
+
+    // Algolia search is fuzzy — keep only stories whose title actually contains
+    // a meaningful seed term, so loosely-matched noise (e.g. an unrelated
+    // "Show HN" post) isn't surfaced as the headline.
+    const seedTokens = seed.toLowerCase().split(/\W+/).filter((w) => w.length > 3);
+    const hits = seedTokens.length
+      ? all.filter((h) => {
+          const t = h.title.toLowerCase();
+          return seedTokens.some((tok) => t.includes(tok));
+        })
+      : all;
     if (!hits.length) return null;
 
     const top = hits.reduce((a, b) => ((b.points ?? 0) > (a.points ?? 0) ? b : a), hits[0]);

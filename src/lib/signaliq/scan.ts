@@ -78,6 +78,9 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
       if (!coverage) failures++;
 
       if (signals.length === 0) return null; // nothing to surface for this seed
+      // Drop ultra-weak lone signals (e.g. a single 1-paper arXiv hit) — noise.
+      const maxMag = Math.max(...signals.map((s) => s.magnitude));
+      if (signals.length === 1 && maxMag < 0.12) return null;
       return scoreOpportunity({ topic: seed, beat, signals, coverage, expansion, tailored });
     }),
   );
