@@ -28,9 +28,12 @@ interface TimelineResp {
 export async function gdeltCoverage(topic: string): Promise<Coverage | null> {
   const url =
     `${BASE}?query=${encodeURIComponent(`"${topic}"`)}` +
-    `&mode=timelinevol&format=json&timespan=3m`;
+    `&mode=timelinevol&format=json&timespan=2m`;
   try {
-    const json = (await gdeltLimit(() => getJson(url))) as TimelineResp;
+    // GDELT's timelinevol is slow — give it more room than the default timeout
+    // (a lighter 2-month window also returns faster), so coverage stops
+    // collapsing to neutral "Medium" for every topic.
+    const json = (await gdeltLimit(() => getJson(url, 12000))) as TimelineResp;
     const data = json.timeline?.[0]?.data ?? [];
     if (!data.length) {
       return { topic, volume: 0, trend: 0, articleCount: 0, source: "gdelt" };

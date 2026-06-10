@@ -49,8 +49,8 @@ export function companyRelevance(
   const t = ` ${text.toLowerCase()} `;
   const themeHits = expansion.themes.reduce((n, w) => (w && t.includes(w) ? n + 1 : n), 0);
   const negHits = expansion.negatives.reduce((n, w) => (w && t.includes(w) ? n + 1 : n), 0);
-  let r = tailored ? 0.65 : 0.0;       // a tailored seed is relevant by construction
-  r += Math.min(themeHits, 4) * 0.2;   // strong theme overlap can carry it to full relevance
+  let r = tailored ? 0.75 : 0.0;       // the model explicitly selected this topic for the company → high fit
+  r += Math.min(themeHits, 4) * 0.2;   // theme overlap pushes toward full relevance
   r -= negHits * 0.3;                  // off-focus industry noise is penalised
   return clamp01(r);
 }

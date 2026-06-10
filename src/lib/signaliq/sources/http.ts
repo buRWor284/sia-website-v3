@@ -9,9 +9,9 @@ export const UA =
 
 const TIMEOUT_MS = 9000;
 
-async function req(url: string, accept: string): Promise<Response> {
+async function req(url: string, accept: string, timeoutMs: number = TIMEOUT_MS): Promise<Response> {
   const ctrl = new AbortController();
-  const t = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     const res = await fetch(url, {
       headers: { "User-Agent": UA, Accept: accept },
@@ -25,12 +25,12 @@ async function req(url: string, accept: string): Promise<Response> {
   }
 }
 
-export async function getJson(url: string): Promise<unknown> {
-  return (await req(url, "application/json")).json();
+export async function getJson(url: string, timeoutMs?: number): Promise<unknown> {
+  return (await req(url, "application/json", timeoutMs)).json();
 }
 
-export async function getText(url: string): Promise<string> {
-  return (await req(url, "application/xml,text/plain,*/*")).text();
+export async function getText(url: string, timeoutMs?: number): Promise<string> {
+  return (await req(url, "application/xml,text/plain,*/*", timeoutMs)).text();
 }
 
 export const clamp01 = (n: number): number =>
