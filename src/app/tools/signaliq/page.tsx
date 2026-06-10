@@ -543,6 +543,20 @@ const SIGNAL_SOURCES: Array<{ id: "sec" | "arxiv" | "wikipedia" | "hackernews"; 
   { id: "hackernews", label: "Hacker News" },
 ];
 
+function FitBadge({ fit }: { fit?: Opportunity["fit"] }) {
+  if (!fit) return null;
+  const color = fit === "high" ? GREEN : fit === "medium" ? AMBER : RED;
+  const label = fit === "high" ? "High fit" : fit === "medium" ? "Medium fit" : "Low fit";
+  return (
+    <span style={{
+      fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase",
+      color, border: `1px solid ${color}`, padding: "2px 7px",
+    }}>
+      {label}
+    </span>
+  );
+}
+
 function OppCard({
   opp,
   onGenerate,
@@ -582,6 +596,9 @@ function OppCard({
         <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 17, lineHeight: 1.2, color: INK, letterSpacing: "-0.01em" }}>
           {opp.headline}
         </h3>
+        {opp.fit && (
+          <div><FitBadge fit={opp.fit} /></div>
+        )}
         <GapBar value={opp.components.coverageGap} />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {opp.signals.map((s, i) =>
@@ -1063,6 +1080,7 @@ function DetailView({
               <span style={{ fontFamily: MONO, fontSize: 8, color: INK55, letterSpacing: ".10em", textTransform: "uppercase" }}>
                 · {opp.beat}
               </span>
+              {opp.fit && <FitBadge fit={opp.fit} />}
             </span>
             <h2 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3.5vw,38px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: INK }}>
               {opp.headline}
