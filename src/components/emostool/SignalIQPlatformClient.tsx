@@ -44,6 +44,9 @@ const BAND_LABEL: Record<OppBand, string> = {
   hot: "Hot lead", look: "Worth a look", early: "Early signal", noise: "Noise",
 };
 
+const FIT_COLOR: Record<NonNullable<Opportunity["fit"]>, string> = { high: GREEN, medium: AMBER, low: RED };
+const FIT_LABEL: Record<NonNullable<Opportunity["fit"]>, string> = { high: "High fit", medium: "Medium fit", low: "Low fit" };
+
 function fmt(iso: string): string {
   const d = new Date(iso);
   const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -178,6 +181,11 @@ function ScanCard({
         <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 16, lineHeight: 1.25, color: INK }}>
           {opp.headline}
         </h3>
+        {opp.fit && (
+          <span style={{ alignSelf: "flex-start", fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".1em", textTransform: "uppercase", color: FIT_COLOR[opp.fit], border: `1px solid ${FIT_COLOR[opp.fit]}`, padding: "2px 7px" }}>
+            {FIT_LABEL[opp.fit]}
+          </span>
+        )}
         <GapBar value={opp.components.coverageGap} />
 
         {/* Source chips */}
@@ -218,9 +226,9 @@ function ScanCard({
             <CompBar label="Startup relevance" value={opp.components.relevance} accent />
             <CompBar label="Beat fit" value={opp.components.fit} />
             <CompBar label="Corroboration" value={opp.components.corroboration} />
-            {opp.relevanceMultiplier != null && opp.relevanceMultiplier < 0.999 && (
+            {opp.fit && (
               <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, lineHeight: 1.4 }}>
-                Base score scaled ×{opp.relevanceMultiplier.toFixed(2)} for fit to your company.
+                Score is signal strength; company fit is <strong>{FIT_LABEL[opp.fit]}</strong> and is used to rank these, not to lower the number.
               </div>
             )}
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: INK55, marginTop: 2 }}>Receipts</div>

@@ -63,10 +63,12 @@ export interface Opportunity {
     credibility: number;   // 0..1
     corroboration: number; // 0..1 (# independent sources)
   };
-  /** Multiplier applied to the base score from company relevance (1 = neutral / no profile). */
+  /** Company-fit weight used for RANKING only (1 = neutral / no profile). Does NOT scale the displayed score. */
   relevanceMultiplier?: number;
   /** True when this opportunity's seed was tailored to the company (vs a generic beat seed). */
   tailored?: boolean;
+  /** Fit tier shown as a badge — only set when a company profile is present. */
+  fit?: "high" | "medium" | "low";
   coverage: Coverage | null;
   signals: Signal[];       // the receipts
   sensitive: boolean;      // tasteful-newsjacking flag (RFP §11.4)

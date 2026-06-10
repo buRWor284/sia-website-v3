@@ -1,15 +1,17 @@
 /**
  * SignalIQ — opportunity scoring. Pure, deterministic, unit-testable.
  *
- *   base        = Σ weighted(magnitude, velocity, coverageGap, fit, credibility, corroboration)
- *   opportunity = base × relevanceMultiplier        (multiplier = 1 when no company profile)
+ *   score (shown) = Σ weighted(magnitude, velocity, coverageGap, fit, credibility, corroboration) × 100
+ *                   — honest signal STRENGTH; relevance never lowers it.
+ *   fit           = how well the opportunity matches the company profile, surfaced as a
+ *                   High/Med/Low badge and used to RANK + filter (not to scale the score).
  *
  * The score is a *lead/whitespace* measure (how far ahead of coverage you are),
  * NOT a probability that the story breaks. See SignalIQ-RFP.md §6 & §11.1.
  *
  * Relevance: when the founder supplies a company profile we expand it (profile.ts)
- * into themes/negatives and scale the score by how well an opportunity fits THIS
- * company — so an industry-loud but off-target signal can't rank as a Hot lead.
+ * into themes/negatives, rank relevant signals first, and drop off-topic ones —
+ * so the radar is focused on THIS company without faking the strength numbers.
  */
 import type { BeatId, Coverage, Opportunity, ProfileExpansion, Signal } from "./types";
 import { RELEVANCE_FLOOR, WEIGHTS, bandFor, beatById, isSensitive } from "./config";
@@ -86,7 +88,16 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     .map((s) => s.detail ?? "")
     .join(" ")}`;
   const relevance = companyRelevance(relText, expansion, tailored);
-  const relevanceMultiplier = expansion ? RELEVANCE_FLOOR + (1 - RELEVANCE_FLOOR) * relevance : 1;
+  // Company fit weights RANKING only — it no longer scales the displayed score,
+  // so an honest, modest signal keeps its true strength number + a fit badge.
+  const rankWeight = expansion ? RELEVANCE_FLOOR + (1 - RELEVANCE_FLOOR) * relevance : 1;
+  const fitTier: Opportunity["fit"] = expansion
+    ? relevance >= 0.7
+      ? "high"
+      : relevance >= 0.4
+        ? "medium"
+        : "low"
+    : undefined;
 
   const base =
     WEIGHTS.magnitude * magnitude +
@@ -96,7 +107,8 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     WEIGHTS.credibility * credibility +
     WEIGHTS.corroborationBonus * corr;
 
-  const score = Math.round(clamp01(base * relevanceMultiplier) * 100);
+  // Displayed score = honest signal strength (NOT scaled by relevance).
+  const score = Math.round(clamp01(base) * 100);
   const band = bandFor(score);
 
   const headline = signals[0]?.title?.trim() || topic;
@@ -111,8 +123,9 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     band: band.band,
     bandLabel: band.label,
     components: { magnitude, velocity, coverageGap, fit, relevance, credibility, corroboration: corr },
-    relevanceMultiplier,
+    relevanceMultiplier: rankWeight,
     tailored,
+    fit: fitTier,
     coverage,
     signals,
     sensitive,
@@ -134,8 +147,11 @@ export function oppId(beat: string, topic: string): string {
  * non-sensitive one so tragedy is never surfaced as a "top opportunity".
  */
 export function rankOpportunities(opps: Opportunity[]): Opportunity[] {
+  // Rank by strength × fit so relevant-and-strong rises, while the DISPLAYED
+  // score stays the honest strength number.
+  const rankScore = (o: Opportunity) => o.score * (o.relevanceMultiplier ?? 1);
   return [...opps].sort((a, b) => {
     if (a.sensitive !== b.sensitive) return a.sensitive ? 1 : -1;
-    return b.score - a.score;
+    return rankScore(b) - rankScore(a);
   });
 }
