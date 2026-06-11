@@ -538,7 +538,7 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
     name: "Brett Helling",
     role: "Enterprise SEO Lead, ClickUp",
     place: "Omaha, NE",
-    photo: "/assets/testimonials/brett-helling.jpg",
+    photo: "/assets/testimonials/brett-helling.jpeg",
     stat: "0 to 1.5M monthly visitors",
   },
   {
@@ -606,7 +606,7 @@ const CMOTestimonials = () => (
             style={{
               margin: "20px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 2.8vw, 20px)",
               color: INK, lineHeight: 1.4, fontStyle: "italic", position: "relative",
-              paddingLeft: 32, flex: 1,
+              paddingLeft: 32, flex: 1, zIndex: 0,
             }}
           >
             <span
@@ -614,7 +614,7 @@ const CMOTestimonials = () => (
               style={{
                 position: "absolute", left: -4, top: -10, fontFamily: SERIF,
                 fontSize: 84, lineHeight: 1, color: INK, fontStyle: "italic",
-                background: YEL, padding: "0 4px",
+                background: YEL, padding: "0 4px", zIndex: -1,
               }}
             >&ldquo;</span>
             {tm.quote}
