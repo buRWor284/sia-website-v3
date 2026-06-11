@@ -49,7 +49,7 @@ const SCOPE: ReadonlyArray<ScopeItem> = [
   { no: "05", t: "Investor & board narrative",
     d: "Marketing slides for board meetings. Investor updates that show growth in language they trust. Sales support when a founder-led deal needs marketing air cover." },
   { no: "06", t: "The hard “no”",
-    d: "A fractional CMO's most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship." },
+    d: "A fractional CMO’s most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship." },
 ];
 
 type Stage = { range: string; t: string; d: string };
@@ -78,6 +78,41 @@ const FIT_OUT: ReadonlyArray<string> = [
   "You are looking for paid-media-only or single-channel help.",
 ];
 
+const STATS: ReadonlyArray<{ n: string; label: string; sub: string }> = [
+  { n: "1.5M",  label: "Monthly visitors",   sub: "Ridester · from zero" },
+  { n: "6×",    label: "Daily signups",      sub: "Centriq · SaaS platform" },
+  { n: "140%",  label: "Traffic in 3 months", sub: "DinarStandard · govt portal" },
+  { n: "$1.2M", label: "Monthly revenue",     sub: "National Tyres & Autocare" },
+];
+
+type FAQItem = { q: string; a: string };
+const FAQS: ReadonlyArray<FAQItem> = [
+  {
+    q: "How many hours a month do I actually get?",
+    a: "The engagement is built around outcomes, not hours. In practice, most months include a weekly founder call (45–60 min), a weekly team or vendor sync (30–45 min), and 6–10 hours of async work — strategy documents, briefs, reviews, and decisions. The right question is whether the marketing function is moving, not how many hours are logged.",
+  },
+  {
+    q: "What’s the difference between this and hiring a marketing consultant?",
+    a: "A consultant advises. I own. I take the marketing chair, write the strategy, and answer for the results alongside you. The weekly cadence means decisions get made in real time, not in a report you receive six weeks later. And the execution layer through DMR.agency means we can move from decision to campaign in days, not quarters.",
+  },
+  {
+    q: "Do you work with non-tech companies?",
+    a: "Yes. The framework travels across categories — SaaS, professional services, e-commerce, and media all follow the same earned-media and positioning logic. Clients in this portfolio include a government web portal, a gig-economy platform, an addiction treatment centre, and an automotive chain. The pattern is consistent: earned authority, a content system, and a growth loop tied to the sales motion.",
+  },
+  {
+    q: "What happens when the engagement ends?",
+    a: "You keep everything. Strategy documents, brand guidelines, editorial calendar, vendor relationships, and every playbook we built together. I write a transition brief at the close and will introduce the person taking the seat after me if that is relevant. The goal is to leave the function stronger than I found it — not to create dependency.",
+  },
+  {
+    q: "Can we bring you on full-time later?",
+    a: "It happens occasionally, but it is rarely the right move. The fractional model works because you get senior marketing thinking without a senior salary. If the company grows to a stage where a full-time CMO is warranted, I will help you find and hire the right person — that is a natural part of the engagement.",
+  },
+  {
+    q: "Do you take equity?",
+    a: "No. The retainer is cash-only. Equity complicates the relationship in ways that tend to hurt early-stage companies — it shifts incentives around spending, hiring, and timelines in subtle but real ways. A clean monthly retainer keeps incentives aligned: I need to produce visible results every month to keep the seat.",
+  },
+];
+
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 const Hero = () => (
@@ -100,7 +135,7 @@ const Hero = () => (
           CMO
         </div>
         <SCaps size={10} ls="0.24em" color={INK55}>
-          Senior Marketing Leadership &nbsp;·&nbsp; On retainer &nbsp;·&nbsp; By the month
+          Senior Marketing Leadership &nbsp;&middot;&nbsp; On retainer &nbsp;&middot;&nbsp; By the month
         </SCaps>
         <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
           Marketing leadership,<br />
@@ -176,9 +211,44 @@ const CMOLead = () => (
           ))}
         </div>
         <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-          Book a discovery call →
+          Book a discovery call &rarr;
         </a>
       </aside>
+    </div>
+  </section>
+);
+
+// ─── Stats Strip ──────────────────────────────────────────────────────────────
+
+const StatsStrip = () => (
+  <section style={{ background: INK }}>
+    <div
+      className="sx"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+      }}
+    >
+      {STATS.map((s, i) => (
+        <div
+          key={i}
+          style={{
+            padding: "36px 24px",
+            borderRight: i < STATS.length - 1 ? `1px solid rgba(250,250,250,.12)` : "none",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(26px, 3.8vw, 44px)", color: YEL, lineHeight: 1, letterSpacing: "-0.03em" }}>
+            {s.n}
+          </div>
+          <div style={{ marginTop: 7, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: PAPER }}>
+            {s.label}
+          </div>
+          <div style={{ marginTop: 4, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: "rgba(250,250,250,.45)", lineHeight: 1.4 }}>
+            {s.sub}
+          </div>
+        </div>
+      ))}
     </div>
   </section>
 );
@@ -227,7 +297,7 @@ const Scope = () => (
       className="grid-cards-3"
       style={{ border: `1px solid ${INK}` }}
     >
-      {SCOPE.map((s, i) => (
+      {SCOPE.map((s) => (
         <div
           key={s.no}
           className="card-border"
@@ -328,7 +398,7 @@ const Timeline = () => (
         }}
       >
         Most fractional engagements drift in the first quarter. To avoid that,
-        every retainer follows the same opening shape — and we
+        every retainer follows the same opening shape &mdash; and we
         calibrate from there.
       </p>
     </div>
@@ -337,7 +407,7 @@ const Timeline = () => (
       className="grid-steps-4"
       style={{ border: `1px solid ${INK}` }}
     >
-      {STAGES.map((s, i) => (
+      {STAGES.map((s) => (
         <div
           key={s.range}
           className="step-card"
@@ -513,7 +583,7 @@ const Fit = () => (
                   fontWeight: 700,
                 }}
               >
-                ×
+                &times;
               </span>
               {line}
             </li>
@@ -532,7 +602,7 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
     quote:
       "Their biggest weapon has been doing outreach to earn high-quality " +
       "backlinks and mentions at scale from the likes of Forbes, Mashable, " +
-      "Reader's Digest, and hundreds of other authority sites. The biggest " +
+      "Reader’s Digest, and hundreds of other authority sites. The biggest " +
       "success story has been helping grow Ridester from zero to 1.5 million " +
       "monthly visitors.",
     name: "Brett Helling",
@@ -543,8 +613,8 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
   },
   {
     quote:
-      "Syed's team earned us high authority links from publications like MSN " +
-      "and Yahoo. Our main site's organic traffic increased by 120%. Our " +
+      "Syed’s team earned us high authority links from publications like MSN " +
+      "and Yahoo. Our main site’s organic traffic increased by 120%. Our " +
       "Public Database saw a 515% increase in clicks, and our average daily " +
       "signups grew 6x.",
     name: "Imani Lea Brown",
@@ -556,13 +626,37 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
   {
     quote:
       "Irfan and his team earned high authority backlinks from publications " +
-      "like Reader's Digest and MSN. The web portal's traffic increased by " +
+      "like Reader’s Digest and MSN. The web portal’s traffic increased by " +
       "140% in 3 months, greatly exceeding our goals.",
     name: "Reem El Shafaki",
     role: "Partner, DinarStandard",
     place: "Dubai",
     photo: "/assets/testimonials/reem-el-shafaki.jpg",
     stat: "140% traffic in 3 months",
+  },
+  {
+    quote:
+      "So chuffed to see a keyword rank to position #4 in Google that gets " +
+      "over 160,000 searches a month — most with commercial intent to buy. " +
+      "Cannot thank Syed Irfan Ajmal and the team enough. They are getting " +
+      "hundreds of keywords for this site ranked.",
+    name: "Azzam Sheikh",
+    role: "Head of Digital, National Tyres & Autocare",
+    place: "United Kingdom",
+    photo: "/assets/testimonials/azzam-sheikh.jpeg",
+    stat: "$160K → $1.2M monthly revenue",
+  },
+  {
+    quote:
+      "Within 2 months we saw quality links from Healthline (DR 92), " +
+      "The Mirror (DR 90), MSN (DR 92), and Consumer Health Digest (DR 68). " +
+      "Our domain rating went from 1 to 27. If you are looking to boost " +
+      "organic traffic and earn quality backlinks, we highly recommend DMR.agency.",
+    name: "Trent Carter",
+    role: "CEO & Founder, Curednation",
+    place: "USA",
+    photo: "/assets/testimonials/trent-carter.jpeg",
+    stat: "DR 1 → 27 in 2 months",
   },
   {
     quote:
@@ -579,7 +673,7 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
 
 const CMOTestimonials = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="04" label="Client results · On the record" />
+    <SectionMast n="04" label="On the record · Named clients, real numbers" />
     <div className="grid-intro">
       <h2
         className="h2-lg"
@@ -599,7 +693,7 @@ const CMOTestimonials = () => (
       {CMO_TESTIMONIALS.map((tm, i) => (
         <article key={i} className="letter-card" style={{ padding: "32px 28px 28px", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-            <Pill size={10.5} ls="0.18em">№ {String(i + 1).padStart(2, "0")}</Pill>
+            <Pill size={10.5} ls="0.18em">&numero; {String(i + 1).padStart(2, "0")}</Pill>
             <SCaps size={10.5} ls="0.18em" color={INK55}>Filed from {tm.place}</SCaps>
           </div>
           <blockquote
@@ -643,11 +737,82 @@ const CMOTestimonials = () => (
   </section>
 );
 
-// ─── §05 · Book the Call ──────────────────────────────────────────────────────
+// ─── §05 · FAQ ────────────────────────────────────────────────────────────────
+
+const FAQ = () => (
+  <section
+    className="sx"
+    style={{
+      background: PAPER2,
+      paddingTop: 90,
+      paddingBottom: 90,
+      borderTop: `1px solid ${INK}`,
+      borderBottom: `1px solid ${INK}`,
+    }}
+  >
+    <SectionMast n="05" label="Common questions · The honest answers" />
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}
+      >
+        Questions worth
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>asking upfront.</Mark>
+        </span>
+      </h2>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18.5, color: INK70, lineHeight: 1.55, maxWidth: 540 }}>
+        The ones that come up most in discovery calls. Better to have them answered before we speak.
+      </p>
+    </div>
+    <div style={{ border: `1px solid ${INK}`, marginTop: 40 }}>
+      {FAQS.map((faq, i) => (
+        <div
+          key={i}
+          style={{
+            borderBottom: i < FAQS.length - 1 ? `1px solid ${INK}` : "none",
+            padding: "28px 32px",
+            background: i % 2 === 0 ? PAPER : PAPER2,
+          }}
+        >
+          <div
+            style={{
+              fontFamily: SERIF,
+              fontWeight: 700,
+              fontSize: "clamp(16px, 2.2vw, 20px)",
+              color: INK,
+              lineHeight: 1.25,
+              letterSpacing: "-0.01em",
+              marginBottom: 12,
+            }}
+          >
+            {faq.q}
+          </div>
+          <p
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontSize: 16,
+              color: INK70,
+              lineHeight: 1.65,
+              fontStyle: "italic",
+              maxWidth: 800,
+            }}
+          >
+            {faq.a}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §06 · Book the Call ──────────────────────────────────────────────────────
 
 const BookCall = () => (
   <section id="book" className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="05" label="Book the call · The next move" />
+    <SectionMast n="06" label="The next move · Thirty minutes, no pitch deck" />
 
     <div
       className="grid-dark-card"
@@ -675,7 +840,7 @@ const BookCall = () => (
           border: `1px solid ${INK}`,
         }}
       >
-        Two seats open · Q3
+        Two seats open &middot; Q3
       </div>
 
       <div>
@@ -735,7 +900,7 @@ const BookCall = () => (
           }}
         >
           <span>Book a discovery call</span>
-          <span style={{ fontFamily: SERIF, fontSize: 22 }}>→</span>
+          <span style={{ fontFamily: SERIF, fontSize: 22 }}>&rarr;</span>
         </a>
         <a
           href="mailto:sia@syedirfanajmal.com"
@@ -756,12 +921,30 @@ const BookCall = () => (
           }}
         >
           <span>Email instead</span>
-          <span style={{ fontFamily: SERIF, fontSize: 22 }}>↗</span>
+          <span style={{ fontFamily: SERIF, fontSize: 22 }}>&nearr;</span>
         </a>
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 6 }}>
           <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
             Reply within one working day. Time zone: GMT+5.
           </SCaps>
+        </div>
+
+        {/* What happens next */}
+        <div style={{ marginTop: 22, paddingTop: 24, borderTop: `1px solid rgba(250,250,250,.15)` }}>
+          <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.4)">What happens next</SCaps>
+          <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 24px" }}>
+            {([
+              { n: "01", t: "30-min call",         d: "Tell me where the business is and where you need it in 12 months." },
+              { n: "02", t: "Proposal in 48h",     d: "If we’re a fit, I’ll send a written scope and retainer proposal within two working days." },
+              { n: "03", t: "Start within a week", d: "No lengthy onboarding. Intake begins and the first weekly call is booked immediately." },
+            ] as const).map(step => (
+              <div key={step.n}>
+                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12, color: YEL, letterSpacing: "0.04em" }}>{step.n}</div>
+                <div style={{ marginTop: 4, fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: PAPER, lineHeight: 1.25 }}>{step.t}</div>
+                <div style={{ marginTop: 5, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.5)", lineHeight: 1.55, fontStyle: "italic" }}>{step.d}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -796,10 +979,12 @@ export default function FractionalCMOPage() {
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
       <Hero />
       <CMOLead />
+      <StatsStrip />
       <Scope />
       <Timeline />
       <Fit />
       <CMOTestimonials />
+      <FAQ />
       <BookCall />
       <CalendlySection />
       <CTATicker />

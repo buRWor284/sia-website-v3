@@ -607,5 +607,26 @@
       "spotify_url": "https://open.spotify.com/episode/4uUVtcFKd6GfpNuIbdyRL3",
       "apple_podcasts_url": "https://podcasts.apple.com/us/podcast/discussing-haro-outreach-seo-agency-business-backlinks/id1347540466?i=1000503886264"
     }
+  },
+  {
+    "episode_number": 30,
+    "episode_code": "S03E10",
+    "season": 3,
+    "season_year": "2020",
+    "title": "Our Agency's 3-Step Client Onboarding Process",
+    "slug": "agency-3-step-client-onboarding-process",
+    "publication_date": "2020-11-01",
+    "guest": null,
+    "is_solo": true,
+    "is_featured": false,
+    "summary": "A walkthrough of the 3-step client onboarding process used at DMR Agency — from proposal to kickoff.",
+    "featured_image_url": "https://syedirfanajmal.com/wp-content/uploads/2020/05/S03E03_Podcast_Banner_Fb.jpg",
+    "hero_text_extracted": null,
+    "embeds": {
+      "youtube_id": null,
+      "anchor_embed_url": null,
+      "spotify_url": null,
+      "apple_podcasts_url": null
+    }
   }
 ]
