@@ -1,0 +1,26 @@
+{
+  "episode_number": 35,
+  "episode_code": "S04E06",
+  "season": 4,
+  "season_year": "2022",
+  "title": "Quantifying Backlinks Quality — The Bare Minimum",
+  "slug": "quantifying-backlinks-quality-bare-minimum",
+  "publication_date": "2022-11-28",
+  "guest": null,
+  "guest_role": null,
+  "is_solo": true,
+  "is_featured": false,
+  "summary": "How to quantify backlink quality in a way that properly rewards higher-DR links. Since DR operates on a logarithmic scale, a linear points system undervalues high-authority links. This episode shares a scoring sheet to assign and track goals for your outreach team members more accurately.",
+  "show_notes_text": "### Quantifying Backlinks Quality — The Bare Minimum\n\nOne reason to move away from a simple link-count metric: the DR range of 1–100 is **not a linear scale — it's logarithmic**. Earning a DR70 link is exponentially harder than a DR30, so your scoring system should reflect that.\n\nThis system grants significantly more points to higher-DR links, which makes for fairer goal-setting and rewards for your outreach team.\n\n**Copy our Google Sheet:** https://docs.google.com/spreadsheets/d/1mr9CsQzRvE1rCk6equFHVPQZzg0m_CxHFut8RlNPyEQ/edit?usp=sharing\n\n**Related backlink type episodes:**\n- Type 1 Backlinks (S03E06)\n- Type 2 Backlinks (S03E07)\n- Type 3 Backlinks (S03E08)",
+  "transcript_text": null,
+  "featured_image_url": null,
+  "hero_text_extracted": null,
+  "embeds": {
+    "youtube_id": "UKDcH3nITJc",
+    "anchor_embed_url": null,
+    "spotify_url": null,
+    "apple_podcasts_url": "https://podcasts.apple.com/us/podcast/quantifying-backlinks-quality-the-bare-minimum-s04e06/id1347540466?i=1000587686522"
+  },
+  "source_url": null,
+  "_wp_post_id": null
+}

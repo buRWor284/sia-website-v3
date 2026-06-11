@@ -1,0 +1,26 @@
+{
+  "episode_number": 36,
+  "episode_code": "S04E07",
+  "season": 4,
+  "season_year": "2021",
+  "title": "Two Methods for Finding No-Follow Links — And Why One of Them Isn't Too Good",
+  "slug": "finding-no-follow-links-two-methods",
+  "publication_date": "2021-11-25",
+  "guest": null,
+  "guest_role": null,
+  "is_solo": true,
+  "is_featured": false,
+  "summary": "Two methods for checking whether the backlinks you've earned are do-follow or the less-desirable no-follow, UGC, or sponsored links — and why one of those methods has a significant flaw.",
+  "show_notes_text": "### Two Methods for Finding No-Follow Links\n\nAfter earning a backlink, you need to verify it's actually do-follow. Here are the two methods and the trade-offs:\n\n**Method 1: Strike Out Nofollow Links Chrome Extension**\nhttps://chrome.google.com/webstore/detail/strike-out-nofollow-links/fkolbdohecbecliihaobiiamdmhhnaei\n\n**Method 2:** Manual inspection of the anchor tag in page source\n\n**Why one of them isn't ideal** — covered in the episode.\n\n**Example links used in the episode:**\n- No-Follow example: Forbes article\n- Do-Follow example: The Guardian article",
+  "transcript_text": null,
+  "featured_image_url": null,
+  "hero_text_extracted": null,
+  "embeds": {
+    "youtube_id": "0JkdnyTPuBw",
+    "anchor_embed_url": null,
+    "spotify_url": null,
+    "apple_podcasts_url": "https://podcasts.apple.com/us/podcast/two-methods-for-finding-no-follow-links-and-why-one/id1347540466?i=1000554548969"
+  },
+  "source_url": null,
+  "_wp_post_id": null
+}
