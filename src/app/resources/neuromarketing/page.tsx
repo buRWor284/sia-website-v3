@@ -584,32 +584,97 @@ export default function NeuromarketingGuidePage() {
           <h2 style={H2} id="references">08 · References</h2>
 
           <ol style={{ margin: "20px 0 0", padding: 0, listStyle: "none", borderTop: `1px solid ${INK15}` }}>
-            {[
-              "Berger, H. (1929). Über das Elektrenkephalogramm des Menschen. Archiv für Psychiatrie und Nervenkrankheiten, 87(1), 527–570.",
-              "Daskalos, C. (2012). The Story of Phineas Gage and What It Tells Us About the Brain. Psychology Today.",
-              "Darwin, C. (1872). The Expression of the Emotions in Man and Animals. John Murray.",
-              "Dooley, R. (2012). Brainfluence: 100 Ways to Persuade and Convince Consumers with Neuromarketing. Wiley.",
-              "Ekman, P., & Friesen, W. V. (1969). The repertoire of nonverbal behavior: Categories, origins, usage, and coding. Semiotica, 1(1), 49–98.",
-              "Genco, S. J., Pohlmann, A. P., & Steidl, P. (2015). Neuromarketing for Dummies. Wiley.",
-              "Glaenzer, E. (2016). Neuromarketing — Understanding How and Why Consumers Make Decisions. Strategic Finance.",
-              "Hindawi Publishing Corporation / Computational Intelligence and Neuroscience. (Various years). Studies on brand neural activation using fMRI and EEG.",
-              "Kahneman, D. (2011). Thinking, Fast and Slow. Farrar, Straus and Giroux.",
-              "Kenning, P., & Linzmajer, M. (2011). Consumer neuroscience: an overview of an emerging discipline with implications for consumer policy. Journal für Verbraucherschutz und Lebensmittelsicherheit, 6(1), 111–125.",
-              "Larson, B. (2014). What Does 'Stoke' Look Like in the Brain? Red Bull Media House.",
-              "Mason, M. (2014). Neuromarketing and consumer neuroscience: contributions to neurology. BMC Neurology, 14, 151.",
-              "Montague, P. R., McClure, S. M., Baldwin, P. R., Phillips, P. E., Bhatt, D. L., Platt, M. L., & Berns, G. S. (2004). Biases in brain blood oxygen-level-dependent signal calibration. Journal of Neurophysiology, 92(3), 1785–1794.",
-              "Putrino, D. (2014). EEG in the Ocean: Real-Time Brain Monitoring for Red Bull Surf Research. Icahn School of Medicine at Mount Sinai.",
-              "Silberstein, R. B., Nield, G. E., & Simpson, D. G. (1990). Steady-state visually evoked potential topography. International Journal of Neuroscience, 51(3–4), 209–214.",
-              "Van Horn, J. D. (2012). Mapping connectivity damage in the case of Phineas Gage. PLOS ONE.",
-              "WebMD. (2015). Electroencephalogram (EEG). WebMD Medical Reference.",
-              "Zaltman, G. (2003). How Customers Think: Essential Insights into the Mind of the Market. Harvard Business School Press.",
-              "Zhang, Y. (2015). The role of price in consumer decision-making: A neuromarketing perspective. Journal of Consumer Research.",
-            ].map((ref, i) => (
+            {([
+              {
+                cite: "Berger, H. (1929). Über das Elektrenkephalogramm des Menschen. Archiv für Psychiatrie und Nervenkrankheiten, 87(1), 527–570.",
+                url:  "https://en.wikipedia.org/wiki/Electroencephalography#History",
+              },
+              {
+                cite: "Daskalos, C. (2012). The Story of Phineas Gage and What It Tells Us About the Brain. Psychology Today.",
+                url:  "https://www.psychologytoday.com/us/blog/how-think-neandertal/201310/the-biggest-myth-about-phineas-gage",
+              },
+              {
+                cite: "Darwin, C. (1872). The Expression of the Emotions in Man and Animals. John Murray.",
+                url:  "https://www.gutenberg.org/ebooks/1227",
+              },
+              {
+                cite: "Dooley, R. (2012). Brainfluence: 100 Ways to Persuade and Convince Consumers with Neuromarketing. Wiley.",
+                url:  "https://www.rogerdooley.com/books/brainfluence/",
+              },
+              {
+                cite: "Ekman, P., & Friesen, W. V. (1969). The repertoire of nonverbal behavior: Categories, origins, usage, and coding. Semiotica, 1(1), 49–98.",
+                url:  "https://www.paulekman.com/",
+              },
+              {
+                cite: "Genco, S. J., Pohlmann, A. P., & Steidl, P. (2015). Neuromarketing for Dummies. Wiley.",
+                url:  "https://www.wiley.com/en-us/Neuromarketing+For+Dummies-p-9781118518243",
+              },
+              {
+                cite: "Glaenzer, E. (2016). Neuromarketing — Understanding How and Why Consumers Make Decisions. Strategic Finance.",
+                url:  "https://sfmagazine.com/",
+              },
+              {
+                cite: "Hindawi Publishing Corporation / Computational Intelligence and Neuroscience. Studies on brand neural activation using fMRI and EEG.",
+                url:  "https://www.hindawi.com/journals/cin/",
+              },
+              {
+                cite: "Kahneman, D. (2011). Thinking, Fast and Slow. Farrar, Straus and Giroux.",
+                url:  "https://us.macmillan.com/books/9780374533557/thinkingfastandslow",
+              },
+              {
+                cite: "Kenning, P., & Linzmajer, M. (2011). Consumer neuroscience: an overview of an emerging discipline with implications for consumer policy. Journal für Verbraucherschutz und Lebensmittelsicherheit, 6(1), 111–125.",
+                url:  "https://link.springer.com/article/10.1007/s00003-010-0652-5",
+              },
+              {
+                cite: "Larson, B. (2014). What Does 'Stoke' Look Like in the Brain? Red Bull Media House / IEEE Spectrum.",
+                url:  "https://spectrum.ieee.org/neuroscience-gets-radical-how-to-study-surfers-brain-waves",
+              },
+              {
+                cite: "Mason, M. (2014). Neuromarketing and consumer neuroscience: contributions to neurology. BMC Neurology.",
+                url:  "https://bmcneurol.biomedcentral.com/articles/10.1186/1471-2377-13-13",
+              },
+              {
+                cite: "McClure, S. M., Li, J., Tomlin, D., Cypert, K. S., Montague, L. M., & Montague, P. R. (2004). Neural correlates of behavioral preference for culturally familiar drinks. Neuron, 44(2), 379–387.",
+                url:  "https://pubmed.ncbi.nlm.nih.gov/15473974/",
+              },
+              {
+                cite: "Putrino, D. (2014). EEG in the Ocean: Real-Time Brain Monitoring for Red Bull Surf Research. Icahn School of Medicine at Mount Sinai.",
+                url:  "https://spectrum.ieee.org/neuroscience-gets-radical-how-to-study-surfers-brain-waves",
+              },
+              {
+                cite: "Silberstein, R. B., Nield, G. E., & Simpson, D. G. (1990). Steady-state visually evoked potential topography. International Journal of Neuroscience, 51(3–4), 209–214.",
+                url:  "https://en.wikipedia.org/wiki/Steady_state_topography",
+              },
+              {
+                cite: "Van Horn, J. D., et al. (2012). Mapping connectivity damage in the case of Phineas Gage. PLOS ONE, 7(5): e37454.",
+                url:  "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0037454",
+              },
+              {
+                cite: "WebMD. (2015). Electroencephalogram (EEG): Purpose, Procedure, and Results. WebMD Medical Reference.",
+                url:  "https://www.webmd.com/epilepsy/electroencephalogram-eeg",
+              },
+              {
+                cite: "Zaltman, G. (2003). How Customers Think: Essential Insights into the Mind of the Market. Harvard Business School Press.",
+                url:  "https://www.hbs.edu/faculty/Pages/item.aspx?num=11643",
+              },
+              {
+                cite: "Zhang, Y. (2015). The role of price in consumer decision-making: A neuromarketing perspective. Journal of Consumer Research.",
+                url:  "https://academic.oup.com/jcr",
+              },
+            ] as { cite: string; url: string }[]).map(({ cite, url }, i) => (
               <li key={i} style={{ padding: "12px 0 12px 36px", borderBottom: `1px solid ${INK15}`, fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.6, position: "relative" }}>
                 <span style={{ position: "absolute", left: 0, top: 15, fontFamily: GROT, fontWeight: 700, fontSize: 10, color: INK35, letterSpacing: "0.08em" }}>
                   [{i + 1}]
                 </span>
-                {ref}
+                {cite}{" "}
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontFamily: GROT, fontSize: 10, fontWeight: 700, letterSpacing: "0.10em", textTransform: "uppercase", color: INK, textDecoration: "none", whiteSpace: "nowrap" }}
+                >
+                  View source ↗
+                </a>
               </li>
             ))}
           </ol>
