@@ -28,7 +28,7 @@ import {
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const AVAILABILITY_SPECS: ReadonlyArray<[string, string]> = [
-  ["Engagement", "Monthly retainer"],
+  ["Engagement", "Monthly retainer · $5K–$10K"],
   ["Minimum",    "6 months"],
   ["Cadence",    "Weekly · 1-on-1 + team"],
   ["Geography",  "Remote · global"],
@@ -74,7 +74,7 @@ const FIT_IN: ReadonlyArray<string> = [
 const FIT_OUT: ReadonlyArray<string> = [
   "You are pre-product-market-fit. (You need product, not marketing.)",
   "You want someone to “do marketing” without setting strategy with you.",
-  "You want a CMO five hours a month for $2K. (Not what this is.)",
+  "You want a CMO five hours a month for $2K. (Retainers start at $5K, and they earn it.)",
   "You are looking for paid-media-only or single-channel help.",
 ];
 
@@ -85,8 +85,40 @@ const STATS: ReadonlyArray<{ n: string; label: string; sub: string }> = [
   { n: "$1.2M", label: "Monthly revenue",     sub: "National Tyres & Autocare" },
 ];
 
+type CaseFile = { tag: string; metric: string; client: string; result: string; body: string; href: string };
+const CASE_FILES: ReadonlyArray<CaseFile> = [
+  {
+    tag: "SAAS · DIGITAL PR",
+    metric: "6×",
+    client: "CENTRIQ · RAISED $11M",
+    result: "6× daily signups for a funded SaaS",
+    body: "Digital PR and journalist outreach earned links from MSN, Yahoo, and niche-relevant sites. Organic traffic rose 120%, database clicks grew 515%, and DR moved 35 to 47.",
+    href: "https://dmr.agency/case-studies/centriq-digital-pr-growth/",
+  },
+  {
+    tag: "PLATFORM · SEO",
+    metric: "1.5M/mo",
+    client: "RIDESTER · USA",
+    result: "Zero to 1.5M monthly visitors in 12 months",
+    body: "460% organic growth through digital PR, visual content, and pay-for-performance journalist outreach. DR climbed 43 to 58 on the way.",
+    href: "https://dmr.agency/case-studies/ridester-seo/",
+  },
+  {
+    tag: "B2B · FINANCIAL SERVICES",
+    metric: "38×",
+    client: "PHYSICIANS THRIVE · USA",
+    result: "734 to 29,000+ monthly visitors over 4 years",
+    body: "A multi-year engagement: 500+ earned placements including MSN, Business Insider, and AOL, DR 33 to 57, and the CEO positioned as a quoted expert in national press.",
+    href: "https://dmr.agency/case-studies/physicians-thrive/",
+  },
+];
+
 type FAQItem = { q: string; a: string };
 const FAQS: ReadonlyArray<FAQItem> = [
+  {
+    q: "What does it cost?",
+    a: "Retainers run $5K to $10K a month depending on scope. For context, a full-time CMO costs $300K+ a year before you have hired a single person to execute; here the execution team comes with the chair. If six months feels like a big first step, the Marketing Leadership Audit below is the smaller one.",
+  },
   {
     q: "How many hours a month do I actually get?",
     a: "The engagement is built around outcomes, not hours. In practice, most months include a weekly founder call (45–60 min), a weekly team or vendor sync (30–45 min), and 6–10 hours of async work — strategy documents, briefs, reviews, and decisions. The right question is whether the marketing function is moving, not how many hours are logged.",
@@ -142,7 +174,7 @@ const Hero = () => (
           <em style={{ fontStyle: "italic", fontWeight: 600 }}>without the headcount.</em>
         </h1>
         <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
-          Strategy ownership, weekly cadence, and agency-level execution through DMR.agency.
+          For B2B and SaaS founders: marketing leadership led by digital PR, SEO, and content, the channels that compound. Strategy ownership, weekly cadence, and agency-level execution through DMR.agency.
         </p>
       </div>
 
@@ -190,8 +222,12 @@ const CMOLead = () => (
           Board and investor updates when those are needed.
         </p>
         <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
-          Six-month minimum engagement. Monthly retainer. Two seats open this
-          quarter; book the call below if you would like to discuss.
+          Retainers run $5K&ndash;$10K a month depending on scope: a fraction
+          of the $300K+ a full-time CMO costs, with agency execution included
+          rather than billed on top. Six-month minimum, with sixty days&rsquo;
+          notice after the first quarter, so you are never locked in. Two
+          seats open this quarter; book the call below if you would like to
+          discuss.
         </p>
       </div>
 
@@ -354,7 +390,82 @@ const Scope = () => (
   </section>
 );
 
-// ─── §02 · First 90 Days ─────────────────────────────────────────────────────
+// ─── §02 · Case Files ────────────────────────────────────────────────────────
+
+const CaseFiles = () => (
+  <section
+    className="sx"
+    style={{
+      background: PAPER2,
+      paddingTop: 90,
+      paddingBottom: 90,
+      borderTop: `1px solid ${INK}`,
+    }}
+  >
+    <SectionMast n="02" label="From the case files · Results on the record" />
+
+    <div className="grid-intro">
+      <h2
+        className="h2-lg"
+        style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}
+      >
+        The numbers,
+        <br />
+        <span style={{ fontStyle: "italic" }}>
+          <Mark>in print.</Mark>
+        </span>
+      </h2>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18.5, color: INK70, lineHeight: 1.55, maxWidth: 540 }}>
+        These campaigns were run by my team at DMR.agency, the same team that
+        executes inside every Fractional CMO retainer. Full write-ups are in
+        the public record.
+      </p>
+    </div>
+
+    <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
+      {CASE_FILES.map((c) => (
+        <div
+          key={c.client}
+          className="card-border"
+          style={{ padding: "28px 24px 26px", background: PAPER, display: "flex", flexDirection: "column", minHeight: 280 }}
+        >
+          <SCaps size={10} ls="0.18em" color={INK55}>{c.tag}</SCaps>
+          <div style={{ marginTop: 14, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(36px, 5vw, 54px)", color: INK, lineHeight: 1, letterSpacing: "-0.03em" }}>
+            {c.metric}
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <SCaps size={10.5} ls="0.16em" color={INK55}>{c.client}</SCaps>
+          </div>
+          <h4 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
+            {c.result}
+          </h4>
+          <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.55, fontStyle: "italic", flex: 1 }}>
+            {c.body}
+          </p>
+          <HRule style={{ margin: "16px 0 12px" }} />
+          <a
+            href={c.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, textDecoration: "none" }}
+          >
+            Read the case file &rarr;
+          </a>
+        </div>
+      ))}
+    </div>
+
+    <p style={{ margin: "22px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }}>
+      Twelve more case files, including $160K to $1.2M a month in organic
+      revenue for an automotive retailer, are in{" "}
+      <a href="https://dmr.agency/case-studies/" target="_blank" rel="noopener noreferrer" style={{ color: INK, textDecoration: "underline" }}>
+        the archive &rarr;
+      </a>
+    </p>
+  </section>
+);
+
+// ─── §03 · First 90 Days ─────────────────────────────────────────────────────
 
 const Timeline = () => (
   <section
@@ -367,7 +478,7 @@ const Timeline = () => (
       borderBottom: `1px solid ${INK}`,
     }}
   >
-    <SectionMast n="02" label="The first 90 days · A working shape" />
+    <SectionMast n="03" label="The first 90 days · A working shape" />
 
     <div className="grid-intro">
       <h2
@@ -457,7 +568,7 @@ const Timeline = () => (
 
 const Fit = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="03" label="Is it for you · The honest filter" />
+    <SectionMast n="04" label="Is it for you · The honest filter" />
 
     <div
       className="grid-subscriptions"
@@ -673,7 +784,7 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
 
 const CMOTestimonials = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="04" label="On the record · Named clients, real numbers" />
+    <SectionMast n="05" label="On the record · Named clients, real numbers" />
     <div className="grid-intro">
       <h2
         className="h2-lg"
@@ -750,7 +861,7 @@ const FAQ = () => (
       borderBottom: `1px solid ${INK}`,
     }}
   >
-    <SectionMast n="05" label="Common questions · The honest answers" />
+    <SectionMast n="06" label="Common questions · The honest answers" />
     <div className="grid-intro">
       <h2
         className="h2-lg"
@@ -812,7 +923,7 @@ const FAQ = () => (
 
 const BookCall = () => (
   <section id="book" className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="06" label="The next move · Thirty minutes, no pitch deck" />
+    <SectionMast n="07" label="The next move · Thirty minutes, no pitch deck" />
 
     <div
       className="grid-dark-card"
@@ -948,6 +1059,80 @@ const BookCall = () => (
         </div>
       </div>
     </div>
+
+    {/* Start smaller: the audit */}
+    <div
+      style={{
+        marginTop: 28,
+        border: `1px solid ${INK}`,
+        background: PAPER2,
+        padding: "30px 32px",
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        gap: "20px 32px",
+        justifyContent: "space-between",
+      }}
+    >
+      <div style={{ flex: "1 1 480px" }}>
+        <Pill size={11} ls="0.20em">Or start smaller</Pill>
+        <h3 style={{ margin: "14px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
+          The Marketing Leadership Audit.
+        </h3>
+        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 16, color: INK70, lineHeight: 1.6, fontStyle: "italic", maxWidth: 640 }}>
+          The first two weeks of the retainer, sold on its own: founder calls,
+          sales-call recordings, competitor scan, a full audit of every
+          marketing asset and channel, and a written brief at the end. $3,000,
+          fixed. If you move into the retainer, the fee credits 100% against
+          your first month.
+        </p>
+      </div>
+      <a
+        href={CALENDLY}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{
+          display: "inline-block",
+          padding: "16px 24px",
+          background: INK,
+          color: PAPER,
+          textDecoration: "none",
+          fontFamily: GROT,
+          fontWeight: 800,
+          fontSize: 12,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Book the audit &rarr;
+      </a>
+    </div>
+  </section>
+);
+
+// ─── Tools band ───────────────────────────────────────────────────────────────
+
+const ToolsBand = () => (
+  <section className="sx" style={{ background: PAPER2, paddingTop: 56, paddingBottom: 56, borderTop: `1px solid ${INK}` }}>
+    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", justifyContent: "space-between", gap: "16px 32px" }}>
+      <div style={{ flex: "1 1 480px" }}>
+        <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
+          Not ready for the call?
+        </h3>
+        <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 16, color: INK70, lineHeight: 1.6, fontStyle: "italic", maxWidth: 620 }}>
+          Run the tools my clients use, free in the library: PressIQ,
+          SignalIQ, JournoCollabIQ, Partner Collab IQ, and 14 more kits,
+          playbooks, and calculators.
+        </p>
+      </div>
+      <a
+        href="/resources"
+        style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `2px solid ${INK}`, paddingBottom: 4, whiteSpace: "nowrap" }}
+      >
+        Browse the library &rarr;
+      </a>
+    </div>
   </section>
 );
 
@@ -981,14 +1166,16 @@ export default function FractionalCMOPage() {
       <CMOLead />
       <StatsStrip />
       <Scope />
+      <CaseFiles />
       <Timeline />
       <Fit />
       <CMOTestimonials />
       <FAQ />
       <BookCall />
       <CalendlySection />
+      <ToolsBand />
       <CTATicker />
-      <Subscriptions sectionNumber="07" />
+      <Subscriptions sectionNumber="08" />
       <Colophon />
       <ScrollButtons />
     </div>
