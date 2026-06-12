@@ -5,7 +5,7 @@ import { ScrollButtons } from "@/components/ScrollButtons";
 export const metadata: Metadata = {
   title: "Podcast · The SIA Show — Syed Irfan Ajmal",
   description:
-    "29 episodes across 3 seasons — conversations with founders, marketers, and operators on SEO, PR, link building, remote work, and growth. Hosted by Syed Irfan Ajmal.",
+    "38 episodes across 4 seasons — conversations with founders, marketers, and operators on SEO, PR, link building, remote work, and growth. Hosted by Syed Irfan Ajmal.",
   openGraph: {
     title: "The SIA Show — Podcast",
     description: "Conversations on SEO, PR, link building, and growth with founders and operators.",
@@ -46,9 +46,23 @@ type Season = {
 
 const SEASONS: ReadonlyArray<Season> = [
   {
-    label: "Season 3", year: "2020", count: 9,
+    label: "Season 4", year: "2021–22", count: 8,
     episodes: [
-      ["S03E09", "Discussing HARO Outreach, SEO Agency Business, and Backlinks Management with Greg Heilers", "Greg Heilers",       "greg-heilers-interview", true],
+      ["S04E09", "Guest Post Pitch Tear Down: Avoid These 11 Mistakes Like the Plague",                      "Solo",               "guest-post-pitch-tear-down-11-mistakes"],
+      ["S04E08", "Boomerang Review — Our Agency's Favourite Tool for Pitching and Email Management",         "Solo",               "boomerang-review-email-pitching-tool"],
+      ["S04E07", "Two Methods for Finding No-Follow Links — And Why One of Them Isn't Too Good",             "Solo",               "finding-no-follow-links-two-methods"],
+      ["S04E06", "Quantifying Backlinks Quality — The Bare Minimum",                                         "Solo",               "quantifying-backlinks-quality-bare-minimum"],
+      ["S04E05", "Reviewing SEO KPIs of Target Websites",                                                    "Solo",               "reviewing-seo-kpis-target-websites"],
+      ["S04E04", "The Difference Between Creating Links vs Earning Links",                                   "Solo",               "creating-links-vs-earning-links"],
+      ["S04E02", "Brendon Burchard's High Performance Planner — My 1 Year Experience",                       "Solo",               "brendon-burchard-high-performance-planner"],
+      ["S04E01", "Lead Scraping With Ahrefs — Operation: Competitor Spying",                                 "Solo",               "lead-scraping-ahrefs-competitor-spying"],
+    ],
+  },
+  {
+    label: "Season 3", year: "2020", count: 10,
+    episodes: [
+      ["S03E10", "Our Agency's 3-Step Client Onboarding Process",                                            "Solo",               "agency-3-step-client-onboarding-process"],
+      ["S03E09", "Discussing HARO Outreach, SEO Agency Business, and Backlinks Management with Greg Heilers", "Greg Heilers",      "greg-heilers-interview", true],
       ["S03E08", "#SEObacklinks Tutorial — Type 3 Backlinks",                                                "Solo",               "seo-backlinks-type3"],
       ["S03E07", "#SEObacklinks Tutorial — Type 2 Backlinks",                                                "Solo",               "seo-backlinks-type2"],
       ["S03E06", "#SEObacklinks Tutorial — Type 1 Backlinks",                                                "Solo",               "seo-backlinks-tutorial"],
@@ -119,8 +133,8 @@ const PLATFORMS: ReadonlyArray<[string, string]> = [
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
-  ["29",   "episodes shipped"],
-  ["03",   "seasons (2018–2020)"],
+  ["38",   "episodes shipped"],
+  ["04",   "seasons (2018–2022)"],
   ["12+",  "expert guests"],
   ["$2.3M","biggest case study covered"],
 ];
@@ -134,10 +148,10 @@ const Hero = () => (
       {/* Left: count */}
       <div className="res-hero-left">
         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
-          29
+          38
         </div>
         <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
-          Episodes<br />three seasons
+          Episodes<br />four seasons
         </div>
       </div>
 
@@ -161,6 +175,7 @@ const Hero = () => (
       {/* Right: topic index */}
       <div className="res-hero-right">
         {[
+          { label: "Season 4 · 2021–22", sub: "Link building & tools" },
           { label: "Season 3 · 2020", sub: "SEO & outreach" },
           { label: "Season 2 · 2019", sub: "Growth & strategy" },
           { label: "Season 1 · 2018", sub: "Foundations" },
@@ -215,7 +230,7 @@ const PodcastLead = () => (
           </span>
           ince 2018, a show about the practical end of digital marketing:
           digital PR, SEO, content, agency operations, and the awkward
-          economics of remote work. Three seasons, twenty-nine episodes,
+          economics of remote work. Four seasons, thirty-eight episodes,
           most of them with guests, all of them under an hour.
         </p>
         <p style={{ marginTop: "0.7em" }}>
@@ -228,7 +243,7 @@ const PodcastLead = () => (
         </p>
         <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
           On pause through 2024–25 while DMR.agency grew. Returning in late
-          2026 with a fourth season focused on EMOS, earned media at scale,
+          2026 with a fifth season focused on EMOS, earned media at scale,
           and conversations with the in-house teams running both.
         </p>
       </div>
