@@ -10,21 +10,15 @@ const MC_ID = "4b6d81a50f";
 const MC_VID = "4651";
 const MC_FID = "003bd4e3f0";
 const MC_HONEYPOT = `b_${MC_U}_${MC_ID}`;
-
-const GDPR_CHECKBOXES = [
-  { key: "2381", label: "Email" },
-];
+// GDPR email-permission field: consent is given by submitting the form
+const MC_GDPR_EMAIL_KEY = "2381";
 
 type Status = "idle" | "loading" | "success" | "error";
 
 const MailchimpForm = () => {
   const [email, setEmail]   = useState("");
-  const [gdpr, setGdpr]     = useState<Record<string, boolean>>({ "2381": false });
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
-
-  const toggleGdpr = (key: string) =>
-    setGdpr((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,9 +35,8 @@ const MailchimpForm = () => {
       EMAIL: email,
       [MC_HONEYPOT]: "", // honeypot must be empty
     });
-    GDPR_CHECKBOXES.forEach(({ key }) => {
-      if (gdpr[key]) params.append(`gdpr[${key}]`, "Y");
-    });
+    // Subscribing via this form is explicit consent to email updates
+    params.append(`gdpr[${MC_GDPR_EMAIL_KEY}]`, "Y");
 
     // Unique callback name to avoid collisions
     const cbName = `_mc_cb_${Date.now()}`;
@@ -86,11 +79,11 @@ const MailchimpForm = () => {
         <SCaps size={11} ls="0.20em" color={YEL}>Confirmation sent</SCaps>
         <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 19, color: PAPER, lineHeight: 1.5, fontStyle: "italic" }}>
           Check <span style={{ color: YEL, fontStyle: "normal" }}>{email}</span>
-          {" "}— there&rsquo;s a confirmation note from the wire waiting for you.
+, there&rsquo;s a confirmation note from the wire waiting for you.
           Click the link inside and you&rsquo;re on the list.
         </p>
         <button
-          onClick={() => { setStatus("idle"); setEmail(""); setGdpr({ "2381": false }); }}
+          onClick={() => { setStatus("idle"); setEmail(""); }}
           style={{
             marginTop: 18, padding: "12px 16px", background: "transparent",
             color: PAPER, border: "1px solid rgba(250,250,250,.5)",
@@ -144,42 +137,13 @@ const MailchimpForm = () => {
         </p>
       )}
 
-      {/* GDPR Marketing Permissions */}
-      <div id="mergeRow-gdpr" style={{ marginTop: 22 }}>
-        <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.55)">Marketing Permissions</SCaps>
-        <p style={{ margin: "8px 0 10px", fontFamily: SERIF, fontSize: 13.5, color: "rgba(250,250,250,.45)", lineHeight: 1.5, fontStyle: "italic" }}>
-          Select the ways you&rsquo;d like to hear from SIA Enterprises:
-        </p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {GDPR_CHECKBOXES.map(({ key, label }) => (
-            <label
-              key={key}
-              style={{
-                display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
-                fontFamily: GROT, fontSize: 12, letterSpacing: "0.12em",
-                textTransform: "uppercase", color: "rgba(250,250,250,.65)",
-              }}
-            >
-              <input
-                type="checkbox"
-                name={`gdpr[${key}]`}
-                value="Y"
-                checked={gdpr[key]}
-                onChange={() => toggleGdpr(key)}
-                style={{ width: 14, height: 14, cursor: "pointer", flexShrink: 0, accentColor: YEL }}
-              />
-              {label}
-            </label>
-          ))}
-        </div>
-        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 12.5, color: "rgba(250,250,250,.35)", lineHeight: 1.5, fontStyle: "italic" }}>
-          You can unsubscribe at any time by clicking the link in the footer of our emails.
-          We use Mailchimp to manage our newsletter.{" "}
-          <a href="https://mailchimp.com/legal/terms" target="_blank" rel="noreferrer"
-            style={{ color: "rgba(250,250,250,.5)", textUnderlineOffset: 3 }}>Learn more</a>{" "}
-          about their privacy practices.
-        </p>
-      </div>
+      <p style={{ margin: "16px 0 0", fontFamily: SERIF, fontSize: 12.5, color: "rgba(250,250,250,.4)", lineHeight: 1.5, fontStyle: "italic" }}>
+        By subscribing you agree to receive email updates from SIA Enterprises.
+        Unsubscribe anytime via the link in any email. We use Mailchimp;{" "}
+        <a href="https://mailchimp.com/legal/terms" target="_blank" rel="noreferrer"
+          style={{ color: "rgba(250,250,250,.5)", textUnderlineOffset: 3 }}>learn more</a>{" "}
+        about their privacy practices.
+      </p>
 
       <div style={{ marginTop: 14 }}>
         <SCaps size={10.5} ls="0.14em" color="rgba(250,250,250,.45)">
