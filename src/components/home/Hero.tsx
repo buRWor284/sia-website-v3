@@ -117,9 +117,7 @@ export const Hero = () => (
             flexWrap: "wrap",
           }}>
             <a
-              href={CALENDLY}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/strategy-call"
               style={{
                 padding: "12px 20px",
                 background: INK,

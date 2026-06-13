@@ -111,9 +111,7 @@ export const SiteHeader = () => {
           })}
         </nav>
         <a
-          href={CALENDLY}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/strategy-call"
           style={{
             fontFamily: GROT, fontWeight: 800, fontSize: 10,
             letterSpacing: ".12em", textTransform: "uppercase",
@@ -169,9 +167,7 @@ export const SiteHeader = () => {
           </Link>
         ))}
         <a
-          href={CALENDLY}
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/strategy-call"
           onClick={() => setMenuOpen(false)}
           style={{
             marginTop: 14, padding: "14px 20px",
