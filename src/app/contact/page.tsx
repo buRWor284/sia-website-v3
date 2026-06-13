@@ -62,7 +62,7 @@ function Hero() {
         {/* Right: topic index */}
         <div className="res-hero-right">
           {[
-            { label: "Book a Call",    sub: "Calendly · 30 min" },
+            { label: "Book a Call",    sub: "Cal.com · 30 min" },
             { label: "Send a Note",    sub: "Via the form below" },
             { label: "Press Inquiry",  sub: "Media · Features · Bylines" },
           ].map(t => (
@@ -357,7 +357,7 @@ export default function ContactPage() {
                 },
                 {
                   label: "Discovery call",
-                  value: "Book via Calendly →",
+                  value: "Book a strategy call →",
                   href: CALENDLY,
                 },
                 {
