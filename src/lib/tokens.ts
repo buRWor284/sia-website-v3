@@ -31,4 +31,11 @@ export const SERIF = 'var(--font-serif)';
 export const GROT  = 'var(--font-grot)';
 export const MONO  = 'var(--font-mono)';
 
+/** @deprecated use CAL_LINK + Cal.com popup. Kept for any remaining Calendly fallbacks. */
 export const CALENDLY = "https://calendly.com/sia_dmr_agency/emos";
+
+/** Cal.com event path — used with data-cal-link for popup and inline embeds. */
+export const CAL_LINK = "syed-irfan-ajmal-cjjebv/30min";
+
+/** Full Cal.com booking URL — used as href fallback when JS is unavailable. */
+export const CAL_URL  = "https://cal.com/syed-irfan-ajmal-cjjebv/30min";

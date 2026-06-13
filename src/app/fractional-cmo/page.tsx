@@ -13,7 +13,8 @@ import {
   SectionMast,
 } from "@/components/bureau/primitives";
 import {
-  CALENDLY,
+  CAL_LINK,
+  CAL_URL,
   GROT,
   INK,
   INK15,
@@ -24,6 +25,11 @@ import {
   SERIF,
   YEL,
 } from "@/lib/tokens";
+
+// ─── Cal.com config strings ───────────────────────────────────────────────────
+
+const CAL_CFG_POPUP = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo" } });
+const CAL_CFG_AUDIT = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo-audit" } });
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -48,8 +54,8 @@ const SCOPE: ReadonlyArray<ScopeItem> = [
     d: "When it is time to add a content lead, a paid-media specialist, or a freelance designer, I run the brief, interview the candidates, and stand behind the hire." },
   { no: "05", t: "Investor & board narrative",
     d: "Marketing slides for board meetings. Investor updates that show growth in language they trust. Sales support when a founder-led deal needs marketing air cover." },
-  { no: "06", t: "The hard “no”",
-    d: "A fractional CMO’s most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship." },
+  { no: "06", t: "The hard \"no\"",
+    d: "A fractional CMO's most important job is filtering. I will say no to half the marketing ideas in the room. The other half, we will ship." },
 ];
 
 type Stage = { range: string; t: string; d: string };
@@ -73,7 +79,7 @@ const FIT_IN: ReadonlyArray<string> = [
 
 const FIT_OUT: ReadonlyArray<string> = [
   "You are pre-product-market-fit. (You need product, not marketing.)",
-  "You want someone to “do marketing” without setting strategy with you.",
+  "You want someone to \"do marketing\" without setting strategy with you.",
   "You want a CMO five hours a month for $2K. (Retainers start at $5K, and they earn it.)",
   "You are looking for paid-media-only or single-channel help.",
 ];
@@ -124,7 +130,7 @@ const FAQS: ReadonlyArray<FAQItem> = [
     a: "The engagement is built around outcomes, not hours. In practice, most months include a weekly founder call (45–60 min), a weekly team or vendor sync (30–45 min), and 6–10 hours of async work — strategy documents, briefs, reviews, and decisions. The right question is whether the marketing function is moving, not how many hours are logged.",
   },
   {
-    q: "What’s the difference between this and hiring a marketing consultant?",
+    q: "What's the difference between this and hiring a marketing consultant?",
     a: "A consultant advises. I own. I take the marketing chair, write the strategy, and answer for the results alongside you. The weekly cadence means decisions get made in real time, not in a report you receive six weeks later. And the execution layer through DMR.agency means we can move from decision to campaign in days, not quarters.",
   },
   {
@@ -246,7 +252,13 @@ const CMOLead = () => (
             </Fragment>
           ))}
         </div>
-        <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+        {/* Cal.com popup CTA */}
+        <a
+          href={CAL_URL}
+          data-cal-link={CAL_LINK}
+          data-cal-config={CAL_CFG_POPUP}
+          style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}
+        >
           Book a discovery call &rarr;
         </a>
       </aside>
@@ -713,7 +725,7 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
     quote:
       "Their biggest weapon has been doing outreach to earn high-quality " +
       "backlinks and mentions at scale from the likes of Forbes, Mashable, " +
-      "Reader’s Digest, and hundreds of other authority sites. The biggest " +
+      "Reader's Digest, and hundreds of other authority sites. The biggest " +
       "success story has been helping grow Ridester from zero to 1.5 million " +
       "monthly visitors.",
     name: "Brett Helling",
@@ -724,8 +736,8 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
   },
   {
     quote:
-      "Syed’s team earned us high authority links from publications like MSN " +
-      "and Yahoo. Our main site’s organic traffic increased by 120%. Our " +
+      "Syed's team earned us high authority links from publications like MSN " +
+      "and Yahoo. Our main site's organic traffic increased by 120%. Our " +
       "Public Database saw a 515% increase in clicks, and our average daily " +
       "signups grew 6x.",
     name: "Imani Lea Brown",
@@ -737,7 +749,7 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
   {
     quote:
       "Irfan and his team earned high authority backlinks from publications " +
-      "like Reader’s Digest and MSN. The web portal’s traffic increased by " +
+      "like Reader's Digest and MSN. The web portal's traffic increased by " +
       "140% in 3 months, greatly exceeding our goals.",
     name: "Reem El Shafaki",
     role: "Partner, DinarStandard",
@@ -759,8 +771,8 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
   },
   {
     quote:
-      "Within 2 months we saw quality links from Healthline (DR 92), " +
-      "The Mirror (DR 90), MSN (DR 92), and Consumer Health Digest (DR 68). " +
+      "Within 2 months we saw quality links from Healthline (DR 92), " +
+      "The Mirror (DR 90), MSN (DR 92), and Consumer Health Digest (DR 68). " +
       "Our domain rating went from 1 to 27. If you are looking to boost " +
       "organic traffic and earn quality backlinks, we highly recommend DMR.agency.",
     name: "Trent Carter",
@@ -991,10 +1003,11 @@ const BookCall = () => (
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* Cal.com popup CTA — primary */}
         <a
-          href={CALENDLY}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={CAL_URL}
+          data-cal-link={CAL_LINK}
+          data-cal-config={CAL_CFG_POPUP}
           style={{
             display: "flex",
             alignItems: "center",
@@ -1008,6 +1021,7 @@ const BookCall = () => (
             fontSize: 14,
             letterSpacing: "0.10em",
             textTransform: "uppercase",
+            cursor: "pointer",
           }}
         >
           <span>Book a discovery call</span>
@@ -1046,7 +1060,7 @@ const BookCall = () => (
           <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 24px" }}>
             {([
               { n: "01", t: "30-min call",         d: "Tell me where the business is and where you need it in 12 months." },
-              { n: "02", t: "Proposal in 48h",     d: "If we’re a fit, I’ll send a written scope and retainer proposal within two working days." },
+              { n: "02", t: "Proposal in 48h",     d: "If we're a fit, I'll send a written scope and retainer proposal within two working days." },
               { n: "03", t: "Start within a week", d: "No lengthy onboarding. Intake begins and the first weekly call is booked immediately." },
             ] as const).map(step => (
               <div key={step.n}>
@@ -1087,10 +1101,11 @@ const BookCall = () => (
           your first month.
         </p>
       </div>
+      {/* Cal.com popup CTA — audit */}
       <a
-        href={CALENDLY}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={CAL_URL}
+        data-cal-link={CAL_LINK}
+        data-cal-config={CAL_CFG_AUDIT}
         style={{
           display: "inline-block",
           padding: "16px 24px",
@@ -1103,6 +1118,7 @@ const BookCall = () => (
           letterSpacing: "0.14em",
           textTransform: "uppercase",
           whiteSpace: "nowrap",
+          cursor: "pointer",
         }}
       >
         Book the audit &rarr;
@@ -1136,9 +1152,9 @@ const ToolsBand = () => (
   </section>
 );
 
-// ─── Calendly ─────────────────────────────────────────────────────────────────
+// ─── Cal.com Inline Booking ───────────────────────────────────────────────────
 
-const CalendlySection = () => (
+const CalSection = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 80, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
     <div style={{ maxWidth: 900, margin: "0 auto" }}>
       <p style={{ margin: "0 0 8px", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK }}>
@@ -1148,9 +1164,8 @@ const CalendlySection = () => (
         Pick a time that works for you.
       </h2>
       <div
-        className="calendly-inline-widget"
-        data-url="https://calendly.com/sia_dmr_agency/emos?hide_event_type_details=1"
-        style={{ minWidth: 320, height: 700 }}
+        id="cal-inline-fractional-cmo"
+        style={{ minWidth: 320, height: 700, overflow: "scroll" }}
       />
     </div>
   </section>
@@ -1161,7 +1176,20 @@ const CalendlySection = () => (
 export default function FractionalCMOPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
+      {/* Initialise Cal.com inline embed for the booking section */}
+      <Script id="cal-inline-fcmo" strategy="afterInteractive">{`
+        (function tryInit() {
+          if (typeof Cal !== "undefined") {
+            Cal("inline", {
+              elementOrSelector: "#cal-inline-fractional-cmo",
+              calLink: "syed-irfan-ajmal-cjjebv/30min",
+              config: { layout: "month_view" },
+            });
+          } else {
+            setTimeout(tryInit, 200);
+          }
+        })();
+      `}</Script>
       <Hero />
       <CMOLead />
       <StatsStrip />
@@ -1172,7 +1200,7 @@ export default function FractionalCMOPage() {
       <CMOTestimonials />
       <FAQ />
       <BookCall />
-      <CalendlySection />
+      <CalSection />
       <ToolsBand />
       <CTATicker />
       <Subscriptions sectionNumber="08" />
