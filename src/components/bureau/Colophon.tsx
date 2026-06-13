@@ -36,8 +36,9 @@ const COLS: ReadonlyArray<FooterCol> = [
     ],
   },
   {
-    head: "Elsewhere",
+    head: "Connect",
     items: [
+      { label: "Contact",           href: "/contact" },
       { label: "Twitter / X ↗",    href: "https://x.com/syedirfanajmal",                                    external: true },
       { label: "LinkedIn ↗",       href: "https://www.linkedin.com/in/syedirfanajmal/",                     external: true },
       { label: "YouTube ↗",        href: "https://youtube.com/@syedirfanajmal/",                             external: true },
