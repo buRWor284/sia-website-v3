@@ -1411,8 +1411,11 @@ export default function SignalIQPage() {
                     <h2 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px,3vw,32px)", lineHeight: 1.1, color: INK }}>
                       {scan.opportunities.length} opportunities found
                     </h2>
-                    <p style={{ margin: "0 0 24px", fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
+                    <p style={{ margin: "0 0 14px", fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
                       Add your startup context to personalise the results and your pitch pack — or skip straight to the full radar.
+                    </p>
+                    <p style={{ margin: "0 0 24px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.5, borderLeft: `2px solid ${AMBER}`, paddingLeft: 10, textAlign: "left" }}>
+                      Works best when your company operates <em>inside</em> one of these beats — health, fintech, SaaS, AI, etc. — where SEC filings, research, and news actually discuss your space. Service or agency businesses (e.g. a marketing/PR firm) will see thinner results.
                     </p>
                     <div style={{ textAlign: "left", marginBottom: 16 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>

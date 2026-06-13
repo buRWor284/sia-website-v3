@@ -91,6 +91,8 @@ export interface CompanyProfile {
 export interface ProfileExpansion {
   /** Startup-specific search seeds to scan instead of the generic beat seeds. */
   seeds: string[];
+  /** LLM-rated fit per seed (lowercased topic → tier), used for the Fit badge. */
+  fits: Record<string, "high" | "medium" | "low">;
   /** Lowercased phrases that signal true relevance to this company. */
   themes: string[];
   /** Industry-adjacent terms that look related but are NOT this company's focus. */

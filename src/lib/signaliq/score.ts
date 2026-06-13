@@ -87,17 +87,22 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
   const relText = `${topic} ${signals.map((s) => s.title).join(" ")} ${signals
     .map((s) => s.detail ?? "")
     .join(" ")}`;
-  const relevance = companyRelevance(relText, expansion, tailored);
-  // Company fit weights RANKING only — it no longer scales the displayed score,
-  // so an honest, modest signal keeps its true strength number + a fit badge.
+  // Fit: use the model's explicit per-topic rating for selected topics; fall
+  // back to a theme-overlap heuristic for generic beat backfill. Fit drives the
+  // badge + RANKING only — it never scales the displayed strength score.
+  let fitTier: Opportunity["fit"] = undefined;
+  let relevance = 1;
+  if (expansion) {
+    const rated = expansion.fits[topic.trim().toLowerCase()];
+    if (rated) {
+      fitTier = rated;
+    } else {
+      const r = companyRelevance(relText, expansion, false);
+      fitTier = r >= 0.4 ? "medium" : "low";
+    }
+    relevance = fitTier === "high" ? 0.9 : fitTier === "medium" ? 0.55 : 0.2;
+  }
   const rankWeight = expansion ? RELEVANCE_FLOOR + (1 - RELEVANCE_FLOOR) * relevance : 1;
-  const fitTier: Opportunity["fit"] = expansion
-    ? relevance >= 0.7
-      ? "high"
-      : relevance >= 0.4
-        ? "medium"
-        : "low"
-    : undefined;
 
   const base =
     WEIGHTS.magnitude * magnitude +

@@ -20,9 +20,19 @@ interface ViewsResp {
 }
 
 async function resolveArticle(seed: string): Promise<string | null> {
-  const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(seed)}&limit=1`;
+  const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(seed)}&limit=3`;
   const json = (await getJson(url)) as SearchResp;
-  return json.pages?.[0]?.key ?? null;
+  const pages = json.pages ?? [];
+  if (!pages.length) return null;
+  // Require a whole-word overlap with the seed so fuzzy substring matches
+  // (e.g. "Saashörner" for "SaaS") don't slip through as bogus signals.
+  const seedTokens = seed.toLowerCase().split(/\W+/).filter((w) => w.length > 2);
+  if (!seedTokens.length) return pages[0].key;
+  const match = pages.find((p) => {
+    const titleTokens = `${p.title} ${p.key.replace(/_/g, " ")}`.toLowerCase().split(/\W+/);
+    return seedTokens.some((t) => titleTokens.includes(t));
+  });
+  return match?.key ?? null;
 }
 
 export async function wikipediaSignal(seed: string): Promise<Signal | null> {

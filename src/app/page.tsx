@@ -690,7 +690,7 @@ export default function HomePage() {
               Without <strong>paying for attention.</strong>
             </p>
             <div className="hero-ctas">
-              <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="btn-primary">Book a discovery call <span className="mono-arrow">→</span></a>
+              <a href="/strategy-call" className="btn-primary">Book a discovery call <span className="mono-arrow">→</span></a>
               <a href="/podcast" className="btn-outline">Listen to the podcast</a>
             </div>
           </div>

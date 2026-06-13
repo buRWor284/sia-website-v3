@@ -587,11 +587,14 @@ export default function SignalIQPlatformClient({
 
       {/* ── Scan section ──────────────────────────────────────────────────────── */}
       <div style={{ background: PAPER2, border: `1px solid ${INK15}`, padding: "20px 24px", marginBottom: 32 }}>
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 12 }}>
           <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase", color: INK55 }}>
             Run a new scan — personalised to your company
           </span>
         </div>
+        <p style={{ margin: "0 0 16px", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, lineHeight: 1.5, borderLeft: `2px solid ${YEL}`, paddingLeft: 10 }}>
+          Works best when your company operates <em>inside</em> one of these beats — health, fintech, SaaS, AI, etc. — where SEC filings, research, and news actually discuss your space. Service or agency businesses (e.g. a marketing/PR firm) will see thinner results.
+        </p>
 
         {/* Step 1 — company profile (required; drives the scan) */}
         <div style={{ marginBottom: 18 }}>

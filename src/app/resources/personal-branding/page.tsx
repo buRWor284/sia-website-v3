@@ -1,17 +1,17 @@
+/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Personal Branding: The Complete Playbook · Syed Irfan Ajmal",
+  title: "Personal Branding 101: How to Brand Yourself for Success · Syed Irfan Ajmal",
   description: "A complete guide to building your personal brand — covering strategy, positioning, storytelling, content and the real examples behind 7-figure personal brands.",
   openGraph: {
-    title: "Personal Branding: The Complete Playbook",
+    title: "Personal Branding 101: How to Brand Yourself for Success",
     description: "Strategy, positioning, storytelling and real examples for building a 7-figure personal brand.",
   },
 };
 
 import { Colophon, Subscriptions } from "@/components/bureau";
 import {
-  DoubleRule,
   HRule,
   Mark,
   Pill,
@@ -32,6 +32,77 @@ import {
   YEL,
 } from "@/lib/tokens";
 
+// ─── Image map (Wayback Machine CDN — replace with /public/articles/personal-branding/ once downloaded) ──────
+const WB16 = "https://web.archive.org/web/20260315103746im_/https://syedirfanajmal.com/wp-content/uploads/2016/06";
+const WB18 = "https://web.archive.org/web/20260315103746im_/https://syedirfanajmal.com/wp-content/uploads/2018/09";
+
+const IMG = {
+  hero:              `${WB16}/Personalbranding101.jpg`,
+  jeffBezos:         `${WB18}/Jeff_Bezos_cc_caricature_small.jpg`,
+  robAsghar:         `${WB18}/Rob-Asghar.jpeg`,
+  billGates:         `${WB16}/Bill-Gates.png`,
+  richardBranson:    `${WB16}/Richard-Branson.png`,
+  steveJobs:         `${WB18}/Steve_Jobs_iPhone_4_presentation.jpg`,
+  boringCompany:     `${WB18}/The-Boring-Company.jpg`,
+  contentTrends:     `${WB18}/Content-trends-1-report-06.png`,
+  siaFacebook:       `${WB16}/Syed-Irfan-Ajmal.png`,
+  empowerPakistan:   `${WB16}/empower-pakistan.jpg`,
+  astrolabsAudience: `${WB16}/Dubai-With-Audience2.jpg`,
+  astrolabsTalk:     `${WB16}/Dubai-Talk.jpg`,
+  chimamanda:        `${WB18}/Chimamanda-Ngozi-Adichie-2.jpg`,
+  harveyMackey:      `${WB18}/tw-aw-mackey-1_400x400.jpg`,
+  timFerrisPortrait: `${WB18}/Tim-Ferriss-cc-Photo-by-Sean-OShaughnessy.jpg`,
+  lewisHowes:        `${WB16}/Lewis-Howes.jpg`,
+  danBrown:          `${WB16}/Dan-Brown.jpg`,
+  timFerrisBanner:   `${WB16}/Tim-Feriss.jpg`,
+  chrisDucker:       `${WB16}/Chris-Ducker.jpg`,
+  marieForleo:       `${WB16}/Marie-Forleo.jpg`,
+  siaPhoto:          `${WB16}/Syed-Irfan-Ajmal.jpg`,
+};
+
+// ─── Helper components ─────────────────────────────────────────────────────────
+
+const ArticleImg = ({
+  src,
+  alt,
+  caption,
+  width = "100%",
+}: {
+  src: string;
+  alt: string;
+  caption?: string;
+  width?: string | number;
+}) => (
+  <figure style={{ margin: "28px 0", textAlign: "center" }}>
+    <img
+      src={src}
+      alt={alt}
+      style={{
+        maxWidth: typeof width === "number" ? `${width}px` : width,
+        width: "100%",
+        height: "auto",
+        display: "block",
+        margin: "0 auto",
+      }}
+    />
+    {caption && (
+      <figcaption
+        style={{
+          marginTop: 10,
+          fontFamily: SERIF,
+          fontStyle: "italic",
+          fontSize: 13,
+          color: INK55,
+          lineHeight: 1.5,
+        }}
+      >
+        {caption}
+      </figcaption>
+    )}
+  </figure>
+);
+
+// ─── TOC ──────────────────────────────────────────────────────────────────────
 const TOC = [
   { n: "01", id: "what-is", title: "What is Personal Branding?" },
   { n: "02", id: "examples", title: "Examples of Successful Personal Brands" },
@@ -41,6 +112,7 @@ const TOC = [
   { n: "06", id: "irfans-story", title: "Irfan's Personal Branding Journey" },
 ];
 
+// ─── Style constants ───────────────────────────────────────────────────────────
 const P: React.CSSProperties = {
   margin: "0 0 20px",
   fontSize: 18,
@@ -166,13 +238,26 @@ export default function PersonalBrandingGuidePage() {
       <section style={{ padding: "72px 56px" }}>
         <div style={{ maxWidth: 760 }}>
 
-          {/* Opening */}
+          {/* Feature image */}
+          <ArticleImg
+            src={IMG.hero}
+            alt="Personal Branding 101 — Brand Yourself for Success"
+          />
+
+          {/* Opening — Jeff Bezos */}
           <div style={BLOCKQUOTE} id="intro">
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 22, lineHeight: 1.4, color: INK, marginBottom: 10 }}>
               "Your brand is what people say about you when you're not in the room."
             </div>
             <SCaps size={10.5} ls="0.14em" color={YEL}>Jeff Bezos — Founder of Amazon</SCaps>
           </div>
+
+          <ArticleImg
+            src={IMG.jeffBezos}
+            alt="Jeff Bezos — Founder of Amazon"
+            caption="Jeff Bezos — Founder of Amazon.com"
+            width={240}
+          />
 
           <p style={P}>
             Personal branding helps you tell your story in the most effective manner, so that you can attract all the right people — partners, employees, customers, investors — and opportunities: a new job, a new project, a speaking gig.
@@ -201,6 +286,14 @@ export default function PersonalBrandingGuidePage() {
             </div>
             <SCaps size={10.5} ls="0.14em" color={YEL}>Rob Asghar — Management Consultant & Forbes Columnist</SCaps>
           </div>
+
+          <ArticleImg
+            src={IMG.robAsghar}
+            alt="Rob Asghar — Management Consultant & Forbes Columnist"
+            caption="Rob Asghar — Management Consultant & Forbes Columnist"
+            width={240}
+          />
+
           <p style={P}>
             Most often, well-known and well-defined company brands are closely tied to the people behind them and their personal brands.
           </p>
@@ -211,15 +304,45 @@ export default function PersonalBrandingGuidePage() {
           <p style={{ ...P, marginTop: 20 }}>
             When we talk of Microsoft we think of <strong>Bill Gates</strong>. And whenever the Virgin Group is mentioned, we immediately think of <strong>Richard Branson</strong> — a man who has built 8 billion-dollar companies in 8 different industries.
           </p>
+
+          <ArticleImg
+            src={IMG.billGates}
+            alt="Bill Gates' Facebook Profile"
+            caption="Bill Gates' Facebook Profile"
+          />
+
+          <ArticleImg
+            src={IMG.richardBranson}
+            alt="Richard Branson's Facebook Profile"
+            caption="Richard Branson's Facebook Profile"
+          />
+
           <p style={P}>
             The same goes for Apple, which is associated with Steve Jobs. His personal brand was the driving force behind getting people super-excited about whatever new product Apple was launching — there were queues of people in front of Apple stores whenever a new iPad, iPhone, or MacBook was being released.
           </p>
+
+          <ArticleImg
+            src={IMG.steveJobs}
+            alt="Steve Jobs unveils the iPhone 4"
+            caption="Steve Jobs unveils the iPhone 4 [June 7, 2010 · San Francisco]"
+          />
+
           <p style={P}>
             Similarly, Tesla, as Referral Candy mentions, is notable for having a "$0 marketing budget," and is seen as an extension of <strong>Elon Musk&apos;s</strong> personal brand as a visionary, a genius, and a great entrepreneur. He does a lot of interviews and is quite active on social media, which makes him the driving force behind a huge fan base that is crazy about the "car of the future."
           </p>
           <p style={P}>
             This type of marketing is earned rather than bought, and Elon&apos;s personal brand is of significant importance in earning all this attention. A two-hour interview on Joe Rogan&apos;s podcast garnered over 14 million views on YouTube within weeks of being published.
           </p>
+          <p style={P}>
+            One of his most talked-about launches was The Boring Company — a tunnel construction company he created almost as a joke. He tweeted: <em>"I am going to build a boring machine and just start digging..."</em> and the internet went wild.
+          </p>
+
+          <ArticleImg
+            src={IMG.boringCompany}
+            alt="The Boring Company — Elon Musk tweet"
+            caption="via Twitter"
+          />
+
           <p style={P}>
             In today&apos;s era, where people and businesses have so many more options, it is vital to have a personal brand so that you can stand out from the crowd and boost your business or career.
           </p>
@@ -271,6 +394,13 @@ export default function PersonalBrandingGuidePage() {
           <p style={P}>
             The best way through which you can become an authority figure is by creating a blog and publishing valuable information on it. Use tools like BuzzSumo and Ahrefs Content Explorer to find topics that are already popular so you can write on them from a different perspective. You can also create different content types on the same topic — an article, a video, and an infographic.
           </p>
+
+          <ArticleImg
+            src={IMG.contentTrends}
+            alt="HubSpot Research: Content Trends"
+            caption="HubSpot Research: Content Trends"
+          />
+
           <p style={P}>
             You should also consider guest blogging to further increase your brand value. I wrote a case study for SEMrush and conducted a webinar showing how we helped a client grow revenue from $160,000/month to $200,000/month with guest posting alone — in only 6 months with minimal resources.
           </p>
@@ -285,6 +415,13 @@ export default function PersonalBrandingGuidePage() {
           <p style={P}>
             Use professional cover photos which show the logos of any large organizations you have worked for, so your personal brand can leverage the brand value that these large organizations carry.
           </p>
+
+          <ArticleImg
+            src={IMG.siaFacebook}
+            alt="Syed Irfan Ajmal — Facebook Profile"
+            caption="My Facebook Profile"
+          />
+
           <p style={P}>
             No one likes the person who is posting only to promote themselves. Make sure the stuff you are posting consists of <strong>80% informational posts, 10% semi-promotional posts, and 10% fully promotional posts</strong>.
           </p>
@@ -297,14 +434,44 @@ export default function PersonalBrandingGuidePage() {
 
           <h3 style={H3}>Step 4 · Speak at Relevant Industry Events</h3>
           <p style={P}>
-            Look for speaking events whenever possible — it will propel you into the limelight and enable you to demonstrate your expertise more effectively. I spoke at a growth hacking workshop hosted at AstroLabs in Dubai and received, in one evening: two offers from startups who wanted me to do marketing for equity, an invite from Google Business Group to do a session for their audience, an increase in website traffic, a request for an interview from a public speaking organization, lots of new connections, and several leads.
+            Look for speaking events whenever possible — it will propel you into the limelight and enable you to demonstrate your expertise more effectively.
           </p>
+
+          <ArticleImg
+            src={IMG.empowerPakistan}
+            alt="Empower Pakistan — Speaking Event"
+          />
+
+          <p style={P}>
+            I spoke at a growth hacking workshop hosted at AstroLabs in Dubai and received, in one evening: two offers from startups who wanted me to do marketing for equity, an invite from Google Business Group to do a session for their audience, an increase in website traffic, a request for an interview from a public speaking organization, lots of new connections, and several leads.
+          </p>
+
+          <ArticleImg
+            src={IMG.astrolabsAudience}
+            alt="AstroLabs Dubai — Audience"
+            caption="AstroLabs, Dubai"
+          />
+
+          <ArticleImg
+            src={IMG.astrolabsTalk}
+            alt="AstroLabs Dubai — Talk"
+            caption="AstroLabs, Dubai"
+          />
+
           <p style={P}>
             All these benefits were the result of only a single speaking event. Imagine the leads you can procure by speaking at several events.
           </p>
           <p style={P}>
             If you haven&apos;t spoken before, the easiest way to get your first gig is to contact your university or college and pitch them a topic. Show them how you made it big and that you want to teach their current students how they can do it too. You can also reach out to local chambers of commerce, Google Business Group chapters, co-working spaces, business incubators, and accelerators.
           </p>
+
+          <ArticleImg
+            src={IMG.chimamanda}
+            alt="Chimamanda Ngozi Adichie — Nigerian Author"
+            caption="Chimamanda Ngozi Adichie — Nigerian Author"
+            width={320}
+          />
+
           <div style={BLOCKQUOTE}>
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               "I think you travel to search and you come back home to find yourself there."
@@ -322,6 +489,14 @@ export default function PersonalBrandingGuidePage() {
           <p style={P}>
             The more people you meet, the more opportunities you&apos;ll get — but don&apos;t try to meet only for the purpose of a handshake and exchanging business cards. It is better to meet fewer people and make a lasting impression than to have a lot of business cards but no real spark.
           </p>
+
+          <ArticleImg
+            src={IMG.harveyMackey}
+            alt="Harvey Mackey — Business Author & Speaker"
+            caption="Harvey Mackey — Business Author & Speaker"
+            width={200}
+          />
+
           <div style={BLOCKQUOTE}>
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               My golden rule of networking is simple: Don&apos;t keep score.
@@ -366,19 +541,42 @@ export default function PersonalBrandingGuidePage() {
           </p>
 
           <h3 style={H3}>Lewis Howes</h3>
+          <ArticleImg
+            src={IMG.lewisHowes}
+            alt="Lewis Howes — Personal Brand"
+            caption="Lewis Howes"
+          />
           <p style={P}>
             Lewis Howes is a prime example of an individual with successful personal branding. He began by hosting LinkedIn events in several cities around the United States and very quickly became a LinkedIn expert. His brand evolved over several years, and now he is better known as a lifestyle entrepreneur "living the dream." His personal brand has been significantly boosted by his podcast, The School of Greatness, which is primarily focused on helping people start their own businesses and achieve greatness.
           </p>
 
           <h3 style={H3}>Dan Brown</h3>
+          <ArticleImg
+            src={IMG.danBrown}
+            alt="Dan Brown — Author"
+            caption="Dan Brown"
+          />
           <p style={P}>
             Dan Brown is the author of several bestselling novels including The Da Vinci Code, which is to date one of the bestselling novels of all time. He was named by TIME Magazine as one of the 100 most influential people in the world. Brown&apos;s novels are treasure hunts set in a 24-hour period and feature recurring themes of cryptography, keys, symbols, codes, and conspiracy theories. He pulls crowds wherever he speaks — his appearance at the Web Summit in Dublin in 2015 was attended by over 40,000 people.
           </p>
 
           <h3 style={H3}>Tim Ferriss</h3>
+          <ArticleImg
+            src={IMG.timFerrisBanner}
+            alt="Tim Ferriss — Author & Investor"
+            caption="Tim Ferriss"
+          />
           <p style={P}>
             Tim Ferriss is a startup angel investor (in Twitter, among others) and the author of the bestselling book <em>The 4-Hour Workweek</em>, which has been translated into 35 languages, sold 1.35 million copies worldwide, and topped the charts of the New York Times, BusinessWeek, and the Wall Street Journal — after being rejected by 26 out of 27 publishers.
           </p>
+
+          <ArticleImg
+            src={IMG.timFerrisPortrait}
+            alt="Tim Ferriss"
+            caption="Photo by Sean O'Shaughnessy (CC)"
+            width={300}
+          />
+
           <div style={BLOCKQUOTE}>
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, lineHeight: 1.6, color: INK70, marginBottom: 8 }}>
               "Personal branding is about managing your name — even if you don&apos;t own a business — in a world of misinformation, disinformation, and semi-permanent Google records. Going on a date? Chances are your &apos;blind&apos; date has Googled your name. Going to a job interview? Ditto."
@@ -390,11 +588,21 @@ export default function PersonalBrandingGuidePage() {
           </p>
 
           <h3 style={H3}>Chris Ducker</h3>
+          <ArticleImg
+            src={IMG.chrisDucker}
+            alt="Chris Ducker — Personal Brand"
+            caption="Chris Ducker"
+          />
           <p style={P}>
             Chris has done a wonderful job promoting himself and his brand on different platforms online, manifested in his website, social media profiles, and business cards. One of the main reasons why Chris has a successful personal brand is his consistency — everything he does is consistent with his brand message. His podcast, The New Business Podcast, is well worth listening to.
           </p>
 
           <h3 style={H3}>Marie Forleo</h3>
+          <ArticleImg
+            src={IMG.marieForleo}
+            alt="Marie Forleo — Personal Brand"
+            caption="Marie Forleo"
+          />
           <p style={P}>
             Marie&apos;s strong personal brand has attracted over 100,000 followers and fans worldwide. Her award-winning web show MarieTV is 100% true to her vision, and her website nails everything related to her personal brand. Every element — tone, design, content — is consistent with who she is and who she serves.
           </p>
@@ -402,6 +610,13 @@ export default function PersonalBrandingGuidePage() {
           {/* Section 06 */}
           <h2 style={H2} id="irfans-story">06 · Irfan&apos;s Personal Branding Journey</h2>
           <HRule />
+
+          <ArticleImg
+            src={IMG.siaPhoto}
+            alt="Syed Irfan Ajmal"
+            caption="Syed Irfan Ajmal"
+          />
+
           <p style={{ ...P, marginTop: 20 }}>
             By writing for HuffPost, Business.com, SEMrush, and other large publications, I was able to associate my personal brand with these large brands. The same happened when I spoke in Dubai, at Google Business Groups sessions, and internationally. These activities built my reputation and credibility in a manner that I have been able to attract opportunities without spending almost anything on outbound marketing — getting offers, deals, speaking gigs, and more right in my inbox.
           </p>
@@ -431,7 +646,7 @@ export default function PersonalBrandingGuidePage() {
 
       {/* ── Next Steps ─────────────────────────────────────────── */}
       <section style={{ padding: "72px 56px", background: PAPER2 }}>
-        <SectionMast n="07" label="Next Steps · Apply What You&apos;ve Learned" />
+        <SectionMast n="07" label="Next Steps · Apply What You've Learned" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 32, marginTop: 40 }}>
           {[
             {

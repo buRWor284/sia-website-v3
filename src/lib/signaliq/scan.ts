@@ -91,8 +91,8 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
   // relevance — the loud industry noise like "drug pricing") as long as enough
   // relevant ones remain, so the radar stays focused without going empty.
   if (expansion) {
-    // Drop low-fit (off-topic) items; keep tailored + medium/high fit.
-    const relevant = ranked.filter((o) => o.tailored || (o.components.relevance ?? 0) >= 0.4);
+    // Drop low-fit (off-topic / tangential) items; keep high + medium fit.
+    const relevant = ranked.filter((o) => o.fit !== "low");
     if (relevant.length >= 5) ranked = relevant;
   }
 
