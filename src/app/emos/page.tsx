@@ -106,14 +106,10 @@ export default function EmosPage() {
           </section>
 
           {/* ── LOGO BAR ───────────────────────────────────────────────── */}
-          <section
-            className="emos-marquee-section"
-            style={{
-              borderTop: `1px solid ${INK15}`,
-              borderBottom: `1px solid ${INK15}`,
-            }}
-          >
-            <p className="emos-marquee-label">Where we&#39;ve placed clients</p>
+          <section className="emos-marquee-section">
+            <div className="max">
+              <div style={{ overflow: "hidden", border: `1px solid ${INK15}`, padding: "14px 0" }}>
+                <p className="emos-marquee-label" style={{ marginBottom: 10 }}>Where we&#39;ve placed clients</p>
             <div className="emos-marquee-track">
               {["Forbes","Harvard Business Review","Yahoo","Business Insider","MSN","AOL","Reader's Digest","Apartment Therapy","Healthline","Forbes","Harvard Business Review","Yahoo","Business Insider","MSN","AOL","Reader's Digest","Apartment Therapy","Healthline"].map((n, i) => (
                 <span key={i}>{n}</span>
@@ -123,6 +119,8 @@ export default function EmosPage() {
               {["MarketWatch","Bankrate","Mashable","Entrepreneur","The Mirror","The Next Web","GoBankingRates","Consumer Health Digest","MarketWatch","Bankrate","Mashable","Entrepreneur","The Mirror","The Next Web","GoBankingRates","Consumer Health Digest"].map((n, i) => (
                 <span key={i}>{n}</span>
               ))}
+              </div>
+              </div>
             </div>
           </section>
 
