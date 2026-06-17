@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   title: "Newsletter",
   description:
     "Real case studies. Unfiltered lessons. Two emails a month from a fractional CMO with 20+ years in the trenches.",
+  openGraph: {
+    title: "Newsletter · Earned Media Lessons Twice a Month",
+    description:
+      "Real case studies and unfiltered lessons. Two emails a month from a fractional CMO with 20+ years in the trenches.",
+  },
   alternates: { canonical: "/newsletter" },
 };
 
