@@ -110,10 +110,12 @@ export const SectionMast = ({
   n,
   label,
   dark = false,
+  noVol = false,
 }: {
   n: string;
   label: string;
   dark?: boolean;
+  noVol?: boolean;
 }) => {
   const c = dark ? PAPER : INK;
   return (
@@ -136,13 +138,15 @@ export const SectionMast = ({
             background: dark ? "rgba(250,250,250,.4)" : INK35,
           }}
         />
-        <SCaps
-          color={dark ? "rgba(250,250,250,.5)" : INK55}
-          size={11}
-          ls="0.18em"
-        >
-          Vol. XV · № {n}
-        </SCaps>
+        {!noVol && (
+          <SCaps
+            color={dark ? "rgba(250,250,250,.5)" : INK55}
+            size={11}
+            ls="0.18em"
+          >
+            Vol. XV · № {n}
+          </SCaps>
+        )}
       </div>
       <div
         style={{
