@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   description:
     "AI-powered journalist beat matching. Find the right reporters and outlets for your story, " +
     "score them by beat fit and recent coverage, generate tailored pitch angles, and export a targeting brief — in minutes.",
+  openGraph: {
+    title: "JournoCollabIQ · Journalist Beat Matcher",
+    description:
+      "Find the right reporters for your story, score them by beat fit and recent coverage, and export a targeting brief in minutes. A free tool from the EMOS suite.",
+  },
   alternates: { canonical: "/tools/journocollabiq" },
 };
 

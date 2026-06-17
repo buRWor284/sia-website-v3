@@ -7,6 +7,11 @@ export const metadata: Metadata = {
     "Track your entire media pitch lifecycle — from drafted to amplified. " +
     "Manage journalist relationships, log placements, monitor follow-ups, and " +
     "visualise your PESO coverage mix. Part of the EMOS earned-media suite.",
+  openGraph: {
+    title: "CoverageIQ · Pitch Tracking CRM",
+    description:
+      "Track your media pitch lifecycle from drafted to amplified, log placements, and visualise your PESO mix. A free tool from the EMOS suite.",
+  },
   alternates: { canonical: "/tools/coverageiq" },
 };
 

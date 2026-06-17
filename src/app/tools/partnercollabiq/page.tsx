@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   description:
     "AI-powered partnership intelligence. Discover non-obvious co-marketing partners, " +
     "score them, generate personalised outreach, and export a 90-day campaign brief — in minutes.",
+  openGraph: {
+    title: "PartnerCollabIQ · Partnership Intelligence",
+    description:
+      "Discover non-obvious co-marketing partners, score them, and export a 90-day campaign brief in minutes. A free tool from the EMOS suite.",
+  },
   alternates: { canonical: "/tools/partnercollabiq" },
 };
 
