@@ -32,6 +32,7 @@ const COLS: ReadonlyArray<FooterCol> = [
       { label: "Podcast",    href: "/podcast" },
       { label: "Gallery",    href: "/gallery" },
       { label: "Resources",  href: "/resources" },
+      { label: "Press Kit",  href: "/press-kit" },
       { label: "Newsletter", href: "/newsletter" },
     ],
   },

@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description:
     "Book a free 30-minute strategy call with Syed Irfan Ajmal. " +
     "Fractional CMO, earned media strategist, and founder of DMR.agency.",
+  alternates: { canonical: "/strategy-call" },
 };
 
 export default function StrategyCallPage() {

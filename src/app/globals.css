@@ -103,6 +103,15 @@ body > * { position: relative; z-index: 2; }
   .sx { padding-left: 56px; padding-right: 56px; }
 }
 
+/* ---- Section container / vertical rhythm / alt surface ------------------
+   Used by the EMOS pages (emos, emos/apply, emos/pay). These were
+   referenced in markup but never defined, so sections rendered with no
+   max-width, no vertical padding, and bg-p2 had no effect. */
+.max    { max-width: 1180px; margin-inline: auto; }
+.sy     { padding-top: clamp(56px, 7vw, 100px); padding-bottom: clamp(56px, 7vw, 100px); }
+.sy-sm  { padding-top: 40px; padding-bottom: 40px; }
+.bg-p2  { background: var(--color-paper-2); }
+
 /* ---- Masthead ----------------------------------------------------------- */
 .mast-namehead {
   display: flex;

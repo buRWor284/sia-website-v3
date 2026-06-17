@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="SIA">
+  <rect width="64" height="64" fill="#1a1410"></rect>
+  <text x="32" y="40" font-family="Newsreader, Georgia, serif" font-weight="700" font-size="28" fill="#FAFAFA" text-anchor="middle" letter-spacing="-1">SIA</text>
+  <rect x="18" y="48" width="28" height="4" fill="#f5b81f"></rect>
+</svg>

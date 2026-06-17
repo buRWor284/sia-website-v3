@@ -39,7 +39,7 @@ export async function generateMetadata({
   const ep = getEpisodeBySlug(slug)
   if (!ep) return {}
   return {
-    title: `${ep.title} | The SIA Business Podcast`,
+    title: `${ep.title} · The SIA Business Podcast`,
     description: ep.summary,
     openGraph: {
       title: ep.hero_text_extracted || ep.title,

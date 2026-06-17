@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     title: "The SIA Show · Podcast",
     description: "Conversations on SEO, PR, link building, and growth with founders and operators.",
   },
+  alternates: { canonical: "/podcast" },
 };
 import {
   DoubleRule,

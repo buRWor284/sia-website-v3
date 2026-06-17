@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: "Apply for EMOS Cohort 1 · 5 Seats · June 22, 2026",
   description:
     "One short application. We review every submission personally within 48 hours. If it's a fit, we'll send a Calendly link to talk through the details.",
+  alternates: { canonical: "/emos/apply" },
 };
 
 /* =========================================================================

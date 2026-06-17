@@ -29,10 +29,10 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://syedirfanajmal.com"),
+  metadataBase: new URL("https://www.syedirfanajmal.com"),
   title: {
     default: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
-    template: "%s — Syed Irfan Ajmal",
+    template: "%s · Syed Irfan Ajmal",
   },
   description:
     "Fractional CMO, international speaker, and founder of DMR.agency. " +
@@ -55,6 +55,56 @@ export const metadata: Metadata = {
   },
 };
 
+// Site-wide structured data (Person + Organization + WebSite).
+// Rendered on every route so search engines have a stable entity graph.
+const siteJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://www.syedirfanajmal.com/#person",
+      name: "Syed Irfan Ajmal",
+      url: "https://www.syedirfanajmal.com",
+      image: "https://www.syedirfanajmal.com/headshot.jpg",
+      jobTitle: "Fractional CMO & Earned Media Strategist",
+      description:
+        "Fractional CMO, international speaker, and founder of DMR.agency. " +
+        "Helping founders and marketing teams get found, get covered, and get customers " +
+        "through GEO, SEO-PR, and earned media.",
+      sameAs: [
+        "https://www.linkedin.com/in/syedirfanajmal/",
+        "https://x.com/syedirfanajmal",
+        "https://twitter.com/syedirfanajmal",
+        "https://youtube.com/@syedirfanajmal/",
+      ],
+      worksFor: { "@id": "https://dmr.agency/#organization" },
+      knowsAbout: [
+        "SEO",
+        "Digital PR",
+        "Earned Media",
+        "Generative Engine Optimization",
+        "Personal Branding",
+        "Content Marketing",
+        "Link Building",
+      ],
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://dmr.agency/#organization",
+      name: "DMR.agency",
+      url: "https://dmr.agency",
+      founder: { "@id": "https://www.syedirfanajmal.com/#person" },
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.syedirfanajmal.com/#website",
+      url: "https://www.syedirfanajmal.com",
+      name: "Syed Irfan Ajmal",
+      publisher: { "@id": "https://www.syedirfanajmal.com/#person" },
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -65,6 +115,10 @@ export default function RootLayout({
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
     >
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
+        />
         <SiteHeader />
         <CredibilityTicker />
         {children}

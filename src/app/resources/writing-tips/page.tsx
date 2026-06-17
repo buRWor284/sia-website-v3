@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "100+ Writing Tips to Become a Better Writer · Syed Irfan Ajmal",
+  title: "100+ Writing Tips to Become a Better Writer",
   description: "Over 100 practical writing tips covering clarity, structure, editing, voice and persuasion — for marketers, founders and anyone who communicates in writing.",
   openGraph: {
     title: "100+ Writing Tips to Become a Better Writer",

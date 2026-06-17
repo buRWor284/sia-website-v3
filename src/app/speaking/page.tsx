@@ -312,7 +312,9 @@ const SpeakingLead = () => (
           ))}
         </div>
         <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 16, display: "block", textAlign: "center", padding: "12px 16px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
-        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 8, display: "block", textAlign: "center", padding: "12px 16px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Download speaker sheet ↓</a>
+        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 8, display: "block", textAlign: "center", padding: "12px 16px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Speaker one-sheet ↓</a>
+        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-Media-Kit-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 8, display: "block", textAlign: "center", padding: "12px 16px", background: PAPER, color: INK, border: `1px solid ${INK}`, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Full media kit ↓</a>
+        <a href="/press-kit" style={{ marginTop: 10, display: "block", textAlign: "center", fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, textDecoration: "underline" }}>View the full press kit →</a>
       </aside>
     </div>
   </section>
@@ -754,7 +756,9 @@ const BottomBookingCTA = () => (
       </p>
       <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
         <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
-        <a href="/assets/speaking/Syed Irfan Ajmal - Speaker Sheet - 08052024.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Speaker sheet ↓</a>
+        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Speaker one-sheet ↓</a>
+        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-Media-Kit-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Media kit ↓</a>
+        <a href="/press-kit" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Press kit →</a>
       </div>
     </div>
   </section>

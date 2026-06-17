@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Personal Branding 101: How to Brand Yourself for Success · Syed Irfan Ajmal",
+  title: "Personal Branding 101: How to Brand Yourself for Success",
   description: "A complete guide to building your personal brand — covering strategy, positioning, storytelling, content and the real examples behind 7-figure personal brands.",
   openGraph: {
     title: "Personal Branding 101: How to Brand Yourself for Success",

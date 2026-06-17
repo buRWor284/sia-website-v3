@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Storytelling 101: Elevate Your Brand · Syed Irfan Ajmal",
+  title: "Storytelling 101: Elevate Your Brand",
   description: "Find out the most effective storytelling tactics and techniques in this mega-guide which can help you elevate your brand like never before!",
   openGraph: {
     title: "Storytelling 101: Elevate Your Brand",

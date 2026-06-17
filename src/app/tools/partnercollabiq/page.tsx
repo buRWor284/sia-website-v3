@@ -4,10 +4,11 @@ import { PartnerCollabIQ } from "@/components/tools/CollabIQ";
 import { ToolHeader } from "@/components/bureau";
 
 export const metadata: Metadata = {
-  title: "PartnerCollabIQ — Partnership Intelligence Tool · SIA",
+  title: "PartnerCollabIQ · Partnership Intelligence Tool",
   description:
     "AI-powered partnership intelligence. Discover non-obvious co-marketing partners, " +
     "score them, generate personalised outreach, and export a 90-day campaign brief — in minutes.",
+  alternates: { canonical: "/tools/partnercollabiq" },
 };
 
 // ToolHeader height: 28px logo + 13px top + 13px bottom padding = 54px

@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/fractional-cmo", changeFrequency: "monthly" as const, priority: 0.9 },
     { url: "/resources",      changeFrequency: "weekly"  as const, priority: 0.8 },
     { url: "/contact",        changeFrequency: "yearly"  as const, priority: 0.6 },
+    { url: "/strategy-call",  changeFrequency: "monthly" as const, priority: 0.8 },
     { url: "/podcast",        changeFrequency: "monthly" as const, priority: 0.7 },
     { url: "/clients",        changeFrequency: "monthly" as const, priority: 0.6 },
     { url: "/gallery",        changeFrequency: "monthly" as const, priority: 0.5 },
@@ -36,6 +37,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/tools/partnercollabiq",       changeFrequency: "monthly" as const, priority: 0.7 },
     { url: "/tools/coverageiq",            changeFrequency: "monthly" as const, priority: 0.7 },
     { url: "/tools/authority-calculator",   changeFrequency: "yearly"  as const, priority: 0.5 },
+    { url: "/tools/journocollabiq",         changeFrequency: "monthly" as const, priority: 0.7 },
+    { url: "/tools/signaliq/about",          changeFrequency: "yearly"  as const, priority: 0.4 },
   ];
 
   const staticEntries = pages.map(({ url, changeFrequency, priority }) => ({

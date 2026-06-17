@@ -18,6 +18,7 @@ const NAV: ReadonlyArray<{ label: string; href: string; matchPrefix?: string }> 
   { label: "EMOS",          href: "/emos"           },
   { label: "Fractional CMO",href: "/fractional-cmo" },
   { label: "Resources",     href: "/resources"      },
+  { label: "Press Kit",     href: "/press-kit"      },
   { label: "Contact",       href: "/contact"        },
 ];
 

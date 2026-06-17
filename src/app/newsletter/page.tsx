@@ -5,9 +5,10 @@ import { DoubleRule, Pill, SCaps } from "@/components/bureau/primitives";
 import { GROT, INK, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
 
 export const metadata: Metadata = {
-  title: "Newsletter — Syed Irfan Ajmal",
+  title: "Newsletter",
   description:
     "Real case studies. Unfiltered lessons. Two emails a month from a fractional CMO with 20+ years in the trenches.",
+  alternates: { canonical: "/newsletter" },
 };
 
 export default function NewsletterPage() {

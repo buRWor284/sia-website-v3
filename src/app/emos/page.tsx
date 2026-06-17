@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   title: "EMOS · Build the Media Presence Investors Check Before Your First Meeting",
   description:
     "EMOS is a Guided Implementation System for founders 3 to 12 months from a Series A raise. One-time investment. Capability you keep forever.",
+  alternates: { canonical: "/emos" },
 };
 
 /* =========================================================================

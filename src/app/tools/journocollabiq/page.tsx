@@ -4,10 +4,11 @@ import { JournoCollabIQ } from "@/components/tools/JournoCollabIQ";
 import { ToolHeader } from "@/components/bureau";
 
 export const metadata: Metadata = {
-  title: "JournoCollabIQ — Journalist Beat Matcher · SIA",
+  title: "JournoCollabIQ · Journalist Beat Matcher",
   description:
     "AI-powered journalist beat matching. Find the right reporters and outlets for your story, " +
     "score them by beat fit and recent coverage, generate tailored pitch angles, and export a targeting brief — in minutes.",
+  alternates: { canonical: "/tools/journocollabiq" },
 };
 
 // ToolHeader height: 28px logo + 13px top + 13px bottom padding = 54px

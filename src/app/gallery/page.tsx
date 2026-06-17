@@ -4,13 +4,14 @@ import GalleryClient from "./GalleryClient";
 import { ScrollButtons } from "@/components/ScrollButtons";
 
 export const metadata: Metadata = {
-  title: "Gallery · Speaking, Conferences & Travel — Syed Irfan Ajmal",
+  title: "Gallery · Speaking, Conferences & Travel",
   description:
     "Photos from international conferences, keynotes, workshops, and travels — Dubai, Bali, Copenhagen, and beyond.",
   openGraph: {
-    title: "Gallery — Syed Irfan Ajmal",
+    title: "Gallery · Speaking, Conferences & Travel",
     description: "Speaking, conferences, and travel photos from around the world.",
   },
+  alternates: { canonical: "/gallery" },
 };
 
 export default function GalleryPage() {

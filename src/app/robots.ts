@@ -6,9 +6,9 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/emostool/"],
+        disallow: ["/api/", "/emostool/", "/emos/pay"],
       },
     ],
-    sitemap: "https://syedirfanajmal.com/sitemap.xml",
+    sitemap: "https://www.syedirfanajmal.com/sitemap.xml",
   };
 }

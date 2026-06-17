@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Neuromarketing 101: What Is Neuromarketing And How Does It Work? · Syed Irfan Ajmal",
+  title: "Neuromarketing 101: What Is Neuromarketing And How Does It Work?",
   description: "A research-backed guide to neuromarketing — covering the history, techniques (fMRI, EEG, eye tracking), real-world examples from Red Bull, Porsche, and Coke vs Pepsi, and how to apply it in your marketing.",
   openGraph: {
     title: "Neuromarketing 101: What Is Neuromarketing And How Does It Work?",
