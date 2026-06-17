@@ -8,6 +8,7 @@ import {
   ReferralCopyButton,
 } from "@/components/bureau/EmosInteractive";
 import { Figure } from "@/components/bureau/EmosFigures";
+import { EmosTOC } from "@/components/bureau/EmosTOC";
 import {
   GROT,
   INK,
@@ -41,39 +42,27 @@ export default function EmosPage() {
         &nbsp;·&nbsp; Application required
       </div>
 
-      {/* ── Nav ───────────────────────────────────────────────────────── */}
-      <nav className="emos-nav">
-        <div className="emos-nav-inner">
-          <a href="#" className="emos-nav-logo">
-            <span
-              style={{
-                background: YEL,
-                color: INK,
-                padding: "0 0.12em",
-                fontWeight: "inherit",
-              }}
-            >
-              EMOS
-            </span>
-            &nbsp; by Syed Irfan Ajmal
-          </a>
-          <ul className="emos-nav-items">
-            <li><a href="#how-it-works">How It Works</a></li>
-            <li><a href="#tools">Tools</a></li>
-            <li><a href="#curriculum">Curriculum</a></li>
-            <li><a href="#proof">Proof</a></li>
-            <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#guarantee">Guarantee</a></li>
-            <li><a href="#faq">FAQ</a></li>
-          </ul>
-          <a href="#apply" className="emos-nav-cta">
-            Submit Your Application →
-          </a>
-        </div>
-      </nav>
 
       <EmosPageWrapper>
-        <div style={{ paddingTop: 91 }}>
+        <div className="layout">
+          <EmosTOC />
+          <aside className="cta-rail">
+            <div className="cta-top">
+              <div className="cta-kicker">Cohort 1 · Founding</div>
+              <div className="cta-title">Apply now</div>
+            </div>
+            <div className="cta-body">
+              <div className="cta-meta">
+                <div className="cta-meta-row"><b>Jul 6</b> 2026 start</div>
+                <div className="cta-meta-row"><b>5</b> founder seats</div>
+                <div className="cta-meta-row"><b>48h</b> decision</div>
+              </div>
+              <div className="cta-seats" title="Seats remaining"><div className="cta-seat" /><div className="cta-seat" /><div className="cta-seat" /><div className="cta-seat open" /><div className="cta-seat open" /></div>
+              <a href="#apply" className="cta-btn">Submit Application →</a>
+              <p className="cta-fine">5 min · reviewed personally</p>
+            </div>
+          </aside>
+          <div className="page-body">
           {/* ── HERO ────────────────────────────────────────────────────── */}
           <section id="hero" className="emos-hero bg-ink sx">
             <div className="max">
@@ -220,7 +209,7 @@ export default function EmosPage() {
           </section>
 
           {/* ── § C: INVESTOR LENS ─────────────────────────────────────── */}
-          <section className="sy sx">
+          <section id="investor-lens" className="sy sx">
             <div className="max">
               <SectionMast noVol n="3" label="The Investor Lens · How VCs Read Your Media Presence" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>How investors read your media presence.</h2>
@@ -242,7 +231,7 @@ export default function EmosPage() {
           </section>
 
           {/* ── § D: NUMBERS ───────────────────────────────────────────── */}
-          <section className="sy bg-ink sx">
+          <section id="the-numbers" className="sy bg-ink sx">
             <div className="max">
               <SectionMast noVol n="4" label="The Numbers · Independent Research" dark />
               <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>Authority isn&#39;t a vibe. It&#39;s how the buying decision happens now.</h2>
@@ -256,7 +245,7 @@ export default function EmosPage() {
           </section>
 
           {/* ── § E: WHY NOW ───────────────────────────────────────────── */}
-          <section className="sy sx">
+          <section id="why-now" className="sy sx">
             <div className="max" style={{ maxWidth: 760 }}>
               <SectionMast noVol n="5" label="Why Now · The Fundraising Timeline Problem" />
               <h2 className="sec-h2" style={{ marginBottom: 24 }}>Six months from now is too late.</h2>
@@ -341,7 +330,7 @@ export default function EmosPage() {
           </section>
 
           {/* ── § H: 5-RETURN FRAMEWORK ────────────────────────────────── */}
-          <section className="sy bg-ink sx">
+          <section id="five-returns" className="sy bg-ink sx">
             <div className="max">
               <SectionMast noVol n="8" label="The 5-Return Framework · One Placement, Five Returns" dark />
               <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>One placement. Five returns.</h2>
@@ -439,7 +428,7 @@ export default function EmosPage() {
           </section>
 
           {/* ── § K: FIT CHECK ─────────────────────────────────────────── */}
-          <section className="sy sx">
+          <section id="fit" className="sy sx">
             <div className="max">
               <SectionMast noVol n="11" label="Fit Check · Who This Is Not For" />
               <h2 className="sec-h2" style={{ marginBottom: 40 }}>Who this is NOT for.</h2>
@@ -634,6 +623,7 @@ export default function EmosPage() {
               <div className="emos-footer-links"><a href="/privacy-policy">Privacy Policy</a><a href="/terms">Terms of Service</a><a href="mailto:sia@syedirfanajmal.com">sia@syedirfanajmal.com</a></div>
             </div>
           </footer>
+          </div>
         </div>
       </EmosPageWrapper>
     </>

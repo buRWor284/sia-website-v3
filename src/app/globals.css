@@ -1295,7 +1295,6 @@ body > * { position: relative; z-index: 2; }
 
 /* ── Announcement bar + Nav ──────────────────────────────────────────────── */
 .emos-announce {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 110;
   background: var(--color-yellow); border-bottom: 1px solid var(--color-ink);
   padding: 9px 20px; text-align: center;
   font-family: var(--font-grot); font-weight: 700; font-size: 11px;
@@ -2186,7 +2185,8 @@ label:has(input[type="checkbox"]),
 @media(max-width:1024px){ .site-links{ display:none; } }
 
 /* ── Left TOC + right apply rail · true 3-column grid (no overlap) ─────── */
-.layout{ padding-top:92px; }
+.layout{ padding-top:0; }
+.page-body [id]{ scroll-margin-top:112px; }
 .toc{ display:none; }
 .cta-rail{ display:none; }
 @media(min-width:1200px){
