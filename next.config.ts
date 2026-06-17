@@ -80,6 +80,25 @@ const nextConfig: NextConfig = {
       { source: "/tools/collab-link-building/",     destination: "/tools/partnercollabiq", permanent: p },
       { source: "/resources/collab-link-building",  destination: "/tools/partnercollabiq", permanent: p },
       { source: "/resources/collab-link-building/", destination: "/tools/partnercollabiq", permanent: p },
+
+      // Legacy WordPress cleanup (added 2026-06-17)
+      // Deleted author archives (e.g. /author/joceylnbrown) -> home
+      { source: "/author",        destination: "/", permanent: p },
+      { source: "/author/:path*", destination: "/", permanent: p },
+      // Old blog taxonomy archives -> resources (closest live equivalent)
+      { source: "/category",        destination: "/resources", permanent: p },
+      { source: "/category/:path*", destination: "/resources", permanent: p },
+      { source: "/tag",        destination: "/resources", permanent: p },
+      { source: "/tag/:path*", destination: "/resources", permanent: p },
+      // Old WP pagination archives -> section root
+      { source: "/page/:path*",         destination: "/",        permanent: p },
+      { source: "/podcast/page",        destination: "/podcast", permanent: p },
+      { source: "/podcast/page/:path*", destination: "/podcast", permanent: p },
+      // Old root-level podcast episode slugs -> canonical /podcast/<slug>
+      { source: "/faisal-khan-interview",   destination: "/podcast/faisal-khan-interview",   permanent: p },
+      { source: "/faisal-khan-interview/",  destination: "/podcast/faisal-khan-interview",   permanent: p },
+      { source: "/greg-heilers-interview",  destination: "/podcast/greg-heilers-interview",  permanent: p },
+      { source: "/greg-heilers-interview/", destination: "/podcast/greg-heilers-interview",  permanent: p },
     ];
   },
   turbopack: {
