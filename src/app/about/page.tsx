@@ -508,6 +508,14 @@ const PressArchive = () => (
         + 80 MORE
       </span>
     </div>
+
+    {/* Press kit CTA */}
+    <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid rgba(250,250,250,.18)`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 16, color: "rgba(250,250,250,.65)", lineHeight: 1.5, maxWidth: 520 }}>
+        Writing about Syed, or need assets? The full media kit has copy-ready bios, fast facts, headshots, coverage, and downloads.
+      </p>
+      <a href="/press-kit" style={{ padding: "14px 22px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", whiteSpace: "nowrap" }}>Download the full press kit →</a>
+    </div>
   </section>
 );
 
@@ -749,9 +757,10 @@ const EditorNote = () => (
           I started my career in tech, moved into sales, then found my
           calling in SEO and earned media. The questions have stayed the
           same since 2004: who reads what, what earns trust, why this story
-          now. I lived and worked in Sweden and Denmark, then built
-          DMR.agency from Peshawar into a practice serving clients across
-          twenty-plus countries.
+          now. I lived and worked in Sweden and Denmark, where I earned a
+          Master&apos;s in International Business and Entrepreneurship from
+          Malardalen University, then built DMR.agency from Peshawar into a
+          practice serving clients across twenty-plus countries.
         </p>
         <p style={{ marginTop: 16, fontFamily: SERIF, fontSize: 17, fontStyle: "italic", color: INK70, lineHeight: 1.6 }}>
           You can usually find me writing from Peshawar. Occasionally I am
@@ -816,6 +825,12 @@ const Outro = () => (
           style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(250,250,250,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
           Fractional CMO →
+        </a>
+        <a
+          href="/press-kit"
+          style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(250,250,250,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
+        >
+          Press kit →
         </a>
       </div>
     </div>
