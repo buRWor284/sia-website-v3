@@ -1355,7 +1355,7 @@ body > * { position: relative; z-index: 2; }
 .emos-cta-ghost:hover { background: rgba(250,250,250,.15); }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
-.emos-hero { padding-top: 36px; padding-bottom: 100px; overflow: hidden; position: relative; }
+.emos-hero { padding-top: 14px; padding-bottom: 100px; overflow: hidden; position: relative; }
 .emos-hero::before {
   content: 'EMOS'; position: absolute; right: -30px; bottom: -40px;
   font-family: var(--font-serif); font-weight: 700; font-size: clamp(180px, 22vw, 320px);
@@ -1364,9 +1364,9 @@ body > * { position: relative; z-index: 2; }
 }
 .emos-hero-headline {
   font-family: var(--font-serif); font-weight: 700;
-  font-size: clamp(20px, 2.75vw, 37px); line-height: 1.08;
+  font-size: clamp(16px, 2.2vw, 30px); line-height: 1.08;
   letter-spacing: -0.025em; color: var(--color-paper);
-  max-width: 880px; margin-bottom: 28px; text-wrap: pretty;
+  max-width: 880px; margin-bottom: 14px; text-wrap: pretty;
 }
 .emos-hero-sub {
   font-family: var(--font-serif); font-size: clamp(17px, 1.8vw, 22px);
@@ -1384,7 +1384,7 @@ body > * { position: relative; z-index: 2; }
 .emos-hero-cta-meta { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: rgba(250,250,250,.45); }
 
 /* ── Hero film (embedded 45s dispatch) ───────────────────────────────────── */
-.emos-hero-film { margin: 32px 0 40px; max-width: 880px; }
+.emos-hero-film { margin: 14px 0 40px; max-width: 880px; }
 .emos-hero-film-kicker {
   font-family: var(--font-grot); font-weight: 700; font-size: 11px;
   letter-spacing: 0.2em; text-transform: uppercase; color: rgba(250,250,250,.55);
