@@ -29,8 +29,8 @@ const FIGS: Record<number, string> = {
         </div>
       </div>`,
   2: `<div class="fig" data-fig="2">
-          <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 2</span><span class="sm-label">One Placement, Five Returns</span><div class="sm-line"></div><span class="sm-vol">§ 8 · 5-Return Framework</span></div><div class="sm-close"></div></div>
-          <p class="fig-desc">A single Tier 1 placement multiplies into five compounding returns, each active independently, long after the article goes live.</p>
+          <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 2</span><span class="sm-label">One Placement, Five Returns</span><div class="sm-line"></div><span class="sm-vol">§ 9 · 5-Return Framework</span></div><div class="sm-close"></div></div>
+          <p class="fig-desc">A single Tier 1 placement multiplies into five parallel returns, each active independently, long after the article goes live.</p>
           <div class="f2">
             <div class="f2-src"><div class="f2-big">1</div><div class="f2-lbl">Placement</div></div>
             <div class="f2-spine"><div class="f2-vline"></div><div class="f2-x5">×5</div></div>
@@ -67,7 +67,7 @@ const FIGS: Record<number, string> = {
         </div>
       </div>`,
   4: `<div class="fig" data-fig="4">
-        <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 4</span><span class="sm-label">Cohort 1 · Week by Week</span><div class="sm-line"></div><span class="sm-vol">§ 6 · What You'll Build</span></div><div class="sm-close"></div></div>
+        <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 4</span><span class="sm-label">Cohort 1 · Week by Week</span><div class="sm-line"></div><span class="sm-vol">§ 7 · What You'll Build</span></div><div class="sm-close"></div></div>
         <p class="fig-desc">8 weeks, 2 tracks, one compounding system. Foundation closes at Week 4 with a guaranteed placement. Accelerate adds four more weeks of Tier 1 linkable asset building.</p>
         <div class="f4">
           <div class="f4-top"><div class="f4-badge">COHORT 1 · JULY 6, 2026</div></div><div class="f4-head"><div class="f4-wks"><div class="f4-wk on" style="--d:.18s;">W1</div><div class="f4-wk on" style="--d:.26s;">W2</div><div class="f4-wk on" style="--d:.34s;">W3</div><div class="f4-wk on" style="--d:.42s;">W4</div><div class="f4-wk off" style="--d:.5s;">W5</div><div class="f4-wk off" style="--d:.58s;">W6</div><div class="f4-wk off" style="--d:.66s;">W7</div><div class="f4-wk off" style="--d:.74s;">W8</div></div></div>
@@ -85,7 +85,7 @@ const FIGS: Record<number, string> = {
         </div>
       </div>`,
   5: `<div class="fig" data-fig="5">
-        <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 5</span><span class="sm-label">Winning Pitch Anatomy</span><div class="sm-line"></div><span class="sm-vol">§ 9 · Curriculum · Week 2</span></div><div class="sm-close"></div></div>
+        <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 5</span><span class="sm-label">Winning Pitch Anatomy</span><div class="sm-line"></div><span class="sm-vol">§ 10 · Curriculum · Week 2</span></div><div class="sm-close"></div></div>
         <p class="fig-desc">The five elements that separate a pitch that gets used from a press release that gets deleted. Most founders include two. EMOS builds the muscle for all five.</p>
         <div class="f5">
           <div class="f5-email">

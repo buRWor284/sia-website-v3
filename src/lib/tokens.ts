@@ -20,6 +20,7 @@ export const INK15   = "rgba(26,20,16,.15)";
 // ── Accent ────────────────────────────────────────────────────────────────────
 export const YEL     = "#f5b81f";
 export const YEL2    = "#ffc83a";
+export const BLUE    = "#2e90c3";   // editorial blue accent (flywheel numbers, eyebrow, CTA underline)
 
 // ── Tool-shell dark surfaces (shared across all tool headers/shells) ───────────
 export const DARK    = "#0e0d0a";   // tool header / dark shell background

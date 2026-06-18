@@ -9,6 +9,7 @@ import {
 } from "@/components/bureau/EmosInteractive";
 import { Figure } from "@/components/bureau/EmosFigures";
 import { EmosTOC } from "@/components/bureau/EmosTOC";
+import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
 import {
   GROT,
   INK,
@@ -269,10 +270,20 @@ export default function EmosPage() {
             </div>
           </section>
 
+          {/* ── § F0: THE PAYOFF · COVERAGE FLYWHEEL ────────────────────── */}
+          <section id="the-payoff" className="sy sx">
+            <div className="max">
+              <SectionMast noVol n="6" label="The Payoff · Six Compounding Benefits" />
+              <h2 className="sec-h2" style={{ marginBottom: 12 }}>Six benefits. One compounding <em style={{ color: YEL }}>engine.</em></h2>
+              <p className="sec-sub" style={{ marginBottom: 40 }}>Every advantage EMOS builds, arranged around the flywheel that compounds them. Hover, tap, or focus any segment to explore.</p>
+              <CoverageFlywheel />
+            </div>
+          </section>
+
           {/* ── § F: WHAT YOU'LL BUILD ─────────────────────────────────── */}
           <section id="how-it-works-detail" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast noVol n="6" label="What You'll Build · Three Stages" />
+              <SectionMast noVol n="7" label="What You'll Build · Three Stages" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Three stages. One compounding system.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Stop outsourcing authority. Start owning it. Each stage produces a concrete output you keep forever.</p>
               <div className="emos-stages-grid">
@@ -305,7 +316,7 @@ export default function EmosPage() {
           {/* ── § G: TOOLS ─────────────────────────────────────────────── */}
           <section id="tools" className="sy sx">
             <div className="max">
-              <SectionMast noVol n="7" label="Tools · Purpose-built for the System" />
+              <SectionMast noVol n="8" label="Tools · Purpose-built for the System" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Three tools. Included free.<br /><em style={{ color: YEL }}>Founding cohort only.</em></h2>
               <p className="sec-sub" style={{ marginBottom: 28 }}>Purpose-built tools that replace the manual work. Cohort 1 founding members get free 3-month access to all three.</p>
               <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 22px", background: YEL, border: `1px solid ${INK}`, marginBottom: 36 }}>
@@ -338,9 +349,9 @@ export default function EmosPage() {
           {/* ── § H: 5-RETURN FRAMEWORK ────────────────────────────────── */}
           <section id="five-returns" className="sy bg-ink sx">
             <div className="max">
-              <SectionMast noVol n="8" label="The 5-Return Framework · One Placement, Five Returns" dark />
+              <SectionMast noVol n="9" label="The 5-Return Framework · One Placement, Five Returns" dark />
               <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>One placement. Five returns.</h2>
-              <p className="sec-sub" style={{ marginBottom: 44, color: "rgba(250,250,250,.55)" }}>Most founders treat a press placement as a one-off win. EMOS extracts five compounding returns from every single one. Which is why one Forbes citation can keep paying for years.</p>
+              <p className="sec-sub" style={{ marginBottom: 44, color: "rgba(250,250,250,.55)" }}>Most founders treat a press placement as a one-off win. EMOS extracts five parallel returns from every single one. Which is why one Forbes citation can keep paying for years.</p>
               <Figure n={2} />
             </div>
           </section>
@@ -348,7 +359,7 @@ export default function EmosPage() {
           {/* ── § I: CURRICULUM ─────────────────────────────────────────── */}
           <section id="curriculum" className="sy sx">
             <div className="max">
-              <SectionMast noVol n="9" label="Curriculum · Two Tracks" />
+              <SectionMast noVol n="10" label="Curriculum · Two Tracks" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Choose the track that matches how fast you need to move.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Both tracks teach the same foundation. Accelerate adds 4 more weeks for founders who want Tier 1 publications and linkable assets.</p>
               <table className="emos-curr-table">
@@ -389,7 +400,7 @@ export default function EmosPage() {
           {/* ── § J: PROOF / TESTIMONIALS ──────────────────────────────── */}
           <section id="proof" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast noVol n="10" label="Proof · The Same System. Their Results." />
+              <SectionMast noVol n="11" label="Proof · The Same System. Their Results." />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>The same system. Their results.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Five results from client campaigns across the US, UK, and Gulf. Click any card to read the full testimony.</p>
               <div style={{ overflow: "hidden", border: `1px solid ${INK15}`, padding: "14px 0", marginBottom: 44 }}>
@@ -436,7 +447,7 @@ export default function EmosPage() {
           {/* ── § K: FIT CHECK ─────────────────────────────────────────── */}
           <section id="fit" className="sy sx">
             <div className="max">
-              <SectionMast noVol n="11" label="Fit Check · Who This Is Not For" />
+              <SectionMast noVol n="12" label="Fit Check · Who This Is Not For" />
               <h2 className="sec-h2" style={{ marginBottom: 40 }}>Who this is NOT for.</h2>
               <div className="emos-fit-grid">
                 <div className="emos-fit-col emos-fit-col-bad">
@@ -459,7 +470,7 @@ export default function EmosPage() {
           {/* ── § L: THE MATH / CALCULATOR ──────────────────────────────── */}
           <section id="calculator" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast noVol n="12" label="The Math · SIA Authority ROI Calculator" />
+              <SectionMast noVol n="13" label="The Math · SIA Authority ROI Calculator" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Find out how much EMOS will save you<br />in financial costs alone.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Let alone the benefits of doing things in-house: investor credibility, AI citations, sales proof, and compounding reach. Adjust to your real numbers.</p>
               <AuthorityCalculator />
@@ -487,7 +498,7 @@ export default function EmosPage() {
           {/* ── § M: INVESTMENT ─────────────────────────────────────────── */}
           <section id="pricing" className="sy bg-ink sx">
             <div className="max">
-              <SectionMast noVol n="13" label="Investment · Two Tracks, One-Time Fee" dark />
+              <SectionMast noVol n="14" label="Investment · Two Tracks, One-Time Fee" dark />
               <div className="emos-pricing-outer">
                 <div className="emos-pricing-math">
                   <h2 className="sec-h2" style={{ marginBottom: 24, color: PAPER }}>Two tracks. One-time investment. Capability you keep forever.</h2>
@@ -552,7 +563,7 @@ export default function EmosPage() {
           {/* ── § N: GUARANTEE ──────────────────────────────────────────── */}
           <section id="guarantee" className="sy sx">
             <div className="max">
-              <SectionMast noVol n="14" label="Risk Reversal · The Guarantee" />
+              <SectionMast noVol n="15" label="Risk Reversal · The Guarantee" />
               <h2 className="sec-h2" style={{ marginBottom: 24 }}>A guarantee no PR agency will ever match.</h2>
               <div className="emos-guarantee-banner"><p className="emos-guarantee-banner-text"><strong>1 verified media placement in 60 days</strong>, or every dollar back. No negotiation.</p></div>
               <div className="emos-commit-grid">
@@ -576,7 +587,7 @@ export default function EmosPage() {
           {/* ── § O: FAQ ───────────────────────────────────────────────── */}
           <section id="faq" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast noVol n="15" label="FAQ · Common Questions" />
+              <SectionMast noVol n="16" label="FAQ · Common Questions" />
               <h2 className="sec-h2" style={{ marginBottom: 40 }}>Common questions.</h2>
               <AccordionGroup className="emos-faq-wrap">
                 {[
