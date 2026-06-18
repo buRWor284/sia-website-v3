@@ -1355,7 +1355,7 @@ body > * { position: relative; z-index: 2; }
 .emos-cta-ghost:hover { background: rgba(250,250,250,.15); }
 
 /* ── Hero ────────────────────────────────────────────────────────────────── */
-.emos-hero { padding-top: 92px; padding-bottom: 100px; overflow: hidden; position: relative; }
+.emos-hero { padding-top: 36px; padding-bottom: 100px; overflow: hidden; position: relative; }
 .emos-hero::before {
   content: 'EMOS'; position: absolute; right: -30px; bottom: -40px;
   font-family: var(--font-serif); font-weight: 700; font-size: clamp(180px, 22vw, 320px);

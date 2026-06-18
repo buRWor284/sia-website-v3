@@ -36,13 +36,6 @@ export const metadata: Metadata = {
 export default function EmosPage() {
   return (
     <>
-      {/* ── Announcement bar ──────────────────────────────────────────── */}
-      <div className="emos-announce">
-        Cohort 1 begins <strong>July 6, 2026</strong> &nbsp;·&nbsp; 5 founders
-        &nbsp;·&nbsp; Application required
-      </div>
-
-
       <EmosPageWrapper>
         <div className="layout">
           <EmosTOC />
@@ -66,12 +59,6 @@ export default function EmosPage() {
           {/* ── HERO ────────────────────────────────────────────────────── */}
           <section id="hero" className="emos-hero bg-ink sx">
             <div className="max">
-              <div className="emos-anti-pills">
-                <span className="emos-anti-pill">Not a course</span>
-                <span className="emos-anti-pill">No agency retainers</span>
-                <span className="emos-anti-pill">No ad spend</span>
-                <span className="emos-anti-pill">No platform dependency</span>
-              </div>
               <h1 className="emos-hero-headline">
                 Build the Media Presence Investors Check Before Your First
                 Meeting.
@@ -87,6 +74,13 @@ export default function EmosPage() {
                     scrolling="no"
                   />
                 </div>
+              </div>
+
+              <div className="emos-anti-pills">
+                <span className="emos-anti-pill">Not a course</span>
+                <span className="emos-anti-pill">No agency retainers</span>
+                <span className="emos-anti-pill">No ad spend</span>
+                <span className="emos-anti-pill">No platform dependency</span>
               </div>
 
               <p className="emos-hero-sub">
