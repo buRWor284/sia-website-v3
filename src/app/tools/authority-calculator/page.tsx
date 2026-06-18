@@ -664,7 +664,7 @@ const BENEFITS: [string, string][] = [
   ["AI / LLM citations",
    "ChatGPT, Perplexity, and Google AI Overviews cite credible publications. Cited brands surface in AI answers about their space, a channel growing faster than any other."],
   ["Investor proof",
-   "VCs Google you before the first meeting. A Tier 1 citation answers the credibility question before it's asked, and shapes the conversation before you're in the room."],
+   "VCs look you up before the first meeting. A Tier 1 citation answers the credibility question before it's asked, and shapes the conversation before you're in the room."],
   ["SEO authority",
    "A DA 80+ backlink lifts your domain rating; target pages rank higher for the keywords your buyers use. The agency invoice stops; the domain authority stays."],
   ["Permanent sales collateral",
@@ -937,7 +937,7 @@ const LLMCallout = () => (
             Also not counted above
           </SCaps>
           {[
-            "Investor credibility (VCs Google you first)",
+            "Investor credibility (VCs look you up first)",
             "Permanent sales collateral",
             "Compounding journalist relationships",
           ].map((b) => (
