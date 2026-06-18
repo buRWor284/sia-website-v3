@@ -1384,7 +1384,7 @@ body > * { position: relative; z-index: 2; }
 .emos-hero-cta-meta { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: rgba(250,250,250,.45); }
 
 /* ── Hero film (embedded 45s dispatch) ───────────────────────────────────── */
-.emos-hero-film { margin-top: 44px; max-width: 880px; }
+.emos-hero-film { margin: 32px 0 40px; max-width: 880px; }
 .emos-hero-film-kicker {
   font-family: var(--font-grot); font-weight: 700; font-size: 11px;
   letter-spacing: 0.2em; text-transform: uppercase; color: rgba(250,250,250,.55);

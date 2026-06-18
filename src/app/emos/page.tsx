@@ -80,6 +80,19 @@ export default function EmosPage() {
                 <strong>EMOS</strong>, the Earned Media Operating System, is a
                 Guided Implementation System for founders <strong>3 to 12 months from a Series A</strong>.
               </p>
+
+              <div className="emos-hero-film">
+                <p className="emos-hero-film-kicker">In a hurry? Watch the 45-second version</p>
+                <div className="emos-hero-film-frame">
+                  <iframe
+                    src="/assets/emos-hero.standalone.html"
+                    title="EMOS | what investors find when they look you up"
+                    loading="lazy"
+                    scrolling="no"
+                  />
+                </div>
+              </div>
+
               <div className="emos-hero-cta-row">
                 <a href="#apply" className="emos-cta-yellow">
                   Submit Your Application →
@@ -101,18 +114,6 @@ export default function EmosPage() {
                 <a href="#guarantee" className="emos-guarantee-see-terms">
                   See terms ↓
                 </a>
-              </div>
-
-              <div className="emos-hero-film">
-                <p className="emos-hero-film-kicker">In a hurry? Watch the 45-second version</p>
-                <div className="emos-hero-film-frame">
-                  <iframe
-                    src="/assets/emos-hero.standalone.html"
-                    title="EMOS | what investors find when they look you up"
-                    loading="lazy"
-                    scrolling="no"
-                  />
-                </div>
               </div>
             </div>
           </section>
