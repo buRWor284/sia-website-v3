@@ -102,6 +102,18 @@ export default function EmosPage() {
                   See terms ↓
                 </a>
               </div>
+
+              <div className="emos-hero-film">
+                <p className="emos-hero-film-kicker">In a hurry? Watch the 45-second version</p>
+                <div className="emos-hero-film-frame">
+                  <iframe
+                    src="/assets/emos-hero.standalone.html"
+                    title="EMOS | what investors find when they look you up"
+                    loading="lazy"
+                    scrolling="no"
+                  />
+                </div>
+              </div>
             </div>
           </section>
 

@@ -1383,6 +1383,21 @@ body > * { position: relative; z-index: 2; }
 .emos-hero-cta-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
 .emos-hero-cta-meta { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: rgba(250,250,250,.45); }
 
+/* ── Hero film (embedded 45s dispatch) ───────────────────────────────────── */
+.emos-hero-film { margin-top: 44px; max-width: 880px; }
+.emos-hero-film-kicker {
+  font-family: var(--font-grot); font-weight: 700; font-size: 11px;
+  letter-spacing: 0.2em; text-transform: uppercase; color: rgba(250,250,250,.55);
+  margin: 0 0 12px; display: flex; align-items: center; gap: 10px;
+}
+.emos-hero-film-kicker::before { content: ''; width: 22px; height: 1px; background: var(--color-yellow); }
+.emos-hero-film-frame {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  border: 1px solid rgba(250,250,250,.14); background: #FAF7F0;
+  overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.35);
+}
+.emos-hero-film-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+
 /* ── Guarantee block (hero) ──────────────────────────────────────────────── */
 .emos-guarantee-block {
   display: flex; align-items: center; gap: 18px; margin-top: 32px;
