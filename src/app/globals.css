@@ -1364,7 +1364,7 @@ body > * { position: relative; z-index: 2; }
 }
 .emos-hero-headline {
   font-family: var(--font-serif); font-weight: 700;
-  font-size: clamp(38px, 5.5vw, 74px); line-height: 1.0;
+  font-size: clamp(20px, 2.75vw, 37px); line-height: 1.08;
   letter-spacing: -0.025em; color: var(--color-paper);
   max-width: 880px; margin-bottom: 28px; text-wrap: pretty;
 }

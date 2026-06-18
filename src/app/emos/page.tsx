@@ -76,10 +76,6 @@ export default function EmosPage() {
                 Build the Media Presence Investors Check Before Your First
                 Meeting.
               </h1>
-              <p className="emos-hero-sub">
-                <strong>EMOS</strong>, the Earned Media Operating System, is a
-                Guided Implementation System for founders <strong>3 to 12 months from a Series A</strong>.
-              </p>
 
               <div className="emos-hero-film">
                 <p className="emos-hero-film-kicker">In a hurry? Watch the 45-second version</p>
@@ -92,6 +88,11 @@ export default function EmosPage() {
                   />
                 </div>
               </div>
+
+              <p className="emos-hero-sub">
+                <strong>EMOS</strong>, the Earned Media Operating System, is a
+                Guided Implementation System for founders <strong>3 to 12 months from a Series A</strong>.
+              </p>
 
               <div className="emos-hero-cta-row">
                 <a href="#apply" className="emos-cta-yellow">
