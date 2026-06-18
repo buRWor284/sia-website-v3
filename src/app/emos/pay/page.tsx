@@ -544,6 +544,7 @@ export default function EmosPayPage() {
             <div className="emos-footer-links">
               <a href="/privacy">Privacy Policy</a>
               <a href="/terms">Terms of Service</a>
+              <a href="/refund-policy">Refund Policy</a>
               <a href="mailto:sia@syedirfanajmal.com">sia@syedirfanajmal.com</a>
             </div>
           </div>
