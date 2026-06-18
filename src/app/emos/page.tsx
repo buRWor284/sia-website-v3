@@ -25,7 +25,7 @@ import {
 export const metadata: Metadata = {
   title: "EMOS · Build the Media Presence Investors Check Before Your First Meeting",
   description:
-    "EMOS is a Guided Implementation System for founders 3 to 12 months from a Series A raise. One-time investment. Capability you keep forever.",
+    "EMOS, the Earned Media Operating System, is a Guided Implementation System for founders 3 to 12 months from a Series A raise. One-time investment. Capability you keep forever.",
   alternates: { canonical: "/emos" },
 };
 
@@ -77,8 +77,8 @@ export default function EmosPage() {
                 Meeting.
               </h1>
               <p className="emos-hero-sub">
-                <strong>EMOS</strong> is a Guided Implementation System for
-                founders <strong>3 to 12 months from a Series A</strong>.
+                <strong>EMOS</strong>, the Earned Media Operating System, is a
+                Guided Implementation System for founders <strong>3 to 12 months from a Series A</strong>.
               </p>
               <div className="emos-hero-cta-row">
                 <a href="#apply" className="emos-cta-yellow">
@@ -128,7 +128,7 @@ export default function EmosPage() {
           <section className="sy-sm bg-p2 sx">
             <div className="max">
               <p style={{ fontFamily: SERIF, fontSize: "clamp(16px,1.8vw,20px)", lineHeight: 1.55, marginBottom: 32, maxWidth: 680 }}>
-                VCs Google you before the first meeting. What they find, or don&#39;t find, is already shaping the conversation.
+                VCs look you up before the first meeting. What they find, or don&#39;t find, is already shaping the conversation.
               </p>
               <div className="emos-proof-grid">
                 <div className="emos-proof-cell"><div className="emos-proof-num">218</div><div className="emos-proof-key">Citations earned</div><div className="emos-proof-note">MarketWatch · Forbes · Bankrate</div></div>

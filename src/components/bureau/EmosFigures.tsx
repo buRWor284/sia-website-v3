@@ -45,7 +45,7 @@ const FIGS: Record<number, string> = {
         </div>`,
   3: `<div class="fig" data-fig="3">
         <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 3</span><span class="sm-label">What the VC Finds · The Pre-Meeting Search</span><div class="sm-line"></div><span class="sm-vol">§ 3 · Investor Lens</span></div><div class="sm-close"></div></div>
-        <p class="fig-desc">What happens when a VC Googles you five minutes before the first call, without EMOS, and after.</p>
+        <p class="fig-desc">What happens when a VC looks you up five minutes before the first call, without EMOS, and after.</p>
         <div class="f3">
           <div class="f3-col f3-before">
             <span class="f3-tag">Before EMOS · The Pre-Meeting Search</span>
