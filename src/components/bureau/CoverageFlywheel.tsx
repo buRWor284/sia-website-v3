@@ -408,5 +408,13 @@ const CF_CSS = `
 @keyframes cfHubIn{from{opacity:0;transform:translate(-50%,-50%) scale(.9);}to{opacity:1;transform:translate(-50%,-50%) scale(1);}}
 @keyframes cfRingIn{from{stroke-dashoffset:1;}to{stroke-dashoffset:0;}}
 @keyframes cfHubPulse{0%{transform:scale(1);opacity:.55;}70%{transform:scale(1.1);opacity:0;}100%{opacity:0;}}
-@media(max-width:640px){.cf-label{font-size:10px;letter-spacing:.1em;}}
+@media(max-width:640px){
+  .cf-label{font-size:10px;letter-spacing:.1em;}
+  /* The hub circle is too small on phones to hold a full benefit sentence, so when a
+     segment is active expand the centre into a rounded card that contains the text. */
+  .cf-hub.cf-active{width:64%;height:auto;min-height:31.25%;border-radius:16px;padding:14px 15px;z-index:5;}
+  .cf-hub.cf-active .cf-hub-default{display:none;}
+  .cf-hub.cf-active .cf-hub-detail{position:relative;inset:auto;padding:0;}
+  .cf-hub-det-desc{font-size:10px;line-height:1.42;}
+}
 `;

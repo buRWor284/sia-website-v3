@@ -158,21 +158,50 @@ export function Figure({ n }: { n: 1 | 2 | 3 | 4 | 5 }) {
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
-    const fig = root.querySelector(".fig");
+    const fig = root.querySelector(".fig") as HTMLElement | null;
     if (!fig) return;
+
+    // Reveal once, by whichever trigger fires first. The IntersectionObserver is the
+    // primary path; the scroll listener and timeout are fallbacks so a figure never
+    // stays stuck at opacity:0 if the observer's initial callback is missed (e.g. a
+    // React Strict Mode double-mount in dev, or the figure being in view on load).
+    let revealed = false;
+    const cleanups: Array<() => void> = [];
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      fig.classList.add("in");
+      onFigIn(fig);
+      cleanups.forEach((fn) => fn());
+    };
+    const inView = () => {
+      const r = fig.getBoundingClientRect();
+      return r.top < window.innerHeight && r.bottom > 0;
+    };
+
     const io = new IntersectionObserver(
       (entries) => {
-        entries.forEach((e) => {
-          if (!e.isIntersecting) return;
-          fig.classList.add("in");
-          onFigIn(fig);
-          io.disconnect();
-        });
+        if (entries.some((e) => e.isIntersecting)) reveal();
       },
       { threshold: 0, rootMargin: "0px 0px -8% 0px" }
     );
     io.observe(fig);
-    return () => io.disconnect();
+    cleanups.push(() => io.disconnect());
+
+    const onScroll = () => {
+      if (inView()) reveal();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    cleanups.push(() => window.removeEventListener("scroll", onScroll));
+
+    const fallback = window.setTimeout(() => {
+      if (inView()) reveal();
+    }, 1200);
+    cleanups.push(() => window.clearTimeout(fallback));
+
+    return () => {
+      cleanups.forEach((fn) => fn());
+    };
   }, [n]);
 
   const html = n === 2 ? `<div class="fig-mount">${FIGS[n]}</div>` : FIGS[n];

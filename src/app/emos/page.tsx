@@ -31,12 +31,27 @@ export const metadata: Metadata = {
 };
 
 /* =========================================================================
-   EMOS LANDING PAGE v3
+   EMOS LANDING PAGE v4 | restructured for length, front-loading, and
+   consolidation. See EMOS-Page-Length-Structure-Audit.md for the rationale.
    ========================================================================= */
 
 export default function EmosPage() {
   return (
     <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+          /* Sticky mobile apply bar: shown where the desktop rail is hidden (< 1200px). */
+          .emos-mobile-bar{position:fixed;left:0;right:0;bottom:0;z-index:200;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:10px 16px;background:${INK};border-top:1px solid ${YEL};box-shadow:0 -10px 30px -18px rgba(0,0,0,.7);}
+          .emos-mobile-bar .mmb-price{font-family:${'var(--font-grot)'};font-weight:900;font-size:12px;letter-spacing:.04em;color:${PAPER};line-height:1.2;}
+          .emos-mobile-bar .mmb-price span{display:block;font-family:${'var(--font-serif)'};font-weight:400;font-style:italic;font-size:10.5px;letter-spacing:0;color:rgba(250,250,250,.6);}
+          .emos-mobile-bar .mmb-btn{flex:0 0 auto;font-family:${'var(--font-grot)'};font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:${YEL};color:${INK};border:1px solid ${INK};padding:12px 16px;text-decoration:none;}
+          @media (min-width:1200px){.emos-mobile-bar{display:none;}}
+          /* keep the fixed bar from covering the footer on mobile */
+          @media (max-width:1199px){.emos-footer{padding-bottom:84px;}}
+          `,
+        }}
+      />
       <EmosPageWrapper>
         <div className="layout">
           <EmosTOC />
@@ -46,6 +61,11 @@ export default function EmosPage() {
               <div className="cta-title">Apply now</div>
             </div>
             <div className="cta-body">
+              {/* CHANGE 2: price surfaced in the sticky rail */}
+              <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 14, letterSpacing: ".03em", color: INK, marginBottom: 10 }}>
+                $2K · $3.5K{" "}
+                <span style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: "italic", fontSize: 11, letterSpacing: 0, color: INK55 }}>one-time</span>
+              </div>
               <div className="cta-meta">
                 <div className="cta-meta-row"><b>Jul 6</b> 2026 start</div>
                 <div className="cta-meta-row"><b>5</b> founder seats</div>
@@ -57,6 +77,7 @@ export default function EmosPage() {
             </div>
           </aside>
           <div className="page-body">
+
           {/* ── HERO ────────────────────────────────────────────────────── */}
           <section id="hero" className="emos-hero bg-ink sx">
             <div className="max">
@@ -66,7 +87,7 @@ export default function EmosPage() {
               </h1>
 
               <div className="emos-hero-film">
-                <p className="emos-hero-film-kicker">In a hurry? Watch the 45-second version</p>
+                <p className="emos-hero-film-kicker">In a hurry? Watch the 45-second film</p>
                 <div className="emos-hero-film-frame">
                   <iframe
                     src="/assets/emos-hero.standalone.html"
@@ -150,7 +171,32 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § A: BUILT BY ──────────────────────────────────────────── */}
+          {/* ── CHANGE 1: OFFER SUMMARY (front-loaded) ──────────────────── */}
+          <section id="offer" className="sy-sm sx">
+            <div className="max">
+              <div style={{ border: `1px solid ${INK}`, background: PAPER2, padding: "clamp(22px,3vw,38px)", display: "flex", flexWrap: "wrap", gap: "clamp(20px,3vw,44px)", alignItems: "center", justifyContent: "space-between" }}>
+                <div style={{ flex: "1 1 340px", minWidth: 0 }}>
+                  <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: INK55, marginBottom: 12 }}>The offer · 30-second read</div>
+                  <p style={{ fontFamily: SERIF, fontSize: "clamp(18px,2vw,23px)", lineHeight: 1.4, color: INK, marginBottom: 18 }}>
+                    A guided cohort where you build your own earned-media system in 4 to 8 weeks, then keep it forever. <strong>Placements-or-refund guarantee.</strong>
+                  </p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+                    <span style={{ border: `1px solid ${INK15}`, padding: "8px 13px", fontFamily: SERIF, fontSize: 14 }}><strong>Foundation</strong> · $2,000 · 4 weeks</span>
+                    <span style={{ border: `1px solid ${INK}`, background: YEL, padding: "8px 13px", fontFamily: SERIF, fontSize: 14 }}><strong>Accelerate</strong> · $3,500 · 8 weeks</span>
+                    <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>one-time · plan for 3 to 5 hrs/week</span>
+                  </div>
+                </div>
+                <div style={{ flex: "0 1 290px", minWidth: 0 }}>
+                  <a href="#apply" className="emos-cta-yellow" style={{ display: "flex", justifyContent: "center", width: "100%" }}>Submit Your Application →</a>
+                  <p style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.55, color: INK70, marginTop: 12 }}>
+                    Apply in 5 minutes. <strong>No payment now.</strong> I review within 48 hours, then a 15-minute fit call decides.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* ── § 1: BUILT BY ──────────────────────────────────────────── */}
           <section id="built-by" className="sy sx">
             <div className="max">
               <SectionMast noVol n="1" label="Built By" />
@@ -160,12 +206,12 @@ export default function EmosPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/assets/headshot-circle.png" alt="Syed Irfan Ajmal" className="pc-photo" />
                     <div className="pc-name">Syed Irfan Ajmal</div>
-                    <div className="pc-title">Columnist · Agency Operator · 12+ Years</div>
+                    <div className="pc-title">Columnist · Agency Operator · 13+ Years</div>
                   </div>
                   <div className="pc-creds">
-                    <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text">Forbes, HBR, HuffPost, World Bank, SEJ, Entrepreneur, The Next Web, Yahoo, MSN <em>+ more</em></div></div>
+                    <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text">Forbes, HBR, HuffPost, World Bank, SEJ, Entrepreneur, The Next Web, Yahoo, MSN, SEMrush, SERPed <em>+ more</em></div></div>
                     <div className="pc-cred"><div className="pc-cred-label">International Speaker</div><div className="pc-cred-text">World Bank · Arabian Travel Market · MaGIC Malaysia · Astrolabs Dubai · DMSS.io Bali</div></div>
-                    <div className="pc-cred"><div className="pc-cred-label">Custom Workshops</div><div className="pc-cred-text">Delivered for SEMrush (NYSE: SEMR) &amp; uHubs, global platforms &amp; enterprise brands</div></div>
+                    <div className="pc-cred"><div className="pc-cred-label">Custom Workshops</div><div className="pc-cred-text">Delivered for SEMrush (NYSE: SEMR) &amp; uHubs(SaaS, UK)</div></div>
                   </div>
                 </div>
                 <div>
@@ -175,11 +221,12 @@ export default function EmosPage() {
                   <p className="emos-bio-quote">
                     EMOS is the consolidation of two perspectives most operators only ever see one of: the agency operator sending pitches, and the columnist reading them.
                   </p>
+                  {/* CHANGE 10: bio lightly condensed (facts unchanged) */}
                   <p className="emos-bio-body">
-                    Founded an earned media agency 12+ years ago. Previously co-founded an award-winning geo-spatial intelligence startup; held marketing leadership at two other ventures. All bootstrapped to profitability. Hosts <em>The SIA Business Podcast</em> (7+ years). Clients across the US, Canada, Europe, Australia, and the Gulf.
+                    Founded an earned media agency 13+ years ago. Earlier, co-founded an award-winning geo-spatial intelligence startup and led marketing at two more ventures, all bootstrapped to profitability. Hosts <em>The SIA Business Podcast</em> (7+ years). Clients across the US, Canada, Europe, Australia, and the Gulf.
                   </p>
                   <div className="emos-stats-strip">
-                    {[["12+","Years"],["100+","Publications"],["$1.2M","Client rev/mo"],["4","Continents"]].map(([v,k]) => (
+                    {[["13+","Years"],["100+","Publications"],["$1.2M","Client rev/mo"],["4","Continents"]].map(([v,k]) => (
                       <div className="emos-stat-cell" key={k}><div className="emos-stat-val">{v}</div><div className="emos-stat-key">{k}</div></div>
                     ))}
                   </div>
@@ -188,7 +235,7 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § B: REAL PROBLEM ──────────────────────────────────────── */}
+          {/* ── § 2: REAL PROBLEM ──────────────────────────────────────── */}
           <section id="how-it-works" className="sy bg-p2 sx">
             <div className="max">
               <SectionMast noVol n="2" label="The Real Problem · Why Most Founders Fail at PR" />
@@ -215,7 +262,7 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § C: INVESTOR LENS ─────────────────────────────────────── */}
+          {/* ── § 3: INVESTOR LENS (+ Numbers merged in) ───────────────── */}
           <section id="investor-lens" className="sy sx">
             <div className="max">
               <SectionMast noVol n="3" label="The Investor Lens · How VCs Read Your Media Presence" />
@@ -231,36 +278,40 @@ export default function EmosPage() {
                 </tbody>
               </table>
               <Figure n={3} />
-              <p style={{ marginTop: 22, fontFamily: SERIF, fontSize: 16, color: INK70 }}>
-                Want to see where you stand? Use the <a href="#calculator" className="emos-tool-link-ink">SIA Authority ROI Calculator ↓</a> to calculate what renting vs. owning authority costs you.
-              </p>
-            </div>
-          </section>
 
-          {/* ── § D: NUMBERS ───────────────────────────────────────────── */}
-          <section id="the-numbers" className="sy bg-ink sx">
-            <div className="max">
-              <SectionMast noVol n="4" label="The Numbers · Independent Research" dark />
-              <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>Authority isn&#39;t a vibe. It&#39;s how the buying decision happens now.</h2>
-              <p className="sec-sub" style={{ marginBottom: 48, color: "rgba(250,250,250,.55)" }}>Three numbers that explain why earned authority outperforms paid acquisition on the metrics that matter to a founder under fundraising pressure.</p>
-              <div className="emos-numbers-grid">
-                <div className="emos-num-card"><div className="emos-num-big">83%</div><div className="emos-num-label">B2B decisions before first contact</div><p className="emos-num-body">Prospects and investors research independently. If you&#39;re not credible where they look, you&#39;re not on the list.</p><div className="emos-num-source">Gartner / Edelman-LinkedIn B2B Report</div></div>
-                <div className="emos-num-card"><div className="emos-num-big">3×</div><div className="emos-num-label">More likely to take a meeting</div><p className="emos-num-body">B2B buyers trust thought leadership over marketing materials. A journalist quoting you does what no landing page ever can.</p><div className="emos-num-source">Edelman-LinkedIn 2024/2025</div></div>
-                <div className="emos-num-card"><div className="emos-num-big" style={{ fontSize: "clamp(28px,3.5vw,48px)" }}>$160K→$1.2M</div><div className="emos-num-label">Monthly revenue lift · client case study</div><p className="emos-num-body">National Tyres &amp; Autocare scaled from $160K to $1.2M monthly organic revenue. Earned coverage compounds; paid ads stop when you pause spend.</p><div className="emos-num-source">Client case study · NTA Campaign</div></div>
+              {/* CHANGE 4: The Numbers folded under the Lens (dark panel keeps the white-on-dark cards readable) */}
+              <div style={{ background: INK, padding: "clamp(28px,4vw,48px)", marginTop: 40 }}>
+                <h3 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>Authority isn&#39;t a vibe. It&#39;s how the buying decision happens now.</h3>
+                <p className="sec-sub" style={{ marginBottom: 40, color: "rgba(250,250,250,.55)" }}>Three numbers that explain why earned authority outperforms paid acquisition on the metrics that matter to a founder under fundraising pressure.</p>
+                {/* CHANGE (item 6): the three numbers shown as an editorial stat ledger instead of a card grid */}
+                <div>
+                  {[
+                    { big: "83%", fs: "clamp(30px,4vw,46px)", label: "B2B decisions before first contact", body: "Prospects and investors research independently. If you're not credible where they look, you're not on the list.", src: "Gartner / Edelman-LinkedIn B2B Report" },
+                    { big: "3×", fs: "clamp(30px,4vw,46px)", label: "More likely to take a meeting", body: "B2B buyers trust thought leadership over marketing materials. A journalist quoting you does what no landing page ever can.", src: "Edelman-LinkedIn 2024/2025" },
+                    { big: "$160K→$1.2M", fs: "clamp(20px,2.4vw,30px)", label: "Monthly revenue lift · client case study", body: "National Tyres & Autocare scaled from $160K to $1.2M monthly organic revenue. Earned coverage compounds; paid ads stop when you pause spend.", src: "Client case study · NTA Campaign" },
+                  ].map((r) => (
+                    <div key={r.big} style={{ display: "flex", flexWrap: "wrap", gap: "6px 30px", alignItems: "baseline", padding: "26px 0", borderTop: "1px solid rgba(250,250,250,.14)" }}>
+                      <div style={{ flex: "0 0 210px", fontFamily: SERIF, fontWeight: 700, fontSize: r.fs, lineHeight: 1, color: YEL, letterSpacing: "-.02em" }}>{r.big}</div>
+                      <div style={{ flex: "1 1 300px", minWidth: 0 }}>
+                        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: PAPER, marginBottom: 8 }}>{r.label}</div>
+                        <p style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.55, color: "rgba(250,250,250,.6)", marginBottom: 8 }}>{r.body}</p>
+                        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(250,250,250,.35)" }}>{r.src}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </section>
 
-          {/* ── § E: WHY NOW ───────────────────────────────────────────── */}
+          {/* ── § 4: WHY NOW (condensed) ───────────────────────────────── */}
           <section id="why-now" className="sy sx">
             <div className="max" style={{ maxWidth: 760 }}>
-              <SectionMast noVol n="5" label="Why Now · The Fundraising Timeline Problem" />
+              <SectionMast noVol n="4" label="Why Now · The Fundraising Timeline Problem" />
               <h2 className="sec-h2" style={{ marginBottom: 24 }}>Six months from now is too late.</h2>
-              <p style={{ fontFamily: SERIF, fontSize: "clamp(17px,2vw,21px)", lineHeight: 1.65, color: INK70, marginBottom: 20 }}>
-                Press takes 30 to 60 days to materialize. Tier 1 placements take 60 to 120. If you wait until fundraising starts, you&#39;re already late.
-              </p>
-              <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: INK70, marginBottom: 40 }}>
-                Most founders realize this after their first investor call, when a VC says <strong>&ldquo;I couldn&#39;t find much about you online.&rdquo;</strong> The fix takes a quarter to build. The diligence window is shorter.
+              {/* CHANGE 5: two paragraphs condensed to one (all facts kept) */}
+              <p style={{ fontFamily: SERIF, fontSize: "clamp(17px,2vw,21px)", lineHeight: 1.65, color: INK70, marginBottom: 40 }}>
+                Press takes 30 to 60 days to materialize, Tier 1 placements 60 to 120. Most founders only realize this after their first investor call, when a VC says <strong>&ldquo;I couldn&#39;t find much about you online&rdquo;</strong>, and by then the diligence window is far shorter than the quarter it takes to fix. If you wait until fundraising starts, you&#39;re already late.
               </p>
               <Figure n={1} />
               <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
@@ -270,20 +321,31 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § F0: THE PAYOFF · COVERAGE FLYWHEEL ────────────────────── */}
+          {/* ── § 5: THE PAYOFF · COVERAGE FLYWHEEL (unchanged) ─────────── */}
           <section id="the-payoff" className="sy sx">
             <div className="max">
-              <SectionMast noVol n="6" label="The Payoff · Six Compounding Benefits" />
+              <SectionMast noVol n="5" label="The Payoff · Six Compounding Benefits" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Six benefits. One compounding <em style={{ color: YEL }}>engine.</em></h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Every advantage EMOS builds, arranged around the flywheel that compounds them. Hover, tap, or focus any segment to explore.</p>
-              <CoverageFlywheel />
+              <CoverageFlywheel ctaHref="#curriculum" />
             </div>
           </section>
 
-          {/* ── § F: WHAT YOU'LL BUILD ─────────────────────────────────── */}
-          <section id="how-it-works-detail" className="sy bg-p2 sx">
+          {/* ── § 6: 5-RETURN FRAMEWORK (moved up, beside the flywheel) ──── */}
+          <section id="five-returns" className="sy bg-ink sx">
             <div className="max">
-              <SectionMast noVol n="7" label="What You'll Build · Three Stages" />
+              <SectionMast noVol n="6" label="The 5-Return Framework · One Placement, Five Returns" dark />
+              <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>One placement. Five returns.</h2>
+              <p className="sec-sub" style={{ marginBottom: 44, color: "rgba(250,250,250,.55)" }}>Most founders treat a press placement as a one-off win. EMOS extracts five parallel returns from every single one. Which is why one Forbes citation can keep paying for years.</p>
+              <Figure n={2} />
+            </div>
+          </section>
+
+          {/* ── § 7: CURRICULUM (+ What You'll Build merged in as a strip) ── */}
+          <section id="curriculum" className="sy sx">
+            <div className="max">
+              <SectionMast noVol n="7" label="Curriculum · Three Stages, Two Tracks" />
+              {/* CHANGE 6: What You'll Build merged in as the 3-stage overview strip */}
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Three stages. One compounding system.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Stop outsourcing authority. Start owning it. Each stage produces a concrete output you keep forever.</p>
               <div className="emos-stages-grid">
@@ -310,57 +372,8 @@ export default function EmosPage() {
                 </div>
               </div>
               <Figure n={4} />
-            </div>
-          </section>
 
-          {/* ── § G: TOOLS ─────────────────────────────────────────────── */}
-          <section id="tools" className="sy sx">
-            <div className="max">
-              <SectionMast noVol n="8" label="Tools · Purpose-built for the System" />
-              <h2 className="sec-h2" style={{ marginBottom: 12 }}>Three tools. Included free.<br /><em style={{ color: YEL }}>Founding cohort only.</em></h2>
-              <p className="sec-sub" style={{ marginBottom: 28 }}>Purpose-built tools that replace the manual work. Cohort 1 founding members get free 3-month access to all three.</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 22px", background: YEL, border: `1px solid ${INK}`, marginBottom: 36 }}>
-                <span style={{ fontSize: 18, flexShrink: 0 }}>🔑</span>
-                <div>
-                  <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>Founding member benefit · Cohort 1 only</div>
-                  <div style={{ fontFamily: SERIF, fontSize: 15, marginTop: 3 }}>Free 3-month access to all three tools.</div>
-                </div>
-              </div>
-              <T1Grid className="grid-2up">
-                {[
-                  { num:"01", stat:"The Journo Outreach Checklist", beta:false, statSub:"Pitch tracking · Follow-ups · Placement log", name:"Every pitch and follow-up in one place", sector:"Tool 01 · Replaces scattered spreadsheets", body:"Track every pitch, follow-up, and response in one place. Submission count, follow-up dates, and placement status at a glance.", replaces:"Scattered HARO exports and manual follow-up tracking" },
-                  { num:"02", stat:"PressIQ", beta:true, statSub:"PR pitch scorer · Mechanics · Personalization", name:"Score and fix your pitch before you send", sector:"Tool 02 · Replaces sending blind", body:"Scores your media pitch across mechanics, personalization, and strength, then shows you exactly how to fix it before you hit send.", replaces:"Sending pitches blind and hoping they land" },
-                  { num:"03", stat:"JournoCollabIQ", beta:true, statSub:"Journalist matching · Beat · Coverage fit", name:"The journalists most likely to respond", sector:"Tool 03 · Replaces cold guesswork", body:"Identify the journalists and editors most likely to respond, based on beat, recent coverage, publication fit, and engagement history. Built from 12+ years of outreach data.", replaces:"Manual press-page trawling and cold inbox roulette" },
-                ].map(tool => (
-                  <div className="emos-t1" key={tool.stat}>
-                    <div className="emos-t1-top">
-                      <div className="emos-t1-logo" style={{ minWidth: 64, minHeight: 48, fontFamily: SERIF, fontWeight: 700, fontSize: 36, color: INK15, letterSpacing: "-.03em" }}>{tool.num}</div>
-                      <div className="emos-t1-plus">+</div>
-                    </div>
-                    <div className="emos-t1-stat-row"><div className="emos-t1-stat" style={{ fontSize: 26, letterSpacing: "-.01em" }}>{tool.stat}{tool.beta && <span className="beta-tag">Beta</span>}</div><div className="emos-t1-stat-sub">{tool.statSub}</div></div>
-                    <div className="emos-t1-meta"><div className="emos-t1-name">{tool.name}</div><div className="emos-t1-sector">{tool.sector}</div></div>
-                    <div className="emos-t1-body"><p className="emos-t1-body-p">{tool.body}</p><span className="emos-t1-rl">Replaces</span><span className="emos-t1-rv">{tool.replaces}</span></div>
-                  </div>
-                ))}
-              </T1Grid>
-            </div>
-          </section>
-
-          {/* ── § H: 5-RETURN FRAMEWORK ────────────────────────────────── */}
-          <section id="five-returns" className="sy bg-ink sx">
-            <div className="max">
-              <SectionMast noVol n="9" label="The 5-Return Framework · One Placement, Five Returns" dark />
-              <h2 className="sec-h2" style={{ marginBottom: 12, color: PAPER }}>One placement. Five returns.</h2>
-              <p className="sec-sub" style={{ marginBottom: 44, color: "rgba(250,250,250,.55)" }}>Most founders treat a press placement as a one-off win. EMOS extracts five parallel returns from every single one. Which is why one Forbes citation can keep paying for years.</p>
-              <Figure n={2} />
-            </div>
-          </section>
-
-          {/* ── § I: CURRICULUM ─────────────────────────────────────────── */}
-          <section id="curriculum" className="sy sx">
-            <div className="max">
-              <SectionMast noVol n="10" label="Curriculum · Two Tracks" />
-              <h2 className="sec-h2" style={{ marginBottom: 12 }}>Choose the track that matches how fast you need to move.</h2>
+              <h3 className="sec-h2" style={{ marginTop: 8, marginBottom: 12 }}>Choose the track that matches how fast you need to move.</h3>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Both tracks teach the same foundation. Accelerate adds 4 more weeks for founders who want Tier 1 publications and linkable assets.</p>
               <table className="emos-curr-table">
                 <thead><tr><th style={{ width: "38%" }}></th><th>Foundation</th><th>Accelerate ★ Best Value</th></tr></thead>
@@ -397,10 +410,43 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § J: PROOF / TESTIMONIALS ──────────────────────────────── */}
+          {/* ── § 8: TOOLS (moved to sit beside Curriculum) ────────────── */}
+          <section id="tools" className="sy sx">
+            <div className="max">
+              <SectionMast noVol n="8" label="Tools · Purpose-built for the System" />
+              <h2 className="sec-h2" style={{ marginBottom: 12 }}>Three tools. Included free.<br /><em style={{ color: YEL }}>Founding cohort only.</em></h2>
+              <p className="sec-sub" style={{ marginBottom: 28 }}>Purpose-built tools that replace the manual work. Cohort 1 founding members get free 3-month access to all three.</p>
+              <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 22px", background: YEL, border: `1px solid ${INK}`, marginBottom: 36 }}>
+                <span style={{ fontSize: 18, flexShrink: 0 }}>🔑</span>
+                <div>
+                  <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>Founding member benefit · Cohort 1 only</div>
+                  <div style={{ fontFamily: SERIF, fontSize: 15, marginTop: 3 }}>Free 3-month access to all three tools.</div>
+                </div>
+              </div>
+              <T1Grid className="grid-2up">
+                {[
+                  { num:"01", stat:"The Journo Outreach Checklist", beta:false, statSub:"Pitch tracking · Follow-ups · Placement log", name:"Every pitch and follow-up in one place", sector:"Tool 01 · Replaces scattered spreadsheets", body:"Track every pitch, follow-up, and response in one place. Submission count, follow-up dates, and placement status at a glance.", replaces:"Scattered HARO exports and manual follow-up tracking" },
+                  { num:"02", stat:"PressIQ", beta:true, statSub:"PR pitch scorer · Mechanics · Personalization", name:"Score and fix your pitch before you send", sector:"Tool 02 · Replaces sending blind", body:"Scores your media pitch across mechanics, personalization, and strength, then shows you exactly how to fix it before you hit send.", replaces:"Sending pitches blind and hoping they land" },
+                  { num:"03", stat:"JournoCollabIQ", beta:true, statSub:"Journalist matching · Beat · Coverage fit", name:"The journalists most likely to respond", sector:"Tool 03 · Replaces cold guesswork", body:"Identify the journalists and editors most likely to respond, based on beat, recent coverage, publication fit, and engagement history. Built from 13+ years of outreach data.", replaces:"Manual press-page trawling and cold inbox roulette" },
+                ].map(tool => (
+                  <div className="emos-t1" key={tool.stat}>
+                    <div className="emos-t1-top">
+                      <div className="emos-t1-logo" style={{ minWidth: 64, minHeight: 48, fontFamily: SERIF, fontWeight: 700, fontSize: 36, color: INK15, letterSpacing: "-.03em" }}>{tool.num}</div>
+                      <div className="emos-t1-plus">+</div>
+                    </div>
+                    <div className="emos-t1-stat-row"><div className="emos-t1-stat" style={{ fontSize: 26, letterSpacing: "-.01em" }}>{tool.stat}{tool.beta && <span className="beta-tag">Beta</span>}</div><div className="emos-t1-stat-sub">{tool.statSub}</div></div>
+                    <div className="emos-t1-meta"><div className="emos-t1-name">{tool.name}</div><div className="emos-t1-sector">{tool.sector}</div></div>
+                    <div className="emos-t1-body"><p className="emos-t1-body-p">{tool.body}</p><span className="emos-t1-rl">Replaces</span><span className="emos-t1-rv">{tool.replaces}</span></div>
+                  </div>
+                ))}
+              </T1Grid>
+            </div>
+          </section>
+
+          {/* ── § 9: PROOF / TESTIMONIALS (fixed case-study links kept) ──── */}
           <section id="proof" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast noVol n="11" label="Proof · The Same System. Their Results." />
+              <SectionMast noVol n="9" label="Proof · The Same System. Their Results." />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>The same system. Their results.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Five results from client campaigns across the US, UK, and Gulf. Click any card to read the full testimony.</p>
               <div style={{ overflow: "hidden", border: `1px solid ${INK15}`, padding: "14px 0", marginBottom: 44 }}>
@@ -444,10 +490,10 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § K: FIT CHECK ─────────────────────────────────────────── */}
+          {/* ── § 10: FIT CHECK ────────────────────────────────────────── */}
           <section id="fit" className="sy sx">
             <div className="max">
-              <SectionMast noVol n="12" label="Fit Check · Who This Is Not For" />
+              <SectionMast noVol n="10" label="Fit Check · Who This Is Not For" />
               <h2 className="sec-h2" style={{ marginBottom: 40 }}>Who this is NOT for.</h2>
               <div className="emos-fit-grid">
                 <div className="emos-fit-col emos-fit-col-bad">
@@ -467,38 +513,20 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § L: THE MATH / CALCULATOR ──────────────────────────────── */}
+          {/* ── § 11: THE MATH / CALCULATOR (TCO moved out to Investment) ── */}
           <section id="calculator" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast noVol n="13" label="The Math · SIA Authority ROI Calculator" />
+              <SectionMast noVol n="11" label="The Math · SIA Authority ROI Calculator" />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Find out how much EMOS will save you<br />in financial costs alone.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Let alone the benefits of doing things in-house: investor credibility, AI citations, sales proof, and compounding reach. Adjust to your real numbers.</p>
               <AuthorityCalculator />
-              <div className="tco">
-                <div className="tco-head">
-                  <div className="tco-eyebrow">Your real cost over 3 years</div>
-                  <div className="tco-sub">EMOS is a one-time investment. The only ongoing cost is optional: a VA to run the system, roughly $5K to $30K a year depending on where you hire, or $0 if you run it yourself. An agency bills the full amount again, every single year.</div>
-                </div>
-                <div className="tcb-wrap">
-                  <div className="tcb-row">
-                    <div className="tcb-head"><span className="tcb-name">EMOS</span><span className="tcb-amt">$3.5K once, then an optional VA · <strong>$3.5K to ~$40K total</strong></span></div>
-                    <div className="tcb-track"><div className="tcb-fill tcb-emos" style={{ width: "11%" }} /></div>
-                  </div>
-                  <div className="tcb-row">
-                    <div className="tcb-head"><span className="tcb-name">Content + SEO + PR agencies</span><span className="tcb-amt"><strong className="tcb-amt-big">$180K to $720K total</strong></span></div>
-                    <div className="tcb-track"><div className="tcb-fill tcb-agency" style={{ width: "100%" }}><span className="tcb-seg">Year 1</span><span className="tcb-seg">Year 2</span><span className="tcb-seg">Year 3</span></div></div>
-                  </div>
-                  <div className="tcb-scale">Agencies bill the full amount again, every year. EMOS is paid once.</div>
-                </div>
-                <div className="tco-foot">Three years of EMOS, even with an onshore VA, runs about half the cheapest agency path and a fraction of the rest. Run it yourself and it&#39;s a rounding error.</div>
-              </div>
             </div>
           </section>
 
-          {/* ── § M: INVESTMENT ─────────────────────────────────────────── */}
+          {/* ── § 12: INVESTMENT (+ TCO merged in) ─────────────────────── */}
           <section id="pricing" className="sy bg-ink sx">
             <div className="max">
-              <SectionMast noVol n="14" label="Investment · Two Tracks, One-Time Fee" dark />
+              <SectionMast noVol n="12" label="Investment · Two Tracks, One-Time Fee" dark />
               <div className="emos-pricing-outer">
                 <div className="emos-pricing-math">
                   <h2 className="sec-h2" style={{ marginBottom: 24, color: PAPER }}>Two tracks. One-time investment. Capability you keep forever.</h2>
@@ -538,6 +566,27 @@ export default function EmosPage() {
                   </div>
                 </div>
               </div>
+
+              {/* CHANGE 8: TCO 3-year comparison moved here from The Math (keeps its own paper background) */}
+              <div className="tco">
+                <div className="tco-head">
+                  <div className="tco-eyebrow">Your real cost over 3 years</div>
+                  <div className="tco-sub">EMOS is a one-time investment. The only ongoing cost is optional: a VA to run the system, roughly $5K to $30K a year depending on where you hire, or $0 if you run it yourself. An agency bills the full amount again, every single year.</div>
+                </div>
+                <div className="tcb-wrap">
+                  <div className="tcb-row">
+                    <div className="tcb-head"><span className="tcb-name">EMOS</span><span className="tcb-amt">$3.5K once, then an optional VA · <strong>$3.5K to ~$40K total</strong></span></div>
+                    <div className="tcb-track"><div className="tcb-fill tcb-emos" style={{ width: "11%" }} /></div>
+                  </div>
+                  <div className="tcb-row">
+                    <div className="tcb-head"><span className="tcb-name">Content + SEO + PR agencies</span><span className="tcb-amt"><strong className="tcb-amt-big">$180K to $720K total</strong></span></div>
+                    <div className="tcb-track"><div className="tcb-fill tcb-agency" style={{ width: "100%" }}><span className="tcb-seg">Year 1</span><span className="tcb-seg">Year 2</span><span className="tcb-seg">Year 3</span></div></div>
+                  </div>
+                  <div className="tcb-scale">Agencies bill the full amount again, every year. EMOS is paid once.</div>
+                </div>
+                <div className="tco-foot">Three years of EMOS, even with an onshore VA, runs about half the cheapest agency path and a fraction of the rest. Run it yourself and it&#39;s a rounding error.</div>
+              </div>
+
               <div id="apply" className="emos-apply-block">
                 <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,250,250,.60)", marginBottom: 16 }}>Apply for Cohort 1</div>
                 <div className="emos-apply-grid">
@@ -560,10 +609,10 @@ export default function EmosPage() {
             </div>
           </section>
 
-          {/* ── § N: GUARANTEE ──────────────────────────────────────────── */}
+          {/* ── § 13: GUARANTEE ────────────────────────────────────────── */}
           <section id="guarantee" className="sy sx">
             <div className="max">
-              <SectionMast noVol n="15" label="Risk Reversal · The Guarantee" />
+              <SectionMast noVol n="13" label="Risk Reversal · The Guarantee" />
               <h2 className="sec-h2" style={{ marginBottom: 24 }}>A guarantee no PR agency will ever match.</h2>
               <div className="emos-guarantee-banner"><p className="emos-guarantee-banner-text"><strong>1 verified media placement in 60 days</strong>, or every dollar back. No negotiation.</p></div>
               <div className="emos-commit-grid">
@@ -578,27 +627,27 @@ export default function EmosPage() {
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span><strong style={{ color: PAPER }}>Foundation:</strong> 1 verified placement within 60 days of cohort end</span></div>
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span><strong style={{ color: PAPER }}>Accelerate:</strong> 2 verified placements within 90 days</span></div>
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span>If I miss either: <strong style={{ color: PAPER }}>full refund of the investment</strong></span></div>
-                  <p className="emos-commit-note">In 12+ years of running earned media campaigns, this system has never failed to produce placements for anyone who worked it consistently.</p>
+                  <p className="emos-commit-note">EMOS is new, but the playbook behind it isn&#39;t. It&#39;s the same earned-media approach my agency has used for 13+ years, and clients who work it consistently earn placements.</p>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* ── § O: FAQ ───────────────────────────────────────────────── */}
+          {/* ── § 14: FAQ (Q3 / Q4 / Q8 trimmed to pointers) ───────────── */}
           <section id="faq" className="sy bg-p2 sx">
             <div className="max">
-              <SectionMast noVol n="16" label="FAQ · Common Questions" />
+              <SectionMast noVol n="14" label="FAQ · Common Questions" />
               <h2 className="sec-h2" style={{ marginBottom: 40 }}>Common questions.</h2>
               <AccordionGroup className="emos-faq-wrap">
                 {[
                   { q:"How much time does this require each week?", a:"Plan for 3 to 5 hours per week: 90 minutes for the live session plus 2 to 3 hours for assignments. The assignments aren't busywork: they're real pitches going to real journalists. Most founders pair the system with a part-time VA ($300 to $1,500 per month)." },
                   { q:"I don't have a team member who can run this. What do I do?", a:"Accelerate includes a VA sourcing and training module. I help you identify what support you need, source the right person, and train them on the system. The real qualification isn't whether you have someone today; it's whether you're willing to hire one after the program ends." },
-                  { q:"I tried PR before and it didn't work. Why is this different?", a:"Most failed PR and link-building efforts share four traits: generic mass pitching, no founder POV, no consistent system, and total dependency on an agency that takes the knowledge with them. EMOS removes all four, and because the coverage is earned, the SEO authority and content credibility compound instead of evaporating when you stop paying." },
-                  { q:"Is this really better than hiring agencies for content, SEO, and PR?", a:"Different thing. Hiring agencies for content, SEO, and PR runs $60,000 to $240,000 a year, indefinitely, and the knowledge leaves when the relationship does. EMOS is a one-time investment that builds the capability inside your company: the earned coverage, the SEO authority it drives, and the content that earns links. Some clients do both. Most don't need to." },
+                  { q:"I tried PR before and it didn't work. Why is this different?", a:"Short version: most failed efforts share four traits (generic mass pitching, no founder POV, no consistent system, agency dependency). EMOS removes all four, and because the coverage is earned, it compounds instead of evaporating when you stop paying. The full breakdown is in The Real Problem above." },
+                  { q:"Is this really better than hiring agencies for content, SEO, and PR?", a:"Agencies run $60,000 to $240,000 a year and the knowledge leaves when the relationship does. EMOS is a one-time investment that builds the capability inside your company. Some clients do both; most don't need to. See the 3-year cost comparison in Investment above, and run your own numbers in the calculator." },
                   { q:"Will this work for my industry?", a:"Yes, provided you have customers, results, or a defensible point of view. The system has produced placements for SaaS, fintech, healthcare, marketplaces, e-commerce, AI, mobility, education, and consumer products." },
                   { q:"When can I expect my first placement?", a:"Most participants submit their first pitches in Week 2 and land their first verified placement within 4 to 6 weeks of cohort end. Tier 1 placements generally take 60 to 120 days from a cold start." },
                   { q:"Will this still work as AI changes search?", a:"Earned media is the most resilient channel against AI-driven shifts. For AI visibility, brand mentions matter even more than backlinks: ChatGPT, Perplexity, and Google's AI Overviews surface the names credible publications talk about, linked or not. Earned coverage gets you both at once: the brand mentions AI cites you for, and the high-authority backlinks that lift your SEO and rank your domain for the terms your buyers use. EMOS doesn't just survive the AI shift; it's built to benefit from it." },
-                  { q:"How exactly does the placement guarantee work?", a:"Foundation: 15 pitches, 1 placement in 60 days. Accelerate: 30 pitches, 2 placements in 90 days. Proof of effort is your tracking spreadsheet. Miss the target and I refund the full investment. In 12+ years, this system has never failed to produce placements for anyone who worked it consistently." },
+                  { q:"How exactly does the placement guarantee work?", a:"Foundation: 15 pitches, 1 placement in 60 days. Accelerate: 30 pitches, 2 in 90 days. Miss it and I refund in full. Full terms, and what each side commits to, are in The Guarantee above." },
                   { q:"What are the EMOS tools? And do I really get them free?", a:"Yes. Cohort 1 founding members get free 3-month access. The Journo Outreach Checklist tracks every pitch, follow-up, and placement, and is included on both tracks. Accelerate adds the full suite: PressIQ [Beta], the PR pitch scorer that grades your pitch on mechanics, personalization, and strength; and JournoCollabIQ [Beta], which surfaces the journalists most likely to respond by beat and coverage fit." },
                 ].map(item => (
                   <div className="emos-acc-item" key={item.q}>
@@ -643,6 +692,12 @@ export default function EmosPage() {
           </div>
         </div>
       </EmosPageWrapper>
+
+      {/* CHANGE 3: sticky mobile apply bar (the desktop rail is hidden < 1200px) */}
+      <div className="emos-mobile-bar">
+        <div className="mmb-price">$2K · $3.5K<span>one-time · Cohort 1 · 5 seats</span></div>
+        <a href="/emos/apply/" className="mmb-btn">Apply →</a>
+      </div>
     </>
   );
 }
