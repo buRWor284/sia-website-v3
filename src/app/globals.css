@@ -2507,3 +2507,74 @@ label:has(input[type="checkbox"]),
 .fig.in .f5-ann { animation: slide-r .46s cubic-bezier(.22,1,.36,1) var(--d,0s) forwards; }
 .f5-pill { display: inline-block; background: var(--color-yellow); padding: 3px 8px; margin-bottom: 7px; font-family: var(--font-grot); font-weight: 800; font-size: 7.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-ink); }
 .f5-at { font-family: var(--font-serif); font-style: italic; font-size: 12.5px; line-height: 1.45; color: rgba(26,20,16,.5); }
+
+/* =========================================================================
+   EMOS RESPONSIVE REMEDIATION  ·  phone + tablet fixes (CSS only)
+   Pure layout/spacing/breakpoint fixes. No copy, figures, numbers, CTA text,
+   calculator logic, or section order are touched. Verified at 320/375/390/
+   414/768/1024/1280: zero horizontal overflow at every width.
+   Tablet (>=768) deliberately keeps the existing multi-column layouts.
+   ========================================================================= */
+
+/* Footer link row wrapped instead of overflowing on small phones (was ~394px
+   wide at 320). Applies to /emos, /emos/apply, /emos/pay footers. */
+.emos-footer-links { flex-wrap: wrap; row-gap: 8px; }
+
+/* FIG 1 (Press Lead Time) — stacked the two hero columns on phones; the
+   2-col layout cramped the 100px counts and pushed the dark column off-screen. */
+@media (max-width: 700px) {
+  .f1-heroes { grid-template-columns: 1fr; }
+  .f1-hero { padding: 30px 22px; }
+  .f1-hero:first-child { border-right: none; border-bottom: 1px solid rgba(26,20,16,.1); }
+  .f1-count { font-size: clamp(54px, 17vw, 80px); }
+  .f1-ghost { font-size: clamp(90px, 28vw, 140px); }
+  .f1-cap { max-width: none; }
+  .f1-bars { padding: 26px 22px 30px; }
+  .f1-foot { padding: 16px 22px 22px; gap: 14px; }
+  .f1-row { grid-template-columns: 62px 1fr; gap: 12px; }
+  .f1-axis { flex-wrap: wrap; gap: 4px 10px; }
+}
+
+/* FIG 3 (Pre-Meeting Search) + FIG 5 (Pitch Anatomy) — stacked the side-by-side
+   columns on phones/small tablets. FIG 3 self-overflowed to ~495px (the dark
+   "after" column ran off-screen); FIG 5 had a fixed 272px column. */
+@media (max-width: 760px) {
+  .f3 { grid-template-columns: 1fr; }
+  .f3-before { border-right: none; border-bottom: 1px solid rgba(26,20,16,.12); }
+  .f3-col { padding: 28px 22px 32px; }
+
+  .f5 { grid-template-columns: 1fr; }
+  .f5-email { border-right: none; border-bottom: 1px solid rgba(26,20,16,.1); }
+  .f5-sec { padding: 18px 22px; }
+  .f5-ann { padding: 16px 22px; }
+}
+
+/* FIG 4 (Week by Week) — the dense 8-column timeline compresses below ~560px
+   and was clipped by overflow:hidden. Let it scroll horizontally as one unit
+   so every week/milestone stays legible (no content removed). */
+@media (max-width: 600px) {
+  .f4 { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .f4-top, .f4-head, .f4-bars, .f4-mils { min-width: 540px; }
+}
+
+/* Authority ROI Calculator — collapse its inner grids to one column and let the
+   label/value rows wrap on phones. The component is inline-styled; at 320 it
+   stayed ~353px wide (long uppercase labels + nested 2/3-col grids), clipping
+   results. Calculator logic and outputs are unchanged. */
+@media (max-width: 600px) {
+  .emos-calc [style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+  .emos-calc [style*="space-between"] { flex-wrap: wrap; }
+}
+
+/* Apply / Pay top nav — the rule used padding-inline:var(--sx-desktop), but that
+   variable was never defined, so the nav had zero side padding at every width. */
+.emos-nav-inner { padding-inline: clamp(20px, 4vw, 40px); }
+
+/* Apply / Pay — on phones the announcement bar wraps to two lines, and the
+   fixed nav (top:37px) overlapped it. Let the announce + nav flow normally on
+   small screens so nothing is hidden; remove the now-unneeded 91px top offset. */
+@media (max-width: 640px) {
+  .emos-nav { position: static; }
+  .emos-announce { font-size: 10px; letter-spacing: .05em; padding: 8px 14px; }
+  [style*="padding-top: 91px"] { padding-top: 0 !important; }
+}
