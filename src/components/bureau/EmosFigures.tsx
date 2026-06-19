@@ -32,14 +32,19 @@ const FIGS: Record<number, string> = {
           <div class="sm"><div class="sm-double"></div><div class="sm-row"><span class="sm-pill">FIG. 2</span><span class="sm-label">One Placement, Five Returns</span><div class="sm-line"></div><span class="sm-vol">§ 9 · 5-Return Framework</span></div><div class="sm-close"></div></div>
           <p class="fig-desc">A single Tier 1 placement multiplies into five parallel returns, each active independently, long after the article goes live.</p>
           <div class="f2">
-            <div class="f2-src"><div class="f2-big">1</div><div class="f2-lbl">Placement</div></div>
-            <div class="f2-spine"><div class="f2-vline"></div><div class="f2-x5">×5</div></div>
+            <div class="f2-src">
+              <div class="f2-big">1</div>
+              <div class="f2-lbl">Placement</div>
+              <div class="f2-srcdiv"></div>
+              <div class="f2-x5lbl">&times; 5 Returns</div>
+            </div>
+            <div class="f2-trunk"><div class="f2-vline"></div></div>
             <div class="f2-rows">
-              <div class="f2-ret" style="--d:.78s;"><div class="f2-n">01</div><div class="f2-title">SEO Authority</div><div class="f2-desc">A high-DA backlink lifts your domain rating; target pages rank higher for the keywords your buyers use</div></div>
-              <div class="f2-ret" style="--d:.94s;"><div class="f2-n">02</div><div class="f2-title">LLM Citation</div><div class="f2-desc">ChatGPT, Perplexity, and Google AI Overviews cite credible publications, your name surfaces in AI answers</div></div>
-              <div class="f2-ret" style="--d:1.1s;"><div class="f2-n">03</div><div class="f2-title">Sales Collateral</div><div class="f2-desc">"As featured in" lifts homepage trust, deck credibility, and email-signature legitimacy</div></div>
-              <div class="f2-ret" style="--d:1.26s;"><div class="f2-n">04</div><div class="f2-title">Investor Proof</div><div class="f2-desc">Founders cited in Tier 1 skip the "who is this?" question before the meeting starts</div></div>
-              <div class="f2-ret" style="--d:1.42s;"><div class="f2-n">05</div><div class="f2-title">Social Signal</div><div class="f2-desc">Share-worthy content for LinkedIn and X, earned coverage compounds organic reach</div></div>
+              <div class="f2-ret" style="--d:.78s;"><div class="f2-numcol"><span class="f2-n">01</span><div class="f2-bar"></div></div><div class="f2-body"><p class="f2-title">SEO Authority</p><p class="f2-desc">A high-DA backlink lifts your domain rating; target pages rank higher for the keywords your buyers use</p></div></div>
+              <div class="f2-ret" style="--d:.94s;"><div class="f2-numcol"><span class="f2-n">02</span><div class="f2-bar"></div></div><div class="f2-body"><p class="f2-title">LLM Citation</p><p class="f2-desc">ChatGPT, Perplexity, and Google AI Overviews cite credible publications, your name surfaces in AI answers</p></div></div>
+              <div class="f2-ret" style="--d:1.1s;"><div class="f2-numcol"><span class="f2-n">03</span><div class="f2-bar"></div></div><div class="f2-body"><p class="f2-title">Sales Collateral</p><p class="f2-desc">"As featured in" lifts homepage trust, deck credibility, and email-signature legitimacy</p></div></div>
+              <div class="f2-ret" style="--d:1.26s;"><div class="f2-numcol"><span class="f2-n">04</span><div class="f2-bar"></div></div><div class="f2-body"><p class="f2-title">Investor Proof</p><p class="f2-desc">Founders cited in Tier 1 skip the "who is this?" question before the meeting starts</p></div></div>
+              <div class="f2-ret" style="--d:1.42s;"><div class="f2-numcol"><span class="f2-n">05</span><svg class="f2-signal" width="20" height="16" viewBox="0 0 20 16" fill="none"><rect x="0" y="10" width="3.5" height="6" rx="0.4" fill="#f5b81f"/><rect x="5.5" y="7" width="3.5" height="9" rx="0.4" fill="#f5b81f"/><rect x="11" y="4" width="3.5" height="12" rx="0.4" fill="#f5b81f"/><rect x="16.5" y="0" width="3.5" height="16" rx="0.4" fill="#f5b81f"/></svg></div><div class="f2-body"><p class="f2-title">Social Signal</p><p class="f2-desc">Share-worthy content for LinkedIn and X, earned coverage compounds organic reach</p></div></div>
             </div>
           </div>
         </div>`,

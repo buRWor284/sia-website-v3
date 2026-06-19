@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import { SectionMast } from "@/components/bureau/primitives";
 import AuthorityCalculator from "@/components/bureau/AuthorityCalculator";
 import {
@@ -348,28 +349,54 @@ export default function EmosPage() {
               {/* CHANGE 6: What You'll Build merged in as the 3-stage overview strip */}
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>Three stages. One compounding system.</h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Stop outsourcing authority. Start owning it. Each stage produces a concrete output you keep forever.</p>
-              <div className="emos-stages-grid">
-                <div className="emos-stage-card">
-                  <div className="emos-stage-num">01</div><div className="emos-stage-name">Get Quoted</div><div className="emos-stage-weeks">Weeks 1 to 4 · Foundation &amp; Accelerate</div>
-                  <p className="emos-stage-outcome">Pitching muscle built. First verified Tier 2/3 placements earned. Investor-ready citation list starts taking shape.</p>
-                  <div className="emos-stage-items">
-                    {["Quotable zones mapped & media kit live","5 personalized pitch templates","15+ pitches submitted with tracking sheet","At least 1 verified placement"].map(t => (<div className="emos-stage-item" key={t}><div className="emos-stage-dot" />{t}</div>))}
-                  </div>
-                </div>
-                <div className="emos-stage-card">
-                  <div className="emos-stage-num">02</div><div className="emos-stage-name">Build Authority Assets</div><div className="emos-stage-weeks">Weeks 5 to 8 · Accelerate only</div>
-                  <p className="emos-stage-outcome">Syed works alongside you on your first 5 pitches. One owned linkable asset goes live. Tier 1 outreach in motion.</p>
-                  <div className="emos-stage-items">
-                    {["Done-with-you first 5 placements","Original report or data study","Infographic and mapographic","Direct outreach to 15 to 20 Tier 1 journalists"].map(t => (<div className="emos-stage-item" key={t}><div className="emos-stage-dot" />{t}</div>))}
-                  </div>
-                </div>
-                <div className="emos-stage-card">
-                  <div className="emos-stage-num">03</div><div className="emos-stage-name">Scale &amp; Systemize</div><div className="emos-stage-weeks">Post-cohort · Accelerate-led</div>
-                  <p className="emos-stage-outcome">The machine runs without you. Coverage compounds month over month, long after the cohort ends.</p>
-                  <div className="emos-stage-items">
-                    {["20+ named-journalist target list","VA-ready system & sourcing module","90-day scaling plan","5-return extraction from every placement"].map(t => (<div className="emos-stage-item" key={t}><div className="emos-stage-dot" />{t}</div>))}
-                  </div>
-                </div>
+              <div className="emos-st-track">
+                {[
+                  { num: "01", title: "Get Quoted", weeksA: "Weeks 1 to 4", weeksB: "Foundation & Accelerate", conn: "", dark: false,
+                    desc: "Pitching muscle built. First verified Tier 2/3 placements earned. Investor-ready citation list starts taking shape.",
+                    items: ["Quotable zones mapped & media kit live","5 personalized pitch templates","15+ pitches submitted with tracking sheet","At least 1 verified placement"] },
+                  { num: "02", title: "Build Authority Assets", weeksA: "Weeks 5 to 8", weeksB: "Accelerate only", conn: "Builds into →", dark: false,
+                    desc: "Syed works alongside you on your first 5 pitches. One owned linkable asset goes live. Tier 1 outreach in motion.",
+                    items: ["Done-with-you first 5 placements","Original report or data study","Infographic and mapographic","Direct outreach to 15 to 20 Tier 1 journalists"] },
+                  { num: "03", title: "Scale & Systemize", weeksA: "Post-cohort", weeksB: "Accelerate-led", conn: "Compounds into →", dark: true,
+                    desc: "The machine runs without you. Coverage compounds month over month, long after the cohort ends.",
+                    items: ["20+ named-journalist target list","VA-ready system & sourcing module","90-day scaling plan","5-return extraction from every placement"] },
+                ].map((s, i) => (
+                  <Fragment key={s.num}>
+                    {i > 0 && (
+                      <div className="emos-st-conn">
+                        <div className="emos-st-conn-line" />
+                        <span className="emos-st-conn-label">{s.conn}</span>
+                      </div>
+                    )}
+                    <div className={`emos-st-card${s.dark ? " is-dark" : ""}`}>
+                      <div className="emos-st-numcol">
+                        <span className="emos-st-vnum">{s.num}</span>
+                        <span className="emos-st-dot" /><span className="emos-st-dot" /><span className="emos-st-dot" />
+                      </div>
+                      <div className="emos-st-content">
+                        <div className="emos-st-header">
+                          <div className="emos-st-headleft">
+                            <span className="emos-st-bignum">{s.num}</span>
+                            <div className="emos-st-meta">
+                              <span className="emos-st-tier">{s.weeksA}</span>
+                              <span className="emos-st-sep" />
+                              <span className="emos-st-tier">{s.weeksB}</span>
+                            </div>
+                            <h3 className="emos-st-title">{s.title}</h3>
+                          </div>
+                          <div className="emos-st-headright">
+                            <p className="emos-st-desc">{s.desc}</p>
+                          </div>
+                        </div>
+                        <div className="emos-st-deliverables">
+                          {s.items.map(t => (
+                            <div className="emos-st-item" key={t}><span className="emos-st-tick" /><span className="emos-st-itext">{t}</span></div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </Fragment>
+                ))}
               </div>
               <Figure n={4} />
 
