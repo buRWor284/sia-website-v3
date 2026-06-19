@@ -1,87 +1,438 @@
 import { ImageResponse } from "next/og";
 
-// Shared Open Graph / Twitter card generator. One brand design, reused by the
-// site-wide default card and every per-page card so they stay consistent.
+// Shared Open Graph / Twitter card generator. Implements the two approved
+// "design_handoff_og_social_cards" directions:
+//   • variant "white" — Direction C: stark white, gold left stripe, split columns,
+//     author block. Preferred; used for tool / product / business pages.
+//   • variant "dark"  — Direction A: dark editorial with a circular headshot.
+//     Used for personal / content pages.
+// One generator drives every page; only the text changes.
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
 
-export function ogCard({
+const W = 1200;
+const H = 630;
+const SAFE = 64;
+
+// ── Tokens (from the handoff) ────────────────────────────────────────────────
+const GOLD = "#F5C518";
+const INK = "#0A0A09";
+const SUB = "#3A3530";
+const RULE = "#E8E3DB";
+// dark
+const D_BG = "#0E0D0A";
+const D_STRIP = "#121110";
+const D_WHITE = "#FFFFFF";
+const D_MUTED = "#9A9690";
+const D_FAINT = "#5E5B57";
+const D_BORDER = "#1E1C18";
+const D_DIVIDER = "#282420";
+
+const HEADSHOT_URL = "https://www.syedirfanajmal.com/og/headshot-card.jpg";
+
+// Press wordmarks. satori has no system fonts, so we approximate the handoff's
+// Georgia/Arial-Narrow with our loaded serif (Newsreader) and sans (Archivo).
+const PUBS: {
+  label: string;
+  family: "Newsreader" | "Archivo";
+  size: number;
+  weight: 400 | 700 | 900;
+  italic?: boolean;
+  ls?: number;
+}[] = [
+  { label: "Forbes", family: "Newsreader", size: 22, weight: 700, italic: true },
+  { label: "HBR", family: "Archivo", size: 17, weight: 900, ls: 2 },
+  { label: "SEMrush", family: "Archivo", size: 15, weight: 700 },
+  { label: "World Bank", family: "Newsreader", size: 16, weight: 700, ls: 1 },
+];
+
+// ── Fonts: load TTF from Google at render (satori can't read the repo's woff2).
+// Old UA forces TTF; cached at module scope; fails soft so a hiccup degrades to
+// satori's default font rather than erroring. ──────────────────────────────────
+const CHARSET =
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,:;!?&@#%$()[]'\"-+/·—";
+
+const FONTS: { family: string; weight: 400 | 600 | 700 | 900; italic?: boolean }[] = [
+  { family: "Archivo", weight: 900 },
+  { family: "Archivo", weight: 700 },
+  { family: "Archivo", weight: 600 },
+  { family: "Newsreader", weight: 700 },
+  { family: "Newsreader", weight: 400, italic: true },
+];
+
+const fontCache = new Map<string, Promise<ArrayBuffer | null>>();
+function loadFont(family: string, weight: number, italic: boolean): Promise<ArrayBuffer | null> {
+  const key = `${family}@${weight}${italic ? "i" : ""}`;
+  if (!fontCache.has(key)) {
+    fontCache.set(
+      key,
+      (async () => {
+        try {
+          const axis = italic ? `ital,wght@1,${weight}` : `wght@${weight}`;
+          const api =
+            `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:${axis}` +
+            `&text=${encodeURIComponent(CHARSET)}`;
+          const css = await fetch(api, {
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Version/5.1 Safari/534.30",
+            },
+          }).then((r) => r.text());
+          const url = css.match(/src:\s*url\(([^)]+\.(?:ttf|otf))\)/)?.[1];
+          if (!url) return null;
+          return await fetch(url).then((r) => r.arrayBuffer());
+        } catch {
+          return null;
+        }
+      })()
+    );
+  }
+  return fontCache.get(key)!;
+}
+
+async function loadFonts() {
+  const loaded = await Promise.all(
+    FONTS.map(async (f) => {
+      const data = await loadFont(f.family, f.weight, !!f.italic);
+      return data
+        ? {
+            name: f.family,
+            data,
+            weight: f.weight as 400 | 600 | 700 | 900,
+            style: (f.italic ? "italic" : "normal") as "italic" | "normal",
+          }
+        : null;
+    })
+  );
+  return loaded.filter(Boolean) as {
+    name: string;
+    data: ArrayBuffer;
+    weight: 400 | 600 | 700 | 900;
+    style: "italic" | "normal";
+  }[];
+}
+
+// Pre-fetch the headshot as a data URI (cached) so a failed image fetch can never
+// throw inside satori — the dark card simply renders without the photo.
+let headshotCache: Promise<string | null> | undefined;
+function loadHeadshot(): Promise<string | null> {
+  if (!headshotCache) {
+    headshotCache = (async () => {
+      try {
+        const buf = await fetch(HEADSHOT_URL).then((r) => r.arrayBuffer());
+        return `data:image/jpeg;base64,${Buffer.from(buf).toString("base64")}`;
+      } catch {
+        return null;
+      }
+    })();
+  }
+  return headshotCache;
+}
+
+function PubStrip({ dark }: { dark: boolean }) {
+  const ink = dark ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.52)";
+  const dot = dark ? D_DIVIDER : "rgba(255,255,255,0.18)";
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 18, flex: 1, minWidth: 0 }}>
+      {PUBS.map((p, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 18 }}>
+          {i > 0 ? (
+            <div style={{ display: "flex", width: 3, height: 3, borderRadius: 3, background: dot }} />
+          ) : null}
+          <div
+            style={{
+              display: "flex",
+              fontFamily: p.family,
+              fontSize: p.size,
+              fontWeight: p.weight,
+              fontStyle: p.italic ? "italic" : "normal",
+              letterSpacing: p.ls ? p.ls : 0,
+              color: ink,
+            }}
+          >
+            {p.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Headline({ lines, size, color }: { lines: string[]; size: number; color: string }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      {lines.map((ln, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            fontFamily: "Archivo",
+            fontSize: size,
+            fontWeight: 900,
+            lineHeight: 1.04,
+            letterSpacing: -size * 0.022,
+            color,
+          }}
+        >
+          {ln}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// Largest font (capped at the handoff's per-line-count size) that still fits the
+// column width, so longer real titles never overflow.
+function fit(lines: string[], base: number, colW: number) {
+  const maxChars = Math.max(1, ...lines.map((l) => l.length));
+  return Math.max(34, Math.min(base, Math.floor(colW / (maxChars * 0.55))));
+}
+
+export async function ogCard({
   eyebrow,
   title,
   subtitle,
+  variant = "white",
+  role = "FOUNDER · DMR.AGENCY",
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
+  variant?: "white" | "dark";
+  role?: string;
 }) {
-  // Scale the headline down for long titles so they always fit.
-  const titleSize = title.length > 70 ? 60 : title.length > 45 ? 74 : 96;
+  const fonts = await loadFonts();
+  const lines = title.split("\n");
+  const opts = { ...OG_SIZE, fonts: fonts.length ? fonts : undefined };
 
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          background: "#0e0d0a",
-          padding: "72px 80px",
-          fontFamily: "sans-serif",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <div style={{ width: 72, height: 8, background: "#f5c518" }} />
-          <div
-            style={{
-              marginLeft: 22,
-              color: "#f5c518",
-              fontSize: 24,
-              letterSpacing: 5,
-            }}
-          >
-            {eyebrow}
-          </div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div
-            style={{
-              color: "#ffffff",
-              fontSize: titleSize,
-              fontWeight: 800,
-              lineHeight: 1.04,
-            }}
-          >
-            {title}
-          </div>
-          {subtitle ? (
-            <div
-              style={{
-                color: "rgba(255,255,255,0.72)",
-                fontSize: 36,
-                marginTop: 26,
-                maxWidth: 980,
-              }}
-            >
-              {subtitle}
-            </div>
-          ) : null}
-        </div>
-
+  // ── Direction A — dark with circular headshot ──────────────────────────────
+  if (variant === "dark") {
+    const STRIP = 102;
+    const hs = await loadHeadshot();
+    const size = fit(lines, lines.length >= 3 ? 68 : lines.length === 2 ? 75 : 84, 800);
+    return new ImageResponse(
+      (
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            width: W,
+            height: H,
+            background: D_BG,
+            position: "relative",
+            fontFamily: "Archivo",
           }}
         >
-          <div style={{ color: "#ffffff", fontSize: 30 }}>syedirfanajmal.com</div>
-          <div style={{ color: "#f5c518", fontSize: 30 }}>@syedirfanajmal</div>
+          {/* gold top accent */}
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 3,
+              background: `linear-gradient(to right, rgba(245,197,24,1) 0%, rgba(245,197,24,0.6) 20%, rgba(245,197,24,0) 58%)`,
+            }}
+          />
+          {/* gold left vertical rule */}
+          <div style={{ position: "absolute", left: SAFE, top: SAFE, bottom: STRIP + 18, width: 3, background: GOLD }} />
+
+          {/* text column */}
+          <div
+            style={{
+              position: "absolute",
+              left: SAFE + 24,
+              right: 290,
+              top: 0,
+              bottom: STRIP,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                color: GOLD,
+                fontSize: 16,
+                fontWeight: 700,
+                letterSpacing: 2.4,
+                marginBottom: 24,
+              }}
+            >
+              {eyebrow}
+            </div>
+            <Headline lines={lines} size={size} color={D_WHITE} />
+            {subtitle ? (
+              <div
+                style={{
+                  display: "flex",
+                  color: D_MUTED,
+                  fontSize: 26,
+                  fontFamily: "Newsreader",
+                  fontStyle: "italic",
+                  lineHeight: 1.45,
+                  marginTop: 22,
+                  maxWidth: 660,
+                }}
+              >
+                {subtitle}
+              </div>
+            ) : null}
+          </div>
+
+          {/* circular headshot (omitted if the image can't be fetched) */}
+          {hs ? (
+            <div
+              style={{
+                position: "absolute",
+                right: SAFE,
+                top: Math.floor((H - STRIP - 190) / 2),
+                width: 190,
+                height: 190,
+                display: "flex",
+                borderRadius: 95,
+                overflow: "hidden",
+                border: "3px solid #E8E2D6",
+              }}
+            >
+              <img src={hs} width={184} height={184} style={{ objectFit: "cover" }} />
+            </div>
+          ) : null}
+
+          {/* bottom strip */}
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: STRIP,
+              background: D_STRIP,
+              borderTop: `1px solid ${D_BORDER}`,
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: SAFE + 24,
+              paddingRight: SAFE,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 18, flex: 1, minWidth: 0 }}>
+              <div style={{ display: "flex", color: D_FAINT, fontSize: 10, fontWeight: 700, letterSpacing: 2.2 }}>
+                AS SEEN IN
+              </div>
+              <div style={{ display: "flex", width: 1, height: 20, background: D_DIVIDER }} />
+              <PubStrip dark />
+            </div>
+            <div style={{ display: "flex", color: GOLD, fontSize: 14, fontWeight: 600 }}>@syedirfanajmal</div>
+          </div>
+        </div>
+      ),
+      opts
+    );
+  }
+
+  // ── Direction C — stark white, split columns ───────────────────────────────
+  const STRIPE = 12;
+  const FOOTER = 96;
+  const size = fit(lines, lines.length >= 3 ? 64 : lines.length === 2 ? 74 : 86, 540);
+  return new ImageResponse(
+    (
+      <div style={{ display: "flex", width: W, height: H, background: "#FFFFFF", position: "relative", fontFamily: "Archivo" }}>
+        {/* gold left stripe */}
+        <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: STRIPE, background: GOLD }} />
+        {/* fine top rule */}
+        <div style={{ position: "absolute", top: 0, left: STRIPE, right: 0, height: 1, background: RULE }} />
+
+        {/* split layout */}
+        <div
+          style={{
+            position: "absolute",
+            left: STRIPE + SAFE,
+            right: SAFE,
+            top: 0,
+            bottom: FOOTER,
+            display: "flex",
+            alignItems: "stretch",
+          }}
+        >
+          {/* left: eyebrow + headline */}
+          <div
+            style={{
+              width: 600,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              paddingTop: 4,
+              paddingRight: 56,
+            }}
+          >
+            <div style={{ display: "flex", color: GOLD, fontSize: 13, fontWeight: 700, letterSpacing: 2.6, marginBottom: 28 }}>
+              {eyebrow}
+            </div>
+            <div style={{ display: "flex", width: 40, height: 2, background: INK, marginBottom: 28 }} />
+            <Headline lines={lines} size={size} color={INK} />
+          </div>
+
+          {/* vertical rule */}
+          <div style={{ display: "flex", width: 1, background: RULE, marginTop: 56, marginBottom: 56 }} />
+
+          {/* right: subtitle + author */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              flex: 1,
+              paddingLeft: 60,
+            }}
+          >
+            {subtitle ? (
+              <div
+                style={{
+                  display: "flex",
+                  color: SUB,
+                  fontSize: 26,
+                  fontFamily: "Newsreader",
+                  fontStyle: "italic",
+                  lineHeight: 1.5,
+                  marginBottom: 28,
+                }}
+              >
+                {subtitle}
+              </div>
+            ) : null}
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", color: INK, fontSize: 16, fontWeight: 700 }}>Syed Irfan Ajmal</div>
+              <div style={{ display: "flex", color: GOLD, fontSize: 11.5, fontWeight: 700, letterSpacing: 1.8, marginTop: 5 }}>
+                {role}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* footer ink bar */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: FOOTER,
+            background: INK,
+            display: "flex",
+            alignItems: "center",
+            paddingLeft: STRIPE + SAFE,
+            paddingRight: SAFE,
+          }}
+        >
+          <div style={{ display: "flex", color: "rgba(255,255,255,0.28)", fontSize: 10, fontWeight: 700, letterSpacing: 2.2 }}>
+            AS SEEN IN
+          </div>
+          <div style={{ display: "flex", width: 1, height: 18, background: "rgba(255,255,255,0.12)", marginLeft: 18, marginRight: 18 }} />
+          <PubStrip dark={false} />
+          <div style={{ display: "flex", color: GOLD, fontSize: 14, fontWeight: 600 }}>@syedirfanajmal</div>
         </div>
       </div>
     ),
-    { ...OG_SIZE }
+    opts
   );
 }

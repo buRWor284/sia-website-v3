@@ -4,11 +4,11 @@ export const alt = "SignalIQ · Syed Irfan Ajmal";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
-export default function Image() {
+export default async function Image() {
   return ogCard({
-    eyebrow: "EMOS TOOL · SYEDIRFANAJMAL.COM",
-    title: "SignalIQ · Media coverage gap scanner",
-    subtitle:
-      "Spot coverage gaps and whitespace across your sector with live signal data.",
+    eyebrow: "SIGNALIQ TOOL · SYEDIRFANAJMAL.COM",
+    title: "SignalIQ\nMedia coverage gap scanner",
+    subtitle: "Find the exact outlets covering your competitors, before they find you.",
+    variant: "dark",
   });
 }

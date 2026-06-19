@@ -4,11 +4,11 @@ export const alt = "PressIQ · Syed Irfan Ajmal";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
-export default function Image() {
+export default async function Image() {
   return ogCard({
-    eyebrow: "EMOS TOOL · SYEDIRFANAJMAL.COM",
-    title: "PressIQ · PR pitch scorer",
-    subtitle:
-      "Score your pitch on mechanics, personalization, and strength, then see how to fix it.",
+    eyebrow: "PRESSIQ TOOL · SYEDIRFANAJMAL.COM",
+    title: "PressIQ\nPR pitch scorer",
+    subtitle: "Score your pitch on mechanics, personalization, and strength, then fix it.",
+    variant: "dark",
   });
 }

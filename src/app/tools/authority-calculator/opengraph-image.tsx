@@ -4,11 +4,11 @@ export const alt = "Authority ROI Calculator · Syed Irfan Ajmal";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
-export default function Image() {
+export default async function Image() {
   return ogCard({
-    eyebrow: "EMOS TOOL · SYEDIRFANAJMAL.COM",
-    title: "Authority ROI Calculator",
-    subtitle:
-      "Model the ROI of renting media authority versus owning the capability with EMOS.",
+    eyebrow: "ROI CALCULATOR · SYEDIRFANAJMAL.COM",
+    title: "Authority ROI\nCalculator",
+    subtitle: "Model the ROI of renting media authority versus owning it with EMOS.",
+    variant: "dark",
   });
 }

@@ -4,9 +4,11 @@ export const alt = "Storytelling 101 · Syed Irfan Ajmal";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 
-export default function Image() {
+export default async function Image() {
   return ogCard({
     eyebrow: "RESOURCE · SYEDIRFANAJMAL.COM",
-    title: "Storytelling 101: Elevate Your Brand",
+    title: "Storytelling\n101",
+    subtitle: "Elevate your brand with narrative.",
+    variant: "dark",
   });
 }
