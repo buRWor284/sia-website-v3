@@ -1532,6 +1532,15 @@ body > * { position: relative; z-index: 2; }
 .emos-st-item:last-child { border-bottom: none; }
 .emos-st-tick { width: 14px; height: 14px; border: 1.5px solid var(--color-ink-35); flex-shrink: 0; position: relative; top: 2px; }
 .emos-st-itext { font-family: var(--font-grot); font-weight: 600; font-size: 15px; line-height: 1.4; color: var(--color-ink); letter-spacing: -0.01em; }
+.emos-st-assets { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--color-ink-15); }
+.emos-st-assets-label { display: block; font-family: var(--font-grot); font-weight: 700; font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--color-ink-35); margin-bottom: 12px; }
+.emos-st-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.emos-st-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid var(--color-ink-15); font-family: var(--font-grot); font-weight: 600; font-size: 12px; letter-spacing: -0.01em; color: var(--color-ink); background: var(--color-paper); transition: background .15s, border-color .15s; }
+.emos-st-chip::before { content: ''; width: 5px; height: 5px; background: var(--color-yellow); flex-shrink: 0; }
+.emos-st-chip:hover { background: var(--color-paper-2); border-color: var(--color-ink-35); }
+.emos-st-card.is-dark .emos-st-assets { border-top-color: var(--color-paper-18); }
+.emos-st-card.is-dark .emos-st-assets-label { color: var(--color-paper-55); }
+.emos-st-card.is-dark .emos-st-chip { border-color: var(--color-paper-25); color: var(--color-paper); background: transparent; }
 .emos-st-conn { display: flex; align-items: center; height: 40px; }
 .emos-st-conn-line { width: 1px; height: 40px; background: var(--color-ink-35); margin-left: 31px; flex-shrink: 0; }
 .emos-st-conn-label { font-family: var(--font-grot); font-weight: 700; font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--color-ink-35); margin-left: 14px; }

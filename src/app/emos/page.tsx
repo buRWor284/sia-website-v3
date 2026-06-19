@@ -353,13 +353,13 @@ export default function EmosPage() {
                 {[
                   { num: "01", title: "Get Quoted", weeksA: "Weeks 1 to 4", weeksB: "Foundation & Accelerate", conn: "", dark: false,
                     desc: "Pitching muscle built. First verified Tier 2/3 placements earned. Investor-ready citation list starts taking shape.",
-                    items: ["Quotable zones mapped & media kit live","5 personalized pitch templates","15+ pitches submitted with tracking sheet","At least 1 verified placement"] },
+                    items: ["Quotable zones mapped & media kit live","5 personalized pitch templates","15+ pitches submitted with tracking sheet","At least 1 verified placement"], assets: [] as string[] },
                   { num: "02", title: "Build Authority Assets", weeksA: "Weeks 5 to 8", weeksB: "Accelerate only", conn: "Builds into →", dark: false,
                     desc: "Syed works alongside you on your first 5 pitches. One owned linkable asset goes live. Tier 1 outreach in motion.",
-                    items: ["Done-with-you first 5 placements","Original report or data study","Infographic and mapographic","Direct outreach to 15 to 20 Tier 1 journalists"] },
+                    items: ["Done-with-you first 5 placements","Original report or data study","Infographic and mapographic","Direct outreach to 15 to 20 Tier 1 journalists"], assets: ["Report","Data study","AI mini-tool","Calculator","Quiz"] },
                   { num: "03", title: "Scale & Systemize", weeksA: "Post-cohort", weeksB: "Accelerate-led", conn: "Compounds into →", dark: true,
                     desc: "The machine runs without you. Coverage compounds month over month, long after the cohort ends.",
-                    items: ["20+ named-journalist target list","VA-ready system & sourcing module","90-day scaling plan","5-return extraction from every placement"] },
+                    items: ["20+ named-journalist target list","VA-ready system & sourcing module","90-day scaling plan","5-return extraction from every placement"], assets: [] as string[] },
                 ].map((s, i) => (
                   <Fragment key={s.num}>
                     {i > 0 && (
@@ -393,6 +393,14 @@ export default function EmosPage() {
                             <div className="emos-st-item" key={t}><span className="emos-st-tick" /><span className="emos-st-itext">{t}</span></div>
                           ))}
                         </div>
+                        {s.assets.length > 0 && (
+                          <div className="emos-st-assets">
+                            <span className="emos-st-assets-label">Linkable asset can be</span>
+                            <div className="emos-st-chips">
+                              {s.assets.map(a => (<span className="emos-st-chip" key={a}>{a}</span>))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </Fragment>
