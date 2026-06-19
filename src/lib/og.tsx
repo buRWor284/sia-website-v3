@@ -1,4 +1,6 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 // Shared Open Graph / Twitter card generator. Implements the two approved
 // "design_handoff_og_social_cards" directions:
@@ -28,8 +30,6 @@ const D_FAINT = "#5E5B57";
 const D_BORDER = "#1E1C18";
 const D_DIVIDER = "#282420";
 
-const HEADSHOT_URL = "https://www.syedirfanajmal.com/og/headshot-card.jpg";
-
 // Press wordmarks. satori has no system fonts, so we approximate the handoff's
 // Georgia/Arial-Narrow with our loaded serif (Newsreader) and sans (Archivo).
 const PUBS: {
@@ -49,9 +49,6 @@ const PUBS: {
 // ── Fonts: load TTF from Google at render (satori can't read the repo's woff2).
 // Old UA forces TTF; cached at module scope; fails soft so a hiccup degrades to
 // satori's default font rather than erroring. ──────────────────────────────────
-const CHARSET =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,:;!?&@#%$()[]'\"-+/·—";
-
 const FONTS: { family: string; weight: 400 | 600 | 700 | 900; italic?: boolean }[] = [
   { family: "Archivo", weight: 900 },
   { family: "Archivo", weight: 700 },
@@ -59,6 +56,22 @@ const FONTS: { family: string; weight: 400 | 600 | 700 | 900; italic?: boolean }
   { family: "Newsreader", weight: 700 },
   { family: "Newsreader", weight: 400, italic: true },
 ];
+
+// satori can only parse TTF / OTF / TTC / WOFF — never WOFF2 or an HTML error body.
+// Validate the signature so a bad response degrades to satori's default font
+// instead of throwing "Offset is outside the bounds of the DataView" at build.
+function isParseableFont(buf: ArrayBuffer): boolean {
+  if (buf.byteLength < 4) return false;
+  const b = new Uint8Array(buf, 0, 4);
+  const sig = ((b[0] << 24) | (b[1] << 16) | (b[2] << 8) | b[3]) >>> 0;
+  return (
+    sig === 0x00010000 || // TrueType
+    sig === 0x4f54544f || // 'OTTO' (OpenType/CFF)
+    sig === 0x74727565 || // 'true'
+    sig === 0x74746366 || // 'ttcf'
+    sig === 0x774f4646 //    'wOFF' (woff)
+  );
+}
 
 const fontCache = new Map<string, Promise<ArrayBuffer | null>>();
 function loadFont(family: string, weight: number, italic: boolean): Promise<ArrayBuffer | null> {
@@ -69,18 +82,23 @@ function loadFont(family: string, weight: number, italic: boolean): Promise<Arra
       (async () => {
         try {
           const axis = italic ? `ital,wght@1,${weight}` : `wght@${weight}`;
-          const api =
-            `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:${axis}` +
-            `&text=${encodeURIComponent(CHARSET)}`;
-          const css = await fetch(api, {
-            headers: {
-              "User-Agent":
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Version/5.1 Safari/534.30",
-            },
-          }).then((r) => r.text());
-          const url = css.match(/src:\s*url\(([^)]+\.(?:ttf|otf))\)/)?.[1];
+          // No &text= subset: the old User-Agent makes Google return a full TTF
+          // (subsetting would force woff2, which satori cannot read).
+          const css = await fetch(
+            `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:${axis}`,
+            {
+              headers: {
+                "User-Agent":
+                  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.30 (KHTML, like Gecko) Version/5.1 Safari/534.30",
+              },
+            }
+          ).then((r) => r.text());
+          const url = css.match(/url\((https:\/\/[^)]+)\)/)?.[1];
           if (!url) return null;
-          return await fetch(url).then((r) => r.arrayBuffer());
+          const res = await fetch(url);
+          if (!res.ok) return null;
+          const buf = await res.arrayBuffer();
+          return isParseableFont(buf) ? buf : null;
         } catch {
           return null;
         }
@@ -112,15 +130,16 @@ async function loadFonts() {
   }[];
 }
 
-// Pre-fetch the headshot as a data URI (cached) so a failed image fetch can never
-// throw inside satori — the dark card simply renders without the photo.
+// Read the headshot from the local /public folder (always present at build time)
+// and inline it as a data URI — no network, so it works during static prerender
+// and never returns a 404 HTML body that would crash satori.
 let headshotCache: Promise<string | null> | undefined;
 function loadHeadshot(): Promise<string | null> {
   if (!headshotCache) {
     headshotCache = (async () => {
       try {
-        const buf = await fetch(HEADSHOT_URL).then((r) => r.arrayBuffer());
-        return `data:image/jpeg;base64,${Buffer.from(buf).toString("base64")}`;
+        const buf = await readFile(join(process.cwd(), "public", "og", "headshot-card.jpg"));
+        return `data:image/jpeg;base64,${buf.toString("base64")}`;
       } catch {
         return null;
       }
