@@ -12,7 +12,7 @@
  * Honesty: scores are a lead/whitespace measure, never a prediction. Said so on-page.
  */
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { ToolHeader } from "@/components/tools/ToolHeader";
@@ -138,6 +138,143 @@ const SRC_LABEL: Record<string, string> = {
 
 const EMOS_URL = "/emos";
 const EMOS_APPLY = "/emos/apply";
+
+// ── stats: the value/effort behind SignalIQ ──────────────────────────────────
+// Per-feed scale figures (verified June 2026). Keyed to SOURCES_DATA.id.
+const SOURCE_STATS: Record<
+  string,
+  { value: number; decimals?: number; prefix?: string; suffix?: string; label: string }
+> = {
+  sec:        { value: 4700,   prefix: "~", suffix: "/day", label: "new filings hit EDGAR" },
+  gdelt:      { value: 100,    suffix: "+",                 label: "languages · refreshed every 15 min" },
+  arxiv:      { value: 24226,                               label: "papers in a record month" },
+  wikipedia:  { value: 493000, prefix: "~", suffix: "/day", label: "edits · 5.7 every second" },
+  hackernews: { value: 1300,   prefix: "~", suffix: "/day", label: "new stories submitted" },
+};
+
+// Rotating cards shown while a scan runs (problem → proof → payoff).
+const SCAN_STATS: Array<{ big: string; rest: string; src: string }> = [
+  { big: "3.43%",      rest: "the average response rate to a PR pitch. Timing is how you beat it.", src: "Propel · State of PR" },
+  { big: "73%",        rest: "of pitches are rejected for being off-beat. A signal-backed angle isn't.", src: "Muck Rack 2024" },
+  { big: "53%",        rest: "of journalists say a pitch should include original data. Your scan builds it.", src: "Muck Rack 2024" },
+  { big: "Weeks ahead", rest: "academic preprints can lead mainstream coverage. SignalIQ reads them first.", src: "arXiv" },
+  { big: "92%",        rest: "of people trust earned media above every form of advertising.", src: "Nielsen" },
+  { big: "$15–40k/yr", rest: "what enterprise media tools cost. The signal layer they skip is free here.", src: "Prowly · Vendr" },
+];
+
+// Headline proof bar on the landing view (counts up on scroll).
+const PROOF_STATS: Array<{ value: number; decimals?: number; suffix?: string; label: string; src: string }> = [
+  { value: 3.43, decimals: 2, suffix: "%", label: "average response rate to a cold PR pitch — the bar SignalIQ helps you clear", src: "Propel · State of PR" },
+  { value: 73,                suffix: "%", label: "of pitches die for being off-beat; a signal-backed angle doesn't", src: "Muck Rack 2024" },
+  { value: 53,                suffix: "%", label: "of journalists want original data in a pitch — every scan builds it", src: "Muck Rack 2024" },
+  { value: 92,                suffix: "%", label: "of people trust earned media above all advertising", src: "Nielsen" },
+];
+
+// ── animated counter (count-up on scroll into view) ──────────────────────────
+function CountUp({
+  value, decimals = 0, prefix = "", suffix = "", duration = 1400, className, style,
+}: {
+  value: number; decimals?: number; prefix?: string; suffix?: string;
+  duration?: number; className?: string; style?: React.CSSProperties;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const fmt = (n: number) =>
+      prefix +
+      n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) +
+      suffix;
+    const reduced =
+      typeof window !== "undefined" && !!window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let raf = 0;
+    let done = false;
+    el.textContent = fmt(reduced ? value : 0);
+    const animate = () => {
+      let start = 0;
+      const tick = (t: number) => {
+        if (!start) start = t;
+        const p = Math.min((t - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = fmt(value * eased);
+        if (p < 1) raf = requestAnimationFrame(tick);
+        else el.textContent = fmt(value);
+      };
+      raf = requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && !done) {
+            done = true;
+            if (reduced) el.textContent = fmt(value);
+            else animate();
+            io.disconnect();
+          }
+        }
+      },
+      { threshold: 0.4 },
+    );
+    io.observe(el);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+  }, [value, decimals, prefix, suffix, duration]);
+  return <span ref={ref} className={className} style={style} />;
+}
+
+// ── scan loader: rotating stat cards + sources lighting up ────────────────────
+function ScanLoader() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setI((n) => (n + 1) % SCAN_STATS.length), 2400);
+    return () => clearInterval(id);
+  }, []);
+  const s = SCAN_STATS[i];
+  return (
+    <div className="siq-loader" role="status" aria-live="polite">
+      <div className="siq-loader-head">
+        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase", color: INK55 }}>
+          Scanning 5 live sources
+        </span>
+        <div className="siq-loader-bar"><span /></div>
+      </div>
+      <div className="siq-loader-feeds">
+        {SOURCES_DATA.map((src, idx) => (
+          <span key={src.id} className="siq-loader-feed" style={{ "--d": `${idx * 0.45}s` } as React.CSSProperties}>
+            <span className="siq-loader-dot" style={{ "--d": `${idx * 0.45}s` } as React.CSSProperties} />
+            {src.name}
+          </span>
+        ))}
+      </div>
+      <div key={i} className="siq-loader-stat">
+        <span className="siq-loader-stat-big">{s.big}</span>
+        <span className="siq-loader-stat-text">{s.rest}</span>
+        <span className="siq-loader-stat-src">{s.src}</span>
+      </div>
+    </div>
+  );
+}
+
+// ── proof strip: headline stats that count up on the landing view ─────────────
+function ProofStrip() {
+  return (
+    <div className="siq-proof">
+      <div className="siq-proof-inner">
+        {PROOF_STATS.map((p, idx) => (
+          <div key={idx} className="siq-proof-cell">
+            <CountUp value={p.value} decimals={p.decimals ?? 0} suffix={p.suffix} className="siq-proof-num" />
+            <p className="siq-proof-label">{p.label}</p>
+            <span className="siq-proof-src">{p.src}</span>
+          </div>
+        ))}
+      </div>
+      <p className="siq-proof-foot">
+        Why timing beats volume in earned media — every figure links back to its source on the{" "}
+        <Link href="/tools/signaliq/about" style={{ color: INK55, textDecoration: "underline", textDecorationColor: INK15 }}>methodology page</Link>.
+      </p>
+    </div>
+  );
+}
 
 // ── info tooltip (click + hover, works on mobile) ─────────────────────────────
 function InfoTooltip({ text, dark = false, width = 270 }: { text: React.ReactNode; dark?: boolean; width?: number }) {
@@ -345,6 +482,21 @@ function SourcesSidebar() {
                   <div style={{ height: "100%", width: `${credPct}%`, background: credColor, transition: "width .5s ease" }} />
                 </div>
               </div>
+              {/* scale stat — the volume SignalIQ watches on this feed */}
+              {SOURCE_STATS[src.id] && (
+                <div style={{ marginBottom: 8 }}>
+                  <CountUp
+                    value={SOURCE_STATS[src.id].value}
+                    decimals={SOURCE_STATS[src.id].decimals ?? 0}
+                    prefix={SOURCE_STATS[src.id].prefix ?? ""}
+                    suffix={SOURCE_STATS[src.id].suffix ?? ""}
+                    style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, letterSpacing: "-0.01em", display: "block", lineHeight: 1.05 }}
+                  />
+                  <span style={{ display: "block", marginTop: 2, fontFamily: MONO, fontWeight: 700, fontSize: 7.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, lineHeight: 1.3 }}>
+                    {SOURCE_STATS[src.id].label}
+                  </span>
+                </div>
+              )}
               {/* benefit */}
               <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, lineHeight: 1.45 }}>
                 {src.benefit}
@@ -967,9 +1119,12 @@ function EmailGate({
   return (
     <form onSubmit={onUnlock} style={{ padding: "18px 20px", border: `1px solid ${INK}`, background: PAPER2 }}>
       <SCaps size={10} ls="0.16em" color={INK}>Unlock more scans &amp; packs</SCaps>
-      <p style={{ margin: "6px 0 12px", fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.5 }}>
+      <p style={{ margin: "6px 0 10px", fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.5 }}>
         Add your email for {EMAIL_SCANS} scans/month and SIA&rsquo;s earned-media playbooks.
         One list, unsubscribe anytime.
+      </p>
+      <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, lineHeight: 1.5, borderLeft: `2px solid ${YEL}`, paddingLeft: 10 }}>
+        Enterprise media tools (Cision, Meltwater) run $15,000&ndash;$40,000 a year for contacts and monitoring. The story-discovery layer they don&rsquo;t have is free here.
       </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <input
@@ -1327,6 +1482,8 @@ export default function SignalIQPage() {
             <div style={{ marginTop: 12 }}>
               <SourcesTicker />
             </div>
+            {/* Proof bar — the numbers behind the method */}
+            <ProofStrip />
             <div style={{ textAlign: "center", padding: "clamp(20px,3vw,36px) clamp(22px,5vw,56px)" }}>
               <button
                 onClick={() => { setIntro(false); }}
@@ -1388,6 +1545,8 @@ export default function SignalIQPage() {
               )}
             </div>
             <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); setOppsRevealed(false); }} onScan={runScan} scanning={scanning} />
+
+            {scanning && <ScanLoader />}
 
             {scanError && (
               <div style={{ maxWidth: 620, margin: "20px auto 0", padding: "12px 14px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
@@ -1906,6 +2065,169 @@ const PAGE_CSS = `
     font-size: 8px !important;
     line-height: 1.6 !important;
     color: ${INK55} !important;
+  }
+
+  /* ── scan loader (rotating stats while scanning) ─────────────────── */
+  .siq-loader {
+    max-width: 640px;
+    margin: 6px auto 0;
+    border: 1px solid ${INK15};
+    background: ${PAPER2};
+    padding: 20px 22px;
+  }
+  .siq-loader-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .siq-loader-bar {
+    position: relative;
+    flex: 1;
+    height: 2px;
+    background: ${INK15};
+    overflow: hidden;
+  }
+  .siq-loader-bar > span {
+    position: absolute;
+    top: 0;
+    left: -35%;
+    height: 100%;
+    width: 35%;
+    background: ${YEL};
+    animation: siq-scan-bar 1.25s ease-in-out infinite;
+  }
+  @keyframes siq-scan-bar {
+    0%   { left: -35%; }
+    100% { left: 100%; }
+  }
+  .siq-loader-feeds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px 16px;
+    margin: 16px 0 18px;
+  }
+  .siq-loader-feed {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: ${MONO};
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: ${INK55};
+    animation: siq-feed-in .5s ease both;
+    animation-delay: var(--d);
+  }
+  .siq-loader-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: ${GREEN};
+    animation: siq-pulse 1.4s ease-in-out infinite;
+    animation-delay: var(--d);
+  }
+  @keyframes siq-feed-in {
+    from { opacity: 0; transform: translateY(3px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .siq-loader-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-height: 86px;
+    animation: siq-stat-in .5s ease both;
+  }
+  @keyframes siq-stat-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .siq-loader-stat-big {
+    font-family: ${SERIF};
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1;
+    color: ${INK};
+    letter-spacing: -0.02em;
+  }
+  .siq-loader-stat-text {
+    font-family: ${SERIF};
+    font-style: italic;
+    font-size: 14px;
+    color: ${INK70};
+    line-height: 1.45;
+    max-width: 520px;
+  }
+  .siq-loader-stat-src {
+    font-family: ${MONO};
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: ${INK35};
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .siq-loader-bar > span { animation: none; left: 0; width: 100%; opacity: .5; }
+    .siq-loader-feed, .siq-loader-stat { animation: none; }
+    .siq-loader-dot { animation: none; }
+  }
+
+  /* ── proof strip (headline stats on landing) ─────────────────────── */
+  .siq-proof {
+    padding: 6px clamp(22px,5vw,56px) 2px;
+  }
+  .siq-proof-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid ${INK15};
+    background: ${PAPER2};
+  }
+  .siq-proof-cell {
+    padding: 20px 18px;
+    border-right: 1px solid ${INK15};
+  }
+  .siq-proof-cell:last-child { border-right: none; }
+  .siq-proof-num {
+    display: block;
+    font-family: ${SERIF};
+    font-weight: 700;
+    font-size: clamp(26px,3.4vw,38px);
+    line-height: 1;
+    color: ${INK};
+    letter-spacing: -0.02em;
+  }
+  .siq-proof-label {
+    margin: 8px 0 8px;
+    font-family: ${SERIF};
+    font-style: italic;
+    font-size: 12.5px;
+    color: ${INK55};
+    line-height: 1.4;
+  }
+  .siq-proof-src {
+    font-family: ${MONO};
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: ${INK35};
+  }
+  .siq-proof-foot {
+    max-width: 1100px;
+    margin: 10px auto 0;
+    text-align: center;
+    font-family: ${SERIF};
+    font-style: italic;
+    font-size: 12px;
+    color: ${INK55};
+  }
+  @media (max-width: 760px) {
+    .siq-proof-inner { grid-template-columns: repeat(2, 1fr); }
+    .siq-proof-cell:nth-child(2) { border-right: none; }
+    .siq-proof-cell:nth-child(1),
+    .siq-proof-cell:nth-child(2) { border-bottom: 1px solid ${INK15}; }
   }
 
   /* ecosystem grid CSS moved to ToolPipelineFooter shared component */
