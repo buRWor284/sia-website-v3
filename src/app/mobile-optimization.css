@@ -1,0 +1,97 @@
+/* =========================================================================
+   MOBILE OPTIMIZATION PASS · 2026-06-19
+   Loaded AFTER globals.css (see layout.tsx) so these overrides win the cascade.
+
+   Technical / responsive polish ONLY — no content, copy, or design changes.
+   Self-contained and fully reversible: delete this file and remove its single
+   import in layout.tsx to revert completely. Scope:
+     1. horizontal-overflow safety
+     2. image aspect-ratio at all widths
+     3. prefers-reduced-motion (battery / CPU / vestibular safety)
+     4. >=44px touch targets
+
+   The two rules that override an existing equal-specificity declaration use
+   !important so they win regardless of stylesheet bundling order. Everything
+   else is either a brand-new property, specificity-0, or already !important.
+   ========================================================================= */
+
+/* ── 1 · Horizontal-overflow safety net ─────────────────────────────────────
+   globals.css sets `max-width: 100vw` on html,body. 100vw includes the
+   scrollbar gutter and can produce a few px of horizontal scroll on desktops
+   with classic scrollbars. `overflow-x: clip` (already set in globals) is the
+   real guard; cap to the content box so the viewport math can't overshoot. */
+html,
+body {
+  max-width: 100% !important;
+}
+
+/* Let long unbreakable strings (URLs, long compound words) wrap instead of
+   forcing horizontal scroll on narrow phones. :where() keeps specificity at 0
+   so every existing rule still wins. Only breaks words that would otherwise
+   overflow — normal text is unaffected. */
+:where(p, li, dd, blockquote, h1, h2, h3, h4, figcaption) {
+  overflow-wrap: break-word;
+}
+
+/* ── 2 · Image aspect ratio at all widths ───────────────────────────────────
+   globals.css sets `max-width:100%` on images but only adds `height:auto`
+   below 640px. Above that, an <img> carrying width/height attributes (e.g. the
+   1200x390 speaking photo) can squash when shrunk on tablets. Inline-styled
+   fixed-size avatars are unaffected (inline-style specificity wins). */
+img {
+  height: auto;
+}
+
+/* ── 3 · Reduced motion — battery / CPU / vestibular safety ──────────────────
+   The stylesheet had no prefers-reduced-motion handling. Neutralise only the
+   *infinite* decorative animations (the two EMOS marquees, the page ticker,
+   the typing-cursor blink, the pulse glow) when the user requests reduced
+   motion. One-shot scroll-reveal animations are intentionally left intact, so
+   no content is ever hidden by this rule. */
+@media (prefers-reduced-motion: reduce) {
+  .emos-marquee-track,
+  .emos-marquee-track-rev,
+  .sia-ticker-track,
+  .f3-cur,
+  .pulse-y {
+    animation: none !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── 4 · Touch targets >=44px (Apple HIG / WCAG 2.5.5) ───────────────────────
+   Brings the masthead controls and the primary EMOS CTAs up to the same 44px
+   minimum the codebase already enforces for checkboxes and the tool back-link.
+   Height floor only — no wording, label, or layout-mode changes. */
+.mast-hamburger {
+  min-height: 44px;
+}
+
+.mast-mobile-link {
+  min-height: 44px;
+}
+
+.mast-mobile-book {
+  min-height: 44px;
+}
+
+.emos-cta-yellow,
+.emos-cta-ink,
+.emos-cta-ghost,
+.emos-nav-cta {
+  min-height: 44px;
+}
+
+/* Homepage "what I do" service pills are tappable links; give them a more
+   comfortable tap height on phones without changing their desktop flow.
+   !important so it wins over the base .what-i-do-pill padding regardless of
+   bundle order. Left/right padding is untouched. */
+@media (max-width: 640px) {
+  .what-i-do-pill {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+}

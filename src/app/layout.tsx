@@ -5,6 +5,7 @@ import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SiteHeader, CredibilityTicker } from "@/components/bureau";
 import "./globals.css";
+import "./mobile-optimization.css"; // loaded after globals so mobile overrides win the cascade
 
 const newsreader = Newsreader({
   variable: "--font-newsreader",
