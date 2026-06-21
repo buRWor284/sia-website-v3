@@ -124,6 +124,11 @@ const SAMPLE_BEAT = `Covers the future of work, distributed teams, and workplace
 
 const STORE_KEY = "sia.pressiq.v2";
 
+// Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered and
+// scoring works exactly as before. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY (+ the server
+// TURNSTILE_SECRET_KEY) to enforce the human check end-to-end.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+
 const BRAND_LABELS: { key: keyof BrandSignals; label: string }[] = [
   { key: "website",     label: "Personal website"  },
   { key: "bylines",     label: "Published bylines" },
@@ -774,8 +779,11 @@ export default function PressIQPage() {
   const [email,    setEmail]    = useState("");
   const [emailDone, setEmailDone] = useState(false);
   const [showGate, setShowGate]   = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   const rightRef = useRef<HTMLElement>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
 
   // localStorage persist
   useEffect(() => {
@@ -799,13 +807,42 @@ export default function PressIQPage() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify({ pitch, query, subject, platform, brand, pitchMode, journalistBeat })); } catch { /* ignore */ }
   }, [pitch, query, subject, platform, brand, pitchMode, journalistBeat]);
 
+  // Cloudflare Turnstile: render the human-check widget when configured. No-op when
+  // NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset, so the tool keeps working without it.
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY) return;
+    const render = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
+      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: "dark",
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((window as any).turnstile) { render(); return; }
+    const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
+    if (!s) {
+      s = document.createElement("script");
+      s.src = SRC; s.async = true; s.defer = true;
+      document.head.appendChild(s);
+    }
+    s.addEventListener("load", render);
+    return () => { s?.removeEventListener("load", render); };
+  }, []);
+
   const live = useMemo(() => {
     if (pitch.trim().length < 15) return null;
     return scoreLayer1(computeMetrics(pitch, subject));
   }, [pitch, subject]);
 
   const subjectPlaceholder = resolveSubject(pitch, subject) || "Re: [Query] — …";
-  const canAnalyze = pitch.trim().length >= 40 && view !== "loading";
+  const canAnalyze = pitch.trim().length >= 40 && view !== "loading" && (!TURNSTILE_SITE_KEY || !!turnstileToken);
 
   function loadSample() {
     setPitch(SAMPLE_PITCH);
@@ -819,11 +856,20 @@ export default function PressIQPage() {
     if (!canAnalyze) return;
     setError(null); setView("loading"); setResult(null); setTab("score");
     try {
-      const res = await fetch("/api/pitch-score", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pitch, query: pitchMode === "standalone" ? journalistBeat : query, subject, platform, brandSignals: brand, store, pitchMode }) });
+      const res = await fetch("/api/pitch-score", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pitch, query: pitchMode === "standalone" ? journalistBeat : query, subject, platform, brandSignals: brand, store, pitchMode, turnstileToken }) });
       const data = (await res.json()) as { error?: string } & ScoreResponse;
       if (!res.ok) { setError(data.error || "Something went wrong scoring your pitch."); setView("pre"); }
       else { setResult(data); setView("post"); setTimeout(() => rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }), 50); }
     } catch { setError("Network error — please try again."); setView("pre"); }
+    finally {
+      // Turnstile tokens are single-use — refresh for the next submission.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
+        w.turnstile.reset(turnstileWidgetId.current);
+        setTurnstileToken("");
+      }
+    }
   }
 
   function reset() { setView("pre"); setResult(null); setError(null); setTab("score"); rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }
@@ -1260,6 +1306,7 @@ export default function PressIQPage() {
                 <input type="checkbox" checked={store} onChange={e => setStore(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
                 <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.32), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
               </label>
+              {TURNSTILE_SITE_KEY && <div ref={turnstileRef} style={{ marginBottom: 12 }} />}
               {error && (
                 <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>{error}</div>
               )}
