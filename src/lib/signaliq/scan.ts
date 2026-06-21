@@ -96,7 +96,7 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
   // function timeout, fetch coverage only for the strongest-signal seeds (the
   // ones most likely to surface as top opportunities); the rest fall back to a
   // neutral coverage gap. The 6h cache means repeat scans cover more over time.
-  const COVERAGE_LIMIT = 6;
+  const COVERAGE_LIMIT = 8;
   const seedStrength = (s: Signal[]) => Math.max(...s.map((x) => x.magnitude));
   const coverageSeeds = new Set(
     [...seedsWithSignals]

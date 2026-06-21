@@ -20,14 +20,15 @@ const BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 // distribution is sampled from production.
 const VOLUME_CAP = 0.5;
 
-// GDELT enforces ~1 request / 5s per IP and returns a PLAINTEXT throttle notice
-// (HTTP 200, not JSON) when exceeded — which previously parsed as an error and
-// collapsed coverage to neutral for nearly every topic. We now:
-//   1) serialise calls with spacing (concurrency 1 + interval),
-//   2) cache results (coverage moves slowly over a 2-month window), and
-//   3) retry once after backing off past GDELT's window if we hit the notice.
-// scan.ts further limits the fan-out to seeds that actually produced signals.
-const gdeltLimit = createLimiter({ concurrency: 1, minIntervalMs: 4000 });
+// GDELT's timelinevol is slow (~10s) AND rate-limited (returns a PLAINTEXT
+// throttle notice — HTTP 200, not JSON — under load). Strategy:
+//   1) modest concurrency so slow calls OVERLAP and finish within the function
+//      budget (serialising them timed out the scan),
+//   2) detect the throttle notice and treat it as "no coverage" (neutral gap)
+//      WITHOUT a synchronous retry (a per-seed back-off blew the timeout),
+//   3) cache results 6h (coverage moves slowly), so repeat scans cover more.
+// scan.ts caps how many seeds reach here so a cold scan stays under maxDuration.
+const gdeltLimit = createLimiter({ concurrency: 4 });
 
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6h — volume is a slow-moving 2-month signal
 const cache = new Map<string, { at: number; val: Coverage }>();
@@ -73,7 +74,7 @@ export async function gdeltCoverage(topic: string): Promise<Coverage | null> {
     // Single attempt only — no synchronous retry (a 5s back-off per seed could
     // blow the function timeout). If throttled, return null (neutral gap); the
     // cache + next scan recover it. scan.ts also caps how many seeds reach here.
-    const text = await gdeltLimit(() => getText(url, 6000));
+    const text = await gdeltLimit(() => getText(url, 11000));
     if (isThrottleNotice(text)) return null;
     const cov = parseTimeline(topic, text);
     if (cov) cache.set(cacheKey, { at: Date.now(), val: cov });
