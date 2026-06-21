@@ -459,7 +459,9 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
           <input style={inp()} placeholder="e.g. Acme Corp" value={biz} autoFocus
-            onChange={e => dispatch({ type: "SET", key: "biz", val: e.target.value })} />
+            onChange={e => dispatch({ type: "SET", key: "biz", val: e.target.value })}
+            onPaste={e => setTimeout(() => dispatch({ type: "SET", key: "biz", val: (e.target as HTMLInputElement).value }), 0)}
+            onBlur={e => dispatch({ type: "SET", key: "biz", val: e.target.value })} />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 28 }}>
           <div>
@@ -1012,6 +1014,14 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     return ()=>clearInterval(t);
   }, [loading]);
 
+  // Scroll to top when journalist results finish loading so content isn't hidden
+  useEffect(()=>{
+    if (!loading && partners.length > 0) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
   async function generatePartners() {
     setLoading(true); setPartners([]); setLoadingIdx(0);
     try {
@@ -1475,7 +1485,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     <>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <div className="v2-collabiq" style={{ background:t.BG1, color:t.TX, minHeight:"100vh" }}>
-        {step>0 && <WizardProgress step={step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:1})} topOffset={toolHeaderHeight} />}
+        {step>0 && <WizardProgress step={step===5 && !!aiBrief ? step : step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:1})} topOffset={toolHeaderHeight} />}
 
         <div key={`stage-${step}`}>
           {step===0 && <Stage0 onStart={()=>dispatch({type:"GO",step:1})} />}
