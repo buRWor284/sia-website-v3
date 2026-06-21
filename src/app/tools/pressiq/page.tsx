@@ -8,6 +8,7 @@
  */
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
@@ -1225,9 +1226,9 @@ export default function PressIQPage() {
           toolPrefix="Press"
           subtitle="Journalist Pitch Score · SIA Wire"
           rightContent={
-            <a href="/" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
+            <Link href="/" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
               ← syedirfanajmal.com
-            </a>
+            </Link>
           }
         />
 
