@@ -1,14 +1,14 @@
 /**
  * /api/signaliq/refresh-coverage
  *
- * Background worker — triggered by Vercel Cron every 5 minutes (see vercel.json).
- * Fetches GDELT coverage for the next ~10 seeds in a rotating cursor over the
+ * Background worker — triggered by Vercel Cron daily + GitHub Actions every 30 min.
+ * Fetches GDELT coverage for the next ~5 seeds in a rotating cursor over the
  * 120 preset seeds, saves results to Supabase, then advances the cursor.
  *
  * This is the ONLY place that calls GDELT. By serialising all GDELT calls here
  * (1 call / 5.2s), we fully own the pace and never trip the rate limit.
- * 10 topics × 5.2s ≈ 52s — safely under Vercel's 60s function limit.
- * 12 cron runs cover all 120 seeds in ~1 hour, then the cycle repeats.
+ * 5 topics × (5.2s delay + ≤7s fetch) ≈ 56s worst case — under Vercel's 60s limit.
+ * 24 cron runs cover all 120 seeds in ~12 hours, then the cycle repeats.
  *
  * Auth: Vercel automatically sends Authorization: Bearer <CRON_SECRET>.
  * Set CRON_SECRET in the Vercel project environment to lock this endpoint down.
@@ -23,7 +23,7 @@ import { getCursor, setCursor, setStoredCoverage } from "@/lib/signaliq/coverage
 export const maxDuration = 60; // seconds
 
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
-const BATCH_SIZE = 10;
+const BATCH_SIZE = 5;
 const DELAY_MS = 5200; // just over 5s — respects GDELT's ~1 req/5s limit
 
 /** All 120 preset seeds in a stable flat order (6 beats × 20 seeds). */
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     try {
       const url =
         `${GDELT_BASE}?query=${encodeURIComponent(`"${topic}"`)}&mode=timelinevol&format=json&timespan=2m`;
-      const text = await getText(url, 12_000);
+      const text = await getText(url, 7_000);
       if (isThrottle(text)) {
         results.push(`throttled:${topic}`);
         continue;
