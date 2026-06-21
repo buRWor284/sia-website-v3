@@ -12,7 +12,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitDb } from "@/lib/rate-limit-db";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { EMAIL_LIMIT, FREE_LIMIT, PITCH_MODEL } from "@/lib/pitch/config";
 import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
@@ -27,7 +27,17 @@ const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_PITCH_CHARS = 8000;
 
 function clientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  // On Vercel, x-real-ip is set by the platform to the true client IP and cannot be
+  // spoofed by the caller. Prefer it; fall back to the LAST x-forwarded-for hop (the
+  // one the platform appends), never the client-controllable first entry.
+  const realIp = req.headers.get("x-real-ip")?.trim();
+  if (realIp) return realIp;
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) {
+    const parts = xff.split(",").map((s) => s.trim()).filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
+  return "unknown";
 }
 
 function coerceBrand(v: unknown): BrandSignals {
@@ -88,7 +98,7 @@ export async function POST(req: NextRequest) {
   const isEmailTier = req.cookies.get("pp_tier")?.value === "email";
   const limit = isEmailTier ? EMAIL_LIMIT : FREE_LIMIT;
   const usageTier: "anonymous" | "email" = isEmailTier ? "email" : "anonymous";
-  const rl = rateLimit(`pitch:${ip}`, { limit, windowMs: MONTH_MS });
+  const rl = await rateLimitDb(`pitch:${ip}`, { limit, windowMs: MONTH_MS });
   if (!rl.ok) {
     return NextResponse.json(
       {
