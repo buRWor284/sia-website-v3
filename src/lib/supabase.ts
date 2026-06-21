@@ -1,11 +1,25 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 // ─── Browser client (no auth) ─────────────────────────────────────────────────
 // Use for public/unauthenticated reads only.
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Lazy: the real client is created on first property access, NOT at module load,
+// so importing this module never throws when NEXT_PUBLIC_SUPABASE_URL is absent
+// (e.g. a local `next build` without Supabase env). Real env is present at runtime.
+let _browserClient: SupabaseClient | null = null
+function getBrowserClient(): SupabaseClient {
+  if (!_browserClient) _browserClient = createClient(supabaseUrl, supabaseAnonKey)
+  return _browserClient
+}
+export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getBrowserClient()
+    const value = Reflect.get(client as object, prop)
+    return typeof value === 'function' ? value.bind(client) : value
+  },
+})
 
 // ─── Authenticated server client ──────────────────────────────────────────────
 // Call this inside Server Actions and Route Handlers.
