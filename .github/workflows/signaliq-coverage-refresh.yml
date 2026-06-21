@@ -1,0 +1,29 @@
+# SignalIQ — Coverage Refresher
+# Triggers the background GDELT poller every 30 minutes.
+# Each run fetches coverage for the next 10 seeds (rotating cursor) and saves
+# to Supabase. 12 runs cover all 120 seeds in ~6 hours, then repeats.
+#
+# Required GitHub secret: CRON_SECRET (same value as the Vercel env var)
+# Add it at: Settings → Secrets and variables → Actions → New repository secret
+
+name: SignalIQ Coverage Refresh
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 minutes
+  workflow_dispatch:           # allow manual trigger from the Actions tab
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Trigger coverage refresh
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://www.syedirfanajmal.com/api/signaliq/refresh-coverage)
+          echo "Response status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "Unexpected status $STATUS" && exit 1
+          fi

@@ -2,7 +2,7 @@
   "crons": [
     {
       "path": "/api/signaliq/refresh-coverage",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 2 * * *"
     }
   ]
 }
