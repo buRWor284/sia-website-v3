@@ -41,7 +41,7 @@ function isThrottleNotice(text: string): boolean {
   return /limit requests|too many requests/i.test(text);
 }
 
-function parseTimeline(topic: string, text: string): Coverage | null {
+export function parseTimeline(topic: string, text: string): Coverage | null {
   let json: TimelineResp;
   try {
     json = JSON.parse(text) as TimelineResp;
