@@ -27,7 +27,7 @@ const VOLUME_CAP = 0.5;
 //   2) cache results (coverage moves slowly over a 2-month window), and
 //   3) retry once after backing off past GDELT's window if we hit the notice.
 // scan.ts further limits the fan-out to seeds that actually produced signals.
-const gdeltLimit = createLimiter({ concurrency: 1, minIntervalMs: 1800 });
+const gdeltLimit = createLimiter({ concurrency: 1, minIntervalMs: 4000 });
 
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6h — volume is a slow-moving 2-month signal
 const cache = new Map<string, { at: number; val: Coverage }>();
@@ -70,16 +70,11 @@ export async function gdeltCoverage(topic: string): Promise<Coverage | null> {
     `&mode=timelinevol&format=json&timespan=2m`;
 
   try {
-    // GDELT's timelinevol is slow — give it more room than the default timeout.
-    const fetchOnce = () => gdeltLimit(() => getText(url, 12000));
-    let text = await fetchOnce();
-    if (isThrottleNotice(text)) {
-      // Back off past GDELT's ~5s window, then retry a single time.
-      await new Promise((r) => setTimeout(r, 5200));
-      text = await fetchOnce();
-    }
-    if (isThrottleNotice(text)) return null; // still throttled → neutral gap; next scan retries
-
+    // Single attempt only — no synchronous retry (a 5s back-off per seed could
+    // blow the function timeout). If throttled, return null (neutral gap); the
+    // cache + next scan recover it. scan.ts also caps how many seeds reach here.
+    const text = await gdeltLimit(() => getText(url, 6000));
+    if (isThrottleNotice(text)) return null;
     const cov = parseTimeline(topic, text);
     if (cov) cache.set(cacheKey, { at: Date.now(), val: cov });
     return cov;

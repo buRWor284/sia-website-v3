@@ -92,9 +92,22 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
   // missing coverage reading is NOT a failure — coverage is the denominator and
   // the scorer treats an unknown gap as neutral — so it no longer forces every
   // scan into the "some sources were unavailable" state.
+  // GDELT is the slow, rate-limited feed. To keep a cold scan safely under the
+  // function timeout, fetch coverage only for the strongest-signal seeds (the
+  // ones most likely to surface as top opportunities); the rest fall back to a
+  // neutral coverage gap. The 6h cache means repeat scans cover more over time.
+  const COVERAGE_LIMIT = 6;
+  const seedStrength = (s: Signal[]) => Math.max(...s.map((x) => x.magnitude));
+  const coverageSeeds = new Set(
+    [...seedsWithSignals]
+      .sort((a, b) => seedStrength(b.signals) - seedStrength(a.signals))
+      .slice(0, COVERAGE_LIMIT)
+      .map((x) => x.seed),
+  );
+
   const perSeed = await Promise.all(
     seedsWithSignals.map(async ({ seed, tailored, signals }) => {
-      const coverage = await gdeltCoverage(seed);
+      const coverage = coverageSeeds.has(seed) ? await gdeltCoverage(seed) : null;
       return scoreOpportunity({ topic: seed, beat, signals, coverage, expansion, tailored });
     }),
   );
