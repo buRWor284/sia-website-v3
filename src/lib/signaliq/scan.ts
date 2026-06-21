@@ -60,32 +60,46 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
 
   let failures = 0;
 
-  const perSeed = await Promise.all(
-    seedList.map(async ({ seed, tailored }) => {
-      const [signalResults, coverage] = await Promise.all([
-        Promise.allSettled(SIGNAL_SOURCES.map((fn) => fn(seed))),
-        gdeltCoverage(seed),
-      ]);
+  // Phase 1 — gather numerator signals for every seed (these feeds tolerate
+  // concurrency). Coverage (GDELT) is deliberately NOT fetched here: GDELT
+  // enforces ~1 req/5s, so fanning it out across all ~18 seeds got throttled
+  // and coverage collapsed to neutral on nearly every topic.
+  const seedsWithSignals = (
+    await Promise.all(
+      seedList.map(async ({ seed, tailored }) => {
+        const signalResults = await Promise.allSettled(SIGNAL_SOURCES.map((fn) => fn(seed)));
 
-      const signals: Signal[] = [];
-      for (const r of signalResults) {
-        if (r.status === "fulfilled") {
-          if (r.value) signals.push(r.value);
-        } else {
-          failures++;
+        const signals: Signal[] = [];
+        for (const r of signalResults) {
+          if (r.status === "fulfilled") {
+            if (r.value) signals.push(r.value);
+          } else {
+            failures++;
+          }
         }
-      }
-      if (!coverage) failures++;
 
-      if (signals.length === 0) return null; // nothing to surface for this seed
-      // Drop ultra-weak lone signals (e.g. a single 1-paper arXiv hit) — noise.
-      const maxMag = Math.max(...signals.map((s) => s.magnitude));
-      if (signals.length === 1 && maxMag < 0.12) return null;
+        if (signals.length === 0) return null; // nothing to surface for this seed
+        // Drop ultra-weak lone signals (e.g. a single 1-paper arXiv hit) — noise.
+        const maxMag = Math.max(...signals.map((s) => s.magnitude));
+        if (signals.length === 1 && maxMag < 0.12) return null;
+        return { seed, tailored, signals };
+      }),
+    )
+  ).filter((x): x is { seed: string; tailored: boolean; signals: Signal[] } => x !== null);
+
+  // Phase 2 — fetch coverage ONLY for seeds that produced a signal (a far
+  // smaller fan-out the throttled+cached GDELT adapter can keep up with). A
+  // missing coverage reading is NOT a failure — coverage is the denominator and
+  // the scorer treats an unknown gap as neutral — so it no longer forces every
+  // scan into the "some sources were unavailable" state.
+  const perSeed = await Promise.all(
+    seedsWithSignals.map(async ({ seed, tailored, signals }) => {
+      const coverage = await gdeltCoverage(seed);
       return scoreOpportunity({ topic: seed, beat, signals, coverage, expansion, tailored });
     }),
   );
 
-  let ranked = rankOpportunities(perSeed.filter((o): o is Opportunity => o !== null));
+  let ranked = rankOpportunities(perSeed);
 
   // With a company profile, drop clearly off-topic items (non-tailored, ~zero
   // relevance — the loud industry noise like "drug pricing") as long as enough

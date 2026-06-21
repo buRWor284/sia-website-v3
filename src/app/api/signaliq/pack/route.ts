@@ -26,7 +26,9 @@ import type { AssetPack, Opportunity, UsageTier } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+// Sonnet pack generation was measured at ~27-30s live, right at the old 30s
+// ceiling (504 risk). Give it headroom.
+export const maxDuration = 60;
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MONTH_MS = 30 * 24 * 60 * 60 * 1000;

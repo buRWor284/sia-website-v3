@@ -52,8 +52,10 @@ export async function wikipediaSignal(seed: string): Promise<Signal | null> {
     const prior = avg(views.slice(-44, -14));
     const spike = prior > 0 ? recent / prior : 1;
 
-    // Skip the unremarkable: flat traffic and low absolute volume.
-    if (spike < 1.15 && recent < 2000) return null;
+    // Skip only the truly unremarkable: flat traffic AND very low absolute
+    // volume. (Higher thresholds were suppressing every stable, high-traffic
+    // article, so Wikipedia almost never contributed a signal.)
+    if (spike < 1.15 && recent < 300) return null;
 
     const magnitude = clamp01(prior > 0 ? recent / (prior * 3) : recent / VIEW_CAP);
     const velocity = clamp01(spike - 1); // +100% → 1.0
