@@ -52,3 +52,8 @@ frontend_claude_design/
 
 # macOS FUSE temp files
 .fuse_hidden*
+
+# local working folders (not app code)
+EMOS/
+LinkedIn Marketing/
+social-previews/
