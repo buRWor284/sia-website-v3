@@ -38,7 +38,7 @@ import {
 // ── Tool-specific colours (not in shared tokens) ───────────────────────────────
 const DARK3   = "#221e17";
 const GREEN   = "#3e6b45";
-const AMBER   = "#d99211";
+const AMBER   = "#9a6a08";
 const RED     = "#c14a32";
 const BLUE    = "#2d5393";
 
@@ -143,7 +143,7 @@ const BRAND_LABELS: { key: keyof BrandSignals; label: string }[] = [
 const LSEC: React.CSSProperties = { padding: "18px 22px", borderBottom: `1px solid ${DARK_BD}` };
 const LSEC_LBL: React.CSSProperties = {
   fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".20em",
-  textTransform: "uppercase", color: ra(PAPER, 0.28), marginBottom: 10, display: "block",
+  textTransform: "uppercase", color: ra(PAPER, 0.5), marginBottom: 10, display: "block",
 };
 const LP_TEXTAREA: React.CSSProperties = {
   width: "100%", padding: "9px 11px", background: DARK3, border: `1px solid ${DARK_BD}`,
@@ -166,7 +166,7 @@ function chipStyle(active: boolean): React.CSSProperties {
 function Gauge({ score, color }: { score: number; color: string }) {
   const r = 70, circ = 2 * Math.PI * r, d = (score / 100) * circ;
   return (
-    <svg viewBox="0 0 180 180" style={{ width: 180, height: 180 }}>
+    <svg viewBox="0 0 180 180" role="img" aria-label={`Score ${score} out of 100`} style={{ width: 180, height: 180 }}>
       <circle cx="90" cy="90" r={r} fill="none" stroke={ra(INK, 0.06)} strokeWidth="7" />
       <circle cx="90" cy="90" r={r} fill="none" stroke={color} strokeWidth="7"
         strokeDasharray={`${d.toFixed(1)} ${(circ - d).toFixed(1)}`} transform="rotate(-90 90 90)" />
@@ -244,7 +244,7 @@ function DimBlock({ dim, score, analysis, subSignals, evidenceKeys, expanded, on
   const evKeys = evidenceKeys?.length ? evidenceKeys : (DIMENSION_EVIDENCE[dim.key] ?? []);
   return (
     <div style={{ border: `1px solid ${ra(INK, 0.18)}`, marginBottom: 10 }}>
-      <div onClick={onToggle} style={{ padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none" }}>
+      <div onClick={onToggle} role="button" tabIndex={0} aria-expanded={expanded} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); } }} style={{ padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: INK }}>{dim.name}</span>
           <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700, color: tc }}>{score}</span>
@@ -341,7 +341,7 @@ function EmailGate({ show, onClose, onUnlock, result }: {
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
       style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: PAPER2, border: `1px solid ${INK}`, maxWidth: 480, width: "100%", overflow: "hidden" }}>
+      <div role="dialog" aria-modal="true" aria-label="Download your PressIQ report" style={{ background: PAPER2, border: `1px solid ${INK}`, maxWidth: 480, width: "100%", overflow: "hidden" }}>
 
         {/* Preview header */}
         <div style={{ background: INK, padding: "24px 28px" }}>
@@ -441,6 +441,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
   const [tickOp, setTickOp]   = useState(1);
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
     const id = setInterval(() => {
       setTickOp(0);
       setTimeout(() => { setTickIdx(i => (i + 1) % TICKER.length); setTickOp(1); }, 200);
@@ -465,7 +466,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
           <em style={{ fontStyle: "italic" }}><span style={{ background: YEL, color: INK, padding: "0 .12em" }}>paste this in?</span></em>
         </h1>
         <p style={{ fontFamily: SERIF, fontSize: 15.5, color: ra(INK, 0.5), lineHeight: 1.6, maxWidth: 540, margin: 0 }}>
-          Score any PR pitch — standalone outreach or a query response — against a 34-point system and the EMOS framework. Get the three fixes that move it most. No signup for your first {FREE_LIMIT}.
+          Score any PR pitch — standalone outreach or a query response — against a 32-point system and the EMOS framework. Get the three fixes that move it most. No signup for your first {FREE_LIMIT}.
         </p>
       </div>
 
@@ -603,12 +604,12 @@ function PostScorePanel({
   return (
     <div>
       {/* Sticky tab bar — visually distinct, hover states via CSS */}
-      <div className="piq-tabs">
+      <div className="piq-tabs" role="tablist" aria-label="Score views">
         <div style={{ fontFamily: MONO, fontSize: 7.5, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.3), padding: "0 18px", display: "flex", alignItems: "center", borderRight: `1px solid ${ra(INK, 0.08)}`, marginRight: 4, whiteSpace: "nowrap" }}>
           View:
         </div>
         {TABS.map(tb => (
-          <button key={tb.id} onClick={() => setTab(tb.id)} className={`piq-tab${tab === tb.id ? " piq-tab-active" : ""}`}>
+          <button key={tb.id} onClick={() => setTab(tb.id)} role="tab" aria-selected={tab === tb.id} className={`piq-tab${tab === tb.id ? " piq-tab-active" : ""}`}>
             {tb.label}
           </button>
         ))}
@@ -1367,4 +1368,16 @@ const PAGE_CSS = `
   .piq-foot-next:hover{opacity:.85}
   @keyframes piq-pulse{0%,80%,100%{opacity:.15}40%{opacity:1}}
   .piq-dot{display:inline-block;width:8px;height:8px;background:${YEL};animation:piq-pulse 1.2s infinite ease-in-out}
+  .piq-field:focus-visible{outline:2px solid ${YEL};outline-offset:1px}
+  .piq-tab:focus-visible,.piq-ghost:focus-visible{outline:2px solid ${INK};outline-offset:2px}
+  @media (max-width:768px){
+    .piq-shell{height:auto;min-height:100dvh;overflow:visible}
+    .piq-body{flex-direction:column;overflow:visible;min-height:0}
+    .piq-left{width:100%;flex-shrink:1;height:auto;border-right:none;border-bottom:1px solid ${DARK_BD}}
+    .piq-right{height:auto;overflow:visible}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .piq-dot{animation:none;opacity:.6}
+    *{transition:none !important;scroll-behavior:auto !important}
+  }
 `;
