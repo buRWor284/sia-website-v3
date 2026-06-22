@@ -125,25 +125,7 @@ export default function RootLayout({
         {children}
       </body>
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
-      {/* Mailchimp embedded form validation — jQuery required by mc-validate.js */}
-      <Script
-        src="https://code.jquery.com/jquery-3.7.1.min.js"
-        strategy="lazyOnload"
-      />
-      <Script
-        src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"
-        strategy="lazyOnload"
-      />
-      <Script id="mc-init" strategy="lazyOnload">{`
-        (function($) {
-          window.fnames = new Array();
-          window.ftypes = new Array();
-          fnames[0]='EMAIL'; ftypes[0]='email';
-          fnames[1]='MMERGE1'; ftypes[1]='text';
-        }(jQuery));
-        var $mcj = jQuery.noConflict(true);
-      `}</Script>
-      {/* Cal.com popup embed — initialises the queue; embed.js loads lazily on first interaction */}
+{/* Cal.com popup embed — initialises the queue; embed.js loads lazily on first interaction */}
       <Script id="cal-init" strategy="lazyOnload">{`
         (function (C, A, L) {
           let p = function (a, ar) { a.q.push(ar); };
