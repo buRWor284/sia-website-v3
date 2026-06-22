@@ -615,7 +615,23 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
                 }
               </div>
               <div style={{ padding: "14px 16px", borderLeft: `1px solid ${INK15}` }}>
-                <button style={{ padding: "7px 14px", background: btnBg, color: btnFg, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>
+                <button
+                  onClick={() => {
+                    if (urgency === "amplify") {
+                      if (pitch.url) window.open(pitch.url, "_blank", "noopener,noreferrer");
+                    } else {
+                      const email = journalist?.email;
+                      if (email) {
+                        navigator.clipboard.writeText(email).then(() => {
+                          const btn = document.activeElement as HTMLButtonElement;
+                          const orig = btn.textContent ?? "";
+                          btn.textContent = "Copied!";
+                          setTimeout(() => { btn.textContent = orig; }, 1500);
+                        });
+                      }
+                    }
+                  }}
+                  style={{ padding: "7px 14px", background: btnBg, color: btnFg, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>
                   {actionLabel}
                 </button>
               </div>
@@ -792,8 +808,8 @@ function ContactsView() {
         {/* Header */}
         <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
           {headers.map((col, i) => (
-            <div key={col.label} onClick={() => handleSort(col.key)} style={{
-              padding: "11px 12px", cursor: "pointer",
+            <div key={col.label} onClick={i !== 5 ? () => handleSort(col.key) : undefined} style={{
+              padding: "11px 12px", cursor: i !== 5 ? "pointer" : "default",
               borderRight: i < headers.length - 1 ? "1px solid rgba(241,235,222,.15)" : "none",
               fontFamily: GROT, fontWeight: 700, fontSize: 9,
               letterSpacing: "0.16em", textTransform: "uppercase", userSelect: "none", whiteSpace: "nowrap",
@@ -1038,6 +1054,10 @@ function NewPitchModal({ onClose }: { onClose: () => void }) {
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Pitch logged</div>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK55, marginBottom: 24 }}>
             &ldquo;{form.subject}&rdquo; added to pipeline as {form.stage}.
+            <br /><br />
+            <span style={{ fontSize: 12, color: INK35, fontStyle: "normal" }}>
+              This is a demo — in the full EMOS platform, pitches are saved to your live pipeline.
+            </span>
           </div>
           <button onClick={onClose} style={{ padding: "12px 28px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>
             Done
