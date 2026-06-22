@@ -42,11 +42,16 @@ export async function logPitch(
         )
       : null;
 
+    // D-13: "store this pitch (anonymised)". When the user opts out we withhold ALL
+    // pitch-derived content — the pitch text, the verbatim journalist query, the
+    // per-dimension analysis text, and the top-fix text — keeping only anonymous
+    // aggregate scores (composite/tier/layer scores, authenticity flag, radar numbers).
+    const stored = input.store !== false;
     const { error } = await db.from("pressiq_scores").insert({
       org_id:               orgId,
       user_id:              internalUserId,
-      pitch_text:           input.store === false ? null : input.pitch,
-      journalist_query:     input.query ?? null,
+      pitch_text:           stored ? input.pitch : null,
+      journalist_query:     stored ? (input.query ?? null) : null,
       platform:             input.platform ?? "manual",
       composite_score:      result.composite,
       tier:                 result.tier.label,
@@ -54,9 +59,9 @@ export async function logPitch(
       layer2_score:         areas.checklist?.score ?? null,
       layer3_score:         l3Score,
       authenticity_risk:    result.authenticityRisk?.flagged ?? false,
-      dimension_breakdown:  areas,
+      dimension_breakdown:  stored ? areas : null,
       radar_axes:           result.radar ?? null,
-      top_fixes:            result.topFixes ?? null,
+      top_fixes:            stored ? (result.topFixes ?? null) : null,
     });
 
     if (error) {

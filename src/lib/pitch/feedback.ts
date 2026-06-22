@@ -90,7 +90,7 @@ export const FEEDBACK: Record<string, FrameMap> = {
     strong: {
       mechanism: "SIA 7-step journo-outreach checklist",
       learn: ESSAYS.checklist,
-      text: "You're hitting most of the 34-point system. Tighten the few remaining steps and this is a pitch a journalist can paste in.",
+      text: "You're hitting most of the 32-point system. Tighten the few remaining steps and this is a pitch a journalist can paste in.",
     },
     weak: {
       mechanism: "SIA 7-step journo-outreach checklist",
@@ -100,7 +100,7 @@ export const FEEDBACK: Record<string, FrameMap> = {
     missing: {
       mechanism: "SIA 7-step journo-outreach checklist",
       learn: ESSAYS.checklist,
-      text: "Most of the 34-point system is missing. Work the checklist top to bottom — research, subject, intro, the answer, the close, the signature.",
+      text: "Most of the 32-point system is missing. Work the checklist top to bottom — research, subject, intro, the answer, the close, the signature.",
     },
   },
   objective: {

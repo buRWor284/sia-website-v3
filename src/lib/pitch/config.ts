@@ -26,22 +26,10 @@ export const PLATFORMS: { id: Platform; label: string; formal: boolean }[] = [
   { id: "b2bwriter", label: "Help a B2B Writer", formal: false },
 ];
 
-/** Composite starting weights (sum = 1.0). Relevance redistributes if no query.
- *  LIVE — read by composite.ts. Do not change without updating composite.ts. */
-export const WEIGHTS = {
-  relevance: 0.25,
-  objective: 0.15,
-  checklist: 0.3,
-  storytelling: 0.12,
-  neuromarketing: 0.12,
-  personalBrand: 0.06,
-} as const;
-
-/** v2 LAUNCH weights (sum = 1.0) — STAGED, not yet live. Activated in step 3, when
- *  composite.ts + the scorePrompt schema actually score `newsroomReady`. Until then
- *  `WEIGHTS` above stays live and scoring is unchanged. Reshuffle rationale: Newsroom-Ready
- *  (the #2 journalist want after relevance) earns 0.12, mostly from de-concentrating the
- *  34-pt checklist (0.30→0.24) and trimming mechanics (0.15→0.12); Neuromarketing cedes its
+/** Composite weights (sum = 1.0). LIVE — read by composite.ts. Relevance redistributes
+ *  proportionally across the other six when no query/beat is provided. Newsroom-Ready
+ *  carries 0.12 (the #2 journalist want after relevance), funded mainly by de-concentrating
+ *  the checklist (0.30→0.24) and trimming mechanics (0.15→0.12); Neuromarketing cedes its
  *  "original data" judgment to Newsroom-Ready. */
 export const WEIGHTS_V2 = {
   relevance: 0.24,
@@ -65,7 +53,7 @@ export const L1_BANDS = {
 
 export const TIERS = [
   { min: 0, max: 39, label: "Will be ignored", badge: "Cold", color: "#c14a32" },
-  { min: 40, max: 64, label: "Needs work", badge: "Warming", color: "#d99211" },
+  { min: 40, max: 64, label: "Needs work", badge: "Warming", color: "#9a6a08" },
   { min: 65, max: 84, label: "Competitive", badge: "Live", color: "#2d5393" },
   { min: 85, max: 100, label: "Placement-grade", badge: "Filed", color: "#3e6b45" },
 ] as const;
@@ -74,7 +62,7 @@ export function tierFor(score: number) {
   return TIERS.find((t) => score >= t.min && score <= t.max) ?? TIERS[0];
 }
 
-/** Layer-2: the 34-point SIA journo-outreach checklist (mirror of the infographic STEPS). */
+/** Layer-2: the 32-point SIA journo-outreach checklist (mirror of the infographic STEPS). */
 export interface ChecklistStep {
   no: string;
   title: string;
@@ -169,7 +157,7 @@ export const CHECKLIST: ChecklistStep[] = [
   },
 ];
 
-export const CHECKLIST_TOTAL = CHECKLIST.reduce((n, s) => n + s.items.length, 0); // 34
+export const CHECKLIST_TOTAL = CHECKLIST.reduce((n, s) => n + s.items.length, 0); // 32
 
 /** Resource essays for feedback deep-links (the EMOS funnel). */
 export const ESSAYS = {

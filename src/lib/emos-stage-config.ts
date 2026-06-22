@@ -54,7 +54,7 @@ export const STAGE_META: Record<EmosStage, {
     label:       "PressIQ",
     tool:        "Pitch Scoring",
     path:        "/emostool/dashboard/pressiq",
-    description: "Score and refine your pitches against 34-point journalist criteria.",
+    description: "Score and refine your pitches against 32-point journalist criteria.",
     threshold:   "Score 5 pitches to advance to CoverageIQ",
     nextLabel:   "CoverageIQ",
   },

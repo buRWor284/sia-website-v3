@@ -100,7 +100,7 @@ const CONTENT: ContentItem[] = [
     title: "PressIQ — Journalist Pitch Score",
     sub: "Will a journalist actually paste your pitch in?",
     blurb:
-      "Paste a HARO, Qwoted, or Featured pitch and score it against a 34-point system and the EMOS framework — storytelling, neuromarketing, and authority — with the three fixes that move it most. Backed by published journalist research.",
+      "Paste a HARO, Qwoted, or Featured pitch and score it against a 32-point system and the EMOS framework — storytelling, neuromarketing, and authority — with the three fixes that move it most. Backed by published journalist research.",
     href: "/tools/pressiq",
     y: "2026",
     newsHeadline: "The Pitch Desk",
@@ -1325,8 +1325,8 @@ function StatusPill({ status }: { status: StepStatus }) {
 
 const PHASE1: PipeStep[] = [
   { n: "1", label: "Catch the right query", tool: "QuerySniper", cap: "Real-time monitoring of journalist queries that match your expertise.", status: "soon", week: "EMOS Wk 1 + 4" },
-  { n: "2", label: "Write to the method", tool: "Journo Outreach Checklist", cap: "QA your pitch against the 7-step method + 34-point checklist.", status: "free", contentId: "kit-journo", week: "EMOS Wk 2" },
-  { n: "3", label: "Score & sharpen", tool: "PressIQ", cap: "Automated pitch score on the 34-point + EMOS rubric — the 3 fixes that move it most.", status: "free", contentId: "tool-pressiq", week: "EMOS Wk 2" },
+  { n: "2", label: "Write to the method", tool: "Journo Outreach Checklist", cap: "QA your pitch against the 7-step method + 32-point checklist.", status: "free", contentId: "kit-journo", week: "EMOS Wk 2" },
+  { n: "3", label: "Score & sharpen", tool: "PressIQ", cap: "Automated pitch score on the 32-point + EMOS rubric — the 3 fixes that move it most.", status: "free", contentId: "tool-pressiq", week: "EMOS Wk 2" },
   { n: "4", label: "Track to coverage", tool: "CoverageIQ", cap: "Log every pitch, follow-up, and outcome. The tracking spreadsheet, productized.", status: "free", href: "/tools/coverageiq", week: "EMOS Wk 3" },
 ];
 

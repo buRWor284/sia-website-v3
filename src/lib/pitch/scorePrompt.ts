@@ -29,7 +29,7 @@ const ANALYSIS = {
 
 export const SCORE_TOOL = {
   name: "return_pitch_score",
-  description: "Return the structured score for the PR pitch across relevance, the 34-point checklist, the three EMOS dimensions, and Newsroom-Ready.",
+  description: "Return the structured score for the PR pitch across relevance, the 32-point checklist, the three EMOS dimensions, and Newsroom-Ready.",
   input_schema: {
     type: "object",
     properties: {
@@ -139,7 +139,7 @@ export const SCORE_TOOL = {
 export const SYSTEM_PROMPT =
   "You are PressIQ, an expert evaluator of PR pitches sent to journalists through source-request platforms " +
   "(HARO/Connectively, Qwoted, Source of Sources, Featured, Help a B2B Writer). You score pitches against a proven " +
-  "34-point system, the EMOS framework (Personal Branding x Storytelling x Neuromarketing), and Newsroom-Ready " +
+  "32-point system, the EMOS framework (Personal Branding x Storytelling x Neuromarketing), and Newsroom-Ready " +
   "(whether the pitch hands the journalist publishable raw material). You are rigorous, specific, and honest — you " +
   "reward original data and a distinctive expert POV over borrowed, Googleable statistics, and stories with a real " +
   "character over credential dumps. For every dimension, write an `analysis` of 2-4 sentences about what THIS pitch " +
@@ -162,7 +162,7 @@ export function buildUserPrompt(input: PitchInput, m: Layer1Metrics): string {
   const isStandalone = input.pitchMode !== "query";
   const queryBlock = isStandalone
     ? (input.query?.trim()
-        ? `JOURNALIST'S BEAT / FOCUS AREA (this is NOT a specific query — assess how well this pitch fits a journalist who covers this beat, not whether it answers a particular ask):\n<beat>\n${input.query.trim()}\n</beat>`
+        ? `JOURNALIST'S BEAT / FOCUS AREA (a beat IS provided, so you MUST set relevance.assessed=true and score how well this pitch fits a journalist who covers this beat; this is NOT a specific query, so judge beat-fit, not whether it answers a particular ask):\n<beat>\n${input.query.trim()}\n</beat>`
         : `JOURNALIST'S BEAT / FOCUS AREA:\n<beat>\n[NOT PROVIDED — set relevance.assessed=false]\n</beat>`)
     : `JOURNALIST'S QUERY / SOURCE REQUEST:\n<query>\n${input.query?.trim() ? input.query.trim() : "[NOT PROVIDED — set relevance.assessed=false and do not penalise; score the other dimensions normally.]"}\n</query>`;
 
@@ -179,7 +179,7 @@ DETERMINISTIC METRICS (already computed — reference, do not recount):
 - Words: ${m.wordCount} · Subject words: ${m.subjectWordCount} · Reading grade: ${m.fkGrade}
 - Questions: ${m.questionCount} · Closing question: ${m.hasClosingQuestion} · Contains a statistic: ${m.hasStatistic}
 
-THE 34-POINT CHECKLIST TO SCORE (Layer 2):
+THE 32-POINT CHECKLIST TO SCORE (Layer 2):
 ${checklistText}
 
 NEWSROOM-READY SUB-SIGNALS TO JUDGE (the new dimension — set each boolean true/false):
@@ -193,7 +193,7 @@ ${input.pitch.trim()}
 </pitch>
 
 Scoring guidance:
-- relevance: ONLY if journalist context was provided. In QUERY MODE: does the pitch answer the EXACT question, match the beat, and respect stated constraints (deadline, format, region, word limit)? In STANDALONE MODE (beat provided): does this pitch fit the journalist's known coverage area — would a journalist who covers this beat find it on-point for their readership? Either way, relevance is the single biggest driver of placement.
+- relevance: assess it whenever ANY journalist context is provided — a query (query mode) OR a beat (standalone mode); in that case you MUST set assessed=true. Only set assessed=false when NO query and NO beat are given. In QUERY MODE: does the pitch answer the EXACT question, match the beat, and respect stated constraints (deadline, format, region, word limit)? In STANDALONE MODE (beat provided): does this pitch fit the journalist's known coverage area — would a journalist who covers this beat find it on-point for their readership? Either way, relevance is the single biggest driver of placement.
 - checklist: for each of the 7 steps return met/of and the one highest-leverage fix.
 - storytelling: reward a problem -> insight -> resolution arc with a real protagonist; penalise credential dumps.
 - neuromarketing: COGNITIVE PACKAGING ONLY — a subject that passes a 2-second read, loss framing, specificity, curiosity. Do NOT credit original data here; that belongs to newsroomReady.

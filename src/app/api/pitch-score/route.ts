@@ -3,7 +3,7 @@
  *
  * PressIQ — scores a PR pitch. Mirrors the repo's /api/collab-ai pattern
  * (direct fetch to the Anthropic Messages API, no SDK). One structured tool-use call
- * scores Relevance + the 34-point checklist + the three EMOS dimensions; Layer-1
+ * scores Relevance + the 32-point checklist + the three EMOS dimensions; Layer-1
  * metrics are computed deterministically server-side.
  *
  * Requires ANTHROPIC_API_KEY in .env.local.  Optional: PITCH_SCORE_MODEL, TURNSTILE_SECRET_KEY.
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Paste a pitch of at least a few sentences to score it." }, { status: 400 });
   }
   if (pitch.length > MAX_PITCH_CHARS) {
-    return NextResponse.json({ error: "That pitch is too long to score — keep it under ~1,000 words." }, { status: 400 });
+    return NextResponse.json({ error: "That pitch is too long to score. Keep it under 8,000 characters (about 1,300 words)." }, { status: 400 });
   }
 
   const input: PitchInput = {
