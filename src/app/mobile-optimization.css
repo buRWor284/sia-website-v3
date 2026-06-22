@@ -95,3 +95,31 @@ img {
     padding-bottom: 12px !important;
   }
 }
+
+/* ── 5 · Footer (Colophon) bottom bar — tidy stacking on phones ──────────────
+   2026-06-20. On phones the bottom bar's groups wrapped into a ragged stack
+   with uneven spacing, and the copyright string broke mid-entity. The markup
+   keeps each legal entity unbreakable (nowrap spans); here the three groups
+   stack in a clean column (22px apart), the email + availability group stacks
+   within it (10px), and the legal links (Privacy / Terms / Refund) sit on one
+   horizontal row with slightly tightened tracking so they fit. Layout only,
+   no text changes; desktop (>640px) is untouched. */
+@media (max-width: 640px) {
+  .colophon-bottom {
+    flex-direction: column !important;
+    align-items: flex-start;
+    gap: 22px !important;
+  }
+  .colophon-bottom-group {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .colophon-legal {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 10px 16px !important;
+  }
+  .colophon-legal a {
+    letter-spacing: 0.06em !important;
+  }
+}

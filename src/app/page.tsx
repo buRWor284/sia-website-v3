@@ -802,7 +802,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/brett-helling.jpeg" alt="Brett Helling" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/brett-helling.jpeg" alt="Brett Helling" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Brett Helling</div>
             <div className="testi__role">CEO, Ridester.com / TrendlineSEO · USA</div>
           </div>
@@ -819,7 +819,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/imani-lea-brown.jpg" alt="Imani Lea Brown" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/imani-lea-brown.jpg" alt="Imani Lea Brown" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Imani Lea Brown</div>
             <div className="testi__role">Centriq (raised $11M) · USA</div>
           </div>
@@ -836,7 +836,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/azzam-sheikh.jpeg" alt="Azzam Sheikh" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/azzam-sheikh.jpeg" alt="Azzam Sheikh" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Azzam Sheikh</div>
             <div className="testi__role">National Tyres &amp; Autocare · UK</div>
           </div>
@@ -853,7 +853,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/reem-el-shafaki.jpg" alt="Reem El Shafaki" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/reem-el-shafaki.jpg" alt="Reem El Shafaki" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Reem El Shafaki</div>
             <div className="testi__role">DinarStandard · UAE</div>
           </div>
@@ -870,7 +870,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/brie-moreau.jpg" alt="Brie Moreau" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/brie-moreau.jpg" alt="Brie Moreau" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Brie Moreau</div>
             <div className="testi__role">Co-founder, DMSS.io Conference · Bali</div>
           </div>
@@ -887,7 +887,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/chuck-wang.jpg" alt="Chuck Wang" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/chuck-wang.jpg" alt="Chuck Wang" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Chuck Wang</div>
             <div className="testi__role">The MVP Marketing Podcast · USA</div>
           </div>
@@ -939,7 +939,7 @@ export default function HomePage() {
             </h2>
             <div className="speaking-photo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/speaking/mps2016.jpg" alt="Syed Irfan Ajmal speaking at MPS2016 Dubai" />
+              <img src="/assets/speaking/mps2016.jpg" alt="Syed Irfan Ajmal speaking at MPS2016 Dubai" width={1200} height={390} loading="lazy" decoding="async" />
               <div className="speaking-photo__caption">MPS2016 · DUBAI, UAE</div>
             </div>
             <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>

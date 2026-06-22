@@ -46,3 +46,6 @@ next-env.d.ts
 
 # design handoff archives (not app code)
 frontend_claude_design/
+
+# clerk configuration (can include secrets)
+/.clerk/

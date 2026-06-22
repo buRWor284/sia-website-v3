@@ -182,18 +182,22 @@ export const Colophon = () => (
     </div>
 
     {/* Bottom bar */}
-    <div style={S.bottom}>
+    <div className="colophon-bottom" style={S.bottom}>
       <div style={S.mono}>
-        © 2026 SYED IRFAN AJMAL · SIA ENTERPRISES (PK SOLE PROP.) · SIA ENTERPRISES INC (WY C-CORP)
+        <span style={{ whiteSpace: "nowrap" }}>© 2026 SYED IRFAN AJMAL</span>
+        {" · "}
+        <span style={{ whiteSpace: "nowrap" }}>SIA ENTERPRISES (PK SOLE PROP.)</span>
+        {" · "}
+        <span style={{ whiteSpace: "nowrap" }}>SIA ENTERPRISES INC (WY C-CORP)</span>
       </div>
 
-      <div style={S.monoFlex}>
+      <div className="colophon-bottom-group" style={S.monoFlex}>
         <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
         <a href="/fractional-cmo" style={S.open}>● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
         <a href="/emos" style={S.open}>● EMOS FOUNDING CLASS · APPLY NOW</a>
       </div>
 
-      <div style={{ ...S.monoFlex, gap: 20 }}>
+      <div className="colophon-legal" style={{ ...S.monoFlex, gap: 20 }}>
         {LEGAL.map((l) => (
           <Link key={l.label} href={l.href} style={S.legalLink}>{l.label}</Link>
         ))}

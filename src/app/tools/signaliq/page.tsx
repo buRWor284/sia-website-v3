@@ -226,7 +226,7 @@ function CountUp({
 function ScanLoader() {
   const [i, setI] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setI((n) => (n + 1) % SCAN_STATS.length), 2400);
+    const id = setInterval(() => setI((n) => (n + 1) % SCAN_STATS.length), 5000);
     return () => clearInterval(id);
   }, []);
   const s = SCAN_STATS[i];
@@ -602,7 +602,7 @@ function SIQHero() {
           <SCaps size={9} ls="0.20em" color={INK55}>How it works</SCaps>
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 0 }}>
             {([
-              ["01", "Pick a beat", "Choose your industry vertical — SaaS, Fintech, Health, Climate, or AI."],
+              ["01", "Pick a beat", "Choose your industry vertical: SaaS, Fintech, Health, Climate, AI, or Cybersecurity."],
               ["02", "Scan the radar", "5 live open-data sources scanned in seconds. No API key. No cost."],
               ["03", "Get an asset pack", "Pitch angle, data brief, journalist list — ready to send."],
             ] as [string, string, string][]).map(([n, title, desc], idx, arr) => (
