@@ -49,3 +49,6 @@ frontend_claude_design/
 
 # clerk configuration (can include secrets)
 /.clerk/
+
+# macOS FUSE temp files
+.fuse_hidden*
