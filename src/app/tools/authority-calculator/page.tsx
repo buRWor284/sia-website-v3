@@ -38,7 +38,7 @@ const hexA  = (hex: string, a: number): string => {
 };
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const SPEND   = { min: 0, max: 10000, step: 500, def: 2000,
+const SPEND   = { min: 500, max: 10000, step: 500, def: 2000,
   hint: "Agency retainer, link-buying, or any combination. Boutique SEO from $2K/mo, mid-market $3K to $5K/mo." };
 const TRAFFIC = { min: 200, max: 50000, step: 200, def: 1500 };
 const AOV     = { min: 50,  max: 10000, step: 50,  def: 300  };
@@ -80,7 +80,7 @@ interface CalcResult {
   roi: number; monthlyGain: number;
 }
 
-// Default output (AOV $300, 1,500 visitors, $2K/mo spend, CVR 1%→3%): ~$117K net improvement
+// Default output (AOV $300, 1,500 visitors, $2K/mo spend, CVR 1%→3%): ~$144K net improvement
 const compute = ({ spend, traffic, aov, tier }: CalcState): CalcResult => {
   const fee            = TIERS.find(t => t.id === tier)!.fee;
   const spendMo        = spend;
@@ -211,7 +211,7 @@ const Inputs = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) => vo
             format={fmt} accent={RED}
           />
           <Slider
-            label="All-channel monthly visitors"
+            label="Monthly visitors"
             hint="Organic, paid, direct, referral, every channel combined."
             min={TRAFFIC.min} max={TRAFFIC.max} step={TRAFFIC.step}
             value={st.traffic} onChange={(v) => set({ traffic: v })}
@@ -504,9 +504,15 @@ const EMOSReveal = ({ st, set }: { st: CalcState; set: (p: Partial<CalcState>) =
 );
 
 // ── Hero Result + CTA ─────────────────────────────────────────────────────────
+// Above ~$1M the exact figure loses meaning — abbreviate gracefully
+const fmtResult = (n: number): string => n >= 1_000_000 ? fmtK(n) : fmt(n);
+// Cap ROI at 9,999% — beyond that the number is a curiosity, not a signal
+const fmtRoi = (roi: number): string =>
+  roi > 9999 ? ">9,999%" : Math.round(roi).toLocaleString("en-US") + "%";
+
 const Result = ({ st }: { st: CalcState }) => {
   const c      = compute(st);
-  const roiStr = Math.round(c.roi).toLocaleString("en-US") + "%";
+  const roiStr = fmtRoi(c.roi);
   return (
     <section style={{ background: PAPER, padding: "40px clamp(22px,5vw,56px) 8px" }}>
       <div style={{
@@ -524,7 +530,7 @@ const Result = ({ st }: { st: CalcState }) => {
             fontSize: "clamp(54px, 11vw, 104px)",
             color: "#7bbf86",
           }}>
-            {fmt(c.netImprovement)}
+            {fmtResult(c.netImprovement)}
           </div>
           <p style={{
             margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic",
@@ -537,8 +543,8 @@ const Result = ({ st }: { st: CalcState }) => {
           {/* stat cards */}
           <div className="calc-herostats" style={{ marginTop: 30 }}>
             {([
-              [roiStr,             "Return on the EMOS fee"],
-              [fmt(c.monthlyGain), "Average monthly gain"],
+              [roiStr,                     "Return on the EMOS fee"],
+              [fmtResult(c.monthlyGain),   "Average monthly gain"],
             ] as [string, string][]).map(([big, lab]) => (
               <div key={lab} style={{ border: "1px solid rgba(250,250,250,.25)", padding: "18px 20px" }}>
                 <div style={{
@@ -583,7 +589,7 @@ const CTABlock = ({ st, variant }: { st: CalcState; variant: "mid" | "close" }) 
               fontSize: "clamp(32px,5vw,60px)",
               color: INK, lineHeight: 0.97, letterSpacing: "-0.028em",
             }}>
-              {fmt(c.netImprovement)} says it&rsquo;s time<br />
+              {fmtResult(c.netImprovement)} says it&rsquo;s time<br />
               <em>to stop renting.</em>
             </h2>
             <p style={{
@@ -970,14 +976,13 @@ const PAGE_STYLES = `
   }
   .calc-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
   .calc-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); }
-  .calc-herostats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .calc-herostats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
   .calc-benefits { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #1a1410; }
   .calc-snap { display: grid; grid-template-columns: 1fr 1fr 1fr; }
   .simple-inputs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
   .simple-tier-grid { display: flex; gap: 14px; }
   @media (max-width: 820px) {
     .calc-grid2 { grid-template-columns: 1fr; }
-    .calc-herostats { grid-template-columns: 1fr 1fr; }
     .simple-inputs-grid { grid-template-columns: 1fr 1fr; }
   }
   @media (max-width: 640px) {
