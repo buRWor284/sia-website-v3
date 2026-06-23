@@ -70,8 +70,9 @@ export async function GET(req: NextRequest) {
       } else {
         results.push(`empty:${topic}`);
       }
-    } catch {
-      results.push(`error:${topic}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      results.push(`error:${topic}:${msg}`);
     }
   }
 
