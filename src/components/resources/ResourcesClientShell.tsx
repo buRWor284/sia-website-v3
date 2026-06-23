@@ -1203,7 +1203,7 @@ function PodcastTeaser() {
             </a>
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            {[{ name: "Apple Podcasts", href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" }, { name: "Spotify", href: "#" }].map((p) => (
+            {[{ name: "Apple Podcasts", href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" }, { name: "Spotify", href: "https://open.spotify.com/show/4ZUfaOaYVckXQ7Q9JnMS92" }].map((p) => (
               <a key={p.name} href={p.href} target={p.href !== "#" ? "_blank" : undefined} rel={p.href !== "#" ? "noopener noreferrer" : undefined}
                 style={{ padding: "10px 16px", border: "1px solid rgba(250,250,250,.25)", color: "rgba(250,250,250,.6)", textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase" }}>
                 {p.name} ↗
