@@ -55,7 +55,8 @@ function coerceBrand(v: unknown): BrandSignals {
 export async function POST(req: NextRequest) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: "ANTHROPIC_API_KEY not set in environment." }, { status: 500 });
+    console.error("pitch-score: ANTHROPIC_API_KEY is not set");
+    return NextResponse.json({ error: "Scoring is temporarily unavailable. Please try again later." }, { status: 500 });
   }
 
   let raw: Record<string, unknown>;
@@ -139,7 +140,8 @@ export async function POST(req: NextRequest) {
 
     if (!res.ok) {
       const err = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
-      return NextResponse.json({ error: err?.error?.message || `Anthropic API error ${res.status}` }, { status: res.status });
+      console.error("pitch-score upstream error:", res.status, err?.error?.message);
+      return NextResponse.json({ error: "Couldn't score the pitch right now. Please try again in a moment." }, { status: 502 });
     }
 
     const json = (await res.json()) as { content?: Array<{ type: string; name?: string; input?: unknown }> };

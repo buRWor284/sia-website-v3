@@ -19,6 +19,9 @@ import {
   EVIDENCE,
   FREE_LIMIT,
   PLATFORMS,
+  TIERS,
+  WEIGHTS_V2,
+  tierFor,
 } from "@/lib/pitch/config";
 import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
 import { emosFrame } from "@/lib/pitch/feedback";
@@ -48,13 +51,7 @@ const ra = (hex: string, alpha: number) => {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
 };
 function bandColor(s: number) { return s >= 75 ? GREEN : s >= 45 ? AMBER : RED; }
-// Tier thresholds that match the 4-tier design system (85/65/40/0)
-function tierForScore(s: number) {
-  if (s >= 85) return { color: GREEN, label: "Filed",           badge: "FILED"   };
-  if (s >= 65) return { color: BLUE,  label: "Competitive",     badge: "LIVE"    };
-  if (s >= 40) return { color: AMBER, label: "Needs work",      badge: "WARMING" };
-  return             { color: RED,   label: "Will be ignored",  badge: "COLD"    };
-}
+// Per-dimension tier label + colour come from config TIERS (single source of truth).
 
 // ── Lazy-load jsPDF (avoids next/script in "use client") ─────────────────────
 function loadJsPDF(): Promise<new (opts: object) => object> {
@@ -171,7 +168,7 @@ function Gauge({ score, color }: { score: number; color: string }) {
       <circle cx="90" cy="90" r={r} fill="none" stroke={color} strokeWidth="7"
         strokeDasharray={`${d.toFixed(1)} ${(circ - d).toFixed(1)}`} transform="rotate(-90 90 90)" />
       <text x="90" y="82" textAnchor="middle" fontFamily={SERIF} fontSize="48" fontWeight="700" fill={INK}>{score}</text>
-      <text x="90" y="104" textAnchor="middle" fontFamily={GROT} fontSize="11" fontWeight="700" letterSpacing=".16em" fill={ra(INK, 0.35)}>/ 100</text>
+      <text x="90" y="104" textAnchor="middle" fontFamily={GROT} fontSize="11" fontWeight="700" letterSpacing=".16em" fill={ra(INK, 0.62)}>/ 100</text>
     </svg>
   );
 }
@@ -182,7 +179,7 @@ function DimBarChart({ scores, dims }: { scores: Record<string, number>; dims: r
     <div style={{ display: "flex", flexDirection: "column" }}>
       {dims.map((dim, i) => {
         const s = scores[dim.key] ?? 0;
-        const t = tierForScore(s);
+        const t = tierFor(s);
         return (
           <div key={dim.key} style={{
             display: "grid", gridTemplateColumns: "140px 42px 1fr", alignItems: "center",
@@ -194,8 +191,8 @@ function DimBarChart({ scores, dims }: { scores: Record<string, number>; dims: r
             <div style={{ position: "relative", height: 18, background: ra(INK, 0.04) }}>
               <div style={{ position: "absolute", inset: 0, width: `${s}%`, background: t.color, opacity: 0.18 }} />
               <div style={{ position: "absolute", inset: 0, width: `${s}%`, borderRight: `2px solid ${t.color}` }} />
-              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontFamily: GROT, fontSize: 7, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.25) }}>
-                {t.label.toUpperCase()}
+              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontFamily: GROT, fontSize: 7, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.6) }}>
+                {t.badge.toUpperCase()}
               </div>
             </div>
           </div>
@@ -225,7 +222,7 @@ function EvidCard({ figKey }: { figKey: string }) {
       <div style={{ width: 6, height: 6, background: YEL, marginTop: 5, flexShrink: 0 }} />
       <div>
         <div style={{ fontFamily: SERIF, fontSize: 13, fontWeight: 600, color: INK, lineHeight: 1.4 }}>{ev.figure}</div>
-        <div style={{ fontFamily: MONO, fontSize: 8, color: ra(INK, 0.35), marginTop: 2 }}>{ev.source}</div>
+        <div style={{ fontFamily: MONO, fontSize: 8, color: ra(INK, 0.62), marginTop: 2 }}>{ev.source}</div>
       </div>
     </a>
   );
@@ -253,7 +250,7 @@ function DimBlock({ dim, score, analysis, subSignals, evidenceKeys, expanded, on
           <div style={{ width: 72, height: 4, background: ra(INK, 0.06) }}>
             <div style={{ width: `${score}%`, height: "100%", background: tc }} />
           </div>
-          <span style={{ fontSize: 16, fontWeight: 700, color: ra(INK, 0.25), width: 16, textAlign: "center" }}>{expanded ? "–" : "+"}</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: ra(INK, 0.6), width: 16, textAlign: "center" }}>{expanded ? "–" : "+"}</span>
         </div>
       </div>
       {expanded && (
@@ -306,7 +303,7 @@ function LiveMeter({ label, val, band, hint }: { label: string; val: string; ban
       <div style={{ height: 4, background: ra(INK, 0.06) }}>
         <div style={{ width: fill, height: "100%", background: fillC, transition: "width .25s ease, background .25s ease" }} />
       </div>
-      <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.38), marginTop: 3 }}>{hint}</div>
+      <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.6), marginTop: 3 }}>{hint}</div>
     </div>
   );
 }
@@ -384,7 +381,7 @@ function EmailGate({ show, onClose, onUnlock, result }: {
                 Join 2,400+ marketers. Real earned-media playbooks, zero filler. One or two emails a month.
               </p>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
-                style={{ width: "100%", padding: "10px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.25)}`, fontFamily: GROT, fontSize: 13, color: INK, outline: "none", borderRadius: 0, marginBottom: 12 }} />
+                style={{ width: "100%", padding: "10px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.6)}`, fontFamily: GROT, fontSize: 13, color: INK, outline: "none", borderRadius: 0, marginBottom: 12 }} />
               <label style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 14, cursor: "pointer" }}>
                 <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3, accentColor: INK }} />
                 <span style={{ fontFamily: GROT, fontSize: 11, color: ra(INK, 0.55), lineHeight: 1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
@@ -393,7 +390,7 @@ function EmailGate({ show, onClose, onUnlock, result }: {
               <button type="submit" style={{ width: "100%", padding: "13px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", border: "none", cursor: "pointer", borderRadius: 0 }}>
                 Subscribe &amp; download PDF →
               </button>
-              <div style={{ fontFamily: MONO, fontSize: 9, color: ra(INK, 0.3), textAlign: "center", marginTop: 10, letterSpacing: ".08em" }}>
+              <div style={{ fontFamily: MONO, fontSize: 9, color: ra(INK, 0.62), textAlign: "center", marginTop: 10, letterSpacing: ".08em" }}>
                 No spam · One-click unsubscribe
               </div>
             </form>
@@ -458,7 +455,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
     <div>
       {/* Hero */}
       <div style={{ padding: "40px 32px 32px", borderBottom: `1px solid ${ra(INK, 0.1)}` }}>
-        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.32), marginBottom: 14 }}>
+        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 14 }}>
           PRESSIQ · JOURNALIST PITCH SCORE
         </div>
         <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px,3.8vw,42px)", lineHeight: 1.08, letterSpacing: "-.025em", color: INK, margin: "0 0 16px" }}>
@@ -472,7 +469,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
 
       {/* Live mechanics */}
       <div style={{ padding: "24px 32px 20px", borderBottom: `1px solid ${ra(INK, 0.1)}` }}>
-        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.32), marginBottom: 18 }}>
+        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>
           LIVE MECHANICS
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 28px" }}>
@@ -487,7 +484,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 14, borderTop: `1px solid ${ra(INK, 0.06)}` }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.35) }}>Mechanics score</span>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.62) }}>Mechanics score</span>
           <div style={{ flex: 1, height: 4, background: ra(INK, 0.05) }}>
             <div style={{ height: "100%", width: `${live?.score ?? 0}%`, background: BLUE, transition: "width .3s ease" }} />
           </div>
@@ -497,19 +494,19 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
 
       {/* WHAT JOURNALISTS SAY — rotating ticker */}
       <div style={{ padding: "24px 32px 0" }}>
-        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.32), marginBottom: 16 }}>
+        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 16 }}>
           WHAT JOURNALISTS SAY
         </div>
         <div style={{ opacity: tickOp, transition: "opacity .2s ease", minHeight: 78 }}>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 32, color: YEL, letterSpacing: "-.02em", lineHeight: 1, marginBottom: 6 }}>{t.stat}</div>
           <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.55), lineHeight: 1.4, marginBottom: 4 }}>{t.text}</div>
-          <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.25) }}>{t.src}</div>
+          <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{t.src}</div>
         </div>
       </div>
 
       {/* SCORED AGAINST — source pills */}
       <div style={{ padding: "20px 32px 28px", borderTop: `1px solid ${ra(INK, 0.08)}`, marginTop: 20 }}>
-        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.32), marginBottom: 10 }}>
+        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>
           SCORED AGAINST
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
@@ -521,7 +518,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
             "Fractl Journalist Survey (n≈500)",
             "Boomerang Email Response Study (40M)",
           ].map(s => (
-            <span key={s} style={{ padding: "4px 8px", border: `1px solid ${ra(INK, 0.08)}`, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.28) }}>{s}</span>
+            <span key={s} style={{ padding: "4px 8px", border: `1px solid ${ra(INK, 0.08)}`, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{s}</span>
           ))}
         </div>
       </div>
@@ -533,7 +530,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
 function LoadingPanel() {
   return (
     <div style={{ padding: "80px 32px 60px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: ra(INK, 0.35), marginBottom: 24, textAlign: "center" }}>
+      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: ra(INK, 0.62), marginBottom: 24, textAlign: "center" }}>
         Scoring against 32 factors across 7 dimensions…
       </div>
       <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.2), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
@@ -562,6 +559,7 @@ function PostScorePanel({
   pitchMode: "standalone" | "query";
 }) {
   const [expanded, setExpanded] = useState<Set<DimKey>>(new Set());
+  const [showCalc, setShowCalc] = useState(false);
   const { composite, tier, areas, relevanceAssessed, strongestLine, topFixes, authenticityRisk } = result;
 
   const scoreMap: Record<string, number> = {};
@@ -605,7 +603,7 @@ function PostScorePanel({
     <div>
       {/* Sticky tab bar — visually distinct, hover states via CSS */}
       <div className="piq-tabs" role="tablist" aria-label="Score views">
-        <div style={{ fontFamily: MONO, fontSize: 7.5, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.3), padding: "0 18px", display: "flex", alignItems: "center", borderRight: `1px solid ${ra(INK, 0.08)}`, marginRight: 4, whiteSpace: "nowrap" }}>
+        <div style={{ fontFamily: MONO, fontSize: 7.5, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.62), padding: "0 18px", display: "flex", alignItems: "center", borderRight: `1px solid ${ra(INK, 0.08)}`, marginRight: 4, whiteSpace: "nowrap" }}>
           View:
         </div>
         {TABS.map(tb => (
@@ -630,6 +628,41 @@ function PostScorePanel({
             </div>
           </div>
 
+          {/* §5A — transparency: estimate note + "how your score is calculated" (config-driven) */}
+          <div style={{ border: `1px solid ${ra(INK, 0.12)}`, background: ra(INK, 0.02), padding: "11px 14px", marginBottom: 16 }}>
+            <div style={{ fontFamily: SERIF, fontSize: 12.5, fontStyle: "italic", color: ra(INK, 0.62), lineHeight: 1.5 }}>
+              This is an estimate, not a verdict. Your Mechanics score is exact: the AI-judged dimensions can shift by about &plusmn;2 points if you re-score. PressIQ rates a pitch&rsquo;s quality and readiness, not your odds of placement.
+            </div>
+            <button onClick={() => setShowCalc(v => !v)} aria-expanded={showCalc} style={{ marginTop: 8, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.55) }}>
+              {showCalc ? "− Hide how your score is calculated" : "+ How your score is calculated"}
+            </button>
+            {showCalc && (
+              <div style={{ marginTop: 12, borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 12 }}>
+                <div style={{ fontFamily: SERIF, fontSize: 12.5, color: ra(INK, 0.6), lineHeight: 1.55, marginBottom: 12 }}>
+                  Your composite is a weighted blend of up to 7 dimensions. Mechanics is computed directly from your text; the other six are scored by an AI evaluator against published journalist research. Relevance carries the most weight, and if you don&rsquo;t add the journalist&rsquo;s query or beat, its weight is shared across the other dimensions.
+                </div>
+                {([
+                  ["relevance", "Relevance"], ["checklist", "SIA 7-step checklist"], ["newsroomReady", "Newsroom-ready"],
+                  ["objective", "Mechanics"], ["storytelling", "Storytelling"], ["neuromarketing", "Neuromarketing"], ["personalBrand", "Personal brand"],
+                ] as [keyof typeof WEIGHTS_V2, string][])
+                  .slice()
+                  .sort((a, b) => WEIGHTS_V2[b[0]] - WEIGHTS_V2[a[0]])
+                  .map(([k, label]) => (
+                    <div key={k} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "3px 0", fontFamily: SERIF, fontSize: 12.5, color: ra(INK, 0.7) }}>
+                      <span style={{ fontFamily: MONO, fontWeight: 700, color: INK, width: 38 }}>{Math.round(WEIGHTS_V2[k] * 100)}%</span>
+                      <span style={{ flex: 1 }}>{label}</span>
+                      <span style={{ fontFamily: MONO, fontSize: 8, letterSpacing: ".1em", textTransform: "uppercase", color: ra(INK, 0.45) }}>{k === "objective" ? "deterministic" : "AI-judged"}</span>
+                    </div>
+                  ))}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12, borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 10 }}>
+                  {TIERS.map(t => (
+                    <span key={t.badge} style={{ fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "#fff", background: t.color, padding: "2px 7px" }}>{t.min}&ndash;{t.max} {t.label}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           {!relevanceAssessed && (
             <div style={{ padding: "13px 16px", marginBottom: 18, border: `1px solid ${AMBER}`, background: "rgba(217,146,17,.05)", fontFamily: SERIF, fontSize: 13.5, fontStyle: "italic", color: ra(INK, 0.65) }}>
               {pitchMode === "query"
@@ -646,22 +679,22 @@ function PostScorePanel({
 
           {strongestLine && (
             <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 20, marginTop: 4 }}>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 8 }}>YOUR STRONGEST LINE</div>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 8 }}>YOUR STRONGEST LINE</div>
               <div style={{ fontFamily: SERIF, fontSize: 17, fontStyle: "italic", color: INK, lineHeight: 1.5, borderLeft: `3px solid ${YEL}`, paddingLeft: 16 }}>&ldquo;{strongestLine}&rdquo;</div>
             </div>
           )}
 
           <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 22, marginTop: 22 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35) }}>YOUR PITCH, BY DIMENSION</div>
-              <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.28) }}>Full breakdown in 03 →</div>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62) }}>YOUR PITCH, BY DIMENSION</div>
+              <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.6) }}>Full breakdown in 03 →</div>
             </div>
             <DimBarChart scores={scoreMap} dims={radarDims} />
           </div>
 
           {/* Scored Against */}
           <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 20, marginTop: 22 }}>
-            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 10 }}>SCORED AGAINST</div>
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>SCORED AGAINST</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 6 }}>
               {["SIA 7-STEP CHECKLIST", "SIA 32-FACTOR SCORING SYSTEM", "EMOS FRAMEWORK"].map(s => (
                 <span key={s} style={{ padding: "3px 7px", background: INK, fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: YEL }}>{s}</span>
@@ -669,7 +702,7 @@ function PostScorePanel({
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
               {["Cision State of the Media 2026", "Muck Rack State of Journalism 2026", "Propel Media Barometer", "Backlinko Journalist Outreach", "Fractl Journalist Survey", "Boomerang Email Study (40M)"].map(s => (
-                <span key={s} style={{ padding: "3px 7px", border: `1px solid ${ra(INK, 0.1)}`, fontFamily: MONO, fontSize: 7, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.3) }}>{s}</span>
+                <span key={s} style={{ padding: "3px 7px", border: `1px solid ${ra(INK, 0.1)}`, fontFamily: MONO, fontSize: 7, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.62) }}>{s}</span>
               ))}
             </div>
           </div>
@@ -702,7 +735,7 @@ function PostScorePanel({
       {/* ── Tab: Top Fixes ───────────────────────────────────────────── */}
       {tab === "fixes" && (
         <div style={{ padding: "24px 32px 28px" }}>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 18 }}>THE 3 FIXES THAT MOVE YOUR SCORE MOST</div>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>THE 3 FIXES THAT MOVE YOUR SCORE MOST</div>
           {topFixes.map((f, i) => <FixCard key={i} rank={i + 1} fix={f} />)}
           <TabNav current={tab} setTab={setTab} onReset={onReset} />
         </div>
@@ -711,7 +744,7 @@ function PostScorePanel({
       {/* ── Tab: Breakdown ───────────────────────────────────────────── */}
       {tab === "breakdown" && (
         <div style={{ padding: "24px 32px 28px" }}>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 18 }}>FULL BREAKDOWN</div>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>FULL BREAKDOWN</div>
           {DIMS.filter(d => d.key !== "relevance" || relevanceAssessed).map(dim => {
             const area = areaFor(dim.key);
             return <DimBlock key={dim.key} dim={dim} score={area.score} analysis={area.analysis} subSignals={area.subSignals} evidenceKeys={area.evidence} expanded={expanded.has(dim.key)} onToggle={() => toggleDim(dim.key)} />;
@@ -723,11 +756,11 @@ function PostScorePanel({
       {/* ── Tab: Evidence ────────────────────────────────────────────── */}
       {tab === "evidence" && (
         <div style={{ padding: "24px 32px 28px" }}>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 14 }}>THE RESEARCH BEHIND YOUR SCORE</div>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 14 }}>THE RESEARCH BEHIND YOUR SCORE</div>
           <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 22 }}>
             Scored against published journalist research — Cision &amp; Muck Rack 2026, Propel, Backlinko, Fractl, Boomerang. Open any dimension in the Breakdown tab to see the exact figures and sources.
           </div>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 10 }}>WHY THIS IS WORTH MORE IN 2026</div>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>WHY THIS IS WORTH MORE IN 2026</div>
           <div style={{ fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 24 }}>
             In an AI-answer world you don&rsquo;t just rank — you get cited. AI engines lean on earned media (Muck Rack: ~82% of AI citations come from earned coverage), and brand mentions out-predict backlinks for AI-Overview visibility ~3× (Ahrefs, 75k brands). The placement this pitch is aiming for is exactly that kind of citation — so a stronger pitch compounds.
           </div>
@@ -746,7 +779,7 @@ function PostScorePanel({
           {/* Email unlock */}
           {!emailDone ? (
             <form onSubmit={unlockEmail} style={{ border: `1px solid ${INK}`, padding: 18 }}>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.35), marginBottom: 8 }}>UNLOCK {EMAIL_LIMIT} SCORES / MONTH</div>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 8 }}>UNLOCK {EMAIL_LIMIT} SCORES / MONTH</div>
               <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.55), marginBottom: 12 }}>Add your email to raise your monthly limit and get SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.</div>
               <div style={{ display: "flex", gap: 8 }}>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={{ flex: 1, padding: "9px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.18)}`, fontFamily: GROT, fontSize: 12, color: INK, outline: "none", borderRadius: 0 }} />
@@ -801,13 +834,14 @@ export default function PressIQPage() {
         if (d.brand && typeof d.brand === "object") setBrand({ ...EMPTY_BRAND, ...(d.brand as Partial<BrandSignals>) });
         if (d.pitchMode === "standalone" || d.pitchMode === "query") setPitchMode(d.pitchMode as "standalone" | "query");
         if (typeof d.journalistBeat === "string") setJournalistBeat(d.journalistBeat);
+        if (typeof d.store === "boolean") setStore(d.store);
       }
     } catch { /* ignore */ }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ pitch, query, subject, platform, brand, pitchMode, journalistBeat })); } catch { /* ignore */ }
-  }, [pitch, query, subject, platform, brand, pitchMode, journalistBeat]);
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ pitch, query, subject, platform, brand, pitchMode, journalistBeat, store })); } catch { /* ignore */ }
+  }, [pitch, query, subject, platform, brand, pitchMode, journalistBeat, store]);
 
   // Cloudflare Turnstile: render the human-check widget when configured. No-op when
   // NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset, so the tool keeps working without it.

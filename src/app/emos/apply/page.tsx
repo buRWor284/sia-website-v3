@@ -14,7 +14,7 @@ import {
 } from "@/lib/tokens";
 
 export const metadata: Metadata = {
-  title: "Apply for EMOS Cohort 1 · 5 Seats · June 22, 2026",
+  title: "Apply for EMOS Cohort 1 · 5 Seats · Rolling Applications",
   description:
     "One short application. We review every submission personally within 48 hours. If it's a fit, we'll send a Calendly link to talk through the details.",
   alternates: { canonical: "/emos/apply" },
@@ -29,7 +29,7 @@ export default function EmosApplyPage() {
     <>
       {/* ── Announcement bar ──────────────────────────────────────────── */}
       <div className="emos-announce">
-        Cohort 1 begins <strong>June 22, 2026</strong> &nbsp;·&nbsp; 5 founders
+        Rolling applications — next cohort forming now &nbsp;·&nbsp; 5 founders
         &nbsp;·&nbsp; Application required
       </div>
 
@@ -95,7 +95,7 @@ export default function EmosApplyPage() {
                 textTransform: "uppercase" as const,
               }}
             >
-              5 Seats. June 22, 2026.
+              5 Seats. Rolling Applications.
               <br />
               Here&rsquo;s How to Claim One.
             </h1>
@@ -253,7 +253,7 @@ export default function EmosApplyPage() {
                       margin: 0,
                     }}
                   >
-                    <strong>5 seats only.</strong> Cohort 1 starts June 22, 2026.
+                    <strong>5 seats only.</strong> Rolling applications — next cohort forming now.
                     We close applications as soon as the cohort fills &mdash; early
                     applicants get priority on the 15-minute call slots.
                   </p>

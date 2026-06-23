@@ -38,7 +38,7 @@ export default function EmosPayPage() {
     <>
       {/* ── Announcement bar ──────────────────────────────────────────── */}
       <div className="emos-announce">
-        Cohort 1 begins <strong>June 22, 2026</strong> &nbsp;·&nbsp; 5 founders
+        Rolling applications — next cohort forming now &nbsp;·&nbsp; 5 founders
         &nbsp;·&nbsp; Application required
       </div>
 
