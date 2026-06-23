@@ -1,15 +1,9 @@
-import type { Metadata } from "next";
-
 // Open Graph title/description for the /emos landing page. Kept in the layout so
 // the large (currently in-progress) page.tsx stays untouched. /emos/apply and
 // /emos/pay set their own openGraph, which overrides this for those routes.
-export const metadata: Metadata = {
-  openGraph: {
-    title: "EMOS · Build the Media Presence Investors Check",
-    description:
-      "A guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.",
-  },
-};
+// Open Graph / Twitter metadata for /emos now lives on the page itself
+// (src/app/emos/page.tsx), the deepest route segment, so it resolves
+// unambiguously for every scraper.
 
 // Service + FAQ structured data for the EMOS offering. Lives in the layout so
 // the large page.tsx stays untouched. Applies across the /emos section.

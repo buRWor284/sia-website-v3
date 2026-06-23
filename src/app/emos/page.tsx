@@ -24,11 +24,34 @@ import {
   YEL,
 } from "@/lib/tokens";
 
+const OG_TITLE = "EMOS · Build the Media Presence Investors Check";
+const OG_DESC =
+  "A guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.";
+
+// Open Graph + Twitter set here on the deepest route segment so every scraper
+// (LinkedIn, Twitter/X, WhatsApp, Facebook) renders the EMOS-specific card
+// rather than falling back to the site-wide default. The file-convention
+// opengraph-image.tsx / twitter-image.tsx in this folder supply the image with
+// width/height/type automatically.
 export const metadata: Metadata = {
   title: "EMOS · Build the Media Presence Investors Check Before Your First Meeting",
   description:
     "EMOS, the Earned Media Operating System, is a Guided Implementation System for founders 3 to 12 months from a Series A raise. One-time investment. Capability you keep forever.",
   alternates: { canonical: "/emos" },
+  openGraph: {
+    type: "website",
+    siteName: "Syed Irfan Ajmal",
+    url: "https://www.syedirfanajmal.com/emos",
+    title: OG_TITLE,
+    description: OG_DESC,
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@syedirfanajmal",
+    creator: "@syedirfanajmal",
+    title: OG_TITLE,
+    description: OG_DESC,
+  },
 };
 
 /* =========================================================================
@@ -68,7 +91,7 @@ export default function EmosPage() {
                 <span style={{ fontFamily: SERIF, fontWeight: 400, fontStyle: "italic", fontSize: 11, letterSpacing: 0, color: INK55 }}>one-time</span>
               </div>
               <div className="cta-meta">
-                <div className="cta-meta-row"><b>Jul 6</b> 2026 start</div>
+                <div className="cta-meta-row"><b>Rolling</b> applications</div>
                 <div className="cta-meta-row"><b>5</b> founder seats</div>
                 <div className="cta-meta-row"><b>48h</b> decision</div>
               </div>
@@ -626,7 +649,7 @@ export default function EmosPage() {
                 <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(250,250,250,.60)", marginBottom: 16 }}>Apply for Cohort 1</div>
                 <div className="emos-apply-grid">
                   <div>
-                    <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: PAPER, lineHeight: 1.1, marginBottom: 16 }}>5 seats. July 6, 2026.<br />Here&#39;s how to claim one.</h3>
+                    <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3vw,36px)", color: PAPER, lineHeight: 1.1, marginBottom: 16 }}>5 seats. Rolling applications.<br />Here&#39;s how to claim one.</h3>
                     <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: "rgba(250,250,250,.60)" }}>One short application. I review every submission personally within 48 hours. If it&#39;s a fit, I&#39;ll send a Calendly link to talk through the details.</p>
                     <p style={{ marginTop: 14, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(250,250,250,.40)" }}>Both tracks include lifetime access to every future EMOS cohort</p>
                   </div>
@@ -702,7 +725,7 @@ export default function EmosPage() {
                 This time next year, your team owns the system. Your name lives in the publications your buyers and investors already trust. The coverage compounds long after the program ends.
               </p>
               <p style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "rgba(250,250,250,.40)", marginBottom: 28 }}>
-                Cohort 1 opens July 6 &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
+                Rolling applications — next cohort forming now &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
               </p>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                 <a href="/emos/apply/" className="emos-cta-yellow" style={{ fontSize: 13, padding: "18px 36px" }}>Submit Your Application →</a>

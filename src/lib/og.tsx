@@ -260,7 +260,7 @@ export async function ogCard({
             style={{
               position: "absolute",
               left: SAFE + 24,
-              right: 290,
+              right: 200,
               top: 0,
               bottom: STRIP,
               display: "flex",
@@ -299,22 +299,23 @@ export async function ogCard({
             ) : null}
           </div>
 
-          {/* circular headshot (omitted if the image can't be fetched) */}
+          {/* small, subtle circular headshot, tucked top-right (omitted if the
+              image can't be fetched) */}
           {hs ? (
             <div
               style={{
                 position: "absolute",
                 right: SAFE,
-                top: Math.floor((H - STRIP - 190) / 2),
-                width: 190,
-                height: 190,
+                top: SAFE + 4,
+                width: 104,
+                height: 104,
                 display: "flex",
-                borderRadius: 95,
+                borderRadius: 52,
                 overflow: "hidden",
-                border: "3px solid #E8E2D6",
+                border: "2px solid rgba(232,226,214,0.45)",
               }}
             >
-              <img src={hs} width={184} height={184} style={{ objectFit: "cover" }} />
+              <img src={hs} width={100} height={100} style={{ objectFit: "cover" }} />
             </div>
           ) : null}
 
