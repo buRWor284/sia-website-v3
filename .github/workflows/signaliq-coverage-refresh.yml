@@ -20,10 +20,13 @@ jobs:
     steps:
       - name: Trigger coverage refresh
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             https://www.syedirfanajmal.com/api/signaliq/refresh-coverage)
+          BODY=$(echo "$RESPONSE" | sed '/HTTP_STATUS:/d')
+          STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS:" | cut -d: -f2)
           echo "Response status: $STATUS"
+          echo "Response body: $BODY"
           if [ "$STATUS" != "200" ]; then
             echo "Unexpected status $STATUS" && exit 1
           fi
