@@ -23,7 +23,7 @@ import { getCursor, setCursor, setStoredCoverage } from "@/lib/signaliq/coverage
 export const maxDuration = 60; // seconds
 
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
-const BATCH_SIZE = 5;
+const BATCH_SIZE = 2;
 const DELAY_MS = 5200; // just over 5s — respects GDELT's ~1 req/5s limit
 
 /** All 120 preset seeds in a stable flat order (6 beats × 20 seeds). */
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
     try {
       const url =
         `${GDELT_BASE}?query=${encodeURIComponent(`"${topic}"`)}&mode=timelinevol&format=json&timespan=2m`;
-      const text = await getText(url, 7_000);
+      const text = await getText(url, 20_000);
       if (isThrottle(text)) {
         results.push(`throttled:${topic}`);
         continue;
