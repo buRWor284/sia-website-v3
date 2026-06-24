@@ -11,7 +11,7 @@ import { INK, INK15, INK35, INK55, INK70, PAPER, PAPER2, SERIF } from "@/lib/tok
 // current canonical destinations; obvious typos fixed; content preserved.
 // =========================================================================
 
-const INFOGRAPHIC = "/infographics/bing-seo-infographic.jpg";
+const INFOGRAPHIC = "/infographics/bing-seo-infographic-2015.html";
 
 // ─── Prose style tokens (mirrors the canonical /resources article look) ───────
 const P: React.CSSProperties  = { margin: "0 0 20px", fontFamily: SERIF, fontSize: 18.5, lineHeight: 1.65, color: INK };
@@ -116,18 +116,16 @@ export default function BingSeoGuidePage() {
         <SectionMast n="01" label="The Bing SEO Infographic" />
         <figure style={{ margin: "0 auto", maxWidth: 760, textAlign: "center" }}>
           <div style={{ border: `1px solid ${INK}`, background: PAPER2, padding: 14 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <iframe
               src={INFOGRAPHIC}
-              alt="The Ultimate Bing SEO Guide infographic — submitting your site, on-site fixes, backlinks, social signals and content formats that help you rank on Bing."
-              width={1092}
-              height={2786}
-              style={{ width: "100%", height: "auto", display: "block" }}
+              title="The Ultimate Bing SEO Guide infographic — submitting your site, on-site fixes, backlinks, social signals and content formats that help you rank on Bing."
+              style={{ width: "100%", height: 1100, display: "block", border: "none" }}
+              loading="lazy"
             />
           </div>
           <figcaption style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK55, lineHeight: 1.5 }}>
             The Ultimate Bing SEO Guide infographic · first published 2015 ·{" "}
-            <Ext href={INFOGRAPHIC}>View full size ↗</Ext>
+            <Ext href={INFOGRAPHIC}>View full page ↗</Ext>
           </figcaption>
         </figure>
       </section>
