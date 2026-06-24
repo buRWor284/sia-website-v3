@@ -4,13 +4,13 @@ import type { Metadata } from "next";
 // shared /infographics layout so this route gets a unique title and the
 // canonical points at the new home for the revived 2015 article.
 export const metadata: Metadata = {
-  title: "How to Win on Bing in 2026 | Guide + Infographic",
+  title: "Bing SEO Guide 2026 | How to Win on Bing + AI Search",
   description:
-    "Bing is the index behind Microsoft Copilot and a named provider inside ChatGPT, so Bing visibility increasingly buys AI visibility. A 2026 guide plus interactive infographic: market share, the AI engine to index map, IndexNow, links vs brand mentions, and a measurement checklist. Fully cited.",
+    "A practical 2026 Bing SEO guide: how to rank on Bing, optimize your on-page and links, turn on IndexNow, and win AI citations in Copilot and ChatGPT. Bing SEO tips, data and a checklist.",
   openGraph: {
-    title: "How to Win on Bing in 2026 | And the AI Answer Engines It Feeds",
+    title: "Bing SEO Guide 2026 | How to Win on Bing and the AI Answer Engines",
     description:
-      "A current, fully cited guide and interactive infographic: why Bing matters, how it feeds Copilot and ChatGPT, and the earned-media moves that win AI citations.",
+      "SEO for Bing in 2026, fully cited: why Bing matters, how it feeds Copilot and ChatGPT, the on-page and IndexNow basics, and the earned-media moves that win AI citations.",
     images: ["/infographics/bing-seo-infographic.jpg"],
   },
   alternates: { canonical: "/infographics/bing-seo" },

@@ -121,7 +121,7 @@ const CARDS: Card[] = [
     label: "of US Google searches end with zero clicks; AI Overviews cut top-spot CTR about 58%.",
     take: "Visibility is not clicks: answers, not just links, win.",
     source: "SparkToro / SimilarWeb, 2026 · Ahrefs, Feb 2026",
-    todo: "Optimize to BE the cited answer; track impressions and citations, not only clicks.",
+    todo: "Optimize to BE the cited answer; track impressions and citations, not just clicks.",
   },
 ];
 
@@ -169,7 +169,7 @@ const CHECKLIST: { tool: string; desc: string }[] = [
   { tool: "Bing Webmaster Tools", desc: "Track impressions, clicks and positions. Check whether the AI-search performance report is live in your dashboard." },
   { tool: "IndexNow", desc: "Push new and updated URLs to Bing, Yandex, Naver, Seznam and Yep instantly." },
   { tool: "GA4 custom channel", desc: "Match AI referrer hostnames: chatgpt.com, perplexity.ai, gemini.google.com, copilot.microsoft.com, bing.com." },
-  { tool: "Keep it in proportion", desc: "AI is under 1% of referrals today. Watch zero-click and citations, not only clicks." },
+  { tool: "Keep it in proportion", desc: "AI is under 1% of referrals today. Watch zero-click and citations, not just clicks." },
 ];
 
 // ─── Table of contents ────────────────────────────────────────────────────────
@@ -307,35 +307,27 @@ export default function BingSeoGuidePage() {
         .bsi-card > summary::-webkit-details-marker { display: none; }
         .bsi-card[open] > summary .bsi-hint::after { content: " (hide)"; }
         .bsi-card[open] > summary .bsi-hint { opacity: .6; }
+        .bsi-toc a:hover span { color: ${INK}; }
+        @media (max-width: 900px) {
+          .bsi-shell { grid-template-columns: 1fr !important; }
+          .bsi-toc { position: static !important; max-height: none !important; overflow: visible !important; border-right: none !important; border-bottom: 1px solid ${INK15}; }
+        }
       `}</style>
 
       {/* ── Header + TOC ───────────────────────────────────────── */}
       <section style={{ padding: "80px 56px 56px" }}>
         <SectionMast n="00" label="The Infographics Desk · Bing SEO 2026" />
-        <div className="grid-dark-card" style={{ alignItems: "start" }}>
-          <div>
-            <Pill size={10.5} ls="0.18em">Guide + Infographic</Pill>
-            <h1 style={{ margin: "16px 0 22px", fontFamily: SERIF, fontWeight: 700, fontSize: 60, lineHeight: 0.98, letterSpacing: "-0.03em" }}>
-              How to Win on Bing{" "}
-              <span style={{ fontStyle: "italic" }}>
-                <Mark>| And the AI Answer Engines It Feeds</Mark>
-              </span>
-            </h1>
-            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 20, lineHeight: 1.6, color: INK70, maxWidth: 620 }}>
-              {`A 2026 field guide for marketers, founders and PR practitioners who know Google SEO, for when the same content must satisfy Bing, Copilot and ChatGPT at once.`}
-            </p>
-          </div>
-          <div style={{ paddingTop: 8 }}>
-            <Pill size={10.5} ls="0.18em">In This Guide</Pill>
-            <div style={{ marginTop: 16 }}>
-              {TOC.map(({ n, id, title }) => (
-                <a key={id} href={`#${id}`} style={{ display: "grid", gridTemplateColumns: "32px 1fr", gap: 12, padding: "9px 0", borderBottom: `1px solid ${INK15}`, textDecoration: "none", color: "inherit", alignItems: "baseline" }}>
-                  <SCaps size={10} ls="0.12em" color={INK35}>{n}</SCaps>
-                  <div style={{ fontFamily: SERIF, fontSize: 14.5, color: INK70 }}>{title}</div>
-                </a>
-              ))}
-            </div>
-          </div>
+        <div style={{ maxWidth: 820 }}>
+          <Pill size={10.5} ls="0.18em">Guide + Infographic</Pill>
+          <h1 style={{ margin: "16px 0 22px", fontFamily: SERIF, fontWeight: 700, fontSize: 60, lineHeight: 0.98, letterSpacing: "-0.03em" }}>
+            How to Win on Bing{" "}
+            <span style={{ fontStyle: "italic" }}>
+              <Mark>| And the AI Answer Engines It Feeds</Mark>
+            </span>
+          </h1>
+          <p style={{ margin: 0, fontFamily: SERIF, fontSize: 20, lineHeight: 1.6, color: INK70, maxWidth: 620 }}>
+            {`A 2026 field guide for marketers, founders and PR practitioners who know Google SEO, for when the same content must satisfy Bing, Copilot and ChatGPT at once.`}
+          </p>
         </div>
         <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginTop: 44, paddingTop: 24, borderTop: `1px solid ${INK15}` }}>
           {[
@@ -351,6 +343,21 @@ export default function BingSeoGuidePage() {
           ))}
         </div>
       </section>
+
+      {/* ── Body shell: persistent sticky left TOC + content ───── */}
+      <div className="bsi-shell" style={{ display: "grid", gridTemplateColumns: "236px minmax(0, 1fr)", alignItems: "start" }}>
+        <aside className="bsi-toc" style={{ position: "sticky", top: 16, alignSelf: "start", maxHeight: "calc(100vh - 32px)", overflowY: "auto", padding: "40px 20px 40px 56px", borderRight: `1px solid ${INK15}` }}>
+          <SCaps size={10.5} ls="0.18em" color={INK55}>In This Guide</SCaps>
+          <nav style={{ marginTop: 14 }}>
+            {TOC.map(({ n, id, title }) => (
+              <a key={id} href={`#${id}`} style={{ display: "grid", gridTemplateColumns: "20px 1fr", gap: 8, padding: "7px 0", borderBottom: `1px solid ${INK15}`, textDecoration: "none", color: "inherit", alignItems: "baseline" }}>
+                <SCaps size={9.5} ls="0.10em" color={INK35}>{n}</SCaps>
+                <span style={{ fontFamily: SERIF, fontSize: 13.5, color: INK70, lineHeight: 1.3 }}>{title}</span>
+              </a>
+            ))}
+          </nav>
+        </aside>
+        <div className="bsi-main">
 
       {/* ── Lead ───────────────────────────────────────────────── */}
       <section style={{ padding: "8px 56px 0" }}>
@@ -532,7 +539,7 @@ export default function BingSeoGuidePage() {
           <p style={{ ...P, marginBottom: 8, fontWeight: 700 }}>{`Measurement`}</p>
           <Bullets items={[
             <>{`Track Bing in Webmaster Tools and AI referrers in GA4.`}</>,
-            <>{`Keep AI traffic in proportion, and watch zero-click and citations, not only clicks.`}</>,
+            <>{`Keep AI traffic in proportion, and watch zero-click and citations, not just clicks.`}</>,
           ]} />
           <p style={P}>{`If you do only one thing this week, verify in Bing Webmaster Tools and switch on IndexNow. If you do only one thing this quarter, build the earned-media engine, because being talked about is what the answer engines reward. The marketers who win the AI answer layer won't be the ones chasing one more link. They'll be the ones the web keeps mentioning.`}</p>
         </div>
@@ -556,6 +563,9 @@ export default function BingSeoGuidePage() {
           </ol>
         </div>
       </section>
+
+        </div>{/* .bsi-main */}
+      </div>{/* .bsi-shell */}
 
       {/* ── 04 · Next steps + archive ──────────────────────────── */}
       <section style={{ padding: "56px 56px", background: PAPER2, marginTop: 56 }}>
