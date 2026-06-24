@@ -13,8 +13,8 @@ type ContentType =
   | "tool"
   | "quiz"
   | "playbook"
-  | "article"
-  | "visual-essay";
+  | "guide"
+  | "infographic";
 
 type TopicKey =
   | "pr"
@@ -62,17 +62,18 @@ interface PlaybookContent extends ContentBase {
   newsDeck: string;
 }
 
-interface ArticleContent extends ContentBase {
-  type: "article";
-  slug: string;
-  cat: string;
+interface GuideContent extends ContentBase {
+  type: "guide";
+  slug?: string;
+  cat?: string;
   external?: boolean;
+  href?: string;
   newsHeadline: string;
   newsDeck: string;
 }
 
-interface VisualEssayContent extends ContentBase {
-  type: "visual-essay";
+interface InfographicContent extends ContentBase {
+  type: "infographic";
   blurb: string;
   href: string;
   newsHeadline: string;
@@ -82,8 +83,8 @@ interface VisualEssayContent extends ContentBase {
 type ContentItem =
   | InteractiveContent
   | PlaybookContent
-  | ArticleContent
-  | VisualEssayContent;
+  | GuideContent
+  | InfographicContent;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONTENT DATA
@@ -300,11 +301,11 @@ const CONTENT: ContentItem[] = [
     newsDeck: "What cognitive science tells us about why some messages work",
   },
 
-  // ── ARTICLES ─────────────────────────────────────────────────────────────
+  // ── GUIDES ───────────────────────────────────────────────────────────────
   {
     id: "art-writing-tips",
-    type: "article",
-    badge: "Article",
+    type: "guide",
+    badge: "Guide",
     topics: ["writing", "content-marketing"],
     title: "100+ Writing Tips to Become a Great Writer",
     slug: "writing-tips",
@@ -316,8 +317,8 @@ const CONTENT: ContentItem[] = [
   },
   {
     id: "art-digital-tools",
-    type: "article",
-    badge: "Article",
+    type: "guide",
+    badge: "Guide",
     topics: ["writing", "content-marketing"],
     title: "6 Must-Have Digital Tools for Writers",
     slug: "digital-tools-writers-editors",
@@ -330,8 +331,8 @@ const CONTENT: ContentItem[] = [
   },
   {
     id: "art-analytics",
-    type: "article",
-    badge: "Article",
+    type: "guide",
+    badge: "Guide",
     topics: ["seo", "content-marketing"],
     title: "5 Google Analytics Metrics for Content Marketers",
     slug: "google-analytics-content-marketing",
@@ -344,8 +345,8 @@ const CONTENT: ContentItem[] = [
   },
   {
     id: "art-ecommerce",
-    type: "article",
-    badge: "Article",
+    type: "guide",
+    badge: "Guide",
     topics: ["strategy", "content-marketing"],
     title: "How To Maximize eCommerce Conversions",
     slug: "maximize-ecommerce-conversions-using-product-discovery",
@@ -356,12 +357,35 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "The Conversion Code",
     newsDeck: "How product discovery turns browsers into buyers",
   },
+  {
+    id: "guide-bing-seo-2026",
+    type: "guide",
+    badge: "Guide + Infographic",
+    topics: ["seo", "pr", "strategy"],
+    title: "How to Win on Bing and the AI Answer Engines It Feeds",
+    href: "/infographics/bing-seo",
+    y: "2026",
+    newsHeadline: "The Bing Desk",
+    newsDeck: "The 2026 field guide to Bing SEO and AI search visibility",
+  },
+  {
+    id: "guide-bing-seo-2015",
+    type: "guide",
+    badge: "Archive · Guide + Infographic",
+    topics: ["seo"],
+    title: "Bing SEO: The 2015 Original",
+    href: "/infographics/bing-seo-2015",
+    y: "2015",
+    updated: "2021",
+    newsHeadline: "The Archive",
+    newsDeck: "The original 2015 Bing SEO guide, faithfully restored",
+  },
 
-  // ── VISUAL ESSAYS ────────────────────────────────────────────────────────
+  // ── INFOGRAPHICS ─────────────────────────────────────────────────────────
   {
     id: "ve-hubstaff",
-    type: "visual-essay",
-    badge: "Visual Essay",
+    type: "infographic",
+    badge: "Infographic",
     topics: ["strategy"],
     private: true,
     title: "Managing Remote Teams with HubStaff",
@@ -375,8 +399,8 @@ const CONTENT: ContentItem[] = [
   },
   {
     id: "ve-writing-habits",
-    type: "visual-essay",
-    badge: "Visual Essay",
+    type: "infographic",
+    badge: "Infographic",
     topics: ["writing"],
     title: "How to Form Writing Habits for Success",
     blurb:
@@ -389,8 +413,8 @@ const CONTENT: ContentItem[] = [
   },
   {
     id: "ve-content-ideas",
-    type: "visual-essay",
-    badge: "Visual Essay",
+    type: "infographic",
+    badge: "Infographic",
     topics: ["content-marketing", "strategy"],
     private: true,
     title: "Getting Content Ideas from Your Customers",
@@ -408,13 +432,13 @@ const CONTENT: ContentItem[] = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TYPE_TABS: { key: "all" | ContentType; label: string }[] = [
-  { key: "all",           label: "All Resources" },
-  { key: "kit",           label: "Kits" },
-  { key: "tool",          label: "Tools" },
-  { key: "quiz",          label: "Quizzes" },
-  { key: "playbook",      label: "Playbooks" },
-  { key: "article",       label: "Articles" },
-  { key: "visual-essay",  label: "Visual Essays" },
+  { key: "all",          label: "All Resources" },
+  { key: "kit",          label: "Kits" },
+  { key: "tool",         label: "Tools" },
+  { key: "quiz",         label: "Quizzes" },
+  { key: "playbook",     label: "Playbooks" },
+  { key: "guide",        label: "Guides" },
+  { key: "infographic",  label: "Infographics" },
 ];
 
 const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
@@ -429,25 +453,25 @@ const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
 ];
 
 const GROUP_ORDER: ContentType[] = [
-  "kit", "tool", "quiz", "playbook", "article", "visual-essay",
+  "kit", "tool", "quiz", "playbook", "guide", "infographic",
 ];
 
 const GROUP_LABEL: Record<ContentType, string> = {
-  "kit":           "Kits · Interactive tools & checklists",
-  "tool":          "Tools · Use them right now",
-  "quiz":          "Quizzes · Score your position",
-  "playbook":      "Playbooks · Deep-dive guides",
-  "article":       "Articles · From the archives",
-  "visual-essay":  "Visual Essays · Research made visible",
+  "kit":          "Kits · Interactive tools & checklists",
+  "tool":         "Tools · Use them right now",
+  "quiz":         "Quizzes · Score your position",
+  "playbook":     "Playbooks · Deep-dive guides",
+  "guide":        "Guides · From the archives",
+  "infographic":  "Infographics · Research made visible",
 };
 
 const TYPE_ACCENT: Record<ContentType, string> = {
-  "kit":           "#f5b81f",
-  "tool":          "#C17817",
-  "quiz":          "#8B6B99",
-  "playbook":      INK,
-  "article":       INK55,
-  "visual-essay":  "#A0522D",
+  "kit":          "#f5b81f",
+  "tool":         "#C17817",
+  "quiz":         "#8B6B99",
+  "playbook":     INK,
+  "guide":        INK55,
+  "infographic":  "#A0522D",
 };
 
 const TOPIC_LABEL: Record<TopicKey, string> = {
@@ -506,23 +530,24 @@ function NewspaperSnippet({ headline, deck }: { headline: string; deck: string }
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getCardBlurb(item: ContentItem): string | null {
-  if (item.type === "article") return null;
-  return item.blurb;
+  if (item.type === "guide") return null;
+  return (item as { blurb?: string }).blurb ?? null;
 }
 
 function getCardSub(item: ContentItem): string | null {
-  if (item.type === "article" || item.type === "visual-essay") return null;
-  return item.sub;
+  if (item.type === "guide" || item.type === "infographic") return null;
+  return (item as { sub?: string }).sub ?? null;
 }
 
 function getCardHref(item: ContentItem): string | null {
   if (item.type === "playbook") return `/resources/${item.slug}`;
-  if (item.type === "article") {
-    return item.external
-      ? `https://syedirfanajmal.com/${item.slug}/`
-      : `/resources/${item.slug}`;
+  if (item.type === "guide") {
+    const g = item as GuideContent;
+    if (g.href) return g.href;
+    if (g.external) return `https://syedirfanajmal.com/${g.slug}/`;
+    return g.slug ? `/resources/${g.slug}` : null;
   }
-  if (item.type === "visual-essay") return item.href;
+  if (item.type === "infographic") return (item as InfographicContent).href;
   // interactive
   const interactive = item as InteractiveContent;
   if (interactive.comingSoon) return null;
@@ -531,8 +556,8 @@ function getCardHref(item: ContentItem): string | null {
 
 function getCardCta(item: ContentItem): string {
   if (item.type === "playbook") return "Read the Guide";
-  if (item.type === "article") return "Read";
-  if (item.type === "visual-essay") return "View Original";
+  if (item.type === "guide") return "Read the Guide";
+  if (item.type === "infographic") return "View Original";
   const interactive = item as InteractiveContent;
   return interactive.cta;
 }
@@ -545,8 +570,15 @@ function isComingSoon(item: ContentItem): boolean {
 }
 
 function isExternal(item: ContentItem): boolean {
-  if (item.type === "visual-essay") return true;
-  if (item.type === "article") return !!(item as ArticleContent).external;
+  if (item.type === "infographic") {
+    const href = (item as InfographicContent).href;
+    return href.startsWith("http");
+  }
+  if (item.type === "guide") {
+    const g = item as GuideContent;
+    if (g.href) return g.href.startsWith("http");
+    return !!g.external;
+  }
   if (item.type === "kit" || item.type === "tool" || item.type === "quiz") {
     return (item as InteractiveContent).href.startsWith("http");
   }
@@ -660,10 +692,7 @@ function ResourceCard({
   const ext = isExternal(item);
 
   // Badge label
-  let badgeLabel = item.badge;
-  if (item.type === "article") {
-    badgeLabel = `Article · ${(item as ArticleContent).cat}`;
-  }
+  const badgeLabel = item.badge;
 
   return (
     <div

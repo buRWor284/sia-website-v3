@@ -41,20 +41,35 @@ const BING_GUIDELINES = "https://www.bing.com/webmasters/help/webmaster-guidelin
 export default function BingSeoGuidePage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <style>{`
+        .bs15-section { padding: 80px 56px 56px; }
+        .bs15-body    { padding: 64px 56px 8px; }
+        .bs15-note    { padding: 40px 56px 0; }
+        .bs15-ig      { padding: 32px 56px 8px; }
+        .bs15-footer  { padding: 24px 56px 64px; }
+        .bs15-h1      { margin: 16px 0 22px; font-family: ${SERIF}; font-weight: 700; font-size: clamp(36px, 8vw, 64px); line-height: 0.98; letter-spacing: -0.03em; }
+        @media (max-width: 680px) {
+          .bs15-section, .bs15-body, .bs15-note, .bs15-ig, .bs15-footer {
+            padding-left: 20px !important;
+            padding-right: 20px !important;
+          }
+          .bs15-section { padding-top: 48px !important; }
+        }
+      `}</style>
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px 56px" }}>
+      <section className="bs15-section">
         <SectionMast n="00" label="The Infographics Desk · Bing SEO" />
         <div style={{ maxWidth: 820 }}>
           <Pill size={10.5} ls="0.18em">Guide + Infographic</Pill>
-          <h1 style={{ margin: "16px 0 22px", fontFamily: SERIF, fontWeight: 700, fontSize: 64, lineHeight: 0.98, letterSpacing: "-0.03em" }}>
+          <h1 className="bs15-h1">
             The Ultimate{" "}
             <span style={{ fontStyle: "italic" }}>
               <Mark>Bing SEO</Mark>
             </span>{" "}
             Guide
           </h1>
-          <p style={{ margin: 0, fontFamily: SERIF, fontSize: 20, lineHeight: 1.6, color: INK70, maxWidth: 620 }}>
+          <p style={{ margin: 0, fontFamily: SERIF, fontSize: "clamp(16px, 2.5vw, 20px)", lineHeight: 1.6, color: INK70, maxWidth: 620 }}>
             {`Bing keeps growing — and it now feeds Microsoft Copilot and a wave of AI answer engines. If you want to diversify your organic traffic beyond Google, it pays to take Bing seriously. Here is the original illustrated guide, restored in full.`}
           </p>
         </div>
@@ -76,7 +91,7 @@ export default function BingSeoGuidePage() {
       <HRule />
 
       {/* ── Editor's note 2026 (moved to top) ──────────────────── */}
-      <section style={{ padding: "40px 56px 0" }}>
+      <section className="bs15-note">
         <div style={{ maxWidth: 760 }}>
           <SCaps size={11} ls="0.22em" color={INK55}>{`Editor's note · 2026`}</SCaps>
           <p style={{ ...P, marginTop: 12, padding: "20px 24px", background: PAPER2, border: `1px solid ${INK35}`, fontSize: 16.5, color: INK70, lineHeight: 1.6 }}>
@@ -93,7 +108,7 @@ export default function BingSeoGuidePage() {
       </section>
 
       {/* ── Intro ──────────────────────────────────────────────── */}
-      <section style={{ padding: "64px 56px 8px" }}>
+      <section className="bs15-body">
         <div style={{ maxWidth: 760 }}>
           <p style={LEAD}>{`You can't ignore Bing anymore. Startled? Keep reading.`}</p>
 
@@ -112,7 +127,7 @@ export default function BingSeoGuidePage() {
       </section>
 
       {/* ── The Infographic (centrepiece) ──────────────────────── */}
-      <section style={{ padding: "32px 56px 8px" }}>
+      <section className="bs15-ig">
         <SectionMast n="01" label="The Bing SEO Infographic" />
         <figure style={{ margin: "0 auto", maxWidth: 760, textAlign: "center" }}>
           <div style={{ border: `1px solid ${INK}`, background: PAPER2, padding: 14 }}>
@@ -131,7 +146,7 @@ export default function BingSeoGuidePage() {
       </section>
 
       {/* ── The Written Guide ──────────────────────────────────── */}
-      <section style={{ padding: "32px 56px 8px" }}>
+      <section className="bs15-ig">
         <SectionMast n="02" label="The Written Guide" />
         <div style={{ maxWidth: 760 }}>
 
@@ -193,7 +208,7 @@ export default function BingSeoGuidePage() {
       </section>
 
       {/* ── Footer nav ─────────────────────────────────────────── */}
-      <section style={{ padding: "24px 56px 64px" }}>
+      <section className="bs15-footer">
         <div style={{ maxWidth: 760, display: "flex", gap: 12, flexWrap: "wrap" }}>
           <a href="/infographics" style={{ padding: "12px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: "var(--font-grot)", fontWeight: 700, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}>
             ← All Infographics
