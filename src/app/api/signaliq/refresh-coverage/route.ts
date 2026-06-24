@@ -81,7 +81,12 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  await setCursor(nextCursor);
+  let cursorError: string | null = null;
+  try {
+    await setCursor(nextCursor);
+  } catch (err) {
+    cursorError = err instanceof Error ? err.message : String(err);
+  }
 
   return NextResponse.json({
     processed: batch.length,
@@ -89,5 +94,6 @@ export async function GET(req: NextRequest) {
     nextCursor,
     totalSeeds: ALL_SEEDS.length,
     results,
+    cursorError,
   });
 }
