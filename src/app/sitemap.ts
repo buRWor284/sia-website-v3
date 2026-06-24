@@ -69,6 +69,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { route: "infographics",                    changeFrequency: "monthly" as const, priority: 0.6 },
     { route: "infographics/writing-benefits",   changeFrequency: "yearly"  as const, priority: 0.6 },
     { route: "infographics/journo-outreach-checklist", changeFrequency: "yearly" as const, priority: 0.6 },
+    { route: "infographics/bing-seo",           changeFrequency: "yearly"  as const, priority: 0.6 },
     // Tools (canonical public lead-magnet tools only — redirected /tools/collabiq removed)
     { route: "tools/signaliq",                  changeFrequency: "monthly" as const, priority: 0.7 },
     { route: "tools/pressiq",                   changeFrequency: "monthly" as const, priority: 0.7 },

@@ -56,6 +56,18 @@ const INFOGRAPHICS: InfographicCard[] = [
   },
   {
     n: "03",
+    tag: "Guide + Infographic",
+    title: "The Ultimate Bing SEO Guide",
+    blurb:
+      "Bing keeps growing — and now feeds Microsoft Copilot and AI answer engines. " +
+      "The original illustrated guide, restored in full: submit your site, follow the " +
+      "guidelines, earn the right links, and diversify your content formats.",
+    href: "/infographics/bing-seo",
+    year: "2015 · Restored 2026",
+    status: "live",
+  },
+  {
+    n: "04",
     tag: "Infographic",
     title: "Managing Remote Teams with HubStaff",
     blurb:
@@ -66,7 +78,7 @@ const INFOGRAPHICS: InfographicCard[] = [
     status: "coming",
   },
   {
-    n: "04",
+    n: "05",
     tag: "Infographic",
     title: "How to Form Writing Habits for Success",
     blurb:
@@ -77,7 +89,7 @@ const INFOGRAPHICS: InfographicCard[] = [
     status: "coming",
   },
   {
-    n: "05",
+    n: "06",
     tag: "Infographic",
     title: "Getting Content Ideas from Your Customers",
     blurb:
@@ -99,7 +111,7 @@ const Hero = () => (
       {/* Left: count */}
       <div className="res-hero-left">
         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
-          5
+          6
         </div>
         <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
           Visual<br />essays
@@ -286,7 +298,7 @@ const Grid = () => (
     </div>
     <div style={{ marginTop: 20 }}>
       <SCaps size={10.5} ls="0.16em" color={INK55}>
-        Infographics marked "Redesign coming" link to the original WordPress edition while the new interactive version is in production.
+        Infographics marked &ldquo;Redesign coming&rdquo; link to the original WordPress edition while the new interactive version is in production.
       </SCaps>
     </div>
   </section>
