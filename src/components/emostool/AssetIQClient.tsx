@@ -210,15 +210,46 @@ function AssetRow({
   asset,
   onStatusChange,
   onDelete,
+  companyContext,
 }: {
   asset: DbAsset;
   onStatusChange: (id: string, status: AssetStatus) => void;
   onDelete: (id: string) => void;
+  companyContext?: string;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [updating, startUpdate] = useTransition();
   const [deleting, startDelete] = useTransition();
+  const [brief, setBrief] = useState<string | null>(null);
+  const [briefLoading, setBriefLoading] = useState(false);
+  const [briefError, setBriefError] = useState<string | null>(null);
+
+  async function generateBrief() {
+    setBriefError(null);
+    setBrief(null);
+    setBriefLoading(true);
+    try {
+      const res = await fetch("/api/emostool/asset-brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assetType:   asset.asset_type,
+          title:       asset.title,
+          keyword:     asset.target_keyword ?? undefined,
+          assetIdea:   asset.description ?? undefined,
+          companyContext: companyContext?.trim() || undefined,
+        }),
+      });
+      const data = await res.json() as { brief?: string; error?: string };
+      if (!res.ok || data.error) { setBriefError(data.error ?? "Failed to generate brief."); return; }
+      setBrief(data.brief ?? null);
+    } catch {
+      setBriefError("Network error — please try again.");
+    } finally {
+      setBriefLoading(false);
+    }
+  }
   const sm = STATUS_META[asset.status];
   const typeLabel = ASSET_TYPES.find(t => t.id === asset.asset_type)?.label ?? asset.asset_type;
 
@@ -278,7 +309,8 @@ function AssetRow({
 
       {/* Expanded actions */}
       {expanded && (
-        <div style={{ background: PAPER2, borderBottom: `1px solid ${INK15}`, padding: "12px 14px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ background: PAPER2, borderBottom: `1px solid ${INK15}`, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* Find journalists CTA */}
           <a
             href={`/emostool/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent((asset.description ?? "").slice(0, 200))}`}
@@ -286,6 +318,38 @@ function AssetRow({
           >
             Find journalists →
           </a>
+
+          {/* AI brief */}
+          {!brief && (
+            <button
+              onClick={e => { e.stopPropagation(); generateBrief(); }}
+              disabled={briefLoading}
+              style={{ padding: "8px 16px", border: `1px solid ${INK15}`, background: PAPER, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", cursor: briefLoading ? "wait" : "pointer" }}
+            >
+              {briefLoading ? "Generating brief…" : "Generate AI brief →"}
+            </button>
+          )}
+          {briefError && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: RED }}>{briefError}</span>}
+          </div>
+
+          {/* Brief output */}
+          {brief && (
+            <div style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "14px 16px" }} onClick={e => e.stopPropagation()}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>AI creation brief</span>
+                <button onClick={() => setBrief(null)} style={{ background: "transparent", border: "none", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, color: INK35, cursor: "pointer", letterSpacing: ".10em", textTransform: "uppercase" }}>✕ Close</button>
+              </div>
+              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.75, whiteSpace: "pre-wrap" }}>{brief}</div>
+              <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
+                <a
+                  href={`/emostool/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent((asset.description ?? "").slice(0, 200))}`}
+                  style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}
+                >
+                  Find journalists for this asset →
+                </a>
+              </div>
+            </div>
+          )}
 
           {/* Status progression */}
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
@@ -571,6 +635,7 @@ export default function AssetIQClient({
               asset={asset}
               onStatusChange={handleStatusChange}
               onDelete={handleDelete}
+              companyContext={companyContext}
             />
           ))}
         </div>

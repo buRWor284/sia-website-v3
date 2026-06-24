@@ -136,11 +136,17 @@ function JournalistCard({
   formData,
   savedNames,
   onSaved,
+  prefillAssetTitle,
+  prefillAssetType,
+  prefillAssetIdea,
 }: {
   j: AIJournalist;
   formData: Record<string, string>;
   savedNames: Set<string>;
   onSaved: (name: string) => void;
+  prefillAssetTitle?: string;
+  prefillAssetType?: string;
+  prefillAssetIdea?: string;
 }) {
   const [saving, startSave] = useTransition();
   const [angle, setAngle] = useState<string | null>(null);
@@ -480,6 +486,9 @@ export default function JournoCollabIQClient({
               formData={lastForm ?? {}}
               savedNames={savedNames}
               onSaved={name => setSavedNames(prev => new Set([...prev, name]))}
+              prefillAssetTitle={prefillAssetTitle}
+              prefillAssetType={prefillAssetType}
+              prefillAssetIdea={prefillAssetIdea}
             />
           ))}
         </div>

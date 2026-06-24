@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { STAGE_META, STAGE_ORDER, type EmosStage } from "@/lib/emos-stage-config";
+import { STAGE_META, STAGE_ORDER, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -58,17 +58,38 @@ export default async function EmosDashboardPage() {
     db.from("coverageiq_pitches").select("id", { count: "exact", head: true }),
   ]);
 
-  const toolStats: Record<EmosStage, { count: number; label: string }> = {
-    signal:   { count: signalRes.count ?? 0,    label: "signals saved"        },
-    asset:    { count: assetRes.count ?? 0,     label: "assets"               },
-    collab:   { count: journalistRes.count ?? 0, label: "journalists"          },
-    press:    { count: pressRes.count ?? 0,     label: "pitches scored"       },
-    coverage: { count: pitchRes.count ?? 0,     label: "pitches tracked"      },
-    full:     { count: 0,                       label: ""                     },
+  const activityCounts = {
+    signals:        signalRes.count ?? 0,
+    assets:         assetRes.count ?? 0,
+    journalists:    journalistRes.count ?? 0,
+    pitchesScored:  pressRes.count ?? 0,
+    pitchesTracked: pitchRes.count ?? 0,
   };
 
-  // Active tool = first incomplete stage
-  const activeStage = currentStage;
+  const toolStats: Record<EmosStage, { count: number; label: string }> = {
+    signal:   { count: activityCounts.signals,        label: "signals saved"   },
+    asset:    { count: activityCounts.assets,         label: "assets"          },
+    collab:   { count: activityCounts.journalists,    label: "journalists"     },
+    press:    { count: activityCounts.pitchesScored,  label: "pitches scored"  },
+    coverage: { count: activityCounts.pitchesTracked, label: "pitches tracked" },
+    full:     { count: 0,                             label: ""                },
+  };
+
+  // Compute the stage the user has EARNED from activity; advance in DB if higher
+  const earnedStage = computeEarnedStage(activityCounts);
+  const earnedIdx   = STAGE_ORDER.indexOf(earnedStage);
+  let stageAdvanced = false;
+  if (earnedIdx > stageIdx && org) {
+    const { error: stageErr } = await db
+      .from("organizations")
+      .update({ emos_stage: earnedStage })
+      .eq("id", org.id);
+    if (!stageErr) stageAdvanced = true;
+  }
+
+  // Use earned stage (if advanced) as the active stage
+  const activeStage = stageAdvanced ? earnedStage : currentStage;
+  const activeStageIdx = stageAdvanced ? earnedIdx : stageIdx;
   const pipelineTools = STAGE_ORDER.filter(s => s !== "full");
 
   return (
@@ -100,6 +121,13 @@ export default async function EmosDashboardPage() {
 
       <div style={{ maxWidth: 1200, marginInline: "auto", padding: "40px clamp(20px,4vw,56px) 80px" }}>
 
+        {/* ── Stage-advanced toast ─────────────────────────────────────────── */}
+        {stageAdvanced && (
+          <div style={{ background: GREEN, color: PAPER, padding: "10px 20px", marginBottom: 16, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase" }}>
+            ✓ Stage advanced — you are now on {STAGE_META[activeStage].label}
+          </div>
+        )}
+
         {/* ── Current step banner ──────────────────────────────────────────── */}
         <div style={{ background: INK, color: PAPER, padding: "18px 24px", marginBottom: 40, display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
           <div>
@@ -107,7 +135,7 @@ export default async function EmosDashboardPage() {
               You are here
             </div>
             <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 16, letterSpacing: ".10em", textTransform: "uppercase" }}>
-              Step {stageIdx + 1} — {STAGE_META[activeStage].label}
+              Step {activeStageIdx + 1} — {STAGE_META[activeStage].label}
             </div>
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.65)", marginTop: 4 }}>
               {STAGE_META[activeStage].threshold}
@@ -134,7 +162,7 @@ export default async function EmosDashboardPage() {
           {pipelineTools.map((stage, i) => {
             const meta = STAGE_META[stage];
             const toolIdx = STAGE_ORDER.indexOf(stage);
-            const isDone    = toolIdx < stageIdx;
+            const isDone    = toolIdx < activeStageIdx;
             const isActive  = stage === activeStage;
             const stats     = toolStats[stage];
 

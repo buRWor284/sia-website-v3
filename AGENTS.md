@@ -48,16 +48,29 @@ SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
 - SIA org + Irfan's user seeded
 - `SUPABASE_SERVICE_ROLE_KEY` env var required in Vercel for server-side writes
 
-### Platform tools (Phases 2–6 ✅)
+### Platform tools (Phases 2–7 ✅)
 Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
 
 - `/emostool/dashboard` — unified pipeline view: one card per tool in order, live data counts, "you are here" banner
 - `/emostool/dashboard/signaliq` — full scan, startup context re-ranking, "Save to EMOS →", "Build asset →" → AssetIQ
-- `/emostool/dashboard/assetiq` — linkable asset tracker: create from signal, type/status/keyword, "Find journalists →" → JournoCollabIQ
-- `/emostool/dashboard/journocollabiq` — journalist CRM: table with DR/pitches/placements, add/edit/delete, "Score a pitch →" → PressIQ
-- `/emostool/dashboard/pressiq` — full scorer, reads ?beat= from URL, "Track this pitch →" → CoverageIQ
-- `/emostool/dashboard/coverageiq` — full pipeline (pitches, contacts, coverage log, PESO, alerts)
-- All tools have PipelineNav footer showing position + "Next step" CTA
+- `/emostool/dashboard/assetiq` — linkable asset tracker: create from signal, type/status/keyword, "Find journalists →" → JournoCollabIQ; AI-assisted brief drafting via `asset-brief` API
+- `/emostool/dashboard/journocollabiq` — journalist CRM: table with DR/pitches/placements, add/edit/delete, "Score a pitch →" → PressIQ (passes assetTitle/assetType/assetIdea)
+- `/emostool/dashboard/pressiq` — full scorer, reads ?beat= + ?assetTitle/Type/Idea from URL, asset context banner, "Track this pitch →" → CoverageIQ (passes ?pitch= query)
+- `/emostool/dashboard/coverageiq` — full pipeline (pitches, contacts, coverage log, PESO, alerts); PipelineNav at bottom; auto-opens New Pitch modal with prefilled subject when arriving from PressIQ
+- All tools have PipelineNav footer showing position + "Next step" CTA with full context handoff
+
+### Cross-tool context handoffs (Phase 7 ✅)
+- SignalIQ → AssetIQ: signal data passed via URL
+- AssetIQ → JournoCollabIQ: asset context passed
+- JournoCollabIQ → PressIQ: ?assetTitle/Type/Idea in URL; PressIQ shows amber asset context banner
+- PressIQ → CoverageIQ: ?pitch= (top scored pitch query, truncated to 200 chars); CoverageIQ auto-opens New Pitch modal prefilled
+
+### SignalIQ coverage refresh (cron)
+- **Vercel Cron:** `/api/signaliq/refresh-coverage` fires daily at 02:00 UTC (`vercel.json`)
+- **GitHub Actions:** `.github/workflows/signaliq-coverage-refresh.yml` fires every 30 minutes as a supplement; hits the same endpoint with `CRON_SECRET`
+- Rotates through 120 preset seeds (6 beats × 20), batch size 2, GDELT rate-limited at 5.2s between calls
+- Cursor persists in Supabase; full cycle completes in ~12 hours (Vercel) or ~6 hours (GHA)
+- **Testing:** trigger manually from GitHub Actions → workflow_dispatch, or hit the endpoint directly with `Authorization: Bearer <CRON_SECRET>`
 
 ### Server actions
 - `src/app/emostool/actions/coverageiq.ts` — createPitch, updatePitchStage, createJournalist, updateJournalist, deleteJournalist, getAlerts, updateAlertStatus
@@ -68,6 +81,7 @@ Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → Coverage
 ### Authenticated API routes (platform-only, no rate limit)
 - `src/app/api/emostool/signaliq/scan/route.ts` — Clerk auth, no Turnstile, same scanBeat() as public
 - `src/app/api/emostool/pitch-score/route.ts` — Clerk auth, no rate limit, always stores, same scoring logic as public
+- `src/app/api/emostool/asset-brief/route.ts` — Clerk auth, generates AI asset brief from signal context
 
 ### Key files
 - `src/lib/supabase.ts` — createSupabaseServerClient (Clerk JWT), createSupabaseServiceClient (service role)
@@ -78,18 +92,18 @@ Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → Coverage
 
 ---
 
-## What's next (Phase 5+)
+## What's next (Phase 8+)
 
-### Phase 5 — Platform tool clones ✅
-All done. Full authenticated versions built for SignalIQ, PressIQ, JournoCollabIQ.
+### Phase 8 — Dashboard stage auto-progression 🔜
+- Stage bar on `/emostool/dashboard` is static — it doesn't advance based on activity
+- Thresholds are defined in `emos-stage-config.ts`; `recordStageEvent` + `getOrgStage` exist in `stage.ts`
+- Need: dashboard to query actual activity counts (saved signals, assets created, journalists added, pitches scored, pitches tracked) and advance the stage bar accordingly
 
-### Phase 6 — AssetIQ (new module)
-- Planning/tracking: create asset, track status, link to signal + pitches
-- AI-assisted creation: draft survey questions, report outlines, calculator specs based on signal
-- `linkable_assets` + `linkable_asset_components` tables already exist in DB schema
+### Phase 9 — Billing (Stripe, D-9)
+- Not started. Requires a conversation before work begins.
 
-### Phase 7 — Cross-tool connections
-Wire the "→ next tool" CTAs between all platform tools.
+### AssetIQ AI-assisted creation (sub-task of Phase 6, partially done)
+- `asset-brief` API route exists; UI flow for drafting survey questions / report outlines / calculator specs from a signal is pending
 
 ---
 

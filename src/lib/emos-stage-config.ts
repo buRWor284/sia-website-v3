@@ -18,6 +18,40 @@ export type StageEventType =
 
 export const STAGE_ORDER: EmosStage[] = ["signal", "asset", "collab", "press", "coverage", "full"];
 
+/**
+ * Numeric thresholds for stage progression.
+ * Reaching the threshold for a stage unlocks the NEXT stage.
+ * e.g. saving 3 signals (signal threshold) unlocks "asset" stage.
+ */
+export const STAGE_THRESHOLDS: Record<EmosStage, number> = {
+  signal:   3,   // 3 signals saved    → unlocks AssetIQ
+  asset:    1,   // 1 asset created    → unlocks JournoCollabIQ
+  collab:   3,   // 3 journalists saved → unlocks PressIQ
+  press:    5,   // 5 pitches scored   → unlocks CoverageIQ
+  coverage: 10,  // 10 pitches tracked → unlocks Full EMOS
+  full:     0,   // already at the top
+};
+
+/**
+ * Compute the highest stage a user has EARNED based on activity counts.
+ * Returns the stage they should currently be at (may be higher than DB value).
+ */
+export function computeEarnedStage(counts: {
+  signals: number;
+  assets: number;
+  journalists: number;
+  pitchesScored: number;
+  pitchesTracked: number;
+}): EmosStage {
+  const { signals, assets, journalists, pitchesScored, pitchesTracked } = counts;
+  if (pitchesTracked >= STAGE_THRESHOLDS.coverage) return "full";
+  if (pitchesScored  >= STAGE_THRESHOLDS.press)    return "coverage";
+  if (journalists    >= STAGE_THRESHOLDS.collab)   return "press";
+  if (assets         >= STAGE_THRESHOLDS.asset)    return "collab";
+  if (signals        >= STAGE_THRESHOLDS.signal)   return "asset";
+  return "signal";
+}
+
 export const STAGE_META: Record<EmosStage, {
   label: string;
   tool: string;
