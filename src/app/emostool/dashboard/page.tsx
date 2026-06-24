@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   title: "EMOS Platform",
 };
 
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -36,7 +35,6 @@ const TOOL_ICONS: Record<EmosStage, string> = {
 export default async function EmosDashboardPage() {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/sign-in");
-  if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");
