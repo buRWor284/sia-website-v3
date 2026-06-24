@@ -42,7 +42,7 @@ export async function getStoredCoverage(topic: string): Promise<Coverage | null>
 /** Upsert a coverage record. Called only by the cron refresher. */
 export async function setStoredCoverage(coverage: Coverage): Promise<void> {
   const db = createSupabaseServiceClient();
-  await db.from(COVERAGE_TABLE).upsert(
+  const { error } = await db.from(COVERAGE_TABLE).upsert(
     {
       topic: coverage.topic.toLowerCase(),
       volume: coverage.volume,
@@ -52,6 +52,7 @@ export async function setStoredCoverage(coverage: Coverage): Promise<void> {
     },
     { onConflict: "topic" },
   );
+  if (error) throw new Error(`setStoredCoverage failed: ${error.message} (code: ${error.code})`);
 }
 
 /** Read the rotating cursor (index into the flat seeds list). */
@@ -74,8 +75,9 @@ export async function getCursor(): Promise<number> {
 /** Advance the rotating cursor. Called by the cron refresher after each batch. */
 export async function setCursor(index: number): Promise<void> {
   const db = createSupabaseServiceClient();
-  await db.from(META_TABLE).upsert(
+  const { error } = await db.from(META_TABLE).upsert(
     { key: CURSOR_KEY, value: String(index), updated_at: new Date().toISOString() },
     { onConflict: "key" },
   );
+  if (error) throw new Error(`setCursor failed: ${error.message} (code: ${error.code})`);
 }
