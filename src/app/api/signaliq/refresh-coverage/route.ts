@@ -72,7 +72,12 @@ export async function GET(req: NextRequest) {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      results.push(`error:${topic}:${msg}`);
+      // GDELT returns 429 when rate-limited — treat as throttled, not a hard error
+      if (msg.includes("429")) {
+        results.push(`throttled:${topic}`);
+      } else {
+        results.push(`error:${topic}:${msg}`);
+      }
     }
   }
 
