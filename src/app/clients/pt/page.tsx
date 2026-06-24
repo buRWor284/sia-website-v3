@@ -21,7 +21,7 @@ const ASSETS: Asset[] = [
   {
     href: "/clients/pt/leverage-score.html",
     title: "Negotiation Leverage Score",
-    desc: "Interactive engine: pick a specialty, region, and state to see a 0–100 bargaining-power score, the levers most worth pushing, and a tailored readout. Every figure cites a report page.",
+    desc: "Interactive engine: pick a specialty, region, and state to see a 0-100 bargaining-power score, the levers most worth pushing, and a tailored readout. Every figure cites a report page.",
     tag: "Interactive demo",
     cta: "Open the tool →",
   },
@@ -58,7 +58,7 @@ export default function PtClientWorkspace() {
             Private workspace · Physicians Thrive
           </div>
           <h1 style={{ fontSize: 32, lineHeight: 1.15, fontWeight: 800, maxWidth: 720 }}>
-            Physicians Thrive — client workspace
+            Physicians Thrive: client workspace
           </h1>
           <p style={{ marginTop: 12, maxWidth: 640, opacity: 0.92, fontSize: 16 }}>
             Working assets prepared by Syed Irfan Ajmal. These are shared privately for review and are not published publicly.

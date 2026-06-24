@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Negotiation Leverage Score — Physicians Thrive (Demo)</title>
+<title>Negotiation Leverage Score | Physicians Thrive (Demo)</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230c6cb4'/><text x='16' y='22' font-family='Arial,sans-serif' font-size='14' font-weight='bold' text-anchor='middle' fill='white'>PT</text></svg>">
 <style>
   :root{
     --navy:#0b2545; --navy2:#13315c; --teal:#1f7a8c; --ink:#1a2330; --muted:#5b6877;
@@ -15,6 +16,13 @@
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased}
   .wrap{max-width:1040px;margin:0 auto;padding:0 20px 60px}
+  .topnav{background:#fff;border-bottom:1px solid var(--line);padding:10px 0;position:sticky;top:0;z-index:40}
+  .topnav .wrap{padding-bottom:0;display:flex;align-items:center;gap:4px}
+  .topnav a{font-size:13px;font-weight:600;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:7px;transition:.15s;white-space:nowrap}
+  .topnav a:hover{background:var(--bg);color:var(--navy)}
+  .topnav a.active{background:rgba(11,37,69,.08);color:var(--navy2)}
+  .topnav .divider{width:1px;height:16px;background:var(--line);margin:0 4px}
+  @media(max-width:600px){.topnav .wrap{gap:2px}}
   header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:26px 0 22px}
   header .wrap{padding-bottom:0}
   .brand{display:flex;align-items:center;gap:12px}
@@ -69,6 +77,15 @@
 </style>
 </head>
 <body>
+<nav class="topnav">
+  <div class="wrap">
+    <a href="/clients/pt/">← Physicians Thrive Tools</a>
+    <span class="divider"></span>
+    <a href="/clients/pt/leverage-score.html" class="active">Leverage Score</a>
+    <a href="/clients/pt/salary-estimator.html">Salary Estimator</a>
+  </div>
+</nav>
+
 <header>
   <div class="wrap">
     <div class="brand">
@@ -78,8 +95,8 @@
         <div class="sub">Powered by the Physicians Thrive 2020 Physician Compensation Report</div>
       </div>
     </div>
-    <div class="tagline">Enter a physician's specialty and market, and the engine returns a 0–100 bargaining-power
-      score with an actionable readout — every figure traceable to a page in the report.</div>
+    <div class="tagline">Enter a physician's specialty and market, and the engine returns a 0-100 bargaining-power
+      score with an actionable readout, with every figure traceable to a page in the report.</div>
     <div class="integrity">🔒&nbsp;<b>Data-fidelity guardrail:</b>&nbsp;no invented numbers. Missing figures read
       "not separately reported." The score is derived; all inputs are cited.</div>
   </div>
@@ -90,7 +107,7 @@
     <div>
       <label for="spec">Specialty</label>
       <select id="spec" onchange="render()">
-        <optgroup label="Full score — demand growth reported (p.14)">
+        <optgroup label="Full score: demand growth reported (p.14)">
           <option value="psychiatry">Psychiatry</option>
           <option value="family" selected>Family Medicine</option>
           <option value="internal">Internal Medicine</option>
@@ -98,7 +115,7 @@
           <option value="anesthesiology">Anesthesiology</option>
           <option value="pediatrics">Pediatrics</option>
         </optgroup>
-        <optgroup label="Partial — demand not separately reported">
+        <optgroup label="Partial: demand not separately reported">
           <option value="cardiology">Cardiology</option>
           <option value="dermatology">Dermatology</option>
         </optgroup>
@@ -116,7 +133,7 @@
     <div>
       <label for="state">State (optional)</label>
       <select id="state" onchange="render()">
-        <option value="none">— not specified —</option>
+        <option value="none">(not specified)</option>
         <optgroup label="Most likely to face shortage (+8, p.15)">
           <option value="WY">Wyoming</option><option value="MT">Montana</option>
           <option value="MS">Mississippi</option><option value="OK">Oklahoma</option>
@@ -139,21 +156,21 @@
           <circle id="arc" cx="100" cy="100" r="84" fill="none" stroke="#0e9f6e" stroke-width="18"
                   stroke-linecap="round" stroke-dasharray="0 528"/>
         </svg>
-        <div class="val"><div class="num" id="scoreNum">—</div><div class="of">out of 100</div></div>
+        <div class="val"><div class="num" id="scoreNum"></div><div class="of">out of 100</div></div>
       </div>
-      <div class="tierpill" id="tierPill">—</div>
+      <div class="tierpill" id="tierPill"></div>
     </div>
 
     <div class="panel readout">
-      <h2 class="headline" id="headline">—</h2>
-      <p class="rationale" id="rationale">—</p>
-      <h3 class="sec">Most winnable levers — ranked by how commonly they're awarded</h3>
+      <h2 class="headline" id="headline"></h2>
+      <p class="rationale" id="rationale"></p>
+      <h3 class="sec">Most winnable levers, ranked by how commonly they are awarded</h3>
       <div class="levers" id="levers"></div>
     </div>
   </div>
 
   <div class="ctabar">
-    <p id="cta">—</p>
+    <p id="cta"></p>
     <a href="#" onclick="return false;">Get a Contract Review →</a>
   </div>
 
@@ -167,7 +184,7 @@
     <span class="tag">reported</span> are quoted directly with page references; the score is
     <span class="tag derived">derived</span> from the published scoring formula. Where the report does not
     break out a figure for the chosen specialty, the engine states <span class="tag warn">not separately reported</span>
-    rather than estimating. &nbsp;Demo styling is neutral — brand colors and logo are swappable to the Physicians Thrive system.
+    rather than estimating. &nbsp;Demo styling is neutral; brand colors and logo are swappable to the Physicians Thrive system.
   </footer>
 </div>
 
@@ -225,10 +242,10 @@ function compute(){
 
 function headlineFor(tier, demandReported){
   const base = {
-    "Strong leverage":"Strong leverage — employers are competing to hire you",
-    "Above-average leverage":"Above-average leverage — you have real room to negotiate",
-    "Moderate leverage":"Moderate leverage — targeted asks can still move the offer",
-    "Limited leverage":"Limited leverage — expert strategy matters most here"
+    "Strong leverage":"Strong leverage: employers are competing to hire you",
+    "Above-average leverage":"Above-average leverage: you have real room to negotiate",
+    "Moderate leverage":"Moderate leverage: targeted asks can still move the offer",
+    "Limited leverage":"Limited leverage: expert strategy matters most here"
   }[tier.label];
   return base;
 }
@@ -251,28 +268,28 @@ function rationaleFor(r){
 
 function leversFor(r){
   // Ranked by prevalence / how commonly awarded (p.10, p.12)
-  const tierAdj = r.tier.label==="Strong leverage" ? "With leverage this high, anchor high and hold firm —"
-                 : r.tier.label==="Above-average leverage" ? "You have room to push —"
-                 : "Even here it's worth asking —";
+  const tierAdj = r.tier.label==="Strong leverage" ? "With leverage this high, anchor high and hold firm."
+                 : r.tier.label==="Above-average leverage" ? "You have room to push."
+                 : "Even here it's worth asking.";
   return [
     {lever:"Signing bonus",
      why:`Most commonly awarded lever. ${tierAdj} aim above the all-physician average.`,
      ev:`70% of physicians earned one; avg $32,692 [reported, p.10]`},
     {lever:"RVU / productivity incentive",
-     why:`Equally common and rising — negotiate the conversion factor and threshold, since it scales with your volume.`,
+     why:`Equally common and rising. Negotiate the conversion factor and threshold, since it scales with your volume.`,
      ev:`70% earned an RVU-based bonus, up from 50% [reported, p.10]`},
     {lever:"Loan repayment",
-     why:`Increasingly offered, especially in shortage markets like the ${r.rg.label} — ask for it explicitly.`,
+     why:`Increasingly offered, especially in shortage markets like the ${r.rg.label}. Ask for it explicitly.`,
      ev:`31% of physicians received it, up from 18% [reported, p.12]`}
   ];
 }
 
 function ctaFor(tier){
   return {
-    "Strong leverage":"Your leverage is at its peak right now — a Physicians Thrive contract review converts it into locked-in signing and RVU terms before you sign.",
-    "Above-average leverage":"You have real negotiating room — a Physicians Thrive contract review helps you capture it across bonus, RVU, and loan-repayment terms.",
-    "Moderate leverage":"This is exactly where expert help pays for itself — a Physicians Thrive contract review pinpoints the terms still worth pushing.",
-    "Limited leverage":"When leverage is tight, strategy is everything — a Physicians Thrive contract review protects you on the terms that matter most."
+    "Strong leverage":"Employers are competing for you right now. Get a contract review before you sign; this is exactly when signing and RVU terms are easiest to lock in.",
+    "Above-average leverage":"There's real room to push here. A Physicians Thrive contract review can help you find the right spots across bonus, RVU, and loan-repayment terms.",
+    "Moderate leverage":"Expert strategy is where modest leverage turns into real gains. Physicians Thrive has seen enough contracts to know which terms still have give.",
+    "Limited leverage":"Tight market, but the contract terms still matter. A Physicians Thrive review makes sure you're protected on the points that move the most money."
   }[tier.label];
 }
 
