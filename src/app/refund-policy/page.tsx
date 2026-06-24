@@ -6,7 +6,9 @@ import { GROT, INK, INK15, INK55, INK70, PAPER, SERIF, YEL } from "@/lib/tokens"
 
 export const metadata: Metadata = {
   title: "Refund Policy",
-  robots: { index: false },
+  description:
+    "EMOS refund terms, including our placements-or-refund guarantee, eligibility, and how to request a refund.",
+  alternates: { canonical: "/refund-policy" },
 };
 
 const LAST_UPDATED = "June 4, 2026";

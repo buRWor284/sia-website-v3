@@ -22,6 +22,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/gallery",        changeFrequency: "monthly" as const, priority: 0.5 },
     { url: "/ventures",       changeFrequency: "monthly" as const, priority: 0.5 },
     { url: "/newsletter",     changeFrequency: "yearly"  as const, priority: 0.5 },
+    { url: "/privacy",        changeFrequency: "yearly"  as const, priority: 0.3 },
+    { url: "/terms",          changeFrequency: "yearly"  as const, priority: 0.3 },
+    { url: "/refund-policy",  changeFrequency: "yearly"  as const, priority: 0.3 },
     // Resource playbooks
     { url: "/resources/personal-branding", changeFrequency: "yearly" as const, priority: 0.7 },
     { url: "/resources/storytelling",      changeFrequency: "yearly" as const, priority: 0.7 },

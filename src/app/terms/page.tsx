@@ -6,7 +6,9 @@ import { GROT, INK, INK15, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
-  robots: { index: false },
+  description:
+    "The terms governing your use of EMOS and Syed Irfan Ajmal's services — access, payments, responsibilities, and limitations.",
+  alternates: { canonical: "/terms" },
 };
 
 const LAST_UPDATED = "June 4, 2026";

@@ -6,7 +6,9 @@ import { GROT, INK, INK15, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  robots: { index: false },
+  description:
+    "How Syed Irfan Ajmal and EMOS collect, use, and protect your information — data, payments, cookies, and your privacy rights.",
+  alternates: { canonical: "/privacy" },
 };
 
 const LAST_UPDATED = "June 4, 2026";
