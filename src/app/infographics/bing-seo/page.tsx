@@ -1,6 +1,7 @@
 import React from "react";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { HRule, Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
+import { InfographicShare } from "@/components/bureau/InfographicShare";
 import {
   BLUE,
   CALENDLY,
@@ -308,6 +309,8 @@ export default function BingSeoGuidePage() {
         .bsi-card[open] > summary .bsi-hint::after { content: " (hide)"; }
         .bsi-card[open] > summary .bsi-hint { opacity: .6; }
         .bsi-toc a:hover span { color: ${INK}; }
+        .bsi-toc a.bsi-active { border-left: 3px solid ${YEL}; padding-left: 10px; margin-left: -13px; }
+        .bsi-toc a.bsi-active span { color: ${INK} !important; font-weight: 700; }
         @media (max-width: 900px) {
           .bsi-shell { grid-template-columns: 1fr !important; }
           .bsi-toc { position: static !important; max-height: none !important; overflow: visible !important; border-right: none !important; border-bottom: 1px solid ${INK15}; }
@@ -429,6 +432,9 @@ export default function BingSeoGuidePage() {
             ))}
           </div>
         </div>
+
+        {/* Take-away: email-gated static download + open embed code */}
+        <InfographicShare />
       </section>
 
       {/* ── 02 · The guide ─────────────────────────────────────── */}
@@ -590,6 +596,33 @@ export default function BingSeoGuidePage() {
 
       <Subscriptions sectionNumber="05" />
       <Colophon />
+
+      {/* Scroll-spy: highlights the active TOC entry as you read */}
+      <script dangerouslySetInnerHTML={{ __html: `
+        (function () {
+          var ids = ${JSON.stringify(TOC.map((t) => t.id))};
+          var links = {};
+          ids.forEach(function (id) {
+            var a = document.querySelector('.bsi-toc a[href="#' + id + '"]');
+            if (a) links[id] = a;
+          });
+          function update() {
+            var trigger = window.scrollY + window.innerHeight * 0.25;
+            var current = ids[0];
+            ids.forEach(function (id) {
+              var el = document.getElementById(id);
+              if (el && el.getBoundingClientRect().top + window.scrollY <= trigger) {
+                current = id;
+              }
+            });
+            ids.forEach(function (id) {
+              if (links[id]) links[id].classList.toggle('bsi-active', id === current);
+            });
+          }
+          window.addEventListener('scroll', update, { passive: true });
+          update();
+        })();
+      ` }} />
     </div>
   );
 }
