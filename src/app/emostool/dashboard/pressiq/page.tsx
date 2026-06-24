@@ -40,17 +40,25 @@ interface DbScore {
 export default async function PressIQPlatformPage({
   searchParams,
 }: {
-  searchParams: Promise<{ beat?: string; journalist?: string }>;
+  searchParams: Promise<{ beat?: string; journalist?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
 }) {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/sign-in");
   if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const params = await searchParams;
-  const initialQuery = params.beat
-    ? decodeURIComponent(params.beat)
-    : params.journalist
-    ? decodeURIComponent(params.journalist)
+  const assetTitle = params.assetTitle ? decodeURIComponent(params.assetTitle) : null;
+  const assetType  = params.assetType  ? decodeURIComponent(params.assetType)  : null;
+  const assetIdea  = params.assetIdea  ? decodeURIComponent(params.assetIdea)  : null;
+
+  // Build query pre-fill: beat + journalist + asset context combined
+  const beatPart      = params.beat       ? decodeURIComponent(params.beat)       : "";
+  const journalistPart = params.journalist ? decodeURIComponent(params.journalist) : "";
+  const assetPart     = assetTitle        ? ` — pitching asset: ${assetTitle}`    : "";
+  const initialQuery  = beatPart
+    ? `${beatPart}${assetPart}`
+    : journalistPart
+    ? `${journalistPart}${assetPart}`
     : "";
 
   const token = await getToken();
@@ -85,6 +93,21 @@ export default async function PressIQPlatformPage({
 
       <div style={{ maxWidth: 1200, marginInline: "auto", padding: "32px clamp(20px,4vw,56px) 80px" }}>
 
+        {/* Asset context banner — shown when arriving from JournoCollabIQ */}
+        {assetTitle && (
+          <div style={{ background: "rgba(245,184,31,.12)", border: `1px solid ${YEL}`, padding: "12px 18px", marginBottom: 24, display: "flex", alignItems: "flex-start", gap: 14 }}>
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 8px", flexShrink: 0 }}>Scoring pitches for</span>
+            <div>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: INK }}>{assetTitle}</div>
+              {assetType && <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, marginTop: 2 }}>{assetType.replace(/_/g, " ")}</div>}
+              {assetIdea && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, marginTop: 4, lineHeight: 1.45 }}>{assetIdea}</div>}
+            </div>
+            <a href="/emostool/dashboard/assetiq" style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: "1px solid rgba(26,20,16,.2)", flexShrink: 0 }}>
+              ← Back to AssetIQ
+            </a>
+          </div>
+        )}
+
         {/* Stats strip */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", border: `1px solid ${INK}`, marginBottom: 32 }}>
           {[
@@ -102,7 +125,14 @@ export default async function PressIQPlatformPage({
 
         <PressIQPlatformClient initialScores={rows} initialQuery={initialQuery} />
 
-        <PipelineNav current="press" />
+        <PipelineNav
+          current="press"
+          nextHref={
+            rows[0]?.journalist_query
+              ? `/emostool/dashboard/coverageiq?pitch=${encodeURIComponent(rows[0].journalist_query.slice(0, 200))}`
+              : undefined
+          }
+        />
       </div>
     </div>
   );

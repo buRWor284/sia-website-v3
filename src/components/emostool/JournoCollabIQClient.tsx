@@ -221,7 +221,8 @@ function JournalistCard({
           <div style={{ background: PAPER2, border: `1px solid ${INK15}`, padding: "12px 14px" }}>
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 8 }}>Tailored pitch angle</div>
             <pre style={{ margin: 0, fontFamily: SERIF, fontSize: 13, color: INK, lineHeight: 1.6, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{angle}</pre>
-            <a href={`/emostool/dashboard/pressiq?beat=${encodeURIComponent(formData.industry ?? "")}&journalist=${encodeURIComponent(j.name)}`}
+            <a
+              href={`/emostool/dashboard/pressiq?beat=${encodeURIComponent(formData.industry ?? "")}&journalist=${encodeURIComponent(j.name)}${prefillAssetTitle ? `&assetTitle=${encodeURIComponent(prefillAssetTitle)}` : ""}${prefillAssetType ? `&assetType=${encodeURIComponent(prefillAssetType)}` : ""}${prefillAssetIdea ? `&assetIdea=${encodeURIComponent(prefillAssetIdea.slice(0, 300))}` : ""}`}
               style={{ display: "inline-block", marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}>
               Score this pitch in PressIQ →
             </a>

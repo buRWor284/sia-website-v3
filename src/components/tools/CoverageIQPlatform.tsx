@@ -1289,16 +1289,18 @@ interface PitchForm {
 
 function NewPitchModal({
   journalists,
+  prefillSubject,
   onClose,
   onSubmit,
 }: {
   journalists: DbJournalist[];
+  prefillSubject?: string;
   onClose: () => void;
   onSubmit: (input: CreatePitchInput) => Promise<void>;
 }) {
   const [form, setForm] = useState<PitchForm>({
-    subject: "", journalist_id: "", client: "", peso_type: "Earned",
-    stage: "drafted", team: "", data_source: "manual", notes: "",
+    subject: prefillSubject ?? "", journalist_id: "", client: "", peso_type: "Earned",
+    stage: "drafted", team: "", data_source: "PressIQ", notes: "",
   });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -1449,16 +1451,19 @@ interface CoverageIQPlatformProps {
   initialPitches: DbPitch[];
   initialJournalists: DbJournalist[];
   initialAlerts: DbAlert[];
+  prefillSubject?: string; // pre-seed "new pitch" modal subject from PressIQ handoff
 }
 
 export default function CoverageIQPlatform({
   initialPitches,
   initialJournalists,
   initialAlerts,
+  prefillSubject,
 }: CoverageIQPlatformProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("pipeline");
-  const [showModal, setShowModal] = useState(false);
+  // Auto-open modal if arriving from PressIQ with a pitch subject pre-filled
+  const [showModal, setShowModal] = useState(!!prefillSubject);
   const [isPending, startTransition] = useTransition();
 
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -1615,6 +1620,7 @@ export default function CoverageIQPlatform({
       {showModal && (
         <NewPitchModal
           journalists={initialJournalists}
+          prefillSubject={prefillSubject}
           onClose={() => setShowModal(false)}
           onSubmit={async (input) => { await handleCreatePitch(input); setShowModal(false); }}
         />
