@@ -46,9 +46,14 @@ export default function NotInvitedPage() {
           </SignOutButton>
         </div>
 
-        <p style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK35, marginTop: 40 }}>
-          To request access, contact Irfan directly.
-        </p>
+        <a
+          href="https://tally.so/r/A7a17y"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: "inline-block", marginTop: 32, padding: "10px 24px", background: "transparent", border: `1px solid ${YEL}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}
+        >
+          Request Access →
+        </a>
 
       </div>
     </div>
