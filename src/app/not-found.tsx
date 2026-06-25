@@ -124,17 +124,17 @@ export default function NotFound() {
           justifyContent: "center",
           alignItems: "center",
           textAlign: "center",
-          paddingTop: 64,
-          paddingBottom: 80,
+          paddingTop: 24,
+          paddingBottom: 40,
         }}
       >
         {/* Reporter illustration */}
-        <div style={{ marginBottom: 36 }}>
+        <div style={{ marginBottom: 20 }}>
           <Image
             src="/images/404-reporter.png"
             alt="A confused reporter standing at a crossroads signpost labelled Home, EMOS, and Resources"
-            width={420}
-            height={280}
+            width={360}
+            height={240}
             priority
             style={{ maxWidth: "100%", height: "auto" }}
           />
@@ -144,36 +144,22 @@ export default function NotFound() {
           style={{
             fontFamily: SERIF,
             fontWeight: 700,
-            fontSize: "clamp(30px, 5vw, 60px)",
-            lineHeight: 1.04,
-            letterSpacing: "-0.03em",
+            fontSize: "clamp(24px, 4vw, 48px)",
+            lineHeight: 1.1,
+            letterSpacing: "-0.02em",
             color: INK,
             maxWidth: 640,
-            margin: 0,
+            margin: "0 0 24px",
+            fontStyle: "italic",
           }}
         >
-          My source said it was here.
+          Whatever you were chasing has moved on. Here&rsquo;s where to pick up the trail:
         </h1>
 
-        <p
-          style={{
-            marginTop: 16,
-            fontFamily: SERIF,
-            fontStyle: "italic",
-            fontSize: 19,
-            color: INK70,
-            maxWidth: 500,
-            lineHeight: 1.55,
-          }}
-        >
-          Whatever you were chasing has moved on — but the story isn&rsquo;t over.
-          Here&rsquo;s where to pick up the trail:
-        </p>
-
-        <DoubleRule style={{ marginTop: 36, marginBottom: 36, maxWidth: 200 }} />
+        <DoubleRule style={{ marginTop: 0, marginBottom: 24, maxWidth: 200 }} />
 
         {/* Quick nav links */}
-        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center", marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
           <a
             href="/"
             style={{
@@ -222,7 +208,7 @@ export default function NotFound() {
           </a>
         </div>
 
-        <SCaps size={9} ls="0.18em" color={INK55} style={{ marginBottom: 56 }}>
+        <SCaps size={9} ls="0.18em" color={INK55} style={{ marginBottom: 32 }}>
           Or try: &nbsp;
           <a href="/about" style={{ color: INK, textDecoration: "underline" }}>About</a> &nbsp;&middot;&nbsp;
           <a href="/podcast" style={{ color: INK, textDecoration: "underline" }}>Podcast</a> &nbsp;&middot;&nbsp;
