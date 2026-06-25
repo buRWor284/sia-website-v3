@@ -12,7 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
-const ADMIN_EMAIL = "syedirfanajmal@gmail.com";
+const ADMIN_EMAILS = ["syedirfanajmal@gmail.com", "sia@syedirfanajmal.com"];
 
 export async function POST(req: NextRequest) {
   // Must be signed in
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   }
   const userData = await userRes.json();
   const callerEmail = userData.email_addresses?.[0]?.email_address;
-  if (callerEmail !== ADMIN_EMAIL) {
+  if (!ADMIN_EMAILS.includes(callerEmail)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
