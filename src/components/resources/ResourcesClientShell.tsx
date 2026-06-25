@@ -1479,53 +1479,56 @@ function GuidedPipeline() {
   return (
     <section className="sx" style={{ background: PAPER }}>
       <style>{`
-        .gp-wrap{ max-width:1200px; margin:0 auto; padding:40px clamp(20px,5vw,64px) 8px; }
-        .gp-head{ border-bottom:2px solid ${INK}; padding-bottom:18px; margin-bottom:24px; }
+        .gp-wrap{ max-width:860px; margin:0 auto; padding:56px clamp(20px,5vw,64px) 32px; }
+        .gp-head{ border-bottom:2px solid ${INK}; padding-bottom:24px; margin-bottom:40px; }
         .gp-kicker{ font-family:${GROT}; font-weight:800; font-size:10px; letter-spacing:.28em; text-transform:uppercase; color:${INK55}; }
-        .gp-title{ font-family:${SERIF}; font-weight:700; font-size:clamp(30px,4vw,44px); line-height:1.02; margin:8px 0 6px; letter-spacing:-.015em; color:${INK}; }
-        .gp-sub{ font-family:${SERIF}; font-size:16px; color:${INK70}; margin:0; max-width:62ch; }
-        .gp-ladder{ margin-top:16px; background:${PAPER2}; border-left:3px solid ${YEL}; padding:9px 14px; font-family:${GROT}; font-size:11px; letter-spacing:.03em; color:${INK70}; }
+        .gp-title{ font-family:${SERIF}; font-weight:700; font-size:clamp(30px,4vw,44px); line-height:1.02; margin:10px 0 10px; letter-spacing:-.015em; color:${INK}; }
+        .gp-sub{ font-family:${SERIF}; font-size:17px; color:${INK70}; margin:0; max-width:62ch; line-height:1.6; }
+        .gp-ladder{ margin-top:20px; background:${PAPER2}; border-left:3px solid ${YEL}; padding:12px 16px; font-family:${GROT}; font-size:11px; letter-spacing:.03em; color:${INK70}; }
         .gp-ladder b{ color:${INK}; }
         .gp-ladder span{ color:${INK}; font-weight:700; border-bottom:2px solid ${YEL}; }
-        .gp-foundation{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:22px; }
-        .gp-found-grp{ background:${PAPER2}; border:1px solid ${INK15}; padding:14px 16px; }
-        .gp-found-label{ font-family:${GROT}; font-weight:800; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:${INK55}; margin-bottom:6px; }
+        .gp-section-break{ display:flex; align-items:center; gap:14px; margin:48px 0 28px; }
+        .gp-section-break-label{ font-family:${GROT}; font-weight:800; font-size:9px; letter-spacing:.28em; text-transform:uppercase; color:${INK55}; white-space:nowrap; }
+        .gp-section-break-line{ flex:1; height:1px; background:${INK15}; }
+        .gp-foundation{ display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:0; }
+        .gp-found-grp{ background:${PAPER2}; border:1px solid ${INK15}; padding:20px 22px; }
+        .gp-found-label{ font-family:${GROT}; font-weight:800; font-size:9px; letter-spacing:.18em; text-transform:uppercase; color:${INK55}; margin-bottom:12px; }
         .gp-chips{ display:flex; flex-direction:column; }
-        .gp-chip{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-family:${SERIF}; font-size:15px; padding:7px 0; border-bottom:1px dotted ${INK15}; color:${INK}; text-decoration:none; }
+        .gp-chip{ display:flex; justify-content:space-between; align-items:center; gap:8px; font-family:${SERIF}; font-size:16px; padding:11px 0; border-bottom:1px solid ${INK15}; color:${INK}; text-decoration:none; }
         .gp-chip:last-child{ border-bottom:none; }
         .gp-chip-link:hover .gp-chip-tag{ text-decoration:underline; }
         .gp-chip-tag{ font-family:${GROT}; font-size:9px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:${INK55}; white-space:nowrap; }
-        .gp-phases{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .gp-phases{ display:grid; grid-template-columns:1fr; gap:24px; }
         .gp-panel{ border:1px solid ${INK}; background:${PAPER}; }
-        .gp-panel-head{ padding:12px 16px; border-bottom:1px solid ${INK}; }
+        .gp-panel-head{ padding:20px 24px; border-bottom:1px solid ${INK}; }
         .gp-panel-reactive .gp-panel-head{ background:${INK}; }
         .gp-panel-reactive .gp-panel-n, .gp-panel-reactive .gp-panel-t{ color:${PAPER}; }
         .gp-panel-reactive .gp-panel-w{ color:rgba(250,250,250,.6); }
         .gp-panel-proactive .gp-panel-head{ background:${YEL}; }
         .gp-panel-n{ font-family:${GROT}; font-weight:800; font-size:9px; letter-spacing:.24em; text-transform:uppercase; opacity:.75; }
-        .gp-panel-t{ font-family:${SERIF}; font-weight:700; font-size:20px; line-height:1.05; margin-top:2px; color:${INK}; }
-        .gp-panel-w{ font-family:${GROT}; font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; margin-top:5px; color:${INK55}; }
-        .gp-panel-body{ padding:4px 16px 12px; }
-        .gp-step{ display:flex; gap:12px; padding:13px 0; border-bottom:1px solid ${INK15}; text-decoration:none; color:${INK}; }
-        .gp-step:last-child{ border-bottom:none; }
+        .gp-panel-t{ font-family:${SERIF}; font-weight:700; font-size:24px; line-height:1.05; margin-top:4px; color:${INK}; }
+        .gp-panel-w{ font-family:${GROT}; font-size:10px; letter-spacing:.06em; text-transform:uppercase; margin-top:6px; color:${INK55}; }
+        .gp-panel-body{ padding:8px 24px 20px; }
+        .gp-step{ display:flex; gap:16px; padding:20px 0; border-bottom:1px solid ${INK15}; text-decoration:none; color:${INK}; }
+        .gp-step:last-child{ border-bottom:none; padding-bottom:4px; }
         .gp-step-link{ cursor:pointer; }
         .gp-step-link:hover .gp-step-tool{ text-decoration:underline; }
-        .gp-num{ flex-shrink:0; width:26px; height:26px; border:1px solid ${INK}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:${GROT}; font-weight:800; font-size:12px; color:${INK}; }
+        .gp-num{ flex-shrink:0; width:30px; height:30px; border:1px solid ${INK}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:${GROT}; font-weight:800; font-size:12px; color:${INK}; margin-top:2px; }
         .gp-step-label{ font-family:${GROT}; font-weight:800; font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; color:${INK55}; }
-        .gp-step-tool{ font-family:${SERIF}; font-weight:700; font-size:17px; line-height:1.15; margin:1px 0 4px; color:${INK}; }
-        .gp-arrow{ font-family:${GROT}; font-size:12px; color:${INK55}; }
-        .gp-step-cap{ font-family:${SERIF}; font-size:13px; color:${INK70}; line-height:1.3; }
-        .gp-step-meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:7px; }
-        .gp-week{ font-family:${GROT}; font-size:9.5px; letter-spacing:.04em; color:${INK55}; border:1px solid ${INK15}; padding:1px 5px; }
-        .gp-loop{ margin-top:20px; border:1px dashed ${INK}; background:${PAPER2}; padding:12px 16px; font-family:${GROT}; font-size:11px; letter-spacing:.04em; color:${INK70}; }
+        .gp-step-tool{ font-family:${SERIF}; font-weight:700; font-size:20px; line-height:1.2; margin:3px 0 6px; color:${INK}; }
+        .gp-arrow{ font-family:${GROT}; font-size:13px; color:${INK55}; }
+        .gp-step-cap{ font-family:${SERIF}; font-size:14.5px; color:${INK70}; line-height:1.5; }
+        .gp-step-meta{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:10px; }
+        .gp-week{ font-family:${GROT}; font-size:9.5px; letter-spacing:.04em; color:${INK55}; border:1px solid ${INK15}; padding:2px 7px; }
+        .gp-loop{ margin-top:28px; border:1px dashed ${INK}; background:${PAPER2}; padding:16px 20px; font-family:${GROT}; font-size:11.5px; letter-spacing:.04em; color:${INK70}; }
         .gp-loop b{ color:${INK}; }
-        .gp-cta{ margin-top:14px; background:${INK}; color:${PAPER}; padding:18px 20px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; text-decoration:none; }
-        .gp-cta .gp-cta-txt{ font-family:${SERIF}; font-size:18px; font-weight:700; }
+        .gp-cta{ margin-top:20px; background:${INK}; color:${PAPER}; padding:24px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; text-decoration:none; }
+        .gp-cta .gp-cta-txt{ font-family:${SERIF}; font-size:19px; font-weight:700; }
         .gp-cta em{ color:${YEL}; font-style:italic; }
-        .gp-cta-btn{ font-family:${GROT}; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; background:${YEL}; color:${INK}; padding:11px 18px; white-space:nowrap; }
+        .gp-cta-btn{ font-family:${GROT}; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; background:${YEL}; color:${INK}; padding:13px 20px; white-space:nowrap; }
         .gp-aside{ margin-top:14px; font-family:${GROT}; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:${INK55}; }
         .gp-aside b{ color:${INK70}; }
-        @media (max-width:880px){ .gp-foundation{ grid-template-columns:1fr; } .gp-phases{ grid-template-columns:1fr; } }
+        @media (max-width:600px){ .gp-foundation{ grid-template-columns:1fr; } }
       `}</style>
 
       <div className="gp-wrap">
@@ -1545,6 +1548,12 @@ function GuidedPipeline() {
             <div className="gp-found-label">Foundation · Make the case</div>
             <div className="gp-chips">{FOUNDATION_CASE.map((c) => <FoundationChip key={c.id} name={c.name} id={c.id} />)}</div>
           </div>
+        </div>
+
+        <div className="gp-section-break">
+          <span className="gp-section-break-label">The Pipeline</span>
+          <div className="gp-section-break-line" />
+          <span className="gp-section-break-label">8 Steps</span>
         </div>
 
         <div className="gp-phases">
