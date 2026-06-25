@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { Mark, Pill, SCaps, SectionMast } from "@/components/bureau/primitives";
+import { Mark, SCaps, SectionMast } from "@/components/bureau/primitives";
 import { GROT, INK, INK15, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -513,58 +513,8 @@ const TOPIC_LABEL: Record<TopicKey, string> = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// NEWSPAPER SNIPPET
+// HELPERS
 // ─────────────────────────────────────────────────────────────────────────────
-
-function NewspaperSnippet({ headline, deck }: { headline: string; deck: string }) {
-  return (
-    <div
-      aria-hidden
-      style={{
-        flex: 1,
-        minHeight: 72,
-        background: PAPER2,
-        border: `1px solid ${INK}`,
-        padding: "8px 10px",
-        overflow: "hidden",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 3 }}>
-        <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 6, letterSpacing: "0.28em", textTransform: "uppercase", color: INK55 }}>
-          Irfan Ajmal
-        </span>
-        <span style={{ fontFamily: GROT, fontSize: 6, color: "rgba(26,20,16,.32)", letterSpacing: "0.12em" }}>
-          MMXXVI
-        </span>
-      </div>
-      <div style={{ borderTop: `2px solid ${INK}`, marginBottom: 2 }} />
-      <div style={{ borderTop: `0.75px solid ${INK}`, marginBottom: 7 }} />
-      <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12, color: INK, lineHeight: 1.15, textTransform: "uppercase", letterSpacing: "-0.005em", marginBottom: 5 }}>
-        {headline}
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 7px", borderTop: "0.5px solid rgba(26,20,16,.2)", paddingTop: 4 }}>
-        <div style={{ fontFamily: SERIF, fontSize: 7, color: INK55, lineHeight: 1.5 }}>{deck}</div>
-        <div style={{ fontFamily: SERIF, fontSize: 7, color: "rgba(26,20,16,.3)", lineHeight: 1.5 }}>
-          syedirfanajmal.com
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER: get card details for expand
-// ─────────────────────────────────────────────────────────────────────────────
-
-function getCardBlurb(item: ContentItem): string | null {
-  if (item.type === "guide") return null;
-  return (item as { blurb?: string }).blurb ?? null;
-}
-
-function getCardSub(item: ContentItem): string | null {
-  if (item.type === "guide" || item.type === "infographic" || item.type === "video") return null;
-  return (item as { sub?: string }).sub ?? null;
-}
 
 function getCardHref(item: ContentItem): string | null {
   if (item.type === "playbook") return `/resources/${item.slug}`;
@@ -576,7 +526,6 @@ function getCardHref(item: ContentItem): string | null {
   }
   if (item.type === "infographic") return (item as InfographicContent).href;
   if (item.type === "video") return `https://youtu.be/${(item as VideoContent).youtubeId}`;
-  // interactive
   const interactive = item as InteractiveContent;
   if (interactive.comingSoon) return null;
   return interactive.href;
@@ -616,426 +565,197 @@ function isExternal(item: ContentItem): boolean {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// BADGES
+// SECTION MAST — double-rule newspaper masthead
 // ─────────────────────────────────────────────────────────────────────────────
 
-function IndexLabel({ index }: { index: number }) {
+function LedgerSectionMast({ n, label, vol }: { n: string; label: string; vol: string }) {
   return (
-    <span
-      style={{
-        display: "inline-flex",
-        padding: "3px 7px 4px",
-        background: YEL,
-        color: INK,
-        fontFamily: GROT,
-        fontWeight: 800,
-        fontSize: 8.5,
-        letterSpacing: "0.16em",
-        lineHeight: 1,
-      }}
-    >
-      § {String(index + 1).padStart(2, "0")}
-    </span>
-  );
-}
-
-function BetaBadge({ open }: { open?: boolean }) {
-  return (
-    <span
-      style={{
-        padding: "2px 7px",
-        background: "#D4A017",
-        color: INK,
-        fontFamily: GROT,
-        fontWeight: 800,
-        fontSize: 7.5,
-        letterSpacing: "0.2em",
-        textTransform: "uppercase",
-      }}
-    >
-      Beta
-    </span>
-  );
-}
-
-function UnderReviewBadge({ open }: { open?: boolean }) {
-  return (
-    <span
-      style={{
-        padding: "3px 8px",
-        background: open ? "rgba(250,250,250,.15)" : "rgba(26,20,16,.1)",
-        color: open ? "rgba(250,250,250,.55)" : INK55,
-        fontFamily: GROT,
-        fontWeight: 800,
-        fontSize: 8,
-        letterSpacing: "0.2em",
-        textTransform: "uppercase",
-        border: `1px solid ${open ? "rgba(250,250,250,.2)" : INK15}`,
-      }}
-    >
-      Under Review
-    </span>
-  );
-}
-
-function ComingSoonBadge({ open }: { open?: boolean }) {
-  return (
-    <span
-      style={{
-        padding: "3px 8px",
-        background: open ? "rgba(250,250,250,.15)" : INK,
-        color: open ? "rgba(250,250,250,.55)" : PAPER,
-        fontFamily: GROT,
-        fontWeight: 800,
-        fontSize: 8,
-        letterSpacing: "0.2em",
-        textTransform: "uppercase",
-      }}
-    >
-      Coming Soon
-    </span>
+    <div style={{ marginTop: 40 }}>
+      <div style={{ borderTop: `1px solid ${INK}` }}><div style={{ marginTop: 3, borderTop: `3px solid ${INK}` }} /></div>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 0 7px" }}>
+        <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase" }}>§ {n}</span>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>{label}</span>
+        <div style={{ flex: 1, height: 1, background: "rgba(26,20,16,.35)" }} />
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>{vol}</span>
+      </div>
+      <div style={{ borderTop: `1px solid ${INK}` }} />
+    </div>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RESOURCE CARD — unified expandable card
+// LEDGER ROW — newspaper-style resource row
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ResourceCard({
-  item,
-  index,
-  isOpen,
-  onToggle,
-}: {
-  item: ContentItem;
-  index: number;
-  isOpen: boolean;
-  onToggle: () => void;
-}) {
+function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
   const [hover, setHover] = useState(false);
-  const accent = TYPE_ACCENT[item.type];
-  const blurb = getCardBlurb(item);
-  const sub = getCardSub(item);
   const href = getCardHref(item);
-  const ctaText = getCardCta(item);
-  const coming = isComingSoon(item);
   const ext = isExternal(item);
+  const coming = isComingSoon(item);
+  const clickable = !!(href && !coming);
 
-  // Badge label
-  const badgeLabel = item.badge;
-
-  return (
+  const inner = (
     <div
+      className="res-row"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
-        display: "flex",
-        flexDirection: "column",
-        background: isOpen ? INK : hover ? PAPER2 : PAPER,
-        cursor: "pointer",
-        transition: "background .22s, color .22s",
-        minHeight: isOpen ? undefined : 280,
-        height: "100%",
+        display: "grid",
+        gridTemplateColumns: "40px 150px 1fr 186px 36px",
+        gap: 20,
+        alignItems: "center",
+        padding: "22px 0",
+        borderBottom: `1px solid ${INK15}`,
+        background: hover && clickable ? PAPER2 : "transparent",
+        transition: "background 0.12s ease",
+        cursor: clickable ? "pointer" : "default",
+        textDecoration: "none",
+        color: INK,
       }}
-      onClick={onToggle}
     >
-      {/* ── Snippet row + toggle button ───────────────────────────────── */}
-      <div
-        style={{
-          display: isOpen ? "none" : "flex",
-          gap: 8,
-          padding: item.type === "video" ? "0" : "16px 16px 0",
-          alignItems: "stretch",
-        }}
-      >
-        {item.type === "video" ? (
-          <div style={{ flex: 1, position: "relative", overflow: "hidden", maxHeight: 160 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={`https://img.youtube.com/vi/${(item as VideoContent).youtubeId}/maxresdefault.jpg`}
-              alt={item.title}
-              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-            />
-            {/* Play badge overlay */}
-            <div style={{
-              position: "absolute", inset: 0,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: "rgba(0,0,0,.22)",
-            }}>
-              <div style={{
-                width: 44, height: 44,
-                background: "#C0392B",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <span style={{ color: "#fff", fontSize: 16, marginLeft: 3, lineHeight: 1 }}>▶</span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
-        )}
-        {item.type !== "video" && (
-          <button
-            onClick={(e) => { e.stopPropagation(); onToggle(); }}
-            style={{
-              width: 22,
-              height: 22,
-              flexShrink: 0,
-              border: `1px solid ${INK}`,
-              background: "none",
-              fontFamily: GROT,
-              fontWeight: 800,
-              fontSize: 14,
-              color: INK,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 0,
-              lineHeight: 1,
-            }}
-            aria-label="Expand card"
-          >
-            +
-          </button>
-        )}
+      {/* Index */}
+      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", color: INK55 }}>
+        {String(n).padStart(2, "0")}
       </div>
 
-      {/* ── Toggle button when open (top right) ──────────────────────── */}
-      {isOpen && (
-        <div style={{ display: "flex", justifyContent: "flex-end", padding: "12px 16px 0" }}>
-          <button
-            onClick={(e) => { e.stopPropagation(); onToggle(); }}
-            style={{
-              width: 22,
-              height: 22,
-              flexShrink: 0,
-              border: `1px solid ${PAPER}`,
-              background: "none",
-              fontFamily: GROT,
-              fontWeight: 800,
-              fontSize: 14,
-              color: PAPER,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 0,
-              lineHeight: 1,
-            }}
-            aria-label="Collapse card"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      {/* ── Type row (badge row) ──────────────────────────────────────── */}
-      <div
-        style={{
-          borderTop: `1px solid ${isOpen ? "rgba(250,250,250,.25)" : INK}`,
-          borderBottom: `1px solid ${isOpen ? "rgba(250,250,250,.25)" : INK}`,
-          borderLeft: `3px solid ${isOpen ? "rgba(250,250,250,.25)" : accent}`,
-          padding: "10px 20px",
-          marginTop: isOpen ? 8 : 12,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <IndexLabel index={index} />
-          <Pill size={10} ls="0.18em">{badgeLabel}</Pill>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          {item.beta && <BetaBadge open={isOpen} />}
-          {item.underReview && <UnderReviewBadge open={isOpen} />}
-          {coming && <ComingSoonBadge open={isOpen} />}
-        </div>
+      {/* Type pill */}
+      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 10px 6px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.15em", textTransform: "uppercase", whiteSpace: "nowrap", alignSelf: "start", marginTop: 2 }}>
+        {item.badge}
+        {item.beta && <span style={{ opacity: 0.6, fontWeight: 700 }}>β</span>}
       </div>
 
-      {/* ── Title + sub ──────────────────────────────────────────────── */}
-      <div style={{ padding: "14px 20px 0" }}>
-        <h3
-          style={{
-            margin: 0,
-            fontFamily: SERIF,
-            fontWeight: 700,
-            fontSize: 21,
-            letterSpacing: "-0.015em",
-            lineHeight: 1.1,
-            color: isOpen ? PAPER : INK,
-          }}
-        >
+      {/* Title + deck */}
+      <div>
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK }}>
           {item.title}
-        </h3>
-        {sub && (
-          <div
-            style={{
-              fontFamily: SERIF,
-              fontStyle: "italic",
-              fontSize: 14.5,
-              color: isOpen ? "rgba(250,250,250,.55)" : INK55,
-              marginTop: 5,
-            }}
-          >
-            {sub}
+        </div>
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, lineHeight: 1.55, color: INK70, marginTop: 6 }}>
+          {item.newsDeck}
+        </div>
+        {coming && (
+          <span style={{ display: "inline-block", marginTop: 8, padding: "3px 8px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+            Coming Soon
+          </span>
+        )}
+        {item.underReview && (
+          <span style={{ display: "inline-block", marginTop: 8, padding: "3px 8px", border: `1px solid ${INK15}`, color: INK55, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+            Under Review
+          </span>
+        )}
+        {/* Topics */}
+        {item.topics.length > 0 && (
+          <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 10 }}>
+            {item.topics.map((t) => (
+              <span key={t} style={{ padding: "2px 7px", border: `1px solid ${INK15}`, fontFamily: GROT, fontWeight: 700, fontSize: 7.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
+                {TOPIC_LABEL[t]}
+              </span>
+            ))}
           </div>
         )}
       </div>
 
-      {/* ── Closed footer ────────────────────────────────────────────── */}
-      {!isOpen && (
-        <div
-          style={{
-            marginTop: "auto",
-            borderTop: `1px solid ${INK15}`,
-            padding: "12px 20px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "baseline",
-          }}
-        >
-          <span
-            style={{
-              fontFamily: GROT,
-              fontSize: 9,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              color: INK55,
-            }}
-          >
-            {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
-          </span>
-          {!coming && href && (
-            <span
-              style={{
-                fontFamily: GROT,
-                fontSize: 10,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: INK,
-              }}
-            >
-              {ctaText} ↗
-            </span>
-          )}
+      {/* Source / headline */}
+      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, textAlign: "right", lineHeight: 1.5 }}>
+        {item.newsHeadline}
+        <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 600, fontSize: 8.5, color: "rgba(26,20,16,.32)" }}>
+          {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
         </div>
-      )}
+      </div>
 
-      {/* ── Open body: blurb, topics, CTA ────────────────────────────── */}
-      {isOpen && (
-        <div
-          style={{
-            padding: "14px 20px 20px",
-            display: "flex",
-            flexDirection: "column",
-            flex: 1,
-          }}
-        >
-          {blurb && (
-            <p
-              style={{
-                margin: "0 0 18px",
-                fontFamily: SERIF,
-                fontSize: 15.5,
-                color: "rgba(250,250,250,.78)",
-                lineHeight: 1.65,
-              }}
-            >
-              {blurb}
-            </p>
-          )}
+      {/* CTA arrow */}
+      <div className="res-cta" style={{ fontFamily: SERIF, fontSize: 22, color: hover && clickable ? YEL : INK, transition: "color 0.12s ease", textAlign: "center", lineHeight: 1 }}>
+        {clickable ? "→" : ""}
+      </div>
+    </div>
+  );
 
-          {/* Topic tags */}
-          {item.topics.length > 0 && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
-              {item.topics.map((t) => (
-                <span
-                  key={t}
-                  style={{
-                    padding: "4px 9px 5px",
-                    border: "1px solid rgba(250,250,250,.2)",
-                    fontFamily: GROT,
-                    fontWeight: 700,
-                    fontSize: 8.5,
-                    letterSpacing: "0.14em",
-                    textTransform: "uppercase",
-                    color: "rgba(250,250,250,.45)",
-                  }}
-                >
-                  {TOPIC_LABEL[t]}
-                </span>
-              ))}
-            </div>
-          )}
+  if (clickable && href) {
+    return (
+      <a href={href} target={ext ? "_blank" : undefined} rel={ext ? "noopener noreferrer" : undefined} style={{ display: "block", textDecoration: "none" }}>
+        {inner}
+      </a>
+    );
+  }
+  return inner;
+}
 
-          {/* CTA row */}
-          <div
-            style={{
-              borderTop: "1px solid rgba(250,250,250,.15)",
-              paddingTop: 16,
-              display: "flex",
-              alignItems: "center",
-              gap: 16,
-              marginTop: "auto",
-            }}
-          >
-            {coming ? (
-              <span
-                style={{
-                  fontFamily: GROT,
-                  fontWeight: 700,
-                  fontSize: 10,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: "rgba(250,250,250,.35)",
-                }}
-              >
-                Available Soon
+// ─────────────────────────────────────────────────────────────────────────────
+// RESOURCE LEDGER — grouped newspaper ledger
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ResourceLedger({
+  filtered,
+}: {
+  filtered: ContentItem[];
+}) {
+  const liveItems = filtered.filter((c) => !c.private);
+  const updatingItems = filtered.filter((c) => c.private);
+
+  if (liveItems.length === 0 && updatingItems.length === 0) {
+    return (
+      <div style={{ padding: "80px 56px", textAlign: "center" }}>
+        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK55, margin: 0 }}>
+          No resources match this filter.
+        </p>
+        <p style={{ marginTop: 10, fontFamily: GROT, fontSize: 10.5, color: "rgba(26,20,16,.32)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+          Try clearing a topic filter or selecting a different type.
+        </p>
+      </div>
+    );
+  }
+
+  // Group live items by type
+  const groups = GROUP_ORDER
+    .map((type) => ({ type, items: liveItems.filter((c) => c.type === type) }))
+    .filter((g) => g.items.length > 0);
+
+  let globalIndex = 0;
+
+  return (
+    <div id="resources" style={{ padding: "0 56px 90px" }}>
+      {groups.map((group, gi) => {
+        const startIndex = globalIndex;
+        globalIndex += group.items.length;
+        return (
+          <div key={group.type}>
+            {/* Category header */}
+            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "28px 0 12px", borderBottom: `1px solid ${INK}` }}>
+              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: INK, borderLeft: `3px solid ${TYPE_ACCENT[group.type]}`, paddingLeft: 10 }}>
+                {GROUP_LABEL[group.type]}
               </span>
-            ) : href ? (
-              <a
-                href={href}
-                target={ext ? "_blank" : undefined}
-                rel={ext ? "noopener noreferrer" : undefined}
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  padding: "10px 18px",
-                  border: `1px solid ${PAPER}`,
-                  background: "transparent",
-                  fontFamily: GROT,
-                  fontWeight: 700,
-                  fontSize: 10,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: PAPER,
-                  textDecoration: "none",
-                  transition: "background .15s, color .15s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = PAPER;
-                  e.currentTarget.style.color = INK;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.color = PAPER;
-                }}
-              >
-                {ctaText} ↗
-              </a>
-            ) : null}
-            <span
-              style={{
-                fontFamily: GROT,
-                fontSize: 9,
-                letterSpacing: "0.14em",
-                textTransform: "uppercase",
-                color: "rgba(250,250,250,.3)",
-              }}
-            >
-              {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
+              <div style={{ flex: 1, height: 1, background: INK15 }} />
+              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(26,20,16,.35)" }}>
+                {group.items.length} {group.items.length === 1 ? "item" : "items"}
+              </span>
+            </div>
+            {group.items.map((item, i) => (
+              <LedgerRow key={item.id} item={item} n={startIndex + i + 1} />
+            ))}
+          </div>
+        );
+      })}
+
+      {/* Being Updated section */}
+      {updatingItems.length > 0 && (
+        <div style={{ marginTop: 48 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>
+              Being Updated
             </span>
+            <div style={{ flex: 1, height: 1, background: INK15 }} />
+            <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.28)" }}>
+              {updatingItems.length} {updatingItems.length === 1 ? "item" : "items"}
+            </span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
+            {updatingItems.map((item) => (
+              <div key={item.id} style={{ background: PAPER, padding: "16px 18px 14px", opacity: 0.55, borderLeft: `3px solid ${TYPE_ACCENT[item.type]}` }}>
+                <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55, marginBottom: 8 }}>{item.badge}</div>
+                <h5 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
+                  {item.title}
+                </h5>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -1044,7 +764,7 @@ function ResourceCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FILTER BAR
+// FILTER BAR — light background, yellow active pills
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FilterBar({
@@ -1063,18 +783,18 @@ function FilterBar({
   count: number;
 }) {
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 100, background: INK, borderBottom: `2px solid ${YEL}` }}>
+    <div style={{ position: "sticky", top: 0, zIndex: 100, background: PAPER, borderBottom: `2px solid ${INK}` }}>
       {/* Row 1 — Type tabs */}
       <div
         style={{
           display: "flex", alignItems: "stretch",
-          padding: "0 20px",
+          padding: "0 56px",
           overflowX: "auto",
-          borderBottom: "1px solid rgba(250,250,250,.10)",
+          borderBottom: `1px solid ${INK15}`,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", paddingRight: 20, marginRight: 4, flexShrink: 0, borderRight: "1px solid rgba(250,250,250,.12)" }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(250,250,250,.3)" }}>
+        <div style={{ display: "flex", alignItems: "center", paddingRight: 20, marginRight: 4, flexShrink: 0, borderRight: `1px solid ${INK15}` }}>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(26,20,16,.35)" }}>
             Type
           </span>
         </div>
@@ -1091,14 +811,14 @@ function FilterBar({
                 background: "transparent",
                 fontFamily: GROT, fontWeight: isActive ? 800 : 600,
                 fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase",
-                color: isActive ? YEL : "rgba(250,250,250,.48)",
-                borderBottom: isActive ? `2px solid ${YEL}` : "2px solid transparent",
+                color: isActive ? INK : INK55,
+                borderBottom: isActive ? `2px solid ${INK}` : "2px solid transparent",
                 marginBottom: -2, whiteSpace: "nowrap",
                 transition: "color 0.12s, border-color 0.12s",
               }}
             >
               {tab.label}
-              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.06em", color: isActive ? YEL : "rgba(250,250,250,.22)" }}>
+              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.06em", color: isActive ? INK : "rgba(26,20,16,.28)" }}>
                 {cnt}
               </span>
             </button>
@@ -1107,8 +827,8 @@ function FilterBar({
       </div>
 
       {/* Row 2 — Topic pills */}
-      <div style={{ display: "flex", alignItems: "center", padding: "7px 20px", gap: 7, overflowX: "auto" }}>
-        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(250,250,250,.28)", flexShrink: 0, marginRight: 4 }}>
+      <div style={{ display: "flex", alignItems: "center", padding: "8px 56px", gap: 7, overflowX: "auto" }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(26,20,16,.32)", flexShrink: 0, marginRight: 4 }}>
           Topic
         </span>
         {TOPIC_PILLS.map((topic) => {
@@ -1119,9 +839,9 @@ function FilterBar({
               onClick={() => toggleTopic(topic.id)}
               style={{
                 padding: "5px 12px 6px",
-                border: `1px solid ${isActive ? YEL : "rgba(250,250,250,.18)"}`,
+                border: `1px solid ${isActive ? INK : "rgba(26,20,16,.25)"}`,
                 background: isActive ? YEL : "transparent",
-                color: isActive ? INK : "rgba(250,250,250,.5)",
+                color: isActive ? INK : INK55,
                 fontFamily: GROT, fontWeight: isActive ? 800 : 600,
                 fontSize: 9.5, letterSpacing: "0.14em", textTransform: "uppercase",
                 cursor: "pointer", whiteSpace: "nowrap",
@@ -1138,7 +858,7 @@ function FilterBar({
             style={{
               marginLeft: 4, padding: "4px 10px",
               background: "transparent", border: "none",
-              color: "rgba(250,250,250,.4)",
+              color: "rgba(26,20,16,.45)",
               fontFamily: GROT, fontWeight: 700, fontSize: 9,
               letterSpacing: "0.16em", textTransform: "uppercase",
               cursor: "pointer", flexShrink: 0,
@@ -1147,110 +867,9 @@ function FilterBar({
             ✕ Clear
           </button>
         )}
-        <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(250,250,250,.22)" }}>
-          {count}
+        <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.3)" }}>
+          {count} result{count !== 1 ? "s" : ""}
         </span>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CONTENT GRID
-// ─────────────────────────────────────────────────────────────────────────────
-
-function ContentGrid({
-  filtered,
-  activeType,
-  openId,
-  setOpenId,
-}: {
-  filtered: ContentItem[];
-  activeType: "all" | ContentType;
-  openId: string | null;
-  setOpenId: (id: string | null) => void;
-}) {
-  const liveItems = filtered.filter((c) => !c.private);
-  const comingBackItems = filtered.filter((c) => c.private);
-
-  if (liveItems.length === 0 && comingBackItems.length === 0) {
-    return (
-      <div className="sx" style={{ paddingTop: 80, paddingBottom: 80, textAlign: "center", borderTop: `1px solid ${INK}` }}>
-        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK55, margin: 0 }}>
-          No resources match this filter.
-        </p>
-        <p style={{ marginTop: 10, fontFamily: GROT, fontSize: 10.5, color: "rgba(26,20,16,.32)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
-          Try clearing a topic filter or selecting a different type.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="sx" style={{ paddingTop: 48, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
-      {liveItems.length > 0 && (
-        <div
-          className="res-card-grid"
-          style={{
-            display: "grid",
-            gap: "28px",
-          }}
-        >
-          {liveItems.map((item, i) => {
-            const cardOpen = openId === item.id;
-            return (
-              <div
-                key={item.id}
-                style={{
-                  position: "relative",
-                  overflow: "visible",
-                  border: `1px solid ${INK}`,
-                }}
-              >
-                <ResourceCard
-                  item={item}
-                  index={i}
-                  isOpen={cardOpen}
-                  onToggle={() => setOpenId(cardOpen ? null : item.id)}
-                />
-              </div>
-            );
-          })}
-        </div>
-      )}
-      {comingBackItems.length > 0 && (
-        <ComingBackSection items={comingBackItems} />
-      )}
-    </div>
-  );
-}
-
-function ComingBackSection({ items }: { items: ContentItem[] }) {
-  return (
-    <div style={{ marginTop: 48 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
-        <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>
-          Being Updated
-        </span>
-        <div style={{ flex: 1, height: 1, background: INK15 }} />
-        <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.28)" }}>
-          {items.length} {items.length === 1 ? "item" : "items"}
-        </span>
-      </div>
-      <div className="grid-stats" style={{ gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
-        {items.map((item) => (
-          <div key={item.id} style={{ background: PAPER, padding: "16px 18px 14px", opacity: 0.55, borderLeft: `3px solid ${TYPE_ACCENT[item.type]}` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-              <Pill size={8} ls="0.16em">{item.badge}</Pill>
-              <span style={{ marginLeft: "auto", padding: "2px 6px", background: "rgba(26,20,16,.08)", fontFamily: GROT, fontWeight: 700, fontSize: 7, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>
-                Updating
-              </span>
-            </div>
-            <h5 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
-              {item.title}
-            </h5>
-          </div>
-        ))}
       </div>
     </div>
   );
@@ -1264,36 +883,36 @@ function PodcastTeaser() {
   return (
     <section
       id="res-podcast"
-      className="sx"
-      style={{ background: INK, color: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `3px solid ${YEL}` }}
+      style={{ background: INK, color: PAPER, padding: "70px 56px", borderTop: `3px solid ${YEL}` }}
     >
-      <SectionMast n="08" label="Podcast · 39 Episodes" dark />
-      <div className="grid-intro">
+      {/* Section mast (dark) */}
+      <div style={{ marginBottom: 44 }}>
+        <div style={{ borderTop: "1px solid rgba(241,235,222,.5)" }}><div style={{ marginTop: 3, borderTop: "3px solid rgba(241,235,222,.5)" }} /></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 0 7px" }}>
+          <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase" }}>§ 02</span>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>Podcast · 39 Episodes</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.25)" }} />
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.35)" }}>Vol. XV · № 02</span>
+        </div>
+        <div style={{ borderTop: "1px solid rgba(241,235,222,.5)" }} />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
         <div>
-          <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: PAPER, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
-            The show<br />
-            <span style={{ fontStyle: "italic" }}><Mark>on the air.</Mark></span>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(36px,5vw,64px)", lineHeight: 0.96, letterSpacing: "-0.03em", color: PAPER, margin: "0 0 28px" }}>
+            The show<br /><em style={{ color: YEL }}>on the air.</em>
           </h2>
-          <p style={{ marginTop: 22, fontFamily: SERIF, fontSize: 19, color: "rgba(250,250,250,.72)", lineHeight: 1.55, maxWidth: 480 }}>
+          <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: "rgba(241,235,222,.7)", maxWidth: 380, margin: 0 }}>
             39 episodes on earned media, SEO-PR, content marketing, and building a brand that gets found.
           </p>
         </div>
         <div>
-          <div style={{ border: "1px solid rgba(250,250,250,.2)", padding: 32, marginBottom: 16 }}>
-            <SCaps size={10.5} ls="0.18em" color={YEL}>Browse the archive</SCaps>
-            <p style={{ margin: "14px 0 24px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, lineHeight: 1.25, letterSpacing: "-0.01em" }}>
-              All 39 episodes — tactics, case studies, and conversations with marketing leaders.
-            </p>
-            <a href="/podcast" style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "14px 22px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11.5, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-              Go to the Podcast →
-            </a>
-          </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.4)", marginBottom: 14 }}>Browse the archive</div>
+          <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: "rgba(241,235,222,.7)", margin: "0 0 28px" }}>Tactics, case studies, and conversations with marketing leaders. New episodes monthly.</p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <a href="/podcast" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>Go to the Podcast →</a>
             {[{ name: "Apple Podcasts", href: "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" }, { name: "Spotify", href: "https://open.spotify.com/show/4ZUfaOaYVckXQ7Q9JnMS92" }].map((p) => (
-              <a key={p.name} href={p.href} target={p.href !== "#" ? "_blank" : undefined} rel={p.href !== "#" ? "noopener noreferrer" : undefined}
-                style={{ padding: "10px 16px", border: "1px solid rgba(250,250,250,.25)", color: "rgba(250,250,250,.6)", textDecoration: "none", fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-                {p.name} ↗
-              </a>
+              <a key={p.name} href={p.href} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", background: "transparent", color: "rgba(241,235,222,.7)", border: "1px solid rgba(241,235,222,.35)", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>{p.name} ↗</a>
             ))}
           </div>
         </div>
@@ -1324,57 +943,59 @@ const PRESS_OUTLETS: [string, string][] = [
 
 function PressSection() {
   return (
-    <section id="res-press" className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90, borderTop: `1px solid ${INK}` }}>
-      <SectionMast n="09" label="Bylines & Citations · Selected publications" />
-      <div className="grid-intro" style={{ marginBottom: 40 }}>
-        <h2 className="h2-lg" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
-          Where the<br />
-          <span style={{ fontStyle: "italic" }}><Mark>writing has gone.</Mark></span>
-        </h2>
-        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18.5, color: INK70, lineHeight: 1.55, maxWidth: 540 }}>
-          Publications I have written for, been quoted in, or been featured by. A fuller index lives on the About page.
-        </p>
+    <section id="res-press" style={{ background: PAPER, padding: "70px 56px", borderTop: `1px solid ${INK}` }}>
+      {/* Section mast */}
+      <div style={{ marginBottom: 44 }}>
+        <div style={{ borderTop: `1px solid ${INK}` }}><div style={{ marginTop: 3, borderTop: `3px solid ${INK}` }} /></div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 0 7px" }}>
+          <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase" }}>§ 03</span>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>Bylines & Citations · Selected publications</span>
+          <div style={{ flex: 1, height: 1, background: "rgba(26,20,16,.35)" }} />
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>Vol. XV · № 03</span>
+        </div>
+        <div style={{ borderTop: `1px solid ${INK}` }} />
       </div>
-      <div className="grid-press-2" style={{ border: `1px solid ${INK}` }}>
-        {PRESS_OUTLETS.map(([n, note]) => (
-          <div key={n} className="press-cell" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 16, padding: "16px 26px", alignItems: "baseline" }}>
-            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK }}>{n}</div>
-            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK70, textAlign: "right" }}>{note}</div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr", gap: 80, alignItems: "start" }}>
+        <div>
+          <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px,4.5vw,58px)", lineHeight: 1.0, letterSpacing: "-0.025em", color: INK, margin: "0 0 20px" }}>
+            Where the writing<br /><em>has <span style={{ background: YEL, color: INK, padding: "0 0.1em" }}>gone.</span></em>
+          </h2>
+          <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: INK70, maxWidth: 360 }}>
+            Publications I have written for, been quoted in, or been featured by. A fuller index lives on the About page.
+          </p>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+          {/* Left col */}
+          <div>
+            {PRESS_OUTLETS.slice(0, Math.ceil(PRESS_OUTLETS.length / 2)).map(([n, note]) => (
+              <div key={n} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 16px 12px 0", borderBottom: `1px solid ${INK15}` }}>
+                <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: INK }}>{n}</span>
+                <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: INK55 }}>{note}</span>
+              </div>
+            ))}
           </div>
-        ))}
+          {/* Right col */}
+          <div style={{ paddingLeft: 20, borderLeft: `1px solid ${INK15}` }}>
+            {PRESS_OUTLETS.slice(Math.ceil(PRESS_OUTLETS.length / 2)).map(([n, note]) => (
+              <div key={n} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 0", borderBottom: `1px solid ${INK15}` }}>
+                <span style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 15.5, color: INK }}>{n}</span>
+                <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.15em", textTransform: "uppercase", color: INK55 }}>{note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-      <div style={{ marginTop: 36, textAlign: "center" }}>
-        <a href="/about#press" style={{ display: "inline-flex", alignItems: "center", gap: 12, padding: "14px 22px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.16em", textTransform: "uppercase" }}>
-          See the full press archive →
-        </a>
+
+      <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid ${INK15}` }}>
+        <a href="/about#press" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>See the full press archive →</a>
       </div>
     </section>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// RESPONSIVE STYLES (injected once)
-// ─────────────────────────────────────────────────────────────────────────────
-
-function ResponsiveGridStyle() {
-  return (
-    <style>{`
-      .res-card-grid {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 960px;
-        margin: 0 auto;
-      }
-      @media (max-width: 660px) {
-        .res-card-grid {
-          grid-template-columns: 1fr !important;
-        }
-      }
-    `}</style>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// GUIDED PIPELINE VIEW (default) — "The Earned-Media Pipeline"
+// GUIDED PIPELINE VIEW — "The EMOS Curriculum"
 // ─────────────────────────────────────────────────────────────────────────────
 
 type StepStatus = "live" | "free" | "soon" | "method";
@@ -1477,7 +1098,7 @@ function FoundationChip({ name, id }: { name: string; id: string }) {
 
 function GuidedPipeline() {
   return (
-    <section className="sx" style={{ background: PAPER }}>
+    <section style={{ background: PAPER }}>
       <style>{`
         .gp-wrap{ max-width:860px; margin:0 auto; padding:56px clamp(20px,5vw,64px) 32px; }
         .gp-head{ border-bottom:2px solid ${INK}; padding-bottom:24px; margin-bottom:40px; }
@@ -1526,8 +1147,6 @@ function GuidedPipeline() {
         .gp-cta .gp-cta-txt{ font-family:${SERIF}; font-size:19px; font-weight:700; }
         .gp-cta em{ color:${YEL}; font-style:italic; }
         .gp-cta-btn{ font-family:${GROT}; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; background:${YEL}; color:${INK}; padding:13px 20px; white-space:nowrap; }
-        .gp-aside{ margin-top:14px; font-family:${GROT}; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:${INK55}; }
-        .gp-aside b{ color:${INK70}; }
         @media (max-width:600px){ .gp-foundation{ grid-template-columns:1fr; } }
       `}</style>
 
@@ -1581,7 +1200,6 @@ function GuidedPipeline() {
           <span className="gp-cta-txt">Try the pieces free. <em>Want the whole sequence, done with you?</em></span>
           <span className="gp-cta-btn">Explore EMOS →</span>
         </a>
-
       </div>
     </section>
   );
@@ -1598,7 +1216,7 @@ function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v:
   ];
   return (
     <div style={{ background: PAPER, borderBottom: `1px solid ${INK15}` }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "18px clamp(20px,5vw,64px)", display: "flex", gap: 10, alignItems: "center" }}>
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "18px 56px", display: "flex", gap: 10, alignItems: "center" }}>
         <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".2em", textTransform: "uppercase", color: INK55, marginRight: 4 }}>View</span>
         {tabs.map((t) => {
           const on = view === t.key;
@@ -1625,7 +1243,6 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
   const [view, setView] = useState<"guided" | "browse">(defaultView);
   const [activeType, setActiveType] = useState<"all" | ContentType>("all");
   const [activeTopics, setActiveTopics] = useState<Set<TopicKey>>(new Set());
-  const [openId, setOpenId] = useState<string | null>(null);
 
   const toggleTopic = useCallback((topicId: TopicKey) => {
     setActiveTopics((prev) => {
@@ -1634,18 +1251,15 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
       else next.add(topicId);
       return next;
     });
-    setOpenId(null);
   }, []);
 
   const clearTopics = useCallback(() => {
     setActiveTopics(new Set());
-    setOpenId(null);
   }, []);
 
   const handleSetType = useCallback((type: "all" | ContentType) => {
     setActiveType(type);
     setActiveTopics(new Set());
-    setOpenId(null);
   }, []);
 
   const filtered = useMemo(() => {
@@ -1658,7 +1272,6 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
 
   return (
     <>
-      <ResponsiveGridStyle />
       <ViewToggle view={view} setView={setView} />
       {view === "guided" ? (
         <GuidedPipeline />
@@ -1670,14 +1283,9 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
             activeTopics={activeTopics}
             toggleTopic={toggleTopic}
             clearTopics={clearTopics}
-            count={filtered.length}
+            count={filtered.filter((c) => !c.private).length}
           />
-          <ContentGrid
-            filtered={filtered}
-            activeType={activeType}
-            openId={openId}
-            setOpenId={setOpenId}
-          />
+          <ResourceLedger filtered={filtered} />
         </>
       )}
       <PodcastTeaser />
