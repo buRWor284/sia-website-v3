@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     body: JSON.stringify({
       email_address: email,
       public_metadata: { emos_access: true },
-      redirect_url: `${process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL ?? "/sign-up"}`,
+      redirect_url: "https://www.syedirfanajmal.com/sign-up",
     }),
   });
 
