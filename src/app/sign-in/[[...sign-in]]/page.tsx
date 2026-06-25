@@ -32,7 +32,6 @@ export default function SignInPage() {
 
       <SignIn
         forceRedirectUrl="/emostool/dashboard"
-        afterSignInUrl="/emostool/dashboard"
         appearance={{
           variables: {
             colorPrimary: INK,
