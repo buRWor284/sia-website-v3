@@ -144,8 +144,8 @@ export default function NotFound() {
           width: "100%",
         }}>
 
-          {/* LEFT — illustration */}
-          <div style={{ display: "flex", justifyContent: "center" }}>
+          {/* LEFT — illustration + caption */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
             <Image
               src="/images/404-reporter.png"
               alt="A confused reporter standing at a crossroads signpost labelled Home, EMOS, and Resources"
@@ -154,20 +154,31 @@ export default function NotFound() {
               priority
               style={{ maxWidth: "100%", height: "auto" }}
             />
+            <p style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "clamp(15px, 1.6vw, 18px)",
+              color: INK70,
+              lineHeight: 1.5,
+              margin: 0,
+              textAlign: "center",
+            }}>
+              Whatever you were chasing has moved on.
+            </p>
           </div>
 
-          {/* RIGHT — copy + nav + newsletter */}
+          {/* RIGHT — nav + newsletter */}
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
             <p style={{
               fontFamily: SERIF,
-              fontStyle: "italic",
+              fontWeight: 700,
               fontSize: "clamp(16px, 2vw, 20px)",
-              color: INK70,
+              color: INK,
               lineHeight: 1.5,
               margin: 0,
             }}>
-              Whatever you were chasing has moved on. Here&rsquo;s where to pick up the trail:
+              Here&rsquo;s where to pick up the trail:
             </p>
 
             {/* Primary nav buttons */}
@@ -185,15 +196,6 @@ export default function NotFound() {
                 Book a call &rarr;
               </a>
             </div>
-
-            <SCaps size={9} ls="0.16em" color={INK55}>
-              Or try: &nbsp;
-              <a href="/about" style={{ color: INK, textDecoration: "underline" }}>About</a>
-              &nbsp;&middot;&nbsp;
-              <a href="/podcast" style={{ color: INK, textDecoration: "underline" }}>Podcast</a>
-              &nbsp;&middot;&nbsp;
-              <a href="/contact" style={{ color: INK, textDecoration: "underline" }}>Contact</a>
-            </SCaps>
 
             <DoubleRule style={{ margin: 0, maxWidth: 160 }} />
 
