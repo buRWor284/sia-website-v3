@@ -145,19 +145,19 @@ export default function NotFound() {
         }}>
 
           {/* LEFT — illustration + caption */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", alignSelf: "stretch", gap: 20 }}>
             <Image
               src="/images/404-reporter.png"
               alt="A confused reporter standing at a crossroads signpost labelled Home, EMOS, and Resources"
-              width={420}
-              height={280}
+              width={540}
+              height={360}
               priority
               style={{ maxWidth: "100%", height: "auto" }}
             />
             <p style={{
               fontFamily: SERIF,
               fontStyle: "italic",
-              fontSize: "clamp(15px, 1.6vw, 18px)",
+              fontSize: "clamp(16px, 1.8vw, 20px)",
               color: INK70,
               lineHeight: 1.5,
               margin: 0,
