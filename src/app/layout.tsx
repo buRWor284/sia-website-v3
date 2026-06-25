@@ -3,7 +3,7 @@ import { Newsreader, Archivo, JetBrains_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
-import { SiteHeader, CredibilityTicker } from "@/components/bureau";
+import { SiteHeaderConditional } from "@/components/SiteHeaderConditional";
 import "./globals.css";
 import "./mobile-optimization.css"; // loaded after globals so mobile overrides win the cascade
 
@@ -120,8 +120,7 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
-        <SiteHeader />
-        <CredibilityTicker />
+        <SiteHeaderConditional />
         {children}
       </body>
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
