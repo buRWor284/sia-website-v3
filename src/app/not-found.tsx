@@ -63,15 +63,15 @@ function InlineNewsletterForm() {
 
   if (status === "success") {
     return (
-      <p style={{ fontFamily: SERIF, fontSize: 16, color: INK70, fontStyle: "italic", margin: 0 }}>
-        ✓ Check <strong style={{ color: INK, fontStyle: "normal" }}>{email}</strong> — confirmation link is on its way.
+      <p style={{ fontFamily: SERIF, fontSize: 15, color: INK70, fontStyle: "italic", margin: 0 }}>
+        Check <strong style={{ color: INK, fontStyle: "normal" }}>{email}</strong> for a confirmation link.
       </p>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate style={{ width: "100%" }}>
-      <div style={{ display: "flex", gap: 0, maxWidth: 480, margin: "0 auto" }}>
+    <form onSubmit={handleSubmit} noValidate>
+      <div style={{ display: "flex", gap: 0 }}>
         <input
           type="email"
           name="EMAIL"
@@ -80,30 +80,30 @@ function InlineNewsletterForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@yourcompany.com"
           style={{
-            flex: 1, padding: "14px 16px",
+            flex: 1, padding: "12px 14px",
             border: `2px solid ${INK}`, borderRight: "none",
             background: PAPER, color: INK,
-            fontFamily: SERIF, fontSize: 16, outline: "none", minWidth: 0,
+            fontFamily: SERIF, fontSize: 15, outline: "none", minWidth: 0,
           }}
         />
         <button
           type="submit"
           disabled={status === "loading"}
           style={{
-            padding: "14px 20px",
+            padding: "12px 16px",
             background: status === "loading" ? "rgba(255,214,0,.6)" : YEL,
             color: INK, border: `2px solid ${INK}`,
             cursor: status === "loading" ? "wait" : "pointer",
-            fontFamily: GROT, fontWeight: 800, fontSize: 11,
+            fontFamily: GROT, fontWeight: 800, fontSize: 10,
             letterSpacing: "0.14em", textTransform: "uppercase",
             whiteSpace: "nowrap",
           }}
         >
-          {status === "loading" ? "Sending…" : "Subscribe →"}
+          {status === "loading" ? "Sending..." : "Subscribe →"}
         </button>
       </div>
       {status === "error" && (
-        <p style={{ margin: "8px 0 0", fontFamily: SERIF, fontSize: 13, color: "#cc0000", fontStyle: "italic" }}>
+        <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 12, color: "#cc0000", fontStyle: "italic" }}>
           {errorMsg || "Something went wrong. Please try again."}
         </p>
       )}
@@ -112,143 +112,118 @@ function InlineNewsletterForm() {
 }
 
 export default function NotFound() {
+  const btnBase: React.CSSProperties = {
+    fontFamily: GROT, fontWeight: 800, fontSize: 10,
+    letterSpacing: "0.12em", textTransform: "uppercase",
+    padding: "11px 18px", textDecoration: "none",
+    display: "inline-block",
+  };
+
   return (
     <>
       <section
         className="sx"
         style={{
           background: PAPER,
-          minHeight: "70vh",
+          minHeight: "80vh",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          paddingTop: 24,
-          paddingBottom: 40,
+          paddingTop: 32,
+          paddingBottom: 48,
         }}
       >
-        {/* Reporter illustration */}
-        <div style={{ marginBottom: 20 }}>
-          <Image
-            src="/images/404-reporter.png"
-            alt="A confused reporter standing at a crossroads signpost labelled Home, EMOS, and Resources"
-            width={360}
-            height={240}
-            priority
-            style={{ maxWidth: "100%", height: "auto" }}
-          />
-        </div>
+        {/* Two-column layout */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "40px 56px",
+          alignItems: "center",
+          maxWidth: 960,
+          margin: "0 auto",
+          width: "100%",
+        }}>
 
-        <h1
-          style={{
-            fontFamily: SERIF,
-            fontWeight: 700,
-            fontSize: "clamp(24px, 4vw, 48px)",
-            lineHeight: 1.1,
-            letterSpacing: "-0.02em",
-            color: INK,
-            maxWidth: 640,
-            margin: "0 0 24px",
-            fontStyle: "italic",
-          }}
-        >
-          Whatever you were chasing has moved on. Here&rsquo;s where to pick up the trail:
-        </h1>
+          {/* LEFT — illustration */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <Image
+              src="/images/404-reporter.png"
+              alt="A confused reporter standing at a crossroads signpost labelled Home, EMOS, and Resources"
+              width={420}
+              height={280}
+              priority
+              style={{ maxWidth: "100%", height: "auto" }}
+            />
+          </div>
 
-        <DoubleRule style={{ marginTop: 0, marginBottom: 24, maxWidth: 200 }} />
+          {/* RIGHT — copy + nav + newsletter */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
-        {/* Quick nav links */}
-        <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
-          <a
-            href="/"
-            style={{
-              fontFamily: GROT, fontWeight: 800, fontSize: 11,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              padding: "14px 24px", background: INK, color: YEL,
-              textDecoration: "none",
-            }}
-          >
-            Back to home &rarr;
-          </a>
-          <a
-            href="/resources"
-            style={{
-              fontFamily: GROT, fontWeight: 800, fontSize: 11,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              padding: "14px 24px", border: `2px solid ${INK}`,
-              color: INK, background: "transparent", textDecoration: "none",
-            }}
-          >
-            Resources &rarr;
-          </a>
-          <a
-            href="/emos"
-            style={{
-              fontFamily: GROT, fontWeight: 800, fontSize: 11,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              padding: "14px 24px", border: `2px solid ${INK}`,
-              color: INK, background: "transparent", textDecoration: "none",
-            }}
-          >
-            EMOS platform &rarr;
-          </a>
-          <a
-            href={CALENDLY}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              fontFamily: GROT, fontWeight: 800, fontSize: 11,
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              padding: "14px 24px", border: `2px solid ${INK}`,
-              color: INK, background: "transparent", textDecoration: "none",
-            }}
-          >
-            Book a call &rarr;
-          </a>
-        </div>
+            <p style={{
+              fontFamily: SERIF,
+              fontStyle: "italic",
+              fontSize: "clamp(16px, 2vw, 20px)",
+              color: INK70,
+              lineHeight: 1.5,
+              margin: 0,
+            }}>
+              Whatever you were chasing has moved on. Here&rsquo;s where to pick up the trail:
+            </p>
 
-        <SCaps size={9} ls="0.18em" color={INK55} style={{ marginBottom: 32 }}>
-          Or try: &nbsp;
-          <a href="/about" style={{ color: INK, textDecoration: "underline" }}>About</a> &nbsp;&middot;&nbsp;
-          <a href="/podcast" style={{ color: INK, textDecoration: "underline" }}>Podcast</a> &nbsp;&middot;&nbsp;
-          <a href="/contact" style={{ color: INK, textDecoration: "underline" }}>Contact</a>
-        </SCaps>
+            {/* Primary nav buttons */}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <a href="/" style={{ ...btnBase, background: INK, color: YEL }}>
+                Home &rarr;
+              </a>
+              <a href="/resources" style={{ ...btnBase, border: `2px solid ${INK}`, color: INK, background: "transparent" }}>
+                Resources &rarr;
+              </a>
+              <a href="/emos" style={{ ...btnBase, border: `2px solid ${INK}`, color: INK, background: "transparent" }}>
+                EMOS &rarr;
+              </a>
+              <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ ...btnBase, border: `2px solid ${INK}`, color: INK, background: "transparent" }}>
+                Book a call &rarr;
+              </a>
+            </div>
 
-        {/* Newsletter strip */}
-        <div
-          style={{
-            width: "100%", maxWidth: 600,
-            borderTop: `2px solid ${INK}`,
-            paddingTop: 40,
-          }}
-        >
-          <SCaps size={10} ls="0.20em" color={INK55} style={{ marginBottom: 10 }}>
-            Subscriptions Desk
-          </SCaps>
-          <p
-            style={{
-              fontFamily: SERIF, fontWeight: 700,
-              fontSize: "clamp(20px, 3vw, 26px)",
-              letterSpacing: "-0.02em", color: INK,
-              margin: "0 0 8px",
-            }}
-          >
-            Don&rsquo;t lose the thread.
-          </p>
-          <p
-            style={{
-              fontFamily: SERIF, fontStyle: "italic",
-              fontSize: 16, color: INK70,
-              margin: "0 0 24px", lineHeight: 1.55,
-            }}
-          >
-            Real earned-media case studies. One or two emails a month. No filler.
-          </p>
-          <InlineNewsletterForm />
-          <p style={{ marginTop: 14, fontFamily: SERIF, fontSize: 12, color: INK55, fontStyle: "italic" }}>
-            No spam · One-click unsubscribe anytime.
-          </p>
+            <SCaps size={9} ls="0.16em" color={INK55}>
+              Or try: &nbsp;
+              <a href="/about" style={{ color: INK, textDecoration: "underline" }}>About</a>
+              &nbsp;&middot;&nbsp;
+              <a href="/podcast" style={{ color: INK, textDecoration: "underline" }}>Podcast</a>
+              &nbsp;&middot;&nbsp;
+              <a href="/contact" style={{ color: INK, textDecoration: "underline" }}>Contact</a>
+            </SCaps>
+
+            <DoubleRule style={{ margin: 0, maxWidth: 160 }} />
+
+            {/* Newsletter */}
+            <div>
+              <SCaps size={9} ls="0.18em" color={INK55} style={{ marginBottom: 6 }}>
+                Subscriptions Desk
+              </SCaps>
+              <p style={{
+                fontFamily: SERIF, fontWeight: 700,
+                fontSize: "clamp(17px, 2vw, 21px)",
+                letterSpacing: "-0.02em", color: INK,
+                margin: "0 0 4px",
+              }}>
+                Don&rsquo;t lose the thread.
+              </p>
+              <p style={{
+                fontFamily: SERIF, fontStyle: "italic",
+                fontSize: 14, color: INK70,
+                margin: "0 0 14px", lineHeight: 1.5,
+              }}>
+                Real earned-media case studies. One or two emails a month. No filler.
+              </p>
+              <InlineNewsletterForm />
+              <p style={{ marginTop: 8, fontFamily: SERIF, fontSize: 11, color: INK55, fontStyle: "italic" }}>
+                No spam · One-click unsubscribe anytime.
+              </p>
+            </div>
+
+          </div>
         </div>
       </section>
       <Colophon />
