@@ -821,14 +821,14 @@ function OppCard({
                     <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: sig ? GREEN : INK35 }}>
                       {label}
                     </span>
-                    <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: sig ? INK55 : INK35, textAlign: "right" }}>
+                    <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: sig ? INK70 : INK55, textAlign: "right" }}>
                       {sig ? (sig.detail || sig.title) : "No signal detected"}
                     </span>
                   </div>
                 );
               })}
 
-              <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: INK35, lineHeight: 1.5 }}>
+              <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: INK70, lineHeight: 1.5 }}>
                 <strong style={{ fontStyle: "normal" }}>Score</strong> = weighted composite across all signal sources above.{" "}
                 <strong style={{ fontStyle: "normal" }}>Coverage Gap bar</strong> uses GDELT alone as its denominator: it measures what % of global news already covers this topic.
                 A wide gap means the story is surging in primary sources but hasn&rsquo;t landed in mainstream press yet, your window to pitch first.
@@ -1448,12 +1448,21 @@ export default function SignalIQPage() {
     e.preventDefault();
     if (!email) return;
     try {
-      await fetch("/api/newsletter-subscribe", {
+      const res = await fetch("/api/newsletter-subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-    } catch { /* non-fatal */ }
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (!data.success) {
+        // Surface the error so the user knows something went wrong
+        alert(data.error || "Subscription failed — please try again.");
+        return;
+      }
+    } catch {
+      alert("Network error — please check your connection and try again.");
+      return;
+    }
     document.cookie = `pp_tier=email; path=/; max-age=${60 * 60 * 24 * 365}`;
     setEmailDone(true);
   }

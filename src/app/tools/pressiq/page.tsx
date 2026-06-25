@@ -222,7 +222,7 @@ function EvidCard({ figKey }: { figKey: string }) {
       <div style={{ width: 6, height: 6, background: YEL, marginTop: 5, flexShrink: 0 }} />
       <div>
         <div style={{ fontFamily: SERIF, fontSize: 13, fontWeight: 600, color: INK, lineHeight: 1.4 }}>{ev.figure}</div>
-        <div style={{ fontFamily: MONO, fontSize: 8, color: ra(INK, 0.62), marginTop: 2 }}>{ev.source}</div>
+        <div style={{ fontFamily: MONO, fontSize: 8, color: ra(INK, 0.75), marginTop: 2 }}>{ev.source}</div>
       </div>
     </a>
   );
@@ -303,7 +303,7 @@ function LiveMeter({ label, val, band, hint }: { label: string; val: string; ban
       <div style={{ height: 4, background: ra(INK, 0.06) }}>
         <div style={{ width: fill, height: "100%", background: fillC, transition: "width .25s ease, background .25s ease" }} />
       </div>
-      <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.6), marginTop: 3 }}>{hint}</div>
+      <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.72), marginTop: 3 }}>{hint}</div>
     </div>
   );
 }
@@ -324,7 +324,7 @@ function EmailGate({ show, onClose, onUnlock, result }: {
     if (!consent) { setErr("Please accept to continue."); return; }
     setErr("");
     fetch("/api/newsletter-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).catch(() => {});
-    document.cookie = `pp_tier=email; path=/; max-age=${60 * 60 * 24 * 365}`;
+    fetch("/api/pitch-tier", { method: "POST" }).catch(() => {});
     setDone(true);
     setTimeout(() => { onUnlock(); onClose(); setDone(false); setEmail(""); setConsent(false); }, 900);
   }
@@ -467,6 +467,22 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
         </p>
       </div>
 
+      {/* Explainer video */}
+      <div style={{ padding: "24px 32px", borderBottom: `1px solid ${ra(INK, 0.1)}` }}>
+        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 12 }}>
+          HOW IT WORKS
+        </div>
+        <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden" }}>
+          <iframe
+            src="https://www.youtube.com/embed/HaXSuks2l54"
+            title="PressIQ Explainer"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+          />
+        </div>
+      </div>
+
       {/* Live mechanics */}
       <div style={{ padding: "24px 32px 20px", borderBottom: `1px solid ${ra(INK, 0.1)}` }}>
         <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>
@@ -594,8 +610,18 @@ function PostScorePanel({
   async function unlockEmail(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
-    try { await fetch("/api/newsletter-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }); } catch { /* non-fatal */ }
-    document.cookie = `pp_tier=email; path=/; max-age=${60 * 60 * 24 * 365}`;
+    try {
+      const res = await fetch("/api/newsletter-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (!data.success) {
+        alert(data.error || "Subscription failed — please try again.");
+        return;
+      }
+    } catch {
+      alert("Network error — please check your connection and try again.");
+      return;
+    }
+    fetch("/api/pitch-tier", { method: "POST" }).catch(() => {});
     setEmailDone(true);
   }
 
@@ -687,7 +713,7 @@ function PostScorePanel({
           <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 22, marginTop: 22 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
               <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62) }}>YOUR PITCH, BY DIMENSION</div>
-              <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.6) }}>Full breakdown in 03 →</div>
+              <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.72) }}>Full breakdown in 03 →</div>
             </div>
             <DimBarChart scores={scoreMap} dims={radarDims} />
           </div>
@@ -1276,7 +1302,7 @@ export default function PressIQPage() {
               <div style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: PAPER, letterSpacing: "-.025em", lineHeight: 1 }}>
                 Press<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 600, letterSpacing: ".18em", textTransform: "uppercase", color: ra(PAPER, 0.20), marginTop: 8, lineHeight: 1.7 }}>
+              <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 600, letterSpacing: ".18em", textTransform: "uppercase", color: ra(PAPER, 0.50), marginTop: 8, lineHeight: 1.7 }}>
                 Journalist pitch score<br />by Syed Irfan Ajmal · SIA Wire
               </div>
             </div>
@@ -1288,7 +1314,7 @@ export default function PressIQPage() {
                 <button onClick={() => setPitchMode("standalone")} style={chipStyle(pitchMode === "standalone")}>Standalone outreach</button>
                 <button onClick={() => setPitchMode("query")} style={chipStyle(pitchMode === "query")}>Answering a query</button>
               </div>
-              <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.28), lineHeight: 1.5, display: "block", marginTop: 10 }}>
+              <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block", marginTop: 10 }}>
                 {pitchMode === "standalone"
                   ? "Proactive pitch to a journalist you’ve targeted. Relevance is scored against their known beat."
                   : "Response to a HARO / Qwoted / Featured source request. Relevance is scored against their specific ask."}
@@ -1340,7 +1366,7 @@ export default function PressIQPage() {
             <div style={{ ...LSEC, borderBottom: "none" }}>
               <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 14, cursor: "pointer" }}>
                 <input type="checkbox" checked={store} onChange={e => setStore(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
-                <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.32), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
+                <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.65), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
               </label>
               {TURNSTILE_SITE_KEY && <div ref={turnstileRef} style={{ marginBottom: 12 }} />}
               {error && (

@@ -833,7 +833,7 @@ function ContactsView() {
                     <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, whiteSpace: "nowrap" }}>{j.name}</span>
                     <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: INK55, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{j.outlet}</span>
                   </div>
-                  <div style={{ fontFamily: MONO, fontSize: 11, color: INK35, marginTop: 2 }}>{j.email}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 11, color: INK70, marginTop: 2 }}>{j.email}</div>
                 </div>
               </div>
               <div style={cc(true)}><span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.08em", color: INK70, lineHeight: 1.3 }}>{j.beat}</span></div>

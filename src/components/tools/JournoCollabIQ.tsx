@@ -18,7 +18,7 @@ const BDS  = "rgba(26,20,16,0.08)";
 const TX   = "#1a1410";
 const TX2  = "rgba(26,20,16,0.70)";
 const TX3  = "rgba(26,20,16,0.45)";
-const TX4  = "rgba(26,20,16,0.20)";
+const TX4  = "rgba(26,20,16,0.50)";
 const ACC  = "#f5b81f";
 const SUCC = "#2d8a4e";
 const ERR  = "#c0392b";
@@ -821,7 +821,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
                     <span style={{ fontFamily:GF, fontSize:11, fontWeight:800, color:"#f1ebde", textTransform:"uppercase", letterSpacing:"0.04em" }}>{title}</span>
                   </div>
                   <span style={{ fontFamily:MF, fontSize:8, color:"rgba(250,250,250,0.3)", letterSpacing:"0.08em", display:"block", marginBottom:4 }}>{days}</span>
-                  <span style={{ fontFamily:GF, fontSize:10, color:"rgba(250,250,250,0.55)", lineHeight:1.5 }}>{desc}</span>
+                  <span style={{ fontFamily:GF, fontSize:10, color:"rgba(250,250,250,0.75)", lineHeight:1.5 }}>{desc}</span>
                 </div>
               ))}
             </div>
@@ -930,15 +930,26 @@ function EmailGate({ show, onClose, onSubscribe }: { show: boolean; onClose: ()=
   const [consent, setConsent] = useState(false);
   const [error, setError]     = useState("");
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   if (!show) return null;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email."); return; }
     if (!consent) { setError("Please accept to continue."); return; }
     setError("");
-    fetch("/api/newsletter-subscribe", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email }) }).catch(()=>{});
+    setLoading(true);
+    try {
+      const res = await fetch("/api/newsletter-subscribe", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email }) });
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (!data.success) { setError(data.error || "Subscription failed — please try again."); setLoading(false); return; }
+    } catch {
+      setError("Network error — please check your connection and try again.");
+      setLoading(false);
+      return;
+    }
+    setLoading(false);
     setSuccess(true);
     onSubscribe(email);
     setTimeout(()=>{ onClose(); setSuccess(false); setEmail(""); setConsent(false); }, 1200);
@@ -968,7 +979,7 @@ function EmailGate({ show, onClose, onSubscribe }: { show: boolean; onClose: ()=
               <span style={{ fontFamily:GF, fontSize:12, color:TX3, lineHeight:1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
             </label>
             {error && <div style={{ fontFamily:MF, fontSize:10, color:ERR, marginBottom:14 }}>{error}</div>}
-            <button type="submit" style={{ ...primaryBtn(), width:"100%", justifyContent:"center", fontSize:13 }}>Subscribe & download</button>
+            <button type="submit" disabled={loading} style={{ ...primaryBtn(), width:"100%", justifyContent:"center", fontSize:13, opacity: loading ? 0.6 : 1 }}>{loading ? "Subscribing…" : "Subscribe & download"}</button>
             <p style={{ fontFamily:MF, fontSize:9, color:TX4, textAlign:"center", marginTop:14, letterSpacing:"0.08em" }}>No spam · One-click unsubscribe</p>
           </form>
         )}
