@@ -744,34 +744,61 @@ function ResourceCard({
         style={{
           display: isOpen ? "none" : "flex",
           gap: 8,
-          padding: "16px 16px 0",
+          padding: item.type === "video" ? "0" : "16px 16px 0",
           alignItems: "stretch",
         }}
       >
-        <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
-        <button
-          onClick={(e) => { e.stopPropagation(); onToggle(); }}
-          style={{
-            width: 22,
-            height: 22,
-            flexShrink: 0,
-            border: `1px solid ${INK}`,
-            background: "none",
-            fontFamily: GROT,
-            fontWeight: 800,
-            fontSize: 14,
-            color: INK,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 0,
-            lineHeight: 1,
-          }}
-          aria-label="Expand card"
-        >
-          +
-        </button>
+        {item.type === "video" ? (
+          <div style={{ flex: 1, position: "relative", overflow: "hidden", maxHeight: 160 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`https://img.youtube.com/vi/${(item as VideoContent).youtubeId}/maxresdefault.jpg`}
+              alt={item.title}
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+            />
+            {/* Play badge overlay */}
+            <div style={{
+              position: "absolute", inset: 0,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              background: "rgba(0,0,0,.22)",
+            }}>
+              <div style={{
+                width: 44, height: 44,
+                background: "#C0392B",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <span style={{ color: "#fff", fontSize: 16, marginLeft: 3, lineHeight: 1 }}>▶</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <NewspaperSnippet headline={item.newsHeadline} deck={item.newsDeck} />
+        )}
+        {item.type !== "video" && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onToggle(); }}
+            style={{
+              width: 22,
+              height: 22,
+              flexShrink: 0,
+              border: `1px solid ${INK}`,
+              background: "none",
+              fontFamily: GROT,
+              fontWeight: 800,
+              fontSize: 14,
+              color: INK,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 0,
+              lineHeight: 1,
+            }}
+            aria-label="Expand card"
+          >
+            +
+          </button>
+        )}
       </div>
 
       {/* ── Toggle button when open (top right) ──────────────────────── */}
@@ -1585,8 +1612,8 @@ function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v:
 // MAIN EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function ResourcesClientShell() {
-  const [view, setView] = useState<"guided" | "browse">("browse");
+export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?: "guided" | "browse" }) {
+  const [view, setView] = useState<"guided" | "browse">(defaultView);
   const [activeType, setActiveType] = useState<"all" | ContentType>("all");
   const [activeTopics, setActiveTopics] = useState<Set<TopicKey>>(new Set());
   const [openId, setOpenId] = useState<string | null>(null);
