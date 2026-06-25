@@ -43,10 +43,13 @@ export default function SignInPage() {
             headerTitle: { fontFamily: GROT, letterSpacing: ".08em", textTransform: "uppercase" },
             headerSubtitle: { display: "none" },
             formButtonPrimary: { background: INK, borderRadius: 0, fontFamily: GROT, letterSpacing: ".10em" },
-            // Hide the "Don't have an account? Sign up" footer
             footer: { display: "none" },
             socialButtonsBlock: { display: "none" },
+            socialButtonsBlockButton: { display: "none" },
+            socialButtonsIconButton: { display: "none" },
             dividerRow: { display: "none" },
+            dividerLine: { display: "none" },
+            dividerText: { display: "none" },
           },
         }}
       />
