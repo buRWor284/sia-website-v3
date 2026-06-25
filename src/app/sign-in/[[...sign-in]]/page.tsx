@@ -45,6 +45,8 @@ export default function SignInPage() {
             formButtonPrimary: { background: INK, borderRadius: 0, fontFamily: GROT, letterSpacing: ".10em" },
             // Hide the "Don't have an account? Sign up" footer
             footer: { display: "none" },
+            socialButtonsBlock: { display: "none" },
+            dividerRow: { display: "none" },
           },
         }}
       />

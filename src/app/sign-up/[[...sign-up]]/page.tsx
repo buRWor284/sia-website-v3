@@ -43,6 +43,8 @@ export default function SignUpPage() {
             headerSubtitle: { display: "none" },
             formButtonPrimary: { background: INK, borderRadius: 0, fontFamily: GROT, letterSpacing: ".10em" },
             footer: { display: "none" },
+            socialButtonsBlock: { display: "none" },
+            dividerRow: { display: "none" },
           },
         }}
       />
