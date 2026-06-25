@@ -1,4 +1,3 @@
-import { SignOutButton } from "@clerk/nextjs";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -39,11 +38,6 @@ export default function NotInvitedPage() {
             Learn about EMOS →
           </a>
 
-          <SignOutButton redirectUrl="/sign-in">
-            <button style={{ padding: "10px 24px", background: "transparent", border: "1px solid rgba(26,20,16,.2)", color: INK55, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer" }}>
-              Sign out and try a different account
-            </button>
-          </SignOutButton>
         </div>
 
         <a
