@@ -6,7 +6,7 @@
  *   trend   — recent vs prior coverage (-1..1)
  * High volume → small coverage gap → lower opportunity score.
  *
- * No API key. VOLUME_CAP below is still uncalibrated — see SignalIQ-Test-Findings.
+ * No API key. VOLUME_CAP calibrated 2026-06-25 from production data (5 rows, recalibrate at ≥50).
  */
 import type { Coverage } from "../types";
 import { avg, clamp, clamp01, getText } from "./http";
@@ -14,11 +14,13 @@ import { createLimiter } from "./throttle";
 
 const BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 
-// ~0.5% of all global coverage = "saturated" for a niche business topic.
-// NOTE: observed live, this tends to pin coverageGap near 1.0 — recalibrate
-// (likely much lower, or switch to a log/percentile scale) once a real value
-// distribution is sampled from production.
-const VOLUME_CAP = 0.5;
+// Calibrated 2026-06-25 from 5 production rows (pipeline started 2026-06-24 ~07:52).
+// Raw GDELT Volume Intensity (% of global news) for niche B2B topics:
+//   max=0.0053, p90=0.00354, avg=0.00129
+// Setting cap just above observed max so the most-covered topic scores ~1.0.
+// Re-calibrate once ≥50 rows are in the cache for a more stable distribution.
+// NOTE: cached rows computed with old cap (0.5) will be stale until next refresh.
+const VOLUME_CAP = 0.005;
 
 // GDELT's timelinevol is slow (~10s) AND rate-limited (returns a PLAINTEXT
 // throttle notice — HTTP 200, not JSON — under load). Strategy:
