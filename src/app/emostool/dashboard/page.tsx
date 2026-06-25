@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { SignOutButton } from "@clerk/nextjs";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { STAGE_META, STAGE_ORDER, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
@@ -113,6 +114,11 @@ export default async function EmosDashboardPage() {
               <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%" }} />
               LIVE
             </span>
+            <SignOutButton redirectUrl="/">
+              <button style={{ background: "transparent", border: "1px solid rgba(241,235,222,.2)", color: "rgba(241,235,222,.55)", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer" }}>
+                Sign out
+              </button>
+            </SignOutButton>
           </div>
         </div>
       </div>
