@@ -81,6 +81,10 @@ const nextConfig: NextConfig = {
       { source: "/resources/collab-link-building",  destination: "/tools/partnercollabiq", permanent: p },
       { source: "/resources/collab-link-building/", destination: "/tools/partnercollabiq", permanent: p },
 
+      // Clerk invite links use /signup (no hyphen) → canonical /sign-up
+      { source: "/signup",        destination: "/sign-up",        permanent: false },
+      { source: "/signup/:path*", destination: "/sign-up/:path*", permanent: false },
+
       // Legacy WordPress cleanup (added 2026-06-17)
       // Deleted author archives (e.g. /author/joceylnbrown) -> home
       { source: "/author",        destination: "/", permanent: p },
