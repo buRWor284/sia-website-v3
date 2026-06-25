@@ -1057,7 +1057,7 @@ export default function HomePage() {
               <li><a href="https://www.linkedin.com/in/syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn ↗</a></li>
               <li><a href="https://www.youtube.com/watch?v=9Zn9TE6Nz6Y&list=PLY3hQIOPokONs4kpRS0d9rLQ6gjv6Hlij" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>
               <li><a href="https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" target="_blank" rel="noopener noreferrer" className="footer__link">Apple Podcasts ↗</a></li>
-              <li><a href="https://creators.spotify.com/pod/profile/syedirfanajmal/episodes/" target="_blank" rel="noopener noreferrer" className="footer__link">Spotify ↗</a></li>
+              <li><a href="https://open.spotify.com/show/4ZUfaOaYVckXQ7Q9JnMS92" target="_blank" rel="noopener noreferrer" className="footer__link">Spotify ↗</a></li>
             </ul>
           </div>
         </div>

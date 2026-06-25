@@ -41,14 +41,23 @@ function hasValidCredentials(req: NextRequest): boolean {
   return decoded.slice(0, i) === user && decoded.slice(i + 1) === pass
 }
 
+// /emostool/not-invited is public (no redirect loop)
+const isNotInvitedRoute = createRouteMatcher(['/emostool/not-invited'])
+
 export default clerkMiddleware(async (auth, req) => {
   // Gate the Physicians Thrive client workspace before anything else.
   if (isClientPtRoute(req)) {
     return hasValidCredentials(req) ? NextResponse.next() : requireBasicAuth()
   }
 
-  if (isProtectedRoute(req)) {
+  if (isProtectedRoute(req) && !isNotInvitedRoute(req)) {
     await auth.protect()
+    // Invite-only: require emos_access = true in Clerk publicMetadata
+    const { sessionClaims } = await auth()
+    const meta = (sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>
+    if (!meta.emos_access) {
+      return NextResponse.redirect(new URL('/emostool/not-invited', req.url))
+    }
   }
 })
 

@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { verifyTier } from "@/lib/pitch/tier-cookie";
 import { EMAIL_LIMIT, FREE_LIMIT, PITCH_MODEL } from "@/lib/pitch/config";
 import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
 import { buildUserPrompt, parseAiResult, SCORE_TOOL, SYSTEM_PROMPT } from "@/lib/pitch/scorePrompt";
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Gating: email tier (cookie set after newsletter unlock) raises the cap.
-  const isEmailTier = req.cookies.get("pp_tier")?.value === "email";
+  const isEmailTier = verifyTier(req.cookies.get("pp_tier")?.value) === "email";
   const limit = isEmailTier ? EMAIL_LIMIT : FREE_LIMIT;
   const usageTier: "anonymous" | "email" = isEmailTier ? "email" : "anonymous";
   const rl = await rateLimitDb(`pitch:${ip}`, { limit, windowMs: MONTH_MS });

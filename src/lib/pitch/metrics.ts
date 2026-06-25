@@ -25,15 +25,17 @@ export function sentences(text: string): string[] {
     .filter(Boolean);
 }
 
-/** Heuristic syllable count (the standard vowel-group method with silent-e handling). */
+/** Heuristic syllable count: vowel-group method with silent-e + consonant-"le" handling. */
 export function syllablesIn(word: string): number {
   let w = word.toLowerCase().replace(/[^a-z]/g, "");
   if (!w) return 0;
   if (w.length <= 3) return 1;
-  w = w.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, "");
-  w = w.replace(/^y/, "");
-  const groups = w.match(/[aeiouy]{1,2}/g);
-  return groups ? groups.length : 1;
+  w = w.replace(/^y/, "");                  // leading y is consonantal, not a vowel
+  const groups = w.match(/[aeiouy]+/g);     // each contiguous vowel run = one syllable
+  let n = groups ? groups.length : 0;
+  if (/[^aeiouy]e$/.test(w)) n -= 1;        // trailing silent 'e' (e.g. "make")
+  if (/[^aeiouy]le$/.test(w)) n += 1;       // consonant + 'le' adds a beat (e.g. "table")
+  return Math.max(1, n);
 }
 
 // ── Subjectivity proxy ──────────────────────────────────────────────────────────

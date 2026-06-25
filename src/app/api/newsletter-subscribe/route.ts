@@ -20,11 +20,14 @@ function getServer(apiKey: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { email } = await req.json() as { email?: string };
+    const { email, tag } = await req.json() as { email?: string; tag?: string };
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
     }
+
+    // Optional segmentation tag from the caller; defaults to the original CollabIQ tag.
+    const tags = tag && /^[a-z0-9_-]+$/i.test(tag) ? [tag] : ["collabiq"];
 
     // If Mailchimp is not configured, succeed silently (dev / missing env)
     if (!API_KEY || !LIST_ID) {
@@ -38,7 +41,7 @@ export async function POST(req: NextRequest) {
     const body = JSON.stringify({
       email_address: email,
       status:        "subscribed",
-      tags:          ["collabiq"],
+      tags,
     });
 
     const res = await fetch(url, {
