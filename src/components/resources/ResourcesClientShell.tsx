@@ -14,7 +14,8 @@ type ContentType =
   | "quiz"
   | "playbook"
   | "guide"
-  | "infographic";
+  | "infographic"
+  | "video";
 
 type TopicKey =
   | "pr"
@@ -80,17 +81,40 @@ interface InfographicContent extends ContentBase {
   newsDeck: string;
 }
 
+interface VideoContent extends ContentBase {
+  type: "video";
+  blurb: string;
+  youtubeId: string;
+  newsHeadline: string;
+  newsDeck: string;
+}
+
 type ContentItem =
   | InteractiveContent
   | PlaybookContent
   | GuideContent
-  | InfographicContent;
+  | InfographicContent
+  | VideoContent;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONTENT DATA
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CONTENT: ContentItem[] = [
+  // ── VIDEOS ───────────────────────────────────────────────────────────────
+  {
+    id: "video-pressiq-explainer",
+    type: "video",
+    badge: "Video",
+    topics: ["pr", "personal-branding", "neuromarketing"],
+    title: "How PressIQ Works",
+    blurb:
+      "A 4-minute walkthrough of PressIQ — how the 32-point scoring engine works, what the 7 dimensions measure, and how to use the Top Fixes tab to rewrite before you send.",
+    youtubeId: "HaXSuks2l54",
+    y: "2026",
+    newsHeadline: "PressIQ Explainer",
+    newsDeck: "See the pitch-scoring engine in action",
+  },
   // ── TOOLS ────────────────────────────────────────────────────────────────
   {
     id: "tool-pressiq",
@@ -439,6 +463,7 @@ const TYPE_TABS: { key: "all" | ContentType; label: string }[] = [
   { key: "playbook",     label: "Playbooks" },
   { key: "guide",        label: "Guides" },
   { key: "infographic",  label: "Infographics" },
+  { key: "video",        label: "Videos" },
 ];
 
 const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
@@ -453,10 +478,11 @@ const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
 ];
 
 const GROUP_ORDER: ContentType[] = [
-  "kit", "tool", "quiz", "playbook", "guide", "infographic",
+  "video", "kit", "tool", "quiz", "playbook", "guide", "infographic",
 ];
 
 const GROUP_LABEL: Record<ContentType, string> = {
+  "video":        "Videos · Watch the framework in action",
   "kit":          "Kits · Interactive tools & checklists",
   "tool":         "Tools · Use them right now",
   "quiz":         "Quizzes · Score your position",
@@ -466,6 +492,7 @@ const GROUP_LABEL: Record<ContentType, string> = {
 };
 
 const TYPE_ACCENT: Record<ContentType, string> = {
+  "video":        "#C0392B",
   "kit":          "#f5b81f",
   "tool":         "#C17817",
   "quiz":         "#8B6B99",
@@ -535,7 +562,7 @@ function getCardBlurb(item: ContentItem): string | null {
 }
 
 function getCardSub(item: ContentItem): string | null {
-  if (item.type === "guide" || item.type === "infographic") return null;
+  if (item.type === "guide" || item.type === "infographic" || item.type === "video") return null;
   return (item as { sub?: string }).sub ?? null;
 }
 
@@ -548,6 +575,7 @@ function getCardHref(item: ContentItem): string | null {
     return g.slug ? `/resources/${g.slug}` : null;
   }
   if (item.type === "infographic") return (item as InfographicContent).href;
+  if (item.type === "video") return `https://youtu.be/${(item as VideoContent).youtubeId}`;
   // interactive
   const interactive = item as InteractiveContent;
   if (interactive.comingSoon) return null;
@@ -558,6 +586,7 @@ function getCardCta(item: ContentItem): string {
   if (item.type === "playbook") return "Read the Guide";
   if (item.type === "guide") return "Read the Guide";
   if (item.type === "infographic") return "View Original";
+  if (item.type === "video") return "Watch on YouTube";
   const interactive = item as InteractiveContent;
   return interactive.cta;
 }
@@ -570,6 +599,7 @@ function isComingSoon(item: ContentItem): boolean {
 }
 
 function isExternal(item: ContentItem): boolean {
+  if (item.type === "video") return true;
   if (item.type === "infographic") {
     const href = (item as InfographicContent).href;
     return href.startsWith("http");
