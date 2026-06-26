@@ -808,7 +808,7 @@ const CMOTestimonials = () => (
         </span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18.5, color: INK70, lineHeight: 1.55, maxWidth: 540 }}>
-        The Fractional CMO offering is new. These results are from the same team and channels that execute inside every retainer.
+        The Fractional CMO offering is new. These results are from DMR.agency, the same team founded in 2013 that executes inside every retainer.
       </p>
     </div>
     <div className="grid-testimonials" style={{ border: `1px solid ${INK}` }}>
