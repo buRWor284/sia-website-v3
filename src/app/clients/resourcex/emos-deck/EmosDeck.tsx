@@ -514,20 +514,20 @@ function Slide09() {
         <span style={{ background: Y, color: K, fontWeight: 800, fontSize: 11, padding: "5px 12px", letterSpacing: "0.12em", flexShrink: 0 }}>ILLUSTRATIVE</span>
       </div>
 
-      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, padding: "28px 60px", alignItems: "stretch" }}>
+      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, padding: "28px 60px" }}>
 
         {/* ── TechCrunch card ── */}
         <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-          <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "3px solid #21ce56" }}>
+          <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "3px solid #21ce56", flexShrink: 0 }}>
             <span style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, color: "#21ce56" }}>TechCrunch</span>
             <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 10, padding: "3px 8px", letterSpacing: "0.10em" }}>EXCLUSIVE</span>
           </div>
-          <div style={{ padding: "18px 22px", flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#21ce56" }}>STARTUPS · AI</div>
-            <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+          <div style={{ padding: "16px 22px 12px", flexShrink: 0 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#21ce56", marginBottom: 12 }}>STARTUPS · AI</div>
+            <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/clients/sajid-headshot.jpg" alt="Sajid Shah" style={{ width: 72, height: 72, objectFit: "cover", objectPosition: "center top", flexShrink: 0 }} />
-              <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.25, color: OD, margin: 0 }}>
+              <img src="/clients/sajid-headshot.jpg" alt="Sajid Shah" style={{ width: 88, height: 88, objectFit: "cover", objectPosition: "center 15%", flexShrink: 0 }} />
+              <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.25, color: OD, margin: 0 }}>
                 Building a 7-Figure AI Startup for the Best from the Global South
               </h3>
             </div>
@@ -535,21 +535,27 @@ function Slide09() {
               By Sajid Shah · Founder, OnSense.io · June 2026
             </p>
           </div>
+          {/* Fill remaining height with photo */}
+          <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/clients/sajid-headshot.jpg" alt="" aria-hidden="true" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", opacity: 0.35, display: "block" }} />
+          </div>
         </div>
 
         {/* ── Startup Grind Pakistan card ── */}
         <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-          <div style={{ padding: "12px 22px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+          <div style={{ padding: "12px 22px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,.08)", flexShrink: 0 }}>
             <span style={{ fontFamily: SANS, fontWeight: 900, fontSize: 20, color: Y }}>Startup Grind</span>
             <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 10, padding: "2px 7px", letterSpacing: "0.10em" }}>PAKISTAN</span>
           </div>
-          <div style={{ height: 185, flexShrink: 0, overflow: "hidden" }}>
+          {/* Event photo — fills most of the card */}
+          <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/clients/sajid-event.jpg" alt="OnSense at tech event" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+            <img src="/clients/sajid-event.jpg" alt="OnSense at tech event" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 55%" }} />
           </div>
-          <div style={{ padding: "14px 22px", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45 }}>PODCAST · EP. 84</div>
-            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, lineHeight: 1.25, color: OD, margin: 0 }}>
+          <div style={{ padding: "14px 22px", flexShrink: 0 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, marginBottom: 8 }}>PODCAST · EP. 84</div>
+            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, lineHeight: 1.25, color: OD, margin: "0 0 8px" }}>
               Sajid Shah on Winning P@SHA ICT and Building OnSense From Karachi
             </h3>
             <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: OD45, margin: 0 }}>
@@ -560,25 +566,28 @@ function Slide09() {
 
         {/* ── Entrepreneur card ── */}
         <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
-          <div style={{ background: "#cc1f24", padding: "14px 22px" }}>
+          <div style={{ background: "#cc1f24", padding: "14px 22px", flexShrink: 0 }}>
             <span style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 26, color: "#fff" }}>Entrepreneur</span>
           </div>
-          <div style={{ padding: "12px 22px 0", display: "flex", gap: 8 }}>
+          <div style={{ padding: "12px 22px 8px", display: "flex", gap: 8, flexShrink: 0 }}>
             {["FOUNDERS", "EARNED MEDIA"].map(tag => (
               <span key={tag} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: "#e8a020", border: "1px solid rgba(232,160,32,.35)", padding: "3px 8px" }}>{tag}</span>
             ))}
           </div>
-          <div style={{ flex: 1, padding: "12px 22px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
-            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.25, color: OD, margin: 0, flex: 1 }}>
+          <div style={{ padding: "8px 22px 14px", flexShrink: 0 }}>
+            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.25, color: OD, margin: 0 }}>
               How I Grew OnSense.io Without a PR Agency — and Got Press That Mattered
             </h3>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 14 }}>
-              <div>
-                <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: OD55, margin: "0 0 2px" }}>By Sajid Shah</p>
-                <p style={{ fontFamily: SANS, fontWeight: 400, fontSize: 11, color: OD45, margin: 0 }}>Contributing Writer · June 2026</p>
-              </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/clients/sajid-pasha.jpg" alt="Sajid Shah at P@SHA" style={{ width: 110, height: 80, objectFit: "cover", objectPosition: "center 20%", flexShrink: 0 }} />
+          </div>
+          {/* P@SHA photo fills remaining space */}
+          <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/clients/sajid-pasha.jpg" alt="Sajid Shah at P@SHA ICT Awards" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%" }} />
+          </div>
+          <div style={{ padding: "10px 22px", flexShrink: 0, display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(255,255,255,.08)" }}>
+            <div>
+              <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: OD55, margin: "0 0 2px" }}>By Sajid Shah</p>
+              <p style={{ fontFamily: SANS, fontWeight: 400, fontSize: 11, color: OD45, margin: 0 }}>Contributing Writer · June 2026</p>
             </div>
           </div>
         </div>
