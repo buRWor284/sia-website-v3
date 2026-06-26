@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Client Dashboard · Lubna Ali Khan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600&family=Archivo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper:  #f1ebde;
+      --paper2: #e8e0cc;
+      --ink:    #1a1410;
+      --ink70:  rgba(26,20,16,0.70);
+      --ink55:  rgba(26,20,16,0.55);
+      --ink35:  rgba(26,20,16,0.32);
+      --ink15:  rgba(26,20,16,0.12);
+      --yel:    #f5b81f;
+      --serif:  'Newsreader', Georgia, serif;
+      --grot:   'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--serif);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0;
+      opacity: 0.045;
+      background-image:
+        radial-gradient(rgba(26,20,16,0.6) 0.5px, transparent 0.5px),
+        radial-gradient(rgba(26,20,16,0.4) 0.5px, transparent 0.5px);
+      background-size: 3px 3px, 7px 7px;
+      background-position: 0 0, 1px 1px;
+      mix-blend-mode: multiply;
+    }
+
+    /* ════════════════════════════════
+       LOGIN WALL
+    ════════════════════════════════ */
+    #login-wall {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--paper);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .login-box {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 360px; padding: 0 24px;
+    }
+    .login-logo {
+      font-family: var(--serif); font-size: 26px;
+      font-weight: 300; letter-spacing: -0.02em;
+      color: var(--ink); margin-bottom: 4px;
+    }
+    .login-logo em { font-style: italic; font-weight: 400; }
+    .login-sub {
+      font-family: var(--grot); font-size: 10.5px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink55); margin-bottom: 28px;
+    }
+    .login-rule { border-top: 1px solid var(--ink); margin-bottom: 24px; }
+    .login-rule::after { content: ''; display: block; margin-top: 3px; border-top: 3px solid var(--ink); }
+    .login-field { margin-bottom: 12px; }
+    .login-label {
+      font-family: var(--grot); font-size: 9.5px;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--ink55); display: block; margin-bottom: 6px;
+    }
+    .login-input {
+      width: 100%; padding: 11px 14px;
+      background: transparent; border: 1px solid var(--ink35);
+      color: var(--ink); font-family: var(--grot); font-size: 13.5px;
+      outline: none; transition: border-color 0.15s; -webkit-appearance: none;
+    }
+    .login-input:focus { border-color: var(--ink); }
+    .login-btn {
+      width: 100%; padding: 12px; margin-top: 10px;
+      background: var(--ink); color: var(--paper); border: none; cursor: pointer;
+      font-family: var(--grot); font-weight: 700;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      transition: background 0.15s;
+    }
+    .login-btn:hover { background: var(--yel); color: var(--ink); }
+    .login-err {
+      display: none; margin-top: 12px;
+      font-family: var(--grot); font-size: 11.5px;
+      color: #a8301a; letter-spacing: 0.04em;
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%       { transform: translateX(-6px); }
+      40%       { transform: translateX(6px); }
+      60%       { transform: translateX(-4px); }
+      80%       { transform: translateX(4px); }
+    }
+    .shake { animation: shake 0.35s ease; }
+
+    /* ════════════════════════════════
+       MAIN CONTENT
+    ════════════════════════════════ */
+    #main { display: none; }
+
+    /* MASTHEAD wrapper — full width */
+    .masthead-wrap {
+      position: relative; z-index: 1;
+      max-width: 1020px; margin: 0 auto; padding: 0 36px;
+    }
+    .masthead { padding: 52px 0 44px; }
+    .masthead-top {
+      display: flex; align-items: baseline;
+      justify-content: space-between; gap: 16px;
+      padding-bottom: 10px; flex-wrap: wrap;
+    }
+    .masthead-byline {
+      font-family: var(--grot); font-weight: 800;
+      font-size: 11px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--ink);
+    }
+    .masthead-date {
+      font-family: var(--grot); font-size: 11px;
+      color: var(--ink55); letter-spacing: 0.08em;
+    }
+    .masthead-name {
+      font-family: var(--serif);
+      font-size: clamp(40px, 6vw, 62px);
+      font-weight: 300; line-height: 1.0;
+      letter-spacing: -0.025em; color: var(--ink);
+      margin: 22px 0 8px;
+    }
+    .masthead-name em { font-style: italic; font-weight: 400; }
+    .masthead-sub {
+      font-family: var(--grot); font-size: 13px;
+      color: var(--ink55); font-weight: 400; letter-spacing: 0.03em;
+    }
+    .masthead-meta {
+      display: flex; align-items: center;
+      gap: 10px; margin-top: 22px; flex-wrap: wrap;
+    }
+
+    /* TWO-COLUMN LAYOUT */
+    .layout-wrap {
+      position: relative; z-index: 1;
+      max-width: 1020px; margin: 0 auto; padding: 0 36px 96px;
+      display: grid;
+      grid-template-columns: 176px 1fr;
+      gap: 0 48px;
+      align-items: start;
+    }
+
+    /* ════════════════════════════════
+       SIDEBAR / TOC
+    ════════════════════════════════ */
+    .sidebar {
+      position: sticky;
+      top: 32px;
+      padding-bottom: 48px;
+    }
+    .toc-label {
+      font-family: var(--grot); font-weight: 700;
+      font-size: 9.5px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--ink35);
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--ink15);
+    }
+    .toc-item {
+      display: block;
+      padding: 9px 10px 9px 12px;
+      margin-bottom: 2px;
+      border-left: 2px solid transparent;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .toc-item:hover { border-left-color: var(--ink35); background: rgba(26,20,16,0.04); }
+    .toc-item.toc-active { border-left-color: var(--yel); background: rgba(245,184,31,0.08); }
+    .toc-num {
+      display: block;
+      font-family: var(--grot); font-weight: 700;
+      font-size: 9px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ink35);
+      margin-bottom: 2px;
+    }
+    .toc-item.toc-active .toc-num { color: var(--ink55); }
+    .toc-name {
+      display: block;
+      font-family: var(--grot); font-size: 12px;
+      font-weight: 500; color: var(--ink55); line-height: 1.3;
+    }
+    .toc-item.toc-active .toc-name { color: var(--ink); }
+    .toc-open-badge {
+      display: none;
+      font-family: var(--grot); font-size: 8.5px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--ink35); margin-top: 3px;
+    }
+    .toc-item.toc-active .toc-open-badge { display: block; }
+
+    /* ════════════════════════════════
+       CONTENT COLUMN
+    ════════════════════════════════ */
+    .content { min-width: 0; }
+
+    /* ── TYPOGRAPHY UTILITIES ── */
+    .scaps {
+      font-family: var(--grot); font-weight: 700;
+      font-size: 10.5px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--ink55);
+    }
+    .pill {
+      display: inline-block; padding: 3px 9px 4px;
+      background: var(--yel); color: var(--ink);
+      font-family: var(--grot); font-weight: 800;
+      font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    }
+    .pill-outline {
+      display: inline-block; padding: 3px 9px 4px;
+      border: 1.5px solid var(--ink35); color: var(--ink55);
+      font-family: var(--grot); font-weight: 700;
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .pill-active {
+      display: inline-block; padding: 2px 8px 3px;
+      background: var(--ink); color: var(--paper);
+      font-family: var(--grot); font-weight: 700;
+      font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    }
+    .pill-done {
+      display: inline-block; padding: 2px 8px 3px;
+      background: #2d7a4f; color: var(--paper);
+      font-family: var(--grot); font-weight: 700;
+      font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+    }
+
+    /* ── DOUBLE RULE ── */
+    .double-rule { border-top: 1px solid var(--ink); }
+    .double-rule::after { content: ''; display: block; margin-top: 3px; border-top: 3px solid var(--ink); }
+
+    /* ════════════════════════════════
+       COLLAPSIBLE SECTIONS
+    ════════════════════════════════ */
+    .section { margin-top: 0; border-bottom: 1px solid var(--ink15); }
+    .section:first-child { border-top: none; }
+
+    /* section mast is now the clickable toggle */
+    .section-mast {
+      cursor: pointer;
+      padding: 0 0 0 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .section-mast:hover .section-title { opacity: 0.7; }
+
+    .section-mast-inner {
+      display: flex; align-items: baseline;
+      gap: 12px; padding: 18px 0 14px; flex-wrap: wrap;
+    }
+    .section-title {
+      font-family: var(--grot); font-weight: 700;
+      font-size: 11px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--ink);
+      transition: opacity 0.15s;
+    }
+    .section-rule { flex: 1; height: 1px; background: var(--ink35); min-width: 12px; }
+
+    /* Toggle icon */
+    .toggle-icon {
+      font-family: var(--grot); font-size: 16px; font-weight: 300;
+      color: var(--ink55); line-height: 1;
+      flex-shrink: 0; margin-left: 2px;
+      transition: transform 0.2s;
+    }
+    .section[data-open="true"] .toggle-icon {
+      transform: rotate(45deg);
+    }
+
+    /* Section body */
+    .section-body {
+      display: none;
+      padding-bottom: 40px;
+    }
+    .section[data-open="true"] .section-body {
+      display: block;
+    }
+
+    /* ── DELIVERED WORK ── */
+    .delivered-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0; border: 1px solid var(--ink15); background: var(--ink15);
+    }
+    .delivered-card { background: var(--paper); padding: 24px 22px 22px; }
+    .delivered-tag {
+      font-family: var(--grot); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink35); margin-bottom: 8px;
+    }
+    .delivered-title {
+      font-family: var(--serif); font-size: 21px;
+      font-weight: 500; margin-bottom: 12px;
+      letter-spacing: -0.01em; line-height: 1.15;
+    }
+    .delivered-body {
+      font-family: var(--grot); font-size: 12.5px;
+      color: var(--ink70); line-height: 1.65;
+    }
+    .delivered-meta {
+      margin-top: 16px; display: flex;
+      align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+
+    /* ── WORKSTREAM CARDS ── */
+    .workstreams {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0; border: 1px solid var(--ink15); background: var(--ink15);
+    }
+    .ws-card { background: var(--paper); padding: 24px 22px 22px; }
+    .ws-num {
+      font-family: var(--grot); font-size: 11px;
+      color: var(--ink35); letter-spacing: 0.1em; font-weight: 500;
+    }
+    .ws-title {
+      font-family: var(--serif); font-size: 22px;
+      font-weight: 500; margin: 10px 0 10px;
+      letter-spacing: -0.01em; line-height: 1.1;
+    }
+    .ws-body {
+      font-family: var(--grot); font-size: 12px;
+      color: var(--ink70); line-height: 1.65;
+    }
+    .ws-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+
+    /* ── TIMELINE ── */
+    .timeline { margin-top: 4px; }
+    .phase { display: grid; grid-template-columns: 24px 1fr; gap: 0 20px; }
+    .phase-spine { display: flex; flex-direction: column; align-items: center; }
+    .phase-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+    .phase-dot.active { background: var(--ink); box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
+    .phase-dot.done   { background: #2d7a4f; }
+    .phase-dot.soon   { background: var(--paper); border: 1.5px solid var(--ink55); }
+    .phase-dot.later  { background: var(--paper); border: 1.5px solid var(--ink35); }
+    .phase-line { flex: 1; width: 1px; background: var(--ink15); margin: 6px 0; min-height: 16px; }
+    .phase-body { padding-bottom: 32px; }
+    .phase-header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .phase-name { font-family: var(--serif); font-size: 18px; font-weight: 500; letter-spacing: -0.01em; }
+    .phase-dates { font-family: var(--grot); font-size: 11px; color: var(--ink55); letter-spacing: 0.06em; }
+    .phase-desc { font-family: var(--grot); font-size: 12px; color: var(--ink70); line-height: 1.65; }
+    .phase-tasks { list-style: none; margin-top: 10px; }
+    .phase-tasks li {
+      font-family: var(--grot); font-size: 12px;
+      color: var(--ink55); padding: 3px 0 3px 16px;
+      position: relative; line-height: 1.5;
+    }
+    .phase-tasks li::before { content: '›'; position: absolute; left: 0; color: var(--ink35); }
+
+    /* ── STATUS GRID ── */
+    .status-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0; border: 1px solid var(--ink15); background: var(--ink15);
+    }
+    .status-col { background: var(--paper); padding: 20px 18px 18px; }
+    .status-col-title {
+      font-family: var(--grot); font-weight: 700;
+      font-size: 10px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--ink55); margin-bottom: 14px;
+    }
+    .status-item {
+      font-family: var(--grot); font-size: 12.5px;
+      color: var(--ink); padding: 9px 0;
+      border-bottom: 1px solid var(--ink15); line-height: 1.5;
+    }
+    .status-item:last-child { border-bottom: none; }
+    .status-item-sub { font-size: 10.5px; color: var(--ink55); margin-top: 2px; }
+
+    /* ── FILES GRID ── */
+    .files-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0; border: 1px solid var(--ink15); background: var(--ink15);
+    }
+    .file-card { background: var(--paper); padding: 16px 16px 14px; }
+    .file-card.pending { opacity: 0.45; }
+    .file-type {
+      font-family: var(--grot); font-size: 9px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--ink55); margin-bottom: 6px;
+    }
+    .file-name { font-family: var(--serif); font-size: 14.5px; font-weight: 500; line-height: 1.25; }
+    .file-desc { font-family: var(--grot); font-size: 10.5px; color: var(--ink55); margin-top: 4px; }
+
+    /* ── CONTACT ── */
+    .contact-card {
+      border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink);
+      padding: 28px 0; display: flex; justify-content: space-between;
+      align-items: flex-start; flex-wrap: wrap; gap: 24px;
+    }
+    .contact-name { font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -0.01em; }
+    .contact-role { font-family: var(--grot); font-size: 11px; color: var(--ink55); letter-spacing: 0.14em; text-transform: uppercase; margin-top: 5px; }
+    .contact-links { display: flex; flex-direction: column; gap: 9px; align-items: flex-end; }
+    .contact-link { font-family: var(--grot); font-size: 12.5px; color: var(--ink); text-decoration: none; letter-spacing: 0.02em; border-bottom: 1px solid transparent; transition: border-color 0.15s; }
+    .contact-link:hover { border-bottom-color: var(--ink); }
+    .contact-cta {
+      display: inline-block; margin-top: 4px; padding: 8px 18px 9px;
+      background: var(--ink); color: var(--paper);
+      font-family: var(--grot); font-weight: 700;
+      font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+      text-decoration: none; transition: background 0.15s;
+    }
+    .contact-cta:hover { background: var(--yel); color: var(--ink); }
+
+    /* ── FOOTER ── */
+    .footer-wrap {
+      position: relative; z-index: 1;
+      max-width: 1020px; margin: 0 auto; padding: 0 36px 60px;
+    }
+    .footer {
+      padding-top: 16px; border-top: 1px solid var(--ink15);
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 8px;
+    }
+    .footer-text { font-family: var(--grot); font-size: 10.5px; color: var(--ink35); letter-spacing: 0.1em; }
+
+    /* ════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════ */
+    @media (max-width: 720px) {
+      .masthead-wrap, .layout-wrap, .footer-wrap { padding: 0 20px; }
+      .layout-wrap { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .workstreams, .delivered-grid, .status-grid { grid-template-columns: 1fr; }
+      .contact-links { align-items: flex-start; }
+      .masthead-name { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══ LOGIN WALL ═══ -->
+<div id="login-wall">
+  <div class="login-box">
+    <div class="login-logo"><em>Lubna</em> Ali Khan</div>
+    <div class="login-sub">Client Dashboard · Private</div>
+    <div class="login-rule"></div>
+    <div id="login-form">
+      <div class="login-field">
+        <label class="login-label" for="u">Username</label>
+        <input class="login-input" type="text" id="u" autocomplete="username" autocapitalize="none" />
+      </div>
+      <div class="login-field">
+        <label class="login-label" for="p">Password</label>
+        <input class="login-input" type="password" id="p" autocomplete="current-password" />
+      </div>
+      <button class="login-btn" onclick="doLogin()">Enter Dashboard</button>
+      <div class="login-err" id="login-err">Incorrect credentials. Please try again.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div id="main">
+
+  <!-- MASTHEAD (full width) -->
+  <div class="masthead-wrap">
+    <div class="masthead">
+      <div class="double-rule"></div>
+      <div class="masthead-top">
+        <span class="masthead-byline">Syed Irfan Ajmal · Client Dashboard</span>
+        <span class="masthead-date">Engagement start: June 2026</span>
+      </div>
+      <h1 class="masthead-name"><em>Lubna</em> Ali Khan</h1>
+      <p class="masthead-sub">GEO &amp; SEO Consultant &nbsp;·&nbsp; Website · Branding · Tooling</p>
+      <div class="masthead-meta">
+        <span class="pill">Active</span>
+        <span class="pill-outline">5 workstreams</span>
+        <span class="pill-outline">Phase 1 · Discovery</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TWO-COLUMN: sidebar + content -->
+  <div class="layout-wrap">
+
+    <!-- SIDEBAR TOC -->
+    <nav class="sidebar" id="toc-nav">
+      <div class="toc-label">Contents</div>
+
+      <div class="toc-item toc-active" onclick="goSection('sec1')" id="toc-sec1">
+        <span class="toc-num">§ 1</span>
+        <span class="toc-name">Already Delivered</span>
+        <span class="toc-open-badge">Open</span>
+      </div>
+      <div class="toc-item" onclick="goSection('sec2')" id="toc-sec2">
+        <span class="toc-num">§ 2</span>
+        <span class="toc-name">Active Scope</span>
+        <span class="toc-open-badge">Open</span>
+      </div>
+      <div class="toc-item" onclick="goSection('sec3')" id="toc-sec3">
+        <span class="toc-num">§ 3</span>
+        <span class="toc-name">Project Phases</span>
+        <span class="toc-open-badge">Open</span>
+      </div>
+      <div class="toc-item" onclick="goSection('sec4')" id="toc-sec4">
+        <span class="toc-num">§ 4</span>
+        <span class="toc-name">Current Status</span>
+        <span class="toc-open-badge">Open</span>
+      </div>
+      <div class="toc-item" onclick="goSection('sec5')" id="toc-sec5">
+        <span class="toc-num">§ 5</span>
+        <span class="toc-name">Files &amp; Docs</span>
+        <span class="toc-open-badge">Open</span>
+      </div>
+      <div class="toc-item" onclick="goSection('sec6')" id="toc-sec6">
+        <span class="toc-num">§ 6</span>
+        <span class="toc-name">Contact</span>
+        <span class="toc-open-badge">Open</span>
+      </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- § 1 Already Delivered — OPEN by default -->
+      <div class="section" id="sec1" data-open="true">
+        <div class="section-mast" onclick="toggleSection('sec1')">
+          <div class="section-mast-inner">
+            <span class="pill">§ 1</span>
+            <span class="section-title">Already Delivered</span>
+            <div class="section-rule"></div>
+            <span class="scaps">Live on your site</span>
+            <span class="toggle-icon">+</span>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="delivered-grid">
+            <div class="delivered-card">
+              <div class="delivered-tag">Delivered · Live</div>
+              <div class="delivered-title">Interactive Infographics</div>
+              <div class="delivered-body">Lubna designed the visuals. Irfan coded them into fully interactive, animated infographics — all published and live on the site. Transforms static graphics into engaging, shareable web experiences.</div>
+              <div class="delivered-meta">
+                <span class="pill-done">Live</span>
+                <span class="pill-outline">Design by Lubna</span>
+                <span class="pill-outline">Code by Irfan</span>
+              </div>
+            </div>
+            <div class="delivered-card">
+              <div class="delivered-tag">Delivered · Live</div>
+              <div class="delivered-title">Custom SEO / GEO Tools</div>
+              <div class="delivered-body">Built together from scratch. A suite of custom tools now live on Lubna's site tools page — purpose-built for her audience of SEO and GEO practitioners, adding real utility and positioning her as a practitioner-first consultant.</div>
+              <div class="delivered-meta">
+                <span class="pill-done">Live</span>
+                <span class="pill-outline">Co-built</span>
+                <span class="pill-outline">Tools page</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- § 2 Active Scope — COLLAPSED -->
+      <div class="section" id="sec2" data-open="false">
+        <div class="section-mast" onclick="toggleSection('sec2')">
+          <div class="section-mast-inner">
+            <span class="pill">§ 2</span>
+            <span class="section-title">Active Scope of Work</span>
+            <div class="section-rule"></div>
+            <span class="scaps">3 workstreams</span>
+            <span class="toggle-icon">+</span>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="workstreams">
+            <div class="ws-card">
+              <div class="ws-num">WS 01</div>
+              <div class="ws-title">Website</div>
+              <div class="ws-body">Design and build a professional consultant website that positions Lubna as the go-to expert for GEO and SEO. Fast, clean, and built to convert visitors into enquiries.</div>
+              <div class="ws-tags">
+                <span class="pill-outline">Design</span>
+                <span class="pill-outline">Development</span>
+                <span class="pill-outline">Copy</span>
+              </div>
+            </div>
+            <div class="ws-card">
+              <div class="ws-num">WS 02</div>
+              <div class="ws-title">SEO / GEO Tools</div>
+              <div class="ws-body">Audit, configure, and connect the right toolstack. Set up dashboards, tracking, and automated reporting for day-one efficiency.</div>
+              <div class="ws-tags">
+                <span class="pill-outline">Toolstack</span>
+                <span class="pill-outline">Setup</span>
+                <span class="pill-outline">Workflows</span>
+              </div>
+            </div>
+            <div class="ws-card">
+              <div class="ws-num">WS 03</div>
+              <div class="ws-title">Branding</div>
+              <div class="ws-body">Develop a cohesive visual identity and positioning strategy. Logo, colour, type, tone of voice, and messaging pillars that cut through in a crowded consultant market.</div>
+              <div class="ws-tags">
+                <span class="pill-outline">Identity</span>
+                <span class="pill-outline">Messaging</span>
+                <span class="pill-outline">Guidelines</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- § 3 Project Phases — COLLAPSED -->
+      <div class="section" id="sec3" data-open="false">
+        <div class="section-mast" onclick="toggleSection('sec3')">
+          <div class="section-mast-inner">
+            <span class="pill">§ 3</span>
+            <span class="section-title">Project Phases</span>
+            <div class="section-rule"></div>
+            <span class="scaps">5 phases · 14 weeks</span>
+            <span class="toggle-icon">+</span>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="timeline">
+
+            <div class="phase">
+              <div class="phase-spine">
+                <div class="phase-dot active"></div>
+                <div class="phase-line"></div>
+              </div>
+              <div class="phase-body">
+                <div class="phase-header">
+                  <span class="phase-name">1 · Discovery &amp; Audit</span>
+                  <span class="pill-active">In progress</span>
+                  <span class="phase-dates">June 2026</span>
+                </div>
+                <div class="phase-desc">Deep-dive into positioning, existing assets, competitors, and target audience. Establish the strategic foundation for all three workstreams.</div>
+                <ul class="phase-tasks">
+                  <li>Stakeholder brief &amp; goals alignment call</li>
+                  <li>Competitor landscape audit (5 to 8 comparators)</li>
+                  <li>Existing brand assets inventory</li>
+                  <li>Audience research &amp; ICP definition</li>
+                  <li>Technical audit of current site</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="phase-spine">
+                <div class="phase-dot soon"></div>
+                <div class="phase-line"></div>
+              </div>
+              <div class="phase-body">
+                <div class="phase-header">
+                  <span class="phase-name">2 · Brand Foundation</span>
+                  <span class="pill-outline" style="font-size:9px;padding:2px 8px 3px;">Upcoming</span>
+                  <span class="phase-dates">July 2026</span>
+                </div>
+                <div class="phase-desc">Build the brand identity from the ground up. Visual language, logo direction, colour palette, typography system, and tone of voice guidelines.</div>
+                <ul class="phase-tasks">
+                  <li>Logo concept &amp; wordmark options</li>
+                  <li>Colour &amp; typography system</li>
+                  <li>Brand voice, tone &amp; messaging pillars</li>
+                  <li>Brand guidelines document (PDF handoff)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="phase-spine">
+                <div class="phase-dot soon"></div>
+                <div class="phase-line"></div>
+              </div>
+              <div class="phase-body">
+                <div class="phase-header">
+                  <span class="phase-name">3 · Website Design &amp; Build</span>
+                  <span class="pill-outline" style="font-size:9px;padding:2px 8px 3px;">Upcoming</span>
+                  <span class="phase-dates">July to Aug 2026</span>
+                </div>
+                <div class="phase-desc">Design, develop, and launch the consultant website. Built for GEO discoverability, professional credibility, and lead generation.</div>
+                <ul class="phase-tasks">
+                  <li>Wireframes &amp; sitemap</li>
+                  <li>Visual design (desktop + mobile)</li>
+                  <li>Copywriting &amp; page content</li>
+                  <li>Development &amp; CMS setup</li>
+                  <li>QA, speed optimisation &amp; launch</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="phase-spine">
+                <div class="phase-dot later"></div>
+                <div class="phase-line"></div>
+              </div>
+              <div class="phase-body">
+                <div class="phase-header">
+                  <span class="phase-name">4 · SEO / GEO Tool Setup</span>
+                  <span class="pill-outline" style="font-size:9px;padding:2px 8px 3px;">Upcoming</span>
+                  <span class="phase-dates">Aug 2026</span>
+                </div>
+                <div class="phase-desc">Configure and connect the full toolstack. Tracking, dashboards, and automated reporting so the operation runs from day one without manual overhead.</div>
+                <ul class="phase-tasks">
+                  <li>Tool audit &amp; stack recommendations</li>
+                  <li>GSC, GA4 &amp; rank tracking setup</li>
+                  <li>GEO monitoring &amp; AI citation tools</li>
+                  <li>Reporting dashboards &amp; workflow SOPs</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="phase">
+              <div class="phase-spine">
+                <div class="phase-dot later"></div>
+              </div>
+              <div class="phase-body">
+                <div class="phase-header">
+                  <span class="phase-name">5 · Launch &amp; Handoff</span>
+                  <span class="pill-outline" style="font-size:9px;padding:2px 8px 3px;">Upcoming</span>
+                  <span class="phase-dates">Sep 2026</span>
+                </div>
+                <div class="phase-desc">Final QA, go-live, and a complete handoff kit. Training on website and tools, full documentation, and a 30-day post-launch check-in.</div>
+                <ul class="phase-tasks">
+                  <li>Final QA &amp; pre-launch checklist</li>
+                  <li>Domain, DNS &amp; hosting transfer</li>
+                  <li>Training session (website + tools)</li>
+                  <li>Full handoff documentation</li>
+                  <li>30-day post-launch review call</li>
+                </ul>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- § 4 Current Status — COLLAPSED -->
+      <div class="section" id="sec4" data-open="false">
+        <div class="section-mast" onclick="toggleSection('sec4')">
+          <div class="section-mast-inner">
+            <span class="pill">§ 4</span>
+            <span class="section-title">Current Status</span>
+            <div class="section-rule"></div>
+            <span class="scaps">As of June 2026</span>
+            <span class="toggle-icon">+</span>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="status-grid">
+            <div class="status-col">
+              <div class="status-col-title">✓ Done</div>
+              <div class="status-item">
+                Interactive infographics published
+                <div class="status-item-sub">Live on site</div>
+              </div>
+              <div class="status-item">
+                Custom SEO / GEO tools built
+                <div class="status-item-sub">Live on tools page</div>
+              </div>
+              <div class="status-item">
+                Client workspace created
+                <div class="status-item-sub">Dashboard and docs ready</div>
+              </div>
+            </div>
+            <div class="status-col">
+              <div class="status-col-title">→ Needs from you</div>
+              <div class="status-item">
+                Book discovery call
+                <div class="status-item-sub">30 min via link below</div>
+              </div>
+              <div class="status-item">
+                Share existing brand assets
+                <div class="status-item-sub">Logo, photos, colour refs if any</div>
+              </div>
+              <div class="status-item">
+                3 to 5 competitor or inspiration sites
+                <div class="status-item-sub">Sites to like or benchmark against</div>
+              </div>
+              <div class="status-item">
+                Goals &amp; non-negotiables
+                <div class="status-item-sub">Quick email or fill the brief doc</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- § 5 Files — COLLAPSED -->
+      <div class="section" id="sec5" data-open="false">
+        <div class="section-mast" onclick="toggleSection('sec5')">
+          <div class="section-mast-inner">
+            <span class="pill">§ 5</span>
+            <span class="section-title">Files &amp; Documents</span>
+            <div class="section-rule"></div>
+            <span class="scaps">Workspace</span>
+            <span class="toggle-icon">+</span>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="files-grid">
+            <div class="file-card">
+              <div class="file-type">Project doc</div>
+              <div class="file-name">Client Brief</div>
+              <div class="file-desc">Goals, context &amp; scope</div>
+            </div>
+            <div class="file-card">
+              <div class="file-type">Tracker</div>
+              <div class="file-name">Project Tracker</div>
+              <div class="file-desc">Tasks, status &amp; owners</div>
+            </div>
+            <div class="file-card">
+              <div class="file-type">Agreement</div>
+              <div class="file-name">Scope of Work</div>
+              <div class="file-desc">Deliverables &amp; timeline</div>
+            </div>
+            <div class="file-card pending">
+              <div class="file-type">Assets · Pending</div>
+              <div class="file-name">Brand Assets</div>
+              <div class="file-desc">Logos, photos &amp; refs</div>
+            </div>
+            <div class="file-card pending">
+              <div class="file-type">Design · Pending</div>
+              <div class="file-name">Brand Guidelines</div>
+              <div class="file-desc">Colours, type, voice</div>
+            </div>
+            <div class="file-card pending">
+              <div class="file-type">Dev · Pending</div>
+              <div class="file-name">Wireframes</div>
+              <div class="file-desc">Pages &amp; sitemap</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- § 6 Contact — COLLAPSED -->
+      <div class="section" id="sec6" data-open="false">
+        <div class="section-mast" onclick="toggleSection('sec6')">
+          <div class="section-mast-inner">
+            <span class="pill">§ 6</span>
+            <span class="section-title">Contact</span>
+            <div class="section-rule"></div>
+            <span class="toggle-icon">+</span>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="contact-card">
+            <div>
+              <div class="contact-name">Syed Irfan Ajmal</div>
+              <div class="contact-role">Founder · DMR.agency</div>
+            </div>
+            <div class="contact-links">
+              <a href="mailto:sia@syedirfanajmal.com" class="contact-link">sia@syedirfanajmal.com</a>
+              <a href="https://www.syedirfanajmal.com" class="contact-link" target="_blank">syedirfanajmal.com</a>
+              <a href="https://calendly.com/sia_dmr_agency/emos" class="contact-cta" target="_blank">Book a call</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- .content -->
+  </div><!-- .layout-wrap -->
+
+  <!-- FOOTER -->
+  <div class="footer-wrap">
+    <div class="footer">
+      <span class="footer-text">Syed Irfan Ajmal · Confidential</span>
+      <span class="footer-text">Prepared June 2026</span>
+    </div>
+  </div>
+
+</div><!-- #main -->
+
+<script>
+  /* ── AUTH ── */
+  (function () {
+    if (sessionStorage.getItem('lak_auth') === '1') unlock();
+  })();
+
+  function unlock() {
+    document.getElementById('login-wall').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+  }
+
+  function doLogin() {
+    var u = document.getElementById('u').value.trim().toLowerCase();
+    var p = document.getElementById('p').value;
+    if (u === 'lubna' && p === '2JFEI@#(@_ds') {
+      sessionStorage.setItem('lak_auth', '1');
+      unlock();
+    } else {
+      var form = document.getElementById('login-form');
+      form.classList.remove('shake');
+      void form.offsetWidth;
+      form.classList.add('shake');
+      document.getElementById('login-err').style.display = 'block';
+    }
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && document.getElementById('login-wall').style.display !== 'none') doLogin();
+  });
+
+  /* ── SECTIONS ── */
+  var sections = ['sec1','sec2','sec3','sec4','sec5','sec6'];
+
+  function toggleSection(id) {
+    var sec  = document.getElementById(id);
+    var open = sec.getAttribute('data-open') === 'true';
+    sec.setAttribute('data-open', open ? 'false' : 'true');
+    syncToc();
+  }
+
+  function goSection(id) {
+    var sec = document.getElementById(id);
+    // Always open the section when navigating to it
+    sec.setAttribute('data-open', 'true');
+    syncToc();
+    // Small delay so content renders before scroll
+    setTimeout(function () {
+      sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 30);
+  }
+
+  function syncToc() {
+    sections.forEach(function (id) {
+      var sec     = document.getElementById(id);
+      var tocItem = document.getElementById('toc-' + id);
+      if (!tocItem) return;
+      var isOpen  = sec.getAttribute('data-open') === 'true';
+      if (isOpen) {
+        tocItem.classList.add('toc-active');
+      } else {
+        tocItem.classList.remove('toc-active');
+      }
+    });
+  }
+
+  /* Highlight TOC item as user scrolls */
+  window.addEventListener('scroll', function () {
+    var midpoint = window.scrollY + window.innerHeight / 3;
+    var current  = 'sec1';
+    sections.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top + window.scrollY <= midpoint) {
+        current = id;
+      }
+    });
+    sections.forEach(function (id) {
+      var tocItem = document.getElementById('toc-' + id);
+      if (!tocItem) return;
+      var sec    = document.getElementById(id);
+      var isOpen = sec.getAttribute('data-open') === 'true';
+      // Keep active styling if section is open OR if it is the current scroll position
+      if (id === current || isOpen) {
+        tocItem.classList.add('toc-active');
+      } else {
+        tocItem.classList.remove('toc-active');
+      }
+    });
+  }, { passive: true });
+
+  // Init TOC state
+  syncToc();
+</script>
+</body>
+</html>
