@@ -1205,22 +1205,6 @@ const BookCall = () => (
             </div>
           </div>
 
-          {/* Tool mentions */}
-          <div style={{ paddingTop: 8, borderTop: "1px solid rgba(250,250,250,.1)" }}>
-            <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.35)">Not sure yet?</SCaps>
-            <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 14, color: "rgba(250,250,250,.55)", lineHeight: 1.6, fontStyle: "italic" }}>
-              Run{" "}
-              <a href="/tools/signaliq" style={{ color: "rgba(250,250,250,.75)", textDecoration: "underline" }}>SignalIQ</a>
-              {" "}or{" "}
-              <a href="/tools/pressiq" style={{ color: "rgba(250,250,250,.75)", textDecoration: "underline" }}>PressIQ</a>
-              {" "}first — the free tools my clients use to map their PR gaps. Bring the output to our call and we can skip the intake entirely.
-            </p>
-            <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 14, color: "rgba(250,250,250,.55)", lineHeight: 1.6, fontStyle: "italic" }}>
-              Not ready for a full retainer?{" "}
-              <a href="/emos" style={{ color: "rgba(250,250,250,.75)", textDecoration: "underline" }}>EMOS</a>
-              {" "}gives you the same system and playbooks to run earned media in-house — at a fraction of the cost. Most clients use it as a stepping stone.
-            </p>
-          </div>
         </div>
 
         {/* Right — form */}
@@ -1228,6 +1212,38 @@ const BookCall = () => (
           <SCaps size={11} ls="0.20em" color="rgba(250,250,250,.45)">Or send a message</SCaps>
           <CMOInquiryForm />
         </div>
+      </div>
+    </div>
+
+    {/* Not sure yet — tools + EMOS */}
+    <div
+      style={{
+        marginTop: 12,
+        border: `1px solid ${INK}`,
+        background: PAPER,
+        padding: "28px 40px",
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "16px 64px",
+        alignItems: "flex-start",
+      }}
+    >
+      <div style={{ flex: "1 1 340px" }}>
+        <SCaps size={10} ls="0.18em" color={INK55}>Not sure yet?</SCaps>
+        <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.6, fontStyle: "italic" }}>
+          Run{" "}
+          <a href="/tools/signaliq" style={{ color: INK, textDecoration: "underline" }}>SignalIQ</a>
+          {" "}or{" "}
+          <a href="/tools/pressiq" style={{ color: INK, textDecoration: "underline" }}>PressIQ</a>
+          {" "}first — the free tools my clients use to map their PR gaps. Bring the output to our call and we can skip the intake entirely.
+        </p>
+      </div>
+      <div style={{ flex: "1 1 340px", borderLeft: `1px solid ${INK}`, paddingLeft: 40 }}>
+        <SCaps size={10} ls="0.18em" color={INK55}>Not ready for a full retainer?</SCaps>
+        <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.6, fontStyle: "italic" }}>
+          <a href="/emos" style={{ color: INK, textDecoration: "underline" }}>EMOS</a>
+          {" "}gives you the same system and playbooks to run earned media in-house — at a fraction of the cost. Most clients use it as a stepping stone.
+        </p>
       </div>
     </div>
 
