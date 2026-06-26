@@ -249,22 +249,17 @@ export function PtWorkspace() {
       {/* ── Main content ────────────────────────────────────────────────── */}
       <main style={{ flex: 1, minWidth: 0 }}>
 
-        {/* Hero */}
-        <section style={{ background: INK, padding: "56px 48px 64px", borderBottom: "1px solid rgba(250,250,250,.06)" }}>
-          <div style={{ display: "flex", alignItems: "stretch", marginBottom: 24, width: "fit-content" }}>
-            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK, background: YEL, padding: "5px 10px" }}>
-              PRIVATE WORKSPACE
-            </span>
-            <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: P60, border: `1px solid ${P25}`, padding: "5px 12px" }}>
-              Physicians Thrive
-            </span>
-          </div>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(32px, 4vw, 56px)", lineHeight: 0.96, letterSpacing: "-0.03em", color: PAPER, marginBottom: 18 }}>
-            Tools ecosystem<br /><em>&amp; growth strategy</em>
+        {/* Hero — compact masthead */}
+        <section style={{ background: INK, padding: "16px 48px 14px", borderBottom: "1px solid rgba(250,250,250,.10)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: INK, background: YEL, padding: "4px 8px", flexShrink: 0 }}>
+            PRIVATE WORKSPACE
+          </span>
+          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.1, letterSpacing: "-0.02em", color: PAPER, margin: 0 }}>
+            Tools ecosystem &amp; <em>growth strategy</em>
           </h1>
-          <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 17, lineHeight: 1.6, color: P60, maxWidth: 520, margin: 0 }}>
-            A proposal-in-demo form: two live tools, four in development, plus a competitor analysis and marketing plan — all powered by PT&rsquo;s annual compensation data.
-          </p>
+          <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: P25, border: `1px solid rgba(250,250,250,.12)`, padding: "4px 9px", flexShrink: 0 }}>
+            Physicians Thrive
+          </span>
         </section>
 
         {/* ── § 01 Active Tools ─────────────────────────────────────────── */}
