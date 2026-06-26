@@ -38,6 +38,7 @@ interface ContentBase {
   private?: boolean;
   beta?: boolean;
   underReview?: boolean;
+  hook: string;
 }
 
 interface InteractiveContent extends ContentBase {
@@ -114,6 +115,7 @@ const CONTENT: ContentItem[] = [
     y: "2026",
     newsHeadline: "PressIQ Explainer",
     newsDeck: "See the pitch-scoring engine in action",
+    hook: "Watch it score a pitch in real time",
   },
   // ── TOOLS ────────────────────────────────────────────────────────────────
   {
@@ -131,6 +133,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "The Pitch Desk",
     newsDeck: "Score any media pitch against the system that earns the placement",
     cta: "Score a Pitch",
+    hook: "Score your pitch in under 60 seconds",
   },
   {
     id: "tool-signaliq",
@@ -147,6 +150,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "The Foresight Desk",
     newsDeck: "Find the data story the press hasn't written yet — and arrive first",
     cta: "Open the Radar",
+    hook: "Find the story the press hasn't filed yet",
   },
 
   {
@@ -164,6 +168,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "The Media List",
     newsDeck: "Who covers your beat — and how to land in their inbox",
     cta: "Find Journalists",
+    hook: "Find the reporter before your rivals do",
   },
 
   // ── CALCULATORS ─────────────────────────────────────────────────────────
@@ -182,6 +187,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Renting vs. Owning",
     newsDeck: "Calculate what credibility really costs you over twelve months",
     cta: "Run the Calculator",
+    hook: "Renting credibility costs more than you think",
   },
 
   // ── KITS ────────────────────────────────────────────────────────────────
@@ -200,6 +206,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Pitch Perfect",
     newsDeck: "The seven-step system that gets reporters to say yes",
     cta: "Open the Kit",
+    hook: "Seven steps most founders quietly skip",
   },
 
   {
@@ -217,6 +224,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "The Partnership Desk",
     newsDeck: "Co-marketing, distribution, and link opportunities across every industry, mapped",
     cta: "Use the Tool",
+    hook: "Your best partner hasn't heard of you yet",
   },
 
   // ── QUIZZES ─────────────────────────────────────────────────────────────
@@ -236,6 +244,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Your Press Score",
     newsDeck: "Eight dimensions of founder media readiness, scored and prescribed",
     cta: "Take the Quiz",
+    hook: "How press-ready is your brand, really",
   },
   {
     id: "kit-writing",
@@ -253,6 +262,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Writing Is Medicine",
     newsDeck: "Science confirms what the Ancients knew about the written word",
     cta: "Open the Kit",
+    hook: "Science says writing rewires the brain",
   },
   {
     id: "quiz-personal-brand",
@@ -270,6 +280,7 @@ const CONTENT: ContentItem[] = [
     newsHeadline: "Who Are You, Really?",
     newsDeck: "A five-pillar personal brand assessment for founders and builders",
     cta: "Take the Quiz",
+    hook: "Five pillars. Which one is your weak spot",
   },
 
   // ── PLAYBOOKS ────────────────────────────────────────────────────────────
@@ -289,6 +300,7 @@ const CONTENT: ContentItem[] = [
     y: "2021",
     newsHeadline: "The Authority Playbook",
     newsDeck: "The complete system for building a recognisable expert brand in public",
+    hook: "Most founders get this completely wrong",
   },
   {
     id: "play-storytelling",
@@ -306,6 +318,7 @@ const CONTENT: ContentItem[] = [
     y: "2020",
     newsHeadline: "The Narrative Framework",
     newsDeck: "The story structures behind every message that lands",
+    hook: "The structure that makes every message stick",
   },
   {
     id: "play-neuromarketing",
@@ -323,6 +336,7 @@ const CONTENT: ContentItem[] = [
     y: "2020",
     newsHeadline: "The Persuasion Code",
     newsDeck: "What cognitive science tells us about why some messages work",
+    hook: "Your brain decides long before you do",
   },
 
   // ── GUIDES ───────────────────────────────────────────────────────────────
@@ -338,6 +352,7 @@ const CONTENT: ContentItem[] = [
     updated: "2022",
     newsHeadline: "The Writer's Rulebook",
     newsDeck: "Every rule serious writers live by, in one place",
+    hook: "100 tips. One place. No filler",
   },
   {
     id: "art-digital-tools",
@@ -352,6 +367,7 @@ const CONTENT: ContentItem[] = [
     private: true,
     newsHeadline: "Tools of the Trade",
     newsDeck: "Six digital tools that make writing faster and sharper",
+    hook: "Six tools that make sharper writers faster",
   },
   {
     id: "art-analytics",
@@ -366,6 +382,7 @@ const CONTENT: ContentItem[] = [
     private: true,
     newsHeadline: "Read the Numbers",
     newsDeck: "The five analytics signals that tell you if your content is working",
+    hook: "Five numbers that reveal if content is working",
   },
   {
     id: "art-ecommerce",
@@ -380,6 +397,7 @@ const CONTENT: ContentItem[] = [
     private: true,
     newsHeadline: "The Conversion Code",
     newsDeck: "How product discovery turns browsers into buyers",
+    hook: "The product discovery trick that converts browsers",
   },
   {
     id: "guide-bing-seo-2026",
@@ -391,6 +409,7 @@ const CONTENT: ContentItem[] = [
     y: "2026",
     newsHeadline: "The Bing Desk",
     newsDeck: "The 2026 field guide to Bing SEO and AI search visibility",
+    hook: "The search engine quietly running AI answers",
   },
   {
     id: "guide-bing-seo-2015",
@@ -403,6 +422,7 @@ const CONTENT: ContentItem[] = [
     updated: "2021",
     newsHeadline: "The Archive",
     newsDeck: "The original 2015 Bing SEO guide, faithfully restored",
+    hook: "The 2015 rules that still hold today",
   },
 
   // ── INFOGRAPHICS ─────────────────────────────────────────────────────────
@@ -420,6 +440,7 @@ const CONTENT: ContentItem[] = [
     updated: "2021",
     newsHeadline: "The Great Dispersal",
     newsDeck: "Data on where work went and what it cost everyone",
+    hook: "Data on where work went and what it cost",
   },
   {
     id: "ve-writing-habits",
@@ -434,6 +455,7 @@ const CONTENT: ContentItem[] = [
     private: true,
     newsHeadline: "Rituals of the Masters",
     newsDeck: "The daily habits that made Hemingway, King, and Didion",
+    hook: "Habits that made Hemingway, King, and Didion",
   },
   {
     id: "ve-content-ideas",
@@ -448,6 +470,7 @@ const CONTENT: ContentItem[] = [
     y: "—",
     newsHeadline: "The Voice in the Reviews",
     newsDeck: "Mining your audience for content angles that convert",
+    hook: "Your audience is writing your editorial calendar",
   },
 ];
 
@@ -499,6 +522,22 @@ const TYPE_ACCENT: Record<ContentType, string> = {
   "playbook":     INK,
   "guide":        INK55,
   "infographic":  "#A0522D",
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// THUMBNAIL THEME — colour variants per README Option B spec
+// ─────────────────────────────────────────────────────────────────────────────
+
+type ThumbnailTheme = { bg: string; catColor: string; hookColor: string; ruleColor: string };
+
+const THUMB_THEME: Record<ContentType, ThumbnailTheme> = {
+  video:       { bg: "#f1ebde", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
+  playbook:    { bg: "#1a1410", catColor: "rgba(241,235,222,.40)", hookColor: "#f1ebde", ruleColor: "#f5b81f" },
+  tool:        { bg: "#f5b81f", catColor: "rgba(26,20,16,.60)", hookColor: "#1a1410", ruleColor: "#1a1410" },
+  guide:       { bg: "#e8e0cc", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
+  kit:         { bg: "#f1ebde", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
+  quiz:        { bg: "#f1ebde", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
+  infographic: { bg: "#f1ebde", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
 };
 
 const TOPIC_LABEL: Record<TopicKey, string> = {
@@ -565,6 +604,61 @@ function isExternal(item: ContentItem): boolean {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// RESOURCE THUMBNAIL — typographic 96×96 card (Option B)
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ResourceThumb({ item }: { item: ContentItem }) {
+  const t = THUMB_THEME[item.type];
+  return (
+    <div
+      style={{
+        width: 96,
+        height: 96,
+        flexShrink: 0,
+        border: "1.5px solid #1a1410",
+        background: t.bg,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: "8px 9px",
+        alignSelf: "center",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* Category overline */}
+      <div
+        style={{
+          fontFamily: GROT,
+          fontWeight: 700,
+          fontSize: 7,
+          letterSpacing: "0.16em",
+          textTransform: "uppercase",
+          color: t.catColor,
+          lineHeight: 1.2,
+        }}
+      >
+        {item.badge}
+      </div>
+      {/* Hook / teaser */}
+      <div
+        style={{
+          fontFamily: SERIF,
+          fontStyle: "italic",
+          fontWeight: 600,
+          fontSize: 13.5,
+          lineHeight: 1.25,
+          color: t.hookColor,
+        }}
+      >
+        {item.hook}
+      </div>
+      {/* Bottom rule */}
+      <div style={{ width: "100%", height: 2, background: t.ruleColor, flexShrink: 0 }} />
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SECTION MAST — double-rule newspaper masthead
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -601,10 +695,10 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
       onMouseLeave={() => setHover(false)}
       style={{
         display: "grid",
-        gridTemplateColumns: "40px 150px 1fr 186px 36px",
+        gridTemplateColumns: "40px 96px 1fr 186px 36px",
         gap: 20,
         alignItems: "center",
-        padding: "22px 0",
+        padding: "16px 0",
         borderBottom: `1px solid ${INK15}`,
         background: hover && clickable ? PAPER2 : "transparent",
         transition: "background 0.12s ease",
@@ -618,16 +712,14 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
         {String(n).padStart(2, "0")}
       </div>
 
-      {/* Type pill */}
-      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 10px 6px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.15em", textTransform: "uppercase", whiteSpace: "nowrap", alignSelf: "start", marginTop: 2 }}>
-        {item.badge}
-        {item.beta && <span style={{ opacity: 0.6, fontWeight: 700 }}>β</span>}
-      </div>
+      {/* Thumbnail */}
+      <ResourceThumb item={item} />
 
       {/* Title + deck */}
       <div>
         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK }}>
           {item.title}
+          {item.beta && <span style={{ marginLeft: 7, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.1em", color: INK55, verticalAlign: "middle" }}>β</span>}
         </div>
         <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, lineHeight: 1.55, color: INK70, marginTop: 6 }}>
           {item.newsDeck}
