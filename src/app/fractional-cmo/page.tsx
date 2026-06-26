@@ -1075,120 +1075,158 @@ const BookCall = () => (
     <SectionMast n="07" label="The next move · Thirty minutes, no pitch deck" />
 
     <div
-      className="grid-dark-card"
       style={{
         background: INK,
         color: PAPER,
-        padding: "40px 32px",
-        position: "relative",
         border: `1px solid ${INK}`,
       }}
     >
+      {/* ── Full-width heading row ── */}
       <div
         style={{
-          position: "absolute",
-          top: -1,
-          right: -1,
-          padding: "8px 16px",
-          background: YEL,
-          color: INK,
-          fontFamily: GROT,
-          fontWeight: 800,
-          fontSize: 11,
-          letterSpacing: "0.18em",
-          textTransform: "uppercase",
-          border: `1px solid ${INK}`,
+          padding: "36px 40px 32px",
+          borderBottom: "1px solid rgba(250,250,250,.12)",
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          gap: "16px 32px",
         }}
       >
-        ● 2 FRACTIONAL CMO SPOTS · Q3 2026
-      </div>
-
-      <div>
-        <SCaps size={11} ls="0.20em" color={YEL}>
-          The honest next step
-        </SCaps>
-        <h2
-          className="h2-sm"
+        <div>
+          <SCaps size={11} ls="0.20em" color={YEL}>The honest next step</SCaps>
+          <h2
+            className="h2-sm"
+            style={{
+              margin: "12px 0 0",
+              fontFamily: SERIF,
+              fontWeight: 700,
+              color: PAPER,
+              lineHeight: 1.02,
+              letterSpacing: "-0.022em",
+            }}
+          >
+            Thirty minutes,{" "}
+            <span style={{ fontStyle: "italic", color: YEL }}>no pitch deck.</span>
+          </h2>
+        </div>
+        <div
           style={{
-            margin: "14px 0 0",
-            fontFamily: SERIF,
-            fontWeight: 700,
-            color: PAPER,
-            lineHeight: 1.02,
-            letterSpacing: "-0.022em",
-          }}
-        >
-          Thirty minutes,
-          <br />
-          <span style={{ fontStyle: "italic", color: YEL }}>no pitch deck.</span>
-        </h2>
-        <p
-          style={{
-            marginTop: 22,
-            fontFamily: SERIF,
-            fontSize: 17.5,
-            color: "rgba(250,250,250,.72)",
-            lineHeight: 1.55,
-            maxWidth: 520,
-          }}
-        >
-          Tell me where the business is, where you want it to be in twelve
-          months, and what marketing has and has not done so far. I will tell
-          you honestly whether a Fractional CMO is the right answer, or
-          something else is.
-        </p>
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {/* Primary CTA */}
-        <a
-          href="https://www.syedirfanajmal.com/strategy-call"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "22px 26px",
-            background: YEL,
-            color: INK,
-            textDecoration: "none",
+            padding: "7px 16px",
+            border: "1px solid rgba(250,250,250,.3)",
             fontFamily: GROT,
             fontWeight: 800,
-            fontSize: 14,
-            letterSpacing: "0.10em",
+            fontSize: 10.5,
+            letterSpacing: "0.18em",
             textTransform: "uppercase",
+            color: "rgba(250,250,250,.6)",
+            whiteSpace: "nowrap",
           }}
         >
-          <span>Book a discovery call</span>
-          <span style={{ fontFamily: SERIF, fontSize: 22 }}>→</span>
-        </a>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
-          <div style={{ flex: 1, height: 1, background: "rgba(250,250,250,.15)" }} />
-          <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.35)">or send a message</SCaps>
-          <div style={{ flex: 1, height: 1, background: "rgba(250,250,250,.15)" }} />
+          ● 2 CMO SPOTS · Q3 2026
         </div>
-        <CMOInquiryForm />
-        <div style={{ marginTop: 6 }}>
-          <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
-            Reply within one working day. Time zone: GMT+5.
+      </div>
+
+      {/* ── Two-column body ── */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 0,
+        }}
+      >
+        {/* Left — copy + CTA + steps */}
+        <div
+          style={{
+            padding: "36px 40px 40px",
+            borderRight: "1px solid rgba(250,250,250,.12)",
+            display: "flex",
+            flexDirection: "column",
+            gap: 24,
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontFamily: SERIF,
+              fontSize: 17,
+              color: "rgba(250,250,250,.72)",
+              lineHeight: 1.6,
+            }}
+          >
+            Tell me where the business is, where you want it to be in twelve
+            months, and what marketing has and has not done so far. I will tell
+            you honestly whether a Fractional CMO is the right answer, or
+            something else is.
+          </p>
+
+          <a
+            href="https://www.syedirfanajmal.com/strategy-call"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "20px 24px",
+              background: YEL,
+              color: INK,
+              textDecoration: "none",
+              fontFamily: GROT,
+              fontWeight: 800,
+              fontSize: 13,
+              letterSpacing: "0.10em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span>Book a discovery call</span>
+            <span style={{ fontFamily: SERIF, fontSize: 20 }}>→</span>
+          </a>
+
+          <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.45)">
+            Reply within one working day · GMT+5
           </SCaps>
+
+          {/* What happens next */}
+          <div style={{ paddingTop: 4 }}>
+            <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.35)">What happens next</SCaps>
+            <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 18 }}>
+              {([
+                { n: "01", t: "30-min call",         d: "Tell me where the business is and where you need it in 12 months." },
+                { n: "02", t: "Proposal in 48h",     d: "If we're a fit, I'll send a written scope and retainer proposal within two working days." },
+                { n: "03", t: "Start within a week", d: "No lengthy onboarding. Intake begins and the first weekly call is booked immediately." },
+              ] as const).map(step => (
+                <div key={step.n} style={{ display: "flex", gap: 14 }}>
+                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12, color: YEL, letterSpacing: "0.04em", paddingTop: 2, flexShrink: 0 }}>{step.n}</div>
+                  <div>
+                    <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: PAPER, lineHeight: 1.25 }}>{step.t}</div>
+                    <div style={{ marginTop: 4, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.45)", lineHeight: 1.55, fontStyle: "italic" }}>{step.d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Tool mentions */}
+          <div style={{ paddingTop: 8, borderTop: "1px solid rgba(250,250,250,.1)" }}>
+            <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.35)">Not sure yet?</SCaps>
+            <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 14, color: "rgba(250,250,250,.55)", lineHeight: 1.6, fontStyle: "italic" }}>
+              Run{" "}
+              <a href="/tools/signaliq" style={{ color: "rgba(250,250,250,.75)", textDecoration: "underline" }}>SignalIQ</a>
+              {" "}or{" "}
+              <a href="/tools/pressiq" style={{ color: "rgba(250,250,250,.75)", textDecoration: "underline" }}>PressIQ</a>
+              {" "}first — the free tools my clients use to map their PR gaps. Bring the output to our call and we can skip the intake entirely.
+            </p>
+            <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 14, color: "rgba(250,250,250,.55)", lineHeight: 1.6, fontStyle: "italic" }}>
+              Not ready for a full retainer?{" "}
+              <a href="/emos" style={{ color: "rgba(250,250,250,.75)", textDecoration: "underline" }}>EMOS</a>
+              {" "}gives you the same system and playbooks to run earned media in-house — at a fraction of the cost. Most clients use it as a stepping stone.
+            </p>
+          </div>
         </div>
 
-        {/* What happens next */}
-        <div style={{ marginTop: 22, paddingTop: 24, borderTop: `1px solid rgba(250,250,250,.15)` }}>
-          <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.4)">What happens next</SCaps>
-          <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "16px 24px" }}>
-            {([
-              { n: "01", t: "30-min call",         d: "Tell me where the business is and where you need it in 12 months." },
-              { n: "02", t: "Proposal in 48h",     d: "If we're a fit, I'll send a written scope and retainer proposal within two working days." },
-              { n: "03", t: "Start within a week", d: "No lengthy onboarding. Intake begins and the first weekly call is booked immediately." },
-            ] as const).map(step => (
-              <div key={step.n}>
-                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12, color: YEL, letterSpacing: "0.04em" }}>{step.n}</div>
-                <div style={{ marginTop: 4, fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: PAPER, lineHeight: 1.25 }}>{step.t}</div>
-                <div style={{ marginTop: 5, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.5)", lineHeight: 1.55, fontStyle: "italic" }}>{step.d}</div>
-              </div>
-            ))}
-          </div>
+        {/* Right — form */}
+        <div style={{ padding: "36px 40px 40px", display: "flex", flexDirection: "column", gap: 12 }}>
+          <SCaps size={11} ls="0.20em" color="rgba(250,250,250,.45)">Or send a message</SCaps>
+          <CMOInquiryForm />
         </div>
       </div>
     </div>
