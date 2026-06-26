@@ -49,51 +49,17 @@ export default function ResourcexWorkspace() {
         .doc-cta:hover { opacity: 0.85 !important; }
       `}</style>
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section style={{ background: INK, padding: "56px 40px 64px" }}>
-        <div style={{ maxWidth: 880, margin: "0 auto" }}>
-
-          {/* Workspace badge */}
-          <div style={{
-            display: "flex", alignItems: "stretch",
-            marginBottom: 24, width: "fit-content",
-          }}>
-            <span style={{
-              fontFamily: GROT, fontWeight: 800, fontSize: 9,
-              letterSpacing: "0.18em", textTransform: "uppercase",
-              color: INK, background: YEL, padding: "5px 10px",
-            }}>
-              PRIVATE WORKSPACE
-            </span>
-            <span style={{
-              fontFamily: GROT, fontWeight: 700, fontSize: 9,
-              letterSpacing: "0.18em", textTransform: "uppercase",
-              color: "rgba(250,250,250,.60)",
-              border: `1px solid ${P25}`, padding: "5px 12px",
-            }}>
-              Resourcex.io
-            </span>
-          </div>
-
-          {/* Headline */}
-          <h1 style={{
-            fontFamily: SERIF, fontWeight: 700,
-            fontSize: "clamp(36px, 5vw, 60px)",
-            lineHeight: 0.96, letterSpacing: "-0.03em",
-            color: PAPER, marginBottom: 18,
-          }}>
-            Sajid Shah: your SIA<br />
-            <em>client workspace</em>
-          </h1>
-
-          <p style={{
-            fontFamily: SERIF, fontWeight: 400, fontSize: 17,
-            lineHeight: 1.6, color: "rgba(250,250,250,.60)",
-            maxWidth: 520, margin: 0,
-          }}>
-            Working assets prepared by Syed Irfan Ajmal. Shared privately for your review.
-          </p>
-        </div>
+      {/* ── Hero — compact masthead ────────────────────────────────────── */}
+      <section style={{ background: INK, padding: "16px 40px 14px", borderBottom: "1px solid rgba(250,250,250,.10)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: INK, background: YEL, padding: "4px 8px", flexShrink: 0 }}>
+          PRIVATE WORKSPACE
+        </span>
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.1, letterSpacing: "-0.02em", color: PAPER, margin: 0 }}>
+          Sajid Shah &amp; <em>your SIA client workspace</em>
+        </h1>
+        <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(250,250,250,.25)", border: "1px solid rgba(250,250,250,.12)", padding: "4px 9px", flexShrink: 0 }}>
+          Resourcex.io
+        </span>
       </section>
 
       {/* ── Documents ─────────────────────────────────────────────────────── */}
