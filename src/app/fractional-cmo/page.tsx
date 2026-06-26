@@ -149,6 +149,10 @@ const FAQS: ReadonlyArray<FAQItem> = [
     q: "Do you take equity?",
     a: "No. The retainer is cash-only. Equity complicates the relationship in ways that tend to hurt early-stage companies — it shifts incentives around spending, hiring, and timelines in subtle but real ways. A clean monthly retainer keeps incentives aligned: I need to produce visible results every month to keep the seat.",
   },
+  {
+    q: "How is this different from just hiring DMR.agency?",
+    a: "Hiring the agency gets you execution: PR, SEO, content, link earning. The Fractional CMO retainer adds the layer above that — strategy ownership, weekly decision-making with the founder, marketing function leadership, board and investor narratives, and hiring. I sit at the table and answer for the results. The agency work happens because I direct it, not instead of it.",
+  },
 ];
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -182,14 +186,17 @@ const Hero = () => (
         <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
           For B2B and SaaS founders: marketing leadership led by digital PR, SEO, and content, the channels that compound. Strategy ownership, weekly cadence, and agency-level execution through DMR.agency.
         </p>
+        <p style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>
+          20+ years · 50+ companies · 500+ earned placements
+        </p>
       </div>
 
-      {/* Right: topic index */}
+      {/* Right: key differentiators */}
       <div className="res-hero-right">
         {[
-          { label: "Strategy",   sub: "Positioning & GTM" },
-          { label: "Execution",  sub: "PR, SEO, content" },
-          { label: "Reporting",  sub: "Board & investor" },
+          { label: "$5K–$10K/mo",     sub: "vs. $300K+ full-time CMO" },
+          { label: "Weekly cadence",   sub: "Decisions in real time" },
+          { label: "Agency included",  sub: "DMR.agency, no extra cost" },
         ].map(t => (
           <div key={t.label}>
             <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, lineHeight: 1.2, letterSpacing: "-0.008em" }}>{t.label}</div>
@@ -232,8 +239,11 @@ const CMOLead = () => (
           of the $300K+ a full-time CMO costs, with agency execution included
           rather than billed on top. Six-month minimum, with sixty days&rsquo;
           notice after the first quarter, so you are never locked in.
-          ● 2 FRACTIONAL CMO SPOTS · Q3 2026 — book the call below if you
-          would like to discuss.
+        </p>
+        <p style={{ marginTop: "0.7em" }}>
+          The difference from hiring the agency directly: I own the marketing
+          function and answer for the strategy. You get a seat at the table,
+          not a vendor on a project brief.
         </p>
       </div>
 
@@ -304,7 +314,7 @@ const StatsStrip = () => (
 
 const Scope = () => (
   <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="01" label="Scope of the retainer · Six things included" />
+    <SectionMast n="02" label="Scope of the retainer · Six things included" />
 
     <div className="grid-intro">
       <h2
@@ -413,7 +423,7 @@ const CaseFiles = () => (
       borderTop: `1px solid ${INK}`,
     }}
   >
-    <SectionMast n="02" label="From the case files · Results on the record" />
+    <SectionMast n="04" label="From the case files · Results on the record" />
 
     <div className="grid-intro">
       <h2
@@ -489,7 +499,7 @@ const Timeline = () => (
       borderBottom: `1px solid ${INK}`,
     }}
   >
-    <SectionMast n="03" label="The first 90 days · A working shape" />
+    <SectionMast n="05" label="The first 90 days · A working shape" />
 
     <div className="grid-intro">
       <h2
@@ -579,7 +589,7 @@ const Timeline = () => (
 
 const Fit = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="04" label="Is it for you · The honest filter" />
+    <SectionMast n="01" label="Is it for you · The honest filter" />
 
     <div
       className="grid-subscriptions"
@@ -795,7 +805,7 @@ const CMO_TESTIMONIALS: ReadonlyArray<CMOTestimonial> = [
 
 const CMOTestimonials = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="05" label="On the record · Named clients, real numbers" />
+    <SectionMast n="03" label="On the record · Named clients, real numbers" />
     <div className="grid-intro">
       <h2
         className="h2-lg"
@@ -815,7 +825,7 @@ const CMOTestimonials = () => (
       {CMO_TESTIMONIALS.map((tm, i) => (
         <article key={i} className="letter-card" style={{ padding: "32px 28px 28px", display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-            <Pill size={10.5} ls="0.18em">&numero; {String(i + 1).padStart(2, "0")}</Pill>
+            <Pill size={10.5} ls="0.18em">№ {String(i + 1).padStart(2, "0")}</Pill>
             <SCaps size={10.5} ls="0.18em" color={INK55}>Filed from {tm.place}</SCaps>
           </div>
           <blockquote
@@ -872,7 +882,7 @@ const FAQ = () => (
       borderBottom: `1px solid ${INK}`,
     }}
   >
-    <SectionMast n="06" label="Common questions · The honest answers" />
+    <SectionMast n="06" label="Common questions · The honest answers, including the hard ones" />
     <div className="grid-intro">
       <h2
         className="h2-lg"
@@ -1068,11 +1078,66 @@ const CMOInquiryForm = () => {
   );
 };
 
-// ─── §06 · Book the Call ──────────────────────────────────────────────────────
+// ─── §07 · Audit ─────────────────────────────────────────────────────────────
+
+const AuditSection = () => (
+  <section className="sx" style={{ background: PAPER2, paddingTop: 70, paddingBottom: 70, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
+    <SectionMast n="07" label="Not ready to commit · The smaller first step" />
+    <div
+      style={{
+        border: `1px solid ${INK}`,
+        background: PAPER,
+        padding: "40px 40px",
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        gap: "20px 48px",
+        justifyContent: "space-between",
+      }}
+    >
+      <div style={{ flex: "1 1 480px" }}>
+        <Pill size={11} ls="0.20em">Or start smaller</Pill>
+        <h3 style={{ margin: "14px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
+          The Marketing Leadership Audit.
+        </h3>
+        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 16, color: INK70, lineHeight: 1.6, fontStyle: "italic", maxWidth: 640 }}>
+          The first two weeks of the retainer, sold on its own: founder calls,
+          sales-call recordings, competitor scan, a full audit of every
+          marketing asset and channel, and a written brief at the end. $3,000,
+          fixed. If you move into the retainer, the fee credits 100% against
+          your first month.
+        </p>
+      </div>
+      <a
+        href={CAL_URL}
+        data-cal-link={CAL_LINK}
+        data-cal-config={CAL_CFG_AUDIT}
+        style={{
+          display: "inline-block",
+          padding: "18px 28px",
+          background: INK,
+          color: PAPER,
+          textDecoration: "none",
+          fontFamily: GROT,
+          fontWeight: 800,
+          fontSize: 12,
+          letterSpacing: "0.14em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+          cursor: "pointer",
+        }}
+      >
+        Book the audit &rarr;
+      </a>
+    </div>
+  </section>
+);
+
+// ─── §08 · Book the Call ──────────────────────────────────────────────────────
 
 const BookCall = () => (
   <section id="book" className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="07" label="The next move · Thirty minutes, no pitch deck" />
+    <SectionMast n="08" label="The next move · Thirty minutes, no pitch deck" />
 
     <div
       style={{
@@ -1235,7 +1300,8 @@ const BookCall = () => (
           <a href="/tools/signaliq" style={{ color: INK, textDecoration: "underline" }}>SignalIQ</a>
           {" "}or{" "}
           <a href="/tools/pressiq" style={{ color: INK, textDecoration: "underline" }}>PressIQ</a>
-          {" "}first — the free tools my clients use to map their PR gaps. Bring the output to our call and we can skip the intake entirely.
+          {" "}first — free tools that map your PR gaps. Bring the output to the call and skip the intake entirely. Full library at{" "}
+          <a href="/resources" style={{ color: INK, textDecoration: "underline" }}>the resources page</a>.
         </p>
       </div>
       <div style={{ flex: "1 1 340px", borderLeft: `1px solid ${INK}`, paddingLeft: 40 }}>
@@ -1245,57 +1311,6 @@ const BookCall = () => (
           {" "}gives you the same system and playbooks to run earned media in-house — at a fraction of the cost. Most clients use it as a stepping stone.
         </p>
       </div>
-    </div>
-
-    {/* Start smaller: the audit */}
-    <div
-      style={{
-        marginTop: 28,
-        border: `1px solid ${INK}`,
-        background: PAPER2,
-        padding: "30px 32px",
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        gap: "20px 32px",
-        justifyContent: "space-between",
-      }}
-    >
-      <div style={{ flex: "1 1 480px" }}>
-        <Pill size={11} ls="0.20em">Or start smaller</Pill>
-        <h3 style={{ margin: "14px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
-          The Marketing Leadership Audit.
-        </h3>
-        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 16, color: INK70, lineHeight: 1.6, fontStyle: "italic", maxWidth: 640 }}>
-          The first two weeks of the retainer, sold on its own: founder calls,
-          sales-call recordings, competitor scan, a full audit of every
-          marketing asset and channel, and a written brief at the end. $3,000,
-          fixed. If you move into the retainer, the fee credits 100% against
-          your first month.
-        </p>
-      </div>
-      {/* Cal.com popup CTA — audit */}
-      <a
-        href={CAL_URL}
-        data-cal-link={CAL_LINK}
-        data-cal-config={CAL_CFG_AUDIT}
-        style={{
-          display: "inline-block",
-          padding: "16px 24px",
-          background: INK,
-          color: PAPER,
-          textDecoration: "none",
-          fontFamily: GROT,
-          fontWeight: 800,
-          fontSize: 12,
-          letterSpacing: "0.14em",
-          textTransform: "uppercase",
-          whiteSpace: "nowrap",
-          cursor: "pointer",
-        }}
-      >
-        Book the audit &rarr;
-      </a>
     </div>
   </section>
 );
@@ -1366,17 +1381,17 @@ export default function FractionalCMOPage() {
       <Hero />
       <CMOLead />
       <StatsStrip />
+      <Fit />
       <Scope />
+      <CMOTestimonials />
       <CaseFiles />
       <Timeline />
-      <Fit />
-      <CMOTestimonials />
       <FAQ />
+      <AuditSection />
       <BookCall />
       <CalSection />
-      <ToolsBand />
       <CTATicker />
-      <Subscriptions sectionNumber="08" />
+      <Subscriptions sectionNumber="09" />
       <Colophon />
       <ScrollButtons />
     </div>
