@@ -131,6 +131,7 @@ export default function PtClientWorkspace() {
     <main style={{ background: INK, minHeight: "100vh" }}>
       <style>{`
         .doc-cta:hover  { opacity: 0.85 !important; }
+        .doc-cta { min-height: 44px !important; display: inline-flex !important; align-items: center; }
         .pt-toc-link:hover { color: ${INK} !important; }
 
         /* ── Masthead ── */
@@ -228,7 +229,6 @@ export default function PtClientWorkspace() {
           .pt-section-dark { padding: 28px 20px 36px; }
           .pt-card-row    { grid-template-columns: 1fr; gap: 14px; padding: 22px 0; }
           .pt-card-row-sm { grid-template-columns: 1fr; gap: 10px; padding: 18px 0; }
-          .pt-tag         { display: none; }
           .pt-roadmap-row { padding: 16px 0; }
           .pt-footer { flex-direction: column; align-items: flex-start; padding: 20px 20px; gap: 12px; }
         }
@@ -468,7 +468,7 @@ export default function PtClientWorkspace() {
               PT&rsquo;s multi-year compensation dataset is the only free, source-cited, longitudinal physician compensation resource in the market.{" "}
               <em>No competitor has 4 years of clean, citable data.</em>
             </p>
-            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", columnGap: 0, rowGap: 10 }}>
               {[
                 { label: "2021 Report", done: true },
                 { label: "2022 Report", done: true },
