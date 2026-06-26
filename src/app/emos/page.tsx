@@ -34,9 +34,9 @@ const OG_DESC =
 // opengraph-image.tsx / twitter-image.tsx in this folder supply the image with
 // width/height/type automatically.
 export const metadata: Metadata = {
-  title: "EMOS · Build the Media Presence Investors Check Before Your First Meeting",
+  title: "EMOS · Earned Media OS for Founders",
   description:
-    "EMOS, the Earned Media Operating System, is a Guided Implementation System for founders 3 to 12 months from a Series A raise. One-time investment. Capability you keep forever.",
+    "EMOS is a guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.",
   alternates: { canonical: "/emos" },
   openGraph: {
     type: "website",

@@ -27,6 +27,9 @@ export default function PartnerCollabIQPage() {
         src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
         strategy="lazyOnload"
       />
+      <h1 style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" }}>
+        PartnerCollabIQ - Partnership Intelligence Tool
+      </h1>
       <ToolHeader toolName="PartnerCollabIQ — Partnership Intelligence" />
       <PartnerCollabIQ toolHeaderHeight={TOOL_HEADER_H} />
     </>

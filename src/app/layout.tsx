@@ -31,14 +31,14 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.syedirfanajmal.com"),
+  // Provides the homepage canonical; all other pages override this via their own alternates.canonical
+  alternates: { canonical: "/" },
   title: {
     default: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
     template: "%s · Syed Irfan Ajmal",
   },
   description:
-    "Fractional CMO, international speaker, and founder of DMR.agency. " +
-    "Helping founders and marketing teams get found, get covered, and get customers " +
-    "through GEO, SEO-PR, and earned media.",
+    "Fractional CMO and founder of DMR.agency. Helping founders and marketing teams get found, get covered, and get customers through GEO, SEO-PR, and earned media.",
   openGraph: {
     type: "website",
     siteName: "Syed Irfan Ajmal",
@@ -110,7 +110,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-in">
     <html
       lang="en"
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
