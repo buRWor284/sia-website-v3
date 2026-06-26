@@ -27,7 +27,7 @@ const DOCS = [
     title: "EMOS Private Founder's Intensive — Proposal",
     body: "Your personalised 8-week earned-media program: full scope, timeline, deliverables, and investment summary. Designed to peak at your acquisition announcement.",
     cta: "View the proposal →",
-    href: "#",
+    href: "/clients/resourcex/emos-deck",
     tag: "INTERACTIVE DECK",
     tagDark: false,
   },

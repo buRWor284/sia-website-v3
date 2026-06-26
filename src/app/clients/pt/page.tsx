@@ -1,89 +1,443 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Physicians Thrive · Client Workspace",
-  description: "Private workspace for Physicians Thrive.",
+  title: "Tools Ecosystem & Growth Strategy · Physicians Thrive",
+  description: "Private client workspace — tools, strategy assets, and data advantage.",
   robots: { index: false, follow: false },
   alternates: { canonical: "/clients/pt" },
 };
 
-const NAVY = "#0a3454";
-const BLUE = "#0c6cb4";
-const GOLD = "#f0c000";
-const INK = "#243240";
-const GRAY = "#6c6c6c";
-const LINE = "#dbe6f1";
-const BG = "#f3f7fb";
+/* ── Design tokens (SIA editorial) ────────────────────────────────────────── */
+const PAPER  = "#FAFAFA";
+const PAPER2 = "#F0F0EE";
+const INK    = "#1a1410";
+const INK70  = "rgba(26,20,16,.70)";
+const INK55  = "rgba(26,20,16,.55)";
+const INK35  = "rgba(26,20,16,.32)";
+const INK15  = "rgba(26,20,16,.15)";
+const YEL    = "#f5b81f";
+const SERIF  = "var(--font-serif)";
+const GROT   = "var(--font-grot)";
+const MONO   = "var(--font-mono)";
+const P25    = "rgba(250,250,250,.25)";
+const P60    = "rgba(250,250,250,.60)";
 
-type Asset = { href: string; title: string; desc: string; tag: string; cta: string };
-
-const ASSETS: Asset[] = [
+/* ── Content ───────────────────────────────────────────────────────────────── */
+const LIVE_TOOLS = [
   {
-    href: "/clients/pt/leverage-score.html",
     title: "Negotiation Leverage Score",
-    desc: "Interactive engine: pick a specialty, region, and state to see a 0-100 bargaining-power score, the levers most worth pushing, and a tailored readout. Every figure cites a report page.",
-    tag: "Interactive demo",
-    cta: "Open the tool →",
+    body: "Pick a specialty, region, and career stage. The engine returns a 0–100 bargaining-power score with ranked negotiation levers — every figure traced to a page in the Physicians Thrive Compensation Report.",
+    cta: "Open Live Demo →",
+    href: "/clients/pt/leverage-score.html",
+    tag: "LIVE DEMO",
   },
   {
-    href: "/clients/pt/salary-estimator.html",
     title: "Physician Salary Estimator",
-    desc: "Salary range, median, and total-compensation breakdown by specialty and region, with provenance chips marking every number as reported, derived, estimated, or not reported.",
-    tag: "Interactive demo",
-    cta: "Open the tool →",
+    body: "30+ specialties × 8 regions. Every salary figure is tagged Reported, Derived, or Estimated — with the source page. Includes YoY salary trends, incentive bonuses by specialty, gender pay gap data, and first-year total comp.",
+    cta: "Open Live Demo →",
+    href: "/clients/pt/salary-estimator.html",
+    tag: "LIVE DEMO",
+  },
+] as const;
+
+const COMING_TOOLS = [
+  {
+    title: "Contract Benchmarker",
+    body: "Paste an offer letter's key terms. Get a market-rate comparison for salary, signing bonus, RVU conversion factor, and benefits — all benchmarked against the 2024 PT report.",
   },
   {
-    href: "/clients/pt/report-2020.pdf",
-    title: "2020 Physician Compensation Report",
-    desc: "The source report behind both tools (Physicians Thrive, 2020). Provided for reference.",
-    tag: "PDF · reference",
-    cta: "Open the PDF →",
+    title: "Gender Pay Gap Checker",
+    body: "Enter specialty and gender. See the documented pay gap for your specialty, how it's trended since 2021, and which contract terms close it fastest.",
   },
-];
+  {
+    title: "Offer Comparison Calculator",
+    body: "Side-by-side analysis of up to 3 job offers with total compensation including base, signing bonus, RVU incentive, benefits value, and relocation.",
+  },
+  {
+    title: "Total Comp + Benefits Scorer",
+    body: "Score a full benefits package: disability insurance, 401k, malpractice, CME, relocation. Converts everything into a first-year dollar value.",
+  },
+] as const;
 
+const STRATEGY_ASSETS = [
+  {
+    title: "Competitor Analysis",
+    body: "How PT's tool suite compares to Resolve, Contract Diagnostics, Contract Rx, WealthKeel, and FastRVU across 8 dimensions — with head-to-head scorecards and market positioning.",
+    cta: "View Analysis →",
+    href: "/clients/pt/competitor-analysis.html",
+    tag: "REPORT",
+  },
+  {
+    title: "Marketing & Distribution Plan",
+    body: "How the tools become a growth engine: embeddable widgets, WCI placement, KevinMD/Medscape pitches, annual report press events, and the physician shortage data story.",
+    cta: "View Plan →",
+    href: "/clients/pt/marketing-plan.html",
+    tag: "STRATEGY DOC",
+  },
+] as const;
+
+const ROADMAP = [
+  {
+    title: "Specialty Leverage Trend",
+    desc: "4-year trajectory of bargaining power by specialty — which are gaining leverage, which are losing it, and why.",
+  },
+  {
+    title: "Embeddable Widget Suite",
+    desc: "Both tools as iframes for residency programs, specialty societies, and physician blogs. Every embed is a backlink and a lead.",
+  },
+  {
+    title: "Annual Report Interactive Hub",
+    desc: "Turn each year's PDF into a searchable, filterable data explorer. The tool becomes the report.",
+  },
+] as const;
+
+/* ── Section mast helper ───────────────────────────────────────────────────── */
+function SectionMast({ label, count }: { label: string; count?: number }) {
+  return (
+    <>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+        <span style={{
+          fontFamily: GROT, fontWeight: 800, fontSize: 9,
+          letterSpacing: "0.14em", textTransform: "uppercase",
+          color: INK, background: YEL, padding: "3px 8px", flexShrink: 0,
+        }}>
+          {label}
+        </span>
+        <div style={{ flexGrow: 1, height: 1, background: INK35 }} />
+        {count !== undefined && (
+          <span style={{ fontFamily: MONO, fontSize: 9, color: INK55, flexShrink: 0 }}>
+            {count} {count === 1 ? "item" : "items"}
+          </span>
+        )}
+      </div>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ height: 1, background: INK }} />
+        <div style={{ height: 3, marginTop: 3, background: INK }} />
+      </div>
+    </>
+  );
+}
+
+/* ── Component ─────────────────────────────────────────────────────────────── */
 export default function PtClientWorkspace() {
   return (
-    <main
-      style={{
-        background: BG,
-        minHeight: "100vh",
-        color: INK,
-        fontFamily:
-          "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif",
-      }}
-    >
-      <section style={{ background: `linear-gradient(155deg, ${BLUE} 0%, ${NAVY} 120%)`, color: "#fff", padding: "48px 0 64px" }}>
-        <div style={{ maxWidth: 920, margin: "0 auto", padding: "0 20px" }}>
-          <div style={{ display: "inline-block", background: "rgba(255,255,255,.14)", border: "1px solid rgba(255,255,255,.3)", padding: "5px 12px", borderRadius: 999, fontSize: 12, fontWeight: 600, letterSpacing: ".4px", marginBottom: 16 }}>
-            Private workspace · Physicians Thrive
+    <main style={{ background: INK, minHeight: "100vh" }}>
+      <style>{`.doc-cta:hover { opacity: 0.85 !important; }`}</style>
+
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      <section style={{ background: INK, padding: "56px 40px 64px" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+
+          <div style={{ display: "flex", alignItems: "stretch", marginBottom: 24, width: "fit-content" }}>
+            <span style={{
+              fontFamily: GROT, fontWeight: 800, fontSize: 9,
+              letterSpacing: "0.18em", textTransform: "uppercase",
+              color: INK, background: YEL, padding: "5px 10px",
+            }}>
+              PRIVATE WORKSPACE
+            </span>
+            <span style={{
+              fontFamily: GROT, fontWeight: 700, fontSize: 9,
+              letterSpacing: "0.18em", textTransform: "uppercase",
+              color: P60, border: `1px solid ${P25}`, padding: "5px 12px",
+            }}>
+              Physicians Thrive
+            </span>
           </div>
-          <h1 style={{ fontSize: 32, lineHeight: 1.15, fontWeight: 800, maxWidth: 720 }}>
-            Physicians Thrive: client workspace
+
+          <h1 style={{
+            fontFamily: SERIF, fontWeight: 700,
+            fontSize: "clamp(36px, 5vw, 60px)",
+            lineHeight: 0.96, letterSpacing: "-0.03em",
+            color: PAPER, marginBottom: 18,
+          }}>
+            Tools ecosystem<br />
+            <em>&amp; growth strategy</em>
           </h1>
-          <p style={{ marginTop: 12, maxWidth: 640, opacity: 0.92, fontSize: 16 }}>
-            Working assets prepared by Syed Irfan Ajmal. These are shared privately for review and are not published publicly.
+
+          <p style={{
+            fontFamily: SERIF, fontWeight: 400, fontSize: 17,
+            lineHeight: 1.6, color: P60, maxWidth: 520, margin: 0,
+          }}>
+            A proposal-in-demo form: two live tools, four in development, plus a competitor analysis and marketing plan — all powered by PT&rsquo;s annual compensation data.
           </p>
         </div>
       </section>
 
-      <section style={{ maxWidth: 920, margin: "0 auto", padding: "0 20px" }}>
-        <div style={{ display: "grid", gap: 16, marginTop: -36 }}>
-          {ASSETS.map((a) => (
-            <a key={a.href} href={a.href} style={{ display: "block", textDecoration: "none", color: INK, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 14, padding: 22, boxShadow: "0 18px 44px -32px rgba(10,52,84,.5)" }}>
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12 }}>
-                <h2 style={{ fontSize: 19, color: NAVY, fontWeight: 800 }}>{a.title}</h2>
-                <span style={{ fontSize: 10.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".5px", color: BLUE, background: "rgba(12,108,180,.1)", padding: "3px 9px", borderRadius: 999, whiteSpace: "nowrap" }}>{a.tag}</span>
+      {/* ── Live Tools ────────────────────────────────────────────────────── */}
+      <section style={{ background: PAPER, padding: "48px 40px 56px" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <SectionMast label="Active Tools" count={LIVE_TOOLS.length} />
+          <div style={{ border: `1px solid ${INK}` }}>
+            {LIVE_TOOLS.map((tool, i) => (
+              <div
+                key={tool.title}
+                style={{
+                  display: "grid", gridTemplateColumns: "1fr auto",
+                  gap: 24, padding: "32px 36px", alignItems: "start",
+                  borderBottom: i < LIVE_TOOLS.length - 1 ? `1px solid ${INK}` : "none",
+                }}
+              >
+                <div>
+                  <h2 style={{
+                    fontFamily: SERIF, fontWeight: 700, fontSize: 24,
+                    lineHeight: 1.15, letterSpacing: "-0.01em",
+                    color: INK, marginBottom: 10,
+                  }}>
+                    {tool.title}
+                  </h2>
+                  <p style={{
+                    fontFamily: SERIF, fontWeight: 400, fontSize: 15,
+                    lineHeight: 1.6, color: INK70, marginBottom: 20,
+                  }}>
+                    {tool.body}
+                  </p>
+                  <a
+                    href={tool.href}
+                    className="doc-cta"
+                    style={{
+                      display: "inline-block",
+                      fontFamily: GROT, fontWeight: 700, fontSize: 10,
+                      letterSpacing: "0.14em", textTransform: "uppercase",
+                      background: INK, color: PAPER, padding: "12px 20px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    {tool.cta}
+                  </a>
+                </div>
+                <span style={{
+                  fontFamily: GROT, fontWeight: 700, fontSize: 9,
+                  letterSpacing: "0.18em", textTransform: "uppercase",
+                  color: INK, background: YEL,
+                  border: `1px solid ${INK}`, padding: "5px 10px",
+                  whiteSpace: "nowrap",
+                }}>
+                  {tool.tag}
+                </span>
               </div>
-              <p style={{ marginTop: 8, fontSize: 14, color: GRAY, lineHeight: 1.55 }}>{a.desc}</p>
-              <span style={{ marginTop: 14, display: "inline-block", background: GOLD, color: "#2a2200", fontWeight: 700, fontSize: 13, padding: "9px 16px", borderRadius: 7 }}>{a.cta}</span>
-            </a>
-          ))}
+            ))}
+          </div>
         </div>
-
-        <p style={{ margin: "26px 0 60px", fontSize: 12, color: GRAY, lineHeight: 1.6 }}>
-          Source for both tools: Physicians Thrive 2020 Physician Compensation Report. Figures are tagged reported / derived; scores are derived. Data gaps are shown as “not separately reported.”
-        </p>
       </section>
+
+      {/* ── In Development ────────────────────────────────────────────────── */}
+      <section style={{ background: PAPER2, padding: "48px 40px 56px" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <SectionMast label="In Development" count={COMING_TOOLS.length} />
+          <div style={{ border: `1px solid ${INK35}` }}>
+            {COMING_TOOLS.map((tool, i) => (
+              <div
+                key={tool.title}
+                style={{
+                  display: "grid", gridTemplateColumns: "1fr auto",
+                  gap: 24, padding: "28px 36px", alignItems: "start",
+                  borderBottom: i < COMING_TOOLS.length - 1 ? `1px solid ${INK35}` : "none",
+                  opacity: 0.65,
+                }}
+              >
+                <div>
+                  <h2 style={{
+                    fontFamily: SERIF, fontWeight: 700, fontSize: 20,
+                    lineHeight: 1.2, letterSpacing: "-0.01em",
+                    color: INK, marginBottom: 8,
+                  }}>
+                    {tool.title}
+                  </h2>
+                  <p style={{
+                    fontFamily: SERIF, fontWeight: 400, fontSize: 14,
+                    lineHeight: 1.6, color: INK55, margin: 0,
+                  }}>
+                    {tool.body}
+                  </p>
+                </div>
+                <span style={{
+                  fontFamily: GROT, fontWeight: 700, fontSize: 9,
+                  letterSpacing: "0.18em", textTransform: "uppercase",
+                  color: INK55, background: PAPER2,
+                  border: `1px solid ${INK35}`, padding: "5px 10px",
+                  whiteSpace: "nowrap",
+                }}>
+                  COMING SOON
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Strategy Assets ───────────────────────────────────────────────── */}
+      <section style={{ background: PAPER, padding: "48px 40px 56px" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <SectionMast label="Strategy Assets" count={STRATEGY_ASSETS.length} />
+          <div style={{ border: `1px solid ${INK}` }}>
+            {STRATEGY_ASSETS.map((asset, i) => (
+              <div
+                key={asset.title}
+                style={{
+                  display: "grid", gridTemplateColumns: "1fr auto",
+                  gap: 24, padding: "32px 36px", alignItems: "start",
+                  borderBottom: i < STRATEGY_ASSETS.length - 1 ? `1px solid ${INK}` : "none",
+                }}
+              >
+                <div>
+                  <h2 style={{
+                    fontFamily: SERIF, fontWeight: 700, fontSize: 24,
+                    lineHeight: 1.15, letterSpacing: "-0.01em",
+                    color: INK, marginBottom: 10,
+                  }}>
+                    {asset.title}
+                  </h2>
+                  <p style={{
+                    fontFamily: SERIF, fontWeight: 400, fontSize: 15,
+                    lineHeight: 1.6, color: INK70, marginBottom: 20,
+                  }}>
+                    {asset.body}
+                  </p>
+                  <a
+                    href={asset.href}
+                    className="doc-cta"
+                    style={{
+                      display: "inline-block",
+                      fontFamily: GROT, fontWeight: 700, fontSize: 10,
+                      letterSpacing: "0.14em", textTransform: "uppercase",
+                      background: INK, color: PAPER, padding: "12px 20px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    {asset.cta}
+                  </a>
+                </div>
+                <span style={{
+                  fontFamily: GROT, fontWeight: 700, fontSize: 9,
+                  letterSpacing: "0.18em", textTransform: "uppercase",
+                  color: INK55, background: PAPER2,
+                  border: `1px solid ${INK35}`, padding: "5px 10px",
+                  whiteSpace: "nowrap",
+                }}>
+                  {asset.tag}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Data Foundation ───────────────────────────────────────────────── */}
+      <section style={{ background: INK, padding: "56px 40px" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+
+          <div style={{ display: "flex", alignItems: "stretch", marginBottom: 24, width: "fit-content" }}>
+            <span style={{
+              fontFamily: GROT, fontWeight: 800, fontSize: 9,
+              letterSpacing: "0.18em", textTransform: "uppercase",
+              color: INK, background: YEL, padding: "5px 10px",
+            }}>
+              DATA FOUNDATION
+            </span>
+          </div>
+
+          <h2 style={{
+            fontFamily: SERIF, fontWeight: 700,
+            fontSize: "clamp(24px, 3vw, 38px)",
+            lineHeight: 1.05, letterSpacing: "-0.02em",
+            color: PAPER, marginBottom: 14,
+          }}>
+            The data asset behind everything
+          </h2>
+
+          <p style={{
+            fontFamily: SERIF, fontWeight: 400, fontSize: 16,
+            lineHeight: 1.7, color: P60, maxWidth: 580, marginBottom: 36,
+          }}>
+            PT&rsquo;s multi-year compensation dataset is the only free, source-cited, longitudinal physician compensation resource in the market.{" "}
+            <em>No competitor has 4 years of clean, citable data.</em>
+          </p>
+
+          <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 0 }}>
+            {[
+              { label: "2021 Report", done: true },
+              { label: "2022 Report", done: true },
+              { label: "2023 Report", done: true },
+              { label: "2024 Report", done: true },
+              { label: "2025 · In Progress", done: false },
+            ].map((y, i) => (
+              <div key={y.label} style={{ display: "flex", alignItems: "center" }}>
+                {i > 0 && (
+                  <div style={{ width: 32, height: 1, background: y.done ? YEL : P25 }} />
+                )}
+                <span style={{
+                  fontFamily: MONO, fontSize: 10,
+                  color: y.done ? YEL : INK55,
+                  border: `1px solid ${y.done ? YEL : "rgba(250,250,250,.18)"}`,
+                  padding: "5px 10px", whiteSpace: "nowrap",
+                }}>
+                  {y.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Roadmap ───────────────────────────────────────────────────────── */}
+      <section style={{ background: PAPER2, padding: "48px 40px 56px" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <SectionMast label="Roadmap" count={ROADMAP.length} />
+          <div style={{ border: `1px solid ${INK35}` }}>
+            {ROADMAP.map((item, i) => (
+              <div
+                key={item.title}
+                style={{
+                  padding: "24px 36px",
+                  borderBottom: i < ROADMAP.length - 1 ? `1px solid ${INK35}` : "none",
+                }}
+              >
+                <h3 style={{
+                  fontFamily: SERIF, fontWeight: 700, fontSize: 18,
+                  letterSpacing: "-0.01em", color: INK, marginBottom: 6,
+                }}>
+                  {item.title}
+                </h3>
+                <p style={{
+                  fontFamily: SERIF, fontWeight: 400, fontSize: 14,
+                  lineHeight: 1.6, color: INK55, margin: 0,
+                }}>
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      <footer style={{
+        background: PAPER2, borderTop: `1px solid ${INK15}`,
+        padding: "20px 40px",
+        display: "flex", justifyContent: "space-between",
+        alignItems: "center", gap: 24,
+      }}>
+        <p style={{
+          fontFamily: SERIF, fontStyle: "italic", fontWeight: 400,
+          fontSize: 12.5, lineHeight: 1.5, color: INK55,
+          margin: 0, maxWidth: 520,
+        }}>
+          All materials prepared exclusively for Physicians Thrive. Built on the EMOS framework by Syed Irfan Ajmal &mdash; shared privately for review.
+        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          <div style={{
+            width: 8, height: 8, background: YEL,
+            border: `1.5px solid ${INK}`, borderRadius: "50%",
+          }} />
+          <span style={{
+            fontFamily: GROT, fontWeight: 700, fontSize: 9,
+            letterSpacing: "0.16em", textTransform: "uppercase", color: INK55,
+          }}>
+            CONFIDENTIAL
+          </span>
+        </div>
+      </footer>
     </main>
   );
 }
