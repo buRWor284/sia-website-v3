@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import Script from "next/script";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
@@ -930,6 +930,137 @@ const FAQ = () => (
   </section>
 );
 
+// ─── CMO Inquiry Form ─────────────────────────────────────────────────────────
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "12px 14px",
+  background: "rgba(250,250,250,.07)",
+  border: "1px solid rgba(250,250,250,.25)",
+  color: PAPER,
+  fontFamily: SERIF,
+  fontSize: 15,
+  lineHeight: 1.4,
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+const CMOInquiryForm = () => {
+  const [fields, setFields] = useState({ name: "", email: "", company: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const set = (k: keyof typeof fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    setFields(f => ({ ...f, [k]: e.target.value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMsg("");
+    try {
+      const res = await fetch("/api/cmo-inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
+      });
+      const json = await res.json() as { ok?: boolean; error?: string };
+      if (!res.ok || !json.ok) {
+        setErrorMsg(json.error || "Something went wrong. Please try again.");
+        setStatus("error");
+      } else {
+        setStatus("sent");
+      }
+    } catch {
+      setErrorMsg("Network error. Please try again.");
+      setStatus("error");
+    }
+  };
+
+  if (status === "sent") {
+    return (
+      <div style={{ padding: "22px 26px", border: "1px solid rgba(250,250,250,.25)", background: "rgba(250,250,250,.06)" }}>
+        <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: YEL, marginBottom: 6 }}>
+          Message received.
+        </div>
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(250,250,250,.65)", lineHeight: 1.55 }}>
+          I&rsquo;ll get back to you within one working day.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* Honeypot */}
+      <input name="website" type="text" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <input
+          type="text"
+          placeholder="Name *"
+          value={fields.name}
+          onChange={set("name")}
+          required
+          style={inputStyle}
+        />
+        <input
+          type="email"
+          placeholder="Email *"
+          value={fields.email}
+          onChange={set("email")}
+          required
+          style={inputStyle}
+        />
+      </div>
+      <input
+        type="text"
+        placeholder="Company (optional)"
+        value={fields.company}
+        onChange={set("company")}
+        style={inputStyle}
+      />
+      <textarea
+        placeholder="What&apos;s the situation? *"
+        value={fields.message}
+        onChange={set("message")}
+        required
+        rows={4}
+        style={{ ...inputStyle, resize: "vertical" }}
+      />
+
+      {status === "error" && (
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "#f87171" }}>
+          {errorMsg}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={status === "sending"}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "16px 22px",
+          background: "transparent",
+          color: PAPER,
+          border: `1px solid ${PAPER}`,
+          fontFamily: GROT,
+          fontWeight: 800,
+          fontSize: 13,
+          letterSpacing: "0.10em",
+          textTransform: "uppercase",
+          cursor: status === "sending" ? "not-allowed" : "pointer",
+          opacity: status === "sending" ? 0.6 : 1,
+        }}
+      >
+        <span>{status === "sending" ? "Sending…" : "Send message"}</span>
+        <span style={{ fontFamily: SERIF, fontSize: 20 }}>→</span>
+      </button>
+    </form>
+  );
+};
+
 // ─── §06 · Book the Call ──────────────────────────────────────────────────────
 
 const BookCall = () => (
@@ -1002,11 +1133,9 @@ const BookCall = () => (
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {/* Cal.com popup CTA — primary */}
+        {/* Primary CTA */}
         <a
-          href={CAL_URL}
-          data-cal-link={CAL_LINK}
-          data-cal-config={CAL_CFG_POPUP}
+          href="https://www.syedirfanajmal.com/strategy-call"
           style={{
             display: "flex",
             alignItems: "center",
@@ -1020,33 +1149,12 @@ const BookCall = () => (
             fontSize: 14,
             letterSpacing: "0.10em",
             textTransform: "uppercase",
-            cursor: "pointer",
           }}
         >
           <span>Book a discovery call</span>
-          <span style={{ fontFamily: SERIF, fontSize: 22 }}>&rarr;</span>
+          <span style={{ fontFamily: SERIF, fontSize: 22 }}>→</span>
         </a>
-        <a
-          href="mailto:sia@syedirfanajmal.com"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "22px 26px",
-            background: "transparent",
-            color: PAPER,
-            border: `1px solid ${PAPER}`,
-            textDecoration: "none",
-            fontFamily: GROT,
-            fontWeight: 800,
-            fontSize: 14,
-            letterSpacing: "0.10em",
-            textTransform: "uppercase",
-          }}
-        >
-          <span>Email instead</span>
-          <span style={{ fontFamily: SERIF, fontSize: 22 }}>&nearr;</span>
-        </a>
+        <CMOInquiryForm />
         <div style={{ marginTop: 6 }}>
           <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
             Reply within one working day. Time zone: GMT+5.
