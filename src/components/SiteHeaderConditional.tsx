@@ -9,7 +9,7 @@
 import { usePathname } from "next/navigation";
 import { SiteHeader, CredibilityTicker } from "@/components/bureau";
 
-const HIDDEN_PREFIXES = ["/emostool", "/sign-in", "/sign-up"];
+const HIDDEN_PREFIXES = ["/emostool", "/sign-in", "/sign-up", "/clients/resourcex/cmo-pilot"];
 
 export function SiteHeaderConditional() {
   const pathname = usePathname();
