@@ -339,118 +339,247 @@ function Slide07() {
   );
 }
 
-/* ── Slide 08 — JournoCollabIQ Demo (dark) ───────────────────────────────── */
+/* ── Slide 08 — JournoCollabIQ Demo (dark, animated) ─────────────────────── */
 function Slide08() {
-  const matches = [
-    { tier: "T1", name: "Alex Konrad", pub: "Forbes · Tech", angle: "\"Bootstrapped Pakistani founder flips the 'you need VC' narrative — exits on his own terms after 3 years.\"", note: "✓ Email verified · 3 past SaaS exits covered" },
-    { tier: "T1", name: "Melia Russell", pub: "Business Insider · Startups", angle: "\"The quiet acquisition that's making noise: how Sajid Shah sold OnSense.io without a single press release.\"", note: "✓ Email verified · Covered 5 Pakistan tech stories" },
-    { tier: "T2", name: "Freya Pratty", pub: "Sifted · Emerging Markets", angle: "\"Bootstrapped exit as a template: what South Asian SaaS founders can learn from OnSense.io's journey.\"", note: "" },
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setStep(1), 700),
+      setTimeout(() => setStep(2), 1300),
+      setTimeout(() => setStep(3), 1900),
+      setTimeout(() => setStep(4), 2700),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  const JOURNALISTS = [
+    {
+      tier: "T1", name: "Alex Konrad", pub: "Forbes", beat: "Tech", pubColor: "#e8392a",
+      angle: "\"Bootstrapped Pakistani founder flips the 'you need VC' narrative — exits on his own terms after 3 years.\"",
+      badge: "✓ Email verified", note: "3 past SaaS exits covered",
+    },
+    {
+      tier: "T1", name: "Melia Russell", pub: "Business Insider", beat: "Startups", pubColor: "#4a7fd4",
+      angle: "\"The quiet acquisition that's making noise: how Sajid Shah sold OnSense.io without a single press release.\"",
+      badge: "✓ Email verified", note: "Covered 5 Pakistan tech stories",
+    },
+    {
+      tier: "T2", name: "Freya Pratty", pub: "Sifted", beat: "Emerging Markets", pubColor: null,
+      angle: "\"Bootstrapped exit as a template: what South Asian SaaS founders can learn from OnSense.io's journey.\"",
+      badge: null, note: null,
+    },
   ];
+
   return (
     <div style={{ background: K, width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
-      <Util badge="EMOS · JOURNOCOLLABIQ" right="SAJID · RESOURCEX.IO" dark />
-      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "420px 1fr", gap: 1, background: OD12 }}>
+      {/* Custom util bar — plain text both sides, no yellow badge */}
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: "0 80px", height: 68, flexShrink: 0,
+        borderBottom: `1.5px solid ${OD12}`,
+        fontFamily: SANS, fontWeight: 700, fontSize: 14,
+        letterSpacing: "0.14em", textTransform: "uppercase", color: OD45,
+      }}>
+        <span>EMOS · ONE OF THE MULTIPLE TOOLS YOUR TEAM WILL USE · JOURNOCOLLABIQ</span>
+        <span>SAJID · RESOURCEX.IO</span>
+      </div>
+
+      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "400px 1fr", gap: 1, background: OD12, overflow: "hidden" }}>
         {/* Left: input panel */}
-        <div style={{ background: "rgba(26,23,18,.80)", padding: "36px 40px", display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 18, color: OD }}>JOURNOCOLLABIQ</div>
-          <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.12em", color: OD45 }}>Find journalists · build angles · draft outreach</div>
-          <div style={{ borderTop: `1px solid ${OD12}`, paddingTop: 20 }}>
+        <div style={{ background: "rgba(26,23,18,.88)", padding: "32px 36px", display: "flex", flexDirection: "column", gap: 18, overflow: "hidden" }}>
+          <div>
+            <div style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, color: Y, letterSpacing: "0.04em" }}>JOURNOCOLLABIQ</div>
+            <div style={{ fontFamily: SANS, fontWeight: 400, fontSize: 14, color: OD45, marginTop: 4 }}>Find journalists · build angles · draft outreach</div>
+          </div>
+          <div style={{ height: 1, background: OD12, flexShrink: 0 }} />
+          <div>
             <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, marginBottom: 8 }}>FOUNDER / BRAND</div>
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 17, color: OD }}>Sajid Shah · OnSense.io</div>
+            <div style={{ border: `1px solid ${OD25}`, padding: "11px 14px", fontFamily: SANS, fontWeight: 700, fontSize: 16, color: OD }}>
+              Sajid Shah · OnSense.io
+            </div>
           </div>
           <div>
             <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, marginBottom: 8 }}>STORY ANGLE</div>
-            <div style={{ border: `1px solid ${OD25}`, padding: "12px 16px", fontFamily: SERIF, fontSize: 17, lineHeight: 1.5, color: OD70 }}>
+            <div style={{ border: `1.5px solid ${Y}`, padding: "12px 14px", fontFamily: SERIF, fontSize: 16, lineHeight: 1.5, color: OD70, background: "rgba(245,197,24,.04)" }}>
               Pakistani SaaS founder sells bootstrapped company after 3 years. Building in public, no VC, earned media-only growth.
             </div>
           </div>
           <div>
             <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, marginBottom: 10 }}>TARGET BEATS</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {["SaaS / Tech Founders", "Pakistan / South Asia", "Bootstrapped"].map(t => (
-                <span key={t} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 13, color: Y, border: `1px solid rgba(245,197,24,.4)`, padding: "4px 10px" }}>{t}</span>
+              {["SaaS / Tech", "Founders", "Pakistan / South Asia", "Bootstrapped"].map(t => (
+                <span key={t} style={{ fontFamily: SANS, fontWeight: 600, fontSize: 13, color: OD70, border: `1px solid ${OD25}`, padding: "5px 10px" }}>{t}</span>
               ))}
             </div>
           </div>
-          <button style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 800, fontSize: 13, letterSpacing: "0.14em", textTransform: "uppercase", border: "none", padding: "14px 0", cursor: "default", marginTop: 8 }}>▶ RUN ANALYSIS</button>
+          <div style={{ flex: 1 }} />
+          <button style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 800, fontSize: 15, letterSpacing: "0.14em", textTransform: "uppercase", border: "none", padding: "15px 0", cursor: "default" }}>▶ RUN ANALYSIS</button>
         </div>
-        {/* Right: results */}
-        <div style={{ background: K, padding: "36px 48px", display: "flex", flexDirection: "column", gap: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 20 }}>
-            <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 15, letterSpacing: "0.14em", textTransform: "uppercase", color: OD }}>JOURNALIST MATCHES · TIER 1–3 · 24 FOUND</span>
-            <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: "3px 10px" }}>✓ Verified active</span>
+
+        {/* Right: results (animated) */}
+        <div style={{ background: K, padding: "24px 40px", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, flexShrink: 0 }}>
+            <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 16, letterSpacing: "0.12em", textTransform: "uppercase", color: OD }}>JOURNALIST MATCHES · TIER 1 - 3 · 24 FOUND</span>
+            <span style={{ background: "rgba(245,197,24,.12)", border: `1px solid rgba(245,197,24,.35)`, fontFamily: SANS, fontWeight: 700, fontSize: 12, letterSpacing: "0.10em", color: Y, padding: "4px 12px" }}>✓ Verified active</span>
           </div>
-          {matches.map(m => (
-            <div key={m.name} style={{ border: `1px solid ${OD12}`, padding: "20px 24px", display: "grid", gridTemplateColumns: "auto 1fr", gap: 20, alignItems: "start", marginBottom: 8 }}>
-              <div style={{ background: m.tier === "T1" ? Y : OD25, color: K, fontFamily: SANS, fontWeight: 800, fontSize: 12, padding: "3px 8px", marginTop: 4 }}>{m.tier}</div>
-              <div>
-                <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 17, color: OD }}>{m.name}</div>
-                <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 13, color: OD45, marginBottom: 8 }}>{m.pub}</div>
-                <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, lineHeight: 1.5, color: OD70, marginBottom: m.note ? 8 : 0 }}>{m.angle}</div>
-                {m.note && <div style={{ fontFamily: SANS, fontSize: 13, color: OD45 }}>{m.note}</div>}
+          <div style={{ height: 2, background: Y, marginBottom: 14, flexShrink: 0 }} />
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+            {JOURNALISTS.map((j, i) => (
+              <div key={j.name} style={{
+                border: `1px solid ${OD12}`,
+                padding: "14px 18px",
+                background: "rgba(236,232,218,.03)",
+                opacity: step > i ? 1 : 0,
+                transform: step > i ? "translateY(0)" : "translateY(10px)",
+                transition: "opacity 0.4s ease, transform 0.4s ease",
+              }}>
+                <div style={{ display: "grid", gridTemplateColumns: "40px 1fr", gap: 14, alignItems: "start" }}>
+                  <div style={{
+                    width: 36, height: 36, borderRadius: "50%",
+                    background: j.tier === "T1" ? Y : "rgba(236,232,218,.18)",
+                    color: j.tier === "T1" ? K : OD70,
+                    fontFamily: SANS, fontWeight: 900, fontSize: 13,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                  }}>{j.tier}</div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+                      <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 18, color: OD }}>{j.name}</span>
+                      <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: j.pubColor || OD45 }}>{j.pub} · {j.beat}</span>
+                    </div>
+                    <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, lineHeight: 1.5, color: OD70, marginBottom: j.badge ? 8 : 0 }}>{j.angle}</div>
+                    {j.badge && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <span style={{ background: "#1a5c28", color: "#7ee89a", fontFamily: SANS, fontWeight: 700, fontSize: 11, padding: "3px 10px" }}>{j.badge}</span>
+                        {j.note && <span style={{ fontFamily: SANS, fontSize: 13, color: OD45 }}>{j.note}</span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* Outreach sequence */}
+            <div style={{
+              background: "rgba(245,197,24,.07)", border: `1px solid rgba(245,197,24,.18)`,
+              padding: "14px 18px",
+              opacity: step >= 4 ? 1 : 0,
+              transform: step >= 4 ? "translateY(0)" : "translateY(8px)",
+              transition: "opacity 0.4s ease, transform 0.4s ease",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 13, letterSpacing: "0.12em", textTransform: "uppercase", color: Y }}>OUTREACH SEQUENCE READY</span>
+                <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, color: Y }}>Export →</span>
+              </div>
+              <p style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.5, color: OD70, margin: "0 0 8px" }}>
+                3-touch email sequence drafted for Tier 1 journalists · personalised per outlet
+              </p>
+              <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, marginBottom: 5 }}>TESTED VARIANTS:</div>
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.6, color: OD55 }}>
+                A: &quot;Pakistani founder bootstrapped, then exited — no VC, no press release&quot;<br />
+                B: &quot;How Sajid Shah sold OnSense.ai without a single pitch to media&quot;
               </div>
             </div>
-          ))}
-          <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: OD45, marginTop: 8 }}>
-            Story angle shown is pre-announcement. The Sprint module adds the acquisition narrative and embargo plan.
-          </p>
+          </div>
         </div>
+      </div>
+
+      {/* Bottom yellow banner */}
+      <div style={{ flexShrink: 0, background: Y, padding: "20px 80px" }}>
+        <p style={{ fontFamily: SANS, fontWeight: 800, fontSize: 22, lineHeight: 1.4, color: K, margin: 0 }}>
+          STORY ANGLE SHOWN IS PRE-ANNOUNCEMENT.{" "}
+          <em style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 22 }}>
+            The Sprint module adds the acquisition narrative and embargo plan.
+          </em>
+        </p>
       </div>
     </div>
   );
 }
 
-/* ── Slide 09 — EMOS Potential Results (light panel) ─────────────────────── */
+/* ── Slide 09 — EMOS Potential Results (dark, with real photos) ───────────── */
 function Slide09() {
   return (
-    <div style={{ background: P2, width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
-      <Util badge="EMOS · WHAT THIS COULD LOOK LIKE" right="ILLUSTRATIVE, NOT A GUARANTEE" />
-      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 32, padding: "40px 80px", alignItems: "stretch" }}>
-        {/* TechCrunch */}
-        <div style={{ background: P, border: `1.5px solid ${K18}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ background: K, padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 18, color: OD }}>TechCrunch</span>
+    <div style={{ background: "#0d0c0a", width: "100%", height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Custom util bar — plain text left, yellow badge right */}
+      <div style={{
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        padding: "0 80px", height: 68, flexShrink: 0,
+        borderBottom: `1.5px solid ${OD12}`,
+        fontFamily: SANS, fontWeight: 700, fontSize: 14,
+        letterSpacing: "0.14em", textTransform: "uppercase", color: OD45,
+      }}>
+        <span>EMOS · WHAT THIS COULD LOOK LIKE · ILLUSTRATIVE, NOT A GUARANTEE</span>
+        <span style={{ background: Y, color: K, fontWeight: 800, fontSize: 11, padding: "5px 12px", letterSpacing: "0.12em", flexShrink: 0 }}>ILLUSTRATIVE</span>
+      </div>
+
+      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, padding: "28px 60px", alignItems: "stretch" }}>
+
+        {/* ── TechCrunch card ── */}
+        <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "3px solid #21ce56" }}>
+            <span style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, color: "#21ce56" }}>TechCrunch</span>
             <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 10, padding: "3px 8px", letterSpacing: "0.10em" }}>EXCLUSIVE</span>
           </div>
-          <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: K55 }}>STARTUPS · AI</div>
-            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, lineHeight: 1.2, color: K, margin: 0 }}>
-              Building a 7-Figure AI Startup for the Best from the Global South
-            </h3>
-            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: K55, margin: 0 }}>
+          <div style={{ padding: "18px 22px", flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#21ce56" }}>STARTUPS · AI</div>
+            <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/clients/sajid-headshot.jpg" alt="Sajid Shah" style={{ width: 72, height: 72, objectFit: "cover", objectPosition: "center top", flexShrink: 0 }} />
+              <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.25, color: OD, margin: 0 }}>
+                Building a 7-Figure AI Startup for the Best from the Global South
+              </h3>
+            </div>
+            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: OD45, margin: 0 }}>
               By Sajid Shah · Founder, OnSense.io · June 2026
             </p>
           </div>
         </div>
-        {/* Startup Grind */}
-        <div style={{ background: P, border: `1.5px solid ${K18}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ background: K, padding: "12px 24px" }}>
-            <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 18, color: OD }}>Startup Grind</span>
-            <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: Y, display: "block", marginTop: 2 }}>PAKISTAN</span>
+
+        {/* ── Startup Grind Pakistan card ── */}
+        <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ padding: "12px 22px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+            <span style={{ fontFamily: SANS, fontWeight: 900, fontSize: 20, color: Y }}>Startup Grind</span>
+            <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 10, padding: "2px 7px", letterSpacing: "0.10em" }}>PAKISTAN</span>
           </div>
-          <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: K55 }}>PODCAST · EP. 84</div>
-            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.2, color: K, margin: 0 }}>
+          <div style={{ height: 185, flexShrink: 0, overflow: "hidden" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/clients/sajid-event.jpg" alt="OnSense at tech event" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+          </div>
+          <div style={{ padding: "14px 22px", flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45 }}>PODCAST · EP. 84</div>
+            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, lineHeight: 1.25, color: OD, margin: 0 }}>
               Sajid Shah on Winning P@SHA ICT and Building OnSense From Karachi
             </h3>
-            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: K55, margin: 0 }}>
+            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: OD45, margin: 0 }}>
               1h 12m · Also on Spotify · June 2026
             </p>
           </div>
         </div>
-        {/* Entrepreneur */}
-        <div style={{ background: P, border: `1.5px solid ${K18}`, display: "flex", flexDirection: "column" }}>
-          <div style={{ background: K, padding: "12px 24px" }}>
-            <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 18, color: OD }}>Entrepreneur</span>
+
+        {/* ── Entrepreneur card ── */}
+        <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <div style={{ background: "#cc1f24", padding: "14px 22px" }}>
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 26, color: "#fff" }}>Entrepreneur</span>
           </div>
-          <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: K55 }}>FOUNDERS · EARNED MEDIA</div>
-            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.2, color: K, margin: 0 }}>
+          <div style={{ padding: "12px 22px 0", display: "flex", gap: 8 }}>
+            {["FOUNDERS", "EARNED MEDIA"].map(tag => (
+              <span key={tag} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: "#e8a020", border: "1px solid rgba(232,160,32,.35)", padding: "3px 8px" }}>{tag}</span>
+            ))}
+          </div>
+          <div style={{ flex: 1, padding: "12px 22px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
+            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.25, color: OD, margin: 0, flex: 1 }}>
               How I Grew OnSense.io Without a PR Agency — and Got Press That Mattered
             </h3>
-            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: K55, margin: 0 }}>
-              By Sajid Shah · Contributing Writer · June 2026
-            </p>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 14 }}>
+              <div>
+                <p style={{ fontFamily: SANS, fontWeight: 700, fontSize: 12, color: OD55, margin: "0 0 2px" }}>By Sajid Shah</p>
+                <p style={{ fontFamily: SANS, fontWeight: 400, fontSize: 11, color: OD45, margin: 0 }}>Contributing Writer · June 2026</p>
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/clients/sajid-pasha.jpg" alt="Sajid Shah at P@SHA" style={{ width: 110, height: 80, objectFit: "cover", objectPosition: "center 20%", flexShrink: 0 }} />
+            </div>
           </div>
         </div>
       </div>
