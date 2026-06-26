@@ -11,20 +11,24 @@ const isProtectedRoute = createRouteMatcher(["/emostool(.*)"]);
 // committed to the repo. Fails closed if the env vars are missing.
 const isClientPtRoute = createRouteMatcher(["/clients/pt", "/clients/pt/(.*)"]);
 
-function requireBasicAuth() {
+// Resourcex.io client workspace: same Basic Auth pattern.
+// Env vars: RESOURCEX_CLIENT_USER / RESOURCEX_CLIENT_PASS
+const isClientResourcexRoute = createRouteMatcher(["/clients/resourcex", "/clients/resourcex/(.*)"]);
+
+function requireBasicAuth(realm: string) {
   return new NextResponse("Authentication required.", {
     status: 401,
     headers: {
       "WWW-Authenticate":
-        'Basic realm="Physicians Thrive client workspace", charset="UTF-8"',
+        `Basic realm="${realm}", charset="UTF-8"`,
       "Cache-Control": "no-store",
     },
   });
 }
 
-function hasValidCredentials(req: NextRequest): boolean {
-  const user = process.env.PT_CLIENT_USER;
-  const pass = process.env.PT_CLIENT_PASS;
+function hasValidCredentials(req: NextRequest, userVar: string, passVar: string): boolean {
+  const user = process.env[userVar];
+  const pass = process.env[passVar];
   if (!user || !pass) return false; // fail closed until configured in Vercel
 
   const header = req.headers.get("authorization");
@@ -47,7 +51,16 @@ const isNotInvitedRoute = createRouteMatcher(["/emostool/not-invited"]);
 export default clerkMiddleware(async (auth, req) => {
   // Gate the Physicians Thrive client workspace before anything else.
   if (isClientPtRoute(req)) {
-    return hasValidCredentials(req) ? NextResponse.next() : requireBasicAuth();
+    return hasValidCredentials(req, "PT_CLIENT_USER", "PT_CLIENT_PASS")
+      ? NextResponse.next()
+      : requireBasicAuth("Physicians Thrive client workspace");
+  }
+
+  // Gate the Resourcex.io client workspace.
+  if (isClientResourcexRoute(req)) {
+    return hasValidCredentials(req, "RESOURCEX_CLIENT_USER", "RESOURCEX_CLIENT_PASS")
+      ? NextResponse.next()
+      : requireBasicAuth("Resourcex client workspace");
   }
 
   if (isProtectedRoute(req) && !isNotInvitedRoute(req)) {
@@ -81,9 +94,10 @@ export const config = {
     // Skip Next.js internals and static files
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     "/(api|trpc)(.*)",
-    // Always run on the gated client workspace, including its static
-    // .html assets (which the matcher above would otherwise skip).
+    // Always run on gated client workspaces, including static .html assets.
     "/clients/pt",
     "/clients/pt/:path*",
+    "/clients/resourcex",
+    "/clients/resourcex/:path*",
   ],
 };

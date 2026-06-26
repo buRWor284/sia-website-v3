@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { EmosUserButton } from "@/components/emostool/EmosUserButton";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -13,5 +14,10 @@ export default function EmostoolLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <EmosUserButton />
+    </>
+  );
 }

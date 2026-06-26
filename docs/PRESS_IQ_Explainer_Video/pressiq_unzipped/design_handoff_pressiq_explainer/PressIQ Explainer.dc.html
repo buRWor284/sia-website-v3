@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600;1,6..72,700&family=Archivo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; overflow: hidden; }
+  </style>
+</helmet>
+<x-import component-from-global-scope="Stage" from="./animations.jsx" width="{{ W }}" height="{{ H }}" duration="{{ D }}" background="#1a1410" loop="{{ F }}" autoplay="{{ T }}" persist-key="pressiq-v1" hint-size="100%,100%">{{ stageContent }}</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1280, &quot;height&quot;: 764 },
+  &quot;pitchPreset&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;default&quot;: &quot;Founder Story&quot;,
+    &quot;options&quot;: [&quot;Founder Story&quot;, &quot;Data Angle&quot;, &quot;Expert Comment&quot;, &quot;Product Launch&quot;],
+    &quot;tsType&quot;: &quot;string&quot;
+  }
+}">
+class Component extends DCLogic {
+  INK = '#1a1410';
+  PAPER = '#f1ebde';
+  P2 = '#e8e0cc';
+  Y = '#f5b81f';
+  NR = "'Newsreader', Georgia, serif";
+  AR = "'Archivo', 'Helvetica Neue', sans-serif";
+  GREEN = '#2d8a4e';
+  ORANGE = '#e07c2e';
+  RED = '#c04040';
+
+  // ── Pitch presets ────────────────────────────────────────────────────────
+  PITCHES = {
+    'Founder Story': {
+      wordCount: 287, subjectWords: 11, grade: 9, closingQ: 0, tone: 'Grounded',
+      toneGood: true, score: 71, tier: 'COMPETITIVE', tierColor: null,
+      strongestLine: '"I grew Ridester from zero to 1.5M monthly visitors in one year using earned media alone."',
+      dims: [82, 61, 74, 55, 78, 68, 71],
+    },
+    'Data Angle': {
+      wordCount: 134, subjectWords: 7, grade: 6, closingQ: 1, tone: 'Factual',
+      toneGood: true, score: 88, tier: 'PLACEMENT-GRADE', tierColor: null,
+      strongestLine: '"Our survey of 1,200 CMOs found 61% have cut agency spend — and moved it to owned media."',
+      dims: [91, 86, 82, 79, 74, 88, 83],
+    },
+    'Expert Comment': {
+      wordCount: 198, subjectWords: 9, grade: 8, closingQ: 1, tone: 'Grounded',
+      toneGood: true, score: 58, tier: 'NEEDS WORK', tierColor: null,
+      strongestLine: '"As the only analyst who covered both the 2018 and 2022 cycles, I can offer direct comparison."',
+      dims: [76, 54, 61, 42, 55, 62, 48],
+    },
+    'Product Launch': {
+      wordCount: 342, subjectWords: 14, grade: 11, closingQ: 0, tone: 'Breathless',
+      toneGood: false, score: 31, tier: 'WILL BE IGNORED', tierColor: null,
+      strongestLine: '"The platform launches in Q3 with integrations across Salesforce, HubSpot and Marketo."',
+      dims: [44, 28, 35, 22, 30, 19, 38],
+    },
+  };
+
+  pitch() {
+    return this.PITCHES[this.props.pitchPreset ?? 'Founder Story'];
+  }
+
+  tierColor(score) {
+    const { GREEN, Y, ORANGE, RED } = this;
+    if (score >= 85) return GREEN;
+    if (score >= 65) return Y;
+    if (score >= 40) return ORANGE;
+    return RED;
+  }
+
+  dimColor(v) {
+    const { GREEN, Y, ORANGE, RED } = this;
+    if (v >= 75) return GREEN;
+    if (v >= 55) return Y;
+    if (v >= 40) return ORANGE;
+    return RED;
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  a = (t, s, dur = 1.4) => {
+    const { animate, Easing } = window;
+    return animate({ from: 0, to: 1, start: s, end: s + dur, ease: Easing.easeOutCubic })(t);
+  };
+
+  fadeStyle = (a, dy = 16) => ({
+    opacity: a,
+    transform: `translateY(${(1 - a) * dy}px)`,
+  });
+
+  // ── SCENE 1: HOOK (0–25s) ─────────────────────────────────────────────
+  HookScene = () => {
+    const { animate, Easing } = window;
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, Y, NR, AR } = this;
+
+    const a82   = this.a(t, 0.8, 2.2);
+    const aSub  = this.a(t, 3.5, 1.5);
+    const aL1   = this.a(t, 10, 1.5);
+    const aL2   = this.a(t, 14, 1.5);
+
+    return React.createElement('div', {
+      'data-screen-label': '§01 Hook',
+      style: { position: 'absolute', inset: 0, background: INK, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }
+    },
+      React.createElement('div', { style: { textAlign: 'center', opacity: a82, transform: `scale(${0.72 + 0.28 * a82}) translateY(${(1 - a82) * 50}px)` } },
+        React.createElement('div', { style: { fontFamily: NR, fontSize: 228, fontWeight: 700, color: Y, lineHeight: 0.85, letterSpacing: '-0.04em' } }, '82%'),
+        React.createElement('div', { style: { opacity: aSub, transform: `translateY(${(1 - aSub) * 10}px)`, fontFamily: AR, fontSize: 20, fontWeight: 600, letterSpacing: '0.2em', color: 'rgba(241,235,222,0.7)', textTransform: 'uppercase', marginTop: 22 } }, 'of media pitches are deleted every day'),
+      ),
+      React.createElement('div', { style: { position: 'absolute', bottom: 108, textAlign: 'center' } },
+        React.createElement('div', { style: { ...this.fadeStyle(aL1), fontFamily: NR, fontSize: 32, fontStyle: 'italic', color: 'rgba(241,235,222,0.7)', marginBottom: 10 } }, 'Not because the stories are bad.'),
+        React.createElement('div', { style: { ...this.fadeStyle(aL2), fontFamily: NR, fontSize: 32, fontWeight: 700, color: Y } }, 'Because the pitches are.'),
+      ),
+    );
+  };
+
+  // ── SCENE 2: PROBLEM (25–60s) ────────────────────────────────────────
+  ProblemScene = () => {
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, P2, Y, NR, AR } = this;
+
+    const aL = [
+      this.a(t, 0.5), this.a(t, 2), this.a(t, 3.5), this.a(t, 5),
+    ];
+    const aStat = this.a(t, 8, 1.6);
+    const aDiag = this.a(t, 16, 1.6);
+    const aRub  = this.a(t, 24, 1.6);
+
+    const lines = [
+      { text: 'You sent a pitch.', italic: false },
+      { text: 'Heard nothing back.', italic: false },
+      { text: 'Blamed the journalist,', italic: true },
+      { text: 'the timing, or the news cycle.', italic: true },
+    ];
+
+    return React.createElement('div', {
+      'data-screen-label': '§02 Problem',
+      style: { position: 'absolute', inset: 0, background: PAPER, display: 'flex', flexDirection: 'column', padding: '56px 72px' }
+    },
+      // Section label
+      React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 14, marginBottom: 36 } },
+        React.createElement('span', { style: { fontFamily: AR, fontSize: 12, fontWeight: 700, letterSpacing: '0.18em', color: Y, textTransform: 'uppercase' } }, '§ 01'),
+        React.createElement('span', { style: { height: 1, width: 32, background: 'rgba(26,20,16,0.22)', display: 'block' } }),
+        React.createElement('span', { style: { fontFamily: AR, fontSize: 12, fontWeight: 600, letterSpacing: '0.14em', color: 'rgba(26,20,16,0.42)', textTransform: 'uppercase' } }, 'THE PROBLEM'),
+      ),
+      // Two-column body
+      React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1px 1fr', gap: '0 48px', flex: 1 } },
+        // LEFT: staggered lines + stat block
+        React.createElement('div', { style: { display: 'flex', flexDirection: 'column', justifyContent: 'space-between' } },
+          React.createElement('div', { style: { marginBottom: 28 } },
+            ...lines.map((l, i) => React.createElement('div', {
+              key: i,
+              style: { ...this.fadeStyle(aL[i], 10), fontFamily: NR, fontSize: 44, fontStyle: l.italic ? 'italic' : 'normal', color: INK, lineHeight: 1.25 }
+            }, l.text))
+          ),
+          React.createElement('div', { style: { ...this.fadeStyle(aStat), display: 'flex', alignItems: 'stretch' } },
+            React.createElement('div', { style: { background: INK, padding: '18px 26px', flexShrink: 0 } },
+              React.createElement('div', { style: { fontFamily: NR, fontSize: 52, fontWeight: 700, color: Y, letterSpacing: '-0.02em', lineHeight: 1, borderBottom: `2px solid ${Y}`, paddingBottom: 3 } }, '3,000'),
+              React.createElement('div', { style: { fontFamily: AR, fontSize: 10, color: 'rgba(241,235,222,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 5 } }, 'JOURNALISTS SAY'),
+            ),
+            React.createElement('div', { style: { background: P2, border: '1px solid rgba(26,20,16,0.1)', padding: '18px 22px', display: 'flex', flexDirection: 'column', justifyContent: 'center' } },
+              React.createElement('div', { style: { fontFamily: NR, fontSize: 18, color: INK, lineHeight: 1.5 } }, 'The real reason..'),
+              React.createElement('div', { style: { fontFamily: NR, fontSize: 18, fontWeight: 700, color: INK, marginBottom: 8 } }, 'is almost always the pitch itself.'),
+              React.createElement('div', { style: { fontFamily: AR, fontSize: 8, letterSpacing: '0.12em', color: 'rgba(26,20,16,0.42)', textTransform: 'uppercase' } }, 'Cision 2026 · Muck Rack · Propel'),
+            ),
+          ),
+        ),
+        // Divider
+        React.createElement('div', { style: { background: 'rgba(26,20,16,0.12)', width: 1, margin: '0 0' } }),
+        // RIGHT: diagnostic + pull quote
+        React.createElement('div', { style: { display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 36 } },
+          React.createElement('div', { style: { ...this.fadeStyle(aDiag) } },
+            React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(26,20,16,0.38)', textTransform: 'uppercase', marginBottom: 14 } }, 'WHY PITCHES FAIL'),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 22, color: 'rgba(26,20,16,0.68)', lineHeight: 1.72 } }, 'Wrong length. Wrong subject line. Too formal. Too vague. Buried the news. Missing the hook. Nothing that makes a journalist think:'),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 22, fontWeight: 700, fontStyle: 'italic', color: INK, marginTop: 8 } }, '"I can use this."'),
+          ),
+          React.createElement('div', { style: { ...this.fadeStyle(aRub), borderLeft: `4px solid ${Y}`, paddingLeft: 22 } },
+            React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(26,20,16,0.38)', textTransform: 'uppercase', marginBottom: 12 } }, 'THE REAL ISSUE'),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 24, fontWeight: 700, fontStyle: 'italic', color: INK, lineHeight: 1.4 } }, '"The problem isn\'t that you\'re a bad writer. It\'s that nobody ever gave you a rubric."'),
+          ),
+        ),
+      ),
+    );
+  };
+
+  // ── SCENE 3: INTRO PRESSIQ (60–90s) ──────────────────────────────────
+  IntroScene = () => {
+    const { animate, Easing } = window;
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, P2, Y, NR, AR } = this;
+
+    const panelW = animate({ from: 0, to: 368, start: 0.3, end: 1.8, ease: Easing.easeOutCubic })(t);
+    const aTitle = this.a(t, 1.5, 1.6);
+    const aTag   = this.a(t, 3.5, 1.4);
+    const aBody  = this.a(t, 5.5, 1.4);
+
+    const platforms = ['HARO', 'QWOTED', 'SOURCE OF SOURCES', 'FEATURED', 'HELP A B2B WRITER'];
+
+    return React.createElement('div', {
+      'data-screen-label': '§03 Intro',
+      style: { position: 'absolute', inset: 0, display: 'flex' }
+    },
+      React.createElement('div', {
+        style: { width: panelW, background: INK, overflow: 'hidden', flexShrink: 0, borderRight: `2px solid ${Y}`, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: panelW > 60 ? '60px 36px' : 0 }
+      },
+        React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: 'rgba(241,235,222,0.38)', textTransform: 'uppercase', marginBottom: 20, whiteSpace: 'nowrap' } }, 'PITCH PLATFORM'),
+        ...platforms.map((p, i) => React.createElement('div', {
+          key: i,
+          style: { ...this.fadeStyle(this.a(t, 2.8 + i * 1.9, 1.2), 0), opacity: this.a(t, 2.8 + i * 1.9, 1.2), transform: `translateX(${(1 - this.a(t, 2.8 + i * 1.9, 1.2)) * 20}px)`, fontFamily: AR, fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', color: Y, textTransform: 'uppercase', padding: '10px 0', borderBottom: '1px solid rgba(241,235,222,0.07)', display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }
+        },
+          React.createElement('span', { style: { width: 5, height: 5, background: Y, display: 'inline-block', flexShrink: 0 } }),
+          p
+        ))
+      ),
+      React.createElement('div', { style: { flex: 1, background: PAPER, padding: '72px 60px', display: 'flex', flexDirection: 'column', justifyContent: 'center' } },
+        React.createElement('div', { style: { ...this.fadeStyle(aTitle), marginBottom: 4 } },
+          React.createElement('div', { style: { background: INK, display: 'inline-block', padding: '4px 12px', marginBottom: 16 } },
+            React.createElement('span', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: Y, textTransform: 'uppercase' } }, 'FREE PITCH SCORER'),
+          ),
+          React.createElement('div', { style: { fontFamily: NR, fontSize: 90, fontWeight: 700, color: INK, lineHeight: 0.88, letterSpacing: '-0.03em' } }, 'PressIQ'),
+        ),
+        React.createElement('div', { style: { height: 1, background: 'rgba(26,20,16,0.18)', margin: '20px 0' } }),
+        React.createElement('div', { style: { ...this.fadeStyle(aTag), fontFamily: NR, fontSize: 22, fontStyle: 'italic', color: 'rgba(26,20,16,0.58)', marginBottom: 28 } }, '"Will a journalist paste this in?"'),
+        React.createElement('div', { style: { ...this.fadeStyle(aBody), fontFamily: NR, fontSize: 19, color: 'rgba(26,20,16,0.65)', lineHeight: 1.72, maxWidth: 530 } }, 'Built on the same framework I use to evaluate pitches for clients at DMR.agency. Paste your pitch, choose your platform. No signup for the first three scores. No fluff.'),
+      ),
+    );
+  };
+
+  // ── SCENE 4: LIVE MECHANICS (90–120s) ────────────────────────────────
+  LiveScene = () => {
+    const { animate, Easing } = window;
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, Y, NR, AR, GREEN, RED } = this;
+
+    const p   = this.pitch();
+    const wc  = Math.round(animate({ from: 0, to: p.wordCount, start: 1.5, end: 16, ease: Easing.linear })(t));
+    const wcOk = wc <= 150;
+    const slOk = p.subjectWords <= 9;
+    const grOk = p.grade <= 7;
+    const cqOk = p.closingQ >= 1;
+    const metrics = [
+      { label: 'WORD COUNT',       val: `${wc}`,                  ideal: 'Target: 100–150 · Propel (555k pitches)',     s: wcOk ? GREEN : RED, show: 1,              bar: Math.min(wc / 400, 1), iS: 100/400, iE: 150/400 },
+      { label: 'SUBJECT LINE',     val: `${p.subjectWords} words`, ideal: 'Target: 6–9 words · Backlinko outreach study', s: slOk ? GREEN : RED, show: this.a(t, 6),  bar: p.subjectWords / 18 },
+      { label: 'READING GRADE',    val: `Grade ${p.grade}`,        ideal: 'Target: ≤ Grade 7 · Boomerang (40M emails)',   s: grOk ? GREEN : RED, show: this.a(t, 10), bar: p.grade / 14 },
+      { label: 'CLOSING QUESTION', val: `${p.closingQ} detected`,  ideal: 'Target: 1 clear ask · Fractl (500 journalists)', s: cqOk ? GREEN : RED, show: this.a(t, 14), bar: p.closingQ },
+      { label: 'TONE',             val: p.tone,                    ideal: 'Factual, not breathless · Cision 2026',       s: p.toneGood ? GREEN : RED, show: this.a(t, 18), bar: p.toneGood ? 0.84 : 0.22 },
+    ];
+    const aQuote = this.a(t, 22, 1.5);
+
+    return React.createElement('div', {
+      'data-screen-label': '§04 Live Mechanics',
+      style: { position: 'absolute', inset: 0, background: INK, display: 'flex', flexDirection: 'column', padding: '54px 70px' }
+    },
+      React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 32 } },
+        React.createElement('div', null,
+          React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: 'rgba(241,235,222,0.38)', textTransform: 'uppercase', marginBottom: 8 } }, '§ 03 — LAYER ONE'),
+          React.createElement('div', { style: { fontFamily: NR, fontSize: 38, fontWeight: 700, color: PAPER, letterSpacing: '-0.02em' } }, 'Live Signals'),
+        ),
+        React.createElement('div', { style: { fontFamily: NR, fontSize: 16, fontStyle: 'italic', color: 'rgba(241,235,222,0.42)', textAlign: 'right', lineHeight: 1.6, whiteSpace: 'pre-line' } }, 'The moment you start typing,\nthe tool is already working.'),
+      ),
+      React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3, flex: 1 } },
+        ...metrics.map((m, i) => React.createElement('div', {
+          key: i,
+          style: { background: 'rgba(241,235,222,0.04)', border: '1px solid rgba(241,235,222,0.07)', padding: '20px 24px', opacity: m.show, transform: `translateY(${(1 - m.show) * 12}px)` }
+        },
+          React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(241,235,222,0.38)', textTransform: 'uppercase', marginBottom: 9 } }, m.label),
+          React.createElement('div', { style: { fontFamily: NR, fontSize: 36, fontWeight: 700, color: m.s, letterSpacing: '-0.02em', marginBottom: 5 } }, m.val),
+          React.createElement('div', { style: { fontFamily: AR, fontSize: 10, color: 'rgba(241,235,222,0.38)', marginBottom: 12 } }, m.ideal),
+          React.createElement('div', { style: { height: 4, background: 'rgba(241,235,222,0.07)', position: 'relative' } },
+            React.createElement('div', { style: { position: 'absolute', inset: 0, width: `${m.bar * 100}%`, background: m.s } }),
+            m.iS ? React.createElement('div', { style: { position: 'absolute', top: 0, bottom: 0, left: `${m.iS * 100}%`, width: `${(m.iE - m.iS) * 100}%`, background: 'rgba(45,138,78,0.3)', border: '1px solid rgba(45,138,78,0.7)' } }) : null
+          )
+        ))
+      ),
+      React.createElement('div', { style: { ...this.fadeStyle(aQuote), marginTop: 18, textAlign: 'center', fontFamily: NR, fontSize: 18, fontStyle: 'italic', color: 'rgba(241,235,222,0.45)' } }, '"If you fail here, nothing else matters."'),
+    );
+  };
+
+  // ── SCENE 5: THE SCORE (120–165s) ────────────────────────────────────
+  ScoreScene = () => {
+    const { animate, Easing } = window;
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, Y, NR, AR, GREEN, ORANGE, RED } = this;
+
+    const p       = this.pitch();
+    const scoreN  = Math.round(animate({ from: 0, to: p.score, start: 1.5, end: 5, ease: Easing.easeOutCubic })(t));
+    const aTier   = this.a(t, 5.5, 1.4);
+    const aScale  = this.a(t, 7, 1.4);
+    const aBars   = animate({ from: 0, to: 1, start: 8, end: 12, ease: Easing.easeOutCubic })(t);
+    const aQuote  = this.a(t, 12, 1.4);
+    const tC      = this.tierColor(p.score);
+
+    const tiers = [
+      { r: '85+',   l: 'Placement-grade', c: GREEN },
+      { r: '65–84', l: 'Competitive',     c: Y },
+      { r: '40–64', l: 'Needs work',      c: ORANGE },
+      { r: '0–39',  l: 'Will be ignored', c: RED },
+    ];
+    const dimNames = ['Relevance', 'Mechanics', 'SIA 7-Step', 'Newsroom-Ready', 'Storytelling', 'Neuromarketing', 'Personal Brand'];
+    const dims = dimNames.map((n, i) => ({ n, v: p.dims[i], c: this.dimColor(p.dims[i]) }));
+
+    return React.createElement('div', {
+      'data-screen-label': '§05 Score',
+      style: { position: 'absolute', inset: 0, display: 'flex' }
+    },
+      React.createElement('div', { style: { width: 400, background: INK, padding: '52px 40px', display: 'flex', flexDirection: 'column', borderRight: '1px solid rgba(241,235,222,0.1)' } },
+        React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: 'rgba(241,235,222,0.38)', textTransform: 'uppercase', marginBottom: 28 } }, '§ 04 — YOUR SCORE'),
+        React.createElement('div', { style: { fontFamily: NR, fontSize: 152, fontWeight: 700, color: tC, lineHeight: 0.84, letterSpacing: '-0.04em' } }, scoreN),
+        React.createElement('div', { style: { fontFamily: AR, fontSize: 9, letterSpacing: '0.16em', color: 'rgba(241,235,222,0.38)', marginTop: 8, textTransform: 'uppercase' } }, 'OUT OF 100'),
+        React.createElement('div', { style: { ...this.fadeStyle(aTier), marginTop: 20, background: tC, display: 'inline-block', padding: '7px 16px', width: 'fit-content' } },
+          React.createElement('span', { style: { fontFamily: AR, fontSize: 13, fontWeight: 800, letterSpacing: '0.14em', color: INK, textTransform: 'uppercase' } }, p.tier)
+        ),
+        React.createElement('div', { style: { opacity: aScale, marginTop: 32 } },
+          ...tiers.map((tier, i) => React.createElement('div', {
+            key: i,
+            style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid rgba(241,235,222,0.06)' }
+          },
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 18, fontWeight: 700, color: tier.c } }, tier.r),
+            React.createElement('div', { style: { fontFamily: AR, fontSize: 9, letterSpacing: '0.12em', color: 'rgba(241,235,222,0.48)', textTransform: 'uppercase' } }, tier.l),
+          ))
+        ),
+        React.createElement('div', { style: { ...this.fadeStyle(aQuote), marginTop: 'auto', paddingTop: 22, borderTop: '1px solid rgba(241,235,222,0.08)' } },
+          React.createElement('div', { style: { fontFamily: AR, fontSize: 8, letterSpacing: '0.18em', color: 'rgba(241,235,222,0.38)', textTransform: 'uppercase', marginBottom: 8 } }, 'STRONGEST LINE'),
+          React.createElement('div', { style: { fontFamily: NR, fontSize: 13, fontStyle: 'italic', color: PAPER, lineHeight: 1.65, background: 'rgba(245,184,31,0.1)', padding: '10px 13px', borderLeft: `3px solid ${tC}` } }, p.strongestLine),
+        ),
+      ),
+      React.createElement('div', { style: { flex: 1, background: PAPER, padding: '52px 44px', display: 'flex', flexDirection: 'column' } },
+        React.createElement('div', { style: { fontFamily: NR, fontSize: 28, fontWeight: 700, color: INK, letterSpacing: '-0.02em', marginBottom: 4 } }, '32-factor analysis'),
+        React.createElement('div', { style: { fontFamily: AR, fontSize: 9, color: 'rgba(26,20,16,0.42)', letterSpacing: '0.16em', textTransform: 'uppercase', paddingBottom: 16, borderBottom: '1px solid rgba(26,20,16,0.1)', marginBottom: 24 } }, 'ACROSS SEVEN DIMENSIONS'),
+        React.createElement('div', { style: { flex: 1, display: 'flex', flexDirection: 'column', gap: 12 } },
+          ...dims.map((d, i) => React.createElement('div', { key: i },
+            React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 5 } },
+              React.createElement('div', { style: { fontFamily: AR, fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', color: INK, textTransform: 'uppercase' } }, d.n),
+              React.createElement('div', { style: { fontFamily: NR, fontSize: 20, fontWeight: 700, color: d.c } }, Math.round(aBars * d.v)),
+            ),
+            React.createElement('div', { style: { height: 7, background: 'rgba(26,20,16,0.07)' } },
+              React.createElement('div', { style: { height: '100%', width: `${aBars * d.v}%`, background: d.c } })
+            )
+          ))
+        ),
+      ),
+    );
+  };
+
+  // ── SCENE 6: 7 DIMENSIONS (165–210s) ─────────────────────────────────
+  DimsScene = () => {
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, Y, NR, AR } = this;
+
+    const dims = [
+      { n: '01', name: 'Relevance',      stat: '82%',      src: 'Cision',         desc: 'The #1 placement filter. Does this pitch answer the journalist\'s query or beat?' },
+      { n: '02', name: 'Mechanics',      stat: '5',         src: 'Live signals',   desc: 'Word count, subject line, reading grade, closing ask, tone.' },
+      { n: '03', name: 'SIA 7-Step',     stat: '7 steps',    src: 'DMR.agency · 32 signals', desc: 'Research, subject line, intro, answer, story, evidence, sign-off.' },
+      { n: '04', name: 'Newsroom-Ready', stat: '47%',       src: 'Muck Rack',      desc: 'Original data, source access, ready visuals, exclusive angle.' },
+      { n: '05', name: 'Storytelling',   stat: 'Arc',       src: 'Stakes + tension', desc: 'Narrative arc, tension, stakes. Journalists file stories, not facts.' },
+      { n: '06', name: 'Neuromarketing', stat: '53%',       src: 'Cision 2026',    desc: 'Specificity, social proof, contrast, urgency. AI-detection flag.' },
+      { n: '07', name: 'Personal Brand', stat: 'Authority', src: 'Credibility',    desc: 'Prior coverage, social proof, source authority signals.' },
+    ];
+
+    return React.createElement('div', {
+      'data-screen-label': '§06 7 Dimensions',
+      style: { position: 'absolute', inset: 0, background: INK, padding: '46px 60px', display: 'flex', flexDirection: 'column' }
+    },
+      React.createElement('div', { style: { display: 'flex', alignItems: 'baseline', gap: 20, marginBottom: 26, borderBottom: '1px solid rgba(241,235,222,0.08)', paddingBottom: 18 } },
+        React.createElement('div', { style: { fontFamily: NR, fontSize: 40, fontWeight: 700, color: PAPER, letterSpacing: '-0.02em' } }, 'The 7 Dimensions'),
+        React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(241,235,222,0.32)', textTransform: 'uppercase' } }, '§ 05 · SCORE BREAKDOWN'),
+      ),
+      React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 3, flex: 1 } },
+        ...dims.map((d, i) => {
+          const aCard = this.a(t, 0.8 + i * 1.4, 1.2);
+          return React.createElement('div', {
+            key: i,
+            style: { background: 'rgba(241,235,222,0.04)', border: '1px solid rgba(241,235,222,0.07)', padding: '16px 13px', opacity: aCard, transform: `translateY(${(1 - aCard) * 30}px)`, display: 'flex', flexDirection: 'column' }
+          },
+            React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.16em', color: Y, textTransform: 'uppercase', marginBottom: 10 } }, d.n),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 16, fontWeight: 700, color: PAPER, lineHeight: 1.2, marginBottom: 10 } }, d.name),
+            React.createElement('div', { style: { height: 1, background: 'rgba(241,235,222,0.08)', marginBottom: 10 } }),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 24, fontWeight: 700, color: Y, letterSpacing: '-0.02em', marginBottom: 3 } }, d.stat),
+            React.createElement('div', { style: { fontFamily: AR, fontSize: 8, letterSpacing: '0.1em', color: 'rgba(241,235,222,0.28)', textTransform: 'uppercase', marginBottom: 12 } }, d.src),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 12, color: 'rgba(241,235,222,0.48)', lineHeight: 1.55, marginTop: 'auto' } }, d.desc),
+          );
+        })
+      ),
+    );
+  };
+
+  // ── SCENE 7: TOP FIXES (210–235s) ────────────────────────────────────
+  FixesScene = () => {
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, P2, Y, NR, AR } = this;
+
+    const aHead = this.a(t, 0.5, 1.6);
+    const fixes = [
+      { n: '01', impact: 'HIGH',   title: 'Subject line: 11 words',         fix: 'Trim to 7 words or fewer. Lead with the news angle, not your credential.', show: this.a(t, 2.5) },
+      { n: '02', impact: 'MEDIUM', title: 'No closing question detected',    fix: 'End with a single direct ask: "Available to comment by Thursday?" — not an open sign-off.', show: this.a(t, 5) },
+      { n: '03', impact: 'MEDIUM', title: 'Reading grade: 9 (target: ≤7)',  fix: 'Split sentences over 20 words. Remove nominalizations. Write for a smart 13-year-old.', show: this.a(t, 7.5) },
+    ];
+
+    return React.createElement('div', {
+      'data-screen-label': '§07 Top Fixes',
+      style: { position: 'absolute', inset: 0, background: PAPER, display: 'flex', flexDirection: 'column', padding: '58px 96px' }
+    },
+      React.createElement('div', { style: { ...this.fadeStyle(aHead), marginBottom: 40 } },
+        React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 } },
+          React.createElement('span', { style: { fontFamily: AR, fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(26,20,16,0.38)', textTransform: 'uppercase' } }, '§ 06'),
+          React.createElement('span', { style: { height: 1, width: 28, background: 'rgba(26,20,16,0.18)', display: 'block' } }),
+          React.createElement('span', { style: { fontFamily: AR, fontSize: 10, fontWeight: 700, letterSpacing: '0.18em', color: 'rgba(26,20,16,0.38)', textTransform: 'uppercase' } }, 'TOP FIXES'),
+        ),
+        React.createElement('div', { style: { fontFamily: NR, fontSize: 50, fontWeight: 700, color: INK, letterSpacing: '-0.02em', lineHeight: 1, whiteSpace: 'pre-line' } }, 'Three changes.\nBefore you hit send.'),
+      ),
+      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 13 } },
+        ...fixes.map((f, i) => React.createElement('div', {
+          key: i,
+          style: { opacity: f.show, transform: `translateX(${(1 - f.show) * 28}px)`, border: `1px solid ${INK}`, padding: '20px 26px', display: 'flex', gap: 26, alignItems: 'flex-start' }
+        },
+          React.createElement('div', { style: { flexShrink: 0, minWidth: 56 } },
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 34, fontWeight: 700, color: Y, letterSpacing: '-0.02em', lineHeight: 1 } }, f.n),
+            React.createElement('div', { style: { background: f.impact === 'HIGH' ? INK : P2, color: f.impact === 'HIGH' ? PAPER : 'rgba(26,20,16,0.55)', fontFamily: AR, fontSize: 8, fontWeight: 700, letterSpacing: '0.16em', textTransform: 'uppercase', padding: '2px 6px', marginTop: 6, display: 'inline-block' } }, f.impact),
+          ),
+          React.createElement('div', null,
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 18, fontWeight: 700, color: INK, marginBottom: 7 } }, f.title),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 16, color: 'rgba(26,20,16,0.62)', lineHeight: 1.65, borderLeft: `3px solid ${Y}`, paddingLeft: 15 } }, f.fix),
+          )
+        ))
+      ),
+    );
+  };
+
+  // ── SCENE 8: EVIDENCE (235–260s) ─────────────────────────────────────
+  EvidScene = () => {
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, Y, NR, AR } = this;
+
+    const aHead = this.a(t, 0.5, 1.5);
+    const srcs = [
+      { name: 'Cision',     sub: 'State of the Media 2026',          stat: '82% of pitches\ndeleted as irrelevant' },
+      { name: 'Muck Rack',  sub: 'Journalist Survey',                 stat: '88% want pitches\ntailored to their beat' },
+      { name: 'Propel',     sub: '555,000 pitches analyzed',          stat: 'Optimal: 100–150\nwords per pitch' },
+      { name: 'Backlinko',  sub: 'Journalist Outreach Study',         stat: '6–9 word subject\nlines outperform' },
+      { name: 'Fractl',     sub: '500 journalists surveyed',          stat: '47% want\noriginal data' },
+      { name: 'Boomerang',  sub: '40M emails analyzed',              stat: 'Grade 5–7: highest\nresponse rate' },
+    ];
+
+    return React.createElement('div', {
+      'data-screen-label': '§08 Evidence',
+      style: { position: 'absolute', inset: 0, background: INK, padding: '50px 66px', display: 'flex', flexDirection: 'column' }
+    },
+      React.createElement('div', { style: { ...this.fadeStyle(aHead), marginBottom: 28 } },
+        React.createElement('div', { style: { fontFamily: AR, fontSize: 9, fontWeight: 700, letterSpacing: '0.2em', color: Y, textTransform: 'uppercase', marginBottom: 10 } }, '§ 07 — THE EVIDENCE'),
+        React.createElement('div', { style: { fontFamily: NR, fontSize: 40, fontWeight: 700, color: PAPER, letterSpacing: '-0.02em', lineHeight: 1 } }, 'Every threshold traces\nto published research.'),
+      ),
+      React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 3, flex: 1 } },
+        ...srcs.map((s, i) => {
+          const aC = this.a(t, 2.2 + i * 1.4, 1.2);
+          return React.createElement('div', {
+            key: i,
+            style: { background: 'rgba(241,235,222,0.04)', border: '1px solid rgba(241,235,222,0.07)', padding: '20px 20px', opacity: aC, transform: `translateY(${(1 - aC) * 16}px)`, display: 'flex', flexDirection: 'column' }
+          },
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 22, fontWeight: 700, color: PAPER, marginBottom: 4 } }, s.name),
+            React.createElement('div', { style: { fontFamily: AR, fontSize: 9, letterSpacing: '0.1em', color: 'rgba(241,235,222,0.32)', textTransform: 'uppercase', paddingBottom: 13, borderBottom: '1px solid rgba(241,235,222,0.07)', marginBottom: 14 } }, s.sub),
+            React.createElement('div', { style: { fontFamily: NR, fontSize: 20, fontStyle: 'italic', color: Y, lineHeight: 1.4, whiteSpace: 'pre-line', marginTop: 'auto' } }, s.stat),
+          );
+        })
+      ),
+    );
+  };
+
+  // ── SCENE 9: CTA (260–275s) ───────────────────────────────────────────
+  CTAScene = () => {
+    const { localTime: t } = window.useSprite();
+    const { INK, PAPER, Y, NR, AR } = this;
+
+    return React.createElement('div', {
+      'data-screen-label': '§09 CTA',
+      style: { position: 'absolute', inset: 0, background: PAPER, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }
+    },
+      React.createElement('div', { style: { textAlign: 'center', maxWidth: 860 } },
+        React.createElement('div', { style: { ...this.fadeStyle(this.a(t, 0.4)), fontFamily: AR, fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', color: 'rgba(26,20,16,0.38)', textTransform: 'uppercase', marginBottom: 16 } }, 'FREE · THREE SCORES · NO SIGNUP'),
+        React.createElement('div', { style: { ...this.fadeStyle(this.a(t, 0.9, 1.8), 22), fontFamily: NR, fontSize: 64, fontWeight: 700, color: INK, lineHeight: 1, letterSpacing: '-0.03em', marginBottom: 10 } }, 'Paste your last pitch in.'),
+        React.createElement('div', { style: { ...this.fadeStyle(this.a(t, 3, 1.4)), fontFamily: NR, fontSize: 32, fontStyle: 'italic', color: 'rgba(26,20,16,0.52)', marginBottom: 44 } }, 'See what the score says.'),
+        React.createElement('div', { style: { ...this.fadeStyle(this.a(t, 5, 1.4)), display: 'inline-block', background: INK, padding: '15px 30px', marginBottom: 28 } },
+          React.createElement('span', { style: { fontFamily: AR, fontSize: 16, fontWeight: 700, letterSpacing: '0.04em', color: Y } }, 'syedirfanajmal.com/tools/pressiq')
+        ),
+        React.createElement('div', { style: { ...this.fadeStyle(this.a(t, 7, 1.4)), fontFamily: NR, fontSize: 17, color: 'rgba(26,20,16,0.5)', marginBottom: 8 } }, 'Want the full framework? The EMOS program is at DMR.agency'),
+        React.createElement('div', { style: { ...this.fadeStyle(this.a(t, 9, 1.4)), fontFamily: NR, fontSize: 20, fontWeight: 700, color: INK } }, 'Fix it before you send the next one.'),
+      ),
+    );
+  };
+
+  // ── Flash overlay between scenes ──────────────────────────────────────
+  FlashAt = ({ time }) => {
+    const { animate, Easing } = window;
+    const t = window.useTime();
+    const opacity = animate({ from: 1, to: 0, start: time, end: time + 0.28, ease: Easing.easeInOutQuad })(t);
+    return (opacity > 0.01 && t >= time - 0.01) ? React.createElement('div', {
+      style: { position: 'absolute', inset: 0, background: '#000', opacity, zIndex: 50, pointerEvents: 'none' }
+    }) : null;
+  };
+
+  // ── renderVals ────────────────────────────────────────────────────────
+  renderVals() {
+    const { Sprite } = window;
+
+    const scenes = [
+      { C: this.HookScene,    s: 0,   e: 25 },
+      { C: this.ProblemScene, s: 25,  e: 60 },
+      { C: this.IntroScene,   s: 60,  e: 90 },
+      { C: this.LiveScene,    s: 90,  e: 120 },
+      { C: this.ScoreScene,   s: 120, e: 165 },
+      { C: this.DimsScene,    s: 165, e: 210 },
+      { C: this.FixesScene,   s: 210, e: 235 },
+      { C: this.EvidScene,    s: 235, e: 260 },
+      { C: this.CTAScene,     s: 260, e: 275 },
+    ];
+
+    const flashes = [25, 60, 90, 120, 165, 210, 235, 260];
+
+    const stageContent = React.createElement(React.Fragment, null,
+      ...scenes.map((sc, i) =>
+        React.createElement(Sprite, { key: `s${i}`, start: sc.s, end: sc.e },
+          React.createElement(sc.C, null)
+        )
+      ),
+      ...flashes.map((ft, i) =>
+        React.createElement(this.FlashAt, { key: `f${i}`, time: ft })
+      )
+    );
+
+    return { stageContent, W: 1280, H: 720, D: 275, T: true, F: false };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+# PressIQ Explainer Video — VO Script
+**Version:** 1.1 (reviewed + corrected) | **Target runtime:** ~3.5–4.5 min | **Date:** 2026-06-24
+
+**Tone:** Direct, credible, slightly dry. Not hype. Irfan's voice — the "been in the room" PR practitioner talking to a peer.  
+**VO style note:** Conversational pace. Short pauses after key stats. No filler enthusiasm.
+
+---
+
+## [HOOK — 0:00–0:25]
+
+Every day, journalists delete 82% of the pitches they receive.
+
+Not because the stories are bad.
+
+Because the pitches are.
+
+---
+
+## [PROBLEM — 0:25–1:00]
+
+If you've ever sent a media pitch and heard nothing back — you probably blamed the journalist, or the timing, or the news cycle.
+
+But research across three thousand journalists says the real reason is almost always the pitch itself.
+
+Wrong length. Wrong subject line. Too formal. Too vague. Buried the news. Missing the hook. Nothing that makes a journalist think: *I can use this.*
+
+The problem isn't that you're a bad writer. It's that nobody ever gave you a rubric.
+
+---
+
+## [INTRODUCING PRESSIQ — 1:00–1:30]
+
+PressIQ is a free pitch scorer built on the same framework I use to evaluate pitches for clients at DMR.agency.
+
+You paste in your pitch, tell it which platform you're pitching — HARO, Qwoted, Source of Sources, Featured, Help a B2B Writer — and it scores it.
+
+No signup for your first three. No fluff.
+
+---
+
+## [LIVE MECHANICS — 1:30–2:00]
+
+The moment you start typing, the tool is already working.
+
+Word count — journalists prefer 100 to 150 words. Most pitches run double that.
+
+Subject line length — the data says 6 to 9 words for open rate.
+
+Reading grade — anything above Grade 7 signals you wrote this for yourself, not for them.
+
+Closing question — one clear ask, not three.
+
+Tone — grounded and factual, not breathless.
+
+These five live signals are Layer One. They're the table stakes. If you fail here, nothing else matters.
+
+---
+
+## [THE SCORE — 2:00–2:45]
+
+Hit score, and the engine runs a 32-factor analysis across seven dimensions.
+
+You get a number, 0 to 100, and a tier.
+
+Zero to 39 — "Will be ignored."
+40 to 64 — "Needs work."
+65 to 84 — "Competitive."
+85 and above — "Placement-grade."
+
+The score isn't a percentage chance of placement — no one has that data. It's a readiness score. How ready is this pitch for a journalist to act on?
+
+It also pulls out your strongest line — the single sentence in your pitch that landed best. That's your anchor when you rewrite.
+
+Below that, seven dimension bars. You can see in three seconds where you're strong and where you're bleeding points.
+
+---
+
+## [THE 7 DIMENSIONS — 2:45–3:30]
+
+The seven dimensions are:
+
+**Relevance** — does this pitch answer the journalist's query or beat? This is the number one placement filter. 82% of journalists delete pitches that miss the brief, per Cision. 88%, per Muck Rack. Before anything else lands, this has to be right.
+
+**Mechanics** — the five live signals you already saw.
+
+**SIA 7-Step Checklist** — 32 factors across research, subject line, intro, answer, story, evidence, and sign-off. The full outreach protocol in one pass.
+
+**Newsroom-Ready** — the dimension most pitch guides miss entirely. 47% of journalists say they want more original data. 58% want source access for interviews. Do you have either? A ready-to-use visual? An exclusive angle? This is the difference between a pitch that gets filed and one that gets forwarded.
+
+**Storytelling** — narrative arc, tension, stakes. Journalists don't file facts. They file stories.
+
+**Neuromarketing** — specificity, social proof, contrast, urgency. The cognitive triggers that make a pitch memorable. And a soft flag if the pitch reads as AI-generated — 53% of journalists distrust generic AI-sounding pitches, per Cision.
+
+**Personal brand** — does the source have credibility? Authority signals, prior coverage, social proof.
+
+Each dimension expands. You see exactly which sub-signals passed, which failed, and the research behind each threshold.
+
+---
+
+## [TOP FIXES — 3:30–3:55]
+
+The tool doesn't stop at diagnosis.
+
+The Top Fixes tab surfaces the three changes that will move your score the most — ranked by impact, not alphabetically.
+
+Not "be more specific." Specific. Like: your subject line is eleven words — trim it to seven or fewer. Or: you have no closing question — end with a single direct ask, not an open-ended sign-off.
+
+These are the fixes you can make in five minutes before you hit send.
+
+---
+
+## [EVIDENCE — 3:55–4:20]
+
+Every threshold in PressIQ traces to published research.
+
+Cision's 2026 State of the Media. Muck Rack's Journalist Survey. Propel's Media Barometer across 555,000 pitches. Backlinko's journalist outreach study. Fractl's survey of 500 journalists. Boomerang's email response analysis of 40 million messages.
+
+The thresholds aren't opinions. They're the median of what the data says works.
+
+---
+
+## [CLOSE / CTA — 4:20–4:45]
+
+PressIQ is free. Three scores a month, no account. Ten with your email.
+
+If you want to go deeper — if you want the full framework, the EMOS program, the strategy behind what makes a pitch land — that's at DMR.agency.
+
+But start here. Paste your last pitch in. See what the score says.
+
+Then fix it before you send the next one.
+
+**[URL lower third: syedirfanajmal.com/tools/pressiq]**
+
+---
+
+## RUNTIME BREAKDOWN
+
+| Section | Time |
+|---|---|
+| Hook | 0:25 |
+| Problem | 0:35 |
+| Intro tool | 0:30 |
+| Live mechanics | 0:30 |
+| The score | 0:45 |
+| 7 dimensions | 0:45 |
+| Top fixes | 0:25 |
+| Evidence | 0:25 |
+| Close / CTA | 0:25 |
+| **Total** | **~4:25** |
+
+---
+
+## SHORTER CUT — "90-Second Version" (for LinkedIn autoplay)
+
+1. **Hook stat** (0:00–0:08) — "82% of pitches get deleted. Not because the story is bad."
+2. **What it is** (0:08–0:20) — "PressIQ scores your PR pitch against 7 dimensions and 32 checkpoints — live, free, no signup."
+3. **Show it working** (0:20–1:00) — Screen record: type pitch → live meters update → hit score → gauge animates → dimension bar chart → top 3 fixes.
+4. **CTA** (1:00–1:15) — "Three free scores at syedirfanajmal.com/tools/pressiq."
+
+---
+
+## THUMBNAIL / COVER FRAME SUGGESTIONS
+
+- Big stat: **"82% deleted"** in red, PressIQ logo bottom-left
+- Split: pitch text on left → score gauge (71, "Competitive") on right
+- Dimension bar chart with score overlay (Competitive tier, yellow)

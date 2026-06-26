@@ -11,8 +11,6 @@ export const metadata: Metadata = {
   title: "AssetIQ — EMOS Platform",
 };
 
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
-
 const PAPER  = "#f1ebde";
 const INK    = "#1a1410";
 const INK55  = "rgba(26,20,16,.55)";
@@ -27,7 +25,6 @@ export default async function AssetIQPage({
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
-  if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const params = await searchParams;
   const signalId    = params.signal ?? null;

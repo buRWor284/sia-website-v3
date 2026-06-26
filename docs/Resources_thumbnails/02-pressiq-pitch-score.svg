@@ -1,0 +1,220 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="ht2" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="1.1" fill="#1a1410" opacity="0.09"></circle>
+    </pattern>
+    <pattern id="xh2" width="6" height="6" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="6" y2="6" stroke="#1a1410" stroke-width="0.65"></line>
+      <line x1="6" y1="0" x2="0" y2="6" stroke="#1a1410" stroke-width="0.65"></line>
+    </pattern>
+    <pattern id="dl2" width="5" height="5" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="5" y2="5" stroke="#1a1410" stroke-width="0.9"></line>
+    </pattern>
+    <radialGradient id="glow2" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f5b81f" stop-opacity="0.88"></stop>
+      <stop offset="50%" stop-color="#f5b81f" stop-opacity="0.35"></stop>
+      <stop offset="100%" stop-color="#f5b81f" stop-opacity="0"></stop>
+    </radialGradient>
+  </defs>
+
+  
+  <rect width="800" height="500" fill="#f1ebde"></rect>
+  <rect width="800" height="500" fill="url(#ht2)"></rect>
+
+  
+  <rect x="2" y="2" width="796" height="496" fill="none" stroke="#1a1410" stroke-width="3"></rect>
+  <rect x="8" y="8" width="784" height="484" fill="none" stroke="#1a1410" stroke-width="1"></rect>
+
+  
+  <text x="400" y="33" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" font-size="9" font-weight="700" fill="#1a1410" letter-spacing="2.5">§ 02 · PRESSIQ: JOURNALIST PITCH SCORE · TOOL</text>
+  <line x1="14" y1="41" x2="786" y2="41" stroke="#1a1410" stroke-width="0.7" opacity="0.3"></line>
+
+  
+  <line x1="14" y1="406" x2="786" y2="406" stroke="#1a1410" stroke-width="2"></line>
+  <rect x="14" y="406" width="772" height="78" fill="#e8e0cc"></rect>
+  <rect x="14" y="406" width="772" height="78" fill="url(#xh2)" opacity="0.13"></rect>
+  
+  <rect x="92" y="390" width="616" height="18" fill="#1a1410"></rect>
+  <rect x="108" y="406" width="584" height="56" fill="#d8d0bc" stroke="#1a1410" stroke-width="1.5"></rect>
+  
+  <rect x="128" y="418" width="18" height="66" fill="#1a1410"></rect>
+  <rect x="654" y="418" width="18" height="66" fill="#1a1410"></rect>
+
+  
+  <g transform="translate(16,54) rotate(-7,36,50)">
+    <rect width="62" height="78" fill="#f1ebde" stroke="#1a1410" stroke-width="2"></rect>
+    <rect width="62" height="13" fill="#f5b81f"></rect>
+    <text x="31" y="11" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="900" fill="#1a1410" letter-spacing="1">PITCH</text>
+    <line x1="9" y1="24" x2="53" y2="24" stroke="#1a1410" stroke-width="1.1" opacity="0.4"></line>
+    <line x1="9" y1="33" x2="53" y2="33" stroke="#1a1410" stroke-width="1.1" opacity="0.35"></line>
+    <line x1="9" y1="42" x2="45" y2="42" stroke="#1a1410" stroke-width="1.1" opacity="0.3"></line>
+    <line x1="9" y1="51" x2="53" y2="51" stroke="#1a1410" stroke-width="1.1" opacity="0.35"></line>
+    <line x1="9" y1="60" x2="40" y2="60" stroke="#1a1410" stroke-width="1.1" opacity="0.3"></line>
+    <line x1="9" y1="69" x2="53" y2="69" stroke="#1a1410" stroke-width="1.1" opacity="0.3"></line>
+  </g>
+  <g transform="translate(38,68) rotate(4,36,50)">
+    <rect width="62" height="78" fill="#f1ebde" stroke="#1a1410" stroke-width="2"></rect>
+    <rect width="62" height="13" fill="#f5b81f"></rect>
+    <text x="31" y="11" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="900" fill="#1a1410" letter-spacing="1">PITCH</text>
+    <line x1="9" y1="24" x2="53" y2="24" stroke="#1a1410" stroke-width="1.1" opacity="0.35"></line>
+    <line x1="9" y1="33" x2="47" y2="33" stroke="#1a1410" stroke-width="1.1" opacity="0.3"></line>
+    <line x1="9" y1="42" x2="53" y2="42" stroke="#1a1410" stroke-width="1.1" opacity="0.3"></line>
+    <line x1="9" y1="51" x2="36" y2="51" stroke="#1a1410" stroke-width="1.1" opacity="0.28"></line>
+  </g>
+  
+  <line x1="74" y1="154" x2="138" y2="172" stroke="#1a1410" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.38"></line>
+  <polygon points="141,174 132,166 138,177" fill="#1a1410" opacity="0.38"></polygon>
+
+  
+  
+  <rect x="56" y="334" width="28" height="60" fill="#1a1410"></rect>
+  <rect x="96" y="334" width="28" height="60" fill="#1a1410"></rect>
+  
+  <ellipse cx="70" cy="395" rx="24" ry="10" fill="#1a1410"></ellipse>
+  <ellipse cx="110" cy="395" rx="24" ry="10" fill="#1a1410"></ellipse>
+  
+  <rect x="40" y="196" width="122" height="142" fill="#1a1410"></rect>
+  <rect x="40" y="196" width="122" height="142" fill="url(#dl2)" opacity="0.14"></rect>
+  
+  <polygon points="74,196 92,218 92,252 84,247 84,204" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></polygon>
+  <polygon points="110,196 92,218 92,252 100,247 100,204" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></polygon>
+  
+  <polygon points="84,204 92,204 99,236 92,244 85,236" fill="#f5b81f" stroke="#1a1410" stroke-width="1.5"></polygon>
+  
+  <rect x="40" y="204" width="18" height="96" fill="#1a1410"></rect>
+  <rect x="40" y="204" width="18" height="96" fill="url(#dl2)" opacity="0.12"></rect>
+  <rect x="38" y="296" width="22" height="11" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></rect>
+  
+  <path d="M160,205 L232,290 L218,298 L146,213 Z" fill="#1a1410"></path>
+  <path d="M160,205 L232,290 L218,298 L146,213 Z" fill="url(#dl2)" opacity="0.12"></path>
+  
+  <rect x="215" y="288" width="19" height="11" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></rect>
+  
+  <ellipse cx="228" cy="303" rx="13" ry="8" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></ellipse>
+  <rect x="220" y="298" width="24" height="8" rx="4" fill="#f1ebde" stroke="#1a1410" stroke-width="1.2"></rect>
+
+  
+  <rect x="80" y="172" width="24" height="26" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></rect>
+  
+  <ellipse cx="92" cy="146" rx="42" ry="38" fill="#f1ebde" stroke="#1a1410" stroke-width="2.5"></ellipse>
+  
+  <path d="M50,141 Q52,106 92,104 Q132,106 134,138 L125,134 Q122,112 92,110 Q62,112 59,135 Z" fill="#1a1410"></path>
+  <path d="M60,115 Q65,126 61,139" fill="none" stroke="#f1ebde" stroke-width="1" opacity="0.36"></path>
+  
+  <ellipse cx="80" cy="152" rx="13" ry="11" fill="rgba(241,235,222,0.45)" stroke="#1a1410" stroke-width="2.2"></ellipse>
+  <ellipse cx="104" cy="152" rx="13" ry="11" fill="rgba(241,235,222,0.45)" stroke="#1a1410" stroke-width="2.2"></ellipse>
+  <line x1="93" y1="152" x2="91" y2="152" stroke="#1a1410" stroke-width="2.5"></line>
+  <line x1="67" y1="150" x2="54" y2="149" stroke="#1a1410" stroke-width="2"></line>
+  <line x1="117" y1="150" x2="130" y2="149" stroke="#1a1410" stroke-width="2"></line>
+  
+  <circle cx="83" cy="153" r="5.5" fill="#1a1410"></circle>
+  <circle cx="85" cy="152" r="2" fill="white"></circle>
+  <circle cx="107" cy="153" r="5.5" fill="#1a1410"></circle>
+  <circle cx="109" cy="152" r="2" fill="white"></circle>
+  
+  <path d="M69,138 Q76,134 86,137" fill="none" stroke="#1a1410" stroke-width="2.8" stroke-linecap="round"></path>
+  <path d="M98,136 Q108,133 116,138" fill="none" stroke="#1a1410" stroke-width="2.8" stroke-linecap="round"></path>
+  
+  <path d="M92,160 Q87,170 85,173 Q88,175 92,174 Q96,175 99,173 Q97,170 92,160" fill="none" stroke="#1a1410" stroke-width="1.8" stroke-linejoin="round"></path>
+  
+  <path d="M82,177 Q88,174 92,177 Q96,174 102,177" fill="none" stroke="#1a1410" stroke-width="2.2" stroke-linecap="round"></path>
+  
+  <line x1="84" y1="182" x2="100" y2="182" stroke="#1a1410" stroke-width="1.8"></line>
+
+  
+  
+  <rect x="394" y="112" width="12" height="281" fill="#1a1410"></rect>
+  
+  <rect x="360" y="390" width="80" height="8" fill="#1a1410"></rect>
+  <rect x="372" y="382" width="56" height="10" fill="#1a1410"></rect>
+  
+  <polygon points="400,93 418,112 382,112" fill="#1a1410"></polygon>
+  <rect x="380" y="88" width="40" height="7" fill="#1a1410"></rect>
+  
+  <rect x="244" y="103" width="312" height="10" fill="#1a1410"></rect>
+  
+  <circle cx="244" cy="108" r="9" fill="#1a1410"></circle>
+  <circle cx="556" cy="108" r="9" fill="#1a1410"></circle>
+
+  
+  
+  <line x1="247" y1="117" x2="242" y2="286" stroke="#1a1410" stroke-width="2" stroke-dasharray="4,3.5"></line>
+  <line x1="276" y1="112" x2="282" y2="286" stroke="#1a1410" stroke-width="1.6" stroke-dasharray="4,3.5"></line>
+  
+  <path d="M196,294 Q262,308 328,294 L322,306 Q262,320 202,306 Z" fill="#e8e0cc" stroke="#1a1410" stroke-width="2.5"></path>
+  
+  <ellipse cx="262" cy="258" rx="74" ry="52" fill="url(#glow2)"></ellipse>
+  
+  <rect x="230" y="230" width="64" height="58" fill="#f1ebde" stroke="#1a1410" stroke-width="2.5"></rect>
+  
+  <polyline points="230,230 262,256 294,230" fill="none" stroke="#1a1410" stroke-width="2.2"></polyline>
+  
+  <line x1="238" y1="268" x2="286" y2="268" stroke="#1a1410" stroke-width="1.3" opacity="0.42"></line>
+  <line x1="238" y1="276" x2="286" y2="276" stroke="#1a1410" stroke-width="1.3" opacity="0.38"></line>
+  <line x1="238" y1="284" x2="272" y2="284" stroke="#1a1410" stroke-width="1.3" opacity="0.32"></line>
+  
+  <rect x="238" y="233" width="48" height="13" fill="#f5b81f" stroke="#1a1410" stroke-width="1.3"></rect>
+  <text x="262" y="243" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="900" fill="#1a1410" letter-spacing="2">PITCH</text>
+
+  
+  
+  <line x1="539" y1="117" x2="533" y2="286" stroke="#1a1410" stroke-width="2" stroke-dasharray="4,3.5"></line>
+  <line x1="556" y1="117" x2="560" y2="286" stroke="#1a1410" stroke-width="1.6" stroke-dasharray="4,3.5"></line>
+  
+  <path d="M484,294 Q548,308 612,294 L606,306 Q548,320 490,306 Z" fill="#e8e0cc" stroke="#1a1410" stroke-width="2.5"></path>
+  
+  
+  <ellipse cx="548" cy="292" rx="50" ry="9" fill="#1a1410"></ellipse>
+  <rect x="498" y="272" width="100" height="20" fill="#1a1410"></rect>
+  <ellipse cx="548" cy="272" rx="50" ry="9" fill="#e8e0cc" stroke="#1a1410" stroke-width="1.8"></ellipse>
+  
+  <rect x="514" y="256" width="68" height="16" fill="#1a1410"></rect>
+  <ellipse cx="548" cy="256" rx="34" ry="7" fill="#e8e0cc" stroke="#1a1410" stroke-width="1.5"></ellipse>
+  
+  <rect x="530" y="244" width="36" height="12" fill="#1a1410"></rect>
+  <ellipse cx="548" cy="244" rx="18" ry="5" fill="#e8e0cc" stroke="#1a1410" stroke-width="1.5"></ellipse>
+  
+  <ellipse cx="548" cy="238" rx="9" ry="5" fill="#1a1410"></ellipse>
+  
+  <text x="548" y="284" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" font-weight="700" fill="#f1ebde" opacity="0.82" letter-spacing="0.5">NEWS STD</text>
+
+  
+  <rect x="620" y="48" width="160" height="358" fill="#1a1410"></rect>
+  <rect x="620" y="48" width="160" height="358" fill="url(#xh2)" opacity="0.07"></rect>
+  
+  <text x="700" y="74" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="7.5" font-weight="700" fill="#f1ebde" letter-spacing="2">PITCH SCORE</text>
+  <line x1="630" y1="80" x2="770" y2="80" stroke="#f1ebde" stroke-width="0.8" opacity="0.2"></line>
+  
+  <text x="700" y="172" text-anchor="middle" font-family="&#39;Newsreader&#39;,&#39;Georgia&#39;,serif" font-size="102" font-weight="700" fill="#f1ebde">84</text>
+  
+  <rect x="650" y="176" width="100" height="4" fill="#f5b81f"></rect>
+  <text x="700" y="196" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="700" fill="#f1ebde" opacity="0.42" letter-spacing="1.5">OUT OF 100</text>
+  
+  <line x1="630" y1="208" x2="770" y2="208" stroke="#f1ebde" stroke-width="0.8" opacity="0.18"></line>
+  
+  <text x="630" y="226" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6" font-weight="700" fill="#f5b81f" opacity="0.88" letter-spacing="1">TIMELINESS</text>
+  <rect x="630" y="229" width="140" height="5" fill="#f1ebde" opacity="0.1"></rect>
+  <rect x="630" y="229" width="122" height="5" fill="#f5b81f" opacity="0.72"></rect>
+  <text x="630" y="244" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6" font-weight="700" fill="#f5b81f" opacity="0.88" letter-spacing="1">ANGLE</text>
+  <rect x="630" y="247" width="140" height="5" fill="#f1ebde" opacity="0.1"></rect>
+  <rect x="630" y="247" width="95" height="5" fill="#f5b81f" opacity="0.62"></rect>
+  <text x="630" y="262" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6" font-weight="700" fill="#f5b81f" opacity="0.88" letter-spacing="1">AUTHORITY</text>
+  <rect x="630" y="265" width="140" height="5" fill="#f1ebde" opacity="0.1"></rect>
+  <rect x="630" y="265" width="111" height="5" fill="#f5b81f" opacity="0.74"></rect>
+  <text x="630" y="280" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6" font-weight="700" fill="#f5b81f" opacity="0.88" letter-spacing="1">RELEVANCE</text>
+  <rect x="630" y="283" width="140" height="5" fill="#f1ebde" opacity="0.1"></rect>
+  <rect x="630" y="283" width="132" height="5" fill="#f5b81f" opacity="0.9"></rect>
+  <text x="630" y="298" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6" font-weight="700" fill="#f5b81f" opacity="0.88" letter-spacing="1">DATA PROOF</text>
+  <rect x="630" y="301" width="140" height="5" fill="#f1ebde" opacity="0.1"></rect>
+  <rect x="630" y="301" width="84" height="5" fill="#f5b81f" opacity="0.56"></rect>
+  
+  <line x1="630" y1="317" x2="770" y2="317" stroke="#f1ebde" stroke-width="0.8" opacity="0.18"></line>
+  
+  <rect x="630" y="325" width="140" height="24" fill="#f5b81f"></rect>
+  <text x="700" y="340" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="7.5" font-weight="900" fill="#1a1410" letter-spacing="1.5">LIKELY PLACEMENT</text>
+  
+  <text x="630" y="370" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" font-weight="400" fill="#f1ebde" opacity="0.32" letter-spacing="0.5">Report № 0847 · June MMXXVI</text>
+
+  
+  <line x1="14" y1="488" x2="786" y2="488" stroke="#1a1410" stroke-width="1.5" opacity="0.35"></line>
+</svg>

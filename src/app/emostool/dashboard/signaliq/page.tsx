@@ -10,8 +10,6 @@ export const metadata: Metadata = {
   title: "SignalIQ — EMOS Platform",
 };
 
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
-
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -25,7 +23,6 @@ const SERIF  = "var(--font-serif)";
 export default async function SignalIQPlatformPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
-  if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const signals = await getSignals();
 

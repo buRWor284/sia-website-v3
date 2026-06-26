@@ -28,12 +28,10 @@ export interface DbSignal {
 }
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 
 async function getAuthenticatedClient() {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/sign-in");
-  if (userId !== ALLOWED_USER_ID) redirect("/");
   const token = await getToken();
   return createSupabaseServerClient(token ?? "");
 }

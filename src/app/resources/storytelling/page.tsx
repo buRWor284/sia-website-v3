@@ -26,35 +26,38 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-// ─── Wayback Machine image URLs ───────────────────────────────────────────────
-const WM = "https://web.archive.org/web/20251205001052im_/https://syedirfanajmal.com/wp-content/uploads/2020/04/";
+// ─── Image map (self-hosted in /public/articles/storytelling/) ───────────────
+// NOTE: Numbered images (2.png–27.png) were not archived by Wayback Machine.
+// Run scripts/download-wp-images.sh to attempt recovery from archive.
+// Hero image (books-3071110_1280.jpg) confirmed available.
+const ST = "/articles/storytelling";
 const IMG = {
-  aesop:            `${WM}2.png`,
-  qissaKhawani:     `${WM}3.png`,
-  hubspotB2B:       `${WM}4.png`,
-  fiveThings:       `${WM}5.png`,
-  brandCanvas:      `${WM}6.png`,
-  storytellingTable:`${WM}7.png`,
-  mozStrategy:      `${WM}8.png`,
-  asosEthical:      `${WM}9.png`,
-  boschFuture:      `${WM}10.png`,
-  targetAudience:   `${WM}11.png`,
-  nikeJustDoIt:     `${WM}12.png`,
-  dunkinDonuts:     `${WM}13.png`,
-  paypal:           `${WM}15.png`,
-  amazonAlexa:      `${WM}16.png`,
-  storyCanvas:      `${WM}17.png`,
-  constantContact:  `${WM}18.png`,
-  productiveMuslim: `${WM}19.png`,
-  platforms:        `${WM}20.png`,
-  instagramBiz:     `${WM}21.png`,
-  benefitsChart:    `${WM}22.png`,
-  scienceBrain:     `${WM}23.png`,
-  visualBrain:      `${WM}24.png`,
-  airbnb:           `${WM}25.png`,
-  googleAtap:       `${WM}26.png`,
-  nikeEquality:     `${WM}27.png`,
-  hero:             "https://web.archive.org/web/20251205001052im_/https://syedirfanajmal.com/wp-content/uploads/2020/04/books-3071110_1280.jpg",
+  aesop:            `${ST}/2.png`,
+  qissaKhawani:     `${ST}/3.png`,
+  hubspotB2B:       `${ST}/4.png`,
+  fiveThings:       `${ST}/5.png`,
+  brandCanvas:      `${ST}/6.png`,
+  storytellingTable:`${ST}/7.png`,
+  mozStrategy:      `${ST}/8.png`,
+  asosEthical:      `${ST}/9.png`,
+  boschFuture:      `${ST}/10.png`,
+  targetAudience:   `${ST}/11.png`,
+  nikeJustDoIt:     `${ST}/12.png`,
+  dunkinDonuts:     `${ST}/13.png`,
+  paypal:           `${ST}/15.png`,
+  amazonAlexa:      `${ST}/16.png`,
+  storyCanvas:      `${ST}/17.png`,
+  constantContact:  `${ST}/18.png`,
+  productiveMuslim: `${ST}/19.png`,
+  platforms:        `${ST}/20.png`,
+  instagramBiz:     `${ST}/21.png`,
+  benefitsChart:    `${ST}/22.png`,
+  scienceBrain:     `${ST}/23.png`,
+  visualBrain:      `${ST}/24.png`,
+  airbnb:           `${ST}/25.png`,
+  googleAtap:       `${ST}/26.png`,
+  nikeEquality:     `${ST}/27.png`,
+  hero:             `${ST}/books-3071110_1280.jpg`,
 };
 
 // ─── Helper components ─────────────────────────────────────────────────────────

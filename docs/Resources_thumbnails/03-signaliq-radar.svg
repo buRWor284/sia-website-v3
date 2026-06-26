@@ -1,0 +1,242 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="ht3" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="1.1" fill="#1a1410" opacity="0.10"></circle>
+    </pattern>
+    <pattern id="xh3" width="6" height="6" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="6" y2="6" stroke="#1a1410" stroke-width="0.65"></line>
+      <line x1="6" y1="0" x2="0" y2="6" stroke="#1a1410" stroke-width="0.65"></line>
+    </pattern>
+    <pattern id="dl3" width="5" height="5" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="5" y2="5" stroke="#1a1410" stroke-width="0.9"></line>
+    </pattern>
+    <pattern id="grid3" width="28" height="28" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="28" y2="0" stroke="#1a1410" stroke-width="0.4" opacity="0.22"></line>
+      <line x1="0" y1="0" x2="0" y2="28" stroke="#1a1410" stroke-width="0.4" opacity="0.22"></line>
+    </pattern>
+  </defs>
+
+  
+  <rect width="800" height="500" fill="#f1ebde"></rect>
+  <rect width="800" height="500" fill="url(#ht3)"></rect>
+
+  
+  <rect x="2" y="2" width="796" height="496" fill="none" stroke="#1a1410" stroke-width="3"></rect>
+  <rect x="8" y="8" width="784" height="484" fill="none" stroke="#1a1410" stroke-width="1"></rect>
+
+  
+  <text x="400" y="33" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,Arial,sans-serif" font-size="9" font-weight="700" fill="#1a1410" letter-spacing="2.5">§ 03 · SIGNALIQ: PROACTIVE PR RADAR · TOOL</text>
+  <line x1="14" y1="41" x2="786" y2="41" stroke="#1a1410" stroke-width="0.7" opacity="0.3"></line>
+
+  
+  <line x1="14" y1="416" x2="786" y2="416" stroke="#1a1410" stroke-width="2"></line>
+  <rect x="14" y="416" width="772" height="68" fill="#e8e0cc"></rect>
+  <rect x="14" y="416" width="772" height="68" fill="url(#xh3)" opacity="0.12"></rect>
+
+  
+  <rect x="466" y="48" width="308" height="232" fill="#e8e0cc" stroke="#1a1410" stroke-width="2.5"></rect>
+  <rect x="466" y="48" width="308" height="232" fill="url(#xh3)" opacity="0.13"></rect>
+  
+  <rect x="466" y="48" width="308" height="22" fill="#1a1410"></rect>
+  <text x="620" y="63" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="7.5" font-weight="700" fill="#f1ebde" letter-spacing="2">SIGNAL DISPATCH BOARD</text>
+
+  
+  <rect x="480" y="84" width="138" height="66" fill="#f5b81f" stroke="#1a1410" stroke-width="2"></rect>
+  <circle cx="549" cy="82" r="5" fill="#1a1410"></circle>
+  <rect x="547" y="82" width="4" height="9" fill="#1a1410"></rect>
+  <text x="490" y="104" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="7" font-weight="900" fill="#1a1410" letter-spacing="0.5">AI FUNDING SURGE</text>
+  <line x1="490" y1="110" x2="608" y2="110" stroke="#1a1410" stroke-width="1" opacity="0.5"></line>
+  <text x="490" y="122" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6" font-weight="700" fill="#1a1410" opacity="0.75">WINDOW: 72 HRS</text>
+  <text x="490" y="136" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6" font-weight="700" fill="#1a1410" opacity="0.65">PITCH NOW →</text>
+
+  
+  <g transform="rotate(3,697,112)">
+    <rect x="632" y="78" width="128" height="66" fill="#f1ebde" stroke="#1a1410" stroke-width="2"></rect>
+    <circle cx="696" cy="76" r="5" fill="#1a1410"></circle>
+    <rect x="694" y="76" width="4" height="9" fill="#1a1410"></rect>
+    <text x="642" y="100" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="7" font-weight="900" fill="#1a1410">SEC RULING</text>
+    <line x1="642" y1="106" x2="750" y2="106" stroke="#1a1410" stroke-width="1" opacity="0.45"></line>
+    <text x="642" y="118" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" fill="#1a1410" opacity="0.65">EMERGING SIGNAL</text>
+    <text x="642" y="130" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" fill="#1a1410" opacity="0.5">48 HRS EARLY</text>
+  </g>
+
+  
+  <g transform="rotate(-2,538,192)">
+    <rect x="480" y="162" width="116" height="56" fill="#1a1410" stroke="#1a1410" stroke-width="1.5"></rect>
+    <circle cx="538" cy="160" r="4.5" fill="#1a1410"></circle>
+    <rect x="536" y="160" width="4" height="8" fill="#1a1410"></rect>
+    <text x="490" y="182" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="900" fill="#f1ebde">PLATFORM SHIFT</text>
+    <text x="490" y="196" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" font-weight="700" fill="#f5b81f">TRENDING: OPEN</text>
+    <text x="490" y="208" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" fill="#f1ebde" opacity="0.6">36 HRS EARLY</text>
+  </g>
+
+  
+  <g transform="rotate(5,694,180)">
+    <rect x="620" y="156" width="148" height="52" fill="#f1ebde" stroke="#1a1410" stroke-width="2"></rect>
+    <circle cx="694" cy="154" r="4.5" fill="#1a1410"></circle>
+    <rect x="692" y="154" width="4" height="8" fill="#1a1410"></rect>
+    <text x="630" y="177" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="900" fill="#1a1410">JOURNALIST ALERT</text>
+    <text x="630" y="190" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" fill="#1a1410" opacity="0.65">NEW BEAT OPEN</text>
+  </g>
+
+  
+  <rect x="16" y="262" width="80" height="100" fill="#e8e0cc" stroke="#1a1410" stroke-width="2.5"></rect>
+  <rect x="16" y="262" width="80" height="100" fill="url(#dl3)" opacity="0.2"></rect>
+  
+  <rect x="16" y="262" width="80" height="20" fill="#1a1410"></rect>
+  <text x="56" y="276" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="700" fill="#f1ebde" letter-spacing="1.5">SIGNAL</text>
+  
+  <rect x="24" y="286" width="64" height="26" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></rect>
+  <line x1="26" y1="292" x2="86" y2="292" stroke="#1a1410" stroke-width="0.7" opacity="0.4"></line>
+  <text x="28" y="300" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="4.5" font-weight="700" fill="#1a1410" opacity="0.65" letter-spacing="0.5">TREND: RISING</text>
+  
+  <circle cx="36" cy="334" r="12" fill="#e8e0cc" stroke="#1a1410" stroke-width="2"></circle>
+  <line x1="36" y1="322" x2="36" y2="330" stroke="#1a1410" stroke-width="2"></line>
+  <circle cx="76" cy="334" r="12" fill="#e8e0cc" stroke="#1a1410" stroke-width="2"></circle>
+  <line x1="76" y1="322" x2="80" y2="329" stroke="#1a1410" stroke-width="2"></line>
+  
+  <circle cx="22" cy="268" r="3" fill="#e8e0cc" stroke="#1a1410" stroke-width="1.2"></circle>
+  <line x1="21" y1="268" x2="23" y2="268" stroke="#1a1410" stroke-width="1"></line>
+  <line x1="22" y1="267" x2="22" y2="269" stroke="#1a1410" stroke-width="1"></line>
+  <circle cx="90" cy="268" r="3" fill="#e8e0cc" stroke="#1a1410" stroke-width="1.2"></circle>
+  <line x1="89" y1="268" x2="91" y2="268" stroke="#1a1410" stroke-width="1"></line>
+  <line x1="90" y1="267" x2="90" y2="269" stroke="#1a1410" stroke-width="1"></line>
+  
+  <rect x="26" y="360" width="12" height="58" fill="#1a1410"></rect>
+  <rect x="74" y="360" width="12" height="58" fill="#1a1410"></rect>
+
+  
+  
+  <path d="M96,305 Q118,297 142,292 Q172,286 200,280 Q228,274 254,270" fill="none" stroke="#1a1410" stroke-width="9" stroke-linecap="round"></path>
+  <path d="M96,305 Q118,297 142,292 Q172,286 200,280 Q228,274 254,270" fill="none" stroke="#f1ebde" stroke-width="6" stroke-linecap="round"></path>
+  
+  <path d="M96,316 Q124,322 152,316 Q180,310 206,302" fill="none" stroke="#1a1410" stroke-width="8" stroke-linecap="round"></path>
+  <path d="M96,316 Q124,322 152,316 Q180,310 206,302" fill="none" stroke="#f1ebde" stroke-width="5" stroke-linecap="round"></path>
+  
+  <text x="128" y="290" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5" font-weight="700" fill="#1a1410" letter-spacing="0.5">AI SECTOR · SIGNAL UP</text>
+  <text x="118" y="318" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5" font-weight="700" fill="#1a1410" letter-spacing="0.5">PITCH WINDOW: OPEN</text>
+
+  
+  
+  <rect x="180" y="308" width="452" height="20" fill="#1a1410"></rect>
+  
+  <rect x="194" y="212" width="424" height="118" fill="#e8e0cc" stroke="#1a1410" stroke-width="2.5"></rect>
+  <rect x="194" y="212" width="424" height="118" fill="url(#grid3)"></rect>
+
+  
+  
+  <path d="M210,232 Q256,224 286,238 Q296,252 282,268 Q258,276 216,270 Q202,257 210,232 Z" fill="#1a1410" opacity="0.16" stroke="#1a1410" stroke-width="1"></path>
+  <text x="248" y="252" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" font-weight="700" fill="#1a1410" opacity="0.7">AI SECTOR</text>
+
+  
+  <path d="M298,228 Q340,222 362,238 Q370,252 360,266 Q336,274 306,268 Q290,254 298,228 Z" fill="#1a1410" opacity="0.13" stroke="#1a1410" stroke-width="1"></path>
+  <text x="330" y="250" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" font-weight="700" fill="#1a1410" opacity="0.7">FINTECH</text>
+
+  
+  <path d="M376,226 Q420,218 448,236 Q460,252 450,270 Q424,280 388,272 Q368,256 376,226 Z" fill="#f5b81f" opacity="0.38" stroke="#1a1410" stroke-width="1.5"></path>
+  
+  <circle cx="414" cy="248" r="26" fill="none" stroke="#f5b81f" stroke-width="2.5" stroke-dasharray="5,3"></circle>
+  <text x="414" y="246" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" font-weight="900" fill="#1a1410">MEDIA &amp; PR</text>
+  <text x="414" y="258" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5" font-weight="700" fill="#1a1410" opacity="0.75">WINDOW OPEN</text>
+
+  
+  <path d="M462,230 Q504,224 528,240 Q536,254 524,268 Q502,276 468,268 Q452,255 462,230 Z" fill="#1a1410" opacity="0.11" stroke="#1a1410" stroke-width="1"></path>
+  <text x="494" y="252" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5.5" font-weight="700" fill="#1a1410" opacity="0.6">ENTERPRISE</text>
+
+  
+  
+  <line x1="248" y1="240" x2="248" y2="226" stroke="#1a1410" stroke-width="1.5"></line>
+  <circle cx="248" cy="222" r="3.5" fill="#e8e0cc" stroke="#1a1410" stroke-width="1.5"></circle>
+  
+  <line x1="414" y1="234" x2="414" y2="218" stroke="#1a1410" stroke-width="2.2"></line>
+  <circle cx="414" cy="214" r="6" fill="#f5b81f" stroke="#1a1410" stroke-width="2"></circle>
+  
+  <line x1="330" y1="242" x2="330" y2="232" stroke="#1a1410" stroke-width="1.5"></line>
+  <circle cx="330" cy="228" r="3" fill="#1a1410"></circle>
+  
+  <line x1="202" y1="304" x2="244" y2="304" stroke="#1a1410" stroke-width="1.5"></line>
+  <line x1="202" y1="301" x2="202" y2="307" stroke="#1a1410" stroke-width="1.5"></line>
+  <line x1="244" y1="301" x2="244" y2="307" stroke="#1a1410" stroke-width="1.5"></line>
+  <text x="223" y="318" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="5" fill="#1a1410" opacity="0.5">SIGNAL RANGE</text>
+
+  
+  <rect x="208" y="326" width="18" height="92" fill="#1a1410"></rect>
+  <rect x="578" y="326" width="18" height="92" fill="#1a1410"></rect>
+  <rect x="202" y="414" width="32" height="10" fill="#1a1410"></rect>
+  <rect x="572" y="414" width="32" height="10" fill="#1a1410"></rect>
+
+  
+  
+  <rect x="244" y="350" width="28" height="68" fill="#1a1410"></rect>
+  <rect x="284" y="344" width="28" height="74" fill="#1a1410"></rect>
+  
+  <ellipse cx="258" cy="419" rx="23" ry="10" fill="#1a1410"></ellipse>
+  <ellipse cx="298" cy="419" rx="23" ry="10" fill="#1a1410"></ellipse>
+  
+  <rect x="228" y="202" width="116" height="152" fill="#f1ebde" stroke="#1a1410" stroke-width="1.8"></rect>
+  <rect x="228" y="202" width="116" height="152" fill="url(#dl3)" opacity="0.06"></rect>
+  
+  <line x1="258" y1="202" x2="250" y2="354" stroke="#1a1410" stroke-width="2.2" opacity="0.48"></line>
+  <line x1="314" y1="202" x2="322" y2="354" stroke="#1a1410" stroke-width="2.2" opacity="0.48"></line>
+  
+  <line x1="286" y1="202" x2="286" y2="326" stroke="#1a1410" stroke-width="1" opacity="0.28"></line>
+  
+  <path d="M228,212 L172,312 L190,320 L248,220 Z" fill="#f1ebde" stroke="#1a1410" stroke-width="1.8"></path>
+  
+  <rect x="174" y="308" width="18" height="14" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></rect>
+  <rect x="174" y="308" width="18" height="6" fill="#1a1410" opacity="0.2"></rect>
+  
+  <ellipse cx="185" cy="326" rx="14" ry="8" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></ellipse>
+  
+  <path d="M344,212 L408,272 L394,280 L328,220 Z" fill="#f1ebde" stroke="#1a1410" stroke-width="1.8"></path>
+  
+  <rect x="390" y="270" width="20" height="13" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></rect>
+  <rect x="390" y="270" width="20" height="6" fill="#1a1410" opacity="0.2"></rect>
+  
+  <ellipse cx="404" cy="288" rx="12" ry="8" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></ellipse>
+  
+  <rect x="402" y="294" width="5" height="22" fill="#f5b81f" stroke="#1a1410" stroke-width="1.2"></rect>
+  
+  <polygon points="402,316 407,316 404.5,326" fill="#1a1410"></polygon>
+
+  
+  <rect x="274" y="174" width="24" height="30" fill="#f1ebde" stroke="#1a1410" stroke-width="1.5"></rect>
+  
+  <ellipse cx="286" cy="148" rx="42" ry="38" fill="#f1ebde" stroke="#1a1410" stroke-width="2.5"></ellipse>
+  
+  <path d="M244,143 Q246,108 286,106 Q326,108 328,140 L319,136 Q316,114 286,112 Q256,114 253,137 Z" fill="#1a1410"></path>
+  <path d="M252,116 Q256,128 252,140" fill="none" stroke="#f1ebde" stroke-width="1" opacity="0.36"></path>
+  <path d="M270,110 Q272,122 268,136" fill="none" stroke="#f1ebde" stroke-width="1" opacity="0.3"></path>
+  
+  <rect x="268" y="147" width="22" height="16" fill="rgba(241,235,222,0.45)" stroke="#1a1410" stroke-width="2"></rect>
+  <rect x="296" y="147" width="22" height="16" fill="rgba(241,235,222,0.45)" stroke="#1a1410" stroke-width="2"></rect>
+  <line x1="290" y1="155" x2="296" y2="155" stroke="#1a1410" stroke-width="2"></line>
+  <line x1="268" y1="153" x2="253" y2="153" stroke="#1a1410" stroke-width="2"></line>
+  <line x1="318" y1="153" x2="333" y2="153" stroke="#1a1410" stroke-width="2"></line>
+  
+  <circle cx="279" cy="157" r="5.5" fill="#1a1410"></circle>
+  <circle cx="279" cy="159" r="2" fill="white"></circle>
+  <circle cx="307" cy="157" r="5.5" fill="#1a1410"></circle>
+  <circle cx="307" cy="159" r="2" fill="white"></circle>
+  
+  <path d="M267,142 Q274,138 283,141" fill="none" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"></path>
+  <path d="M295,140 Q304,137 312,141" fill="none" stroke="#1a1410" stroke-width="2.5" stroke-linecap="round"></path>
+  
+  <path d="M286,163 Q281,172 279,175 Q282,177 286,176 Q290,177 293,175 Q291,172 286,163" fill="none" stroke="#1a1410" stroke-width="1.8" stroke-linejoin="round"></path>
+  
+  <path d="M278,180 Q286,185 294,180" fill="none" stroke="#1a1410" stroke-width="1.8" stroke-linecap="round"></path>
+
+  
+  <rect x="96" y="52" width="170" height="82" fill="#1a1410"></rect>
+  <rect x="96" y="52" width="170" height="82" fill="url(#xh3)" opacity="0.08"></rect>
+  <text x="181" y="76" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="7" font-weight="700" fill="#f5b81f" letter-spacing="2">YOU ARE</text>
+  <text x="181" y="114" text-anchor="middle" font-family="&#39;Newsreader&#39;,&#39;Georgia&#39;,serif" font-size="40" font-weight="700" fill="#f1ebde">72 HRS</text>
+  <rect x="116" y="118" width="130" height="3" fill="#f5b81f"></rect>
+  <text x="181" y="130" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="6.5" font-weight="700" fill="#f1ebde" opacity="0.52" letter-spacing="1.5">AHEAD OF THE CYCLE</text>
+
+  
+  <rect x="14" y="452" width="772" height="30" fill="#1a1410"></rect>
+  <text x="400" y="471" text-anchor="middle" font-family="&#39;Archivo&#39;,&#39;Helvetica Neue&#39;,sans-serif" font-size="9" font-weight="900" fill="#f5b81f" letter-spacing="4">SIGNAL DETECTED · PITCH FIRST →→→</text>
+
+  <line x1="14" y1="488" x2="786" y2="488" stroke="#1a1410" stroke-width="1.5" opacity="0.35"></line>
+</svg>

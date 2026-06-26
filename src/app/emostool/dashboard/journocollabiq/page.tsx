@@ -10,8 +10,6 @@ export const metadata: Metadata = {
   title: "JournoCollabIQ — EMOS Platform",
 };
 
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
-
 const PAPER  = "#f1ebde";
 const INK    = "#1a1410";
 const INK15  = "rgba(26,20,16,.15)";
@@ -28,7 +26,6 @@ export default async function JournoCollabIQPage({
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
-  if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const params = await searchParams;
 

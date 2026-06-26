@@ -32,32 +32,30 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-// ─── Image map (Wayback Machine CDN — replace with /public/articles/personal-branding/ once downloaded) ──────
-const WB16 = "https://web.archive.org/web/20260315103746im_/https://syedirfanajmal.com/wp-content/uploads/2016/06";
-const WB18 = "https://web.archive.org/web/20260315103746im_/https://syedirfanajmal.com/wp-content/uploads/2018/09";
-
+// ─── Image map (self-hosted in /public/articles/personal-branding/) ──────────
+const PB = "/articles/personal-branding";
 const IMG = {
-  hero:              `${WB16}/Personalbranding101.jpg`,
-  jeffBezos:         `${WB18}/Jeff_Bezos_cc_caricature_small.jpg`,
-  robAsghar:         `${WB18}/Rob-Asghar.jpeg`,
-  billGates:         `${WB16}/Bill-Gates.png`,
-  richardBranson:    `${WB16}/Richard-Branson.png`,
-  steveJobs:         `${WB18}/Steve_Jobs_iPhone_4_presentation.jpg`,
-  boringCompany:     `${WB18}/The-Boring-Company.jpg`,
-  contentTrends:     `${WB18}/Content-trends-1-report-06.png`,
-  siaFacebook:       `${WB16}/Syed-Irfan-Ajmal.png`,
-  empowerPakistan:   `${WB16}/empower-pakistan.jpg`,
-  astrolabsAudience: `${WB16}/Dubai-With-Audience2.jpg`,
-  astrolabsTalk:     `${WB16}/Dubai-Talk.jpg`,
-  chimamanda:        `${WB18}/Chimamanda-Ngozi-Adichie-2.jpg`,
-  harveyMackey:      `${WB18}/tw-aw-mackey-1_400x400.jpg`,
-  timFerrisPortrait: `${WB18}/Tim-Ferriss-cc-Photo-by-Sean-OShaughnessy.jpg`,
-  lewisHowes:        `${WB16}/Lewis-Howes.jpg`,
-  danBrown:          `${WB16}/Dan-Brown.jpg`,
-  timFerrisBanner:   `${WB16}/Tim-Feriss.jpg`,
-  chrisDucker:       `${WB16}/Chris-Ducker.jpg`,
-  marieForleo:       `${WB16}/Marie-Forleo.jpg`,
-  siaPhoto:          `${WB16}/Syed-Irfan-Ajmal.jpg`,
+  hero:              `${PB}/Personalbranding101.jpg`,
+  jeffBezos:         `${PB}/Jeff_Bezos_cc_caricature_small.jpg`,
+  robAsghar:         `${PB}/Rob-Asghar.jpeg`,
+  billGates:         `${PB}/Bill-Gates.png`,
+  richardBranson:    `${PB}/Richard-Branson.png`,
+  steveJobs:         `${PB}/Steve_Jobs_iPhone_4_presentation.jpg`,
+  boringCompany:     `${PB}/The-Boring-Company.jpg`,
+  contentTrends:     `${PB}/Content-trends-1-report-06.png`,
+  siaFacebook:       `${PB}/Syed-Irfan-Ajmal.png`,
+  empowerPakistan:   `${PB}/empower-pakistan.jpg`,
+  astrolabsAudience: `${PB}/Dubai-With-Audience2.jpg`,
+  astrolabsTalk:     `${PB}/Dubai-Talk.jpg`,
+  chimamanda:        `${PB}/Chimamanda-Ngozi-Adichie-2.jpg`,
+  harveyMackey:      `${PB}/tw-aw-mackey-1_400x400.jpg`,
+  timFerrisPortrait: `${PB}/Tim-Ferriss-cc-Photo-by-Sean-OShaughnessy.jpg`,
+  lewisHowes:        `${PB}/Lewis-Howes.jpg`,
+  danBrown:          `${PB}/Dan-Brown.jpg`,
+  timFerrisBanner:   `${PB}/Tim-Feriss.jpg`,
+  chrisDucker:       `${PB}/Chris-Ducker.jpg`,
+  marieForleo:       `${PB}/Marie-Forleo.jpg`,
+  siaPhoto:          `${PB}/Syed-Irfan-Ajmal.jpg`,
 };
 
 // ─── Helper components ─────────────────────────────────────────────────────────

@@ -10,8 +10,6 @@ export const metadata: Metadata = {
   title: "CoverageIQ — EMOS Platform",
 };
 
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
-
 export default async function CoverageIQPlatformPage({
   searchParams,
 }: {
@@ -19,7 +17,6 @@ export default async function CoverageIQPlatformPage({
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
-  if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const params = await searchParams;
   const prefillSubject = params.pitch ? decodeURIComponent(params.pitch) : undefined;

@@ -1,0 +1,13 @@
+{
+  "name": "pressiq-renderer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Playwright renderer for PressIQ Explainer animation",
+  "scripts": {
+    "setup": "npm install && npx playwright install chromium",
+    "render": "node render-pressiq.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.44.0"
+  }
+}

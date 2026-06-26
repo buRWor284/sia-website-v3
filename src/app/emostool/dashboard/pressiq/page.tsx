@@ -10,8 +10,6 @@ export const metadata: Metadata = {
   title: "PressIQ — EMOS Platform",
 };
 
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
-
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
 const INK    = "#1a1410";
@@ -44,7 +42,6 @@ export default async function PressIQPlatformPage({
 }) {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/sign-in");
-  if (userId !== ALLOWED_USER_ID) redirect("/");
 
   const params = await searchParams;
   const assetTitle = params.assetTitle ? decodeURIComponent(params.assetTitle) : null;
