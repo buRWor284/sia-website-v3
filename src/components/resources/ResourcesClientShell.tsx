@@ -612,7 +612,7 @@ function ResourceThumb({ item }: { item: ContentItem }) {
   return (
     <div
       style={{
-        width: 96,
+        width: 120,
         height: 96,
         flexShrink: 0,
         border: "1.5px solid #1a1410",
@@ -695,7 +695,7 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
       onMouseLeave={() => setHover(false)}
       style={{
         display: "grid",
-        gridTemplateColumns: "40px 96px 1fr 186px 36px",
+        gridTemplateColumns: "40px 120px 1fr 186px 36px",
         gap: 20,
         alignItems: "center",
         padding: "16px 0",
