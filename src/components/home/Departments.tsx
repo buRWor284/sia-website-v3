@@ -53,7 +53,7 @@ const SERVICES: ReadonlyArray<Service> = [
     body:
       "For founders without a marketing leader. Weekly cadence, full " +
       "strategy ownership, agency-level execution through DMR.agency. " +
-      "Six months minimum. Two seats open this quarter.",
+      "Six months minimum. ● 2 FRACTIONAL CMO SPOTS · Q3 2026.",
     foot: "For Series A / B founders",
     cta: "Inquire",
     href: "/fractional-cmo",

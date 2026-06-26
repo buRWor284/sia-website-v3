@@ -163,7 +163,7 @@ const Hero = () => (
           2
         </div>
         <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
-          Seats open<br />this quarter
+          ● 2 CMO SPOTS<br />Q3 2026
         </div>
       </div>
 
@@ -231,9 +231,9 @@ const CMOLead = () => (
           Retainers run $5K&ndash;$10K a month depending on scope: a fraction
           of the $300K+ a full-time CMO costs, with agency execution included
           rather than billed on top. Six-month minimum, with sixty days&rsquo;
-          notice after the first quarter, so you are never locked in. Two
-          seats open this quarter; book the call below if you would like to
-          discuss.
+          notice after the first quarter, so you are never locked in.
+          ● 2 FRACTIONAL CMO SPOTS · Q3 2026 — book the call below if you
+          would like to discuss.
         </p>
       </div>
 
@@ -241,8 +241,7 @@ const CMOLead = () => (
       <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
         <Pill size={11} ls="0.20em">Availability</Pill>
         <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>
-          Two seats open<br />
-          <span style={{ fontStyle: "italic", fontWeight: 600 }}>this quarter.</span>
+          ● 2 FRACTIONAL CMO SPOTS · Q3 2026
         </div>
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
           {AVAILABILITY_SPECS.map(([k, v]) => (
@@ -963,7 +962,7 @@ const BookCall = () => (
           border: `1px solid ${INK}`,
         }}
       >
-        Two seats open &middot; Q3
+        ● 2 FRACTIONAL CMO SPOTS · Q3 2026
       </div>
 
       <div>
