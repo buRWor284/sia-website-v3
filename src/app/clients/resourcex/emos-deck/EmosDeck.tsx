@@ -522,23 +522,19 @@ function Slide09() {
             <span style={{ fontFamily: SANS, fontWeight: 900, fontSize: 22, color: "#21ce56" }}>TechCrunch</span>
             <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 10, padding: "3px 8px", letterSpacing: "0.10em" }}>EXCLUSIVE</span>
           </div>
-          <div style={{ padding: "16px 22px 12px", flexShrink: 0 }}>
-            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: "#21ce56", marginBottom: 12 }}>STARTUPS · AI</div>
-            <div style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/clients/sajid-headshot.jpg" alt="Sajid Shah" style={{ width: 88, height: 88, objectFit: "cover", objectPosition: "center 15%", flexShrink: 0 }} />
-              <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.25, color: OD, margin: 0 }}>
-                Building a 7-Figure AI Startup for the Best from the Global South
-              </h3>
-            </div>
-            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: OD45, margin: 0 }}>
+          <div style={{ padding: "20px 22px 16px", flexShrink: 0 }}>
+            <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 14, letterSpacing: "0.14em", textTransform: "uppercase", color: "#21ce56", marginBottom: 16 }}>STARTUPS · AI</div>
+            <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 34, lineHeight: 1.2, color: OD, margin: "0 0 16px" }}>
+              Building a 7-Figure AI Startup for the Best from the Global South
+            </h3>
+            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: OD45, margin: 0 }}>
               By Sajid Shah · Founder, OnSense.io · June 2026
             </p>
           </div>
-          {/* Fill remaining height with photo */}
-          <div style={{ flex: 1, overflow: "hidden", minHeight: 0 }}>
+          {/* Photo — fixed height, no duplicate thumbnail */}
+          <div style={{ height: 380, flexShrink: 0, overflow: "hidden" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/clients/sajid-headshot.jpg" alt="" aria-hidden="true" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", opacity: 0.35, display: "block" }} />
+            <img src="/clients/sajid-headshot.jpg" alt="Sajid Shah" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", opacity: 0.55, display: "block" }} />
           </div>
         </div>
 
