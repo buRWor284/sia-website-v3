@@ -698,6 +698,8 @@ export function EmosDeck() {
   const [emailOpen, setEmailOpen] = useState(false);
   const [scale, setScale] = useState(1);
   const stageRef = useRef<HTMLDivElement>(null);
+  const swipeStartX = useRef<number | null>(null);
+  const swipeStartY = useRef<number | null>(null);
   const total = SLIDES.length;
 
   const prev = useCallback(() => setSlide(s => Math.max(0, s - 1)), []);
@@ -712,6 +714,23 @@ export function EmosDeck() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [prev, next]);
+
+  /* swipe gesture navigation */
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length !== 1) return;
+    swipeStartX.current = e.touches[0].clientX;
+    swipeStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (swipeStartX.current == null) return;
+    const dx = swipeStartX.current - e.changedTouches[0].clientX;
+    const dy = (swipeStartY.current ?? 0) - e.changedTouches[0].clientY;
+    swipeStartX.current = null;
+    swipeStartY.current = null;
+    if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx > 0) next(); else prev();
+  }, [next, prev]);
 
   /* scale canvas to fit stage */
   useEffect(() => {
@@ -738,6 +757,15 @@ export function EmosDeck() {
         .emos-nav-btn:hover { opacity: 0.8 !important; }
         .emos-action-btn:hover { opacity: 0.8 !important; }
         .emos-prev-btn:hover, .emos-next-btn:hover { background: rgba(245,197,24,.15) !important; }
+        .emos-mobile-advisory { display: none; }
+        @media (max-width: 640px) {
+          .emos-mobile-advisory { display: flex !important; }
+          .emos-action-inner { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+          .emos-back-link { min-height: 44px; display: flex !important; align-items: center !important; }
+          .emos-action-btn { min-height: 44px !important; display: flex !important; align-items: center !important; }
+          .emos-dot { min-height: 32px !important; padding: 12px 4px !important; box-sizing: content-box !important; }
+          .emos-nav-strip { padding: 4px 20px !important; }
+        }
         @media print {
           .emos-no-print { display: none !important; }
           body { background: white !important; }
@@ -746,13 +774,23 @@ export function EmosDeck() {
         }
       `}</style>
 
+      {/* ── Mobile advisory banner ──────────────────────────────────────────── */}
+      <div className="emos-mobile-advisory emos-no-print" style={{
+        background: Y, padding: "8px 20px", flexShrink: 0,
+        alignItems: "center", justifyContent: "center", gap: 12,
+      }}>
+        <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: K }}>
+          Best on desktop · Swipe or tap ‹ › to navigate
+        </span>
+      </div>
+
       {/* ── Action bar ─────────────────────────────────────────────────────── */}
       <div className="emos-no-print" style={{
         background: "#1e1c17", borderBottom: `1px solid ${OD12}`,
         padding: "10px 32px", flexShrink: 0,
       }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-          <Link href="/clients/resourcex" style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, textDecoration: "none" }}>← Workspace</Link>
+        <div className="emos-action-inner" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
+          <Link href="/clients/resourcex" className="emos-back-link" style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, textDecoration: "none" }}>← Workspace</Link>
           {emailOpen ? (
             <EmailForm onClose={() => setEmailOpen(false)} />
           ) : (
@@ -765,7 +803,7 @@ export function EmosDeck() {
       </div>
 
       {/* ── Stage ──────────────────────────────────────────────────────────── */}
-      <div className="emos-stage" ref={stageRef} style={{ flex: 1, position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div className="emos-stage" ref={stageRef} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} style={{ flex: 1, position: "relative", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {/* Slide canvas */}
         <div className="emos-canvas" style={{ width: 1920, height: 1080, transform: `scale(${scale})`, transformOrigin: "center center", position: "absolute", overflow: "hidden" }}>
           <SlideComponent />
@@ -791,10 +829,11 @@ export function EmosDeck() {
       </div>
 
       {/* ── Slide counter / dot nav ─────────────────────────────────────────── */}
-      <div className="emos-no-print" style={{ flexShrink: 0, background: "#1e1c17", borderTop: `1px solid ${OD12}`, padding: "10px 32px", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      <div className="emos-nav-strip emos-no-print" style={{ flexShrink: 0, background: "#1e1c17", borderTop: `1px solid ${OD12}`, padding: "10px 32px", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         {SLIDES.map((_, i) => (
           <button
             key={i}
+            className="emos-dot"
             onClick={() => setSlide(i)}
             style={{ width: i === slide ? 24 : 8, height: 8, background: i === slide ? Y : OD25, border: "none", cursor: "pointer", transition: "all 0.2s", borderRadius: 0 }}
             aria-label={`Go to slide ${i + 1}`}

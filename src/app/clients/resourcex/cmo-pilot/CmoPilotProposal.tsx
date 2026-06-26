@@ -158,18 +158,27 @@ export function CmoPilotProposal() {
           .timeline-grid { grid-template-columns: 1fr 1fr !important; }
           .cover-grid  { grid-template-columns: 1fr !important; }
           .role-grid   { grid-template-columns: 1fr !important; }
+          .data-grid-3 { grid-template-columns: 1fr !important; }
+          .action-bar  { padding: 8px 20px !important; }
+          .cmo-section { padding: 24px 20px 28px !important; }
+          .cmo-divider { margin: 0 20px !important; }
+          .cmo-footer  { padding: 12px 20px !important; }
         }
         @media (max-width: 480px) {
           .masthead-center { display: none !important; }
           .timeline-grid   { grid-template-columns: 1fr !important; }
           .action-bar-inner { flex-direction: column; align-items: flex-start !important; gap: 10px !important; }
+          .action-back  { min-height: 44px; display: flex !important; align-items: center !important; }
+          .action-dl    { min-height: 44px !important; display: flex !important; align-items: center !important; }
+          .action-email { min-height: 44px !important; display: flex !important; align-items: center !important; }
+          .cmo-book-btn { min-height: 44px !important; display: flex !important; align-items: center !important; justify-content: center !important; box-sizing: border-box !important; }
         }
       `}</style>
 
       <div style={{ maxWidth: 900, margin: "0 auto", background: PAPER }}>
 
         {/* ══ ACTION BAR ════════════════════════════════════════════════════ */}
-        <div className="no-print" style={{
+        <div className="no-print action-bar" style={{
           background: PAPER2,
           borderBottom: `1px solid ${INK15}`,
           padding: "10px 40px",
@@ -179,7 +188,7 @@ export function CmoPilotProposal() {
             alignItems: "center", gap: 16,
           }}>
             {/* Back link */}
-            <Link href="/clients/resourcex" style={{
+            <Link href="/clients/resourcex" className="action-back" style={{
               fontFamily: GROT, fontWeight: 700, fontSize: 9,
               letterSpacing: "0.14em", textTransform: "uppercase",
               color: INK55, textDecoration: "none",
@@ -229,42 +238,18 @@ export function CmoPilotProposal() {
         <header style={{
           borderBottom: `1px solid ${INK}`,
           padding: "14px 40px",
-          display: "flex", justifyContent: "space-between",
-          alignItems: "center", gap: 16,
+          display: "flex", alignItems: "center", gap: 10,
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 28, height: 28, background: YEL,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontFamily: GROT, fontWeight: 900, fontSize: 11, color: INK,
-              flexShrink: 0,
-            }}>SIA</div>
-            <span style={{
-              fontFamily: GROT, fontWeight: 700, fontSize: 10,
-              letterSpacing: "0.22em", textTransform: "uppercase", color: INK55,
-            }}>Syed Irfan Ajmal</span>
-          </div>
-
-          <div className="masthead-center" style={{ textAlign: "center" }}>
-            <div style={{
-              fontFamily: GROT, fontWeight: 900, fontSize: 13,
-              letterSpacing: "0.30em", textTransform: "uppercase", color: INK,
-            }}>THE SIA WIRE</div>
-            <div style={{
-              fontFamily: GROT, fontWeight: 400, fontSize: 10,
-              letterSpacing: "0.16em", textTransform: "uppercase", color: INK55,
-              marginTop: 3,
-            }}>Pilot Proposal &nbsp;·&nbsp; Fractional CMO &nbsp;·&nbsp; Advisory</div>
-          </div>
-
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.16em", color: INK55 }}>
-              June 2026
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 10, color: INK55, marginTop: 2 }}>
-              Vol. I &nbsp;·&nbsp; № 01
-            </div>
-          </div>
+          <div style={{
+            width: 28, height: 28, background: YEL,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontFamily: GROT, fontWeight: 900, fontSize: 11, color: INK,
+            flexShrink: 0,
+          }}>SIA</div>
+          <span style={{
+            fontFamily: GROT, fontWeight: 700, fontSize: 10,
+            letterSpacing: "0.22em", textTransform: "uppercase", color: INK55,
+          }}>Syed Irfan Ajmal</span>
         </header>
 
         {/* ══ HERO 3-COLUMN GRID ════════════════════════════════════════════ */}
@@ -358,8 +343,8 @@ export function CmoPilotProposal() {
         </div>
 
         {/* ══ §01 THE ROLE ══════════════════════════════════════════════════ */}
-        <section style={{ padding: "36px 40px 40px" }}>
-          <SectionMast num="01" label="THE ROLE" vol="Vol. I · № 01" />
+        <section className="cmo-section" style={{ padding: "36px 40px 40px" }}>
+          <SectionMast num="01" label="THE ROLE" />
           <p style={{
             fontFamily: SERIF, fontWeight: 400, fontSize: 16,
             lineHeight: 1.65, color: INK70, textAlign: "justify",
@@ -371,14 +356,14 @@ export function CmoPilotProposal() {
           </p>
         </section>
 
-        <div style={{ height: 1, background: INK15, margin: "0 40px" }} />
+        <div className="cmo-divider" style={{ height: 1, background: INK15, margin: "0 40px" }} />
 
         {/* ══ §02 THE ENGAGEMENT ════════════════════════════════════════════ */}
-        <section style={{ padding: "36px 40px 40px" }}>
+        <section className="cmo-section" style={{ padding: "36px 40px 40px" }}>
           <SectionMast num="02" label="THE ENGAGEMENT" vol="3-month pilot" />
 
           {/* Data grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}`, gap: 1, background: INK15, marginBottom: 20 }}>
+          <div className="data-grid-3" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", border: `1px solid ${INK}`, gap: 1, background: INK15, marginBottom: 20 }}>
             {[
               { label: "TERM",        val: "3-month pilot",      sub: "extendable to 6 months" },
               { label: "COMMITMENT",  val: "10 hrs / week",      sub: "dedicated to this account", highlight: true },
@@ -414,10 +399,10 @@ export function CmoPilotProposal() {
           </div>
         </section>
 
-        <div style={{ height: 1, background: INK15, margin: "0 40px" }} />
+        <div className="cmo-divider" style={{ height: 1, background: INK15, margin: "0 40px" }} />
 
         {/* ══ §03 WHAT THE PILOT COVERS ═════════════════════════════════════ */}
-        <section style={{ padding: "36px 40px 40px" }}>
+        <section className="cmo-section" style={{ padding: "36px 40px 40px" }}>
           <SectionMast num="03" label="WHAT THE PILOT COVERS" vol="Included · Not included" />
 
           <div className="cover-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", border: `1px solid ${INK}` }}>
@@ -471,10 +456,10 @@ export function CmoPilotProposal() {
           </div>
         </section>
 
-        <div style={{ height: 1, background: INK15, margin: "0 40px" }} />
+        <div className="cmo-divider" style={{ height: 1, background: INK15, margin: "0 40px" }} />
 
         {/* ══ §04 INVESTMENT ════════════════════════════════════════════════ */}
-        <section style={{ padding: "36px 40px 40px" }}>
+        <section className="cmo-section" style={{ padding: "36px 40px 40px" }}>
           <SectionMast num="04" label="INVESTMENT" vol="Base + success fee" />
 
           {/* Price cards */}
@@ -571,7 +556,7 @@ export function CmoPilotProposal() {
         </section>
 
         {/* ══ FOOTER ════════════════════════════════════════════════════════ */}
-        <footer style={{
+        <footer className="cmo-footer" style={{
           borderTop: `1px solid ${INK}`,
           padding: "14px 40px",
           display: "flex", justifyContent: "space-between",

@@ -44,10 +44,21 @@ const DOCS = [
 export default function ResourcexWorkspace() {
   return (
     <main style={{ background: INK, minHeight: "100vh" }}>
-      <style>{`.doc-cta:hover { opacity: 0.85 !important; }`}</style>
+      <style>{`
+        .doc-cta:hover { opacity: 0.85 !important; }
+        @media (max-width: 640px) {
+          .rx-hero { padding: 14px 20px !important; }
+          .rx-docs { padding: 28px 20px 36px !important; }
+          .rx-doc-card { grid-template-columns: 1fr !important; padding: 20px !important; }
+          .rx-doc-tag { display: none !important; }
+          .rx-doc-title { font-size: 18px !important; }
+          .doc-cta { display: flex !important; align-items: center !important; justify-content: center !important; min-height: 44px !important; padding: 12px 20px !important; box-sizing: border-box !important; }
+          .rx-footer { padding: 14px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+        }
+      `}</style>
 
       {/* ── Hero — compact masthead ────────────────────────────────────── */}
-      <section style={{ background: INK, padding: "16px 40px 14px", borderBottom: "1px solid rgba(250,250,250,.10)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+      <section className="rx-hero" style={{ background: INK, padding: "16px 40px 14px", borderBottom: "1px solid rgba(250,250,250,.10)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
         <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: INK, background: YEL, padding: "4px 8px", flexShrink: 0 }}>
           PRIVATE WORKSPACE
         </span>
@@ -60,7 +71,7 @@ export default function ResourcexWorkspace() {
       </section>
 
       {/* ── Documents ─────────────────────────────────────────────────────── */}
-      <section style={{ background: PAPER, padding: "48px 40px 56px" }}>
+      <section className="rx-docs" style={{ background: PAPER, padding: "48px 40px 56px" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
@@ -78,9 +89,9 @@ export default function ResourcexWorkspace() {
 
           <div style={{ border: `1px solid ${INK}` }}>
             {DOCS.map((doc, i) => (
-              <div key={doc.tag} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, padding: "32px 36px", alignItems: "start", borderBottom: i < DOCS.length - 1 ? `1px solid ${INK}` : "none" }}>
+              <div key={doc.tag} className="rx-doc-card" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, padding: "32px 36px", alignItems: "start", borderBottom: i < DOCS.length - 1 ? `1px solid ${INK}` : "none" }}>
                 <div>
-                  <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK, marginBottom: 10 }}>
+                  <h2 className="rx-doc-title" style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK, marginBottom: 10 }}>
                     {doc.title}
                   </h2>
                   <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 20 }}>
@@ -90,7 +101,7 @@ export default function ResourcexWorkspace() {
                     {doc.cta}
                   </Link>
                 </div>
-                <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: doc.tagDark ? PAPER : INK55, background: doc.tagDark ? INK : PAPER2, border: `1px solid ${doc.tagDark ? INK : INK35}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
+                <span className="rx-doc-tag" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: doc.tagDark ? PAPER : INK55, background: doc.tagDark ? INK : PAPER2, border: `1px solid ${doc.tagDark ? INK : INK35}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
                   {doc.tag}
                 </span>
               </div>
@@ -100,7 +111,7 @@ export default function ResourcexWorkspace() {
       </section>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer style={{ background: PAPER2, borderTop: `1px solid ${INK15}`, padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 24 }}>
+      <footer className="rx-footer" style={{ background: PAPER2, borderTop: `1px solid ${INK15}`, padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 24 }}>
         <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 400, fontSize: 12.5, lineHeight: 1.5, color: INK55, margin: 0, maxWidth: 520 }}>
           All materials prepared exclusively for Sajid Shah / Resourcex.io. Built on the EMOS framework by Syed Irfan Ajmal, shared privately for review.
         </p>
