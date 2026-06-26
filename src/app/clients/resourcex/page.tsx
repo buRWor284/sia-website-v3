@@ -207,8 +207,7 @@ export default function ResourcexWorkspace() {
           fontSize: 12.5, lineHeight: 1.5, color: INK55,
           margin: 0, maxWidth: 520,
         }}>
-          All materials are confidential and prepared exclusively for Sajid Shah / Resourcex.io.
-          Please do not forward or share externally.
+          All materials prepared exclusively for Sajid Shah / Resourcex.io. Built on the EMOS framework by Syed Irfan Ajmal, shared privately for review.
         </p>
         <div style={{
           display: "flex", alignItems: "center", gap: 8, flexShrink: 0,

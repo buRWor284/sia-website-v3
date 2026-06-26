@@ -435,7 +435,7 @@ export default function PtClientWorkspace() {
           fontSize: 12.5, lineHeight: 1.5, color: INK55,
           margin: 0, maxWidth: 520,
         }}>
-          All materials prepared exclusively for Physicians Thrive. Built on the EMOS framework by Syed Irfan Ajmal &mdash; shared privately for review.
+          All materials prepared exclusively for Physicians Thrive. Built on the EMOS framework by Syed Irfan Ajmal, shared privately for review.
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <div style={{
