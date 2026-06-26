@@ -24,17 +24,17 @@ const P25     = "rgba(250,250,250,.25)";
 
 const DOCS = [
   {
-    title: "EMOS Private Founder's Intensive — Proposal",
-    body: "Your personalised 8-week earned-media program: full scope, timeline, deliverables, and investment summary. Designed to peak at your acquisition announcement.",
-    cta: "View the proposal →",
+    title: "Founder PR + Acquisition Launch Strategy",
+    body: "Your 8-week earned-media roadmap: build Sajid Shah's personal brand as a founder, establish thought leadership with ghostwritten content, cultivate journalist relationships, and orchestrate a media launch timed to your acquisition announcement.",
+    cta: "Open the strategy deck",
     href: "/clients/resourcex/emos-deck",
     tag: "INTERACTIVE DECK",
     tagDark: false,
   },
   {
     title: "Fractional CMO Pilot Offer",
-    body: "The one-page engagement outline for the Resourcex × happy.co account: scope, rate, success-fee structure, and pilot terms.",
-    cta: "Open the PDF →",
+    body: "The one-page engagement outline for the Resourcex x happy.co account: scope, rate, success-fee structure, and pilot terms.",
+    cta: "Open the PDF",
     href: "/clients/resourcex/cmo-pilot",
     tag: "PDF · ONE-PAGER",
     tagDark: true,
@@ -44,10 +44,7 @@ const DOCS = [
 export default function ResourcexWorkspace() {
   return (
     <main style={{ background: INK, minHeight: "100vh" }}>
-      {/* Hover styles — server-safe CSS */}
-      <style>{`
-        .doc-cta:hover { opacity: 0.85 !important; }
-      `}</style>
+      <style>{`.doc-cta:hover { opacity: 0.85 !important; }`}</style>
 
       {/* ── Hero — compact masthead ────────────────────────────────────── */}
       <section style={{ background: INK, padding: "16px 40px 14px", borderBottom: "1px solid rgba(250,250,250,.10)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
@@ -66,90 +63,34 @@ export default function ResourcexWorkspace() {
       <section style={{ background: PAPER, padding: "48px 40px 56px" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
 
-          {/* Section mast */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 12,
-            marginBottom: 12,
-          }}>
-            <span style={{
-              fontFamily: GROT, fontWeight: 800, fontSize: 9,
-              letterSpacing: "0.14em", textTransform: "uppercase",
-              color: INK, background: YEL,
-              padding: "3px 8px", flexShrink: 0,
-            }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 8px", flexShrink: 0 }}>
               YOUR DOCUMENTS
             </span>
             <div style={{ flexGrow: 1, height: 1, background: INK35 }} />
-            <span style={{
-              fontFamily: MONO, fontSize: 9,
-              color: INK55, flexShrink: 0,
-            }}>
-              2 items
-            </span>
+            <span style={{ fontFamily: MONO, fontSize: 9, color: INK55, flexShrink: 0 }}>2 items</span>
           </div>
 
-          {/* Double rule */}
           <div style={{ marginBottom: 24 }}>
             <div style={{ height: 1, background: INK }} />
             <div style={{ height: 3, marginTop: 3, background: INK }} />
           </div>
 
-          {/* Card container */}
           <div style={{ border: `1px solid ${INK}` }}>
             {DOCS.map((doc, i) => (
-              <div
-                key={doc.tag}
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr auto",
-                  gap: 24,
-                  padding: "32px 36px",
-                  alignItems: "start",
-                  borderBottom: i < DOCS.length - 1 ? `1px solid ${INK}` : "none",
-                }}
-              >
-                {/* Left */}
+              <div key={doc.tag} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, padding: "32px 36px", alignItems: "start", borderBottom: i < DOCS.length - 1 ? `1px solid ${INK}` : "none" }}>
                 <div>
-                  <h2 style={{
-                    fontFamily: SERIF, fontWeight: 700, fontSize: 24,
-                    lineHeight: 1.15, letterSpacing: "-0.01em",
-                    color: INK, marginBottom: 10,
-                  }}>
+                  <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK, marginBottom: 10 }}>
                     {doc.title}
                   </h2>
-                  <p style={{
-                    fontFamily: SERIF, fontWeight: 400, fontSize: 15,
-                    lineHeight: 1.6, color: INK70, marginBottom: 20,
-                  }}>
+                  <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 20 }}>
                     {doc.body}
                   </p>
-                  <Link
-                    href={doc.href}
-                    className="doc-cta"
-                    style={{
-                      display: "inline-block",
-                      fontFamily: GROT, fontWeight: 700, fontSize: 10,
-                      letterSpacing: "0.14em", textTransform: "uppercase",
-                      background: INK, color: PAPER,
-                      padding: "12px 20px",
-                      textDecoration: "none",
-                      transition: "opacity 0.12s ease",
-                    }}
-                  >
+                  <Link href={doc.href} className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: INK, color: PAPER, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
                     {doc.cta}
                   </Link>
                 </div>
-
-                {/* Right: type tag */}
-                <span style={{
-                  fontFamily: GROT, fontWeight: 700, fontSize: 9,
-                  letterSpacing: "0.18em", textTransform: "uppercase",
-                  color: doc.tagDark ? PAPER : INK55,
-                  background: doc.tagDark ? INK : PAPER2,
-                  border: `1px solid ${doc.tagDark ? INK : INK35}`,
-                  padding: "5px 10px",
-                  whiteSpace: "nowrap",
-                }}>
+                <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: doc.tagDark ? PAPER : INK55, background: doc.tagDark ? INK : PAPER2, border: `1px solid ${doc.tagDark ? INK : INK35}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
                   {doc.tag}
                 </span>
               </div>
@@ -159,38 +100,13 @@ export default function ResourcexWorkspace() {
       </section>
 
       {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer style={{
-        background: PAPER2,
-        borderTop: `1px solid ${INK15}`,
-        padding: "20px 40px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 24,
-      }}>
-        <p style={{
-          fontFamily: SERIF, fontStyle: "italic", fontWeight: 400,
-          fontSize: 12.5, lineHeight: 1.5, color: INK55,
-          margin: 0, maxWidth: 520,
-        }}>
+      <footer style={{ background: PAPER2, borderTop: `1px solid ${INK15}`, padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 24 }}>
+        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 400, fontSize: 12.5, lineHeight: 1.5, color: INK55, margin: 0, maxWidth: 520 }}>
           All materials prepared exclusively for Sajid Shah / Resourcex.io. Built on the EMOS framework by Syed Irfan Ajmal, shared privately for review.
         </p>
-        <div style={{
-          display: "flex", alignItems: "center", gap: 8, flexShrink: 0,
-        }}>
-          <div style={{
-            width: 8, height: 8,
-            background: YEL,
-            border: `1.5px solid ${INK}`,
-            borderRadius: "50%",
-          }} />
-          <span style={{
-            fontFamily: GROT, fontWeight: 700, fontSize: 9,
-            letterSpacing: "0.16em", textTransform: "uppercase",
-            color: INK55,
-          }}>
-            CONFIDENTIAL
-          </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+          <div style={{ width: 8, height: 8, background: YEL, border: `1.5px solid ${INK}`, borderRadius: "50%" }} />
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>CONFIDENTIAL</span>
         </div>
       </footer>
     </main>
