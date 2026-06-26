@@ -5,7 +5,7 @@ import { ScrollButtons } from "@/components/ScrollButtons";
 export const metadata: Metadata = {
   title: "Podcast · The SIA Show",
   description:
-    "38 episodes across 4 seasons: conversations with founders, marketers, and operators on SEO, PR, link building, remote work, and growth. Hosted by Syed Irfan Ajmal.",
+    "38 episodes across 4 seasons. Conversations with founders, marketers, and operators on SEO, PR, link building, remote work, and growth.",
   openGraph: {
     title: "The SIA Show · Podcast",
     description: "Conversations on SEO, PR, link building, and growth with founders and operators.",

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Authority ROI Calculator · Rent vs. Own",
   description:
-    "Compare the cost of renting media authority through agencies versus owning the capability with EMOS, and model your first-year ROI. A free interactive calculator.",
+    "Model the cost of renting media authority through agencies versus owning the capability with EMOS. Free interactive calculator.",
   openGraph: {
     title: "Authority ROI Calculator · Rent vs. Own",
     description:

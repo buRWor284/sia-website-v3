@@ -38,12 +38,18 @@ export async function generateMetadata({
   const { slug } = await params
   const ep = getEpisodeBySlug(slug)
   if (!ep) return {}
+  // Truncate summary to 160 chars for meta description
+  const metaDesc = ep.summary && ep.summary.length > 160
+    ? ep.summary.slice(0, 157).replace(/\s+\S*$/, "") + "..."
+    : ep.summary
   return {
-    title: `${ep.title} · The SIA Business Podcast`,
-    description: ep.summary,
+    // Root layout template appends " · Syed Irfan Ajmal" — no need for the full podcast suffix
+    title: ep.title,
+    description: metaDesc,
+    alternates: { canonical: `/podcast/${slug}` },
     openGraph: {
       title: ep.hero_text_extracted || ep.title,
-      description: ep.summary,
+      description: metaDesc,
       images: ep.featured_image_url ? [{ url: ep.featured_image_url }] : [],
     },
   }
@@ -132,7 +138,7 @@ export default async function EpisodePage({
             <div style={{ marginTop: 16 }}>
               <SCaps size={11} ls="0.18em" color="rgba(250,250,250,.7)">
                 Guest · {ep.guest}
-                {ep.guest_role ? ` — ${ep.guest_role}` : ""}
+                {ep.guest_role ? `, ${ep.guest_role}` : ""}
               </SCaps>
             </div>
           )}
@@ -221,7 +227,7 @@ export default async function EpisodePage({
               height="102"
               width="100%"
               style={{ border: 0 }}
-              title={`${ep.title} — audio player`}
+              title={`${ep.title}: audio player`}
             />
           </div>
         )}

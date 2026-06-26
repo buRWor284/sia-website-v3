@@ -6,8 +6,7 @@ import { ToolHeader } from "@/components/bureau";
 export const metadata: Metadata = {
   title: "JournoCollabIQ · Journalist Beat Matcher",
   description:
-    "AI-powered journalist beat matching. Find the right reporters and outlets for your story, " +
-    "score them by beat fit and recent coverage, generate tailored pitch angles, and export a targeting brief — in minutes.",
+    "Find the right reporters for your story, score them by beat fit and recent coverage, generate pitch angles, and export a targeting brief. Free from the EMOS suite.",
   openGraph: {
     title: "JournoCollabIQ · Journalist Beat Matcher",
     description:
@@ -28,7 +27,10 @@ export default function JournoCollabIQPage() {
         strategy="lazyOnload"
       />
       {/* Sticky tool header — WizardProgress is offset by TOOL_HEADER_H so they stack */}
-      <ToolHeader toolName="JournoCollabIQ — Journalist Beat Matcher" />
+      <h1 style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" }}>
+        JournoCollabIQ - Journalist Beat Matcher
+      </h1>
+      <ToolHeader toolName="JournoCollabIQ: Journalist Beat Matcher" />
       <JournoCollabIQ toolHeaderHeight={TOOL_HEADER_H} />
     </>
   );

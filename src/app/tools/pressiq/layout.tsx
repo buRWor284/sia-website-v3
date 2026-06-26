@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "PressIQ · PR Pitch Scorer",
   description:
-    "PressIQ scores your media pitch on relevance, mechanics, newsroom-ready material, and the EMOS framework (storytelling, neuromarketing, personal brand), then shows you exactly how to fix it. A free interactive tool from the EMOS suite.",
+    "Paste your pitch. PressIQ scores it on relevance, mechanics, and newsroom-readiness, then tells you exactly what to fix. Free tool from the EMOS suite.",
   openGraph: {
     title: "PressIQ · PR Pitch Scorer",
     description:

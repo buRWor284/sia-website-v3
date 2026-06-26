@@ -2,10 +2,10 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Neuromarketing 101: What Is Neuromarketing And How Does It Work?",
-  description: "A research-backed guide to neuromarketing — covering the history, techniques (fMRI, EEG, eye tracking), real-world examples from Red Bull, Porsche, and Coke vs Pepsi, and how to apply it in your marketing.",
+  title: "Neuromarketing 101: What It Is and How It Works",
+  description: "A research-backed guide to neuromarketing: history, techniques (fMRI, EEG, eye tracking), and real-world examples from Red Bull, Porsche, and Coke vs Pepsi.",
   openGraph: {
-    title: "Neuromarketing 101: What Is Neuromarketing And How Does It Work?",
+    title: "Neuromarketing 101: What It Is and How It Works",
     description: "Research-backed guide covering fMRI, EEG, facial coding, eye tracking, and real-world neuromarketing examples from Red Bull, Porsche, and Coke vs Pepsi.",
   },
 };
@@ -31,8 +31,8 @@ const IMG = {
   redBullEeg:      "/articles/neuromarketing/RedBull-EEG.jpeg",
   phineaSkull:     "/articles/neuromarketing/Phineas-gage-rod-skull-model-story.jpg",
   phineasPortrait: "/articles/neuromarketing/PhineasGage.jpg",
-  // phineasBrain wide scan — not in local folder, using archive URL
-  phineasBrain:    "https://web.archive.org/web/20260120020120im_/https://syedirfanajmal.com/wp-content/uploads/2017/10/Phineas-gage-1024x356.jpg",
+  // phineasBrain wide scan — run scripts/download-wp-images.sh to recover from archive
+  phineasBrain:    "/articles/neuromarketing/Phineas-gage-1024x356.jpg",
   rotatingBrain:   "/articles/neuromarketing/Fig2_Rotating_brain_colored.gif",
   pepsiCoke:       "/articles/neuromarketing/neuromarketing-pepsi-cocacola.png",
   eegScanner:      "/articles/neuromarketing/EEG-Scanner.jpg",
