@@ -278,10 +278,6 @@ export default function PtClientWorkspace() {
                   display: "grid", gridTemplateColumns: "1fr auto",
                   gap: 24, padding: "32px 36px", alignItems: "start",
                   borderBottom: i < STRATEGY_ASSETS.length - 1 ? `1px solid ${INK}` : "none",
-                  filter: "blur(3px)",
-                  pointerEvents: "none",
-                  userSelect: "none",
-                  opacity: 0.7,
                 }}
               >
                 <div>
@@ -303,32 +299,22 @@ export default function PtClientWorkspace() {
                       display: "inline-block",
                       fontFamily: GROT, fontWeight: 700, fontSize: 10,
                       letterSpacing: "0.14em", textTransform: "uppercase",
-                      background: INK, color: PAPER, padding: "12px 20px",
+                      background: INK35, color: PAPER, padding: "12px 20px",
+                      cursor: "not-allowed",
                     }}
                   >
-                    {asset.cta}
+                    Available Upon Request
                   </span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
-                  <span style={{
-                    fontFamily: GROT, fontWeight: 700, fontSize: 9,
-                    letterSpacing: "0.18em", textTransform: "uppercase",
-                    color: INK55, background: PAPER2,
-                    border: `1px solid ${INK35}`, padding: "5px 10px",
-                    whiteSpace: "nowrap",
-                  }}>
-                    {asset.tag}
-                  </span>
-                  <span style={{
-                    fontFamily: GROT, fontWeight: 700, fontSize: 9,
-                    letterSpacing: "0.14em", textTransform: "uppercase",
-                    color: PAPER, background: INK,
-                    border: `1px solid ${INK}`, padding: "5px 10px",
-                    whiteSpace: "nowrap",
-                  }}>
-                    AVAILABLE UPON REQUEST
-                  </span>
-                </div>
+                <span style={{
+                  fontFamily: GROT, fontWeight: 700, fontSize: 9,
+                  letterSpacing: "0.18em", textTransform: "uppercase",
+                  color: INK55, background: PAPER2,
+                  border: `1px solid ${INK35}`, padding: "5px 10px",
+                  whiteSpace: "nowrap",
+                }}>
+                  {asset.tag}
+                </span>
               </div>
             ))}
           </div>
@@ -435,7 +421,7 @@ export default function PtClientWorkspace() {
           fontSize: 12.5, lineHeight: 1.5, color: INK55,
           margin: 0, maxWidth: 520,
         }}>
-          All materials prepared exclusively for Physicians Thrive. Built on the EMOS framework by Syed Irfan Ajmal, shared privately for review.
+          All materials prepared exclusively for Physicians Thrive. Built on the EMOS framework by Syed Irfan Ajmal &mdash; shared privately for review.
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
           <div style={{
