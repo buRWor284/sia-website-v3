@@ -304,7 +304,7 @@ const StatsStrip = () => (
 
 const Scope = () => (
   <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="01" label="What's on the table · Scope of the retainer" />
+    <SectionMast n="01" label="Scope of the retainer · Six things included" />
 
     <div className="grid-intro">
       <h2
@@ -822,15 +822,15 @@ const CMOTestimonials = () => (
             style={{
               margin: "20px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 2.8vw, 20px)",
               color: INK, lineHeight: 1.4, fontStyle: "italic", position: "relative",
-              paddingLeft: 32, flex: 1, zIndex: 0,
+              paddingLeft: 36, flex: 1,
             }}
           >
             <span
               aria-hidden
               style={{
-                position: "absolute", left: -4, top: -10, fontFamily: SERIF,
-                fontSize: 84, lineHeight: 1, color: INK, fontStyle: "italic",
-                background: YEL, padding: "0 4px", zIndex: -1,
+                position: "absolute", left: 0, top: -4, fontFamily: SERIF,
+                fontSize: 72, lineHeight: 1, color: YEL, fontStyle: "italic",
+                pointerEvents: "none", userSelect: "none", opacity: 0.9,
               }}
             >&ldquo;</span>
             {tm.quote}
@@ -934,15 +934,16 @@ const FAQ = () => (
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
-  padding: "12px 14px",
-  background: "rgba(250,250,250,.07)",
-  border: "1px solid rgba(250,250,250,.25)",
+  padding: "13px 16px",
+  background: "rgba(250,250,250,.06)",
+  border: "1px solid rgba(250,250,250,.35)",
   color: PAPER,
   fontFamily: SERIF,
   fontSize: 15,
   lineHeight: 1.4,
   outline: "none",
   boxSizing: "border-box",
+  caretColor: YEL,
 };
 
 const CMOInquiryForm = () => {
@@ -990,7 +991,13 @@ const CMOInquiryForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <form onSubmit={handleSubmit} className="cmo-form" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <style>{`
+        .cmo-form input::placeholder,
+        .cmo-form textarea::placeholder { color: rgba(250,250,250,.4); }
+        .cmo-form input:focus,
+        .cmo-form textarea:focus { border-color: rgba(250,250,250,.7); outline: none; }
+      `}</style>
       {/* Honeypot */}
       <input name="website" type="text" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
 
@@ -1154,6 +1161,11 @@ const BookCall = () => (
           <span>Book a discovery call</span>
           <span style={{ fontFamily: SERIF, fontSize: 22 }}>→</span>
         </a>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4 }}>
+          <div style={{ flex: 1, height: 1, background: "rgba(250,250,250,.15)" }} />
+          <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.35)">or send a message</SCaps>
+          <div style={{ flex: 1, height: 1, background: "rgba(250,250,250,.15)" }} />
+        </div>
         <CMOInquiryForm />
         <div style={{ marginTop: 6 }}>
           <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
