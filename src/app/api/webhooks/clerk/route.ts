@@ -26,6 +26,14 @@ export async function POST(req: NextRequest) {
   if (evt.type === "user.created") {
     const userId = evt.data.id;
 
+    // Client workspace users are provisioned with client_slug already set.
+    // Don't overwrite their metadata with emos_access — they're not EMOS users.
+    const existingMeta = (evt.data.public_metadata ?? {}) as Record<string, unknown>;
+    if (existingMeta.client_slug) {
+      console.log(`Skipping emos_access for client user ${userId} (client_slug: ${existingMeta.client_slug})`);
+      return NextResponse.json({ received: true });
+    }
+
     const secretKey = process.env.CLERK_SECRET_KEY;
     if (!secretKey) {
       console.error("CLERK_SECRET_KEY is not set");
