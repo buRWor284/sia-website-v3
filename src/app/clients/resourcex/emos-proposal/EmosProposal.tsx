@@ -148,14 +148,16 @@ export function EmosProposal() {
           .ep-curriculum    { grid-template-columns: 1fr !important; }
           .ep-action-bar    { padding: 8px 16px !important; }
           .ep-action-inner  { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+          .ep-btn-group     { flex-direction: column !important; align-items: stretch !important; width: 100% !important; }
           .ep-back-link     { min-height: 44px; display: flex !important; align-items: center !important; }
-          .ep-action-btn    { min-height: 44px !important; display: flex !important; align-items: center !important; }
-          .ep-deck-link     { min-height: 44px !important; display: flex !important; align-items: center !important; }
+          .ep-action-btn    { min-height: 44px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+          .ep-deck-link     { min-height: 44px !important; display: flex !important; align-items: center !important; justify-content: center !important; }
           .ep-section       { padding: 24px 16px 28px !important; }
           .ep-divider       { margin: 0 16px !important; }
           .ep-hero-inner    { padding: 32px 16px 24px !important; }
           .ep-footer        { padding: 12px 16px !important; flex-direction: column !important; align-items: flex-start !important; gap: 8px !important; }
           .ep-coverage      { padding: 14px 16px !important; gap: 20px !important; }
+          .ep-journo-left   { min-width: 0 !important; width: 100% !important; }
         }
       `}</style>
 
@@ -168,7 +170,7 @@ export function EmosProposal() {
             {emailOpen ? (
               <EmailForm onClose={() => setEmailOpen(false)} />
             ) : (
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div className="ep-btn-group" style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <Link href="/clients/resourcex/emos-deck" target="_blank" className="ep-deck-link" style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, textDecoration: "none", border: `1px solid ${OD25}`, padding: "7px 14px", transition: "opacity 0.12s" }}>▶ View Presentation</Link>
                 <button className="ep-action-btn" onClick={() => window.print()} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", background: "none", color: OD45, border: `1px solid ${OD25}`, padding: "7px 14px", cursor: "pointer", transition: "opacity 0.12s" }}>↓ Download PDF</button>
                 <button className="ep-action-btn" onClick={() => setEmailOpen(true)} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", background: Y, color: K, border: "none", padding: "8px 14px", cursor: "pointer", transition: "opacity 0.12s" }}>✉ Email PDF</button>
@@ -405,7 +407,7 @@ export function EmosProposal() {
 
           <div className="ep-journo-layout" style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 1, background: OD12 }}>
             {/* Left: input panel */}
-            <div style={{ background: "rgba(26,23,18,.88)", padding: "28px 28px", display: "flex", flexDirection: "column", gap: 16 }}>
+            <div className="ep-journo-left" style={{ background: "rgba(26,23,18,.88)", padding: "28px 28px", display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <div style={{ fontFamily: SANS, fontWeight: 900, fontSize: 20, color: Y, letterSpacing: "0.04em" }}>JOURNOCOLLABIQ</div>
                 <div style={{ fontFamily: SANS, fontWeight: 400, fontSize: 13, color: OD45, marginTop: 4 }}>Find journalists · build angles · draft outreach</div>
