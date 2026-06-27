@@ -25,6 +25,7 @@ export interface DbSignal {
   company_name: string | null;
   company_context: string | null;
   scan_category: string | null;    // the beat label at scan time
+  fit: "high" | "medium" | "low" | null;  // company-fit rating from LLM
 }
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
@@ -42,7 +43,7 @@ export async function getSignals(): Promise<DbSignal[]> {
   const db = await getAuthenticatedClient();
   const { data, error } = await db
     .from("signaliq_signals")
-    .select("id, beat_id, headline, summary, source, source_url, signal_score, coverage_gap, status, detected_at, company_name, company_context, scan_category")
+    .select("id, beat_id, headline, summary, source, source_url, signal_score, coverage_gap, status, detected_at, company_name, company_context, scan_category, fit")
     .order("detected_at", { ascending: false })
     .limit(200);
 
@@ -62,10 +63,12 @@ export async function getSignals(): Promise<DbSignal[]> {
     company_name: string | null;
     company_context: string | null;
     scan_category: string | null;
+    fit: string | null;
   }) => ({
     ...row,
     beat_name: row.scan_category, // category doubles as the display beat name
     status: row.status as DbSignal["status"],
+    fit: (row.fit as DbSignal["fit"]) ?? null,
   }));
 }
 
@@ -138,6 +141,7 @@ export async function saveSignalFromOpportunity(
         company_name:    options?.companyName?.trim() || null,
         company_context: options?.companyContext?.trim()?.slice(0, 600) || null,
         scan_category:   beatLabel,
+        fit:             opp.fit ?? null,
       })
       .select("id")
       .single();
@@ -220,6 +224,7 @@ export async function saveSignalFromScan(
         company_name:    companyName?.trim() || null,
         company_context: companyContext?.trim()?.slice(0, 600) || null,
         scan_category:   beatLabel,
+        fit:             opp.fit ?? null,
       })
       .select("id")
       .single();

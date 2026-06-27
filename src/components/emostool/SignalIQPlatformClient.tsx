@@ -354,7 +354,7 @@ function SignalLibrary({
 }) {
   void refreshKey; // parent re-render cue (server refresh via revalidatePath)
 
-  const GRID = "1fr 84px 84px 92px 156px";
+  const GRID = "1fr 78px 84px 84px 92px 156px";
   const [statusFilter, setStatusFilter] = useState<"all" | DbSignal["status"]>("all");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
   const [removed, setRemoved] = useState<Set<string>>(new Set());
@@ -427,8 +427,8 @@ function SignalLibrary({
       <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
         {/* Table header */}
         <div style={{ display: "grid", gridTemplateColumns: GRID, background: INK, color: PAPER }}>
-          {["Signal / scanned for", "Score", "Gap", "Detected", "Status"].map((h, i) => (
-            <div key={h} style={{ padding: "10px 13px", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", borderRight: i < 4 ? "1px solid rgba(241,235,222,.12)" : "none" }}>
+          {["Signal / scanned for", "Fit", "Score", "Gap", "Detected", "Status"].map((h, i) => (
+            <div key={h} style={{ padding: "10px 13px", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", borderRight: i < 5 ? "1px solid rgba(241,235,222,.12)" : "none" }}>
               {h}
             </div>
           ))}
@@ -469,6 +469,20 @@ function SignalLibrary({
                   <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, marginTop: 5, lineHeight: 1.4 }}>
                     {sig.summary.length > 110 ? sig.summary.slice(0, 110) + "…" : sig.summary}
                   </div>
+                )}
+              </div>
+              {/* Fit */}
+              <div style={{ padding: "13px 11px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
+                {sig.fit ? (
+                  <span style={{
+                    fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".1em", textTransform: "uppercase",
+                    color: FIT_COLOR[sig.fit], border: `1px solid ${FIT_COLOR[sig.fit]}`,
+                    padding: "2px 6px", whiteSpace: "nowrap",
+                  }}>
+                    {sig.fit === "high" ? "High" : sig.fit === "medium" ? "Med" : "Low"}
+                  </span>
+                ) : (
+                  <span style={{ fontFamily: MONO, fontSize: 12, color: INK35 }}>—</span>
                 )}
               </div>
               {/* Score */}
