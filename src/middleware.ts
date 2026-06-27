@@ -5,15 +5,15 @@ import { NextResponse, type NextRequest } from "next/server";
 // /emos (course landing page) stays completely public and untouched.
 const isProtectedRoute = createRouteMatcher(["/emostool(.*)"]);
 
-// Physicians Thrive client workspace: gated with a single shared
-// username + password (HTTP Basic Auth). Credentials come from the
-// Vercel env vars PT_CLIENT_USER / PT_CLIENT_PASS and are never
-// committed to the repo. Fails closed if the env vars are missing.
-const isClientPtRoute = createRouteMatcher(["/clients/pt", "/clients/pt/(.*)"]);
+// ─── Legacy Basic Auth clients ────────────────────────────────────────────────
+// PT and Resourcex stay on HTTP Basic Auth (shared username/password via Vercel
+// env vars). All new clients should use the Clerk-based system below instead.
 
-// Resourcex.io client workspace: same Basic Auth pattern.
-// Env vars: RESOURCEX_CLIENT_USER / RESOURCEX_CLIENT_PASS
+const isClientPtRoute = createRouteMatcher(["/clients/pt", "/clients/pt/(.*)"]);
 const isClientResourcexRoute = createRouteMatcher(["/clients/resourcex", "/clients/resourcex/(.*)"]);
+
+// Keep this in sync with the two matchers above.
+const BASIC_AUTH_CLIENT_SLUGS = new Set(["pt", "resourcex"]);
 
 function requireBasicAuth(realm: string) {
   return new NextResponse("Authentication required.", {
@@ -45,24 +45,67 @@ function hasValidCredentials(req: NextRequest, userVar: string, passVar: string)
   return decoded.slice(0, i) === user && decoded.slice(i + 1) === pass;
 }
 
+// ─── Clerk-based client workspaces ───────────────────────────────────────────
+// New clients get individual Clerk accounts instead of shared Basic Auth.
+// Each user has publicMetadata.client_slug set to the workspace slug they own.
+// To provision a new client: run `scripts/create-client.mjs` (or invoke the
+// "add-client" Cowork skill), then create src/app/clients/<slug>/page.tsx.
+
+// Matches any /clients/:slug route — Basic Auth slugs are skipped inside the handler.
+const isClerkClientRoute = createRouteMatcher(["/clients/:slug", "/clients/:slug/(.*)"]);
+
+// Public escape hatch — shown when a logged-in user tries the wrong workspace.
+const isClientUnauthorizedPage = createRouteMatcher(["/clients/unauthorized"]);
+
 // /emostool/not-invited is public (no redirect loop)
 const isNotInvitedRoute = createRouteMatcher(["/emostool/not-invited"]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // Gate the Physicians Thrive client workspace before anything else.
+  // ── Legacy: PT (Basic Auth) ──────────────────────────────────────────────
   if (isClientPtRoute(req)) {
     return hasValidCredentials(req, "PT_CLIENT_USER", "PT_CLIENT_PASS")
       ? NextResponse.next()
       : requireBasicAuth("Physicians Thrive client workspace");
   }
 
-  // Gate the Resourcex.io client workspace.
+  // ── Legacy: Resourcex (Basic Auth) ──────────────────────────────────────
   if (isClientResourcexRoute(req)) {
     return hasValidCredentials(req, "RESOURCEX_CLIENT_USER", "RESOURCEX_CLIENT_PASS")
       ? NextResponse.next()
       : requireBasicAuth("Resourcex client workspace");
   }
 
+  // ── Public: client "wrong workspace" page ────────────────────────────────
+  if (isClientUnauthorizedPage(req)) return NextResponse.next();
+
+  // ── Clerk-authenticated client workspaces ────────────────────────────────
+  if (isClerkClientRoute(req)) {
+    const slug = req.nextUrl.pathname.split("/")[2]; // /clients/{slug}/...
+
+    // Belt-and-suspenders: skip if this slug is on Basic Auth (already returned above).
+    if (slug && !BASIC_AUTH_CLIENT_SLUGS.has(slug)) {
+      await auth.protect(); // redirects unauthenticated users to /sign-in
+
+      const { sessionClaims, userId } = await auth();
+      const meta = (sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+
+      if (meta.client_slug !== slug) {
+        // JWT may be stale — do a live Clerk API check before rejecting.
+        try {
+          const clerkApi = await clerkClient();
+          const user = await clerkApi.users.getUser(userId!);
+          if (user.publicMetadata?.client_slug !== slug) {
+            return NextResponse.redirect(new URL("/clients/unauthorized", req.url));
+          }
+          // Live metadata matches — let through; JWT will catch up on next refresh.
+        } catch {
+          return NextResponse.redirect(new URL("/clients/unauthorized", req.url));
+        }
+      }
+    }
+  }
+
+  // ── EMOS tool: Clerk auth + emos_access metadata ─────────────────────────
   if (isProtectedRoute(req) && !isNotInvitedRoute(req)) {
     await auth.protect();
     // Invite-only: require emos_access = true in Clerk publicMetadata.
