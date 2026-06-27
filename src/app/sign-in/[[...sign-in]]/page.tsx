@@ -31,7 +31,7 @@ export default function SignInPage() {
       </p>
 
       <SignIn
-        forceRedirectUrl="/emostool/dashboard"
+        fallbackRedirectUrl="/emostool/dashboard"
         appearance={{
           variables: {
             colorPrimary: INK,
