@@ -229,6 +229,7 @@ export default function PtClientWorkspace() {
           .pt-section-dark { padding: 28px 20px 36px; }
           .pt-card-row    { grid-template-columns: 1fr; gap: 14px; padding: 22px 0; }
           .pt-card-row-sm { grid-template-columns: 1fr; gap: 10px; padding: 18px 0; }
+          .pt-tag         { justify-self: start; }
           .pt-roadmap-row { padding: 16px 0; }
           .pt-footer { flex-direction: column; align-items: flex-start; padding: 20px 20px; gap: 12px; }
         }
