@@ -20,34 +20,6 @@ const YEL     = "#f5b81f";
 const SERIF   = "var(--font-serif)";
 const GROT    = "var(--font-grot)";
 const MONO    = "var(--font-mono)";
-const P25     = "rgba(250,250,250,.25)";
-
-const DOCS = [
-  {
-    title: "Founder PR + Acquisition Launch Strategy",
-    body: "Your 8-week earned-media roadmap: build Sajid Shah's personal brand as a founder, establish thought leadership with ghostwritten content, cultivate journalist relationships, and orchestrate a media launch timed to your acquisition announcement.",
-    cta: "Read the proposal →",
-    href: "/clients/resourcex/emos-proposal",
-    tag: "PROPOSAL",
-    tagDark: false,
-  },
-  {
-    title: "EMOS Strategy — Presentation Deck",
-    body: "The same proposal in slide format. Best viewed on desktop. Open in a new tab to download as PDF.",
-    cta: "View the presentation →",
-    href: "/clients/resourcex/emos-deck",
-    tag: "INTERACTIVE DECK",
-    tagDark: false,
-  },
-  {
-    title: "Fractional CMO Pilot Offer",
-    body: "The one-page engagement outline for the Resourcex x happy.co account: scope, rate, success-fee structure, and pilot terms.",
-    cta: "Open the offer →",
-    href: "/clients/resourcex/cmo-pilot",
-    tag: "PDF · ONE-PAGER",
-    tagDark: true,
-  },
-] as const;
 
 export default function ResourcexWorkspace() {
   return (
@@ -60,6 +32,7 @@ export default function ResourcexWorkspace() {
           .rx-doc-card { grid-template-columns: 1fr !important; padding: 20px !important; }
           .rx-doc-tag { display: none !important; }
           .rx-doc-title { font-size: 18px !important; }
+          .rx-cta-row { flex-direction: column !important; align-items: stretch !important; }
           .doc-cta { display: flex !important; align-items: center !important; justify-content: center !important; min-height: 44px !important; padding: 12px 20px !important; box-sizing: border-box !important; }
           .rx-footer { padding: 14px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
         }
@@ -87,7 +60,7 @@ export default function ResourcexWorkspace() {
               YOUR DOCUMENTS
             </span>
             <div style={{ flexGrow: 1, height: 1, background: INK35 }} />
-            <span style={{ fontFamily: MONO, fontSize: 9, color: INK55, flexShrink: 0 }}>3 items</span>
+            <span style={{ fontFamily: MONO, fontSize: 9, color: INK55, flexShrink: 0 }}>2 items</span>
           </div>
 
           <div style={{ marginBottom: 24 }}>
@@ -96,24 +69,54 @@ export default function ResourcexWorkspace() {
           </div>
 
           <div style={{ border: `1px solid ${INK}` }}>
-            {DOCS.map((doc, i) => (
-              <div key={doc.tag} className="rx-doc-card" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, padding: "32px 36px", alignItems: "start", borderBottom: i < DOCS.length - 1 ? `1px solid ${INK}` : "none" }}>
-                <div>
-                  <h2 className="rx-doc-title" style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK, marginBottom: 10 }}>
-                    {doc.title}
-                  </h2>
-                  <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 20 }}>
-                    {doc.body}
-                  </p>
-                  <Link href={doc.href} className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: INK, color: PAPER, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
-                    {doc.cta}
-                  </Link>
+
+            {/* ── Card 1: EMOS Proposal + Deck (combined) ── */}
+            <div className="rx-doc-card" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, padding: "32px 36px", alignItems: "start", borderBottom: `1px solid ${INK}` }}>
+              <div>
+                <h2 className="rx-doc-title" style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK, marginBottom: 10 }}>
+                  Founder PR + Acquisition Launch Strategy
+                </h2>
+                <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 24 }}>
+                  Your 8-week earned-media roadmap: press kit, authority content, journalist relationships, and an announcement sprint timed to your deal. Available in two formats below.
+                </p>
+                <div className="rx-cta-row" style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
+                  <div>
+                    <Link href="/clients/resourcex/emos-proposal" className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: INK, color: PAPER, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
+                      Read the proposal →
+                    </Link>
+                    <div style={{ fontFamily: GROT, fontSize: 9, color: INK55, marginTop: 6, letterSpacing: "0.08em" }}>Scrollable · works on any device</div>
+                  </div>
+                  <div>
+                    <Link href="/clients/resourcex/emos-deck" target="_blank" className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: PAPER2, color: INK, border: `1.5px solid ${INK35}`, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
+                      View the deck →
+                    </Link>
+                    <div style={{ fontFamily: GROT, fontSize: 9, color: INK55, marginTop: 6, letterSpacing: "0.08em" }}>Slide format · best on desktop</div>
+                  </div>
                 </div>
-                <span className="rx-doc-tag" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: doc.tagDark ? PAPER : INK55, background: doc.tagDark ? INK : PAPER2, border: `1px solid ${doc.tagDark ? INK : INK35}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
-                  {doc.tag}
-                </span>
               </div>
-            ))}
+              <span className="rx-doc-tag" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, background: PAPER2, border: `1px solid ${INK35}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
+                PROPOSAL + DECK
+              </span>
+            </div>
+
+            {/* ── Card 2: Fractional CMO ── */}
+            <div className="rx-doc-card" style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 24, padding: "32px 36px", alignItems: "start" }}>
+              <div>
+                <h2 className="rx-doc-title" style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK, marginBottom: 10 }}>
+                  Fractional CMO Pilot Offer
+                </h2>
+                <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 20 }}>
+                  The one-page engagement outline for the Resourcex x happy.co account: scope, rate, success-fee structure, and pilot terms.
+                </p>
+                <Link href="/clients/resourcex/cmo-pilot" className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: INK, color: PAPER, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
+                  Open the offer →
+                </Link>
+              </div>
+              <span className="rx-doc-tag" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: PAPER, background: INK, border: `1px solid ${INK}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
+                PDF · ONE-PAGER
+              </span>
+            </div>
+
           </div>
         </div>
       </section>

@@ -46,10 +46,9 @@ export async function GET(req: NextRequest) {
 
   const cursor = await getCursor();
   const batch = ALL_SEEDS.slice(cursor, cursor + BATCH_SIZE);
-  // Wrap around so the cursor cycles endlessly through all seeds.
-  const nextCursor = (cursor + BATCH_SIZE) % ALL_SEEDS.length;
 
   const results: string[] = [];
+  let successCount = 0; // only count non-throttled fetches toward cursor advance
 
   for (let i = 0; i < batch.length; i++) {
     const topic = batch[i];
@@ -60,6 +59,7 @@ export async function GET(req: NextRequest) {
         `${GDELT_BASE}?query=${encodeURIComponent(`"${topic}"`)}&mode=timelinevol&format=json&timespan=2m`;
       const text = await getText(url, 20_000);
       if (isThrottle(text)) {
+        // Do NOT count throttled seeds — cursor stays, they'll be retried next run.
         results.push(`throttled:${topic}`);
         continue;
       }
@@ -70,16 +70,23 @@ export async function GET(req: NextRequest) {
       } else {
         results.push(`empty:${topic}`);
       }
+      successCount++;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       // GDELT returns 429 when rate-limited — treat as throttled, not a hard error
       if (msg.includes("429")) {
         results.push(`throttled:${topic}`);
+        // Do NOT count — retry next run
       } else {
         results.push(`error:${topic}:${msg}`);
+        successCount++; // non-throttle errors still advance (likely a bad seed, not rate limit)
       }
     }
   }
+
+  // Only advance cursor by the number of seeds that weren't throttled.
+  // If everything was throttled, cursor stays put and we retry the same seeds next run.
+  const nextCursor = (cursor + successCount) % ALL_SEEDS.length;
 
   let cursorError: string | null = null;
   try {
@@ -90,6 +97,7 @@ export async function GET(req: NextRequest) {
 
   return NextResponse.json({
     processed: batch.length,
+    successful: successCount,
     cursor,
     nextCursor,
     totalSeeds: ALL_SEEDS.length,
