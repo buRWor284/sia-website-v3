@@ -77,7 +77,7 @@ export default function ResourcexWorkspace() {
                   Founder PR + Acquisition Launch Strategy
                 </h2>
                 <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 24 }}>
-                  Your 8-week earned-media roadmap: press kit, authority content, journalist relationships, and an announcement sprint timed to your deal. Available in two formats below.
+                  Your 8-week earned-media roadmap: press kit, authority content, journalist relationships, and an announcement sprint timed to your deal. We guide your team through every step and run it with you, so the capability stays in-house with no agency retainer. Available in two formats below.
                 </p>
                 <div className="rx-cta-row" style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
                   <div>
