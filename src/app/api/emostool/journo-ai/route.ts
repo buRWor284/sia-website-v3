@@ -12,7 +12,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 
 const ANGLE_LABEL: Record<string, string> = {
   discount:    "Expert commentary — a quotable expert take for a story they're already writing",
@@ -130,7 +129,6 @@ Write in plain, direct prose. Tone: expert consultant. Length: 400–600 words.`
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  if (userId !== ALLOWED_USER_ID) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "ANTHROPIC_API_KEY not set." }, { status: 500 });

@@ -9,7 +9,7 @@
  * + New Pitch Modal
  */
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import {
   PAPER, PAPER2, INK, INK70, INK55, INK35, INK15,
   YEL, YEL2, SERIF, GROT, MONO,
@@ -23,7 +23,7 @@ type Stage = "drafted" | "sent" | "opened" | "replied" | "placed" | "amplified";
 type PesoType = "Earned" | "Shared" | "Owned" | "Paid";
 type LinkType = "Do Follow" | "No Follow";
 type ContentType = "Original" | "Republished";
-type DataSource = "Manual" | "PressIQ" | "AuthorityIQ" | "Google Alerts";
+type DataSource = "Manual" | "PressIQ" | "SignalIQ" | "Google Alerts";
 type AlertStatus = "new" | "reviewed" | "archived";
 type AlertType = "syndication" | "mention" | "pickup";
 
@@ -93,7 +93,7 @@ const JOURNALISTS: Journalist[] = [
   { id: "j10", name: "Carlos Mendez",   outlet: "Marketing Land",            beat: "Digital Marketing",  dr: 76, email: "carlos@mland.com",           lastContact: "2026-05-18", pitchesSent: 2, placements: 0 },
 ];
 
-const PITCHES: Pitch[] = [
+const DEFAULT_PITCHES: Pitch[] = [
   { id:"p1",  subject:"Data study: 73% of earned links outperform paid in 12 months",          journalist:"j1",  client:"DMR.agency", stage:"placed",    peso:"Earned", sentDate:"2026-05-10", placedDate:"2026-05-28", url:"https://techcrunch.com/2026/05/earned-media-study/",           anchorText:"earned media ROI",           dr:93, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:460 },
   { id:"p2",  subject:"Expert quote: Why fractional CMOs are the future for Series A",          journalist:"j2",  client:"SIA Enterprises",       stage:"replied",   peso:"Earned", sentDate:"2026-06-01", placedDate:null,         url:null,                                                           anchorText:"fractional CMO",             dr:95, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:"2026-06-06", points:null },
   { id:"p3",  subject:"Guest post: The PESO framework for modern link building",                journalist:"j3",  client:"DMR.agency",             stage:"placed",    peso:"Earned", sentDate:"2026-04-20", placedDate:"2026-05-15", url:"https://searchenginejournal.com/peso-link-building/",          anchorText:"PESO media model",           dr:82, linkType:"Do Follow", contentType:"Original",   team:"Nirvana",      dataSource:"PressIQ", followUpDue:null,         points:380 },
@@ -119,6 +119,31 @@ const ALERTS: Alert[] = [
   { id:"a4", date:"2026-06-02", type:"syndication", title:"HubSpot piece republished on Business2Community",        url:"https://business2community.com/content-engine/",      source:"Google Alert", status:"reviewed" },
   { id:"a5", date:"2026-06-01", type:"mention",     title:"EMOS mentioned in Ahrefs weekly digest",                 url:"https://ahrefs.com/digest/june-1/",                   source:"Google Alert", status:"archived" },
 ];
+
+// ── Live pitch store (localStorage-backed) ─────────────────────────────────────
+const CIQ_KEY = "sia.coverageiq.v1";
+
+function _loadPitches(): Pitch[] {
+  if (typeof window === "undefined") return [...DEFAULT_PITCHES];
+  try {
+    const raw = localStorage.getItem(CIQ_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Pitch[];
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch { /* ignore */ }
+  return [...DEFAULT_PITCHES];
+}
+
+// eslint-disable-next-line prefer-const
+let PITCHES: Pitch[] = _loadPitches();
+let _rerenderCoverage: (() => void) | null = null;
+
+function addPitchGlobal(p: Pitch): void {
+  PITCHES = [p, ...PITCHES];
+  try { localStorage.setItem(CIQ_KEY, JSON.stringify(PITCHES)); } catch { /* ignore */ }
+  _rerenderCoverage?.();
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -647,27 +672,23 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
 
 type CoverageLogKey = "placedDate" | "outlet" | "anchorText" | "dr" | "peso" | "linkType" | "contentType" | "points";
 
-const COVERAGE_LOG = PITCHES.filter(p => p.stage === "placed" || p.stage === "amplified").map(p => {
-  const j = p.journalist ? JOURNALISTS.find(jj => jj.id === p.journalist) : null;
-  return {
-    ...p,
-    outlet: j ? j.outlet : (p.peso === "Shared" ? "LinkedIn" : "DMR.agency Blog"),
-  };
-});
-
 function CoverageLogView() {
+  const coverageLog = PITCHES.filter(p => p.stage === "placed" || p.stage === "amplified").map(p => {
+    const j = p.journalist ? JOURNALISTS.find(jj => jj.id === p.journalist) : null;
+    return { ...p, outlet: j ? j.outlet : (p.peso === "Shared" ? "LinkedIn" : "DMR.agency Blog") };
+  });
   const [sortBy, setSortBy] = useState<CoverageLogKey>("placedDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   const sorted = useMemo(() => {
-    return [...COVERAGE_LOG].sort((a, b) => {
+    return [...coverageLog].sort((a, b) => {
       const va = (a as Record<string, unknown>)[sortBy] ?? "";
       const vb = (b as Record<string, unknown>)[sortBy] ?? "";
       if (va < vb) return sortDir === "asc" ? -1 : 1;
       if (va > vb) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
-  }, [sortBy, sortDir]);
+  }, [sortBy, sortDir, coverageLog]);
 
   const handleSort = (col: CoverageLogKey) => {
     if (sortBy === col) setSortDir(d => d === "asc" ? "desc" : "asc");
@@ -675,10 +696,10 @@ function CoverageLogView() {
   };
   const arrow = (col: CoverageLogKey) => sortBy === col ? (sortDir === "asc" ? " ↑" : " ↓") : "";
 
-  const totalPoints = COVERAGE_LOG.reduce((s, c) => s + (c.points ?? 0), 0);
-  const drItems = COVERAGE_LOG.filter(c => c.dr);
+  const totalPoints = coverageLog.reduce((s, c) => s + (c.points ?? 0), 0);
+  const drItems = coverageLog.filter(c => c.dr);
   const avgDR = drItems.length ? Math.round(drItems.reduce((s, c) => s + (c.dr ?? 0), 0) / drItems.length) : 0;
-  const doFollow = COVERAGE_LOG.filter(c => c.linkType === "Do Follow").length;
+  const doFollow = coverageLog.filter(c => c.linkType === "Do Follow").length;
 
   const cols: { key: CoverageLogKey; label: string; w: string }[] = [
     { key: "placedDate",  label: "Date",        w: "90px" },
@@ -697,7 +718,7 @@ function CoverageLogView() {
       {/* Summary strip */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", border: `1px solid ${INK}`, marginBottom: 24 }}>
         {[
-          { num: COVERAGE_LOG.length, label: "TOTAL PLACEMENTS" },
+          { num: coverageLog.length, label: "TOTAL PLACEMENTS" },
           { num: totalPoints,         label: "TOTAL POINTS" },
           { num: avgDR,               label: "AVG DOMAIN RATING" },
           { num: doFollow,            label: "DO-FOLLOW LINKS" },
@@ -755,7 +776,7 @@ function CoverageLogView() {
       </div>
 
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-        {COVERAGE_LOG.length} placements logged · Click column headers to sort
+        {coverageLog.length} placements logged · Click column headers to sort
       </div>
     </div>
   );
@@ -1027,10 +1048,10 @@ interface PitchForm {
   dataSource: DataSource; notes: string;
 }
 
-const DATA_SOURCES: DataSource[] = ["Manual", "PressIQ", "AuthorityIQ", "Google Alerts"];
+const DATA_SOURCES: DataSource[] = ["Manual", "PressIQ", "SignalIQ", "Google Alerts"];
 const TEAMS = ["Firestarters", "Nirvana", "Wizards"];
 
-function NewPitchModal({ onClose }: { onClose: () => void }) {
+function NewPitchModal({ onClose, onAdd }: { onClose: () => void; onAdd: (p: Pitch) => void }) {
   const [form, setForm] = useState<PitchForm>({
     subject: "", journalist: "", client: "", peso: "Earned",
     stage: "drafted", team: "", dataSource: "Manual", notes: "",
@@ -1050,14 +1071,24 @@ function NewPitchModal({ onClose }: { onClose: () => void }) {
     return (
       <div style={{ position: "fixed", inset: 0, background: "rgba(26,20,16,.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 200 }} onClick={onClose}>
         <div style={{ background: PAPER, border: `1px solid ${INK}`, padding: 48, maxWidth: 480, textAlign: "center" }} onClick={e => e.stopPropagation()}>
-          <div style={{ width: 40, height: 40, background: YEL, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 18 }}>→</div>
+          <div style={{ width: 40, height: 40, background: YEL, margin: "0 auto 20px", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 18 }}>✓</div>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, marginBottom: 8 }}>Pitch logged</div>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK55, marginBottom: 24 }}>
-            &ldquo;{form.subject}&rdquo; added to pipeline as {form.stage}.
-            <br /><br />
-            <span style={{ fontSize: 12, color: INK35, fontStyle: "normal" }}>
-              This is a demo — in the full EMOS platform, pitches are saved to your live pipeline.
-            </span>
+            &ldquo;{form.subject}&rdquo; saved to your pipeline.
+          </div>
+          {/* PressIQ cross-link nudge */}
+          <div style={{ background: PAPER2, border: `1px solid ${INK15}`, padding: "14px 20px", marginBottom: 24, textAlign: "left" }}>
+            <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>Before you send</div>
+            <div style={{ fontFamily: SERIF, fontSize: 14, color: INK, lineHeight: 1.5, marginBottom: 10 }}>
+              Score your pitch in PressIQ to check clarity, relevance, and journalist fit — before hitting send.
+            </div>
+            <a
+              href="/tools/pressiq"
+              onClick={onClose}
+              style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}
+            >
+              Score in PressIQ →
+            </a>
           </div>
           <button onClick={onClose} style={{ padding: "12px 28px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>
             Done
@@ -1069,7 +1100,31 @@ function NewPitchModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(26,20,16,.6)", display: "flex", alignItems: "flex-start", justifyContent: "center", zIndex: 200, paddingTop: 60, overflowY: "auto" }} onClick={onClose}>
-      <form onSubmit={e => { e.preventDefault(); if (form.subject.trim()) setSubmitted(true); }}
+      <form onSubmit={e => {
+        e.preventDefault();
+        if (!form.subject.trim()) return;
+        const newPitch: Pitch = {
+          id: `u${Date.now()}`,
+          subject: form.subject.trim(),
+          journalist: form.journalist || null,
+          client: form.client.trim() || "—",
+          stage: form.stage,
+          peso: form.peso,
+          sentDate: form.stage !== "drafted" ? new Date().toISOString().split("T")[0] : null,
+          placedDate: null,
+          url: null,
+          anchorText: null,
+          dr: null,
+          linkType: null,
+          contentType: null,
+          team: form.team || "",
+          dataSource: form.dataSource,
+          followUpDue: null,
+          points: null,
+        };
+        onAdd(newPitch);
+        setSubmitted(true);
+      }}
         style={{ background: PAPER, border: `1px solid ${INK}`, width: "100%", maxWidth: 640, marginBottom: 60 }}
         onClick={e => e.stopPropagation()}
       >
@@ -1169,6 +1224,12 @@ type TabId = "pipeline" | "followups" | "coverage" | "contacts" | "peso";
 export default function CoverageIQ() {
   const [activeTab, setActiveTab] = useState<TabId>("pipeline");
   const [showModal, setShowModal] = useState(false);
+  // Ticker forces re-render when addPitchGlobal mutates the module-level PITCHES array
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    _rerenderCoverage = () => setTick(n => n + 1);
+    return () => { _rerenderCoverage = null; };
+  }, []);
 
   const today = new Date(); today.setHours(0,0,0,0);
   const followUpCount =
@@ -1178,7 +1239,7 @@ export default function CoverageIQ() {
   const tabs: { id: TabId; label: string; count: number | null; highlight?: boolean }[] = [
     { id: "pipeline",  label: "Pipeline",       count: PITCHES.length },
     { id: "followups", label: "Follow-ups",     count: followUpCount, highlight: followUpCount > 0 },
-    { id: "coverage",  label: "Coverage Log",   count: COVERAGE_LOG.length },
+    { id: "coverage",  label: "Coverage Log",   count: PITCHES.filter(p => p.stage === "placed" || p.stage === "amplified").length },
     { id: "contacts",  label: "Contacts",       count: JOURNALISTS.length },
     { id: "peso",      label: "PESO Dashboard", count: null },
   ];
@@ -1284,7 +1345,7 @@ export default function CoverageIQ() {
       </main>
 
       {/* ── Modal ──────────────────────────────────────────────────────── */}
-      {showModal && <NewPitchModal onClose={() => setShowModal(false)} />}
+      {showModal && <NewPitchModal onClose={() => setShowModal(false)} onAdd={addPitchGlobal} />}
 
       {/* ── Footer ─────────────────────────────────────────────────────── */}
       <ToolPipelineFooter currentTool="coverageiq" />

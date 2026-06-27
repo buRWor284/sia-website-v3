@@ -9,8 +9,8 @@
 import { useState, useEffect, useReducer, useRef, useCallback } from "react";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
-const BG0  = "#F0F0EE";
-const BG1  = "#FAFAFA";
+const BG0  = "#f1ebde";
+const BG1  = "#e8e0cc";
 const BG2  = "#FFFFFF";
 const BD   = "rgba(26,20,16,0.15)";
 const BDS  = "rgba(26,20,16,0.08)";

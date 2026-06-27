@@ -16,16 +16,12 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // extra headroom for the company-profile expansion call
 
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity"];
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
-  if (userId !== ALLOWED_USER_ID) {
-    return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
 
   let raw: Record<string, unknown>;

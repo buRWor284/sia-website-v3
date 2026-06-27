@@ -11,7 +11,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 
 const ASSET_TYPE_LABELS: Record<string, string> = {
   research_report: "Research Report (original data study or survey)",
@@ -66,7 +65,6 @@ Write in direct, practical prose. No fluff. Length: 500–700 words total.`;
 export async function POST(request: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  if (userId !== ALLOWED_USER_ID) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "ANTHROPIC_API_KEY not set." }, { status: 500 });

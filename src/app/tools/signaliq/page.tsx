@@ -755,16 +755,18 @@ function OppCard({
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {opp.signals.map((s, i) =>
             s.source === "sec" ? (
-              // EDGAR EFTS is a JSON-only API — no human-readable URL exists.
-              // Show as a non-link chip with a tooltip pointing to sec.gov instead.
-              <span
+              // EDGAR EFTS is a JSON-only API — no human-readable URL for individual results.
+              // Link to the EDGAR full-text search so users can explore filings directly.
+              <a
                 key={i}
+                href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=8-K&dateb=&owner=include&count=40"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="siq-chip"
-                title="SEC EDGAR data — visit sec.gov to search filings directly"
-                style={{ cursor: "default", opacity: 0.75 }}
+                title="SEC EDGAR — no direct link for this result. Click to search EDGAR filings."
               >
-                {SRC_LABEL[s.source]} · sec.gov
-              </span>
+                {SRC_LABEL[s.source]} · sec.gov ↗
+              </a>
             ) : (
               <a
                 key={i}

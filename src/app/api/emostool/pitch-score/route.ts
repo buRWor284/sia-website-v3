@@ -21,7 +21,6 @@ export const maxDuration = 30;
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MAX_PITCH_CHARS = 8000;
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 
 function coerceBrand(v: unknown): BrandSignals {
   const o = (typeof v === "object" && v ? v : {}) as Record<string, unknown>;
@@ -38,7 +37,6 @@ function coerceBrand(v: unknown): BrandSignals {
 export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  if (userId !== ALLOWED_USER_ID) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured." }, { status: 500 });
