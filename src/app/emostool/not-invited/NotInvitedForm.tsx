@@ -162,10 +162,10 @@ export default function NotInvitedForm() {
         )}
 
         <a
-          href="/emos"
+          href="/tools"
           style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, textDecoration: "none" }}
         >
-          Learn about EMOS →
+          Explore the free tools →
         </a>
 
       </div>
