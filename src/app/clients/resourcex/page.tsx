@@ -26,7 +26,15 @@ const DOCS = [
   {
     title: "Founder PR + Acquisition Launch Strategy",
     body: "Your 8-week earned-media roadmap: build Sajid Shah's personal brand as a founder, establish thought leadership with ghostwritten content, cultivate journalist relationships, and orchestrate a media launch timed to your acquisition announcement.",
-    cta: "Open the strategy deck",
+    cta: "Read the proposal →",
+    href: "/clients/resourcex/emos-proposal",
+    tag: "PROPOSAL",
+    tagDark: false,
+  },
+  {
+    title: "EMOS Strategy — Presentation Deck",
+    body: "The same proposal in slide format. Best viewed on desktop. Open in a new tab to download as PDF.",
+    cta: "View the presentation →",
     href: "/clients/resourcex/emos-deck",
     tag: "INTERACTIVE DECK",
     tagDark: false,
@@ -34,7 +42,7 @@ const DOCS = [
   {
     title: "Fractional CMO Pilot Offer",
     body: "The one-page engagement outline for the Resourcex x happy.co account: scope, rate, success-fee structure, and pilot terms.",
-    cta: "Open the PDF",
+    cta: "Open the offer →",
     href: "/clients/resourcex/cmo-pilot",
     tag: "PDF · ONE-PAGER",
     tagDark: true,
@@ -79,7 +87,7 @@ export default function ResourcexWorkspace() {
               YOUR DOCUMENTS
             </span>
             <div style={{ flexGrow: 1, height: 1, background: INK35 }} />
-            <span style={{ fontFamily: MONO, fontSize: 9, color: INK55, flexShrink: 0 }}>2 items</span>
+            <span style={{ fontFamily: MONO, fontSize: 9, color: INK55, flexShrink: 0 }}>3 items</span>
           </div>
 
           <div style={{ marginBottom: 24 }}>
