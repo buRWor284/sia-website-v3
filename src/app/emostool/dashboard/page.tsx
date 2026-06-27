@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@clerk/nextjs";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { STAGE_META, STAGE_ORDER, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
+import { STAGE_META, STAGE_ORDER, STAGE_THRESHOLDS, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -91,6 +91,19 @@ export default async function EmosDashboardPage() {
   const activeStageIdx = stageAdvanced ? earnedIdx : stageIdx;
   const pipelineTools = STAGE_ORDER.filter(s => s !== "full");
 
+  // Progress toward the next stage threshold
+  const stageCountMap: Record<EmosStage, number> = {
+    signal:   activityCounts.signals,
+    asset:    activityCounts.assets,
+    collab:   activityCounts.journalists,
+    press:    activityCounts.pitchesScored,
+    coverage: activityCounts.pitchesTracked,
+    full:     0,
+  };
+  const progressCurrent   = stageCountMap[activeStage] ?? 0;
+  const progressThreshold = STAGE_THRESHOLDS[activeStage] ?? 0;
+  const progressPct       = progressThreshold > 0 ? Math.min(100, Math.round((progressCurrent / progressThreshold) * 100)) : 100;
+
   return (
     <div style={{ minHeight: "100vh", background: PAPER, fontFamily: SERIF }}>
 
@@ -144,6 +157,16 @@ export default async function EmosDashboardPage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.65)", marginTop: 4 }}>
               {STAGE_META[activeStage].threshold}
             </div>
+            {activeStage !== "full" && (
+              <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ flex: 1, maxWidth: 200, height: 4, background: "rgba(241,235,222,.15)", borderRadius: 2, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${progressPct}%`, background: progressPct >= 100 ? "#3e6b45" : YEL, transition: "width .3s ease" }} />
+                </div>
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11, color: progressPct >= 100 ? "#3e6b45" : YEL, whiteSpace: "nowrap" }}>
+                  {progressCurrent} / {progressThreshold}
+                </span>
+              </div>
+            )}
           </div>
           <a
             href={STAGE_META[activeStage].path}
@@ -220,6 +243,16 @@ export default async function EmosDashboardPage() {
                     <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: isActive ? "rgba(241,235,222,.45)" : INK55, marginTop: 2 }}>
                       {stats.label}
                     </div>
+                    {isActive && progressThreshold > 0 && (
+                      <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 6, justifyContent: "flex-end" }}>
+                        <div style={{ width: 80, height: 3, background: "rgba(241,235,222,.15)", borderRadius: 2, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${progressPct}%`, background: progressPct >= 100 ? "#3e6b45" : YEL }} />
+                        </div>
+                        <span style={{ fontFamily: MONO, fontSize: 9, color: progressPct >= 100 ? "#3e6b45" : "rgba(241,235,222,.55)" }}>
+                          {progressPct}%
+                        </span>
+                      </div>
+                    )}
                   </div>
                 )}
                 {stats.count === 0 && <div style={{ padding: "20px 20px" }} />}

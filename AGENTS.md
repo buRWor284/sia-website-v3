@@ -48,7 +48,7 @@ SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
 - SIA org + Irfan's user seeded
 - `SUPABASE_SERVICE_ROLE_KEY` env var required in Vercel for server-side writes
 
-### Platform tools (Phases 2–7 ✅)
+### Platform tools (Phases 2–8 ✅)
 Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → CoverageIQ
 
 - `/emostool/dashboard` — unified pipeline view: one card per tool in order, live data counts, "you are here" banner
@@ -92,12 +92,7 @@ Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → Coverage
 
 ---
 
-## What's next (Phase 8+)
-
-### Phase 8 — Dashboard stage auto-progression 🔜
-- Stage bar on `/emostool/dashboard` is static — it doesn't advance based on activity
-- Thresholds are defined in `emos-stage-config.ts`; `recordStageEvent` + `getOrgStage` exist in `stage.ts`
-- Need: dashboard to query actual activity counts (saved signals, assets created, journalists added, pitches scored, pitches tracked) and advance the stage bar accordingly
+## What's next (Phase 9+)
 
 ### Phase 9 — Billing (Stripe, D-9)
 - Not started. Requires a conversation before work begins.
