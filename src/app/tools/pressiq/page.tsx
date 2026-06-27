@@ -155,7 +155,7 @@ function chipStyle(active: boolean): React.CSSProperties {
     display: "inline-block", padding: "5px 9px",
     border: `1px solid ${active ? YEL : DARK_BD}`, background: active ? YEL : "transparent",
     fontSize: 10.5, fontWeight: 600, cursor: "pointer",
-    color: active ? DARK : ra(PAPER, 0.35), transition: "all .1s", fontFamily: GROT, margin: 2, borderRadius: 0,
+    color: active ? DARK : ra(PAPER, 0.6), transition: "all .1s", fontFamily: GROT, margin: 2, borderRadius: 0,
   };
 }
 
@@ -282,7 +282,7 @@ function FixCard({ rank, fix }: { rank: number; fix: ScoreResponse["topFixes"][0
         <div style={{ width: 26, height: 26, background: YEL, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 13, color: INK }}>{rank}</div>
         <div>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER }}>{fix.area}</div>
-          {fix.mechanism && <div style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(PAPER, 0.35), marginTop: 2 }}>{fix.mechanism}</div>}
+          {fix.mechanism && <div style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(PAPER, 0.65), marginTop: 2 }}>{fix.mechanism}</div>}
         </div>
       </div>
       <div style={{ padding: "14px 16px", fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.7), lineHeight: 1.6 }}>{fix.text}</div>
@@ -348,7 +348,7 @@ function EmailGate({ show, onClose, onUnlock, result }: {
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontFamily: SERIF, fontSize: 52, fontWeight: 700, color: tierColor, lineHeight: 1 }}>{score}</div>
-              <div style={{ fontFamily: GROT, fontSize: 9, color: ra(PAPER, 0.35), letterSpacing: ".14em" }}>/ 100</div>
+              <div style={{ fontFamily: GROT, fontSize: 9, color: ra(PAPER, 0.65), letterSpacing: ".14em" }}>/ 100</div>
             </div>
             <div>
               <span style={{ display: "inline-block", padding: "4px 10px", background: tierColor, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", marginBottom: 8 }}>
@@ -424,7 +424,7 @@ function TabNav({ current, setTab, onReset }: { current: Tab; setTab: (t: Tab) =
           {next.label} →
         </button>
       ) : (
-        <button onClick={onReset} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "transparent", border: `1px solid ${ra(INK, 0.2)}`, color: ra(INK, 0.5), fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer" }}>
+        <button onClick={onReset} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "transparent", border: `1px solid ${ra(INK, 0.3)}`, color: ra(INK, 0.65), fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer" }}>
           ← Score another pitch
         </button>
       )}
@@ -549,7 +549,7 @@ function LoadingPanel() {
       <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: ra(INK, 0.62), marginBottom: 24, textAlign: "center" }}>
         Scoring against 32 factors across 7 dimensions…
       </div>
-      <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.2), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
+      <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.5), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
         Cision State of the Media 2026 (n≈1,800)<br />
         Muck Rack State of Journalism 2026 (n≈900)<br />
         Propel Media Barometer Q1 2024 (425k+ pitches)<br />
@@ -677,7 +677,7 @@ function PostScorePanel({
                     <div key={k} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "3px 0", fontFamily: SERIF, fontSize: 12.5, color: ra(INK, 0.7) }}>
                       <span style={{ fontFamily: MONO, fontWeight: 700, color: INK, width: 38 }}>{Math.round(WEIGHTS_V2[k] * 100)}%</span>
                       <span style={{ flex: 1 }}>{label}</span>
-                      <span style={{ fontFamily: MONO, fontSize: 8, letterSpacing: ".1em", textTransform: "uppercase", color: ra(INK, 0.45) }}>{k === "objective" ? "deterministic" : "AI-judged"}</span>
+                      <span style={{ fontFamily: MONO, fontSize: 8, letterSpacing: ".1em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{k === "objective" ? "deterministic" : "AI-judged"}</span>
                     </div>
                   ))}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12, borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 10 }}>
@@ -1325,12 +1325,12 @@ export default function PressIQPage() {
             <div style={LSEC}>
               {pitchMode === "standalone" ? (
                 <>
-                  <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional — what topics they cover</span></span>
+                  <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional — what topics they cover</span></span>
                   <textarea value={journalistBeat} onChange={e => setJournalistBeat(e.target.value)} placeholder="e.g. Covers SaaS growth, founder stories, and future-of-work data. Writes for TechCrunch’s Startups desk." className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
                 </>
               ) : (
                 <>
-                  <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
+                  <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
                   <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted / Featured query here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
                 </>
               )}
@@ -1343,7 +1343,7 @@ export default function PressIQPage() {
             </div>
 
             <div style={LSEC}>
-              <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional — else parsed from line 1</span></span>
+              <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional — else parsed from line 1</span></span>
               <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
             </div>
 
@@ -1355,7 +1355,7 @@ export default function PressIQPage() {
             </div>
 
             <div style={LSEC}>
-              <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.15), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
+              <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                 {BRAND_LABELS.map(({ key, label }) => (
                   <button key={key} onClick={() => setBrand(b => ({ ...b, [key]: !b[key] }))} style={chipStyle(brand[key])}>{label}</button>

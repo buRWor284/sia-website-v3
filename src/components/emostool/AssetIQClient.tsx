@@ -105,7 +105,8 @@ function CreateForm({
           status: "draft",
           published_url: null,
           links_earned: 0,
-          signal_ref: signalId ? `signal:${signalId}:${(signalHeadline ?? "").substring(0, 100)}` : null,
+          signal_id: signalId ?? null,
+          signal_headline: signalHeadline ?? null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
@@ -277,9 +278,9 @@ function AssetRow({
         <div style={{ padding: "13px 14px" }}>
           <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14, lineHeight: 1.3, color: INK }}>{asset.title}</div>
           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".08em", textTransform: "uppercase", color: INK55, marginTop: 3 }}>{typeLabel}</div>
-          {asset.signal_ref && (
-            <div style={{ fontFamily: MONO, fontSize: 9, color: INK35, marginTop: 3 }}>
-              ↳ from signal
+          {asset.signal_id && (
+            <div style={{ fontFamily: MONO, fontSize: 9, color: INK35, marginTop: 3 }} title={asset.signal_headline ?? undefined}>
+              ↳ from signal{asset.signal_headline ? `: ${asset.signal_headline.substring(0, 60)}…` : ""}
             </div>
           )}
         </div>

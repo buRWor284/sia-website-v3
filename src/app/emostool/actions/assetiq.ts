@@ -29,7 +29,8 @@ export interface DbAsset {
   status: AssetStatus;
   published_url: string | null;
   links_earned: number;
-  signal_ref: string | null; // stored in description as "signal:<id>:<headline>" prefix
+  signal_id: string | null;       // FK → signaliq_signals.id
+  signal_headline: string | null; // denormalized headline for display
   created_at: string;
   updated_at: string;
 }
@@ -49,7 +50,7 @@ export async function getAssets(): Promise<DbAsset[]> {
   const db = await getAuthenticatedClient();
   const { data, error } = await db
     .from("linkable_assets")
-    .select("id, asset_type, title, description, target_keyword, status, published_url, links_earned, created_at, updated_at")
+    .select("id, asset_type, title, description, target_keyword, status, published_url, links_earned, signal_id, signal_headline, created_at, updated_at")
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -64,17 +65,14 @@ export async function getAssets(): Promise<DbAsset[]> {
     status: string;
     published_url: string | null;
     links_earned: number;
+    signal_id: string | null;
+    signal_headline: string | null;
     created_at: string;
     updated_at: string;
   }) => ({
     ...row,
     asset_type: row.asset_type as AssetType,
     status: row.status as AssetStatus,
-    // Extract signal_ref from description prefix if present
-    signal_ref: row.description?.startsWith("signal:") ? row.description.split("\n")[0] : null,
-    description: row.description?.startsWith("signal:")
-      ? (row.description.split("\n").slice(1).join("\n") || null)
-      : row.description,
   }));
 }
 
@@ -89,22 +87,17 @@ export async function createAsset(input: CreateAssetInput): Promise<{ id: string
     .single();
   if (orgError || !org) { console.error("createAsset: no org", orgError?.message); return null; }
 
-  // Encode signal reference in description prefix so we don't need a schema change
-  let description = input.description ?? null;
-  if (input.signal_id) {
-    const sigRef = `signal:${input.signal_id}:${(input.signal_headline ?? "").substring(0, 100)}`;
-    description = description ? `${sigRef}\n${description}` : sigRef;
-  }
-
   const { data, error } = await db
     .from("linkable_assets")
     .insert({
-      org_id:         org.id,
-      asset_type:     input.asset_type,
-      title:          input.title,
-      description:    description ?? null,
-      target_keyword: input.target_keyword ?? null,
-      status:         "draft",
+      org_id:          org.id,
+      asset_type:      input.asset_type,
+      title:           input.title,
+      description:     input.description ?? null,
+      target_keyword:  input.target_keyword ?? null,
+      signal_id:       input.signal_id ?? null,
+      signal_headline: input.signal_headline?.substring(0, 200) ?? null,
+      status:          "draft",
     })
     .select("id")
     .single();
