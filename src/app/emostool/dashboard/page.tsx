@@ -1,9 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@clerk/nextjs";
-import { createSupabaseServerClient } from "@/lib/supabase";
+import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase";
 import { STAGE_META, STAGE_ORDER, STAGE_THRESHOLDS, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
+
+// Admin emails bypass the subscription gate (Irfan + ops aliases)
+const ADMIN_EMAILS = ["syedirfanajmal@gmail.com", "sia@syedirfanajmal.com"];
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -36,6 +39,24 @@ const TOOL_ICONS: Record<EmosStage, string> = {
 export default async function EmosDashboardPage() {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/sign-in");
+
+  // ── Subscription gate ─────────────────────────────────────────────────────
+  // Non-admin users must have an active Stripe subscription to access the platform.
+  const user      = await currentUser();
+  const userEmail = user?.emailAddresses?.[0]?.emailAddress ?? "";
+
+  if (!ADMIN_EMAILS.includes(userEmail)) {
+    const serviceDb = createSupabaseServiceClient();
+    const { data: sub } = await serviceDb
+      .from("stripe_subscriptions")
+      .select("status")
+      .eq("email", userEmail)
+      .maybeSingle();
+
+    if (!sub || sub.status !== "active") {
+      redirect("/emos/subscribe");
+    }
+  }
 
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");

@@ -8,14 +8,14 @@
 -- ============================================================================
 
 ALTER TABLE linkable_assets
-  ADD COLUMN IF NOT EXISTS signal_id       TEXT REFERENCES signaliq_signals(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS signal_id       UUID REFERENCES signaliq_signals(id) ON DELETE SET NULL,
   ADD COLUMN IF NOT EXISTS signal_headline TEXT;
 
 -- Backfill from existing "signal:<id>:<headline>\n<rest>" description prefixes.
 -- Format: signal:{uuid}:{headline up to 100 chars}\n{optional real description}
 UPDATE linkable_assets
 SET
-  signal_id       = substring(description FROM '^signal:([^:]+):'),
+  signal_id       = (substring(description FROM '^signal:([^:]+):'))::uuid,
   signal_headline = substring(description FROM '^signal:[^:]+:([^\n]*)'),
   description     = CASE
     WHEN description SIMILAR TO 'signal:[^\n]+\n%'
