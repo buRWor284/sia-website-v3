@@ -16,7 +16,7 @@ export const CredibilityTicker = () => {
   <div className="sia-ticker" aria-label="Publications · Speaking · Podcast">
     {[0, 1].map((i) => (
       <span key={i} className="sia-ticker-track" aria-hidden={i > 0 ? true : undefined}>
-        <span>Bylines &amp; Citations: Forbes · HBR · Entrepreneur · SEMrush · World Bank</span>
+        <span>BYLINES &amp; CITATIONS: FORBES · HBR · ENTREPRENEUR · SEMRUSH · WORLD BANK</span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>GLOBAL CLIENTS · 4 CONTINENTS</span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
