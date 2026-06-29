@@ -1015,10 +1015,23 @@ body > * { position: relative; z-index: 2; }
   }
 }
 
-/* Phone: collapse the mosaic to a single featured item (About §E) */
+/* Phone: one-at-a-time horizontal swipe carousel (About §E) — all items kept, none hidden */
 @media (max-width: 639px) {
-  .gallery-mosaic { grid-template-columns: 1fr; }
-  .gallery-mosaic figure:not(:first-child) { display: none !important; }
+  .gallery-mosaic {
+    display: flex;
+    grid-template-columns: none;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 12px;
+    scrollbar-width: none;
+  }
+  .gallery-mosaic::-webkit-scrollbar { display: none; }
+  .gallery-mosaic > figure {
+    flex: 0 0 88%;
+    scroll-snap-align: center;
+  }
 }
 
 /* ---- Hero 2-col layout (speaking / podcast / fractional-cmo) ----------- */
