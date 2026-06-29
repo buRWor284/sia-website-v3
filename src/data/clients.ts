@@ -118,7 +118,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "San Francisco SaaS for household-item management. Worked across " +
       "acquisition, content, and PR; the company subsequently raised $11M.",
     role: "Growth + earned media",
-    caseStudy: null,
+    caseStudy: "https://dmr.agency/case-studies/centriq-digital-pr-growth/",
     logo: "/assets/clients/centriq.png",
     services: ["Fractional CMO", "EMOS"],
   },

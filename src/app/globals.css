@@ -1015,6 +1015,12 @@ body > * { position: relative; z-index: 2; }
   }
 }
 
+/* Phone: collapse the mosaic to a single featured item (About §E) */
+@media (max-width: 639px) {
+  .gallery-mosaic { grid-template-columns: 1fr; }
+  .gallery-mosaic figure:not(:first-child) { display: none !important; }
+}
+
 /* ---- Hero 2-col layout (speaking / podcast / fractional-cmo) ----------- */
 .grid-hero-2col {
   display: grid;
