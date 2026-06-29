@@ -88,7 +88,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "Major UK autocare e-commerce. Multi-quarter digital PR + SEO programme; " +
       "the result was published as a SEMrush case study.",
     role: "Lead · digital PR + organic strategy",
-    caseStudy: "https://dmr.agency/case-studies/nta-case-study/",
+    caseStudy: "https://dmr.agency/case-studies/auto-retailer-seo/",
     logo: "/assets/clients/nta.jpg",
     services: ["EMOS", "Fractional CMO"],
   },
@@ -103,7 +103,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "US-based ridesharing media property. Built editorial authority and " +
       "earned-media programme from scratch to 1.5M monthly uniques.",
     role: "Strategy + outreach",
-    caseStudy: "https://dmr.agency/case-studies/ridester-case-study/",
+    caseStudy: "https://dmr.agency/case-studies/ridester-seo/",
     logo: "/assets/clients/ridester.png",
     services: ["EMOS", "Fractional CMO"],
   },
