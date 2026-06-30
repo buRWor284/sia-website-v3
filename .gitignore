@@ -58,3 +58,7 @@ frontend_claude_design/
 LinkedIn Marketing/
 social-previews/
 docs/SignalIQ/
+
+# Working/design zips - keep big archives out of git
+*.zip
+!public/press-kit/assets/Syed-Irfan-Ajmal-Press-Kit-Assets.zip
