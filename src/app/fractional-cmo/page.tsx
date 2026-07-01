@@ -30,6 +30,7 @@ import {
 
 const CAL_CFG_POPUP = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo" } });
 const CAL_CFG_AUDIT = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo-audit" } });
+const CAL_CFG_FINAL = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo-final" } });
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -153,6 +154,10 @@ const FAQS: ReadonlyArray<FAQItem> = [
     q: "How is this different from just hiring DMR.agency?",
     a: "Hiring the agency gets you execution: PR, SEO, content, link earning. The Fractional CMO retainer adds the layer above that — strategy ownership, weekly decision-making with the founder, marketing function leadership, board and investor narratives, and hiring. I sit at the table and answer for the results. The agency work happens because I direct it, not instead of it.",
   },
+  {
+    q: "Have you personally held the title of CMO before?",
+    a: "No, and I would rather say that directly than let the title imply something it hasn't earned. What I have is twenty years founding and running DMR.agency, the same team behind every result on this page, plus my own record of earned media, speaking, and public visibility. I'm not selling a corporate CMO résumé; I'm selling an operator who has actually shipped the campaigns and is willing to take the chair. If a former in-house CMO with a specific industry pedigree is the requirement, I'm not that person, and it's better you know now than three months in.",
+  },
 ];
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -234,11 +239,22 @@ const CMOLead = () => (
           lifecycle, paid, brand. Hiring and vendor selection when it is time.
           Board and investor updates when those are needed.
         </p>
+        <p style={{ marginTop: "0.7em" }}>
+          That same operator&rsquo;s instinct is aimed at my own visibility
+          first: bylines and citations in Forbes, HBR, and Entrepreneur; a
+          keynote at the World Bank and Arabian Travel Market; workshops run
+          for SEMrush (NYSE: SEMR) and uHubs; and a podcast now in its fourth
+          season. It is the same earned-media playbook the retainer sells
+          &mdash; I use it on myself before I use it on you.
+        </p>
         <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
           Retainers run $5K&ndash;$10K a month depending on scope: a fraction
           of the $300K+ a full-time CMO costs, with agency execution included
           rather than billed on top. Six-month minimum, with sixty days&rsquo;
-          notice after the first quarter, so you are never locked in.
+          notice after the first quarter, so you are never locked in. If six
+          months is a bigger first step than you want to take today, the
+          $3,000 Marketing Leadership Audit below gets you the same intake and
+          a written brief without the retainer.
         </p>
         <p style={{ marginTop: "0.7em" }}>
           The difference from hiring the agency directly: I own the marketing
@@ -1226,7 +1242,9 @@ const BookCall = () => (
           </p>
 
           <a
-            href="https://www.syedirfanajmal.com/strategy-call"
+            href={CAL_URL}
+            data-cal-link={CAL_LINK}
+            data-cal-config={CAL_CFG_FINAL}
             style={{
               display: "flex",
               alignItems: "center",
@@ -1240,6 +1258,7 @@ const BookCall = () => (
               fontSize: 13,
               letterSpacing: "0.10em",
               textTransform: "uppercase",
+              cursor: "pointer",
             }}
           >
             <span>Book a discovery call</span>

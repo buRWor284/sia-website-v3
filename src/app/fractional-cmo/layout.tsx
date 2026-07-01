@@ -42,6 +42,14 @@ const FAQ = [
     q: "Do you take equity?",
     a: "No. The retainer is cash-only. A clean monthly retainer keeps incentives aligned, since I need to produce visible results every month to keep the seat.",
   },
+  {
+    q: "How is this different from just hiring DMR.agency?",
+    a: "Hiring the agency gets you execution: PR, SEO, content, link earning. The Fractional CMO retainer adds strategy ownership, weekly decision-making with the founder, marketing function leadership, board and investor narratives, and hiring, directing the agency work rather than replacing it.",
+  },
+  {
+    q: "Have you personally held the title of CMO before?",
+    a: "No. What I bring instead is twenty years founding and running DMR.agency, the same team behind every result referenced on this page, plus my own record of earned media, speaking, and public visibility using the same playbook the retainer sells.",
+  },
 ];
 
 const jsonLd = {
