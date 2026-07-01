@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scope, Ownership &amp; KPIs · The Private Founder's Intensive · EMOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,700;1,6..72,400;1,6..72,600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --P:#ECE8DA; --P2:#E4DDC7; --K:#1a1712;
+    --K70:rgba(26,23,18,.70); --K55:rgba(26,23,18,.55); --K35:rgba(26,23,18,.35);
+    --K18:rgba(26,23,18,.18); --K10:rgba(26,23,18,.10);
+    --Y:#f5c518;
+    --OD:#ECE8DA; --OD70:rgba(236,232,218,.70); --OD45:rgba(236,232,218,.45);
+    --OD25:rgba(236,232,218,.25); --OD12:rgba(236,232,218,.12);
+    --SERIF:'Newsreader',Georgia,serif;
+    --SANS:'Archivo','Helvetica Neue',Arial,sans-serif;
+    --MONO:'Courier New',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--P);font-family:var(--SERIF);color:var(--K);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:900px;margin:0 auto;background:var(--P);}
+  a{color:inherit;}
+  em{font-style:italic;}
+
+  /* ── Action bar ── */
+  .action-bar{background:var(--K);border-bottom:1px solid var(--OD12);padding:9px 32px;}
+  .action-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;}
+  .back-link{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--OD45);text-decoration:none;}
+  .btn-group{display:flex;align-items:center;gap:8px;}
+  .btn-ghost{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--OD45);text-decoration:none;background:none;border:1px solid var(--OD25);padding:7px 14px;cursor:pointer;transition:opacity .12s;}
+  .btn-solid{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;background:var(--Y);color:var(--K);border:none;padding:8px 14px;cursor:pointer;transition:opacity .12s;}
+  .btn-ghost:hover,.btn-solid:hover{opacity:.8;}
+
+  /* ── Hero (tightened) ── */
+  .hero{background:var(--K);}
+  .hero-inner{padding:18px 40px 16px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:7px;}
+  .emos-mono{display:flex;align-items:center;gap:0;}
+  .emos-strip{width:5px;height:38px;background:var(--Y);flex-shrink:0;}
+  .emos-box{width:38px;height:38px;background:var(--Y);display:flex;align-items:center;justify-content:center;}
+  .emos-box span{font-family:var(--SANS);font-weight:900;font-size:12px;color:var(--K);letter-spacing:.04em;}
+  .hero-eyebrow{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--OD45);}
+  .hero h1{font-family:var(--SERIF);font-weight:700;font-size:clamp(23px,3.8vw,36px);line-height:1.0;letter-spacing:-.025em;color:var(--OD);margin:0;}
+  .hero-chiprow{display:flex;align-items:center;gap:12px;margin-top:1px;flex-wrap:wrap;justify-content:center;}
+  .chip-confidential{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--K);background:var(--Y);padding:4px 12px;}
+  .hero-mono{font-family:var(--MONO);font-size:10px;color:var(--OD45);text-transform:uppercase;}
+
+  /* ── Section + mast ── */
+  .section{padding:24px 40px 22px;}
+  .mast{margin-bottom:14px;}
+  .mast-row{display:flex;align-items:center;gap:12px;margin-bottom:7px;}
+  .mast-badge{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--K);background:var(--Y);padding:3px 8px;flex-shrink:0;}
+  .mast-label{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--K55);}
+  .mast-rule{flex-grow:1;height:1px;background:var(--K35);}
+  .mast-vol{font-family:var(--MONO);font-size:9px;color:var(--K55);flex-shrink:0;text-transform:uppercase;}
+  .mast-bar1{height:1px;background:var(--K);}
+  .mast-bar2{height:3px;margin-top:3px;background:var(--K);}
+  .dark .mast-label{color:var(--OD45);}
+  .dark .mast-rule{background:var(--OD25);}
+  .dark .mast-vol{color:var(--OD45);}
+  .dark .mast-bar1{background:var(--OD45);}
+  .dark .mast-bar2{background:var(--OD45);}
+
+  .divider{height:1px;background:var(--K18);margin:0 40px;}
+
+  /* ── Type ── */
+  .lead{font-family:var(--SERIF);font-weight:400;font-size:16px;line-height:1.5;color:var(--K70);margin:0;max-width:740px;}
+  .lead strong{font-weight:700;color:var(--K);}
+  .para{font-family:var(--SERIF);font-size:15px;line-height:1.55;color:var(--K70);margin:0 0 14px;max-width:730px;}
+  .para strong{font-weight:700;color:var(--K);}
+  .caption{font-family:var(--SERIF);font-size:15px;color:var(--K55);margin:4px 0 12px;}
+  .caption strong{font-weight:700;color:var(--K);font-style:normal;}
+  .caption .paren{font-style:italic;font-size:14px;}
+
+  /* ── Grid tables ── */
+  .gtable{display:grid;gap:1px;background:var(--K18);border:1px solid var(--K18);}
+  .cell{background:var(--P);padding:13px 18px;}
+  .cell-h{background:var(--K);}
+  .ch-label{font-family:var(--SANS);font-weight:800;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--OD);}
+  .cell .lbl{font-family:var(--SANS);font-weight:700;font-size:13px;color:var(--K);line-height:1.4;}
+  .cell .val{font-family:var(--SERIF);font-size:14px;line-height:1.5;color:var(--K70);}
+  .cell .val strong{font-weight:700;color:var(--K);}
+
+  /* bullets */
+  .blist{display:flex;flex-direction:column;gap:7px;}
+  .brow{display:flex;gap:8px;align-items:flex-start;}
+  .bsq{width:5px;height:5px;background:var(--Y);flex-shrink:0;margin-top:7px;}
+  .btxt{font-family:var(--SERIF);font-weight:400;font-size:14px;line-height:1.5;color:var(--K70);}
+  .btxt strong{font-weight:700;color:var(--K);}
+
+  /* callout (dark band) */
+  .callout-dark{background:var(--K);padding:15px 24px;}
+  .callout-dark p{font-family:var(--SERIF);font-style:italic;font-size:16px;line-height:1.5;color:var(--OD70);margin:0;text-align:center;}
+  .callout-dark.left p{text-align:left;}
+  .callout-dark p strong{font-style:normal;font-weight:700;color:var(--OD);}
+
+  /* note */
+  .note{background:var(--P2);border-left:3px solid var(--Y);padding:14px 20px;}
+  .note p{font-family:var(--SERIF);font-size:14px;line-height:1.55;color:var(--K70);margin:0;}
+
+  /* need (per-stage requirement) */
+  .need{background:var(--P2);border-left:3px solid var(--Y);padding:10px 14px;margin-top:11px;}
+  .need p{font-family:var(--SERIF);font-size:13px;line-height:1.5;color:var(--K70);margin:0;}
+  .need p strong{font-weight:700;color:var(--K);}
+
+  /* sidebar box */
+  .sidebar{background:var(--P2);border:1px solid var(--K18);border-left:3px solid var(--Y);padding:14px 18px;margin:0 0 14px;}
+  .sidebar-k{font-family:var(--SANS);font-weight:800;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--K55);margin:0 0 7px;}
+  .sidebar-p{font-family:var(--SERIF);font-size:14px;line-height:1.55;color:var(--K70);margin:0;}
+
+  /* AT A GLANCE (dark) */
+  .glance{background:var(--K);}
+  .glance .gtable{background:var(--OD12);border-color:var(--OD12);}
+  .glance .cell{background:var(--K);padding:11px 16px;}
+  .glance .lbl{color:var(--OD);}
+  .glance .val{color:var(--OD70);}
+  .glance .val strong{color:var(--Y);}
+
+  /* ── TOC ── */
+  .toc{margin:20px 40px 6px;border:1px solid var(--K18);background:var(--P2);}
+  .toc-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;border-bottom:1px solid var(--K18);}
+  .toc-kicker{font-family:var(--SANS);font-weight:800;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--K55);}
+  .toc-toggle{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--K);background:var(--Y);border:none;padding:6px 12px;cursor:pointer;transition:opacity .12s;}
+  .toc-toggle:hover{opacity:.8;}
+  .toc-links{display:flex;flex-wrap:wrap;gap:2px;padding:7px;}
+  .toc-links a{display:flex;align-items:center;gap:9px;font-family:var(--SANS);font-weight:600;font-size:12px;color:var(--K70);text-decoration:none;padding:7px 12px;flex:1 1 240px;border:1px solid transparent;transition:background .12s,border-color .12s,color .12s;}
+  .toc-links a:hover{background:var(--P);border-color:var(--K18);color:var(--K);}
+  .toc-links a b{font-family:var(--SANS);font-weight:900;font-size:11px;color:var(--K);background:var(--Y);padding:2px 0;min-width:26px;text-align:center;flex-shrink:0;}
+
+  /* ── Collapsible sections ── */
+  .sec-sum{list-style:none;cursor:pointer;display:block;transition:background .12s;}
+  .sec-sum::-webkit-details-marker{display:none;}
+  .sec-sum:focus-visible{outline:2px solid var(--Y);outline-offset:3px;}
+  .sec .chev{font-size:0;flex-shrink:0;line-height:1;}
+  .sec .chev::after{content:"+ Expand";display:inline-block;font-family:var(--SANS);font-weight:800;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--K);background:var(--Y);padding:4px 10px;white-space:nowrap;transition:opacity .12s;}
+  details.sec[open] .chev::after{content:"− Collapse";}
+  .sec-sum:hover .chev::after{opacity:.8;}
+  .sec .teaser{font-family:var(--SERIF);font-style:italic;font-size:14px;color:var(--K55);margin-top:7px;}
+  details.sec[open] .teaser{display:none;}
+  .sec-body{padding-top:14px;}
+  .sec-sum:hover .mast-label{color:var(--K);}
+  .sec-sum:hover{background:var(--P2);}
+
+  /* KPI commit / target : full width, checklist */
+  .kpi-stack{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+  .cblock{border:1px solid var(--K18);}
+  .cblock .chead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:11px 20px;}
+  .cblock.commit .chead{background:var(--K);}
+  .cblock.commit .chead .ct{color:var(--OD);}
+  .cblock.commit .chead .cs{color:var(--OD45);}
+  .cblock.aim .chead{background:var(--P2);border-bottom:1px solid var(--K18);}
+  .cblock.aim .chead .ct{color:var(--K);}
+  .cblock.aim .chead .cs{color:var(--K55);}
+  .chead .ct{font-family:var(--SANS);font-weight:800;font-size:12px;letter-spacing:.10em;text-transform:uppercase;}
+  .chead .cs{font-family:var(--SERIF);font-style:italic;font-size:13px;}
+  .cbody{background:var(--P);padding:3px 20px 6px;}
+  .citem{display:flex;gap:13px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--K10);}
+  .citem:last-child{border-bottom:none;}
+  .cmark{flex-shrink:0;width:19px;height:19px;display:flex;align-items:center;justify-content:center;font-family:var(--SANS);font-weight:900;font-size:11px;margin-top:1px;}
+  .cblock.commit .cmark{background:var(--Y);color:var(--K);}
+  .cblock.aim .cmark{border:1.5px solid var(--K35);color:var(--K55);}
+  .citxt{font-family:var(--SERIF);font-size:15px;line-height:1.5;color:var(--K70);}
+  .citxt strong{font-weight:700;color:var(--K);}
+
+  /* pre / launch / post cards */
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--K18);border:1px solid var(--K18);}
+  .pcard{background:var(--P);display:flex;flex-direction:column;}
+  .pcard .pband{background:var(--P2);border-bottom:1px solid var(--K18);padding:10px 18px;}
+  .pcard .pband span{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.10em;text-transform:uppercase;color:var(--K55);line-height:1.5;}
+  .pcard .pbody{padding:15px 18px 18px;display:flex;flex-direction:column;gap:11px;flex:1;}
+  .pcard .ptitle{font-family:var(--SERIF);font-weight:700;font-size:18px;line-height:1.14;letter-spacing:-.01em;color:var(--K);margin:0;}
+
+  /* who-does-what columns */
+  .wcol{background:var(--P);padding:18px 20px;display:flex;flex-direction:column;gap:12px;}
+  .wcol.keep{background:var(--P2);}
+  .wcol .whead{font-family:var(--SANS);font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--K);line-height:1.3;border-bottom:2px solid var(--K);padding-bottom:9px;}
+
+  /* coverage range highlight */
+  .cov .expected{background:var(--P2);}
+  .cov .cell-h.expected{background:#2a2620;}
+  .cov .cell-h.expected .ch-label{color:var(--Y);}
+
+  /* numbered cadence */
+  .cadence{display:flex;flex-direction:column;gap:1px;background:var(--K18);border:1px solid var(--K18);}
+  .crow{background:var(--P);padding:15px 22px;display:flex;gap:18px;align-items:flex-start;}
+  .cnum{font-family:var(--SERIF);font-weight:700;font-size:32px;line-height:.9;color:var(--Y);flex-shrink:0;width:38px;text-align:center;}
+  .ctxt{font-family:var(--SERIF);font-size:15px;line-height:1.5;color:var(--K70);margin:0;}
+  .ctxt strong{font-weight:700;color:var(--K);}
+  .cbodyx{flex:1;min-width:0;}
+  .subhead{font-family:var(--SANS);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--K);border-bottom:2px solid var(--K);padding-bottom:8px;margin:0 0 13px;}
+  .subhead .sd{font-family:var(--SERIF);font-weight:400;font-style:italic;font-size:12px;letter-spacing:0;text-transform:none;color:var(--K55);margin-left:8px;}
+
+  /* key terms */
+  .terms{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--K18);border:1px solid var(--K18);}
+  .term{background:var(--P);padding:16px 20px;}
+  .term .tk{font-family:var(--SANS);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--K);margin:0 0 7px;}
+  .term .td{font-family:var(--SERIF);font-size:14px;line-height:1.55;color:var(--K70);margin:0;}
+
+  /* footer */
+  .footer{border-top:1px solid var(--K18);padding:14px 40px;display:flex;flex-direction:column;gap:5px;background:var(--P2);}
+  .footer .f1{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--K55);}
+  .footer .f2{font-family:var(--SANS);font-weight:400;font-size:10px;letter-spacing:.04em;color:var(--K55);}
+
+  /* responsive */
+  @media (max-width:760px){
+    .three{grid-template-columns:1fr;}
+    .who3{grid-template-columns:1fr !important;}
+    .terms{grid-template-columns:1fr;}
+    .glance .gtable{grid-template-columns:1fr !important;}
+    .cov.gtable{grid-template-columns:1fr 1fr !important;}
+  }
+  @media (max-width:480px){
+    .section{padding:20px 18px 20px;}
+    .divider{margin:0 18px;}
+    .toc{margin:18px 18px 6px;}
+    .hero-inner{padding:18px 18px 16px;}
+    .action-bar,.footer{padding-left:18px;padding-right:18px;}
+    .crow{gap:12px;}
+    .cnum{font-size:28px;width:30px;}
+    .cov.gtable{grid-template-columns:1fr !important;}
+  }
+  @media print{
+    .no-print{display:none !important;}
+    body{background:#fff;}
+    .sec .teaser,.sec .chev{display:none !important;}
+    .sec-body{display:block !important;padding-top:14px;}
+    .hero,.glance,.callout-dark,.cblock.commit .chead,.cell-h{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+
+  /* §03 v4b : datasheet (spec-sheet) KPIs */
+  .ksheet{border:1px solid var(--K18);background:var(--K18);display:flex;flex-direction:column;gap:1px;}
+  .ks-head{display:grid;grid-template-columns:1.15fr .8fr 2.6fr;background:var(--K);}
+  .ks-head span{font-family:var(--SANS);font-weight:800;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--OD);padding:10px 16px;}
+  .ks-row{display:grid;grid-template-columns:1.15fr .8fr 2.6fr;background:var(--P);}
+  .ks-row>span{padding:12px 16px;}
+  .ks-c1{font-family:var(--SERIF);font-size:14px;color:var(--K);line-height:1.4;}
+  .ks-c1 strong{font-weight:700;color:var(--K);}
+  .ks-sub{font-family:var(--MONO);font-size:9px;color:var(--K55);text-transform:uppercase;letter-spacing:.04em;}
+  .ks-c3{font-family:var(--SERIF);font-size:14px;line-height:1.5;color:var(--K70);}
+  .ks-c3 strong{font-weight:700;color:var(--K);}
+  .tag{font-family:var(--SANS);font-weight:800;font-size:9px;letter-spacing:.10em;text-transform:uppercase;padding:3px 9px;display:inline-block;white-space:nowrap;}
+  .tag-c{background:var(--Y);color:var(--K);}
+  .tag-t{background:none;color:var(--K55);border:1.5px solid var(--K35);}
+  .ks-legend{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:16px;}
+  .ks-legend>span{font-family:var(--SERIF);font-size:13px;color:var(--K55);display:flex;align-items:center;gap:8px;line-height:1.4;}
+  @media (max-width:680px){
+    .ks-head{display:none;}
+    .ks-row{grid-template-columns:1fr;gap:2px;padding:10px 0;}
+    .ks-row>span{padding:3px 16px;}
+    .ks-c2{order:-1;}
+  }
+  @media print{ .ks-head,.tag{-webkit-print-color-adjust:exact;print-color-adjust:exact;} }
+
+  /* v6: define-cards (no flat/gray fill) + prominence highlight */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--K18);border:1px solid var(--K18);}
+  .dcard{background:var(--P);border-top:4px solid var(--Y);padding:19px 20px;display:flex;flex-direction:column;gap:9px;}
+  .dcard .dsub{font-family:var(--SANS);font-weight:800;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--K55);}
+  .dcard .dterm{font-family:var(--SERIF);font-weight:700;font-size:19px;color:var(--K);margin:0;line-height:1.15;}
+  .dcard .ddesc{font-family:var(--SERIF);font-size:14px;line-height:1.5;color:var(--K70);margin:0;}
+  .mark{background:var(--Y);color:var(--K);font-weight:700;padding:0 5px;white-space:normal;}
+  @media (max-width:760px){ .two{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ══ ACTION BAR ══ -->
+  <div class="action-bar no-print">
+    <div class="action-inner">
+      <a class="back-link" href="/clients/resourcex/emos-proposal">← Back to Proposal</a>
+      <div class="btn-group">
+        <a class="btn-ghost" href="/clients/resourcex/emos-proposal">▤ Full Proposal</a>
+        <button class="btn-solid" onclick="downloadPDF()">↓ Download PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ HERO (tightened) ══ -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="emos-mono">
+        <span class="emos-strip"></span>
+        <div class="emos-box"><span>EMOS</span></div>
+        <span class="emos-strip"></span>
+      </div>
+      <div class="hero-eyebrow">The Private Founder's Intensive</div>
+      <h1>Scope, Ownership &amp; <em>KPIs</em></h1>
+      <div class="hero-chiprow">
+        <span class="chip-confidential">Confidential</span>
+        <span class="hero-mono">Sajid / ResourceX · June 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ INTRO ══ -->
+  <section class="section" style="padding-top:18px;padding-bottom:2px;">
+    <p class="lead">Two modules over eight weeks: the Founder Authority Foundation, then the Announcement Sprint. This sheet answers your questions directly: your KPIs, who runs what, what your team keeps, and what we need from you at each stage.</p>
+  </section>
+
+  <!-- ══ YOUR NUMBERS AT A GLANCE (always open) ══ -->
+  <section class="section glance dark" id="sec-glance" style="background:var(--K);">
+    <div class="mast">
+      <div class="mast-row">
+        <span class="mast-badge">★</span>
+        <span class="mast-label">Your numbers at a glance</span>
+        <div class="mast-rule"></div>
+        <span class="mast-vol">Summary</span>
+      </div>
+      <div class="mast-bar1"></div>
+      <div class="mast-bar2"></div>
+    </div>
+    <div class="gtable" style="grid-template-columns:1fr 1.25fr;">
+      <div class="cell cell-h"><span class="ch-label">What you get</span></div>
+      <div class="cell cell-h"><span class="ch-label">The number</span></div>
+
+      <div class="cell"><span class="lbl">Ghostwritten authority articles under your name</span></div>
+      <div class="cell"><span class="val"><strong>3</strong> · 800 to 1,200 words · 2 revision rounds each · published under your name on your own channels (site, LinkedIn, Medium)</span></div>
+
+      <div class="cell"><span class="lbl">Article topics</span></div>
+      <div class="cell"><span class="val">Your general expertise: AI, PropTech, building from an emerging market, remote-team operations, founder lessons.</span></div>
+
+      <div class="cell"><span class="lbl">Linkable authority asset (data-led)</span></div>
+      <div class="cell"><span class="val"><strong>1</strong> · <strong>a data asset, infographic, interactive map, calculator or quiz</strong>, depending on what data is available · we recommend the format, you make the final call · built by your pod from our brief, with our direction and review · designed to earn links and seed a data story</span></div>
+
+      <div class="cell"><span class="lbl">Named target journalists for the announcement</span></div>
+      <div class="cell"><span class="val"><strong>15 to 20</strong>, from a working list of 40 to 60</span></div>
+
+      <div class="cell"><span class="lbl">Pitch volume your pod runs</span></div>
+      <div class="cell"><span class="val">Ramping to <strong>15+ a week</strong></span></div>
+
+      <div class="cell"><span class="lbl">Earned coverage</span></div>
+      <div class="cell"><span class="val">Quotes, features, or guest bylines in real outlets, forms not guaranteed · ranges in section 3</span></div>
+
+      <div class="cell"><span class="lbl">First verified placement</span></div>
+      <div class="cell"><span class="val"><strong>Targeted Week 3 to 4, sometimes sooner</strong> (publication is the editor's call)</span></div>
+
+      <div class="cell"><span class="lbl">Announcement rollout</span></div>
+      <div class="cell"><span class="val">We pitch an exclusive to a priority outlet first, then coordinate a wider release on the day; running it is the outlet's call</span></div>
+
+      <div class="cell"><span class="lbl">Press kit</span></div>
+      <div class="cell"><span class="val">Complete: bios, boilerplate, fact sheet, founder Q&amp;A, past-coverage page</span></div>
+
+      <div class="cell"><span class="lbl">Founder web presence</span></div>
+      <div class="cell"><span class="val">Refreshed, indexable, with Person schema for Google and AI assistants</span></div>
+
+      <div class="cell"><span class="lbl">Training format</span></div>
+      <div class="cell"><span class="val">Pre-recorded video lessons on the system, tools, and pitching mechanics, watched before each week's call, <strong>yours to keep permanently</strong></span></div>
+
+      <div class="cell"><span class="lbl">EMOS tools</span></div>
+      <div class="cell"><span class="val">Journo Outreach Checklist (a template) <strong>free for life</strong> · PressIQ and JournoCollabIQ <strong>free for 3 months</strong></span></div>
+
+      <div class="cell"><span class="lbl">Coverage quality</span></div>
+      <div class="cell"><span class="val">Real, editorially independent outlets only. No pay-to-play, no sponsored placements, no link farms</span></div>
+    </div>
+  </section>
+
+  <!-- ══ CONTENTS / TOC ══ -->
+  <nav class="toc no-print" aria-label="Contents">
+    <div class="toc-bar">
+      <span class="toc-kicker">Contents</span>
+      <button id="toggleAllBtn" class="toc-toggle" onclick="toggleAll()">Expand all</button>
+    </div>
+    <div class="toc-links">
+      <a href="#sec-glance"><b>★</b> At a glance</a>
+      <a href="#sec-01"><b>01</b> Pre, launch, post</a>
+      <a href="#sec-02"><b>02</b> Who does what</a>
+      <a href="#sec-03"><b>03</b> KPIs: commit vs target</a>
+      <a href="#sec-04"><b>04</b> What we mean by coverage</a>
+      <a href="#sec-05"><b>05</b> Why no fixed count</a>
+      <a href="#sec-06"><b>06</b> Keeping your team on track</a>
+      <a href="#sec-07"><b>07</b> Your pod</a>
+      <a href="#sec-08"><b>08</b> Platform stack</a>
+      <a href="#sec-terms"><b>¶</b> Key terms</a>
+    </div>
+  </nav>
+
+  <!-- ══ §01 PRE, LAUNCH, POST ══ -->
+  <details class="section sec" id="sec-01">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 01</span>
+          <span class="mast-label">Pre, launch, post</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">Foundation builds now over about six weeks; the two-week Sprint triggers on your date; post-launch is team-led. What we need from you is called out at each stage.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="three" style="margin-bottom:14px;">
+        <div class="pcard">
+          <div class="pband"><span>about 5 to 6 weeks, starts now, independent of your date</span></div>
+          <div class="pbody">
+            <h3 class="ptitle">Pre · Module 1 · Founder Authority Foundation</h3>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">Build your durable assets: web presence, 3 authority articles, complete press kit, and one linkable authority asset</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Train your pod on the pitching system and start live pitching</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Assemble the named list of 15 to 20 journalists</span></div>
+            </div>
+            <div class="need"><p><strong>What we need from you:</strong> confirm your pod, approve the article outlines and the asset concept, and send your bios, a headshot, and one proprietary data point we can build the asset around.</p></div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pband"><span>two weeks, triggered on your confirmed date</span></div>
+          <div class="pbody">
+            <h3 class="ptitle">Launch · Module 2 · Announcement Sprint</h3>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">Narrative and angle, embargo and exclusivity plan, outreach templates</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">We offer an exclusive to a priority outlet, then coordinate a wider release on the day</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Every asset is already in place before anything goes public</span></div>
+            </div>
+            <div class="need"><p><strong>What we need from you:</strong> confirm the announcement date (this locks the Sprint), approve the final narrative, and be reachable on launch day for interview requests.</p></div>
+          </div>
+        </div>
+        <div class="pcard">
+          <div class="pband"><span>the days right after launch</span></div>
+          <div class="pbody">
+            <h3 class="ptitle">Post · included in the Sprint, team-led</h3>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">Your team runs the follow-up cadence on the first placements, with us on call</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Each placement is put to work: a featured-in page for your search results, social proof, and openers for warm outreach</span></div>
+            </div>
+            <div class="need"><p><strong>What we need from you:</strong> your pod runs the follow-up.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-dark">
+        <p><strong>Eight weeks, two modules, one fee.</strong> Foundation (about six weeks) plus Sprint (two weeks), post-launch follow-up included.</p>
+      </div>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ §02 WHO DOES WHAT ══ -->
+  <details class="section sec" id="sec-02">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 02</span>
+          <span class="mast-label">Who does what</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">We build the durable assets, your pod runs the daily pitching, and the capability stays in-house.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="three who3" style="margin-bottom:14px;">
+        <div class="wcol">
+          <div class="whead">We run for you</div>
+          <div class="blist">
+            <div class="brow"><div class="bsq"></div><span class="btxt">Ghostwrite the 3 authority articles</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Build the complete press kit</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Produce the founder web refresh</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Research the named journalist list</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Scope the authority asset, whether a data asset, infographic, interactive map, calculator or quiz depending on what data is available, and shape it into a story angle; we recommend the format, you make the final call</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Design the narrative, embargo and exclusivity plan</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Lead strategy and the announcement, and deliver the training and tools</span></div>
+          </div>
+        </div>
+        <div class="wcol">
+          <div class="whead">We train and review · your team runs</div>
+          <div class="blist">
+            <div class="brow"><div class="bsq"></div><span class="btxt">Build the authority asset from our brief (we direct the concept and review each draft)</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Daily query filtering across the platform stack (we set up the saved searches and filters)</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Pitch writing and sending, scored by PressIQ</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">Tracker upkeep and reactive outreach off breaking news</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">The announcement send on your confirmed date</span></div>
+          </div>
+        </div>
+        <div class="wcol keep">
+          <div class="whead">Yours to keep, permanently</div>
+          <div class="blist">
+            <div class="brow"><div class="bsq"></div><span class="btxt">The pod and its trained skills</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">The pre-recorded training video library</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">The system, templates, and the 700+ site blacklist</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">The journalist relationships you build</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">The habit, the cadence, and the tracker</span></div>
+            <div class="brow"><div class="bsq"></div><span class="btxt">No retainer, and nothing leaves when the program ends</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <p>Filtering queries every day is your pod's job by design. That is how the capability stays inside your team after the program ends.</p>
+      </div>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ §03 KPIs ══ -->
+  <details class="section sec" id="sec-03" open>
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 03</span>
+          <span class="mast-label">KPIs: what we commit vs what we target</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">What we commit to, what we target, the coverage range, and the quality bar.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="ksheet">
+        <div class="ks-head">
+          <span>Metric</span>
+          <span>Type</span>
+          <span>Spec</span>
+        </div>
+
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Authority articles</strong></span>
+          <span class="ks-c2"><span class="tag tag-c">Committed</span></span>
+          <span class="ks-c3">3 under your name · 800 to 1,200 words · 2 revision rounds each · published on your channels. Publication guaranteed; outside pickup is upside.</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Authority asset</strong></span>
+          <span class="ks-c2"><span class="tag tag-c">Committed</span></span>
+          <span class="ks-c3">One linkable authority asset, a data asset, infographic, interactive map, calculator or quiz depending on what data is available. We recommend the format, you make the final call. Scoped by us and built by your pod under our direction and review. Data source confirmed with you at kickoff.</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Press kit</strong></span>
+          <span class="ks-c2"><span class="tag tag-c">Committed</span></span>
+          <span class="ks-c3">Complete: bios, boilerplate, fact sheet, founder Q&amp;A, past-coverage page</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Founder web presence</strong></span>
+          <span class="ks-c2"><span class="tag tag-c">Committed</span></span>
+          <span class="ks-c3">Clean, indexable bio page · authority articles linked · Person schema so Google and AI assistants (ChatGPT, Perplexity, AI Overviews) can cite you</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Named journalists</strong></span>
+          <span class="ks-c2"><span class="tag tag-c">Committed</span></span>
+          <span class="ks-c3">15 to 20 named for the announcement, from a working list of 40 to 60</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Announcement plan</strong></span>
+          <span class="ks-c2"><span class="tag tag-c">Committed</span></span>
+          <span class="ks-c3">Embargo and exclusivity plan plus 3 outreach templates</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Training + EMOS tools</strong></span>
+          <span class="ks-c2"><span class="tag tag-c">Committed</span></span>
+          <span class="ks-c3">Team trained on the full system through pre-recorded video lessons on the system, tools, and pitching mechanics, watched before each week's call so live time stays on teardowns and Q&amp;A. Yours to keep permanently. Journo Outreach Checklist (a template) free for life; PressIQ and JournoCollabIQ free for 3 months, beta-or-better, with a human reviewing the output</span>
+        </div>
+
+        <div class="ks-row">
+          <span class="ks-c1"><strong>First placement</strong></span>
+          <span class="ks-c2"><span class="tag tag-t">Targeted</span></span>
+          <span class="ks-c3">Live pitching from Week 2; first verified placement typically Week 3 to 4, sometimes sooner (publication is the editor's call)</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Earned coverage</strong><br /><span class="ks-sub">reactive · Wks 2 to 6</span></span>
+          <span class="ks-c2"><span class="tag tag-t">Targeted</span></span>
+          <span class="ks-c3"><strong>2 to 4 expected</strong> · 1 to 2 conservative · 5+ upside · any piece may be a quote, feature or byline</span>
+        </div>
+        <div class="ks-row">
+          <span class="ks-c1"><strong>Announcement coverage</strong><br /><span class="ks-sub">Wks 7 to 8 + tail</span></span>
+          <span class="ks-c2"><span class="tag tag-t">Targeted</span></span>
+          <span class="ks-c3"><strong>1 lead placement + 3 to 6 pickups expected</strong> · 2 to 3 pickups conservative (lead not assured) · 1 lead + 8 to 12 upside</span>
+        </div>
+      </div>
+
+      <div class="ks-legend">
+        <span><span class="tag tag-c">Committed</span> in our control, on a dated schedule.</span>
+        <span><span class="tag tag-t">Targeted</span> an editor's call, so a target, not a promise. Ranges are illustrative and set with you at kickoff.</span>
+      </div>
+
+      <div class="callout-dark" style="margin-top:18px;">
+        <p><strong>Expected across the eight weeks:</strong> 3 authority articles and one linkable asset that you own, plus roughly 6 to 11 pieces of earned coverage in total, in any mix of quotes, features and bylines (2 to 4 in the Foundation, and 1 lead placement plus 3 to 6 pickups at the announcement).</p>
+      </div>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ §04 WHAT WE MEAN BY COVERAGE ══ -->
+  <details class="section sec" id="sec-04">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 04</span>
+          <span class="mast-label">What we mean by coverage</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">Earned coverage means real, independent outlets writing about you or citing you. It can take three forms.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="three" style="margin-bottom:1px;">
+        <div class="dcard">
+          <div class="dsub">Most reliable · most of the range</div>
+          <h3 class="dterm">Quote or citation</h3>
+          <p class="ddesc">A journalist <span class="mark">quoting you as a source</span></p>
+        </div>
+        <div class="dcard">
+          <div class="dsub">A piece about you</div>
+          <h3 class="dterm">Feature</h3>
+          <p class="ddesc">A standalone piece <span class="mark">written about you</span></p>
+        </div>
+        <div class="dcard">
+          <div class="dsub">Upside, pursued when the opening is there</div>
+          <h3 class="dterm">Guest byline</h3>
+          <p class="ddesc">An article under your name in the outlet, <span class="mark">counts toward the same range</span></p>
+        </div>
+      </div>
+
+      <div class="two" style="margin-top:16px;">
+        <div class="cblock commit" style="border:none;">
+          <div class="chead"><span class="ct">How the range works</span></div>
+          <div class="cbody">
+            <div class="citem"><span class="cmark">✓</span><span class="citxt">We do not promise a form or a count</span></div>
+            <div class="citem"><span class="cmark">✓</span><span class="citxt"><span class="mark">Quotes and citations are the most reliable</span> and make up most of the range</span></div>
+            <div class="citem"><span class="cmark">✓</span><span class="citxt">A guest byline in a named outlet is upside we pursue when the opening is there, and it counts toward the same range</span></div>
+          </div>
+        </div>
+        <div class="cblock aim" style="border:none;">
+          <div class="chead"><span class="ct">The quality bar</span></div>
+          <div class="cbody">
+            <div class="citem"><span class="cmark">—</span><span class="citxt">The named outlets we aim for (Forbes, Business Insider, TechCrunch, Startup Grind, Sifted, Entrepreneur, and the proptech and home-services trades) are illustrative targets, not guarantees</span></div>
+            <div class="citem"><span class="cmark">—</span><span class="citxt">Every outlet is real and editorially independent. <span class="mark">No pay-to-play, no sponsored placements, no link farms</span></span></div>
+            <div class="citem"><span class="cmark">—</span><span class="citxt">Every target is screened against our 700+ site blacklist, so coverage builds your credibility rather than diluting it</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ §05 WHY NO FIXED COUNT ══ -->
+  <details class="section sec" id="sec-05">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 05</span>
+          <span class="mast-label">Why no fixed count</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">Guaranteed coverage is advertising, not earned media. Here's the honest reasoning, and how to lift the odds.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="two">
+        <div class="cblock commit" style="border:none;">
+          <div class="chead"><span class="ct">The honest reasoning</span></div>
+          <div class="cbody">
+            <div class="citem"><span class="cmark">✓</span><span class="citxt"><span class="mark">Guaranteed coverage is advertising, not earned media.</span></span></div>
+            <div class="citem"><span class="cmark">✓</span><span class="citxt">The closest analogy given your engineering background is chip yield: <span class="mark">no process promises one specific die passes</span></span></div>
+            <div class="citem"><span class="cmark">✓</span><span class="citxt">So you run the process that lifts the whole curve, timed to your peak news value</span></div>
+          </div>
+        </div>
+        <div class="cblock aim" style="border:none;">
+          <div class="chead"><span class="ct">To lift it</span></div>
+          <div class="cbody">
+            <div class="citem"><span class="cmark">—</span><span class="citxt"><span class="mark">Bring one proprietary data point</span> to kickoff</span></div>
+            <div class="citem"><span class="cmark">—</span><span class="citxt">It's what gives journalists a reason to write</span></div>
+            <div class="citem"><span class="cmark">—</span><span class="citxt">A data-led story often travels further than the exit figure</span></div>
+            <div class="citem"><span class="cmark">—</span><span class="citxt">Worth a quick conversation at kickoff</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ §06 CADENCE ══ -->
+  <details class="section sec" id="sec-06">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 06</span>
+          <span class="mast-label">How we keep your team on track</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">One weekly working hour: live pitch teardowns, scored reviews, and done-with-you support through your first placements.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="cadence">
+        <div class="crow">
+          <div class="cnum">1</div>
+          <div class="cbodyx">
+            <p class="ctxt" style="margin:0 0 9px;"><strong>One weekly working call, about an hour.</strong></p>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">Foundational training runs as <span class="mark">pre-recorded video lessons</span>, watched before each call so live time stays on teardowns and Q&amp;A</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Run by our program lead and me, depending on the topic</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Live pitch teardowns plus Q&amp;A in one session: real pitches on screen before they send, rebuilt together</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Next week's targets set before we close</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">We coach the quality of the work, with a second short call only in a peak week such as launch</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="crow">
+          <div class="cnum">2</div>
+          <div class="cbodyx">
+            <p class="ctxt" style="margin:0 0 9px;"><strong>I lead strategy and the announcement.</strong></p>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">I join the weekly call for direction and the higher-stakes reviews</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">I run the narrative, embargo, and exclusivity planning myself</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">You get my judgment on the decisions that move the needle, while your program lead carries the weekly execution coaching so it never stalls</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="crow">
+          <div class="cnum">3</div>
+          <div class="cbodyx">
+            <p class="ctxt" style="margin:0 0 9px;"><strong>Pitch review: scored, then human.</strong></p>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">PressIQ scores every pitch on mechanics, personalization, and strength before it goes out</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">We review each batch at the weekly call</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">The tool carries the per-pitch load so the human review stays sharp</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="crow">
+          <div class="cnum">4</div>
+          <div class="cbodyx">
+            <p class="ctxt" style="margin:0 0 9px;"><strong>Done-with-you through your first placements.</strong></p>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">We work alongside your pod on the first placements, up to five, within the program window</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">The method is proven on real wins before we step back</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="crow">
+          <div class="cnum">5</div>
+          <div class="cbodyx">
+            <p class="ctxt" style="margin:0 0 9px;"><strong>Async support between calls.</strong></p>
+            <div class="blist">
+              <div class="brow"><div class="bsq"></div><span class="btxt">Quick questions by email or Slack, answered within one to two business days</span></div>
+              <div class="brow"><div class="bsq"></div><span class="btxt">Anything substantive we work live at the weekly call, where you get a full teardown rather than a one-line reply</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ §07 THE POD YOU BRING ══ -->
+  <details class="section sec" id="sec-07">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 07</span>
+          <span class="mast-label">The pod you bring</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">Your throughput dial: a content owner plus one or two VAs, with our side alongside.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="blist">
+        <div class="brow"><div class="bsq"></div><span class="btxt"><strong>Floor:</strong> a content owner plus one dedicated VA, about 25 to 35 hours a week combined in the build weeks, tapering after</span></div>
+        <div class="brow"><div class="bsq"></div><span class="btxt"><strong>Stronger:</strong> a content lead managing two VAs, which roughly doubles throughput and shortens time to placement</span></div>
+        <div class="brow"><div class="bsq"></div><span class="btxt">VAs in the execution seats keep things moving if your senior people get pulled away</span></div>
+        <div class="brow"><div class="bsq"></div><span class="btxt">On our side: me plus our program lead</span></div>
+      </div>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ §08 THE PLATFORM STACK YOU OWN ══ -->
+  <details class="section sec" id="sec-08">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">§ 08</span>
+          <span class="mast-label">The platform stack you own</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">Source accounts your team holds and keeps, about $150 to $300 a month, not a fee to us.</div>
+    </summary>
+    <div class="sec-body">
+      <p class="para" style="margin-bottom:14px;">Industry-standard source platforms. Your team holds these accounts directly and keeps them after the program, so this is infrastructure you own:</p>
+
+      <div class="gtable" style="grid-template-columns:1.6fr 1fr;margin-bottom:14px;">
+        <div class="cell cell-h"><span class="ch-label">Platform</span></div>
+        <div class="cell cell-h"><span class="ch-label">Typical cost</span></div>
+
+        <div class="cell"><span class="lbl">Qwoted Pro</span></div>
+        <div class="cell"><span class="val">~$99/mo</span></div>
+
+        <div class="cell"><span class="lbl">Featured (per seat)</span></div>
+        <div class="cell"><span class="val">~$49/mo</span></div>
+
+        <div class="cell"><span class="lbl">Source of Sources · #JournoRequest</span></div>
+        <div class="cell"><span class="val">free</span></div>
+
+        <div class="cell"><span class="lbl">Optional proactive sequencing (Mailshake + 2 domains/inboxes)</span></div>
+        <div class="cell"><span class="val">~$60 to 130/mo, only if you scale outbound</span></div>
+      </div>
+
+      <p class="para" style="margin-bottom:0;">Roughly $150 to $300 a month total, confirmed at kickoff. That is under 1% of the international done-for-you route, and less than a single VA seat. Your three months of EMOS tools sit on top, free.</p>
+    </div>
+  </details>
+
+  <div class="divider"></div>
+
+  <!-- ══ KEY TERMS ══ -->
+  <details class="section sec" id="sec-terms">
+    <summary class="sec-sum">
+      <div class="mast">
+        <div class="mast-row">
+          <span class="mast-badge">¶</span>
+          <span class="mast-label">Key terms</span>
+          <div class="mast-rule"></div>
+          <span class="chev">▸</span>
+        </div>
+        <div class="mast-bar1"></div>
+        <div class="mast-bar2"></div>
+      </div>
+      <div class="teaser">Citation, byline, boilerplate, fact sheet, embargo, and schema, in plain English.</div>
+    </summary>
+    <div class="sec-body">
+      <div class="terms">
+        <div class="term">
+          <p class="tk">Citation (or quote)</p>
+          <p class="td">a journalist quotes you as an expert source inside their own article. This is the most reliable form of earned coverage, and what we target most through reactive and proactive pitching.</p>
+        </div>
+        <div class="term">
+          <p class="tk">Byline</p>
+          <p class="td">an article published under your name. Your 3 authority articles are bylined on your own channels (site, LinkedIn, Medium) and guaranteed. A guest byline in a third-party outlet is one possible form of earned coverage, pursued as upside, not promised.</p>
+        </div>
+        <div class="term">
+          <p class="tk">Boilerplate</p>
+          <p class="td">the standard about-us paragraph at the foot of every press release: about 100 words on who you are, what you do, and your key facts, written once and reused everywhere.</p>
+        </div>
+        <div class="term">
+          <p class="tk">Fact sheet</p>
+          <p class="td">a one-page reference a journalist can grab fast: founding date, what you do, team size, milestones, location, and leadership, in scannable bullets.</p>
+        </div>
+        <div class="term">
+          <p class="tk">Embargo</p>
+          <p class="td">you share the story with outlets ahead of time, on the agreement that none publish until an agreed date and hour. The defining feature is timing, not exclusivity: several outlets can hold it and all go live when you announce. An exclusive is the opposite, one outlet, first.</p>
+        </div>
+        <div class="term">
+          <p class="tk">Schema</p>
+          <p class="td">structured data, invisible code that states your key facts (name, role, links) in a format Google and AI assistants read directly, which helps you show up in knowledge panels and AI answers.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ══ FOOTER ══ -->
+  <footer class="footer">
+    <span class="f1">EMOS · SIA Enterprises · sia@syedirfanajmal.com</span>
+    <span class="f2">SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.) · Confidential, prepared privately for Sajid / ResourceX</span>
+  </footer>
+
+</div>
+
+<script>
+  (function(){
+    function secs(){ return Array.prototype.slice.call(document.querySelectorAll('details.sec')); }
+    function anyClosed(){ return secs().some(function(d){ return !d.open; }); }
+    function updateLabel(){
+      var b=document.getElementById('toggleAllBtn');
+      if(b) b.textContent = anyClosed() ? 'Expand all' : 'Collapse all';
+    }
+    window.toggleAll=function(){
+      var open=anyClosed();
+      secs().forEach(function(d){ d.open=open; });
+      updateLabel();
+    };
+    window.downloadPDF=function(){
+      secs().forEach(function(d){ d.open=true; });
+      updateLabel();
+      window.print();
+    };
+    function openAndScroll(id){
+      var el=document.getElementById(id);
+      if(!el) return;
+      if(el.tagName.toLowerCase()==='details') el.open=true;
+      updateLabel();
+      el.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    document.addEventListener('DOMContentLoaded', function(){
+      document.querySelectorAll('.toc-links a').forEach(function(a){
+        a.addEventListener('click', function(e){
+          e.preventDefault();
+          var id=a.getAttribute('href').slice(1);
+          openAndScroll(id);
+          if(history.replaceState) history.replaceState(null,'',a.getAttribute('href'));
+        });
+      });
+      secs().forEach(function(d){ d.addEventListener('toggle', updateLabel); });
+      updateLabel();
+    });
+    window.addEventListener('beforeprint', function(){ secs().forEach(function(d){ d.open=true; }); });
+  })();
+</script>
+</body>
+</html>

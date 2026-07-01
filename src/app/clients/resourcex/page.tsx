@@ -92,10 +92,16 @@ export default function ResourcexWorkspace() {
                     </Link>
                     <div style={{ fontFamily: GROT, fontSize: 9, color: INK55, marginTop: 6, letterSpacing: "0.08em" }}>Slide format · best on desktop</div>
                   </div>
+                  <div>
+                    <Link href="/clients/resourcex/scope-ownership-kpis-v5.html" target="_blank" className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: PAPER2, color: INK, border: `1.5px solid ${INK35}`, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
+                      Scope, ownership &amp; KPIs →
+                    </Link>
+                    <div style={{ fontFamily: GROT, fontSize: 9, color: INK55, marginTop: 6, letterSpacing: "0.08em" }}>Reference sheet · works on any device</div>
+                  </div>
                 </div>
               </div>
               <span className="rx-doc-tag" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, background: PAPER2, border: `1px solid ${INK35}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
-                PROPOSAL + DECK
+                PROPOSAL + DECK + KPIs
               </span>
             </div>
 
