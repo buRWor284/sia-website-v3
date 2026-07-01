@@ -85,7 +85,7 @@ function EmailForm({ onClose }: { onClose: () => void }) {
         <button onClick={onClose} style={{
           fontFamily: GROT, fontWeight: 700, fontSize: 9,
           letterSpacing: "0.12em", textTransform: "uppercase",
-          background: "none", border: "none", color: INK55,
+          background: "none", border: "none", color: "rgba(250,250,250,.55)",
           cursor: "pointer", padding: 0,
         }}>Dismiss</button>
       </div>
@@ -124,7 +124,7 @@ function EmailForm({ onClose }: { onClose: () => void }) {
       <button onClick={onClose} style={{
         fontFamily: GROT, fontWeight: 700, fontSize: 9,
         letterSpacing: "0.12em", textTransform: "uppercase",
-        background: "none", border: "none", color: INK55,
+        background: "none", border: "none", color: "rgba(250,250,250,.55)",
         cursor: "pointer", padding: "8px 4px",
       }}>✕</button>
       {status === "error" && (
@@ -146,6 +146,7 @@ export function CmoPilotProposal() {
         .cmo-book-btn:hover { background: ${YEL2} !important; }
         .action-dl:hover { opacity: 0.8 !important; }
         .action-email:hover { opacity: 0.8 !important; }
+        .rx-hub-link:hover { background: ${YEL} !important; color: ${INK} !important; border-color: ${YEL} !important; }
         @media print {
           .no-print { display: none !important; }
           body { background: white; }
@@ -165,10 +166,9 @@ export function CmoPilotProposal() {
           .cmo-footer  { padding: 12px 20px !important; }
         }
         @media (max-width: 480px) {
-          .masthead-center { display: none !important; }
           .timeline-grid   { grid-template-columns: 1fr !important; }
           .action-bar-inner { flex-direction: column; align-items: flex-start !important; gap: 10px !important; }
-          .action-back  { min-height: 44px; display: flex !important; align-items: center !important; }
+          .rx-hub-link  { min-height: 44px; display: flex !important; align-items: center !important; }
           .action-dl    { min-height: 44px !important; display: flex !important; align-items: center !important; }
           .action-email { min-height: 44px !important; display: flex !important; align-items: center !important; }
           .cmo-book-btn { min-height: 44px !important; display: flex !important; align-items: center !important; justify-content: center !important; box-sizing: border-box !important; }
@@ -177,23 +177,24 @@ export function CmoPilotProposal() {
 
       <div style={{ maxWidth: 900, margin: "0 auto", background: PAPER }}>
 
-        {/* ══ ACTION BAR ════════════════════════════════════════════════════ */}
+        {/* ══ ACTION BAR — combined nav + document actions ═════════════════ */}
         <div className="no-print action-bar" style={{
-          background: PAPER2,
-          borderBottom: `1px solid ${INK15}`,
-          padding: "10px 40px",
+          background: INK,
+          borderBottom: `3px solid ${YEL}`,
+          padding: "9px 40px",
         }}>
           <div className="action-bar-inner" style={{
             display: "flex", justifyContent: "space-between",
-            alignItems: "center", gap: 16,
+            alignItems: "center", gap: 16, flexWrap: "wrap",
           }}>
-            {/* Back link */}
-            <Link href="/clients/resourcex" className="action-back" style={{
+            <Link href="/clients/resourcex" className="rx-hub-link" style={{
               fontFamily: GROT, fontWeight: 700, fontSize: 9,
               letterSpacing: "0.14em", textTransform: "uppercase",
-              color: INK55, textDecoration: "none",
+              color: PAPER, textDecoration: "none", flexShrink: 0,
+              background: "rgba(250,250,250,.10)", border: "1px solid rgba(250,250,250,.30)",
+              borderRadius: 3, padding: "7px 13px", transition: "background 0.12s, color 0.12s",
             }}>
-              ← Workspace
+              ← Hub
             </Link>
 
             {/* Buttons */}
@@ -207,8 +208,8 @@ export function CmoPilotProposal() {
                   style={{
                     fontFamily: GROT, fontWeight: 700, fontSize: 9,
                     letterSpacing: "0.14em", textTransform: "uppercase",
-                    background: "none", color: INK,
-                    border: `1px solid ${INK35}`,
+                    background: "none", color: PAPER,
+                    border: `1px solid rgba(250,250,250,.30)`,
                     padding: "7px 14px", cursor: "pointer",
                     transition: "opacity 0.12s",
                   }}
@@ -221,7 +222,7 @@ export function CmoPilotProposal() {
                   style={{
                     fontFamily: GROT, fontWeight: 700, fontSize: 9,
                     letterSpacing: "0.14em", textTransform: "uppercase",
-                    background: INK, color: PAPER,
+                    background: YEL, color: INK,
                     border: "none",
                     padding: "8px 14px", cursor: "pointer",
                     transition: "opacity 0.12s",
@@ -233,24 +234,6 @@ export function CmoPilotProposal() {
             )}
           </div>
         </div>
-
-        {/* ══ MASTHEAD ══════════════════════════════════════════════════════ */}
-        <header style={{
-          borderBottom: `1px solid ${INK}`,
-          padding: "14px 40px",
-          display: "flex", alignItems: "center", gap: 10,
-        }}>
-          <div style={{
-            width: 28, height: 28, background: YEL,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontFamily: GROT, fontWeight: 900, fontSize: 11, color: INK,
-            flexShrink: 0,
-          }}>SIA</div>
-          <span style={{
-            fontFamily: GROT, fontWeight: 700, fontSize: 10,
-            letterSpacing: "0.22em", textTransform: "uppercase", color: INK55,
-          }}>Syed Irfan Ajmal</span>
-        </header>
 
         {/* ══ HERO 3-COLUMN GRID ════════════════════════════════════════════ */}
         <div className="hero-grid" style={{
@@ -555,20 +538,20 @@ export function CmoPilotProposal() {
           </div>
         </section>
 
-        {/* ══ FOOTER ════════════════════════════════════════════════════════ */}
-        <footer className="cmo-footer" style={{
-          borderTop: `1px solid ${INK}`,
+        {/* ══ FOOTER — standardized across all resourcex client pages ═══════ */}
+        <footer className="cmo-footer rx-footer-std" style={{
+          background: PAPER2,
+          borderTop: `1px solid ${INK15}`,
           padding: "14px 40px",
           display: "flex", justifyContent: "space-between",
           alignItems: "center", gap: 16, flexWrap: "wrap",
         }}>
-          {[
-            "© 2013 – 2026 Syed Irfan Ajmal",
-            "SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.)",
-            "sia@syedirfanajmal.com · www.syedirfanajmal.com",
-          ].map(text => (
-            <span key={text} style={{ fontFamily: GROT, fontWeight: 400, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>{text}</span>
-          ))}
+          <span style={{ fontFamily: GROT, fontWeight: 400, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
+            © 2013–2026 Syed Irfan Ajmal · SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.) · sia@syedirfanajmal.com
+          </span>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
+            <span style={{ color: YEL }}>●</span> CONFIDENTIAL · Prepared privately for Sajid Shah / Resourcex.io
+          </span>
         </footer>
 
       </div>

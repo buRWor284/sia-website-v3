@@ -39,15 +39,15 @@ export default function ResourcexWorkspace() {
       `}</style>
 
       {/* ── Hero — compact masthead ────────────────────────────────────── */}
-      <section className="rx-hero" style={{ background: INK, padding: "16px 40px 14px", borderBottom: "1px solid rgba(250,250,250,.10)", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+      <section className="rx-hero" style={{ background: INK, padding: "16px 40px 14px", borderBottom: "1px solid rgba(250,250,250,.10)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
         <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.18em", textTransform: "uppercase", color: INK, background: YEL, padding: "4px 8px", flexShrink: 0 }}>
           PRIVATE WORKSPACE
         </span>
-        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.1, letterSpacing: "-0.02em", color: PAPER, margin: 0 }}>
-          Sajid Shah &amp; <em>your SIA client workspace</em>
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.1, letterSpacing: "-0.02em", color: PAPER, margin: 0, textAlign: "center" }}>
+          Resourcex.io <em>/ Sajid Shah</em>
         </h1>
-        <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(250,250,250,.25)", border: "1px solid rgba(250,250,250,.12)", padding: "4px 9px", flexShrink: 0 }}>
-          Resourcex.io
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: PAPER, background: "rgba(250,250,250,.10)", border: "1px solid rgba(250,250,250,.35)", padding: "4px 9px", flexShrink: 0, textAlign: "right" }}>
+          By SIA Enterprises / Syed Irfan Ajmal
         </span>
       </section>
 
@@ -77,18 +77,18 @@ export default function ResourcexWorkspace() {
                   Founder PR + Acquisition Launch Strategy
                 </h2>
                 <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 24 }}>
-                  Your 8-week earned-media roadmap: press kit, authority content, journalist relationships, and an announcement sprint timed to your deal. We guide your team through every step and run it with you, so the capability stays in-house with no agency retainer. Available in two formats below.
+                  An 8-week earned-media roadmap: press kit, authority content, journalist relationships, and an announcement sprint timed to your deal. Delivered in-house with no agency retainer, using our EMOS (Earned Media OS) framework. Full write-up below, plus a slide deck and a quick-reference sheet for scope, ownership, and KPIs.
                 </p>
                 <div className="rx-cta-row" style={{ display: "flex", alignItems: "flex-start", gap: 16, flexWrap: "wrap" }}>
                   <div>
                     <Link href="/clients/resourcex/emos-proposal" className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: INK, color: PAPER, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
-                      Read the proposal →
+                      Read the EMOS proposal →
                     </Link>
                     <div style={{ fontFamily: GROT, fontSize: 9, color: INK55, marginTop: 6, letterSpacing: "0.08em" }}>Scrollable · works on any device</div>
                   </div>
                   <div>
                     <Link href="/clients/resourcex/emos-deck" target="_blank" className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: PAPER2, color: INK, border: `1.5px solid ${INK35}`, padding: "12px 20px", textDecoration: "none", transition: "opacity 0.12s ease" }}>
-                      View the deck →
+                      View the EMOS deck →
                     </Link>
                     <div style={{ fontFamily: GROT, fontSize: 9, color: INK55, marginTop: 6, letterSpacing: "0.08em" }}>Slide format · best on desktop</div>
                   </div>
@@ -127,15 +127,14 @@ export default function ResourcexWorkspace() {
         </div>
       </section>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
-      <footer className="rx-footer" style={{ background: PAPER2, borderTop: `1px solid ${INK15}`, padding: "20px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 24 }}>
-        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 400, fontSize: 12.5, lineHeight: 1.5, color: INK55, margin: 0, maxWidth: 520 }}>
-          All materials prepared exclusively for Sajid Shah / Resourcex.io. Built on the EMOS framework by Syed Irfan Ajmal, shared privately for review.
-        </p>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-          <div style={{ width: 8, height: 8, background: YEL, border: `1.5px solid ${INK}`, borderRadius: "50%" }} />
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55 }}>CONFIDENTIAL</span>
-        </div>
+      {/* ── Footer — standardized across all resourcex client pages ────────── */}
+      <footer className="rx-footer rx-footer-std" style={{ background: PAPER2, borderTop: `1px solid ${INK15}`, padding: "14px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: GROT, fontWeight: 400, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
+          © 2013–2026 Syed Irfan Ajmal · SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.) · sia@syedirfanajmal.com
+        </span>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
+          <span style={{ color: YEL }}>●</span> CONFIDENTIAL · Prepared privately for Sajid Shah / Resourcex.io
+        </span>
       </footer>
     </main>
   );

@@ -127,6 +127,7 @@ export function EmosProposal() {
         @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,700;1,6..72,400;1,6..72,600&display=swap');
         .ep-action-btn:hover { opacity: 0.8 !important; }
         .ep-deck-link:hover  { opacity: 0.8 !important; }
+        .ep-back-link:hover  { background: ${Y} !important; color: ${K} !important; border-color: ${Y} !important; }
         @media print {
           .ep-no-print { display: none !important; }
           body { background: white; }
@@ -164,9 +165,15 @@ export function EmosProposal() {
       <div style={{ maxWidth: 900, margin: "0 auto", background: P }}>
 
         {/* ══ ACTION BAR ════════════════════════════════════════════════════ */}
-        <div className="ep-action-bar ep-no-print" style={{ background: K, borderBottom: `1px solid ${OD12}`, padding: "10px 32px" }}>
+        <div className="ep-action-bar ep-no-print" style={{ background: K, borderBottom: `3px solid ${Y}`, padding: "9px 32px" }}>
           <div className="ep-action-inner" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-            <Link href="/clients/resourcex" className="ep-back-link" style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, textDecoration: "none" }}>← Workspace</Link>
+            <Link href="/clients/resourcex" className="ep-back-link" style={{
+              fontFamily: SANS, fontWeight: 700, fontSize: 9,
+              letterSpacing: "0.14em", textTransform: "uppercase",
+              color: OD, textDecoration: "none",
+              background: "rgba(236,232,218,.10)", border: `1px solid rgba(236,232,218,.30)`,
+              borderRadius: 3, padding: "7px 13px", transition: "background 0.12s, color 0.12s",
+            }}>← Hub</Link>
             {emailOpen ? (
               <EmailForm onClose={() => setEmailOpen(false)} />
             ) : (
@@ -636,12 +643,14 @@ export function EmosProposal() {
           </Link>
         </section>
 
-        {/* ══ FOOTER ════════════════════════════════════════════════════════ */}
-        <footer className="ep-footer" style={{ borderTop: `1px solid ${K18}`, padding: "14px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap", background: P2 }}>
+        {/* ══ FOOTER — standardized across all resourcex client pages ═══════ */}
+        <footer className="ep-footer rx-footer-std" style={{ borderTop: `1px solid ${K18}`, padding: "14px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap", background: P2 }}>
           <span style={{ fontFamily: SANS, fontWeight: 400, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: K55 }}>
-            © 2026 Syed Irfan Ajmal · SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.)
+            © 2013–2026 Syed Irfan Ajmal · SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.) · sia@syedirfanajmal.com
           </span>
-          <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: K55 }}>CONFIDENTIAL · PLEASE DO NOT CIRCULATE</span>
+          <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: K55 }}>
+            <span style={{ color: Y }}>●</span> CONFIDENTIAL · Prepared privately for Sajid Shah / Resourcex.io
+          </span>
         </footer>
 
       </div>

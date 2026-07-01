@@ -792,6 +792,7 @@ export function EmosDeck() {
         @import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600;1,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600&display=swap');
         .emos-nav-btn:hover { opacity: 0.8 !important; }
         .emos-action-btn:hover { opacity: 0.8 !important; }
+        .emos-back-link:hover { background: ${Y} !important; color: ${K} !important; border-color: ${Y} !important; }
         .emos-prev-btn:hover, .emos-next-btn:hover { background: rgba(245,197,24,.15) !important; }
         .emos-mobile-advisory { display: none; }
         @media (max-width: 640px) {
@@ -816,11 +817,17 @@ export function EmosDeck() {
 
       {/* ── Action bar ─────────────────────────────────────────────────────── */}
       <div className="emos-no-print" style={{
-        background: "#1e1c17", borderBottom: `1px solid ${OD12}`,
-        padding: "10px 32px", flexShrink: 0,
+        background: "#1e1c17", borderBottom: `3px solid ${Y}`,
+        padding: "9px 32px", flexShrink: 0,
       }}>
         <div className="emos-action-inner" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-          <Link href="/clients/resourcex" className="emos-back-link" style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, textDecoration: "none" }}>← Workspace</Link>
+          <Link href="/clients/resourcex" className="emos-back-link" style={{
+            fontFamily: SANS, fontWeight: 700, fontSize: 9,
+            letterSpacing: "0.14em", textTransform: "uppercase",
+            color: OD, textDecoration: "none",
+            background: "rgba(236,232,218,.10)", border: `1px solid rgba(236,232,218,.30)`,
+            borderRadius: 3, padding: "7px 13px", transition: "background 0.12s, color 0.12s",
+          }}>← Hub</Link>
           {emailOpen ? (
             <EmailForm onClose={() => setEmailOpen(false)} />
           ) : (

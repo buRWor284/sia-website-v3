@@ -28,9 +28,11 @@
   em{font-style:italic;}
 
   /* ── Action bar ── */
-  .action-bar{background:var(--K);border-bottom:1px solid var(--OD12);padding:9px 32px;}
-  .action-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;}
-  .back-link{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--OD45);text-decoration:none;}
+  .action-bar{background:var(--K);border-bottom:3px solid var(--Y);padding:8px 32px;}
+  .action-inner{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .back-group{display:flex;align-items:center;gap:8px;}
+  .back-link{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--OD);text-decoration:none;background:rgba(236,232,218,.10);border:1px solid rgba(236,232,218,.30);border-radius:3px;padding:7px 13px;transition:background .12s,color .12s;}
+  .back-link:hover{background:var(--Y);color:var(--K);border-color:var(--Y);}
   .btn-group{display:flex;align-items:center;gap:8px;}
   .btn-ghost{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--OD45);text-decoration:none;background:none;border:1px solid var(--OD25);padding:7px 14px;cursor:pointer;transition:opacity .12s;}
   .btn-solid{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;background:var(--Y);color:var(--K);border:none;padding:8px 14px;cursor:pointer;transition:opacity .12s;}
@@ -200,10 +202,11 @@
   .term .tk{font-family:var(--SANS);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--K);margin:0 0 7px;}
   .term .td{font-family:var(--SERIF);font-size:14px;line-height:1.55;color:var(--K70);margin:0;}
 
-  /* footer */
-  .footer{border-top:1px solid var(--K18);padding:14px 40px;display:flex;flex-direction:column;gap:5px;background:var(--P2);}
+  /* footer — standardized across all resourcex client pages */
+  .footer{border-top:1px solid var(--K18);padding:14px 40px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:var(--P2);}
   .footer .f1{font-family:var(--SANS);font-weight:700;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--K55);}
-  .footer .f2{font-family:var(--SANS);font-weight:400;font-size:10px;letter-spacing:.04em;color:var(--K55);}
+  .footer .f2{font-family:var(--SANS);font-weight:400;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--K55);}
+  .footer .dot{color:var(--Y);}
 
   /* responsive */
   @media (max-width:760px){
@@ -271,7 +274,9 @@
   <!-- ══ ACTION BAR ══ -->
   <div class="action-bar no-print">
     <div class="action-inner">
-      <a class="back-link" href="/clients/resourcex/emos-proposal">← Back to Proposal</a>
+      <div class="back-group">
+        <a class="back-link" href="/clients/resourcex">← Hub</a>
+      </div>
       <div class="btn-group">
         <a class="btn-ghost" href="/clients/resourcex/emos-proposal">▤ Full Proposal</a>
         <button class="btn-solid" onclick="downloadPDF()">↓ Download PDF</button>
@@ -877,10 +882,10 @@
     </div>
   </details>
 
-  <!-- ══ FOOTER ══ -->
+  <!-- ══ FOOTER — standardized across all resourcex client pages ══ -->
   <footer class="footer">
-    <span class="f1">EMOS · SIA Enterprises · sia@syedirfanajmal.com</span>
-    <span class="f2">SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.) · Confidential, prepared privately for Sajid / ResourceX</span>
+    <span class="f2">© 2013–2026 Syed Irfan Ajmal · SIA Enterprises Inc (WY C-Corp) · SIA Enterprises (PK Sole Prop.) · sia@syedirfanajmal.com</span>
+    <span class="f1"><span class="dot">●</span> CONFIDENTIAL · Prepared privately for Sajid Shah / Resourcex.io</span>
   </footer>
 
 </div>
