@@ -13,8 +13,6 @@ import {
   SectionMast,
 } from "@/components/bureau/primitives";
 import {
-  CAL_LINK,
-  CAL_URL,
   GROT,
   INK,
   INK15,
@@ -26,16 +24,10 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-// ─── Cal.com config strings ───────────────────────────────────────────────────
-
-const CAL_CFG_POPUP = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo" } });
-const CAL_CFG_AUDIT = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo-audit" } });
-const CAL_CFG_FINAL = JSON.stringify({ layout: "month_view", metadata: { source: "sia-fractional-cmo-final" } });
-
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const AVAILABILITY_SPECS: ReadonlyArray<[string, string]> = [
-  ["Engagement", "Monthly retainer · $5K–$10K"],
+  ["Engagement", "Monthly retainer · $5K-$10K"],
   ["Minimum",    "6 months"],
   ["Cadence",    "Weekly · 1-on-1 + team"],
   ["Geography",  "Remote · global"],
@@ -50,7 +42,7 @@ const SCOPE: ReadonlyArray<ScopeItem> = [
   { no: "02", t: "Weekly cadence",
     d: "A standing weekly call with the founder, plus a weekly sync with the team or vendors. Decisions get made on the call, not in week-long Slack threads." },
   { no: "03", t: "Execution through DMR.agency",
-    d: "You get the agency behind me without buying a second retainer. Digital PR, SEO, content production, link earning, journalist outreach — the full stack at agency rates inside the engagement." },
+    d: "You get the agency behind me without buying a second retainer. Digital PR, SEO, content production, link earning, journalist outreach: the full stack at agency rates inside the engagement." },
   { no: "04", t: "Hiring & vendor selection",
     d: "When it is time to add a content lead, a paid-media specialist, or a freelance designer, I run the brief, interview the candidates, and stand behind the hire." },
   { no: "05", t: "Investor & board narrative",
@@ -61,11 +53,11 @@ const SCOPE: ReadonlyArray<ScopeItem> = [
 
 type Stage = { range: string; t: string; d: string };
 const STAGES: ReadonlyArray<Stage> = [
-  { range: "Days 1–14",  t: "Intake & audit",
+  { range: "Days 1-14",  t: "Intake & audit",
     d: "Founder calls, sales call recordings, competitor scan, audit of every existing marketing asset and channel. You receive a written brief at the end of week two." },
-  { range: "Days 15–45", t: "First plan, first wins",
+  { range: "Days 15-45", t: "First plan, first wins",
     d: "A 60-day plan: positioning sharpening, ICP, two or three campaigns to ship immediately. We are looking for early signal, not perfection." },
-  { range: "Days 45–90", t: "System & cadence",
+  { range: "Days 45-90", t: "System & cadence",
     d: "The marketing function gets a real shape. Reporting cadence, content pipeline, PR calendar, the weekly rhythm. Hiring brief if a role needs filling." },
   { range: "Day 91+",    t: "Compound or part ways",
     d: "Quarterly review. We either renew, sharpen, or part ways. The retainer is monthly; you are never locked in past sixty days notice." },
@@ -128,7 +120,7 @@ const FAQS: ReadonlyArray<FAQItem> = [
   },
   {
     q: "How many hours a month do I actually get?",
-    a: "The engagement is built around outcomes, not hours. In practice, most months include a weekly founder call (45–60 min), a weekly team or vendor sync (30–45 min), and 6–10 hours of async work — strategy documents, briefs, reviews, and decisions. The right question is whether the marketing function is moving, not how many hours are logged.",
+    a: "The engagement is built around outcomes, not hours. In practice, most months include a weekly founder call (45-60 min), a weekly team or vendor sync (30-45 min), and 6-10 hours of async work: strategy documents, briefs, reviews, and decisions. The right question is whether the marketing function is moving, not how many hours are logged.",
   },
   {
     q: "What's the difference between this and hiring a marketing consultant?",
@@ -136,27 +128,27 @@ const FAQS: ReadonlyArray<FAQItem> = [
   },
   {
     q: "Do you work with non-tech companies?",
-    a: "Yes. The framework travels across categories — SaaS, professional services, e-commerce, and media all follow the same earned-media and positioning logic. Clients in this portfolio include a government web portal, a gig-economy platform, an addiction treatment centre, and an automotive chain. The pattern is consistent: earned authority, a content system, and a growth loop tied to the sales motion.",
+    a: "Yes. The framework travels across categories: SaaS, professional services, e-commerce, and media all follow the same earned-media and positioning logic. Clients in this portfolio include a government web portal, a gig-economy platform, an addiction treatment centre, and an automotive chain. The pattern is consistent: earned authority, a content system, and a growth loop tied to the sales motion.",
   },
   {
     q: "What happens when the engagement ends?",
-    a: "You keep everything. Strategy documents, brand guidelines, editorial calendar, vendor relationships, and every playbook we built together. I write a transition brief at the close and will introduce the person taking the seat after me if that is relevant. The goal is to leave the function stronger than I found it — not to create dependency.",
+    a: "You keep everything. Strategy documents, brand guidelines, editorial calendar, vendor relationships, and every playbook we built together. I write a transition brief at the close and will introduce the person taking the seat after me if that is relevant. The goal is to leave the function stronger than I found it, not to create dependency.",
   },
   {
     q: "Can we bring you on full-time later?",
-    a: "It happens occasionally, but it is rarely the right move. The fractional model works because you get senior marketing thinking without a senior salary. If the company grows to a stage where a full-time CMO is warranted, I will help you find and hire the right person — that is a natural part of the engagement.",
+    a: "It happens occasionally, but it is rarely the right move. The fractional model works because you get senior marketing thinking without a senior salary. If the company grows to a stage where a full-time CMO is warranted, I will help you find and hire the right person, and that is a natural part of the engagement.",
   },
   {
     q: "Do you take equity?",
-    a: "No. The retainer is cash-only. Equity complicates the relationship in ways that tend to hurt early-stage companies — it shifts incentives around spending, hiring, and timelines in subtle but real ways. A clean monthly retainer keeps incentives aligned: I need to produce visible results every month to keep the seat.",
+    a: "No. The retainer is cash-only. Equity complicates the relationship in ways that tend to hurt early-stage companies: it shifts incentives around spending, hiring, and timelines in subtle but real ways. A clean monthly retainer keeps incentives aligned: I need to produce visible results every month to keep the seat.",
   },
   {
     q: "How is this different from just hiring DMR.agency?",
-    a: "Hiring the agency gets you execution: PR, SEO, content, link earning. The Fractional CMO retainer adds the layer above that — strategy ownership, weekly decision-making with the founder, marketing function leadership, board and investor narratives, and hiring. I sit at the table and answer for the results. The agency work happens because I direct it, not instead of it.",
+    a: "Hiring the agency gets you execution: PR, SEO, content, link earning. The Fractional CMO retainer adds the layer above that: strategy ownership, weekly decision-making with the founder, marketing function leadership, board and investor narratives, and hiring. I sit at the table and answer for the results. The agency work happens because I direct it, not instead of it.",
   },
   {
     q: "Have you personally held the title of CMO before?",
-    a: "No, and I would rather say that directly than let the title imply something it hasn't earned. What I have is twenty years founding and running DMR.agency, the same team behind every result on this page, plus my own record of earned media, speaking, and public visibility. I'm not selling a corporate CMO résumé; I'm selling an operator who has actually shipped the campaigns and is willing to take the chair. If a former in-house CMO with a specific industry pedigree is the requirement, I'm not that person, and it's better you know now than three months in.",
+    a: "No, not the formal title, and I would rather say that directly than let \"CMO\" imply something it hasn't earned. Twenty-two years now, since 2004, as an entrepreneur and operator across sales, tech, and marketing roles and ventures in the US (remote), Sweden, Denmark, and Pakistan. The last thirteen of those years, since 2013, have been founding and running DMR.agency, the same team behind every result on this page. I'm not selling a corporate CMO résumé; I'm selling an operator who has actually shipped the campaigns and is willing to take the chair. If a former in-house CMO with a specific industry pedigree is the requirement, I'm not that person, and it's better you know now than three months in.",
   },
 ];
 
@@ -199,7 +191,7 @@ const Hero = () => (
       {/* Right: key differentiators */}
       <div className="res-hero-right">
         {[
-          { label: "$5K–$10K/mo",     sub: "vs. $300K+ full-time CMO" },
+          { label: "$5K-$10K/mo",     sub: "vs. $300K+ full-time CMO" },
           { label: "Weekly cadence",   sub: "Decisions in real time" },
           { label: "Agency included",  sub: "DMR.agency, no extra cost" },
         ].map(t => (
@@ -229,37 +221,51 @@ const CMOLead = () => (
           or founders without a marketing leader. I take the marketing chair at
           your table on a monthly retainer: strategy ownership, weekly cadence,
           agency-level execution through <strong>DMR.agency</strong>, and the
-          kind of decision-making that does not wait on a six-month CMO search.
+          kind of decision-making that does not wait on a six-month CMO
+          search. I show up weekly and own the marketing function end to end:
+          PR, SEO, content, lifecycle, paid, brand, hiring, and board updates
+          when it is time.
         </p>
-        <p style={{ marginTop: "0.7em" }}>
-          The role looks different at every company, but the shape is
-          consistent: I show up weekly, I own the marketing function end to
-          end, and I have a small team behind me that can execute almost
-          anything we decide on, almost immediately. PR, SEO, content,
-          lifecycle, paid, brand. Hiring and vendor selection when it is time.
-          Board and investor updates when those are needed.
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          That same operator&rsquo;s instinct is aimed at my own visibility
-          first: bylines and citations in Forbes, HBR, and Entrepreneur; a
-          keynote at the World Bank and Arabian Travel Market; workshops run
-          for SEMrush (NYSE: SEMR) and uHubs; and a podcast now in its fourth
-          season. It is the same earned-media playbook the retainer sells
-          &mdash; I use it on myself before I use it on you.
-        </p>
-        <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
-          Retainers run $5K&ndash;$10K a month depending on scope: a fraction
-          of the $300K+ a full-time CMO costs, with agency execution included
-          rather than billed on top. Six-month minimum, with sixty days&rsquo;
-          notice after the first quarter, so you are never locked in. If six
-          months is a bigger first step than you want to take today, the
-          $3,000 Marketing Leadership Audit below gets you the same intake and
-          a written brief without the retainer.
-        </p>
-        <p style={{ marginTop: "0.7em" }}>
-          The difference from hiring the agency directly: I own the marketing
-          function and answer for the strategy. You get a seat at the table,
-          not a vendor on a project brief.
+
+        <div style={{ marginTop: "1em", display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+          {[
+            "Operator since 2004",
+            "DMR.agency since 2013",
+            "Forbes · HBR · Entrepreneur",
+            "World Bank keynote",
+            "SEMrush workshop",
+            "Podcast · season 4",
+          ].map((tag) => (
+            <span
+              key={tag}
+              style={{
+                display: "inline-block",
+                padding: "5px 10px",
+                border: `1.5px solid ${INK}`,
+                fontFamily: GROT,
+                fontWeight: 700,
+                fontSize: 9.5,
+                letterSpacing: "0.10em",
+                textTransform: "uppercase",
+                color: INK70,
+              }}
+            >
+              {tag}
+            </span>
+          ))}
+          <a href="#leadership-audit" style={{ textDecoration: "none" }}>
+            <Pill size={9.5} ls="0.10em">$3K audit: smaller first step &rarr;</Pill>
+          </a>
+        </div>
+
+        <p style={{ marginTop: "0.9em", fontStyle: "italic" }}>
+          Retainers run $5K-$10K a month depending on scope, a fraction of the
+          $300K+ a full-time CMO costs, with agency execution included rather
+          than billed on top. Six-month minimum, sixty days notice after the
+          first quarter, so you are never locked in. The difference from
+          hiring the agency directly: I own the marketing function and answer
+          for the strategy, you get a seat at the table, not a vendor on a
+          project brief.
         </p>
       </div>
 
@@ -277,11 +283,9 @@ const CMOLead = () => (
             </Fragment>
           ))}
         </div>
-        {/* Cal.com popup CTA */}
+        {/* Same-page calendar CTA: scrolls to the embedded booking widget below instead of a popup or another page */}
         <a
-          href={CAL_URL}
-          data-cal-link={CAL_LINK}
-          data-cal-config={CAL_CFG_POPUP}
+          href="#cal-inline-fractional-cmo"
           style={{ marginTop: 22, display: "block", textAlign: "center", padding: "14px 18px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", cursor: "pointer" }}
         >
           Book a discovery call &rarr;
@@ -546,7 +550,7 @@ const Timeline = () => (
         }}
       >
         Most fractional engagements drift in the first quarter. To avoid that,
-        every retainer follows the same opening shape &mdash; and we
+        every retainer follows the same opening shape, and we
         calibrate from there.
       </p>
     </div>
@@ -1097,7 +1101,7 @@ const CMOInquiryForm = () => {
 // ─── §07 · Audit ─────────────────────────────────────────────────────────────
 
 const AuditSection = () => (
-  <section className="sx" style={{ background: PAPER2, paddingTop: 70, paddingBottom: 70, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
+  <section id="leadership-audit" className="sx" style={{ background: PAPER2, paddingTop: 70, paddingBottom: 70, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}`, scrollMarginTop: 112 }}>
     <SectionMast n="07" label="Not ready to commit · The smaller first step" />
     <div
       style={{
@@ -1125,9 +1129,7 @@ const AuditSection = () => (
         </p>
       </div>
       <a
-        href={CAL_URL}
-        data-cal-link={CAL_LINK}
-        data-cal-config={CAL_CFG_AUDIT}
+        href="#cal-inline-fractional-cmo"
         style={{
           display: "inline-block",
           padding: "18px 28px",
@@ -1143,7 +1145,7 @@ const AuditSection = () => (
           cursor: "pointer",
         }}
       >
-        Book the audit &rarr;
+        Book a call &rarr;
       </a>
     </div>
   </section>
@@ -1242,9 +1244,7 @@ const BookCall = () => (
           </p>
 
           <a
-            href={CAL_URL}
-            data-cal-link={CAL_LINK}
-            data-cal-config={CAL_CFG_FINAL}
+            href="#cal-inline-fractional-cmo"
             style={{
               display: "flex",
               alignItems: "center",
@@ -1319,7 +1319,7 @@ const BookCall = () => (
           <a href="/tools/signaliq" style={{ color: INK, textDecoration: "underline" }}>SignalIQ</a>
           {" "}or{" "}
           <a href="/tools/pressiq" style={{ color: INK, textDecoration: "underline" }}>PressIQ</a>
-          {" "}first — free tools that map your PR gaps. Bring the output to the call and skip the intake entirely. Full library at{" "}
+          {" "}first, free tools that map your PR gaps. Bring the output to the call and skip the intake entirely. Full library at{" "}
           <a href="/resources" style={{ color: INK, textDecoration: "underline" }}>the resources page</a>.
         </p>
       </div>
@@ -1327,7 +1327,7 @@ const BookCall = () => (
         <SCaps size={10} ls="0.18em" color={INK55}>Not ready for a full retainer?</SCaps>
         <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.6, fontStyle: "italic" }}>
           <a href="/emos" style={{ color: INK, textDecoration: "underline" }}>EMOS</a>
-          {" "}gives you the same system and playbooks to run earned media in-house — at a fraction of the cost. Most clients use it as a stepping stone.
+          {" "}gives you the same system and playbooks to run earned media in-house, at a fraction of the cost. Most clients use it as a stepping stone.
         </p>
       </div>
     </div>
@@ -1372,7 +1372,7 @@ const CalSection = () => (
       </h2>
       <div
         id="cal-inline-fractional-cmo"
-        style={{ minWidth: 320, height: 700, overflow: "scroll" }}
+        style={{ minWidth: 320, height: 700, overflow: "scroll", scrollMarginTop: 112 }}
       />
     </div>
   </section>

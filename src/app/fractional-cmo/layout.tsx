@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Fractional CMO · Strategic Marketing Leadership",
   description:
-    "Fractional CMO services for startups and scale-ups. GEO, SEO-PR strategy, earned media, and content marketing leadership — without the full-time overhead.",
+    "Fractional CMO services for startups and scale-ups. GEO, SEO-PR strategy, earned media, and content marketing leadership, without the full-time overhead.",
   openGraph: {
     title: "Fractional CMO · Strategic Marketing Leadership",
-    description: "Strategic marketing leadership for startups and scale-ups — GEO, SEO-PR, and earned media.",
+    description: "Strategic marketing leadership for startups and scale-ups: GEO, SEO-PR, and earned media.",
   },
   alternates: { canonical: "/fractional-cmo" },
 };
@@ -48,7 +48,7 @@ const FAQ = [
   },
   {
     q: "Have you personally held the title of CMO before?",
-    a: "No. What I bring instead is twenty years founding and running DMR.agency, the same team behind every result referenced on this page, plus my own record of earned media, speaking, and public visibility using the same playbook the retainer sells.",
+    a: "No, not the formal title. Twenty-two years since 2004 as an entrepreneur and operator across sales, tech, and marketing roles in the US, Sweden, Denmark, and Pakistan, the last thirteen years founding and running DMR.agency, the same team behind every result referenced on this page.",
   },
 ];
 

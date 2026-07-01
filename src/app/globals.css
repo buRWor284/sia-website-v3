@@ -45,6 +45,7 @@ html, body {
   background: var(--color-paper);
   overflow-x: clip; /* clip (not hidden) so position:sticky still works */
   max-width: 100vw;
+  scroll-behavior: smooth;
 }
 
 * { box-sizing: border-box; }
