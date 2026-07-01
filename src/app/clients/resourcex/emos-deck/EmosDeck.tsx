@@ -697,7 +697,9 @@ export function EmosDeck() {
   const [slide, setSlide] = useState(0);
   const [emailOpen, setEmailOpen] = useState(false);
   const [scale, setScale] = useState(1);
+  const [downloading, setDownloading] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
   const swipeStartX = useRef<number | null>(null);
   const swipeStartY = useRef<number | null>(null);
   const total = SLIDES.length;
@@ -750,6 +752,40 @@ export function EmosDeck() {
 
   const SlideComponent = SLIDES[slide];
 
+  /* export full deck as a real multi-page PDF (all 11 slides, not just current) */
+  const handleDownloadPdf = useCallback(async () => {
+    if (downloading) return;
+    setDownloading(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf"),
+      ]);
+      const container = exportRef.current;
+      if (!container) return;
+      const slideEls = Array.from(container.children) as HTMLElement[];
+      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [1920, 1080] });
+      for (let i = 0; i < slideEls.length; i++) {
+        const canvas = await html2canvas(slideEls[i], {
+          width: 1920,
+          height: 1080,
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#1a1712",
+        });
+        const img = canvas.toDataURL("image/jpeg", 0.92);
+        if (i > 0) pdf.addPage([1920, 1080], "landscape");
+        pdf.addImage(img, "JPEG", 0, 0, 1920, 1080);
+      }
+      pdf.save("EMOS-Private-Founders-Intensive.pdf");
+    } catch (err) {
+      console.error("PDF export failed:", err);
+      window.alert("Sorry — the PDF couldn't be generated. Please try again.");
+    } finally {
+      setDownloading(false);
+    }
+  }, [downloading]);
+
   return (
     <div style={{ background: "#14130f", height: "100vh", display: "flex", flexDirection: "column" }}>
       <style>{`
@@ -765,12 +801,6 @@ export function EmosDeck() {
           .emos-action-btn { min-height: 44px !important; display: flex !important; align-items: center !important; }
           .emos-dot { min-height: 32px !important; padding: 12px 4px !important; box-sizing: content-box !important; }
           .emos-nav-strip { padding: 4px 20px !important; }
-        }
-        @media print {
-          .emos-no-print { display: none !important; }
-          body { background: white !important; }
-          .emos-stage { height: auto !important; }
-          .emos-canvas { position: static !important; transform: none !important; width: 100% !important; height: auto !important; page-break-after: always !important; }
         }
       `}</style>
 
@@ -795,7 +825,7 @@ export function EmosDeck() {
             <EmailForm onClose={() => setEmailOpen(false)} />
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <button className="emos-action-btn" onClick={() => window.print()} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", background: "none", color: OD45, border: `1px solid rgba(236,232,218,.25)`, padding: "7px 14px", cursor: "pointer", transition: "opacity 0.12s" }}>↓ Download PDF</button>
+              <button className="emos-action-btn" onClick={handleDownloadPdf} disabled={downloading} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", background: "none", color: OD45, border: `1px solid rgba(236,232,218,.25)`, padding: "7px 14px", cursor: downloading ? "wait" : "pointer", opacity: downloading ? 0.6 : 1, transition: "opacity 0.12s" }}>{downloading ? "Generating…" : "↓ Download PDF"}</button>
               <button className="emos-action-btn" onClick={() => setEmailOpen(true)} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", background: Y, color: K, border: "none", padding: "8px 14px", cursor: "pointer", transition: "opacity 0.12s" }}>✉ Email PDF</button>
             </div>
           )}
@@ -840,6 +870,19 @@ export function EmosDeck() {
           />
         ))}
         <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", color: OD45, marginLeft: 16 }}>{slide + 1} / {total}</span>
+      </div>
+
+      {/* ── Hidden full-deck render used only for PDF export (all slides, full size, off-screen) ── */}
+      <div
+        ref={exportRef}
+        aria-hidden="true"
+        style={{ position: "fixed", top: 0, left: "-99999px", width: 1920, pointerEvents: "none" }}
+      >
+        {SLIDES.map((S, i) => (
+          <div key={i} style={{ width: 1920, height: 1080, overflow: "hidden" }}>
+            <S />
+          </div>
+        ))}
       </div>
     </div>
   );
