@@ -103,21 +103,21 @@ export function EmosProposal() {
   const PRESS_CARDS = [
     {
       outlet: "TechCrunch", outletColor: "#21ce56", outletBg: "#111010",
-      badge: "EXCLUSIVE", section: "STARTUPS · AI",
-      headline: "Building a 7-Figure AI Startup for the Best from the Global South",
-      byline: "By Sajid Shah · Founder, OnSense.io · June 2026",
+      badge: "QUOTED", section: "STARTUPS · AI",
+      headline: "How founders in the Global South are building 7-figure AI startups",
+      byline: "Sajid Shah, Founder of OnSense.io, quoted · June 2026",
     },
     {
       outlet: "Startup Grind Pakistan", outletColor: Y, outletBg: "#111010",
-      badge: null, section: "PODCAST · EP. 84",
-      headline: "Sajid Shah on Winning P@SHA ICT and Building OnSense From Karachi",
-      byline: "1h 12m · Also on Spotify · June 2026",
+      badge: "FEATURE, PODCAST", section: "PODCAST · EP. 84",
+      headline: "Sajid Shah on winning P@SHA ICT and building OnSense from Karachi",
+      byline: "Guest interview · also on Spotify · June 2026",
     },
     {
       outlet: "Entrepreneur", outletColor: "#fff", outletBg: "#cc1f24",
-      badge: null, section: "FOUNDERS · EARNED MEDIA",
-      headline: "How I Grew OnSense.io Without a PR Agency — and Got Press That Mattered",
-      byline: "By Sajid Shah · Contributing Writer · June 2026",
+      badge: "GUEST BYLINE", section: "FOUNDERS · EARNED MEDIA",
+      headline: "The bootstrapped playbook: growing without a PR agency",
+      byline: "By Sajid Shah · Founder, OnSense.io · June 2026",
     },
   ];
 
@@ -226,15 +226,17 @@ export function EmosProposal() {
             <div style={{ background: P, padding: "28px 32px" }}>
               <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 10, letterSpacing: "0.20em", textTransform: "uppercase", color: K55, marginBottom: 16 }}>WHAT THEY FIND TODAY</div>
               <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 16, lineHeight: 1.65, color: K70, margin: 0 }}>
-                A LinkedIn profile. Maybe a mention in a Pakistan tech roundup. No bylines. No press kit.
-                No owned narrative. The story of OnSense.io exists — it just isn&apos;t findable under your name.
+                A LinkedIn profile. Maybe a mention in a Pakistan tech roundup. No quotes in the outlets
+                that matter. No authored articles. No press kit. No owned narrative. The story of
+                OnSense.io exists, it just isn&apos;t findable under your name.
               </p>
             </div>
             <div style={{ background: K, padding: "28px 32px" }}>
               <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 10, letterSpacing: "0.20em", textTransform: "uppercase", color: OD45, marginBottom: 16 }}>WHAT THEY&apos;LL FIND AFTER</div>
               <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 16, lineHeight: 1.65, color: OD70, margin: 0 }}>
-                Bylined articles in outlets they recognise. A press kit ready to share. An Authority Asset
-                they can link to. A founder narrative that shows up before anyone has to ask.
+                Quotes in outlets they recognise. Articles under your name on your own channels: your
+                site, LinkedIn and Medium. A press kit ready to share. An Authority Asset they can link
+                to. A founder narrative that shows up before anyone has to ask.
               </p>
             </div>
           </div>
@@ -502,54 +504,70 @@ export function EmosProposal() {
             <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45 }}>EMOS · WHAT THIS COULD LOOK LIKE · ILLUSTRATIVE, NOT A GUARANTEE</span>
             <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 9, padding: "4px 10px", letterSpacing: "0.12em", flexShrink: 0 }}>ILLUSTRATIVE</span>
           </div>
-          <div style={{ height: 1, background: OD12, marginBottom: 24 }} />
+          <div style={{ height: 1, background: OD12, marginBottom: 16 }} />
+          <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.55, color: OD45, margin: "0 0 24px", maxWidth: 680 }}>
+            Illustrative forms of earned coverage: a quote, a feature, and a guest byline. None are guaranteed.
+            Your authored articles also run under your name on your own channels: your site, LinkedIn, Medium.
+          </p>
 
           <div className="ep-press-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
             {/* TechCrunch */}
-            <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column" }}>
+            <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
               <div style={{ padding: "12px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "3px solid #21ce56", flexShrink: 0 }}>
                 <span style={{ fontFamily: SANS, fontWeight: 900, fontSize: 18, color: "#21ce56" }}>TechCrunch</span>
-                <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 9, padding: "2px 7px" }}>EXCLUSIVE</span>
+                <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 9, padding: "2px 7px" }}>QUOTED</span>
               </div>
               <div style={{ padding: "16px 18px", flex: 1 }}>
                 <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "#21ce56", marginBottom: 12 }}>STARTUPS · AI</div>
                 <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, lineHeight: 1.25, color: OD, margin: "0 0 12px" }}>
-                  Building a 7-Figure AI Startup for the Best from the Global South
+                  How founders in the Global South are building 7-figure AI startups
                 </h3>
-                <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: OD45, margin: 0 }}>By Sajid Shah · Founder, OnSense.io · June 2026</p>
+                <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: OD45, margin: 0 }}>Sajid Shah, Founder of OnSense.io, quoted · June 2026</p>
+              </div>
+              <div style={{ height: 140, flexShrink: 0, overflow: "hidden" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/clients/sajid-headshot.jpg" alt="Sajid Shah" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 20%", display: "block" }} />
               </div>
             </div>
 
             {/* Startup Grind Pakistan */}
-            <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column" }}>
+            <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
               <div style={{ padding: "10px 18px", display: "flex", alignItems: "center", gap: 8, borderBottom: "1px solid rgba(255,255,255,.08)", flexShrink: 0 }}>
                 <span style={{ fontFamily: SANS, fontWeight: 900, fontSize: 17, color: Y }}>Startup Grind</span>
-                <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 9, padding: "2px 6px" }}>PAKISTAN</span>
+                <span style={{ background: Y, color: K, fontFamily: SANS, fontWeight: 700, fontSize: 9, padding: "2px 6px" }}>FEATURE, PODCAST</span>
+              </div>
+              <div style={{ height: 140, flexShrink: 0, overflow: "hidden" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/clients/sajid-event.jpg" alt="OnSense at tech event" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 55%", display: "block" }} />
               </div>
               <div style={{ padding: "16px 18px", flex: 1 }}>
                 <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: OD45, marginBottom: 10 }}>PODCAST · EP. 84</div>
                 <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, lineHeight: 1.25, color: OD, margin: "0 0 12px" }}>
-                  Sajid Shah on Winning P@SHA ICT and Building OnSense From Karachi
+                  Sajid Shah on winning P@SHA ICT and building OnSense from Karachi
                 </h3>
-                <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: OD45, margin: 0 }}>1h 12m · Also on Spotify · June 2026</p>
+                <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: OD45, margin: 0 }}>Guest interview · also on Spotify · June 2026</p>
               </div>
             </div>
 
             {/* Entrepreneur */}
-            <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column" }}>
+            <div style={{ background: "#111010", border: "1px solid rgba(255,255,255,.10)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
               <div style={{ background: "#cc1f24", padding: "12px 18px", flexShrink: 0 }}>
                 <span style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 22, color: "#fff" }}>Entrepreneur</span>
               </div>
               <div style={{ padding: "16px 18px", flex: 1 }}>
                 <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
-                  {["FOUNDERS", "EARNED MEDIA"].map(tag => (
+                  {["GUEST BYLINE", "FOUNDERS", "EARNED MEDIA"].map(tag => (
                     <span key={tag} style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.10em", color: "#e8a020", border: "1px solid rgba(232,160,32,.35)", padding: "2px 7px" }}>{tag}</span>
                   ))}
                 </div>
                 <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, lineHeight: 1.25, color: OD, margin: "0 0 12px" }}>
-                  How I Grew OnSense.io Without a PR Agency — and Got Press That Mattered
+                  The bootstrapped playbook: growing without a PR agency
                 </h3>
-                <p style={{ fontFamily: SANS, fontWeight: 400, fontSize: 12, color: OD45, margin: 0 }}>By Sajid Shah · Contributing Writer · June 2026</p>
+                <p style={{ fontFamily: SANS, fontWeight: 400, fontSize: 12, color: OD45, margin: 0 }}>By Sajid Shah · Founder, OnSense.io · June 2026</p>
+              </div>
+              <div style={{ height: 140, flexShrink: 0, overflow: "hidden" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/clients/sajid-pasha.jpg" alt="Sajid Shah at P@SHA ICT Awards" style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center 30%", display: "block" }} />
               </div>
             </div>
           </div>
