@@ -3,7 +3,7 @@
 import { Fragment, useState } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import Script from "next/script";
-import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
+import { Colophon, Subscriptions } from "@/components/bureau";
 import {
   DoubleRule,
   HRule,
@@ -184,7 +184,7 @@ const Hero = () => (
           For B2B and SaaS founders: marketing leadership led by digital PR, SEO, and content, the channels that compound. Strategy ownership, weekly cadence, and agency-level execution through DMR.agency.
         </p>
         <p style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>
-          20+ years · 50+ companies · 500+ earned placements
+          ~22 years · 50+ companies
         </p>
       </div>
 
@@ -259,13 +259,12 @@ const CMOLead = () => (
         </div>
 
         <p style={{ marginTop: "0.9em", fontStyle: "italic" }}>
-          Retainers run $5K-$10K a month depending on scope, a fraction of the
-          $300K+ a full-time CMO costs, with agency execution included rather
-          than billed on top. Six-month minimum, sixty days notice after the
-          first quarter, so you are never locked in. The difference from
-          hiring the agency directly: I own the marketing function and answer
-          for the strategy, you get a seat at the table, not a vendor on a
-          project brief.
+          Retainers run monthly, a fraction of the $300K+ a full-time CMO
+          costs, with agency execution included rather than billed on top.
+          Six-month minimum, sixty days notice after the first quarter, so you
+          are never locked in. The difference from hiring the agency
+          directly: I own the marketing function and answer for the strategy,
+          you get a seat at the table, not a vendor on a project brief.
         </p>
       </div>
 
@@ -1409,7 +1408,6 @@ export default function FractionalCMOPage() {
       <AuditSection />
       <BookCall />
       <CalSection />
-      <CTATicker />
       <Subscriptions sectionNumber="09" />
       <Colophon />
       <ScrollButtons />
