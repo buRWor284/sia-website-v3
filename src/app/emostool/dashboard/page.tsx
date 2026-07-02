@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { SignOutButton } from "@clerk/nextjs";
 import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase";
+import { ensureOrgProvisioned } from "@/lib/emos-provision";
 import { STAGE_META, STAGE_ORDER, STAGE_THRESHOLDS, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
 
@@ -51,15 +52,20 @@ export default async function EmosDashboardPage() {
 
   const isAdmin = ADMIN_EMAILS.some((e) => e.toLowerCase() === userEmail);
 
+  console.log(`[emos-dashboard] userId=${userId} email="${userEmail}" isAdmin=${isAdmin}`);
+
   if (!isAdmin) {
     const serviceDb = createSupabaseServiceClient();
-    const { data: sub } = await serviceDb
+    const { data: sub, error: subErr } = await serviceDb
       .from("stripe_subscriptions")
       .select("status")
       .ilike("email", userEmail)
       .maybeSingle();
 
+    console.log(`[emos-dashboard] subscription lookup for "${userEmail}": sub=${JSON.stringify(sub)} error=${subErr ? JSON.stringify(subErr) : "none"}`);
+
     if (!sub || sub.status !== "active") {
+      console.log(`[emos-dashboard] REDIRECTING to /emos/subscribe — no active subscription for "${userEmail}"`);
       redirect("/emos/subscribe");
     }
   }
@@ -67,10 +73,37 @@ export default async function EmosDashboardPage() {
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");
 
-  const { data: org } = await db
+  let { data: org, error: orgErr } = await db
     .from("organizations")
     .select("id, name, slug, emos_stage, plan")
     .single();
+
+  console.log(`[emos-dashboard] org lookup: org=${JSON.stringify(org)} error=${orgErr ? JSON.stringify(orgErr) : "none"}`);
+
+  // M4 (2026-07-02 review): lazy provisioning fallback. Users created before
+  // the Clerk webhook provisioned org/user rows (or whose webhook delivery
+  // failed) had no org — empty dashboard, every save failing. Provision on
+  // first load, then read back via the service client (the current JWT's RLS
+  // context may not see the fresh rows yet).
+  if (!org && userEmail) {
+    const prov = await ensureOrgProvisioned(userId, userEmail, user?.fullName ?? null);
+    if (prov.ok) {
+      const svc = createSupabaseServiceClient();
+      const { data: u } = await svc
+        .from("users")
+        .select("org_id")
+        .eq("clerk_user_id", userId)
+        .single();
+      if (u) {
+        const { data: freshOrg } = await svc
+          .from("organizations")
+          .select("id, name, slug, emos_stage, plan")
+          .eq("id", u.org_id)
+          .single();
+        org = freshOrg;
+      }
+    }
+  }
 
   const currentStage = (org?.emos_stage as EmosStage) ?? "signal";
   const stageIdx = STAGE_ORDER.indexOf(currentStage);
