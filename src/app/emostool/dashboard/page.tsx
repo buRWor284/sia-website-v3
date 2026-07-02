@@ -43,17 +43,20 @@ export default async function EmosDashboardPage() {
   // ── Subscription gate ─────────────────────────────────────────────────────
   // Non-admin users must have an active Stripe subscription to access the platform.
   const user      = await currentUser();
-  const userEmail =
+  const userEmail = (
     user?.primaryEmailAddress?.emailAddress ??
     user?.emailAddresses?.[0]?.emailAddress ??
-    "";
+    ""
+  ).toLowerCase().trim();
 
-  if (!ADMIN_EMAILS.includes(userEmail)) {
+  const isAdmin = ADMIN_EMAILS.some((e) => e.toLowerCase() === userEmail);
+
+  if (!isAdmin) {
     const serviceDb = createSupabaseServiceClient();
     const { data: sub } = await serviceDb
       .from("stripe_subscriptions")
       .select("status")
-      .eq("email", userEmail)
+      .ilike("email", userEmail)
       .maybeSingle();
 
     if (!sub || sub.status !== "active") {
