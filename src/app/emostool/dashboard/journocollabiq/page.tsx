@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  title: "JournoCollabIQ — EMOS Platform",
+  title: "JournoCollabIQ | EMOS Platform",
 };
 
 const PAPER  = "#f1ebde";

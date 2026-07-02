@@ -43,7 +43,10 @@ export default async function EmosDashboardPage() {
   // ── Subscription gate ─────────────────────────────────────────────────────
   // Non-admin users must have an active Stripe subscription to access the platform.
   const user      = await currentUser();
-  const userEmail = user?.emailAddresses?.[0]?.emailAddress ?? "";
+  const userEmail =
+    user?.primaryEmailAddress?.emailAddress ??
+    user?.emailAddresses?.[0]?.emailAddress ??
+    "";
 
   if (!ADMIN_EMAILS.includes(userEmail)) {
     const serviceDb = createSupabaseServiceClient();
@@ -162,7 +165,7 @@ export default async function EmosDashboardPage() {
         {/* ── Stage-advanced toast ─────────────────────────────────────────── */}
         {stageAdvanced && (
           <div style={{ background: GREEN, color: PAPER, padding: "10px 20px", marginBottom: 16, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase" }}>
-            ✓ Stage advanced — you are now on {STAGE_META[activeStage].label}
+            ✓ Stage advanced, you are now on {STAGE_META[activeStage].label}
           </div>
         )}
 
@@ -173,7 +176,7 @@ export default async function EmosDashboardPage() {
               You are here
             </div>
             <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 16, letterSpacing: ".10em", textTransform: "uppercase" }}>
-              Step {activeStageIdx + 1} — {STAGE_META[activeStage].label}
+              Step {activeStageIdx + 1} | {STAGE_META[activeStage].label}
             </div>
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.65)", marginTop: 4 }}>
               {STAGE_META[activeStage].threshold}

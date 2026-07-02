@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  title: "PressIQ — EMOS Platform",
+  title: "PressIQ | EMOS Platform",
 };
 
 const PAPER  = "#f1ebde";
@@ -51,7 +51,7 @@ export default async function PressIQPlatformPage({
   // Build query pre-fill: beat + journalist + asset context combined
   const beatPart      = params.beat       ? decodeURIComponent(params.beat)       : "";
   const journalistPart = params.journalist ? decodeURIComponent(params.journalist) : "";
-  const assetPart     = assetTitle        ? ` — pitching asset: ${assetTitle}`    : "";
+  const assetPart     = assetTitle        ? `, pitching asset: ${assetTitle}`    : "";
   const initialQuery  = beatPart
     ? `${beatPart}${assetPart}`
     : journalistPart

@@ -12,7 +12,7 @@
  * Honesty: scores are a lead/whitespace measure, never a prediction. Said so on-page.
  */
 
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, useId } from "react";
 import Link from "next/link";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { ToolHeader } from "@/components/tools/ToolHeader";
@@ -87,7 +87,7 @@ const SOURCES_DATA = [
     type: "Edit-Surge Detector",
     credibility: 0.65,
     badge: "Research signal",
-    benefit: "Edit-frequency spikes reveal when a topic is being actively researched en masse — often weeks before journalist interest peaks.",
+    benefit: "Edit-frequency spikes reveal when a topic is being actively researched en masse, often weeks before journalist interest peaks.",
     url: "https://en.wikipedia.org",
     role: "Signal",
   },
@@ -97,7 +97,7 @@ const SOURCES_DATA = [
     type: "Tech Forum Velocity",
     credibility: 0.55,
     badge: "Attention radar",
-    benefit: "Points and comment velocity reveals which tech, SaaS, and AI stories are gaining momentum right now — before they break wide.",
+    benefit: "Points and comment velocity reveals which tech, SaaS, and AI stories are gaining momentum right now, before they break wide.",
     url: "https://news.ycombinator.com",
     role: "Signal",
   },
@@ -121,10 +121,10 @@ const bandColor = (b: OppBand): string =>
 
 /** Tooltip copy explaining what each band means */
 const BAND_TOOLTIP: Record<OppBand, string> = {
-  hot:   "Hot lead — Score ≥ 80. High signal volume vs. thin press coverage. Pitch now before the press catches up.",
-  look:  "Worth a look — Score 60–79. A real gap exists. Investigate the angle before committing to a pitch.",
-  early: "Early — Score 40–59. Signal is emerging but coverage is still low. First-mover window if the story develops.",
-  noise: "Noise / late — Score < 40. Either very low signal or already heavily covered. Low opportunity.",
+  hot:   "Hot lead: Score ≥ 80. High signal volume vs. thin press coverage. Pitch now before the press catches up.",
+  look:  "Worth a look: Score 60-79. A real gap exists. Investigate the angle before committing to a pitch.",
+  early: "Early: Score 40-59. Signal is emerging but coverage is still low. First-mover window if the story develops.",
+  noise: "Noise / late: Score < 40. Either very low signal or already heavily covered. Low opportunity.",
 };
 
 // Source display labels
@@ -159,14 +159,14 @@ const SCAN_STATS: Array<{ big: string; rest: string; src: string }> = [
   { big: "53%",        rest: "of journalists say a pitch should include original data. Your scan builds it.", src: "Muck Rack 2024" },
   { big: "Weeks ahead", rest: "academic preprints can lead mainstream coverage. SignalIQ reads them first.", src: "arXiv" },
   { big: "92%",        rest: "of people trust earned media above every form of advertising.", src: "Nielsen" },
-  { big: "$15–40k/yr", rest: "what enterprise media tools cost. The signal layer they skip is free here.", src: "Prowly · Vendr" },
+  { big: "$15-40k/yr", rest: "what enterprise media tools cost. The signal layer they skip is free here.", src: "Prowly · Vendr" },
 ];
 
 // Headline proof bar on the landing view (counts up on scroll).
 const PROOF_STATS: Array<{ value: number; decimals?: number; suffix?: string; label: string; src: string }> = [
-  { value: 3.43, decimals: 2, suffix: "%", label: "average response rate to a cold PR pitch — the bar SignalIQ helps you clear", src: "Propel · State of PR" },
+  { value: 3.43, decimals: 2, suffix: "%", label: "average response rate to a cold PR pitch: the bar SignalIQ helps you clear", src: "Propel · State of PR" },
   { value: 73,                suffix: "%", label: "of pitches die for being off-beat; a signal-backed angle doesn't", src: "Muck Rack 2024" },
-  { value: 53,                suffix: "%", label: "of journalists want original data in a pitch — every scan builds it", src: "Muck Rack 2024" },
+  { value: 53,                suffix: "%", label: "of journalists want original data in a pitch: every scan builds it", src: "Muck Rack 2024" },
   { value: 92,                suffix: "%", label: "of people trust earned media above all advertising", src: "Nielsen" },
 ];
 
@@ -269,24 +269,35 @@ function ProofStrip() {
         ))}
       </div>
       <p className="siq-proof-foot">
-        Why timing beats volume in earned media — every figure links back to its source on the{" "}
+        Why timing beats volume in earned media: every figure links back to its source on the{" "}
         <Link href="/tools/signaliq/about" style={{ color: INK55, textDecoration: "underline", textDecorationColor: INK15 }}>methodology page</Link>.
       </p>
     </div>
   );
 }
 
-// ── info tooltip (click + hover, works on mobile) ─────────────────────────────
+// ── info tooltip (click + hover + keyboard focus, works on mobile) ────────────
 function InfoTooltip({ text, dark = false, width = 270 }: { text: React.ReactNode; dark?: boolean; width?: number }) {
   const [open, setOpen] = useState(false);
   const bg = dark ? PAPER : INK;
   const fg = dark ? INK : PAPER;
+  const tooltipId = `siq-tooltip-${useId()}`;
   return (
     <span style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}>
       <span
+        role="button"
+        tabIndex={0}
+        aria-describedby={open ? tooltipId : undefined}
+        aria-label="More information"
         onClick={(e) => { e.stopPropagation(); setOpen(v => !v); }}
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setOpen(false)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") { setOpen(false); (e.currentTarget as HTMLElement).blur(); }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(v => !v); }
+        }}
         style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           width: 14, height: 14, borderRadius: 999,
@@ -297,7 +308,7 @@ function InfoTooltip({ text, dark = false, width = 270 }: { text: React.ReactNod
         }}
       >i</span>
       {open && (
-        <span className="siq-tooltip-popup" style={{
+        <span id={tooltipId} role="tooltip" className="siq-tooltip-popup" style={{
           position: "absolute", top: "calc(100% + 8px)", left: "50%",
           transform: "translateX(-50%)",
           width, padding: "10px 13px",
@@ -334,6 +345,8 @@ function ScoreRing({
       width={size}
       height={size}
       viewBox="0 0 100 100"
+      role="img"
+      aria-label={`Score ${score} out of 100`}
       style={{ flexShrink: 0 }}
     >
       <circle cx="50" cy="50" r={r} fill="none" stroke={INK15} strokeWidth="5.5" />
@@ -428,7 +441,7 @@ function SourcesTicker() {
                 {src.name}
               </span>
               <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.72)" }}>
-                {src.benefit.split(" — ")[0]}
+                {src.benefit.split(". ")[0]}
               </span>
               <span className="siq-ticker-sep">·····</span>
             </span>
@@ -507,7 +520,7 @@ function SourcesSidebar() {
       </div>
       <div style={{ marginTop: 18, paddingTop: 12, borderTop: `1px solid ${INK15}` }}>
         <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, lineHeight: 1.5 }}>
-          All feeds are free, no API key. Every signal links back to its primary-source URL — click through to verify.
+          All feeds are free, no API key. Every signal links back to its primary-source URL: click through to verify.
         </p>
       </div>
     </aside>
@@ -588,12 +601,12 @@ function SIQHero() {
             </em>
           </h1>
           <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(15px,1.8vw,20px)", color: INK70, lineHeight: 1.5 }}>
-            {PRODUCT} scans open, primary-source data — filings, research, search and
-            forum surges — and ranks the stories rising fastest before the press has
+            {PRODUCT} scans open, primary-source data (filings, research, search and
+            forum surges) and ranks the stories rising fastest before the press has
             caught up. Then it drafts the pitch.
           </p>
           <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 13, color: INK55, lineHeight: 1.5 }}>
-            Early signals, not predictions — every opportunity links back to its source.
+            Early signals, not predictions: every opportunity links back to its source.
           </p>
         </div>
 
@@ -604,7 +617,7 @@ function SIQHero() {
             {([
               ["01", "Pick a beat", "Choose your industry vertical: SaaS, Fintech, Health, Climate, AI, or Cybersecurity."],
               ["02", "Scan the radar", "5 live open-data sources scanned in seconds. No API key. No cost."],
-              ["03", "Get an asset pack", "Pitch angle, data brief, journalist list — ready to send."],
+              ["03", "Get an asset pack", "Pitch angle, data brief, journalist list: ready to send."],
             ] as [string, string, string][]).map(([n, title, desc], idx, arr) => (
               <div key={n} style={{ display: "flex", gap: 14, paddingBottom: 16, marginBottom: idx < arr.length - 1 ? 16 : 0, borderBottom: idx < arr.length - 1 ? `1px solid ${INK15}` : "none" }}>
                 <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: YEL, lineHeight: 1, flexShrink: 0, letterSpacing: "-0.02em" }}>{n}</span>
@@ -763,7 +776,7 @@ function OppCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 className="siq-chip"
-                title="SEC EDGAR — no direct link for this result. Click to search EDGAR filings."
+                title="SEC EDGAR: no direct link for this result. Click to search EDGAR filings."
               >
                 {SRC_LABEL[s.source]} · sec.gov ↗
               </a>
@@ -782,7 +795,7 @@ function OppCard({
         </div>
         {opp.sensitive && (
           <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: RED, lineHeight: 1.4 }}>
-            Sensitive topic — handle with care.
+            Sensitive topic: handle with care.
           </p>
         )}
 
@@ -926,9 +939,9 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
             </div>
             {([
               ["01", "Score the pitch angle in PressIQ before you send it"],
-              ["02", "Use the journalist shortlist in this pack — personalise your outreach to each one before sending"],
+              ["02", "Use the journalist shortlist in this pack, personalise your outreach to each one before sending"],
               ["03", "Build the linkable asset using the EMOS playbook and cadence"],
-              ["04", "Run the full earned-media play — EMOS handles the system around it"],
+              ["04", "Run the full earned-media play: EMOS handles the system around it"],
             ] as [string, string][]).map(([n, t]) => (
               <div key={n} style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "baseline" }}>
                 <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: INK, lineHeight: 1, borderBottom: `2px solid ${YEL}`, paddingBottom: 1, flexShrink: 0 }}>{n}</span>
@@ -942,9 +955,9 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
               <SCaps size={9} ls="0.14em" color={INK55}>Going solo</SCaps>
             </div>
             {([
-              ["01", "Use the data brief as your research base — cite the numbers directly"],
+              ["01", "Use the data brief as your research base: cite the numbers directly"],
               ["02", "Personalise the pitch angle for each journalist and outlet you contact"],
-              ["03", "Build the linkable asset on your site before you pitch — give them something to link to"],
+              ["03", "Build the linkable asset on your site before you pitch: give them something to link to"],
               ["04", "Verify every caution and fact-check the sources before sending anything"],
             ] as [string, string][]).map(([n, t]) => (
               <div key={n} style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "baseline" }}>
@@ -1033,7 +1046,7 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
       {/* Cautions */}
       {pack.cautions.length > 0 && (
         <div style={{ marginTop: 16, padding: "14px 18px", border: `1px solid ${AMBER}`, background: hexA(AMBER, 0.08) }}>
-          <SCaps size={10} ls="0.16em" color={INK}>Before you pitch — verify</SCaps>
+          <SCaps size={10} ls="0.16em" color={INK}>Before you pitch: verify</SCaps>
           <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
             {pack.cautions.map((ct, i) => (
               <li key={i} style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.5, color: INK70, marginBottom: 4 }}>{ct}</li>
@@ -1049,7 +1062,7 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
           <Pill size={8} ls="0.14em">Live · Primary data</Pill>
         </div>
         <p style={{ margin: "8px 0 12px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.5 }}>
-          Every signal below comes from a live, open, primary-source database —
+          Every signal below comes from a live, open, primary-source database,
           not stale training data. No hallucinated citations. Click through to verify.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
@@ -1076,7 +1089,7 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
         <div>
           <SCaps size={10} ls="0.14em" color={INK}>Download full report</SCaps>
           <p style={{ margin: "4px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.4 }}>
-            PDF covering all three steps — opportunities, asset pack, sources, and pitch angle.
+            PDF covering all three steps: opportunities, asset pack, sources, and pitch angle.
             {!emailDone && " Requires newsletter subscription."}
           </p>
         </div>
@@ -1114,7 +1127,7 @@ function EmailGate({
   if (done) {
     return (
       <div style={{ padding: "14px 20px", border: `1px solid ${GREEN}`, background: hexA(GREEN, 0.06), fontFamily: SERIF, fontSize: 14.5, color: INK }}>
-        ✓ Unlocked — {EMAIL_SCANS} scans a month. Check your inbox.
+        ✓ Unlocked, {EMAIL_SCANS} scans a month. Check your inbox.
       </div>
     );
   }
@@ -1161,7 +1174,7 @@ function EmosCTA() {
           <span style={{ fontStyle: "italic", color: YEL }}>EMOS</span> turns it into coverage.
         </h3>
         <p style={{ margin: "14px 0 22px", fontFamily: SERIF, fontSize: 16, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 560 }}>
-          {PRODUCT} powers two of the three EMOS pillars —{" "}
+          {PRODUCT} powers two of the three EMOS pillars:{" "}
           <strong style={{ color: PAPER }}>Linkable Assets</strong> and{" "}
           <strong style={{ color: PAPER }}>Proactive PR</strong>. The full Earned Media
           Operating System gives your team the playbooks, journalist system, and
@@ -1215,7 +1228,7 @@ function DetailView({
           ← Back to the radar
         </button>
         <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
-          Step 3 — Asset pack
+          Step 3 | Asset pack
         </span>
       </div>
 
@@ -1243,7 +1256,7 @@ function DetailView({
               {opp.headline}
             </h2>
             <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK55, lineHeight: 1.4 }}>
-              A lead/whitespace score — how far ahead of the coverage you are.
+              A lead/whitespace score: how far ahead of the coverage you are.
               Not a prediction the story breaks.
             </p>
           </div>
@@ -1263,7 +1276,7 @@ function DetailView({
           <SectionMast n="02" label="Your asset pack" />
           {packing && (
             <div style={{ padding: 30, textAlign: "center", border: `1px solid ${INK15}`, background: PAPER2, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }}>
-              Building your asset pack — brief, pitch angle, and reporter desks…
+              Building your asset pack: brief, pitch angle, and reporter desks…
             </div>
           )}
           {packError && !packing && (
@@ -1361,7 +1374,7 @@ export default function SignalIQPage() {
       if (!res.ok) setScanError(data.error || "Scan failed.");
       else setScan(data as ScanResponse);
     } catch {
-      setScanError("Network error — please try again.");
+      setScanError("Network error. Please try again.");
     } finally {
       setScanning(false);
     }
@@ -1384,7 +1397,7 @@ export default function SignalIQPage() {
       if (res.ok) { setScan(data as ScanResponse); setUsedContext(true); }
       else setScanError(data.error || "Scan failed.");
     } catch {
-      setScanError("Network error — please try again.");
+      setScanError("Network error. Please try again.");
     } finally {
       setScanning(false);
       setOppsRevealed(true);
@@ -1407,7 +1420,7 @@ export default function SignalIQPage() {
       if (!res.ok) setPackError(data.error || "Could not generate the pack.");
       else setPack(data as AssetPack);
     } catch {
-      setPackError("Network error — please try again.");
+      setPackError("Network error. Please try again.");
     } finally {
       setPacking(false);
     }
@@ -1442,7 +1455,7 @@ export default function SignalIQPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch {
-      alert("Network error — could not generate PDF.");
+      alert("Network error. Could not generate PDF.");
     }
   }
 
@@ -1458,11 +1471,11 @@ export default function SignalIQPage() {
       const data = await res.json() as { success?: boolean; error?: string };
       if (!data.success) {
         // Surface the error so the user knows something went wrong
-        alert(data.error || "Subscription failed — please try again.");
+        alert(data.error || "Subscription failed. Please try again.");
         return;
       }
     } catch {
-      alert("Network error — please check your connection and try again.");
+      alert("Network error. Please check your connection and try again.");
       return;
     }
     document.cookie = `pp_tier=email; path=/; max-age=${60 * 60 * 24 * 365}`;
@@ -1546,12 +1559,12 @@ export default function SignalIQPage() {
             <div style={{ padding: "20px clamp(22px,5vw,56px) 0" }}>
               {step === 1 && (
                 <p style={{ margin: 0, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
-                  Step 1 — Pick your beat, then scan the live radar
+                  Step 1 | Pick your beat, then scan the live radar
                 </p>
               )}
               {step === 2 && (
                 <p style={{ margin: 0, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
-                  Step 2 — {oppsRevealed ? (usedContext ? "Results personalised to your startup" : "Full radar results") : "Tell us about your startup to personalise your results"}
+                  Step 2 | {oppsRevealed ? (usedContext ? "Results personalised to your startup" : "Full radar results") : "Tell us about your startup to personalise your results"}
                 </p>
               )}
             </div>
@@ -1582,24 +1595,24 @@ export default function SignalIQPage() {
                       {scan.opportunities.length} opportunities found
                     </h2>
                     <p style={{ margin: "0 0 14px", fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
-                      Add your startup context to personalise the results and your pitch pack — or skip straight to the full radar.
+                      Add your startup context to personalise the results and your pitch pack, or skip straight to the full radar.
                     </p>
                     <p style={{ margin: "0 0 24px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.5, borderLeft: `2px solid ${AMBER}`, paddingLeft: 10, textAlign: "left" }}>
-                      Works best when your company operates <em>inside</em> one of these beats — health, fintech, SaaS, AI, etc. — where SEC filings, research, and news actually discuss your space. Service or agency businesses (e.g. a marketing/PR firm) will see thinner results.
+                      Works best when your company operates <em>inside</em> one of these beats (health, fintech, SaaS, AI, etc.) where SEC filings, research, and news actually discuss your space. Service or agency businesses (e.g. a marketing/PR firm) will see thinner results.
                     </p>
                     <div style={{ textAlign: "left", marginBottom: 16 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
                         <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
                           Your startup context
                         </label>
-                        <InfoTooltip text="Your context now tailors the scan itself — we expand it into company-specific topics and score every result by how well it fits you, then personalise your pitch pack. Takes a few extra seconds." />
+                        <InfoTooltip text="Your context now tailors the scan itself: we expand it into company-specific topics and score every result by how well it fits you, then personalise your pitch pack. Takes a few extra seconds." />
                       </div>
                       <textarea
                         value={companyContext}
                         onChange={e => setCompanyContext(e.target.value)}
                         maxLength={400}
                         rows={4}
-                        placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital — we have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
+                        placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital. We have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
                         style={{
                           width: "100%", boxSizing: "border-box",
                           fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK,
@@ -1675,7 +1688,7 @@ export default function SignalIQPage() {
                     {!emailDone && (
                       <form onSubmit={unlockEmail} style={{ marginTop: 28, maxWidth: 1100, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
                         <span style={{ fontFamily: SERIF, fontSize: 14, color: INK70, flex: 1, minWidth: 220 }}>
-                          Get <strong>{EMAIL_SCANS} scans/month</strong> + the full earned-media playbook — free.
+                          Get <strong>{EMAIL_SCANS} scans/month</strong> + the full earned-media playbook, free.
                         </span>
                         <input
                           type="email"
@@ -1693,7 +1706,7 @@ export default function SignalIQPage() {
                     )}
                     {emailDone && (
                       <div style={{ marginTop: 28, maxWidth: 1100, padding: "12px 18px", border: `1px solid ${GREEN}`, background: hexA(GREEN, 0.05), fontFamily: SERIF, fontSize: 14, color: INK }}>
-                        ✓ Unlocked — {EMAIL_SCANS} scans/month. Check your inbox.
+                        ✓ Unlocked, {EMAIL_SCANS} scans/month. Check your inbox.
                       </div>
                     )}
                   </div>

@@ -78,10 +78,10 @@ const TABS: { id: Tab; label: string; short: string }[] = [
 
 // ── Dimensions ────────────────────────────────────────────────────────────────
 const DIMS = [
-  { key: "relevance",      name: "Answering the brief",  short: "Relevance",  mech: "Relevance — the #1 filter"           },
+  { key: "relevance",      name: "Answering the brief",  short: "Relevance",  mech: "Relevance: the #1 filter"            },
   { key: "objective",      name: "Mechanics",             short: "Mechanics",  mech: "Mechanics (Respondable-style)"        },
   { key: "checklist",      name: "SIA 7-Step Checklist", short: "SIA 7-step", mech: "SIA 7-step journo-outreach checklist" },
-  { key: "newsroomReady",  name: "Newsroom-ready",        short: "Newsroom",   mech: "Newsroom-ready — publishable material"},
+  { key: "newsroomReady",  name: "Newsroom-ready",        short: "Newsroom",   mech: "Newsroom-ready: publishable material" },
   { key: "storytelling",   name: "Storytelling",          short: "Story",      mech: "Narrative transportation"             },
   { key: "neuromarketing", name: "Neuromarketing",        short: "Neuro",      mech: "System 1 + original data"             },
   { key: "personalBrand",  name: "Personal brand",        short: "Personal",   mech: "E-E-A-T & the halo effect"            },
@@ -92,33 +92,33 @@ type DimKey = typeof DIMS[number]["key"];
 const TICKER = [
   { stat: "82%",   text: "of journalists delete off-beat pitches",        src: "Cision 2026"           },
   { stat: "88%",   text: "immediately delete pitches outside their beat", src: "Muck Rack 2026"        },
-  { stat: "3.03%", text: "response for 51–150 word pitches",              src: "Propel, 425k+ pitches" },
+  { stat: "3.03%", text: "response for 51-150 word pitches",              src: "Propel, 425k+ pitches" },
   { stat: "+36%",  text: "responses at 3rd-grade reading level",          src: "Boomerang, 40M emails" },
-  { stat: "+50%",  text: "reply likelihood with 1–3 questions",           src: "Boomerang"             },
+  { stat: "+50%",  text: "reply likelihood with 1-3 questions",           src: "Boomerang"             },
   { stat: "47%",   text: "want more data / research (#1 want)",           src: "Cision 2026"           },
   { stat: "58%",   text: "want source access for interviews",             src: "Muck Rack 2026"        },
   { stat: "53%",   text: "distrust generic, AI-sounding pitches",         src: "Cision 2026"           },
 ];
 
 // ── Sample content ────────────────────────────────────────────────────────────
-const SAMPLE_PITCH = `Subject: Re: Experts on the 4-day week — our 18-month data + [Stats + Examples]
+const SAMPLE_PITCH = `Subject: Re: Experts on the 4-day week - our 18-month data + [Stats + Examples]
 
 Hi Sarah,
 
-Loved your piece last month on remote-team burnout — the bit about "always-on guilt" mirrored exactly what we measured.
+Loved your piece last month on remote-team burnout. The bit about "always-on guilt" mirrored exactly what we measured.
 
 I'm Priya Raman, founder of Tilt (we run ops for 40 distributed startups). When we cut to a 4-day week 18 months ago, I was sure output would drop. It didn't. We tracked 1,200 employees across 12 companies: focused output rose 9%, and voluntary attrition fell by a third.
 
-The counterintuitive part: the win wasn't "rest." It was that a hard deadline forced teams to kill low-value meetings — 22% of recurring meetings vanished in the first month.
+The counterintuitive part: the win wasn't "rest." It was that a hard deadline forced teams to kill low-value meetings: 22% of recurring meetings vanished in the first month.
 
 Happy to share the raw dataset, or connect you with two founders who reversed course and went back to five days. Which would be more useful for your piece?
 
-Priya Raman — Founder, Tilt · tilt.example.com
+Priya Raman · Founder, Tilt · tilt.example.com
 priya@tilt.example.com · @priyaraman · linkedin.com/in/priyaraman`;
 
 const SAMPLE_QUERY = `Looking for founders / HR leads who have implemented a 4-day work week for at least 6 months and can share real performance data (retention, output, revenue impact). Especially interested in anyone who tried it and reversed course. For a feature in The Future of Work series. Requirements: Named source, must be available for a 15-min phone interview.`;
 
-const SAMPLE_BEAT = `Covers the future of work, distributed teams, and workplace productivity. Writes the Future of Work series — regular features on 4-day weeks, remote-first culture, async practices, and workforce wellbeing data. Prefers named sources with real numbers from their own operations, not thought-leader takes.`;
+const SAMPLE_BEAT = `Covers the future of work, distributed teams, and workplace productivity. Writes the Future of Work series: regular features on 4-day weeks, remote-first culture, async practices, and workforce wellbeing data. Prefers named sources with real numbers from their own operations, not thought-leader takes.`;
 
 const STORE_KEY = "sia.pressiq.v2";
 
@@ -265,7 +265,7 @@ function DimBlock({ dim, score, analysis, subSignals, evidenceKeys, expanded, on
             <span style={{ display: "inline-block", padding: "3px 8px", background: bandC, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 8 }}>
               {dim.mech}
             </span>
-            <div style={{ fontFamily: SERIF, fontSize: 13.5, fontStyle: "italic", color: ra(INK, 0.55), lineHeight: 1.6, marginBottom: 12 }}>{frame.text}</div>
+            <div style={{ fontFamily: SERIF, fontSize: 13.5, fontStyle: "italic", color: ra(INK, 0.62), lineHeight: 1.6, marginBottom: 12 }}>{frame.text}</div>
             {evKeys.map(k => <EvidCard key={k} figKey={k} />)}
           </div>
         </div>
@@ -377,14 +377,14 @@ function EmailGate({ show, onClose, onUnlock, result }: {
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, marginBottom: 6, letterSpacing: "-.015em" }}>
                 One step to download
               </div>
-              <p style={{ fontFamily: SERIF, fontSize: 14, color: ra(INK, 0.55), marginBottom: 18, lineHeight: 1.55 }}>
+              <p style={{ fontFamily: SERIF, fontSize: 14, color: ra(INK, 0.62), marginBottom: 18, lineHeight: 1.55 }}>
                 Join 2,400+ marketers. Real earned-media playbooks, zero filler. One or two emails a month.
               </p>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
                 style={{ width: "100%", padding: "10px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.6)}`, fontFamily: GROT, fontSize: 13, color: INK, outline: "none", borderRadius: 0, marginBottom: 12 }} />
               <label style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 14, cursor: "pointer" }}>
                 <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3, accentColor: INK }} />
-                <span style={{ fontFamily: GROT, fontSize: 11, color: ra(INK, 0.55), lineHeight: 1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
+                <span style={{ fontFamily: GROT, fontSize: 11, color: ra(INK, 0.62), lineHeight: 1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
               </label>
               {err && <div style={{ fontFamily: MONO, fontSize: 10, color: RED, marginBottom: 10 }}>{err}</div>}
               <button type="submit" style={{ width: "100%", padding: "13px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", border: "none", cursor: "pointer", borderRadius: 0 }}>
@@ -463,7 +463,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
           <em style={{ fontStyle: "italic" }}><span style={{ background: YEL, color: INK, padding: "0 .12em" }}>paste this in?</span></em>
         </h1>
         <p style={{ fontFamily: SERIF, fontSize: 15.5, color: ra(INK, 0.5), lineHeight: 1.6, maxWidth: 540, margin: 0 }}>
-          Score any PR pitch — standalone outreach or a query response — against a 32-point system and the EMOS framework. Get the three fixes that move it most. No signup for your first {FREE_LIMIT}.
+          Score any PR pitch (standalone outreach or a query response) against a 32-point system and the EMOS framework. Get the three fixes that move it most. No signup for your first {FREE_LIMIT}.
         </p>
       </div>
 
@@ -515,7 +515,7 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
         </div>
         <div style={{ opacity: tickOp, transition: "opacity .2s ease", minHeight: 78 }}>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 32, color: YEL, letterSpacing: "-.02em", lineHeight: 1, marginBottom: 6 }}>{t.stat}</div>
-          <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.55), lineHeight: 1.4, marginBottom: 4 }}>{t.text}</div>
+          <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.62), lineHeight: 1.4, marginBottom: 4 }}>{t.text}</div>
           <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{t.src}</div>
         </div>
       </div>
@@ -614,11 +614,11 @@ function PostScorePanel({
       const res = await fetch("/api/newsletter-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
       const data = await res.json() as { success?: boolean; error?: string };
       if (!data.success) {
-        alert(data.error || "Subscription failed — please try again.");
+        alert(data.error || "Subscription failed. Please try again.");
         return;
       }
     } catch {
-      alert("Network error — please check your connection and try again.");
+      alert("Network error. Please check your connection and try again.");
       return;
     }
     fetch("/api/pitch-tier", { method: "POST" }).catch(() => {});
@@ -650,7 +650,7 @@ function PostScorePanel({
               </span>
             </div>
             <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, color: INK, marginTop: 12, letterSpacing: "-.015em" }}>
-              {composite >= 85 ? "Placement-grade." : composite >= 65 ? "Competitive — tighten it." : composite >= 40 ? "Real material, missing the system." : "This will get ignored."}
+              {composite >= 85 ? "Placement-grade." : composite >= 65 ? "Competitive: tighten it." : composite >= 40 ? "Real material, missing the system." : "This will get ignored."}
             </div>
           </div>
 
@@ -659,7 +659,7 @@ function PostScorePanel({
             <div style={{ fontFamily: SERIF, fontSize: 12.5, fontStyle: "italic", color: ra(INK, 0.62), lineHeight: 1.5 }}>
               This is an estimate, not a verdict. Your Mechanics score is exact: the AI-judged dimensions can shift by about &plusmn;2 points if you re-score. PressIQ rates a pitch&rsquo;s quality and readiness, not your odds of placement.
             </div>
-            <button onClick={() => setShowCalc(v => !v)} aria-expanded={showCalc} style={{ marginTop: 8, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.55) }}>
+            <button onClick={() => setShowCalc(v => !v)} aria-expanded={showCalc} style={{ marginTop: 8, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.62) }}>
               {showCalc ? "− Hide how your score is calculated" : "+ How your score is calculated"}
             </button>
             {showCalc && (
@@ -682,7 +682,7 @@ function PostScorePanel({
                   ))}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12, borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 10 }}>
                   {TIERS.map(t => (
-                    <span key={t.badge} style={{ fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "#fff", background: t.color, padding: "2px 7px" }}>{t.min}&ndash;{t.max} {t.label}</span>
+                    <span key={t.badge} style={{ fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "#fff", background: t.color, padding: "2px 7px" }}>{t.min}-{t.max} {t.label}</span>
                   ))}
                 </div>
               </div>
@@ -692,14 +692,14 @@ function PostScorePanel({
           {!relevanceAssessed && (
             <div style={{ padding: "13px 16px", marginBottom: 18, border: `1px solid ${AMBER}`, background: "rgba(217,146,17,.05)", fontFamily: SERIF, fontSize: 13.5, fontStyle: "italic", color: ra(INK, 0.65) }}>
               {pitchMode === "query"
-                ? "Scored without the journalist’s query, so relevance — the #1 driver of placement — wasn’t assessed. Add it for a full score."
-                : "No journalist beat was provided, so relevance — the #1 driver of placement — wasn’t assessed. Add the journalist’s beat for a fuller score."}
+                ? "Scored without the journalist’s query, so relevance (the #1 driver of placement) wasn’t assessed. Add it for a full score."
+                : "No journalist beat was provided, so relevance (the #1 driver of placement) wasn’t assessed. Add the journalist’s beat for a fuller score."}
             </div>
           )}
           {authenticityRisk?.flagged && (
             <div style={{ padding: "13px 16px", marginBottom: 18, border: `1px solid ${RED}`, background: "rgba(193,74,50,.04)" }}>
               <span style={{ display: "inline-block", padding: "3px 8px", background: RED, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 6 }}>READS TEMPLATED</span>
-              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.65) }}>{authenticityRisk.note || "This reads like a template anyone could send. Add a first-hand detail or a number only you have — 53% of journalists distrust generic, AI-sounding pitches."}</div>
+              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.65) }}>{authenticityRisk.note || "This reads like a template anyone could send. Add a first-hand detail or a number only you have: 53% of journalists distrust generic, AI-sounding pitches."}</div>
             </div>
           )}
 
@@ -738,13 +738,13 @@ function PostScorePanel({
           {/* EMOS CTA */}
           <div style={{ background: INK, padding: 22, marginTop: 22 }}>
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: YEL, marginBottom: 8 }}>
-              {composite >= 85 ? "YOU'VE GOT THE STANDARD — NOW SCALE IT" : "WHERE THIS SCORING COMES FROM"}
+              {composite >= 85 ? "YOU'VE GOT THE STANDARD | NOW SCALE IT" : "WHERE THIS SCORING COMES FROM"}
             </div>
             <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: PAPER, letterSpacing: "-.01em", marginBottom: 6 }}>
               This tool scores one pitch.<br /><span style={{ color: YEL }}>EMOS builds the whole pipeline.</span>
             </div>
             <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(PAPER, 0.55), lineHeight: 1.6, marginBottom: 14 }}>
-              PressIQ runs on the EMOS framework — Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently.
+              PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently.
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <a href={composite >= 65 ? EMOS_APPLY : EMOS_URL} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", padding: "10px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", textDecoration: "none" }}>
@@ -784,18 +784,18 @@ function PostScorePanel({
         <div style={{ padding: "24px 32px 28px" }}>
           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 14 }}>THE RESEARCH BEHIND YOUR SCORE</div>
           <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 22 }}>
-            Scored against published journalist research — Cision &amp; Muck Rack 2026, Propel, Backlinko, Fractl, Boomerang. Open any dimension in the Breakdown tab to see the exact figures and sources.
+            Scored against published journalist research: Cision &amp; Muck Rack 2026, Propel, Backlinko, Fractl, Boomerang. Open any dimension in the Breakdown tab to see the exact figures and sources.
           </div>
           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>WHY THIS IS WORTH MORE IN 2026</div>
           <div style={{ fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 24 }}>
-            In an AI-answer world you don&rsquo;t just rank — you get cited. AI engines lean on earned media (Muck Rack: ~82% of AI citations come from earned coverage), and brand mentions out-predict backlinks for AI-Overview visibility ~3× (Ahrefs, 75k brands). The placement this pitch is aiming for is exactly that kind of citation — so a stronger pitch compounds.
+            In an AI-answer world you don&rsquo;t just rank: you get cited. AI engines lean on earned media (Muck Rack: ~82% of AI citations come from earned coverage), and brand mentions out-predict backlinks for AI-Overview visibility ~3× (Ahrefs, 75k brands). The placement this pitch is aiming for is exactly that kind of citation, so a stronger pitch compounds.
           </div>
 
           {/* PDF report download (value-add beyond design spec) */}
           <div style={{ padding: "16px 18px", border: `1px solid ${ra(INK, 0.15)}`, background: PAPER2, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
             <div>
               <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK, marginBottom: 3 }}>Download PDF report</div>
-              <div style={{ fontFamily: SERIF, fontSize: 13, color: ra(INK, 0.55) }}>Cover, score, top fixes, full breakdown, EMOS recommendations.</div>
+              <div style={{ fontFamily: SERIF, fontSize: 13, color: ra(INK, 0.62) }}>Cover, score, top fixes, full breakdown, EMOS recommendations.</div>
             </div>
             <button onClick={onDownload} style={{ padding: "10px 18px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", border: "none", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
               Download report ↓
@@ -806,14 +806,14 @@ function PostScorePanel({
           {!emailDone ? (
             <form onSubmit={unlockEmail} style={{ border: `1px solid ${INK}`, padding: 18 }}>
               <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 8 }}>UNLOCK {EMAIL_LIMIT} SCORES / MONTH</div>
-              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.55), marginBottom: 12 }}>Add your email to raise your monthly limit and get SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.</div>
+              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.62), marginBottom: 12 }}>Add your email to raise your monthly limit and get SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.</div>
               <div style={{ display: "flex", gap: 8 }}>
                 <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={{ flex: 1, padding: "9px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.18)}`, fontFamily: GROT, fontSize: 12, color: INK, outline: "none", borderRadius: 0 }} />
                 <button type="submit" style={{ padding: "9px 16px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>Unlock →</button>
               </div>
             </form>
           ) : (
-            <div style={{ fontFamily: SERIF, fontSize: 14.5, color: GREEN, fontWeight: 600 }}>✓ Unlocked — you now have {EMAIL_LIMIT} scores a month. Check your inbox.</div>
+            <div style={{ fontFamily: SERIF, fontSize: 14.5, color: GREEN, fontWeight: 600 }}>✓ Unlocked, you now have {EMAIL_LIMIT} scores a month. Check your inbox.</div>
           )}
 
           <TabNav current={tab} setTab={setTab} onReset={onReset} />
@@ -903,7 +903,7 @@ export default function PressIQPage() {
     return scoreLayer1(computeMetrics(pitch, subject));
   }, [pitch, subject]);
 
-  const subjectPlaceholder = resolveSubject(pitch, subject) || "Re: [Query] — …";
+  const subjectPlaceholder = resolveSubject(pitch, subject) || "Re: [Query] - …";
   const canAnalyze = pitch.trim().length >= 40 && view !== "loading" && (!TURNSTILE_SITE_KEY || !!turnstileToken);
 
   function loadSample() {
@@ -922,7 +922,7 @@ export default function PressIQPage() {
       const data = (await res.json()) as { error?: string } & ScoreResponse;
       if (!res.ok) { setError(data.error || "Something went wrong scoring your pitch."); setView("pre"); }
       else { setResult(data); setView("post"); setTimeout(() => rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }), 50); }
-    } catch { setError("Network error — please try again."); setView("pre"); }
+    } catch { setError("Network error. Please try again."); setView("pre"); }
     finally {
       // Turnstile tokens are single-use — refresh for the next submission.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1060,7 +1060,7 @@ export default function PressIQPage() {
     const vX = scoreX + 56;
     const vW = W - MR - vX;
     doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...iCREAM);
-    const headText = result.composite >= 85 ? "Placement-grade." : result.composite >= 65 ? "Competitive — tighten it." : result.composite >= 40 ? "Real material, missing the system." : "This will get ignored.";
+    const headText = result.composite >= 85 ? "Placement-grade." : result.composite >= 65 ? "Competitive: tighten it." : result.composite >= 40 ? "Real material, missing the system." : "This will get ignored.";
     const headLines = doc.splitTextToSize(headText, vW) as string[];
     headLines.forEach((l, i) => doc.text(l, vX, y + 6 + i * 8));
 
@@ -1153,7 +1153,7 @@ export default function PressIQPage() {
     doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...iINK);
     doc.text("The 3 Fixes That Move Your Score Most", ML, y); y += 4;
     doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iMID);
-    doc.text("Address these in order — each one compounds the next.", ML, y); y += 12;
+    doc.text("Address these in order: each one compounds the next.", ML, y); y += 12;
 
     result.topFixes.slice(0, 3).forEach((f, i) => {
       // Fix header bar (dark)
@@ -1257,7 +1257,7 @@ export default function PressIQPage() {
     // Body copy
     doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(140, 128, 110);
     const ctaBody = doc.splitTextToSize(
-      "The step-by-step system for founders who want press, partnerships, and authority — before their Series A.",
+      "The step-by-step system for founders who want press, partnerships, and authority before their Series A.",
       110
     ) as string[];
     ctaBody.forEach(l => { doc.text(l, W / 2, y, { align: "center" }); y += 6; });
@@ -1325,7 +1325,7 @@ export default function PressIQPage() {
             <div style={LSEC}>
               {pitchMode === "standalone" ? (
                 <>
-                  <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional — what topics they cover</span></span>
+                  <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, what topics they cover</span></span>
                   <textarea value={journalistBeat} onChange={e => setJournalistBeat(e.target.value)} placeholder="e.g. Covers SaaS growth, founder stories, and future-of-work data. Writes for TechCrunch’s Startups desk." className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
                 </>
               ) : (
@@ -1343,7 +1343,7 @@ export default function PressIQPage() {
             </div>
 
             <div style={LSEC}>
-              <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional — else parsed from line 1</span></span>
+              <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, else parsed from line 1</span></span>
               <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
             </div>
 

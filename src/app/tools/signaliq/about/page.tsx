@@ -28,9 +28,9 @@ const SOURCES = [
     role: "Signal",
     credibility: "95%",
     description:
-      "The SEC's full-text search index (EFTS). SignalIQ counts how many filings mention a keyword in the past 30 days and compares that to the prior-month baseline. A surge in disclosures — earnings calls, 10-Ks, 8-Ks — often precedes mainstream press coverage by days to weeks. Federal-grade, primary-source data: corporations are legally required to disclose material information, so these signals carry real weight.",
+      "The SEC's full-text search index (EFTS). SignalIQ counts how many filings mention a keyword in the past 30 days and compares that to the prior-month baseline. A surge in disclosures (earnings calls, 10-Ks, 8-Ks) often precedes mainstream press coverage by days to weeks. Federal-grade, primary-source data: corporations are legally required to disclose material information, so these signals carry real weight.",
     url: "https://efts.sec.gov/LATEST/search-index?q=%22keyword%22&dateRange=custom&startdt=2024-01-01",
-    commercial: "Public domain — US government data.",
+    commercial: "Public domain: US government data.",
   },
   {
     name: "GDELT DOC 2.0",
@@ -48,7 +48,7 @@ const SOURCES = [
     role: "Signal",
     credibility: "80%",
     description:
-      "arXiv hosts academic preprints — research papers published before peer review. Academic preprint volume is a leading indicator: research attention typically precedes mainstream press coverage by weeks to months. SignalIQ counts paper submissions matching a keyword in the past 30 days. We use only metadata (title, date, link) — not full paper text.",
+      "arXiv hosts academic preprints: research papers published before peer review. Academic preprint volume is a leading indicator: research attention typically precedes mainstream press coverage by weeks to months. SignalIQ counts paper submissions matching a keyword in the past 30 days. We use only metadata (title, date, link), not full paper text.",
     url: "https://arxiv.org",
     commercial: "Metadata freely reusable under arXiv's API terms.",
   },
@@ -58,7 +58,7 @@ const SOURCES = [
     role: "Signal",
     credibility: "65%",
     description:
-      "Wikipedia's pageview API returns daily view counts for any article. A spike in views — especially across a cluster of related articles — reveals when a topic is being actively researched en masse. This often precedes journalist interest by one to three weeks: journalists research before they write. We use view counts only, not article text.",
+      "Wikipedia's pageview API returns daily view counts for any article. A spike in views (especially across a cluster of related articles) reveals when a topic is being actively researched en masse. This often precedes journalist interest by one to three weeks: journalists research before they write. We use view counts only, not article text.",
     url: "https://wikimedia.org/api/rest_v1/",
     commercial: "View counts are open data, freely usable.",
   },
@@ -68,7 +68,7 @@ const SOURCES = [
     role: "Signal",
     credibility: "55%",
     description:
-      "Hacker News's Algolia API surfaces stories and comments. SignalIQ measures points and comment velocity for the top matching stories in the past 30 days. HN skews toward tech, SaaS, and AI stories — it's a leading indicator for those beats but a lagging one for health, climate, or fintech stories where the community is smaller.",
+      "Hacker News's Algolia API surfaces stories and comments. SignalIQ measures points and comment velocity for the top matching stories in the past 30 days. HN skews toward tech, SaaS, and AI stories: it's a leading indicator for those beats but a lagging one for health, climate, or fintech stories where the community is smaller.",
     url: "https://hn.algolia.com/api",
     commercial: "Free, public API.",
   },
@@ -76,10 +76,10 @@ const SOURCES = [
 
 const SCORE_COMPONENTS = [
   { label: "Coverage gap", weight: "30%", description: "How thin is press coverage relative to signal volume? The bigger the gap, the bigger the opportunity window. This is the heaviest component." },
-  { label: "Signal magnitude", weight: "25%", description: "Raw volume of signals — filing counts, paper counts, view counts. More signal = more real activity." },
+  { label: "Signal magnitude", weight: "25%", description: "Raw volume of signals: filing counts, paper counts, view counts. More signal = more real activity." },
   { label: "Signal velocity", weight: "22%", description: "How fast is signal volume growing? A topic with 10 filings this month vs. 1 last month scores higher than one steady at 50." },
   { label: "Beat fit", weight: "13%", description: "How closely does this topic match the selected beat? Prevents off-topic results from surfacing high." },
-  { label: "Source credibility", weight: "10%", description: "Weighted average credibility of the sources that returned data. An SEC-only signal scores higher than a Hacker News–only signal." },
+  { label: "Source credibility", weight: "10%", description: "Weighted average credibility of the sources that returned data. An SEC-only signal scores higher than a Hacker News-only signal." },
   { label: "Corroboration bonus", weight: "+15% max", description: "A bonus added when multiple independent sources confirm the same topic. One source is a hint. Three is a story." },
 ];
 
@@ -123,7 +123,7 @@ export default function SignalIQAboutPage() {
           </h1>
           <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(15px,1.8vw,19px)", color: INK70, lineHeight: 1.55, maxWidth: 680 }}>
             SignalIQ is a signal-vs-coverage gap detector, not a prediction engine.
-            It tells you where primary-source activity is surging ahead of press coverage —
+            It tells you where primary-source activity is surging ahead of press coverage,
             not whether a story will break. Every score links back to verifiable, open data.
           </p>
           <DoubleRule style={{ marginTop: 32 }} />
@@ -136,17 +136,17 @@ export default function SignalIQAboutPage() {
             A score of 85/100 does not mean there is an 85% chance this story breaks in the press.
             It means this topic has a high signal-to-coverage gap right now: a lot of activity in
             primary sources (filings, papers, forum discussion) relative to how much the press has
-            covered it. That gap is your opportunity window — not a guarantee.
+            covered it. That gap is your opportunity window, not a guarantee.
           </p>
           <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: INK70 }}>
             Stories with high scores can go nowhere. Stories with low scores can explode overnight.
-            SignalIQ gives you a data-backed starting point for your pitch research — the judgment
+            SignalIQ gives you a data-backed starting point for your pitch research. The judgment
             call of whether and how to pitch is still yours.
           </p>
           <div style={{ marginTop: 20, padding: "16px 20px", borderLeft: `3px solid ${AMBER}`, background: "rgba(217,146,17,.06)" }}>
             <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5, color: INK70, lineHeight: 1.55 }}>
               <strong style={{ fontStyle: "normal", color: INK }}>The badge = lead/whitespace score.</strong>{" "}
-              Think of it as &ldquo;how far ahead of the coverage are you?&rdquo; — not &ldquo;how likely is this to get covered?&rdquo;
+              Think of it as &ldquo;how far ahead of the coverage are you?&rdquo;, not &ldquo;how likely is this to get covered?&rdquo;
             </p>
           </div>
         </section>
@@ -158,7 +158,7 @@ export default function SignalIQAboutPage() {
           <SCaps size={10} ls="0.16em" color={INK}>§ 02 · Data sources</SCaps>
           <p style={{ margin: "12px 0 24px", fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: INK70 }}>
             SignalIQ pulls from five open, primary-source databases. No paywalled data. No stale training data.
-            Every signal links back to its original source — you can click through and verify anything we surface.
+            Every signal links back to its original source: you can click through and verify anything we surface.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             {SOURCES.map((src) => (
@@ -187,7 +187,7 @@ export default function SignalIQAboutPage() {
           <SCaps size={10} ls="0.16em" color={INK}>§ 03 · How the score is calculated</SCaps>
           <p style={{ margin: "12px 0 24px", fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: INK70 }}>
             The opportunity score is a weighted composite across five components, with a corroboration bonus
-            added on top. Coverage gap carries the most weight — the whole premise of SignalIQ is that the
+            added on top. Coverage gap carries the most weight: the whole premise of SignalIQ is that the
             gap between signal and press coverage is the opportunity.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${INK15}` }}>
@@ -201,7 +201,7 @@ export default function SignalIQAboutPage() {
           </div>
           <div style={{ marginTop: 20, padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
             <p style={{ margin: 0, fontFamily: MONO, fontSize: 9.5, letterSpacing: ".06em", color: INK55, lineHeight: 1.6 }}>
-              BAND THRESHOLDS: Hot lead ≥ 80 · Worth a look 60–79 · Early 40–59 · Noise / late &lt; 40
+              BAND THRESHOLDS: Hot lead ≥ 80 · Worth a look 60-79 · Early 40-59 · Noise / late &lt; 40
             </p>
           </div>
         </section>
@@ -210,7 +210,7 @@ export default function SignalIQAboutPage() {
 
         {/* § 04 — Beta transparency */}
         <section className="about-section">
-          <SCaps size={10} ls="0.16em" color={INK}>§ 04 · Beta transparency — what we hardcoded and why</SCaps>
+          <SCaps size={10} ls="0.16em" color={INK}>§ 04 · Beta transparency: what we hardcoded and why</SCaps>
 
           <p style={{ margin: "12px 0 16px", fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: INK70 }}>
             SignalIQ is in beta. Two deliberate limitations are worth knowing about.
@@ -232,7 +232,7 @@ export default function SignalIQAboutPage() {
             </p>
             <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55, lineHeight: 1.5 }}>
               This is intentional for the beta. In a future version, pro users will be able to add custom seeds
-              for their specific niche — but we wanted to ship a reliable, auditable tool first.
+              for their specific niche, but we wanted to ship a reliable, auditable tool first.
             </p>
           </div>
 
@@ -246,7 +246,7 @@ export default function SignalIQAboutPage() {
               companies most likely to use this tool.
             </p>
             <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: INK70 }}>
-              The &ldquo;right&rdquo; beat for your company is not always your industry — it&rsquo;s the vertical your
+              The &ldquo;right&rdquo; beat for your company is not always your industry: it&rsquo;s the vertical your
               target journalists cover. A health-AI company should usually choose Health &amp; Wellness,
               not SaaS, unless the story is about the startup itself (a funding round, a product launch
               to tech press).
@@ -260,7 +260,7 @@ export default function SignalIQAboutPage() {
 
           <div style={{ padding: "18px 20px", border: `1px solid ${INK15}`, background: PAPER2 }}>
             <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".08em", textTransform: "uppercase", color: INK, marginBottom: 10 }}>
-              Your startup context — what it does and doesn&rsquo;t do
+              Your startup context: what it does and doesn&rsquo;t do
             </div>
             <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: INK70 }}>
               Adding your startup context re-ranks the scan results by keyword relevance to your description,
@@ -268,7 +268,7 @@ export default function SignalIQAboutPage() {
             </p>
             <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55, lineHeight: 1.5 }}>
               We deliberately kept the scan beat-wide. A tool that only surfaces topics directly matching
-              your company description would miss adjacent opportunities — often the most interesting ones.
+              your company description would miss adjacent opportunities, often the most interesting ones.
               The market radar should be broader than your current pitch list.
             </p>
           </div>

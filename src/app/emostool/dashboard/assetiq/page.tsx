@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
-  title: "AssetIQ — EMOS Platform",
+  title: "AssetIQ | EMOS Platform",
 };
 
 const PAPER  = "#f1ebde";

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "PartnerCollabIQ · Partnership Intelligence Tool",
   description:
     "AI-powered partnership intelligence. Discover non-obvious co-marketing partners, " +
-    "score them, generate personalised outreach, and export a 90-day campaign brief — in minutes.",
+    "score them, generate personalised outreach, and export a 90-day campaign brief in minutes.",
   openGraph: {
     title: "PartnerCollabIQ · Partnership Intelligence",
     description:
@@ -30,7 +30,7 @@ export default function PartnerCollabIQPage() {
       <h1 style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" }}>
         PartnerCollabIQ - Partnership Intelligence Tool
       </h1>
-      <ToolHeader toolName="PartnerCollabIQ — Partnership Intelligence" />
+      <ToolHeader toolName="PartnerCollabIQ: Partnership Intelligence" />
       <PartnerCollabIQ toolHeaderHeight={TOOL_HEADER_H} />
     </>
   );
