@@ -137,6 +137,13 @@ const SRC_LABEL: Record<string, string> = {
 };
 
 const EMOS_URL = "/emos";
+
+// Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered
+// and scanning works exactly as before. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY (+ the
+// server TURNSTILE_SECRET_KEY) to enforce the human check end-to-end.
+// (H7, 2026-07-02 review: SignalIQ previously had no Turnstile wiring at all, so
+// enabling the secret for PressIQ would have 403'd every SignalIQ user.)
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const EMOS_APPLY = "/emos/apply";
 
 // ── stats: the value/effort behind SignalIQ ──────────────────────────────────
@@ -1316,6 +1323,48 @@ export default function SignalIQPage() {
   const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
 
+  // Cloudflare Turnstile (same managed-widget pattern as PressIQ)
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY) return;
+    const render = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
+      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: "dark",
+        callback: (token: string) => setTurnstileToken(token),
+        "expired-callback": () => setTurnstileToken(""),
+        "error-callback": () => setTurnstileToken(""),
+      });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((window as any).turnstile) { render(); return; }
+    const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
+    if (!s) {
+      s = document.createElement("script");
+      s.src = SRC; s.async = true; s.defer = true;
+      document.head.appendChild(s);
+    }
+    s.addEventListener("load", render);
+    return () => { s?.removeEventListener("load", render); };
+  }, []);
+
+  // Turnstile tokens are single-use — refresh after every API call.
+  function resetTurnstile() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
+      w.turnstile.reset(turnstileWidgetId.current);
+      setTurnstileToken("");
+    }
+  }
+
   // Step 0: intro/landing screen (click-through before step 1)
   const [intro, setIntro] = useState(true);
   // Step 2: opportunities hidden until user adds context or clicks skip
@@ -1368,7 +1417,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat }),
+        body: JSON.stringify({ beat, turnstileToken: turnstileToken || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setScanError(data.error || "Scan failed.");
@@ -1377,6 +1426,7 @@ export default function SignalIQPage() {
       setScanError("Network error. Please try again.");
     } finally {
       setScanning(false);
+      resetTurnstile();
     }
   }
 
@@ -1391,7 +1441,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat, companyContext: companyContext.trim() }),
+        body: JSON.stringify({ beat, companyContext: companyContext.trim(), turnstileToken: turnstileToken || undefined }),
       });
       const data = await res.json();
       if (res.ok) { setScan(data as ScanResponse); setUsedContext(true); }
@@ -1401,6 +1451,7 @@ export default function SignalIQPage() {
     } finally {
       setScanning(false);
       setOppsRevealed(true);
+      resetTurnstile();
     }
   }
 
@@ -1414,7 +1465,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/pack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ opportunity: opp, store: true, companyContext: companyContext.trim() || undefined }),
+        body: JSON.stringify({ opportunity: opp, store: true, companyContext: companyContext.trim() || undefined, turnstileToken: turnstileToken || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setPackError(data.error || "Could not generate the pack.");
@@ -1423,6 +1474,7 @@ export default function SignalIQPage() {
       setPackError("Network error. Please try again.");
     } finally {
       setPacking(false);
+      resetTurnstile();
     }
   }
 
@@ -1478,7 +1530,13 @@ export default function SignalIQPage() {
       alert("Network error. Please check your connection and try again.");
       return;
     }
-    document.cookie = `pp_tier=email; path=/; max-age=${60 * 60 * 24 * 365}`;
+    // H7 (2026-07-02 review): the tier cookie is HMAC-signed server-side.
+    // Setting it via document.cookie produced an unsigned value that fails
+    // verifyTier() once PITCH_TIER_SECRET is set — use the same endpoint
+    // PressIQ uses, which sets the signed, httpOnly cookie.
+    try {
+      await fetch("/api/pitch-tier", { method: "POST" });
+    } catch { /* non-fatal — the subscribe succeeded; tier just won't unlock this session */ }
     setEmailDone(true);
   }
 
@@ -1569,6 +1627,13 @@ export default function SignalIQPage() {
               )}
             </div>
             <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); setOppsRevealed(false); }} onScan={runScan} scanning={scanning} />
+
+            {/* Cloudflare Turnstile human check — renders only when the site key is set */}
+            {TURNSTILE_SITE_KEY && (
+              <div style={{ display: "flex", justifyContent: "center", marginTop: 14 }}>
+                <div ref={turnstileRef} />
+              </div>
+            )}
 
             {scanning && <ScanLoader />}
 

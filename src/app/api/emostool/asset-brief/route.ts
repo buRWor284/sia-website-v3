@@ -6,8 +6,8 @@
  *
  * POST body: { assetType, title, signalHeadline?, assetIdea?, dataBrief?, pitchAngle?, keyword? }
  */
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { requireEmosAccess } from "@/lib/emos-guard";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -63,8 +63,8 @@ Write in direct, practical prose. No fluff. Length: 500–700 words total.`;
 }
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  const guard = await requireEmosAccess({ rateLimitKey: "asset-brief" });
+  if (!guard.ok) return guard.res;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "ANTHROPIC_API_KEY not set." }, { status: 500 });

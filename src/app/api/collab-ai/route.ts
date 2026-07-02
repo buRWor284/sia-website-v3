@@ -4,13 +4,23 @@
  * Calls the Anthropic Messages API directly via fetch — no SDK required.
  * Requires ANTHROPIC_API_KEY in .env.local
  *
- * POST body: { type: "partner-suggestions" | "email-writer" | "campaign-brief", data: {...} }
+ * POST body: { type: "partner-suggestions" | "email-writer" | "campaign-brief", data: {...}, turnstileToken? }
+ *
+ * Abuse protection (H1, 2026-07-02 review): Turnstile + DB-backed IP rate
+ * limit + per-field char caps — same pattern as /api/pitch-score. This route
+ * previously had none and calls Opus, so a bot loop could drain the
+ * Anthropic budget.
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { verifyTurnstile } from "@/lib/turnstile";
+import { rateLimitDb } from "@/lib/rate-limit-db";
+import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DAILY_LIMIT = 12; // per IP across all three call types — generous for real use
 
 // ─────────────────────────────────────────────────────────────
 // Prompt builders
@@ -147,7 +157,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "ANTHROPIC_API_KEY not set in environment." }, { status: 500 });
   }
 
-  let body: { type?: string; data?: Record<string, unknown> };
+  let body: { type?: string; data?: Record<string, unknown>; turnstileToken?: string };
   try {
     body = await request.json();
   } catch {
@@ -155,15 +165,37 @@ export async function POST(request: NextRequest) {
   }
 
   const { type, data } = body;
-  if (!type || !data) {
+  if (!type || !data || typeof data !== "object") {
     return NextResponse.json({ error: "Missing type or data." }, { status: 400 });
   }
 
+  const ip = clientIp(request);
+
+  // Bot protection (no-op in dev if TURNSTILE_SECRET_KEY unset).
+  const human = await verifyTurnstile(
+    typeof body.turnstileToken === "string" ? body.turnstileToken : undefined,
+    ip,
+  );
+  if (!human) {
+    return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
+  }
+
+  // DB-backed rate limit — holds across serverless instances.
+  const rl = await rateLimitDb(`collab-ai:${ip}`, { limit: DAILY_LIMIT, windowMs: DAY_MS });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "You've hit today's limit for AI generations on this tool. Try again tomorrow." },
+      { status: 429 },
+    );
+  }
+
+  const capped = capToolInput(data);
+
   let prompt: string;
   switch (type) {
-    case "partner-suggestions": prompt = buildPartnerPrompt(data); break;
-    case "email-writer":        prompt = buildEmailPrompt(data);   break;
-    case "campaign-brief":      prompt = buildBriefPrompt(data);   break;
+    case "partner-suggestions": prompt = buildPartnerPrompt(capped); break;
+    case "email-writer":        prompt = buildEmailPrompt(capped);   break;
+    case "campaign-brief":      prompt = buildBriefPrompt(capped);   break;
     default:
       return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });
   }

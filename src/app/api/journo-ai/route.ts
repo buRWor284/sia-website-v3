@@ -11,12 +11,22 @@
  * v1 generates journalists from the model's knowledge and asks for a recent article per name
  * (to be VERIFIED in the UI). v2 grounds this in LIVE coverage via the SignalIQ GDELT layer —
  * real recent articles → real current bylines. See JournoCollabIQ-Retargeting-Plan.md.
+ *
+ * Abuse protection (H1, 2026-07-02 review): Turnstile + DB-backed IP rate
+ * limit + per-field char caps — same pattern as /api/pitch-score. This route
+ * previously had none and calls Opus, so a bot loop could drain the
+ * Anthropic budget.
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { verifyTurnstile } from "@/lib/turnstile";
+import { rateLimitDb } from "@/lib/rate-limit-db";
+import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DAILY_LIMIT = 12; // per IP across all three call types — generous for real use
 
 // Angle types. Internal keys are inherited from the clone (discount/institution/badge).
 const ANGLE_LABEL: Record<string, string> = {
@@ -145,7 +155,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "ANTHROPIC_API_KEY not set in environment." }, { status: 500 });
   }
 
-  let body: { type?: string; data?: Record<string, unknown> };
+  let body: { type?: string; data?: Record<string, unknown>; turnstileToken?: string };
   try {
     body = await request.json();
   } catch {
@@ -153,15 +163,37 @@ export async function POST(request: NextRequest) {
   }
 
   const { type, data } = body;
-  if (!type || !data) {
+  if (!type || !data || typeof data !== "object") {
     return NextResponse.json({ error: "Missing type or data." }, { status: 400 });
   }
 
+  const ip = clientIp(request);
+
+  // Bot protection (no-op in dev if TURNSTILE_SECRET_KEY unset).
+  const human = await verifyTurnstile(
+    typeof body.turnstileToken === "string" ? body.turnstileToken : undefined,
+    ip,
+  );
+  if (!human) {
+    return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
+  }
+
+  // DB-backed rate limit — holds across serverless instances.
+  const rl = await rateLimitDb(`journo-ai:${ip}`, { limit: DAILY_LIMIT, windowMs: DAY_MS });
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "You've hit today's limit for AI generations on this tool. Try again tomorrow." },
+      { status: 429 },
+    );
+  }
+
+  const capped = capToolInput(data);
+
   let prompt: string;
   switch (type) {
-    case "partner-suggestions": prompt = buildJournalistPrompt(data); break; // journalist suggestions
-    case "email-writer":        prompt = buildAnglePrompt(data);      break; // tailored angle
-    case "campaign-brief":      prompt = buildMediaPlanPrompt(data);  break; // media targeting brief
+    case "partner-suggestions": prompt = buildJournalistPrompt(capped); break; // journalist suggestions
+    case "email-writer":        prompt = buildAnglePrompt(capped);      break; // tailored angle
+    case "campaign-brief":      prompt = buildMediaPlanPrompt(capped);  break; // media targeting brief
     default:
       return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });
   }

@@ -7,8 +7,8 @@
  * Same request/response shape as /api/journo-ai.
  * POST body: { type: "partner-suggestions" | "email-writer" | "campaign-brief", data: {...} }
  */
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { requireEmosAccess } from "@/lib/emos-guard";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -127,8 +127,8 @@ Write in plain, direct prose. Tone: expert consultant. Length: 400–600 words.`
 }
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  const guard = await requireEmosAccess({ rateLimitKey: "journo-ai" });
+  if (!guard.ok) return guard.res;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "ANTHROPIC_API_KEY not set." }, { status: 500 });

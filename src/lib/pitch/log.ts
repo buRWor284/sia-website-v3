@@ -8,7 +8,7 @@
 
 import { createHash } from "crypto";
 import { createSupabaseServiceClient } from "@/lib/supabase";
-import { recordStageEvent } from "@/app/emostool/actions/stage";
+import { recordStageEventFor } from "@/lib/emos-stage-events";
 import type { PitchInput, ScoreResponse } from "./types";
 
 export async function logPitch(
@@ -70,7 +70,7 @@ export async function logPitch(
       console.log(`[pitch-score] saved hash=${pitchHash} composite=${result.composite} tier=${result.tier.label}`);
       // Stage progression: pitch_scored event (only when user is authenticated)
       if (clerkUserId) {
-        void recordStageEvent("pitch_scored", { clerkUserId });
+        void recordStageEventFor(clerkUserId, "pitch_scored");
       }
     }
   } catch (err) {

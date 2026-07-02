@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { verifyTier } from "@/lib/pitch/tier-cookie";
 // pdfkit ships as CJS; use require so it works in both edge-compat and Node runtimes
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const PDFDocument = require("pdfkit") as typeof import("pdfkit");
@@ -51,7 +52,9 @@ function body(doc: InstanceType<typeof PDFDocument>, text: string) {
 
 export async function POST(req: NextRequest) {
   // ── email gate ──────────────────────────────────────────────────────────────
-  const tier = req.cookies.get("pp_tier")?.value;
+  // H7 (2026-07-02 review): verify the HMAC-signed cookie (same helper as
+  // PressIQ) instead of comparing the raw value, which anyone could hand-set.
+  const tier = verifyTier(req.cookies.get("pp_tier")?.value);
   if (tier !== "email") {
     return NextResponse.json(
       { error: "A newsletter subscription is required to download the PDF report." },

@@ -6,8 +6,8 @@
  *
  * POST body: same shape as /api/pitch-score (PitchInput), minus turnstileToken.
  */
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { requireEmosAccess } from "@/lib/emos-guard";
 import { PITCH_MODEL } from "@/lib/pitch/config";
 import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
 import { buildUserPrompt, parseAiResult, SCORE_TOOL, SYSTEM_PROMPT } from "@/lib/pitch/scorePrompt";
@@ -35,8 +35,9 @@ function coerceBrand(v: unknown): BrandSignals {
 }
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  const guard = await requireEmosAccess({ rateLimitKey: "pitch-score" });
+  if (!guard.ok) return guard.res;
+  const { userId } = guard;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured." }, { status: 500 });

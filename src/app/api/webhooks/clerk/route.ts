@@ -2,8 +2,23 @@
  * /api/webhooks/clerk
  *
  * Listens for Clerk webhook events.
- * On user.created: automatically grants emos_access via Clerk Backend API
- * so invited users land on the dashboard without any manual metadata step.
+ *
+ * SECURITY (C1, 2026-07-02 review): this webhook previously granted
+ * public_metadata.emos_access to EVERY user.created event, which made the
+ * invite gate decorative — anyone who reached /sign-up got platform access.
+ * It no longer grants anything. Both legitimate invite paths
+ * (/api/emos-send-invite and the Stripe checkout webhook) set
+ * emos_access: true on the Clerk INVITATION itself, and Clerk copies that to
+ * the user's public_metadata at sign-up — so an invited user already arrives
+ * with the flag. Non-invited sign-ups get no access.
+ *
+ * On user.created for an invited (emos_access) user, we provision the
+ * Supabase organizations + users rows (M4) so the dashboard and saves work
+ * from the first session.
+ *
+ * NOTE: also set Clerk Dashboard → Restrictions → Sign-up mode to
+ * "Restricted" so non-invited accounts can't be created at all. That setting
+ * lives in the dashboard and cannot be enforced from this repo.
  *
  * Required env vars:
  *   CLERK_WEBHOOK_SIGNING_SECRET  — from Clerk Dashboard → Webhooks → signing secret
@@ -12,6 +27,7 @@
 
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest, NextResponse } from "next/server";
+import { ensureOrgProvisioned } from "@/lib/emos-provision";
 
 export async function POST(req: NextRequest) {
   // Verify signature — throws if invalid
@@ -25,43 +41,44 @@ export async function POST(req: NextRequest) {
 
   if (evt.type === "user.created") {
     const userId = evt.data.id;
+    const meta = (evt.data.public_metadata ?? {}) as Record<string, unknown>;
 
-    // Client workspace users are provisioned with client_slug already set.
-    // Don't overwrite their metadata with emos_access — they're not EMOS users.
-    const existingMeta = (evt.data.public_metadata ?? {}) as Record<string, unknown>;
-    if (existingMeta.client_slug) {
-      console.log(`Skipping emos_access for client user ${userId} (client_slug: ${existingMeta.client_slug})`);
+    // Client workspace users are provisioned with client_slug already set —
+    // they're not EMOS users; leave them alone.
+    if (meta.client_slug) {
+      console.log(`[clerk-webhook] client user ${userId} (client_slug: ${meta.client_slug}) — no EMOS provisioning`);
       return NextResponse.json({ received: true });
     }
 
-    const secretKey = process.env.CLERK_SECRET_KEY;
-    if (!secretKey) {
-      console.error("CLERK_SECRET_KEY is not set");
-      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    // Invite gate: only users whose sign-up carried emos_access (copied from
+    // an invitation created by /api/emos-send-invite or the Stripe webhook)
+    // are EMOS users. Everyone else gets NOTHING granted here.
+    if (meta.emos_access !== true) {
+      console.log(`[clerk-webhook] user ${userId} signed up without an EMOS invitation — no access granted`);
+      return NextResponse.json({ received: true });
     }
 
-    try {
-      const res = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${secretKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          public_metadata: { emos_access: true },
-        }),
-      });
+    // Invited user → provision Supabase org + user rows (M4).
+    const email =
+      evt.data.email_addresses?.find(
+        (e) => e.id === evt.data.primary_email_address_id,
+      )?.email_address ??
+      evt.data.email_addresses?.[0]?.email_address ??
+      "";
+    const fullName = [evt.data.first_name, evt.data.last_name]
+      .filter(Boolean)
+      .join(" ");
 
-      if (!res.ok) {
-        const err = await res.text();
-        console.error(`Failed to set emos_access for ${userId}:`, res.status, err);
-        return NextResponse.json({ error: "Failed to update user metadata" }, { status: 502 });
-      }
+    if (!email) {
+      console.error(`[clerk-webhook] invited user ${userId} has no email address — cannot provision org`);
+      return NextResponse.json({ received: true });
+    }
 
-      console.log(`emos_access granted to user ${userId}`);
-    } catch (err) {
-      console.error("Clerk API fetch error:", err);
-      return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    const result = await ensureOrgProvisioned(userId, email, fullName || null);
+    if (!result.ok) {
+      // Non-fatal for Clerk (return 200 so it doesn't retry forever), but logged.
+      // The dashboard's lazy provisioning fallback will retry on first load.
+      console.error(`[clerk-webhook] provisioning failed for ${userId}:`, result.error);
     }
   }
 

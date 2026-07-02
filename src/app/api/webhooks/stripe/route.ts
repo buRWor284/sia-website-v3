@@ -80,6 +80,60 @@ function verifyStripeWebhook(
   });
 }
 
+// ─── Clerk access revocation (H3, 2026-07-02 review) ─────────────────────────
+// Cancelled subscribers previously kept emos_access forever: the webhook only
+// flipped the DB status, but middleware gates on the Clerk flag. Revoke it here
+// so cancellation locks the platform everywhere, immediately.
+
+/**
+ * Set emos_access on the Clerk user with this email.
+ * Returns "updated" | "not_found" | "error".
+ * Also used on checkout for RE-subscribers (whose Clerk account already
+ * exists, so a fresh invitation would fail) to restore access.
+ */
+async function setClerkAccess(email: string, access: boolean): Promise<"updated" | "not_found" | "error"> {
+  const secretKey = process.env.CLERK_SECRET_KEY;
+  if (!secretKey) {
+    console.error("[stripe-webhook] CLERK_SECRET_KEY not set — cannot update emos_access");
+    return "error";
+  }
+
+  try {
+    const lookup = await fetch(
+      `https://api.clerk.com/v1/users?email_address=${encodeURIComponent(email)}&limit=1`,
+      { headers: { Authorization: `Bearer ${secretKey}` } },
+    );
+    if (!lookup.ok) {
+      console.error("[stripe-webhook] Clerk user lookup failed:", lookup.status, await lookup.text());
+      return "error";
+    }
+    const users = (await lookup.json()) as Array<{ id: string }>;
+    const clerkUserId = users?.[0]?.id;
+    if (!clerkUserId) return "not_found";
+
+    // PATCH /users/{id}/metadata does a shallow MERGE (unlike PATCH /users/{id},
+    // which replaces) — so client_slug or other metadata keys survive.
+    const res = await fetch(`https://api.clerk.com/v1/users/${clerkUserId}/metadata`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${secretKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ public_metadata: { emos_access: access } }),
+    });
+
+    if (!res.ok) {
+      console.error("[stripe-webhook] emos_access update failed:", res.status, await res.text());
+      return "error";
+    }
+    console.log(`[stripe-webhook] emos_access=${access} set for ${email} (${clerkUserId})`);
+    return "updated";
+  } catch (err) {
+    console.error("[stripe-webhook] setClerkAccess error:", err);
+    return "error";
+  }
+}
+
 // ─── Clerk invite ─────────────────────────────────────────────────────────────
 
 async function sendClerkInvite(email: string): Promise<string | null> {
@@ -257,12 +311,19 @@ export async function POST(req: NextRequest) {
         console.error("[stripe-webhook] Supabase upsert failed:", upsertErr);
       }
 
-      // Send Clerk invite + welcome email
-      const inviteUrl = await sendClerkInvite(email);
-      if (inviteUrl) {
-        await sendWelcomeEmail(email, inviteUrl);
-      } else {
-        console.error("[stripe-webhook] Clerk invite failed for", email, "— subscription recorded but invite NOT sent");
+      // Existing Clerk account (re-subscriber or invited beta user who now
+      // pays): a fresh invitation would fail — restore access directly instead.
+      const restored = await setClerkAccess(email, true);
+      if (restored === "not_found") {
+        // New customer — send Clerk invite + welcome email as before.
+        const inviteUrl = await sendClerkInvite(email);
+        if (inviteUrl) {
+          await sendWelcomeEmail(email, inviteUrl);
+        } else {
+          console.error("[stripe-webhook] Clerk invite failed for", email, "— subscription recorded but invite NOT sent");
+        }
+      } else if (restored === "error") {
+        console.error("[stripe-webhook] could not verify/restore Clerk access for", email);
       }
 
       console.log("[stripe-webhook] checkout.session.completed processed for", email);
@@ -271,13 +332,21 @@ export async function POST(req: NextRequest) {
 
     case "customer.subscription.deleted": {
       const sub = event.data.object;
-      const { error } = await db
+      const { data: rows, error } = await db
         .from("stripe_subscriptions")
         .update({ status: "canceled", updated_at: new Date().toISOString() })
-        .eq("stripe_subscription_id", sub.id as string);
+        .eq("stripe_subscription_id", sub.id as string)
+        .select("email");
 
-      if (error) console.error("[stripe-webhook] cancel update failed:", error);
-      else       console.log("[stripe-webhook] subscription canceled:", sub.id);
+      if (error) {
+        console.error("[stripe-webhook] cancel update failed:", error);
+      } else {
+        console.log("[stripe-webhook] subscription canceled:", sub.id);
+        // H3: revoke platform access in Clerk, not just the DB flag.
+        const email = rows?.[0]?.email as string | undefined;
+        if (email) await setClerkAccess(email, false);
+        else console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
+      }
       break;
     }
 

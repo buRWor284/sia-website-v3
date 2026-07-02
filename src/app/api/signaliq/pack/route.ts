@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { verifyTier } from "@/lib/pitch/tier-cookie";
 import { EMAIL_PACKS, FREE_PACKS, SIGNALIQ_MODEL } from "@/lib/signaliq/config";
 import {
   PACK_SYSTEM,
@@ -70,7 +71,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }
 
-  const isEmail = req.cookies.get("pp_tier")?.value === "email";
+  // H7 (2026-07-02 review): verify the HMAC-signed cookie (same helper as
+  // PressIQ) instead of comparing the raw value, which anyone could hand-set.
+  const isEmail = verifyTier(req.cookies.get("pp_tier")?.value) === "email";
   const limit = isEmail ? EMAIL_PACKS : FREE_PACKS;
   const tier: UsageTier = isEmail ? "email" : "anonymous";
   const rl = rateLimit(`signaliq-pack:${ip}`, { limit, windowMs: MONTH_MS });

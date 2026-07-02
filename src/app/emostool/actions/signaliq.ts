@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { recordStageEvent } from "./stage";
 import type { Opportunity } from "@/lib/signaliq/types";
@@ -73,91 +73,11 @@ export async function getSignals(): Promise<DbSignal[]> {
 }
 
 // ─── Save a signal from a scan result ────────────────────────────────────────
-
-/**
- * Called from the SignalIQ scan API route (server-side) or directly from a
- * platform Server Action. Uses the service client when clerkUserId is passed
- * directly (API route context), otherwise uses auth() (Server Action context).
- */
-export async function saveSignalFromOpportunity(
-  opp: Opportunity,
-  beatLabel: string,
-  options?: { clerkUserId?: string; companyContext?: string; companyName?: string },
-): Promise<string | null> {
-  try {
-    const db = createSupabaseServiceClient();
-
-    // Resolve org_id from either provided clerkUserId or auth()
-    let clerkUserId = options?.clerkUserId;
-    if (!clerkUserId) {
-      const { userId } = await auth();
-      if (!userId) return null;
-      clerkUserId = userId;
-    }
-
-    const { data: user } = await db
-      .from("users")
-      .select("org_id")
-      .eq("clerk_user_id", clerkUserId)
-      .single();
-    if (!user) return null;
-
-    // Ensure beat exists (upsert by name)
-    let beatId: string | null = null;
-    const { data: existingBeat } = await db
-      .from("signaliq_beats")
-      .select("id")
-      .eq("org_id", user.org_id)
-      .eq("name", beatLabel)
-      .single();
-
-    if (existingBeat) {
-      beatId = existingBeat.id;
-    } else {
-      const { data: newBeat } = await db
-        .from("signaliq_beats")
-        .insert({ org_id: user.org_id, name: beatLabel, keywords: [] })
-        .select("id")
-        .single();
-      beatId = newBeat?.id ?? null;
-    }
-
-    // Build summary from signal sources
-    const summary = opp.signals.map(s => s.title).join(" · ").substring(0, 500);
-    const primarySignal = opp.signals[0];
-
-    const { data: signal, error } = await db
-      .from("signaliq_signals")
-      .insert({
-        org_id:          user.org_id,
-        beat_id:         beatId,
-        headline:        opp.headline,
-        summary,
-        source:          primarySignal?.source ?? "manual",
-        source_url:      primarySignal?.url ?? null,
-        signal_score:    opp.score ?? null,
-        coverage_gap:    opp.components?.coverageGap ?? null,
-        status:          "saved",
-        company_name:    options?.companyName?.trim() || null,
-        company_context: options?.companyContext?.trim()?.slice(0, 600) || null,
-        scan_category:   beatLabel,
-        fit:             opp.fit ?? null,
-      })
-      .select("id")
-      .single();
-
-    if (error) { console.error("saveSignal error:", error.message); return null; }
-
-    // Stage progression
-    void recordStageEvent("signal_saved", { clerkUserId });
-
-    revalidatePath("/emostool/dashboard/signaliq");
-    return signal?.id ?? null;
-  } catch (err) {
-    console.error("saveSignalFromOpportunity error (non-fatal):", err);
-    return null;
-  }
-}
+// H4 (2026-07-02 review): the clerkUserId-accepting variant
+// (saveSignalFromOpportunity) was a server action that trusted a
+// caller-supplied user ID with the service client. It moved to
+// src/lib/signaliq/save-signal.ts (`server-only`) as saveSignalForUser().
+// Only auth()-based actions remain exposed here.
 
 // ─── Explicit save from platform scan (called by client component) ────────────
 

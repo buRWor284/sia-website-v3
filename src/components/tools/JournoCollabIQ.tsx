@@ -558,13 +558,15 @@ function Stage2({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
 }
 
 // ── Stage 3: Partners ──────────────────────────────────────────────────────────
-function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNiches, onToggle, onScore, onGatedCsv }: {
+function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNiches, onToggle, onScore, onGatedCsv, error, onRetry }: {
   partners: AiPartner[]; loading: boolean; loadingIdx: number;
   industry: string; strategy: string; biz: string;
   selNiches: string[];
   onToggle: (n: string) => void;
   onScore:  (n: string, c: string) => void;
   onGatedCsv: () => void;
+  error: string | null;
+  onRetry: () => void;
 }) {
   if (loading) {
     const msg = V2_LOADING[loadingIdx % V2_LOADING.length];
@@ -593,6 +595,20 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
             <div className="v2-shimmer" style={{ width: "70%", height: 10 }} />
           </div>
         ))}
+      </StageWrapper>
+    );
+  }
+
+  // H6 (2026-07-02 review): real error state instead of silently substituting
+  // mock journalists (real named reporters, some no longer at those outlets)
+  // labelled as live, personalised AI matches.
+  if (error) {
+    return (
+      <StageWrapper title="The research didn't come back." subtitle="No sample journalists have been substituted — retry to get live matches personalised to your story.">
+        <div style={{ border: `1px solid ${ERR}`, background: "rgba(192,57,43,0.06)", padding: "22px 24px", textAlign: "center" }}>
+          <p style={{ fontFamily: GF, fontSize: 14, color: TX, margin: "0 0 16px", lineHeight: 1.6 }}>{error}</p>
+          <button onClick={onRetry} style={{ ...primaryBtn(), justifyContent: "center" }}>↻ Try again</button>
+        </div>
       </StageWrapper>
     );
   }
@@ -998,6 +1014,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   const [aiBrief, setAiBrief]       = useState("");
   const [aiEmailLoading, setAiEmailLoading] = useState(false);
   const [aiBriefLoading, setAiBriefLoading] = useState(false);
+  const [partnersError, setPartnersError]   = useState<string|null>(null);
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
   const [isSub, setIsSub]   = useState(()=>{ try { return !!localStorage.getItem(V2_SUB); } catch { return false; } });
@@ -1034,39 +1051,36 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   }, [loading]);
 
   async function generatePartners() {
-    setLoading(true); setPartners([]); setLoadingIdx(0);
+    // H6 (2026-07-02 review): no more silent mock fallback. The old mock
+    // contained REAL named reporters (several no longer at those outlets)
+    // presented as live AI matches — users could pitch stale people believing
+    // they were matched live. Show a real error + retry instead.
+    setLoading(true); setPartners([]); setLoadingIdx(0); setPartnersError(null);
     try {
       const res = await fetch("/api/journo-ai", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy } }),
       });
-      if (res.ok) {
-        const json = await res.json() as { result?: string };
-        // API returns { result: "<JSON array string>" }
-        if (json.result) {
-          // Strip markdown fences if present
-          const cleaned = json.result.replace(/^```json?\s*/i,"").replace(/```\s*$/,"").trim();
-          const list = JSON.parse(cleaned) as AiPartner[];
-          if (Array.isArray(list) && list.length > 0) {
-            const sliced = list.slice(0, 8);
-            setPartners(sliced);
-            // Auto-select all + clear stale email target from previous session
-            dispatch({ type: "SET_NICHES", val: sliced.map(p => p.name) });
-            dispatch({ type: "SET", key: "scPartner", val: sliced[0]?.name || "" });
-            setLoading(false);
-            return;
-          }
+      const json = await res.json().catch(() => ({})) as { result?: string; error?: string };
+      if (res.ok && json.result) {
+        // Strip markdown fences if present
+        const cleaned = json.result.replace(/^```json?\s*/i,"").replace(/```\s*$/,"").trim();
+        const list = JSON.parse(cleaned) as AiPartner[];
+        if (Array.isArray(list) && list.length > 0) {
+          const sliced = list.slice(0, 8);
+          setPartners(sliced);
+          // Auto-select all + clear stale email target from previous session
+          dispatch({ type: "SET_NICHES", val: sliced.map(p => p.name) });
+          dispatch({ type: "SET", key: "scPartner", val: sliced[0]?.name || "" });
+          return;
         }
       }
-    } catch { /* fall through to mock */ }
-    // Fallback mock — only reached if API key is missing or Claude returns invalid JSON
-    setTimeout(()=>{
-      const mock = V2_MOCK[ind] || V2_GENERIC;
-      setPartners(mock);
-      dispatch({ type: "SET_NICHES", val: mock.map(p => p.name) });
-      dispatch({ type: "SET", key: "scPartner", val: mock[0]?.name || "" });
+      setPartnersError(json.error || "The AI research didn't come back with results. Please try again.");
+    } catch {
+      setPartnersError("Couldn't reach the AI research service. Check your connection and try again.");
+    } finally {
       setLoading(false);
-    }, 3000);
+    }
   }
 
   function handleGated(action: string) {
@@ -1502,7 +1516,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
           {step===0 && <Stage0 onStart={()=>dispatch({type:"GO",step:1})} />}
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
-          {step===3 && <Stage3 partners={partners} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} />}
+          {step===3 && <Stage3 partners={partners} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} />}
           {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
           {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} />}
         </div>

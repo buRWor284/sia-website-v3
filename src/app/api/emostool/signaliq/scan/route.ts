@@ -6,8 +6,8 @@
  *
  * POST body: { beat: BeatId }
  */
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { requireEmosAccess } from "@/lib/emos-guard";
 import { scanBeat } from "@/lib/signaliq/scan";
 import { logScan } from "@/lib/signaliq/log";
 import type { BeatId, ScanResponse } from "@/lib/signaliq/types";
@@ -19,10 +19,8 @@ export const maxDuration = 60; // extra headroom for the company-profile expansi
 const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity"];
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  }
+  const guard = await requireEmosAccess({ rateLimitKey: "signaliq-scan" });
+  if (!guard.ok) return guard.res;
 
   let raw: Record<string, unknown>;
   try {

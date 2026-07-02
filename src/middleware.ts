@@ -5,6 +5,13 @@ import { NextResponse, type NextRequest } from "next/server";
 // /emos (course landing page) stays completely public and untouched.
 const isProtectedRoute = createRouteMatcher(["/emostool(.*)"]);
 
+// C2 (2026-07-02 review): "/emostool(.*)" does NOT match /api/emostool/* —
+// the platform API routes were reachable by ANY signed-in Clerk account with
+// no emos_access check. Gate them here too (belt) in addition to the
+// requireEmosAccess() guard inside each handler (suspenders). APIs get JSON
+// errors, not redirects.
+const isProtectedApiRoute = createRouteMatcher(["/api/emostool(.*)"]);
+
 // ─── Legacy Basic Auth clients ────────────────────────────────────────────────
 // PT and Resourcex stay on HTTP Basic Auth (shared username/password via Vercel
 // env vars). All new clients should use the Clerk-based system below instead.
@@ -103,6 +110,28 @@ export default clerkMiddleware(async (auth, req) => {
         }
       }
     }
+  }
+
+  // ── EMOS platform API routes: Clerk auth + emos_access, JSON errors ──────
+  if (isProtectedApiRoute(req)) {
+    const { sessionClaims, userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+    const meta = (sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+    if (!meta.emos_access) {
+      // JWT may be stale — live check before rejecting, fail closed.
+      try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        if (!user.publicMetadata?.emos_access) {
+          return NextResponse.json({ error: "EMOS platform access required." }, { status: 403 });
+        }
+      } catch {
+        return NextResponse.json({ error: "Could not verify platform access." }, { status: 403 });
+      }
+    }
+    return NextResponse.next();
   }
 
   // ── EMOS tool: Clerk auth + emos_access metadata ─────────────────────────

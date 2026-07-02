@@ -2,12 +2,12 @@
  * /api/emostool/signaliq/pack
  *
  * Authenticated version of the SignalIQ asset pack generator.
- * No Turnstile, no rate limit — Clerk auth only.
+ * Gated by the shared EMOS guard (access + subscription + rate limit).
  *
  * POST body: { opportunity, companyContext? }
  */
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { requireEmosAccess } from "@/lib/emos-guard";
 import { SIGNALIQ_MODEL } from "@/lib/signaliq/config";
 import {
   PACK_SYSTEM,
@@ -24,7 +24,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-const ALLOWED_USER_ID = "user_3Eoj1EYMREQhylhnRWn2AbzcZHH";
 
 function coerceOpportunity(v: unknown): Opportunity | null {
   if (!v || typeof v !== "object") return null;
@@ -34,9 +33,10 @@ function coerceOpportunity(v: unknown): Opportunity | null {
 }
 
 export async function POST(req: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  if (userId !== ALLOWED_USER_ID) return NextResponse.json({ error: "Forbidden." }, { status: 403 });
+  // H6 (2026-07-02 review): previously hardcoded to one test user ID, which
+  // returned "Forbidden." for every real customer. Now uses the shared guard.
+  const guard = await requireEmosAccess({ rateLimitKey: "signaliq-pack" });
+  if (!guard.ok) return guard.res;
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "ANTHROPIC_API_KEY not set." }, { status: 500 });
