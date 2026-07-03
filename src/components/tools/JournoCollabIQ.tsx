@@ -1393,10 +1393,12 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         </div>
 
         {/* Cloudflare Turnstile human check — renders only when the site key is
-            set. Pinned above the fixed wizard footer so an interactive challenge
-            is actually visible (it used to sit below the page fold). */}
+            set. Fixed at mid-right (not bottom-right) so it stays visible above
+            the fixed wizard footer AND never lands on the ToolPipelineFooter
+            cards further down the page. Do not move this into normal page
+            flow — it used to sit below the fold there and never rendered. */}
         {TURNSTILE_SITE_KEY && step>0 && (
-          <div style={{ position:"fixed", bottom:76, right:24, zIndex:89 }}>
+          <div style={{ position:"fixed", top:"50%", right:24, transform:"translateY(-50%)", zIndex:89 }}>
             <div ref={turnstileRef} />
           </div>
         )}

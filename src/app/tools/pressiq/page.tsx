@@ -100,24 +100,6 @@ const TICKER = [
   { stat: "53%",   text: "distrust generic, AI-sounding pitches",         src: "Cision 2026"           },
 ];
 
-// ── Sample content ────────────────────────────────────────────────────────────
-const SAMPLE_PITCH = `Subject: Data: 40 B2B marketplaces benchmarked, only 11 meet their own definition
-
-Hi Jordan,
-
-I've been following your coverage of marketplace infrastructure on TechCrunch. We just wrapped a benchmark of 40 platforms that call themselves a "B2B marketplace," scored against a simple 3-part definition (multi-vendor listings, split payments, independent vendor onboarding). Only 11 actually qualify.
-
-I'm Maya Chen, co-founder and CEO of Fairground. We build the marketplace infrastructure some of these 40 platforms run on, so we had the data already, we just hadn't scored it until now.
-
-Happy to share the full breakdown, or put you in touch with two of the 11 that qualify for a quote.
-
-Maya Chen · Co-founder & CEO, Fairground · fairground.example.com
-maya@fairground.example.com · @mayachen · linkedin.com/in/mayachen`;
-
-const SAMPLE_QUERY = `Looking for founders or operators of B2B marketplaces who can share original numbers on vendor onboarding, split payments, or take rates, for a piece on why most self-described "B2B marketplaces" are really just catalogs. Especially interested in benchmarks comparing platforms. Requirements: named source, shareable data, available for a 15-min phone interview.`;
-
-const SAMPLE_BEAT = `Covers marketplace infrastructure, B2B commerce platforms, and the payment rails behind them for TechCrunch. Regular features on multi-vendor marketplaces, vendor onboarding, and platform take rates. Prefers named founders with original data from their own operations, not thought-leader takes.`;
-
 const STORE_KEY = "sia.pressiq.v2";
 
 // Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered and
@@ -927,13 +909,6 @@ export default function PressIQPage() {
   const subjectPlaceholder = resolveSubject(pitch, subject) || "Re: [Query] - …";
   const canAnalyze = pitch.trim().length >= 40 && view !== "loading" && (!TURNSTILE_SITE_KEY || !!turnstileToken);
 
-  function loadSample() {
-    setPitch(SAMPLE_PITCH);
-    if (pitchMode === "query") setQuery(SAMPLE_QUERY);
-    else setJournalistBeat(SAMPLE_BEAT);
-    const fl = SAMPLE_PITCH.split("\n")[0];
-    if (fl.startsWith("Subject: ")) setSubject(fl.replace("Subject: ", ""));
-  }
 
   async function analyze() {
     if (!canAnalyze) return;
@@ -1402,7 +1377,6 @@ export default function PressIQPage() {
                 <div style={LSEC}>
                   <span style={LSEC_LBL}>Your pitch</span>
                   <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
-                  <div style={{ marginTop: 6 }}><button onClick={loadSample} className="piq-ghost">↻ Load a sample pitch</button></div>
                 </div>
 
                 <div style={LSEC}>

@@ -1649,11 +1649,14 @@ export default function SignalIQPage() {
           </>
         )}
 
-        {/* Cloudflare Turnstile human check — fixed bottom-right so it stays
-            mounted across steps 1-3 (scan, personalise, asset pack) and an
-            interactive challenge is always visible (JournoCollabIQ pattern) */}
+        {/* Cloudflare Turnstile human check — fixed at mid-right so it stays
+            mounted and visible across steps 1-3 (scan, personalise, asset pack)
+            without ever landing on the ToolPipelineFooter cards at the bottom
+            of the page (previous bottom-right anchor overlapped them once
+            scrolled to the end). Do not move this back into normal page flow —
+            it must stay visible in the viewport or the token never fires. */}
         {TURNSTILE_SITE_KEY && !intro && (
-          <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 89 }}>
+          <div style={{ position: "fixed", top: "50%", right: 24, transform: "translateY(-50%)", zIndex: 89 }}>
             <div ref={turnstileRef} />
           </div>
         )}
