@@ -16,6 +16,7 @@ import {
 } from "@/lib/tokens";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import { EmailCaptureStrip, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 
 // ── Data model ─────────────────────────────────────────────────────────────────
 
@@ -81,7 +82,7 @@ const PIPELINE_STAGES: { id: Stage; label: string }[] = [
 ];
 
 const JOURNALISTS: Journalist[] = [
-  { id: "j1",  name: "Sarah Chen",      outlet: "TechCrunch",                beat: "SaaS / Startups",    dr: 93, email: "s.chen@tc.com",              lastContact: "2026-05-28", pitchesSent: 4, placements: 2 },
+  { id: "j1",  name: "Jordan Ames",     outlet: "TechCrunch",                beat: "Marketplace Infra",  dr: 93, email: "j.ames@tc.com",              lastContact: "2026-05-28", pitchesSent: 4, placements: 2 },
   { id: "j2",  name: "Marcus Webb",     outlet: "Forbes",                    beat: "Marketing / CMO",    dr: 95, email: "m.webb@forbes.com",          lastContact: "2026-06-01", pitchesSent: 3, placements: 1 },
   { id: "j3",  name: "Priya Sharma",    outlet: "Search Engine Journal",     beat: "SEO / Content",      dr: 82, email: "priya@sej.com",              lastContact: "2026-05-15", pitchesSent: 6, placements: 3 },
   { id: "j4",  name: "Tom Kaplan",      outlet: "Entrepreneur",              beat: "Growth / Founders",  dr: 91, email: "t.kaplan@entrepreneur.com",  lastContact: "2026-05-20", pitchesSent: 2, placements: 0 },
@@ -94,22 +95,22 @@ const JOURNALISTS: Journalist[] = [
 ];
 
 const DEFAULT_PITCHES: Pitch[] = [
-  { id:"p1",  subject:"Data study: 73% of earned links outperform paid in 12 months",          journalist:"j1",  client:"DMR.agency", stage:"placed",    peso:"Earned", sentDate:"2026-05-10", placedDate:"2026-05-28", url:"https://techcrunch.com/2026/05/earned-media-study/",           anchorText:"earned media ROI",           dr:93, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:460 },
-  { id:"p2",  subject:"Expert quote: Why fractional CMOs are the future for Series A",          journalist:"j2",  client:"SIA Enterprises",       stage:"replied",   peso:"Earned", sentDate:"2026-06-01", placedDate:null,         url:null,                                                           anchorText:"fractional CMO",             dr:95, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:"2026-06-06", points:null },
-  { id:"p3",  subject:"Guest post: The PESO framework for modern link building",                journalist:"j3",  client:"DMR.agency",             stage:"placed",    peso:"Earned", sentDate:"2026-04-20", placedDate:"2026-05-15", url:"https://searchenginejournal.com/peso-link-building/",          anchorText:"PESO media model",           dr:82, linkType:"Do Follow", contentType:"Original",   team:"Nirvana",      dataSource:"PressIQ", followUpDue:null,         points:380 },
-  { id:"p4",  subject:"Founder story: From 0 to 1.5M organic traffic in one year",             journalist:"j4",  client:"Ridester",               stage:"sent",      peso:"Earned", sentDate:"2026-06-03", placedDate:null,         url:null,                                                           anchorText:null,                         dr:91, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-08", points:null },
-  { id:"p5",  subject:"How-to: Building a content engine that earns 50+ links/quarter",        journalist:"j5",  client:"DMR.agency", stage:"amplified", peso:"Earned", sentDate:"2026-04-01", placedDate:"2026-04-18", url:"https://blog.hubspot.com/content-engine-links/",               anchorText:"content marketing strategy", dr:88, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:420 },
-  { id:"p6",  subject:"Data pitch: Link building ROI benchmarks by industry",                  journalist:"j6",  client:"DMR.agency",             stage:"opened",    peso:"Earned", sentDate:"2026-06-02", placedDate:null,         url:null,                                                           anchorText:null,                         dr:79, linkType:null,         contentType:null,          team:"Nirvana",      dataSource:"PressIQ", followUpDue:"2026-06-07", points:null },
-  { id:"p7",  subject:"Expert roundup contribution: Top SEO predictions for 2027",             journalist:"j7",  client:"SIA Enterprises",       stage:"placed",    peso:"Earned", sentDate:"2026-05-12", placedDate:"2026-05-30", url:"https://inc.com/seo-predictions-2027/",                        anchorText:"SEO-PR strategy",            dr:92, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:450 },
-  { id:"p8",  subject:"Case study: Earned media vs paid backlinks — 18 month analysis",        journalist:"j8",  client:"DMR.agency",             stage:"replied",   peso:"Earned", sentDate:"2026-05-28", placedDate:null,         url:null,                                                           anchorText:"earned media analysis",      dr:85, linkType:"Do Follow", contentType:"Original",   team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-05", points:null },
-  { id:"p9",  subject:"Thought leadership: The death of transactional link building",          journalist:"j9",  client:"SIA Enterprises",       stage:"amplified", peso:"Earned", sentDate:"2026-03-15", placedDate:"2026-04-02", url:"https://contentmarketinginstitute.com/death-transactional-links/", anchorText:"earned media operating system", dr:80, linkType:"Do Follow", contentType:"Original", team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:360 },
-  { id:"p10", subject:"Newsjacking: Google March 2026 core update — earned media angle",       journalist:"j10", client:"DMR.agency", stage:"drafted",   peso:"Earned", sentDate:null,         placedDate:null,         url:null,                                                           anchorText:null,                         dr:76, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:null,         points:null },
-  { id:"p11", subject:"LinkedIn article: 5 PESO lessons from 200+ earned placements",         journalist:null,  client:"SIA Enterprises",       stage:"amplified", peso:"Shared", sentDate:"2026-05-20", placedDate:"2026-05-20", url:"https://linkedin.com/pulse/peso-lessons/",                     anchorText:null,                         dr:null,linkType:null,         contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:200 },
-  { id:"p12", subject:"Blog post: How CoverageIQ tracks your earned media pipeline",           journalist:null,  client:"DMR.agency",             stage:"placed",    peso:"Owned",  sentDate:"2026-05-25", placedDate:"2026-05-25", url:"https://dmr.agency/blog/coverageiq-pipeline/",                 anchorText:null,                         dr:null,linkType:null,         contentType:"Original",   team:"Nirvana",      dataSource:"Manual",  followUpDue:null,         points:150 },
-  { id:"p13", subject:"Sponsored feature: Earned Media OS for in-house teams",                journalist:"j2",  client:"SIA Enterprises",       stage:"sent",      peso:"Paid",   sentDate:"2026-06-04", placedDate:null,         url:null,                                                           anchorText:"EMOS",                       dr:95, linkType:null,         contentType:null,          team:"Firestarters", dataSource:"Manual",  followUpDue:"2026-06-09", points:null },
-  { id:"p14", subject:"HARO response: Best practices for digital PR measurement",              journalist:"j3",  client:"DMR.agency",             stage:"placed",    peso:"Earned", sentDate:"2026-05-05", placedDate:"2026-05-22", url:"https://searchenginejournal.com/digital-pr-measurement/",      anchorText:"digital PR metrics",         dr:82, linkType:"Do Follow", contentType:"Original",   team:"Nirvana",      dataSource:"PressIQ", followUpDue:null,         points:380 },
-  { id:"p15", subject:"Infographic pitch: The anatomy of a successful media pitch",            journalist:"j5",  client:"DMR.agency", stage:"opened",    peso:"Earned", sentDate:"2026-06-03", placedDate:null,         url:null,                                                           anchorText:null,                         dr:88, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-08", points:null },
-  { id:"p16", subject:"Expert quote: Neuromarketing meets earned media",                       journalist:"j7",  client:"SIA Enterprises",       stage:"drafted",   peso:"Earned", sentDate:null,         placedDate:null,         url:null,                                                           anchorText:null,                         dr:92, linkType:null,         contentType:null,          team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:null },
+  { id:"p1",  subject:"Data: 40 B2B marketplaces benchmarked, only 11 meet their own definition",          journalist:"j1",  client:"Fairground", stage:"placed",    peso:"Earned", sentDate:"2026-05-10", placedDate:"2026-05-28", url:"https://techcrunch.com/2026/05/b2b-marketplace-benchmark/",           anchorText:"B2B marketplace benchmark",           dr:93, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:460 },
+  { id:"p2",  subject:"Expert quote: Why fractional CMOs are the future for Series A",          journalist:"j2",  client:"Tilt",       stage:"replied",   peso:"Earned", sentDate:"2026-06-01", placedDate:null,         url:null,                                                           anchorText:"fractional CMO",             dr:95, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:"2026-06-06", points:null },
+  { id:"p3",  subject:"Guest post: The PESO framework for modern link building",                journalist:"j3",  client:"Fairground",             stage:"placed",    peso:"Earned", sentDate:"2026-04-20", placedDate:"2026-05-15", url:"https://searchenginejournal.com/peso-link-building/",          anchorText:"PESO media model",           dr:82, linkType:"Do Follow", contentType:"Original",   team:"Nirvana",      dataSource:"PressIQ", followUpDue:null,         points:380 },
+  { id:"p4",  subject:"Founder story: From 0 to 1.5M organic traffic in one year",             journalist:"j4",  client:"Northbeam",               stage:"sent",      peso:"Earned", sentDate:"2026-06-03", placedDate:null,         url:null,                                                           anchorText:null,                         dr:91, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-08", points:null },
+  { id:"p5",  subject:"How-to: Building a content engine that earns 50+ links/quarter",        journalist:"j5",  client:"Fairground", stage:"amplified", peso:"Earned", sentDate:"2026-04-01", placedDate:"2026-04-18", url:"https://blog.hubspot.com/content-engine-links/",               anchorText:"content marketing strategy", dr:88, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"PressIQ", followUpDue:null,         points:420 },
+  { id:"p6",  subject:"Data pitch: Link building ROI benchmarks by industry",                  journalist:"j6",  client:"Fairground",             stage:"opened",    peso:"Earned", sentDate:"2026-06-02", placedDate:null,         url:null,                                                           anchorText:null,                         dr:79, linkType:null,         contentType:null,          team:"Nirvana",      dataSource:"PressIQ", followUpDue:"2026-06-07", points:null },
+  { id:"p7",  subject:"Expert roundup contribution: Top SEO predictions for 2027",             journalist:"j7",  client:"Tilt",       stage:"placed",    peso:"Earned", sentDate:"2026-05-12", placedDate:"2026-05-30", url:"https://inc.com/seo-predictions-2027/",                        anchorText:"SEO-PR strategy",            dr:92, linkType:"Do Follow", contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:450 },
+  { id:"p8",  subject:"Case study: Earned media vs paid backlinks: 18-month analysis",        journalist:"j8",  client:"Fairground",             stage:"replied",   peso:"Earned", sentDate:"2026-05-28", placedDate:null,         url:null,                                                           anchorText:"earned media analysis",      dr:85, linkType:"Do Follow", contentType:"Original",   team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-05", points:null },
+  { id:"p9",  subject:"Thought leadership: The death of transactional link building",          journalist:"j9",  client:"Tilt",       stage:"amplified", peso:"Earned", sentDate:"2026-03-15", placedDate:"2026-04-02", url:"https://contentmarketinginstitute.com/death-transactional-links/", anchorText:"earned media operating system", dr:80, linkType:"Do Follow", contentType:"Original", team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:360 },
+  { id:"p10", subject:"Newsjacking: Google March 2026 core update, earned media angle",       journalist:"j10", client:"Fairground", stage:"drafted",   peso:"Earned", sentDate:null,         placedDate:null,         url:null,                                                           anchorText:null,                         dr:76, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:null,         points:null },
+  { id:"p11", subject:"LinkedIn article: 5 PESO lessons from 200+ earned placements",         journalist:null,  client:"Tilt",       stage:"amplified", peso:"Shared", sentDate:"2026-05-20", placedDate:"2026-05-20", url:"https://linkedin.com/pulse/peso-lessons/",                     anchorText:null,                         dr:null,linkType:null,         contentType:"Original",   team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:200 },
+  { id:"p12", subject:"Blog post: How CoverageIQ tracks your earned media pipeline",           journalist:null,  client:"Fairground",             stage:"placed",    peso:"Owned",  sentDate:"2026-05-25", placedDate:"2026-05-25", url:"https://dmr.agency/blog/coverageiq-pipeline/",                 anchorText:null,                         dr:null,linkType:null,         contentType:"Original",   team:"Nirvana",      dataSource:"Manual",  followUpDue:null,         points:150 },
+  { id:"p13", subject:"Sponsored feature: Earned Media OS for in-house teams",                journalist:"j2",  client:"Tilt",       stage:"sent",      peso:"Paid",   sentDate:"2026-06-04", placedDate:null,         url:null,                                                           anchorText:"EMOS",                       dr:95, linkType:null,         contentType:null,          team:"Firestarters", dataSource:"Manual",  followUpDue:"2026-06-09", points:null },
+  { id:"p14", subject:"HARO response: Best practices for digital PR measurement",              journalist:"j3",  client:"Fairground",             stage:"placed",    peso:"Earned", sentDate:"2026-05-05", placedDate:"2026-05-22", url:"https://searchenginejournal.com/digital-pr-measurement/",      anchorText:"digital PR metrics",         dr:82, linkType:"Do Follow", contentType:"Original",   team:"Nirvana",      dataSource:"PressIQ", followUpDue:null,         points:380 },
+  { id:"p15", subject:"Infographic pitch: The anatomy of a successful media pitch",            journalist:"j5",  client:"Fairground", stage:"opened",    peso:"Earned", sentDate:"2026-06-03", placedDate:null,         url:null,                                                           anchorText:null,                         dr:88, linkType:null,         contentType:null,          team:"Wizards",      dataSource:"PressIQ", followUpDue:"2026-06-08", points:null },
+  { id:"p16", subject:"Expert quote: Neuromarketing meets earned media",                       journalist:"j7",  client:"Tilt",       stage:"drafted",   peso:"Earned", sentDate:null,         placedDate:null,         url:null,                                                           anchorText:null,                         dr:92, linkType:null,         contentType:null,          team:"Firestarters", dataSource:"Manual",  followUpDue:null,         points:null },
 ];
 
 const ALERTS: Alert[] = [
@@ -382,8 +383,10 @@ function PipelineView() {
         })}
       </div>
 
-      {/* Table */}
-      <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
+      {/* Table — horizontal scroll container so the fixed-width columns don't
+          get clipped on narrow screens (2026-07 QA finding at ~550px) */}
+      <div style={{ border: `1px solid ${INK}`, overflowX: "auto" }}>
+       <div style={{ minWidth: 760 }}>
         {/* Header */}
         <div style={{
           display: "grid", gridTemplateColumns: "1fr 150px 96px 80px 64px 72px",
@@ -490,6 +493,7 @@ function PipelineView() {
             </div>
           );
         })}
+       </div>
       </div>
 
       {/* Summary line */}
@@ -675,7 +679,7 @@ type CoverageLogKey = "placedDate" | "outlet" | "anchorText" | "dr" | "peso" | "
 function CoverageLogView() {
   const coverageLog = PITCHES.filter(p => p.stage === "placed" || p.stage === "amplified").map(p => {
     const j = p.journalist ? JOURNALISTS.find(jj => jj.id === p.journalist) : null;
-    return { ...p, outlet: j ? j.outlet : (p.peso === "Shared" ? "LinkedIn" : "DMR.agency Blog") };
+    return { ...p, outlet: j ? j.outlet : (p.peso === "Shared" ? "LinkedIn" : "Fairground Blog") };
   });
   const [sortBy, setSortBy] = useState<CoverageLogKey>("placedDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -1148,7 +1152,7 @@ function NewPitchModal({ onClose, onAdd }: { onClose: () => void; onAdd: (p: Pit
               </select>
             </MField>
             <MField label="Client">
-              <input type="text" value={form.client} onChange={e => set("client", e.target.value)} placeholder="e.g., DMR.agency" style={inp} />
+              <input type="text" value={form.client} onChange={e => set("client", e.target.value)} placeholder="e.g., Fairground" style={inp} />
             </MField>
           </div>
 
@@ -1345,6 +1349,18 @@ export default function CoverageIQ() {
         {activeTab === "coverage"  && <CoverageLogView />}
         {activeTab === "contacts"  && <ContactsView />}
         {activeTab === "peso"      && <PESODashboard />}
+
+        {/* Conversion strips — every other public tool gates value behind an
+            email and pitches EMOS after delivering value; CoverageIQ had
+            neither (2026-07 consistency review). */}
+        <EmailCaptureStrip
+          toolName="CoverageIQ"
+          benefit="Get the follow-up cadences, placement playbooks, and PESO scoring templates behind this CRM: one earned-media brief in your inbox each week, no fluff."
+        />
+        <EmosCTAStrip
+          toolName="CoverageIQ"
+          pitch="CoverageIQ is the last step of the pipeline: it tracks what your pitches earn. The full Earned Media Operating System gives your team the story signals, journalist matching, and pitch scoring that fill this pipeline in the first place."
+        />
       </main>
 
       {/* ── Modal ──────────────────────────────────────────────────────── */}

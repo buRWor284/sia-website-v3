@@ -594,7 +594,7 @@ function SIQHero() {
         SIGNAL
       </div>
       <SCaps color={INK55} size={10.5} ls="0.24em">
-        {PRODUCT} · Proactive-PR Radar · SIA Wire
+        {PRODUCT} · Story Radar
       </SCaps>
 
       {/* 2-col hero grid */}
@@ -1596,7 +1596,7 @@ export default function SignalIQPage() {
       <style>{PAGE_CSS}</style>
       <ToolHeader
         toolPrefix="Signal"
-        subtitle="Story Radar · SIA Wire"
+        subtitle="Story Radar"
         rightContent={
           <>
             <Link href="/tools/signaliq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>

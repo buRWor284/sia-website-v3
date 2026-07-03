@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import { JournoCollabIQ } from "@/components/tools/JournoCollabIQ";
-import { ToolHeader } from "@/components/bureau";
+import { ToolHeader } from "@/components/tools/ToolHeader";
 
 export const metadata: Metadata = {
   title: "JournoCollabIQ · Journalist Beat Matcher",
@@ -16,8 +16,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tools/journocollabiq" },
 };
 
-// ToolHeader height: 28px logo + 13px top + 13px bottom padding = 54px
-export const TOOL_HEADER_H = 54;
+// Shared tools/ToolHeader is a fixed 52px bar
+export const TOOL_HEADER_H = 52;
 
 export default function JournoCollabIQPage() {
   return (
@@ -32,16 +32,22 @@ export default function JournoCollabIQPage() {
         JournoCollabIQ - Journalist Beat Matcher
       </h1>
       <ToolHeader
-        toolName="JournoCollabIQ: Journalist Beat Matcher"
-        rightExtra={
-          <Link
-            href="/tools/journocollabiq/how-it-works"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontFamily: "var(--font-grot)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "#f5b81f", textDecoration: "none", whiteSpace: "nowrap" }}
-          >
-            How it works →
-          </Link>
+        toolPrefix="JournoCollab"
+        subtitle="Journalist Beat Matcher"
+        rightContent={
+          <>
+            <Link
+              href="/tools/journocollabiq/how-it-works"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontFamily: "var(--font-grot)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "#f5b81f", textDecoration: "none", whiteSpace: "nowrap" }}
+            >
+              How it works →
+            </Link>
+            <Link href="/" style={{ fontFamily: "var(--font-mono)", fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
+              ← syedirfanajmal.com
+            </Link>
+          </>
         }
       />
       <JournoCollabIQ toolHeaderHeight={TOOL_HEADER_H} />

@@ -450,13 +450,13 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
       <div style={{ marginBottom: 48 }}>
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
-          <input style={inp()} placeholder="e.g. Acme Corp" value={biz} autoFocus
+          <input style={inp()} placeholder="e.g. Fairground" value={biz} autoFocus
             onChange={e => dispatch({ type: "SET", key: "biz", val: e.target.value })} />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 28 }}>
           <div>
             <label style={lbl(TX3)}>Website</label>
-            <input style={inp()} placeholder="e.g. acme.com" value={domain}
+            <input style={inp()} placeholder="e.g. fairground.example.com" value={domain}
               onChange={e => dispatch({ type: "SET", key: "domain", val: e.target.value })} />
           </div>
           <div>

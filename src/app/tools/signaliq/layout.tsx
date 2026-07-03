@@ -3,11 +3,11 @@ import type { Metadata } from "next";
 // Metadata-only wrapper for the SignalIQ public tool (the page itself is a
 // client component and cannot export metadata). No UI is changed here.
 export const metadata: Metadata = {
-  title: "SignalIQ · Media Coverage Gap Scanner",
+  title: "SignalIQ · Story Radar | Media Coverage Gap Scanner",
   description:
     "SignalIQ spots media coverage gaps and whitespace across your sector with live signal data. A free interactive tool from the EMOS suite.",
   openGraph: {
-    title: "SignalIQ · Media Coverage Gap Scanner",
+    title: "SignalIQ · Story Radar",
     description:
       "Spot media coverage gaps and whitespace across your sector with live signal data.",
   },

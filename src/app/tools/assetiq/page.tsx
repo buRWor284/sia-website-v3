@@ -524,7 +524,7 @@ export default function AssetIQPage() {
                       <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", color: P55 }}>PLATFORM</span>
                     </div>
                     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.2, marginBottom: 8 }}>
-                      FactCheck IQ | Verification Pipeline
+                      FactcheckIQ | Verification Pipeline
                     </div>
                     <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, lineHeight: 1.5, color: P72 }}>
                       Verify every claim in the asset before it goes out to journalists.
@@ -534,7 +534,7 @@ export default function AssetIQPage() {
                     href="/tools/factcheckiq"
                     style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "14px 24px", whiteSpace: "nowrap", textDecoration: "none" }}
                   >
-                    Go to FactCheck IQ {"→"}
+                    Go to FactcheckIQ {"→"}
                   </Link>
                 </div>
               </div>

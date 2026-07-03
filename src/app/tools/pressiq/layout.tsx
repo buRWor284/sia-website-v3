@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 
 // Metadata-only wrapper for the PressIQ public tool (client component).
 export const metadata: Metadata = {
-  title: "PressIQ · PR Pitch Scorer",
+  title: "PressIQ · Journalist Pitch Score",
   description:
     "Paste your pitch. PressIQ scores it on relevance, mechanics, and newsroom-readiness, then tells you exactly what to fix. Free tool from the EMOS suite.",
   openGraph: {
-    title: "PressIQ · PR Pitch Scorer",
+    title: "PressIQ · Journalist Pitch Score",
     description:
       "Score your media pitch on relevance, newsroom-ready material, and the EMOS framework, and see exactly how to fix it.",
   },

@@ -144,9 +144,13 @@ type Action =
   | { type: "GO"; step: number };
 
 // ── State ──────────────────────────────────────────────────────────────────────
-const V2_STORE = "collabiq_v2_state";
-const V2_SUB   = "collabiq_v2_sub";
-const V2_THEME = "collabiq_v2_theme";
+// NOTE: keys were "collabiq_v2_*" (copied when this tool was forked from
+// PartnerCollabIQ), so the two tools silently shared persisted form state —
+// business names typed into one showed up "pre-filled" in the other
+// (2026-07 QA finding). Own keys now; PartnerCollabIQ keeps the old ones.
+const V2_STORE = "journocollabiq_v1_state";
+const V2_SUB   = "journocollabiq_v1_sub";
+const V2_THEME = "journocollabiq_v1_theme";
 
 function initState(): CollabState {
   try {
@@ -236,7 +240,7 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
   return (
     <StageWrapper
       title="Find the journalists who'll actually cover this."
-      subtitle="JournoCollabIQ surfaces the reporters who cover your beat — grounded in their recent work — then gives you the angle, a media list, and a targeting brief to land the story."
+      subtitle="JournoCollabIQ surfaces the reporters who cover your beat, grounded in their recent work, then gives you the angle, a media list, and a targeting brief to land the story."
       heroExtra={
         <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 40 }}>
           <a href="/tools/journocollabiq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ ...ghostBtn(), padding: "10px 18px", fontSize: 11, textDecoration: "none" }}>
@@ -251,7 +255,7 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
       <div style={{ marginBottom: 48 }}>
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
-          <input style={inp()} placeholder="e.g. Acme Corp" value={biz} autoFocus
+          <input style={inp()} placeholder="e.g. Fairground" value={biz} autoFocus
             onChange={e => dispatch({ type: "SET", key: "biz", val: e.target.value })}
             onPaste={e => setTimeout(() => dispatch({ type: "SET", key: "biz", val: (e.target as HTMLInputElement).value }), 0)}
             onBlur={e => dispatch({ type: "SET", key: "biz", val: e.target.value })} />
@@ -259,7 +263,7 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 28 }}>
           <div>
             <label style={lbl(TX3)}>Website</label>
-            <input style={inp()} placeholder="e.g. acme.com" value={domain}
+            <input style={inp()} placeholder="e.g. fairground.example.com" value={domain}
               onChange={e => dispatch({ type: "SET", key: "domain", val: e.target.value })} />
           </div>
           <div>

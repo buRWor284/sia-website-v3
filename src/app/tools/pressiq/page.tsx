@@ -101,24 +101,22 @@ const TICKER = [
 ];
 
 // ── Sample content ────────────────────────────────────────────────────────────
-const SAMPLE_PITCH = `Subject: Re: Experts on the 4-day week - our 18-month data + [Stats + Examples]
+const SAMPLE_PITCH = `Subject: Data: 40 B2B marketplaces benchmarked, only 11 meet their own definition
 
-Hi Sarah,
+Hi Jordan,
 
-Loved your piece last month on remote-team burnout. The bit about "always-on guilt" mirrored exactly what we measured.
+I've been following your coverage of marketplace infrastructure on TechCrunch. We just wrapped a benchmark of 40 platforms that call themselves a "B2B marketplace," scored against a simple 3-part definition (multi-vendor listings, split payments, independent vendor onboarding). Only 11 actually qualify.
 
-I'm Priya Raman, founder of Tilt (we run ops for 40 distributed startups). When we cut to a 4-day week 18 months ago, I was sure output would drop. It didn't. We tracked 1,200 employees across 12 companies: focused output rose 9%, and voluntary attrition fell by a third.
+I'm Maya Chen, co-founder and CEO of Fairground. We build the marketplace infrastructure some of these 40 platforms run on, so we had the data already, we just hadn't scored it until now.
 
-The counterintuitive part: the win wasn't "rest." It was that a hard deadline forced teams to kill low-value meetings: 22% of recurring meetings vanished in the first month.
+Happy to share the full breakdown, or put you in touch with two of the 11 that qualify for a quote.
 
-Happy to share the raw dataset, or connect you with two founders who reversed course and went back to five days. Which would be more useful for your piece?
+Maya Chen · Co-founder & CEO, Fairground · fairground.example.com
+maya@fairground.example.com · @mayachen · linkedin.com/in/mayachen`;
 
-Priya Raman · Founder, Tilt · tilt.example.com
-priya@tilt.example.com · @priyaraman · linkedin.com/in/priyaraman`;
+const SAMPLE_QUERY = `Looking for founders or operators of B2B marketplaces who can share original numbers on vendor onboarding, split payments, or take rates, for a piece on why most self-described "B2B marketplaces" are really just catalogs. Especially interested in benchmarks comparing platforms. Requirements: named source, shareable data, available for a 15-min phone interview.`;
 
-const SAMPLE_QUERY = `Looking for founders / HR leads who have implemented a 4-day work week for at least 6 months and can share real performance data (retention, output, revenue impact). Especially interested in anyone who tried it and reversed course. For a feature in The Future of Work series. Requirements: Named source, must be available for a 15-min phone interview.`;
-
-const SAMPLE_BEAT = `Covers the future of work, distributed teams, and workplace productivity. Writes the Future of Work series: regular features on 4-day weeks, remote-first culture, async practices, and workforce wellbeing data. Prefers named sources with real numbers from their own operations, not thought-leader takes.`;
+const SAMPLE_BEAT = `Covers marketplace infrastructure, B2B commerce platforms, and the payment rails behind them for TechCrunch. Regular features on multi-vendor marketplaces, vendor onboarding, and platform take rates. Prefers named founders with original data from their own operations, not thought-leader takes.`;
 
 const STORE_KEY = "sia.pressiq.v2";
 
@@ -544,10 +542,20 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
 
 // ── Loading panel ─────────────────────────────────────────────────────────────
 function LoadingPanel() {
+  // Elapsed-time counter + expectation setting: the AI scoring call routinely
+  // takes 20-30s and QA flagged that users assume the tool froze without it.
+  const [secs, setSecs] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSecs(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
   return (
     <div style={{ padding: "80px 32px 60px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: ra(INK, 0.62), marginBottom: 24, textAlign: "center" }}>
+      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: ra(INK, 0.62), marginBottom: 10, textAlign: "center" }}>
         Scoring against 32 factors across 7 dimensions…
+      </div>
+      <div style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.45), marginBottom: 24, textAlign: "center" }}>
+        {secs}s elapsed · a full analysis typically takes 20-30 seconds
       </div>
       <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.5), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
         Cision State of the Media 2026 (n≈1,800)<br />
@@ -1285,7 +1293,7 @@ export default function PressIQPage() {
         {/* ── Header ───────────────────────────────────────────────── */}
         <ToolHeader
           toolPrefix="Press"
-          subtitle="Journalist Pitch Score · SIA Wire"
+          subtitle="Journalist Pitch Score"
           rightContent={
             <>
               <Link href="/tools/pressiq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
@@ -1308,7 +1316,7 @@ export default function PressIQPage() {
                 Press<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
               </div>
               <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 600, letterSpacing: ".18em", textTransform: "uppercase", color: ra(PAPER, 0.50), marginTop: 8, lineHeight: 1.7 }}>
-                Journalist pitch score<br />by Syed Irfan Ajmal · SIA Wire
+                Journalist pitch score<br />by Syed Irfan Ajmal
               </div>
             </div>
 

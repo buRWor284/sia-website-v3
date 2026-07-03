@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { PartnerCollabIQ } from "@/components/tools/CollabIQ";
-import { ToolHeader } from "@/components/bureau";
+import Link from "next/link";
+import { ToolHeader } from "@/components/tools/ToolHeader";
 
 export const metadata: Metadata = {
   title: "PartnerCollabIQ · Partnership Intelligence Tool",
@@ -16,8 +17,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tools/partnercollabiq" },
 };
 
-// ToolHeader height: 28px logo + 13px top + 13px bottom padding = 54px
-export const TOOL_HEADER_H = 54;
+// Shared tools/ToolHeader is a fixed 52px bar
+export const TOOL_HEADER_H = 52;
 
 export default function PartnerCollabIQPage() {
   return (
@@ -30,7 +31,15 @@ export default function PartnerCollabIQPage() {
       <h1 style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" }}>
         PartnerCollabIQ - Partnership Intelligence Tool
       </h1>
-      <ToolHeader toolName="PartnerCollabIQ: Partnership Intelligence" />
+      <ToolHeader
+        toolPrefix="PartnerCollab"
+        subtitle="Partnership Intelligence"
+        rightContent={
+          <Link href="/" style={{ fontFamily: "var(--font-mono)", fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
+            ← syedirfanajmal.com
+          </Link>
+        }
+      />
       <PartnerCollabIQ toolHeaderHeight={TOOL_HEADER_H} />
     </>
   );

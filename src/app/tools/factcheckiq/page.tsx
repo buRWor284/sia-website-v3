@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * FactCheck IQ — public teaser page
+ * FactcheckIQ — public teaser page
  * /tools/factcheckiq
  *
- * High-fidelity React port of the design handoff "FactCheck IQ Framework v4"
+ * High-fidelity React port of the design handoff "FactcheckIQ Framework v4"
  * (design_handoff_factcheck_iq). This is a MARKETING EXPLAINER for a
- * platform-only tool, not a working version of FactCheck IQ: no API routes,
+ * platform-only tool, not a working version of FactcheckIQ: no API routes,
  * no email gates, no live file upload or scoring.
  *
  * Three lanes: a raw draft comes in → a 10-step verification pipeline runs
@@ -165,7 +165,7 @@ const ActDivider = () => (
   </>
 );
 
-export default function FactCheckIQPage() {
+export default function FactcheckIQPage() {
   const [selected, setSelected] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState<SpeedName>("Normal");
@@ -183,7 +183,7 @@ export default function FactCheckIQPage() {
   return (
     <>
       <ToolHeader
-        toolPrefix="FactCheck"
+        toolPrefix="Factcheck"
         subtitle="How it works · Verification pipeline"
         rightContent={
           <Link
@@ -241,6 +241,11 @@ export default function FactCheckIQPage() {
                     <span className="fc-pulse" style={{ width: 9, height: 9, background: YEL, display: "inline-block" }} />
                     <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".18em" }}>INTERACTIVE</span>
                   </div>
+                  <div style={{ marginBottom: 8 }}>
+                    <span style={{ display: "inline-block", fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".1em", textTransform: "uppercase", background: YEL, color: INK, padding: "4px 9px" }}>
+                      Sample scenario · Fairground (illustrative)
+                    </span>
+                  </div>
                   <div style={{ fontFamily: MONO, fontSize: 11, color: P55 }}>
                     10 STEPS {"·"} 2 MODES {"·"} 6 VERDICTS {"·"} 5 PRINCIPLES {"·"} 11 METHODS
                   </div>
@@ -260,13 +265,13 @@ export default function FactCheckIQPage() {
                 </div>
                 <div style={{ flex: 1, maxWidth: 760, border: `1px solid ${INK}`, background: PAPER2, padding: "14px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
                   <div>
-                    <SCaps size={9.5} ls=".16em" color={INK55} style={{ display: "block", marginBottom: 8 }}>Pasted draft + 2 files</SCaps>
+                    <SCaps size={9.5} ls=".16em" color={INK55} style={{ display: "block", marginBottom: 8 }}>Fairground&apos;s draft blog post + 2 files</SCaps>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: 7, border: `1px solid ${INK}`, background: PAPER, fontFamily: MONO, fontWeight: 500, fontSize: 11, padding: "5px 9px" }}>
                         <span style={{ color: "#9b2c2c" }}>{"▣"}</span> nielsen-trust.pdf
                       </span>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: 7, border: `1px solid ${INK}`, background: PAPER, fontFamily: MONO, fontWeight: 500, fontSize: 11, padding: "5px 9px" }}>
-                        <span style={{ color: "#2a5db0" }}>{"▣"}</span> earned-media-post.docx
+                        <span style={{ color: "#2a5db0" }}>{"▣"}</span> fairground-earned-media-post.docx
                       </span>
                     </div>
                   </div>
@@ -594,7 +599,7 @@ export default function FactCheckIQPage() {
                   A safety net, <span style={{ color: YEL }}>not a ghostwriter</span>
                 </h2>
                 <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.6, color: P72, maxWidth: "76ch", margin: "18px 0 0" }}>
-                  Spell-check caught typos. Grammar-check caught grammar. FactCheck IQ catches the false claim and the invented source, before your reader does. It works the same whether a person or an AI wrote the draft: it verifies, and it never writes for you. Like the typewriter, spell-check, and Grammarly before it, this is a tool that makes writers more trustworthy, not obsolete.
+                  Spell-check caught typos. Grammar-check caught grammar. FactcheckIQ catches the false claim and the invented source, before your reader does. It works the same whether a person or an AI wrote the draft: it verifies, and it never writes for you. Like the typewriter, spell-check, and Grammarly before it, this is a tool that makes writers more trustworthy, not obsolete.
                 </p>
                 <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P45, marginTop: 18 }}>
                   For human writers and AI drafts alike
