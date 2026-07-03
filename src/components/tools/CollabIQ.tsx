@@ -1032,27 +1032,37 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     return ()=>clearInterval(t);
   }, [loading]);
 
-  // Cloudflare Turnstile (same managed-widget pattern as PressIQ/SignalIQ)
-  const [turnstileToken, setTurnstileToken] = useState("");
+  // Cloudflare Turnstile (same hardened pattern as JournoCollabIQ/SignalIQ:
+  // token ref for async reads, render retried when the container mounts,
+  // expired-callback auto-reset, waitForToken before every API call)
+  const turnstileTokenRef = useRef("");
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
+  const setToken = (tok: string) => { turnstileTokenRef.current = tok; };
+
+  // The widget container only exists when step>0 — the intro (step 0) is up at
+  // mount, so a run-once render finds no container and would never retry.
+  function tryRenderTurnstile() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (!TURNSTILE_SITE_KEY || !w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
+    turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
+      sitekey: TURNSTILE_SITE_KEY,
+      theme: theme === "dark" ? "dark" : "light",
+      callback: (token: string) => setToken(token),
+      // Token expired mid-session — reset so the managed widget re-solves.
+      "expired-callback": () => {
+        setToken("");
+        try { if (turnstileWidgetId.current) w.turnstile.reset(turnstileWidgetId.current); } catch { /* noop */ }
+      },
+      "error-callback": () => setToken(""),
+    });
+  }
 
   useEffect(() => {
     if (!TURNSTILE_SITE_KEY) return;
-    const render = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = window as any;
-      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
-      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
-        sitekey: TURNSTILE_SITE_KEY,
-        theme: theme === "dark" ? "dark" : "light",
-        callback: (token: string) => setTurnstileToken(token),
-        "expired-callback": () => setTurnstileToken(""),
-        "error-callback": () => setTurnstileToken(""),
-      });
-    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).turnstile) { render(); return; }
+    if ((window as any).turnstile) { tryRenderTurnstile(); return; }
     const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
     let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
     if (!s) {
@@ -1060,10 +1070,20 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
       s.src = SRC; s.async = true; s.defer = true;
       document.head.appendChild(s);
     }
-    s.addEventListener("load", render);
-    return () => { s?.removeEventListener("load", render); };
+    const onLoad = () => tryRenderTurnstile();
+    s.addEventListener("load", onLoad);
+    return () => { s?.removeEventListener("load", onLoad); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Re-attempt render whenever the step changes: the container mounts when the
+  // visitor leaves the intro (step 0 → 1), and tearing down/re-rendering is a
+  // no-op thanks to the turnstileWidgetId guard.
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || state.step === 0) return;
+    tryRenderTurnstile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.step]);
 
   // Turnstile tokens are single-use — refresh after every API call.
   function resetTurnstile() {
@@ -1071,8 +1091,27 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     const w = window as any;
     if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
       w.turnstile.reset(turnstileWidgetId.current);
-      setTurnstileToken("");
+      setToken("");
     }
+  }
+
+  // Wait (briefly) for a valid token before hitting the API. If the current
+  // token is gone (expired/consumed), reset the widget — the managed flow
+  // usually re-solves without user interaction — and poll for the new token.
+  async function waitForToken(ms = 8000): Promise<string> {
+    if (!TURNSTILE_SITE_KEY) return "";
+    if (turnstileTokenRef.current) return turnstileTokenRef.current;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (turnstileWidgetId.current && w.turnstile) {
+      try { w.turnstile.reset(turnstileWidgetId.current); } catch { /* noop */ }
+    }
+    const t0 = Date.now();
+    while (Date.now() - t0 < ms) {
+      await new Promise(r => setTimeout(r, 250));
+      if (turnstileTokenRef.current) return turnstileTokenRef.current;
+    }
+    return "";
   }
 
   async function generatePartners() {
@@ -1085,7 +1124,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     try {
       const res = await fetch("/api/collab-ai", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy }, turnstileToken: turnstileToken || undefined }),
+        body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy }, turnstileToken: (await waitForToken()) || undefined }),
       });
       const json = await res.json().catch(() => ({})) as { result?: string; error?: string };
       if (res.ok && json.result) {
@@ -1479,7 +1518,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
                partner:state.scPartner,       // field name the API prompt expects
                partnerCat:state.scCat,
                scorePct },
-        turnstileToken: turnstileToken || undefined,
+        turnstileToken: (await waitForToken()) || undefined,
       })});
       if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiEmail(j.result);setAiEmailLoading(false);return;}}
     } catch { /* fallback */ } finally { resetTurnstile(); }
@@ -1501,7 +1540,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
                selNiches:state.selNiches,
                partner:state.scPartner, partnerCat:state.scCat,
                scorePct, verdictText },
-        turnstileToken: turnstileToken || undefined,
+        turnstileToken: (await waitForToken()) || undefined,
       })});
       if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiBrief(j.result);setAiBriefLoading(false);return;}}
     } catch { /* fallback */ } finally { resetTurnstile(); }
