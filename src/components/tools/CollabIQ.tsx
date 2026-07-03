@@ -875,7 +875,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         <div>
           <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.14em", textTransform:"uppercase", display:"block", marginBottom:6 }}>Want someone to execute this for you?</span>
           <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, fontStyle:"italic", letterSpacing:"-0.01em" }}>DMR.agency</span>
-          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>partnerships and link building, done for you.</span>
+          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>done for you Digital PR, GEO, SEO, and Content Marketing.</span>
         </div>
         <a href="https://dmr.agency" target="_blank" rel="noopener noreferrer"
           style={{ ...primaryBtn(), textDecoration:"none", fontSize:11, padding:"12px 22px" }}>
