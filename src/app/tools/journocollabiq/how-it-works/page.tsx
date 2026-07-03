@@ -275,6 +275,12 @@ export default function JournoCollabIQHowItWorksPage() {
       />
 
       <div style={{ background: PAPER, fontFamily: SERIF, color: INK, minHeight: "100vh", overflowX: "hidden" }}>
+        <style>{`
+          @keyframes jcqFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+          @keyframes jcqBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+          .jcq-reveal { animation: jcqFadeUp .38s ease both; }
+          .jcq-blink { animation: jcqBlink 1.4s ease-in-out infinite; }
+        `}</style>
 
         {/* ============ HEADER / HERO (dark) ============ */}
         <header style={{ background: INK, color: PAPER, padding: "22px 40px" }}>
@@ -483,8 +489,8 @@ export default function JournoCollabIQHowItWorksPage() {
             {/* marker row */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(8, minmax(0,1fr))", gap: 8, marginBottom: 22 }}>
               {CRITERIA.map((c, i) => (
-                <div key={c.num} style={{ textAlign: "center", color: YEL, fontSize: 12, height: 12 }}>
-                  {i === step ? "▲" : ""}
+                <div key={c.num} style={{ textAlign: "center", color: YEL, fontSize: 12, height: 12, opacity: i === step ? 1 : 0, transition: "opacity .18s ease" }}>
+                  ▲
                 </div>
               ))}
             </div>
@@ -512,12 +518,12 @@ export default function JournoCollabIQHowItWorksPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 0, border: `1px solid ${INK}`, borderTop: "none" }}>
               <div style={{ display: "grid", gridTemplateColumns: "132px 1fr" }}>
                 <div style={{ background: INK, color: PAPER, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 10px" }}>
-                  <div style={{ fontSize: 30, color: YEL, lineHeight: 1 }}>{current.icon}</div>
+                  <div className={playing ? "jcq-blink" : undefined} style={{ fontSize: 30, color: YEL, lineHeight: 1 }}>{current.icon}</div>
                   <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.18em", marginTop: 14, color: P72 }}>
                     CRITERION {current.num}
                   </div>
                 </div>
-                <div style={{ padding: "24px 28px" }}>
+                <div key={current.num} className="jcq-reveal" style={{ padding: "24px 28px" }}>
                   <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 23, letterSpacing: "-0.01em", margin: "0 0 10px", maxWidth: 560 }}>{current.question}</h3>
                   <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.55, color: INK70, margin: 0, maxWidth: 560 }}>{current.test}</p>
                   <div style={capsLbl(10, "0.16em", { marginTop: 18 })}>{current.tag}</div>

@@ -217,6 +217,10 @@ export default function SignalIQHowItWorksPage() {
           .sigfw .sig-src:hover { background: ${PAPER2}; }
           .sigfw .sig-step:hover .sig-ibox { border-color: ${INK}; }
           .sigfw .sig-beat:hover, .sigfw .sig-chip:hover { background: ${YEL}; color: ${INK}; }
+          @keyframes sigFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+          @keyframes sigBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+          .sig-reveal { animation: sigFadeUp .38s ease both; }
+          .sig-blink { animation: sigBlink 1.4s ease-in-out infinite; }
           /* Narrow-width guardrails — desktop measurements untouched above these points */
           @media (max-width: 760px) {
             .sigfw-actindex { grid-template-columns: 1fr 1fr !important; }
@@ -408,10 +412,10 @@ export default function SignalIQHowItWorksPage() {
                 {/* Detail panel */}
                 <div style={{ display: "flex", border: `1px solid ${INK}`, borderTop: "none", minHeight: 148 }}>
                   <div style={{ background: INK, color: YEL, width: 130, flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
-                    <span style={{ fontSize: 30, lineHeight: 1 }}>{active.icon}</span>
+                    <span className={playing ? "sig-blink" : undefined} style={{ fontSize: 30, lineHeight: 1 }}>{active.icon}</span>
                     <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".12em", color: P55 }}>STEP {pad(step + 1)}</span>
                   </div>
-                  <div style={{ padding: "22px 26px", background: PAPER, flex: 1 }}>
+                  <div key={step} className="sig-reveal" style={{ padding: "22px 26px", background: PAPER, flex: 1 }}>
                     <h3 style={{ fontFamily: GROT, fontWeight: 800, fontSize: 20, letterSpacing: ".02em", textTransform: "uppercase", margin: "0 0 10px" }}>
                       {active.name}
                     </h3>

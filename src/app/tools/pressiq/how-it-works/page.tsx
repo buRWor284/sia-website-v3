@@ -264,6 +264,10 @@ export default function PressIQHowItWorksPage() {
         .piq-inkbtn:hover { opacity: .85; }
         .piq-cta { transition: background .12s ease; }
         .piq-cta:hover { background: #ffc83a !important; }
+        @keyframes piqFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes piqBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+        .piq-reveal { animation: piqFadeUp .38s ease both; }
+        .piq-blink { animation: piqBlink 1.4s ease-in-out infinite; }
         @media (max-width:1040px){ .piq-scorehead { grid-template-columns: 1fr !important; justify-items: center; } }
         @media (max-width:900px){
           .piq-a1grid, .piq-detail, .piq-bkrow { grid-template-columns: 1fr !important; }
@@ -483,8 +487,8 @@ export default function PressIQHowItWorksPage() {
             {/* detail panel */}
             <div className="piq-detail" style={{ border: `1px solid ${INK}`, display: "grid", gridTemplateColumns: "200px 1fr", minHeight: 180 }}>
               <div style={{ background: INK, color: PAPER, padding: "24px 22px", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 20 }}>
-                <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".16em", color: P55 }}>{stepLabel}</span>
-                <div style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
+                <span className={playing ? "piq-blink" : undefined} style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".16em", color: P55 }}>{stepLabel}</span>
+                <div key={d.n} className="piq-reveal" style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
                   <div>
                     <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", color: P55, textTransform: "uppercase", marginBottom: 4 }}>Weight</div>
                     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 44, lineHeight: 0.9, color: PAPER }}>{d.weight}</div>
@@ -495,7 +499,7 @@ export default function PressIQHowItWorksPage() {
                   </div>
                 </div>
               </div>
-              <div style={{ padding: "26px 30px", background: PAPER3, display: "flex", flexDirection: "column", gap: 14 }}>
+              <div key={d.n} className="piq-reveal" style={{ padding: "26px 30px", background: PAPER3, display: "flex", flexDirection: "column", gap: 14 }}>
                 <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap" }}>
                   <h3 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 30, lineHeight: 1, margin: 0, letterSpacing: "-.01em" }}>{d.name}</h3>
                   <span style={{ display: "inline-block", padding: "5px 10px", background: INK, color: PAPER, fontFamily: MONO, fontSize: 11, letterSpacing: ".04em" }}>{d.tag}</span>

@@ -189,6 +189,10 @@ export default function CoverageIQHowItWorksPage() {
         .ciq-hov-ink:hover { opacity: .85; }
         .ciq-hov-yel { transition: background .12s; }
         .ciq-hov-yel:hover { background: ${YEL2} !important; }
+        @keyframes ciqFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes ciqBlink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+        .ciq-reveal { animation: ciqFadeUp .38s ease both; }
+        .ciq-blink { animation: ciqBlink 1.4s ease-in-out infinite; }
         @media (max-width: 900px) {
           .ciq-act1 { grid-template-columns: 1fr !important; }
           .ciq-2col { grid-template-columns: 1fr !important; }
@@ -357,13 +361,14 @@ export default function CoverageIQHowItWorksPage() {
                           color: isActive ? YEL : INK,
                           display: "flex", alignItems: "center", justifyContent: "center", fontSize: 19,
                           // The one permitted shadow: the functional active-marker glow ring.
-                          boxShadow: isActive ? "0 0 0 4px rgba(245,184,31,.35)" : undefined,
+                          boxShadow: isActive ? "0 0 0 4px rgba(245,184,31,.35)" : "0 0 0 0 rgba(245,184,31,0)",
+                          transition: "background .18s ease, color .18s ease, box-shadow .18s ease",
                         }}
                       >
                         {st.glyph}
                       </div>
                       <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".1em", color: INK45 }}>{st.n}</div>
-                      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: ".08em", textAlign: "center", color: isActive ? INK : INK60 }}>
+                      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: ".08em", textAlign: "center", color: isActive ? INK : INK60, transition: "color .18s ease" }}>
                         {st.name.toUpperCase()}
                       </div>
                     </button>
@@ -396,10 +401,10 @@ export default function CoverageIQHowItWorksPage() {
             {/* detail panel */}
             <div className="ciq-detail" style={{ border: `1px solid ${INK}`, borderTop: "none", display: "grid", gridTemplateColumns: "120px 1fr" }}>
               <div style={{ background: INK, color: YEL, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "22px 10px", gap: 10 }}>
-                <div style={{ fontSize: 30, lineHeight: 1 }}>{active.glyph}</div>
+                <div className={playing ? "ciq-blink" : undefined} style={{ fontSize: 30, lineHeight: 1 }}>{active.glyph}</div>
                 <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".14em", color: P55 }}>STEP {active.n}</div>
               </div>
-              <div style={{ padding: "22px 26px", minWidth: 0 }}>
+              <div key={active.n} className="ciq-reveal" style={{ padding: "22px 26px", minWidth: 0 }}>
                 <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, lineHeight: 1 }}>{active.name}</div>
                 <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.5, color: INK70, marginTop: 8, maxWidth: 640 }}>{active.short}</div>
                 <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5, lineHeight: 1.5, color: INK55, marginTop: 6, maxWidth: 640 }}>
