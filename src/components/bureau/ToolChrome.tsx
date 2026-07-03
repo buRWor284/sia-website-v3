@@ -17,9 +17,12 @@ const MONO = "'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace";
 export const ToolHeader = ({
   toolName,
   sticky = true,
+  rightExtra,
 }: {
   toolName: string;
   sticky?: boolean;
+  /** Optional slot rendered before the back link — e.g. a "How it works" link. */
+  rightExtra?: React.ReactNode;
 }) => (
   <header
     style={{
@@ -54,13 +57,16 @@ export const ToolHeader = ({
       </span>
     </div>
 
-    <Link href="/" className="tool-back-link" style={{
-      fontFamily: GROT, fontWeight: 700, fontSize: 9,
-      letterSpacing: ".16em", textTransform: "uppercase",
-      color: CREAM45, textDecoration: "none", whiteSpace: "nowrap",
-    }}>
-      ← syedirfanajmal.com
-    </Link>
+    <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
+      {rightExtra}
+      <Link href="/" className="tool-back-link" style={{
+        fontFamily: GROT, fontWeight: 700, fontSize: 9,
+        letterSpacing: ".16em", textTransform: "uppercase",
+        color: CREAM45, textDecoration: "none", whiteSpace: "nowrap",
+      }}>
+        ← syedirfanajmal.com
+      </Link>
+    </div>
   </header>
 );
 

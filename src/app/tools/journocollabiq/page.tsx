@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Script from "next/script";
 import { JournoCollabIQ } from "@/components/tools/JournoCollabIQ";
 import { ToolHeader } from "@/components/bureau";
@@ -30,7 +31,17 @@ export default function JournoCollabIQPage() {
       <h1 style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap" }}>
         JournoCollabIQ - Journalist Beat Matcher
       </h1>
-      <ToolHeader toolName="JournoCollabIQ: Journalist Beat Matcher" />
+      <ToolHeader
+        toolName="JournoCollabIQ: Journalist Beat Matcher"
+        rightExtra={
+          <Link
+            href="/tools/journocollabiq/how-it-works"
+            style={{ fontFamily: "var(--font-grot)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "#f5b81f", textDecoration: "none", whiteSpace: "nowrap" }}
+          >
+            How it works →
+          </Link>
+        }
+      />
       <JournoCollabIQ toolHeaderHeight={TOOL_HEADER_H} />
     </>
   );
