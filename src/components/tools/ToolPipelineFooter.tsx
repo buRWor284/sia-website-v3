@@ -3,19 +3,19 @@
 /**
  * ToolPipelineFooter — shared earned-media pipeline footer.
  * Used on SignalIQ, PressIQ, JournoCollabIQ, CoverageIQ, and the two
- * platform teaser pages (AssetIQ, FactCheckIQ).
+ * platform teaser pages (AssetIQ, FactcheckIQ).
  * NOT used on PartnerCollabIQ (separate tool, outside EMOS workflow).
  *
  * The strip mixes two card kinds:
  *   - Free tools (SignalIQ, JournoCollabIQ, PressIQ, CoverageIQ): numbered
  *     01–04, unchanged from before — no renumbering, so no copy elsewhere
  *     that references "step 01–04" breaks.
- *   - Platform tools (AssetIQ, FactCheckIQ): visually distinct "PLATFORM"
+ *   - Platform tools (AssetIQ, FactcheckIQ): visually distinct "PLATFORM"
  *     cards with an ink-on-yellow tag in place of a step number, so it's
  *     unmistakable that these live inside the paid EMOS Platform, not the
  *     free lead-magnet tools.
  *
- * Order (the Fairground journey): SignalIQ → AssetIQ → FactCheckIQ →
+ * Order (the Fairground journey): SignalIQ → AssetIQ → FactcheckIQ →
  * JournoCollabIQ → PressIQ → CoverageIQ → EMOS.
  *
  * Pass `currentTool` to highlight "You are here".
@@ -50,7 +50,7 @@ interface PipelineCard {
 const PIPELINE: PipelineCard[] = [
   { step: "01", tool: "SignalIQ",        href: "/tools/signaliq",        toolId: "signaliq",        role: "Find the story" },
   { step: "PLATFORM", tool: "AssetIQ",       href: "/tools/assetiq",       toolId: "assetiq",       role: "Build the asset",   platform: true },
-  { step: "PLATFORM", tool: "FactCheckIQ",   href: "/tools/factcheckiq",   toolId: "factcheckiq",   role: "Verify the claims", platform: true },
+  { step: "PLATFORM", tool: "FactcheckIQ",   href: "/tools/factcheckiq",   toolId: "factcheckiq",   role: "Verify the claims", platform: true },
   { step: "02", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
   { step: "03", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
   { step: "04", tool: "CoverageIQ",      href: "/tools/coverageiq",      toolId: "coverageiq",      role: "Track the placement" },
@@ -148,7 +148,7 @@ export function ToolPipelineFooter({ currentTool, compact }: Props) {
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: compact ? 8 : 12, flexWrap: "wrap" }}>
         <SCaps size={8.5} ls="0.20em" color={INK55}>The SIA earned-media pipeline</SCaps>
         <div style={{ flex: 1, height: 1, background: INK15, minWidth: 16 }} />
-        <Link href="/emos" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, textDecoration: "none" }}>
+        <Link href="/tools" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, textDecoration: "none" }}>
           How they fit together ↗
         </Link>
       </div>

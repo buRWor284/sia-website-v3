@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Mark, SCaps, SectionMast } from "@/components/bureau/primitives";
 import { GROT, INK, INK15, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
 
@@ -1131,9 +1131,10 @@ const PHASE1: PipeStep[] = [
 
 const PHASE2: PipeStep[] = [
   { n: "5", label: "Find the story first", tool: "SignalIQ", cap: "Surfaces breaking stories and coverage gaps before the press piles in.", status: "free", contentId: "tool-signaliq", week: "EMOS Wk 4 → P2" },
-  { n: "6", label: "Build the linkable asset", tool: "Infographics · Quizzes · Data reports", cap: "Your own newsworthy asset. The kits and quizzes here are live demos of this step.", status: "free", href: "/infographics", week: "EMOS Wk 5–6" },
-  { n: "7", label: "Target named journalists", tool: "JournoCollabIQ", cap: "Journalist Beat Matcher — who covers your topic and is most likely to bite.", status: "free", contentId: "tool-journocollabiq", week: "EMOS Wk 7" },
-  { n: "8", label: "Launch & compound", tool: "Publish + pitch Tier 1", cap: "Dedicated page, Tier-1 exclusive then Tier-2 release, then fold back into the loop.", status: "method", href: "/emos", week: "EMOS Wk 8" },
+  { n: "6", label: "Build the linkable asset", tool: "AssetIQ", cap: "Turns a SignalIQ opportunity into a linkable asset — report, calculator, or quiz — with a 6-step builder engine.", status: "soon", href: "/tools/assetiq", week: "EMOS Wk 5" },
+  { n: "7", label: "Verify before you pitch", tool: "FactCheckIQ", cap: "Runs every claim and stat in the asset through a 10-step verification pipeline before a journalist can poke a hole in it.", status: "soon", href: "/tools/factcheckiq", week: "EMOS Wk 6" },
+  { n: "8", label: "Target named journalists", tool: "JournoCollabIQ", cap: "Journalist Beat Matcher — who covers your topic and is most likely to bite.", status: "free", contentId: "tool-journocollabiq", week: "EMOS Wk 7" },
+  { n: "9", label: "Launch & compound", tool: "Publish + pitch Tier 1", cap: "Dedicated page, Tier-1 exclusive then Tier-2 release — scored again with PressIQ, tracked again with CoverageIQ, then folded back into the loop.", status: "method", href: "/emos", week: "EMOS Wk 8" },
 ];
 
 const FOUNDATION_SCIENCE = [
@@ -1146,6 +1147,19 @@ const FOUNDATION_CASE = [
   { name: "Founder Press Readiness", id: "quiz-founder-press" },
   { name: "Personal Brand Strength", id: "quiz-personal-brand" },
 ];
+
+// Everything already surfaced elsewhere in the guided view (Foundation chips +
+// both pipeline phases + the adjacent PartnerCollabIQ card) is excluded here,
+// so this list can't go stale as CONTENT changes — it's just "what's left."
+const GUIDED_VIEW_USED_IDS = new Set<string>([
+  ...FOUNDATION_SCIENCE.map((c) => c.id),
+  ...FOUNDATION_CASE.map((c) => c.id),
+  ...PHASE1.filter((s) => s.contentId).map((s) => s.contentId as string),
+  ...PHASE2.filter((s) => s.contentId).map((s) => s.contentId as string),
+  "tool-collabiq",
+]);
+
+const RELATED_ASSETS: ContentItem[] = CONTENT.filter((c) => !GUIDED_VIEW_USED_IDS.has(c.id) && !c.private);
 
 function resolveStepHref(step: PipeStep): string | null {
   if (step.contentId) {
@@ -1171,6 +1185,21 @@ function PipeStepRow({ step, accent }: { step: PipeStep; accent: "ink" | "yel" }
   return href
     ? <a className="gp-step gp-step-link" href={href}>{inner}</a>
     : <div className="gp-step">{inner}</div>;
+}
+
+function AdjacentToolCard({ id }: { id: string }) {
+  const item = CONTENT.find((c) => c.id === id);
+  if (!item || item.type !== "tool") return null;
+  const t = item as InteractiveContent;
+  const href = getCardHref(item);
+  return (
+    <a className="gp-adj-card" href={href ?? undefined}>
+      <div className="gp-adj-badge">Also public · not part of this pipeline</div>
+      <div className="gp-adj-title">{t.title}</div>
+      <div className="gp-adj-blurb">{t.sub}</div>
+      <span className="gp-adj-cta">{t.cta} ↗</span>
+    </a>
+  );
 }
 
 function FoundationChip({ name, id }: { name: string; id: string }) {
@@ -1239,6 +1268,17 @@ function GuidedPipeline() {
         .gp-cta .gp-cta-txt{ font-family:${SERIF}; font-size:19px; font-weight:700; }
         .gp-cta em{ color:${YEL}; font-style:italic; }
         .gp-cta-btn{ font-family:${GROT}; font-weight:800; font-size:11px; letter-spacing:.14em; text-transform:uppercase; background:${YEL}; color:${INK}; padding:13px 20px; white-space:nowrap; }
+        .gp-adj-card{ display:block; margin-top:24px; border:1px solid ${INK15}; background:${PAPER2}; padding:18px 22px; text-decoration:none; }
+        .gp-adj-badge{ font-family:${GROT}; font-weight:800; font-size:8.5px; letter-spacing:.16em; text-transform:uppercase; color:${INK55}; margin-bottom:8px; }
+        .gp-adj-title{ font-family:${SERIF}; font-weight:700; font-size:18px; color:${INK}; }
+        .gp-adj-blurb{ font-family:${SERIF}; font-style:italic; font-size:13.5px; color:${INK70}; margin-top:4px; }
+        .gp-adj-cta{ display:inline-block; margin-top:10px; font-family:${GROT}; font-weight:800; font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:${INK}; }
+        .gp-related{ margin-top:40px; }
+        .gp-related-label{ font-family:${GROT}; font-weight:800; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:${INK55}; margin-bottom:14px; }
+        .gp-related-scroll{ display:flex; gap:1px; overflow-x:auto; background:${INK15}; border:1px solid ${INK15}; }
+        .gp-related-card{ flex:0 0 200px; background:${PAPER}; padding:14px 16px 16px; text-decoration:none; }
+        .gp-related-badge{ font-family:${GROT}; font-weight:700; font-size:7.5px; letter-spacing:.14em; text-transform:uppercase; color:${INK55}; }
+        .gp-related-title{ font-family:${SERIF}; font-weight:700; font-size:14.5px; line-height:1.25; color:${INK}; margin-top:6px; }
         @media (max-width:600px){ .gp-foundation{ grid-template-columns:1fr; } }
       `}</style>
 
@@ -1264,7 +1304,7 @@ function GuidedPipeline() {
         <div className="gp-section-break">
           <span className="gp-section-break-label">The Pipeline</span>
           <div className="gp-section-break-line" />
-          <span className="gp-section-break-label">8 Steps</span>
+          <span className="gp-section-break-label">9 Steps</span>
         </div>
 
         <div className="gp-phases">
@@ -1286,7 +1326,35 @@ function GuidedPipeline() {
           </div>
         </div>
 
+        <div className="gp-loop">↻ &nbsp;<b>Reused, not new</b> — Phase 2 leans on the same PressIQ scoring and CoverageIQ tracking from Phase 1 for its own pitches; they&rsquo;re not one-phase tools, just introduced once.</div>
+
         <div className="gp-loop">↻ &nbsp;<b>The compounding loop</b> — every placement becomes credibility that makes the next pitch easier.</div>
+
+        <AdjacentToolCard id="tool-collabiq" />
+
+        {RELATED_ASSETS.length > 0 && (
+          <div className="gp-related">
+            <div className="gp-related-label">Related assets · Calculators, quizzes, kits &amp; infographics not in this pipeline</div>
+            <div className="gp-related-scroll">
+              {RELATED_ASSETS.map((item) => {
+                const href = getCardHref(item);
+                const inner = (
+                  <>
+                    <div className="gp-related-badge">{item.badge}</div>
+                    <div className="gp-related-title">{item.title}</div>
+                  </>
+                );
+                return href ? (
+                  <a key={item.id} className="gp-related-card" href={href} target={isExternal(item) ? "_blank" : undefined} rel={isExternal(item) ? "noopener noreferrer" : undefined}>
+                    {inner}
+                  </a>
+                ) : (
+                  <div key={item.id} className="gp-related-card" style={{ opacity: 0.6 }}>{inner}</div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <a className="gp-cta" href="/emos">
           <span className="gp-cta-txt">Try the pieces free. <em>Want the whole sequence, done with you?</em></span>
@@ -1336,6 +1404,27 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
   const [activeType, setActiveType] = useState<"all" | ContentType>("all");
   const [activeTopics, setActiveTopics] = useState<Set<TopicKey>>(new Set());
 
+  // ── Deep-linkable views: /resources#all and /resources#emos ──────────────
+  // Default (no hash) still opens on Browse All. A shared #emos or #all link
+  // forces the matching tab on load and scrolls past the hero to the toggle.
+  useEffect(() => {
+    // URL hash isn't available during SSR, so the only way to honour a
+    // shared #emos / #all link is to sync it once, right after mount.
+    const hash = window.location.hash.replace("#", "").toLowerCase();
+    if (hash === "emos" || hash === "all") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL hash on first load, not a render-loop
+      setView(hash === "emos" ? "guided" : "browse");
+      document.getElementById("resources-view")?.scrollIntoView({ block: "start" });
+    }
+  }, []);
+
+  const handleSetView = useCallback((v: "guided" | "browse") => {
+    setView(v);
+    if (typeof window !== "undefined") {
+      history.replaceState(null, "", `#${v === "guided" ? "emos" : "all"}`);
+    }
+  }, []);
+
   const toggleTopic = useCallback((topicId: TopicKey) => {
     setActiveTopics((prev) => {
       const next = new Set(prev);
@@ -1364,7 +1453,8 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
 
   return (
     <>
-      <ViewToggle view={view} setView={setView} />
+      <div id="resources-view" />
+      <ViewToggle view={view} setView={handleSetView} />
       {view === "guided" ? (
         <GuidedPipeline />
       ) : (
