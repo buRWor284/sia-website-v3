@@ -151,9 +151,9 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
       <DoubleRule dark={onDark} style={{ marginBottom: compact ? 12 : 16 }} />
 
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: compact ? 8 : 12, flexWrap: "wrap" }}>
-        <SCaps size={8.5} ls="0.20em" color={onDark ? "rgba(241,235,222,.55)" : INK55}>The SIA earned-media pipeline</SCaps>
-        <div style={{ flex: 1, height: 1, background: onDark ? "rgba(241,235,222,.18)" : INK15, minWidth: 16 }} />
-        <Link href="/tools" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: onDark ? "rgba(241,235,222,.55)" : INK55, textDecoration: "none" }}>
+        <SCaps size={8.5} ls="0.20em" color={onDark ? "rgba(241,235,222,.78)" : INK55}>The SIA earned-media pipeline</SCaps>
+        <div style={{ flex: 1, height: 1, background: onDark ? "rgba(241,235,222,.22)" : INK15, minWidth: 16 }} />
+        <Link href="/tools" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: onDark ? "rgba(241,235,222,.78)" : INK55, textDecoration: "none" }}>
           How they fit together ↗
         </Link>
       </div>
