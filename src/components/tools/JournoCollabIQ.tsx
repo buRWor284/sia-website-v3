@@ -1284,7 +1284,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(140,128,110);
     const sub=doc.splitTextToSize("The step-by-step system for founders who want press, partnerships, and authority before their Series A.",120) as string[];
     doc.text(sub,W/2,cy,{align:"center"}); cy+=sub.length*7+14;
-    const inclusions=["Step-by-step earned media playbooks","Weekly office hours with Syed Irfan Ajmal","Journalist & editor contact database","Collab link building templates & frameworks","Cohort-based training programme"];
+    const inclusions=["Step-by-step earned media playbooks","Journalist & editor contact database","Collab link building templates & frameworks","Ongoing platform access, no cohort or course"];
     const inclBoxH=16+inclusions.length*10+8;
     doc.setDrawColor(50,42,32); doc.setLineWidth(0.4);
     doc.rect(W/2-52,cy,104,inclBoxH);
@@ -1299,9 +1299,6 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     doc.setFillColor(...GOLD); doc.rect(W/2-54,cy,108,14,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...INK);
     doc.text("Learn more at syedirfanajmal.com/emos",W/2,cy+9,{align:"center"});
-    cy+=18;
-    doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(70,62,50);
-    doc.text("Founding class open  ·  Limited spots",W/2,cy,{align:"center"});
     // Attribution well above footer zone — no overlap
     doc.setFontSize(7); doc.setTextColor(55,46,36);
     doc.text(`Generated via JournoCollabIQ  ·  ${date}`,W/2,H-24,{align:"center"});

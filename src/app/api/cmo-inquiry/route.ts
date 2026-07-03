@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
@@ -150,6 +151,16 @@ export async function POST(request: NextRequest) {
   // ── Honeypot check ─────────────────────────────────────────
   if (body && typeof body === "object" && (body as Record<string, unknown>).website) {
     return NextResponse.json({ ok: true });
+  }
+
+  // ── Turnstile verification ─────────────────────────────────
+  const turnstileToken = (body as Record<string, unknown>)?.turnstileToken as string | undefined;
+  const turnstileOk = await verifyTurnstile(turnstileToken, ip);
+  if (!turnstileOk) {
+    return NextResponse.json(
+      { error: "Bot verification failed. Please refresh and try again." },
+      { status: 403 }
+    );
   }
 
   const result = validate(body);

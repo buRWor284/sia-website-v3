@@ -1,9 +1,10 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import Script from "next/script";
 import { Colophon, Subscriptions } from "@/components/bureau";
+import { Turnstile } from "@/components/Turnstile";
 import {
   DoubleRule,
   HRule,
@@ -979,6 +980,9 @@ const CMOInquiryForm = () => {
   const [fields, setFields] = useState({ name: "", email: "", company: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+
+  const handleToken = useCallback((token: string) => setTurnstileToken(token), []);
 
   const set = (k: keyof typeof fields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setFields(f => ({ ...f, [k]: e.target.value }));
@@ -991,7 +995,7 @@ const CMOInquiryForm = () => {
       const res = await fetch("/api/cmo-inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(fields),
+        body: JSON.stringify({ ...fields, turnstileToken }),
       });
       const json = await res.json() as { ok?: boolean; error?: string };
       if (!res.ok || !json.ok) {
@@ -1029,6 +1033,9 @@ const CMOInquiryForm = () => {
       `}</style>
       {/* Honeypot */}
       <input name="website" type="text" style={{ display: "none" }} tabIndex={-1} autoComplete="off" />
+
+      {/* Invisible Turnstile */}
+      <Turnstile onToken={handleToken} />
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <input

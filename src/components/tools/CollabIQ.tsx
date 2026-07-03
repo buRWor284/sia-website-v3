@@ -842,14 +842,14 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         </div>
       )}
 
-      {/* EMOS CTA */}
+      {/* DMR.agency CTA */}
       <div style={{ marginTop:aiBrief?0:16, padding:"24px 28px", background:BG2, border:`1px solid ${BD}`, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
         <div>
           <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.14em", textTransform:"uppercase", display:"block", marginBottom:6 }}>Want someone to execute this for you?</span>
-          <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, fontStyle:"italic", letterSpacing:"-0.01em" }}>Earned Media OS</span>
-          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>the full partnership system, done with you.</span>
+          <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, fontStyle:"italic", letterSpacing:"-0.01em" }}>DMR.agency</span>
+          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>partnerships and link building, done for you.</span>
         </div>
-        <a href="https://www.syedirfanajmal.com/emos/" target="_blank" rel="noopener noreferrer"
+        <a href="https://dmr.agency" target="_blank" rel="noopener noreferrer"
           style={{ ...primaryBtn(), textDecoration:"none", fontSize:11, padding:"12px 22px" }}>
           Learn more ↗
         </a>
@@ -1459,7 +1459,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
       pageFooter(briefPage);
     }
 
-    // ════ FINAL PAGE: EMOS CTA (DARK) ══════════════════════════════
+    // ════ FINAL PAGE: DMR.agency CTA (DARK) ══════════════════════════════
     doc.addPage();
     const lastPage=aiBrief?5:4;
     doc.setFillColor(...INK); doc.rect(0,0,W,H,"F");
@@ -1471,15 +1471,14 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     cy+=48;
     doc.setFillColor(...GOLD); doc.rect(M,cy,18,1,"F"); doc.rect(W-M-18,cy,18,1,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GOLD);
-    doc.text("WANT RESULTS LIKE THESE AT SCALE?",W/2,cy+1,{align:"center"});
+    doc.text("WANT SOMEONE TO EXECUTE THIS FOR YOU?",W/2,cy+1,{align:"center"});
     cy+=12;
     doc.setFont("helvetica","bold"); doc.setFontSize(34); doc.setTextColor(...CREAM);
-    doc.text("Earned Media",W/2,cy,{align:"center"}); cy+=12;
-    doc.setTextColor(...GOLD); doc.text("Operating System",W/2,cy,{align:"center"}); cy+=14;
+    doc.text("DMR.agency",W/2,cy,{align:"center"}); cy+=14;
     doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(140,128,110);
-    const sub=doc.splitTextToSize("The step-by-step system for founders who want press, partnerships, and authority before their Series A.",120) as string[];
+    const sub=doc.splitTextToSize("Partnership outreach, link building, and co-marketing execution — handled end-to-end by the team at DMR.agency.",120) as string[];
     doc.text(sub,W/2,cy,{align:"center"}); cy+=sub.length*7+14;
-    const inclusions=["Step-by-step earned media playbooks","Weekly office hours with Syed Irfan Ajmal","Journalist & editor contact database","Collab link building templates & frameworks","Cohort-based training programme"];
+    const inclusions=["Partner identification & vetting","Outreach execution and follow-up","Backlink & co-marketing placements","Reporting on results, not just activity"];
     const inclBoxH=16+inclusions.length*10+8;
     doc.setDrawColor(50,42,32); doc.setLineWidth(0.4);
     doc.rect(W/2-52,cy,104,inclBoxH);
@@ -1493,10 +1492,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     cy+=inclBoxH+14;
     doc.setFillColor(...GOLD); doc.rect(W/2-54,cy,108,14,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...INK);
-    doc.text("Learn more at syedirfanajmal.com/emos",W/2,cy+9,{align:"center"});
-    cy+=18;
-    doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(70,62,50);
-    doc.text("Founding class open  ·  Limited spots",W/2,cy,{align:"center"});
+    doc.text("Learn more at dmr.agency",W/2,cy+9,{align:"center"});
     // Attribution well above footer zone — no overlap
     doc.setFontSize(7); doc.setTextColor(55,46,36);
     doc.text(`Generated via PartnerCollabIQ  ·  ${date}`,W/2,H-24,{align:"center"});
