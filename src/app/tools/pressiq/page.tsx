@@ -430,8 +430,40 @@ function TabNav({ current, setTab, onReset }: { current: Tab; setTab: (t: Tab) =
   );
 }
 
-// ── Pre-score panel ───────────────────────────────────────────────────────────
-function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }) {
+// ── Live mechanics (standalone card, sits next to the pitch step) ────────────
+function LiveMechanics({ live }: { live: ReturnType<typeof scoreLayer1> | null }) {
+  function st(s?: "ideal" | "ok" | "off"): "green" | "amber" | "red" | "neutral" {
+    return !s ? "neutral" : s === "ideal" ? "green" : s === "ok" ? "amber" : "red";
+  }
+  return (
+    <section style={{ background: "#fff", border: `1px solid ${ra(INK, 0.1)}`, borderRadius: 6, padding: "24px 28px" }}>
+      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>
+        LIVE MECHANICS
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 28px" }}>
+        <LiveMeter label="Word count" val={live ? String(live.bands.wordCount.value) : "0"} band={st(live?.bands.wordCount.status)} hint={live ? live.bands.wordCount.hint : "Type to measure"} />
+        <LiveMeter label="Subject length" val={live ? `${live.bands.subjectWords.value} word${live.bands.subjectWords.value !== 1 ? "s" : ""}` : "0 words"} band={st(live?.bands.subjectWords.status)} hint={live ? live.bands.subjectWords.hint : "Add a subject line"} />
+        <LiveMeter label="Reading level" val={live ? `Grade ${Math.round(live.bands.readingGrade.value)}` : "—"} band={st(live?.bands.readingGrade.status)} hint={live ? live.bands.readingGrade.hint : "Need more text"} />
+        <LiveMeter label="Closing question" val={live ? (live.metrics.hasClosingQuestion ? "Yes" : "No") : "—"} band={st(live?.bands.questions.status)} hint={live ? live.bands.questions.hint : "Need more text"} />
+        <div style={{ gridColumn: "1/-1" }}>
+          <LiveMeter label="Tone / subjectivity"
+            val={live ? (live.bands.subjectivity.status === "ideal" ? "Clean" : live.bands.subjectivity.status === "ok" ? "Mild" : "Flagged") : "—"}
+            band={st(live?.bands.subjectivity.status)} hint={live ? live.bands.subjectivity.hint : "Need more text"} />
+        </div>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 14, borderTop: `1px solid ${ra(INK, 0.06)}` }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.62) }}>Mechanics score</span>
+        <div style={{ flex: 1, height: 4, background: ra(INK, 0.05) }}>
+          <div style={{ height: "100%", width: `${live?.score ?? 0}%`, background: BLUE, transition: "width .3s ease" }} />
+        </div>
+        <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: INK }}>{live?.score ?? 0}</span>
+      </div>
+    </section>
+  );
+}
+
+// ── Intro panel (step 0 — sells the tool before asking for input) ────────────
+function IntroPanel({ onStart }: { onStart: () => void }) {
   const [tickIdx, setTickIdx] = useState(0);
   const [tickOp, setTickOp]   = useState(1);
 
@@ -445,12 +477,9 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
   }, []);
 
   const t = TICKER[tickIdx];
-  function st(s?: "ideal" | "ok" | "off"): "green" | "amber" | "red" | "neutral" {
-    return !s ? "neutral" : s === "ideal" ? "green" : s === "ok" ? "amber" : "red";
-  }
 
   return (
-    <div>
+    <div style={{ background: "#fff", border: `1px solid ${ra(INK, 0.1)}`, borderRadius: 6, overflow: "hidden" }}>
       {/* Hero */}
       <div style={{ padding: "40px 32px 32px", borderBottom: `1px solid ${ra(INK, 0.1)}` }}>
         <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 14 }}>
@@ -478,31 +507,6 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
             allowFullScreen
             style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
           />
-        </div>
-      </div>
-
-      {/* Live mechanics */}
-      <div style={{ padding: "24px 32px 20px", borderBottom: `1px solid ${ra(INK, 0.1)}` }}>
-        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>
-          LIVE MECHANICS
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 28px" }}>
-          <LiveMeter label="Word count" val={live ? String(live.bands.wordCount.value) : "0"} band={st(live?.bands.wordCount.status)} hint={live ? live.bands.wordCount.hint : "Type to measure"} />
-          <LiveMeter label="Subject length" val={live ? `${live.bands.subjectWords.value} word${live.bands.subjectWords.value !== 1 ? "s" : ""}` : "0 words"} band={st(live?.bands.subjectWords.status)} hint={live ? live.bands.subjectWords.hint : "Add a subject line"} />
-          <LiveMeter label="Reading level" val={live ? `Grade ${Math.round(live.bands.readingGrade.value)}` : "—"} band={st(live?.bands.readingGrade.status)} hint={live ? live.bands.readingGrade.hint : "Need more text"} />
-          <LiveMeter label="Closing question" val={live ? (live.metrics.hasClosingQuestion ? "Yes" : "No") : "—"} band={st(live?.bands.questions.status)} hint={live ? live.bands.questions.hint : "Need more text"} />
-          <div style={{ gridColumn: "1/-1" }}>
-            <LiveMeter label="Tone / subjectivity"
-              val={live ? (live.bands.subjectivity.status === "ideal" ? "Clean" : live.bands.subjectivity.status === "ok" ? "Mild" : "Flagged") : "—"}
-              band={st(live?.bands.subjectivity.status)} hint={live ? live.bands.subjectivity.hint : "Need more text"} />
-          </div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 14, borderTop: `1px solid ${ra(INK, 0.06)}` }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.62) }}>Mechanics score</span>
-          <div style={{ flex: 1, height: 4, background: ra(INK, 0.05) }}>
-            <div style={{ height: "100%", width: `${live?.score ?? 0}%`, background: BLUE, transition: "width .3s ease" }} />
-          </div>
-          <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: INK }}>{live?.score ?? 0}</span>
         </div>
       </div>
 
@@ -535,6 +539,13 @@ function PreScorePanel({ live }: { live: ReturnType<typeof scoreLayer1> | null }
             <span key={s} style={{ padding: "4px 8px", border: `1px solid ${ra(INK, 0.08)}`, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{s}</span>
           ))}
         </div>
+      </div>
+
+      {/* CTA into the form */}
+      <div style={{ padding: "24px 32px 32px", display: "flex", justifyContent: "flex-end" }}>
+        <button onClick={onStart} style={{ padding: "14px 28px", border: "none", background: INK, color: YEL, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", borderRadius: 0 }}>
+          Start scoring your pitch →
+        </button>
       </div>
     </div>
   );
@@ -842,6 +853,8 @@ export default function PressIQPage() {
   const [pitchMode, setPitchMode] = useState<"standalone" | "query">("standalone");
   const [journalistBeat, setJournalistBeat] = useState("");
   const [view,     setView]     = useState<"pre" | "loading" | "post">("pre");
+  const [introDone, setIntroDone] = useState(false);
+  const [formStep, setFormStep] = useState<1 | 2>(1);
   const [result,   setResult]   = useState<ScoreResponse | null>(null);
   const [error,    setError]    = useState<string | null>(null);
   const [tab,      setTab]      = useState<Tab>("score");
@@ -942,7 +955,14 @@ export default function PressIQPage() {
     }
   }
 
-  function reset() { setView("pre"); setResult(null); setError(null); setTab("score"); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  function reset() { setView("pre"); setResult(null); setError(null); setTab("score"); setFormStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }
+
+  // Step-bar navigation: only lets the user jump to a step they've already passed.
+  function goToStep(n: 0 | 1 | 2) {
+    if (n === 0) { setIntroDone(false); return; }
+    if (view === "post") { setView("pre"); setResult(null); }
+    setFormStep(n);
+  }
 
   // PDF generation
   const generatePDF = useCallback(async () => {
@@ -1306,21 +1326,29 @@ export default function PressIQPage() {
           }
         />
 
-        {/* ── Step bar ─────────────────────────────────────────────── */}
-        <nav className="piq-step-bar">
-          <span className={`piq-step ${view !== "pre" ? "past" : "active"}`} onClick={() => view === "post" && reset()}>
-            <span className="piq-step-no">{view !== "pre" ? "✓" : "1"}</span> Your pitch
-          </span>
-          <span className="piq-step-connector" />
-          <span className={`piq-step ${view === "post" ? "active" : ""}`}>
-            <span className="piq-step-no">2</span> Score
-          </span>
-        </nav>
+        {/* ── Step bar (hidden on the intro screen, like SignalIQ's) ── */}
+        {introDone && (
+          <nav className="piq-step-bar">
+            <span className={`piq-step past`} onClick={() => goToStep(1)}>
+              <span className="piq-step-no">✓</span> Pitch context
+            </span>
+            <span className="piq-step-connector" />
+            <span className={`piq-step ${view === "post" ? "past" : formStep === 2 ? "active" : ""}`} onClick={() => view === "post" && goToStep(2)}>
+              <span className="piq-step-no">{view === "post" ? "✓" : "2"}</span> Your pitch
+            </span>
+            <span className="piq-step-connector" />
+            <span className={`piq-step ${view === "post" ? "active" : ""}`}>
+              <span className="piq-step-no">3</span> Score
+            </span>
+          </nav>
+        )}
 
         {/* ── Single scrolling column ─────────────────────────────── */}
         <main ref={rightRef} className="piq-col">
 
-          {view !== "post" && (
+          {!introDone && <IntroPanel onStart={() => setIntroDone(true)} />}
+
+          {introDone && view === "pre" && formStep === 1 && (
             <section className="piq-form-card">
               <div style={{ padding: "22px 22px 16px", borderBottom: `1px solid ${DARK_BD}` }}>
                 <div style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: PAPER, letterSpacing: "-.025em", lineHeight: 1 }}>
@@ -1346,7 +1374,7 @@ export default function PressIQPage() {
               </div>
 
               {/* ── Journalist context (beat or query) ────────────── */}
-              <div style={LSEC}>
+              <div style={{ ...LSEC, borderBottom: "none" }}>
                 {pitchMode === "standalone" ? (
                   <>
                     <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, what topics they cover</span></span>
@@ -1360,55 +1388,73 @@ export default function PressIQPage() {
                 )}
               </div>
 
-              <div style={LSEC}>
-                <span style={LSEC_LBL}>Your pitch</span>
-                <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
-                <div style={{ marginTop: 6 }}><button onClick={loadSample} className="piq-ghost">↻ Load a sample pitch</button></div>
-              </div>
-
-              <div style={LSEC}>
-                <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, else parsed from line 1</span></span>
-                <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
-              </div>
-
-              <div style={LSEC}>
-                <span style={LSEC_LBL}>Platform</span>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                  {PLATFORMS.map(p => <button key={p.id} onClick={() => setPlatform(p.id)} style={chipStyle(platform === p.id)}>{p.label}</button>)}
-                </div>
-              </div>
-
-              <div style={LSEC}>
-                <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                  {BRAND_LABELS.map(({ key, label }) => (
-                    <button key={key} onClick={() => setBrand(b => ({ ...b, [key]: !b[key] }))} style={chipStyle(brand[key])}>{label}</button>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ ...LSEC, borderBottom: "none" }}>
-                <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 14, cursor: "pointer" }}>
-                  <input type="checkbox" checked={store} onChange={e => setStore(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
-                  <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.65), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
-                </label>
-                {TURNSTILE_SITE_KEY && <div ref={turnstileRef} style={{ marginBottom: 12 }} />}
-                {error && (
-                  <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>{error}</div>
-                )}
-                <button onClick={analyze} disabled={!canAnalyze} style={{ width: "100%", padding: 14, border: "none", background: canAnalyze ? YEL : ra(YEL, 0.35), color: canAnalyze ? DARK : ra(DARK, 0.4), fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: canAnalyze ? "pointer" : "not-allowed", transition: "opacity .12s", borderRadius: 0 }}>
-                  {view === "loading" ? "Scoring your pitch…" : "Analyze pitch →"}
+              <div style={{ padding: "18px 22px 22px", display: "flex", justifyContent: "flex-end" }}>
+                <button onClick={() => setFormStep(2)} style={{ padding: "12px 24px", border: "none", background: YEL, color: DARK, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", borderRadius: 0 }}>
+                  Next: your pitch →
                 </button>
-                <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(PAPER, 0.6), textAlign: "center", lineHeight: 1.9 }}>
-                  {FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research
-                </div>
               </div>
             </section>
           )}
 
-          {view === "pre" && <PreScorePanel live={live} />}
-          {view === "loading" && <LoadingPanel />}
-          {view === "post" && result && (
+          {introDone && view === "pre" && formStep === 2 && (
+            <>
+              <section className="piq-form-card">
+                <div style={LSEC}>
+                  <span style={LSEC_LBL}>Your pitch</span>
+                  <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
+                  <div style={{ marginTop: 6 }}><button onClick={loadSample} className="piq-ghost">↻ Load a sample pitch</button></div>
+                </div>
+
+                <div style={LSEC}>
+                  <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, else parsed from line 1</span></span>
+                  <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
+                </div>
+
+                <div style={LSEC}>
+                  <span style={LSEC_LBL}>Platform</span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {PLATFORMS.map(p => <button key={p.id} onClick={() => setPlatform(p.id)} style={chipStyle(platform === p.id)}>{p.label}</button>)}
+                  </div>
+                </div>
+
+                <div style={LSEC}>
+                  <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {BRAND_LABELS.map(({ key, label }) => (
+                      <button key={key} onClick={() => setBrand(b => ({ ...b, [key]: !b[key] }))} style={chipStyle(brand[key])}>{label}</button>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ ...LSEC, borderBottom: "none" }}>
+                  <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 14, cursor: "pointer" }}>
+                    <input type="checkbox" checked={store} onChange={e => setStore(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
+                    <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.65), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
+                  </label>
+                  {TURNSTILE_SITE_KEY && <div ref={turnstileRef} style={{ marginBottom: 12 }} />}
+                  {error && (
+                    <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>{error}</div>
+                  )}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button onClick={() => setFormStep(1)} style={{ padding: "14px 18px", border: `1px solid ${ra(PAPER, 0.3)}`, background: "transparent", color: ra(PAPER, 0.75), fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", cursor: "pointer" }}>
+                      ← Back
+                    </button>
+                    <button onClick={analyze} disabled={!canAnalyze} style={{ flex: 1, padding: 14, border: "none", background: canAnalyze ? YEL : ra(YEL, 0.35), color: canAnalyze ? DARK : ra(DARK, 0.4), fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: canAnalyze ? "pointer" : "not-allowed", transition: "opacity .12s", borderRadius: 0 }}>
+                      Analyze pitch →
+                    </button>
+                  </div>
+                  <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(PAPER, 0.6), textAlign: "center", lineHeight: 1.9 }}>
+                    {FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research
+                  </div>
+                </div>
+              </section>
+
+              <LiveMechanics live={live} />
+            </>
+          )}
+
+          {introDone && view === "loading" && <LoadingPanel />}
+          {introDone && view === "post" && result && (
             <PostScorePanel result={result} tab={tab} setTab={setTab}
               email={email} setEmail={setEmail} emailDone={emailDone} setEmailDone={setEmailDone}
               onDownload={() => setShowGate(true)} onReset={reset} pitchMode={pitchMode} />
