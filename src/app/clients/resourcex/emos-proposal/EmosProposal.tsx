@@ -144,9 +144,12 @@ export function EmosProposal() {
           .ep-invest-grid   { grid-template-columns: 1fr !important; }
           .ep-what-keep     { grid-template-columns: 1fr !important; }
           .ep-why-grid      { grid-template-columns: 1fr !important; }
+          .ep-dash-kpis     { grid-template-columns: repeat(3, 1fr) !important; }
+          .ep-dash-body     { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 480px) {
           .ep-curriculum    { grid-template-columns: 1fr !important; }
+          .ep-dash-kpis     { grid-template-columns: repeat(2, 1fr) !important; }
           .ep-action-bar    { padding: 8px 16px !important; }
           .ep-action-inner  { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
           .ep-btn-group     { flex-direction: column !important; align-items: stretch !important; width: 100% !important; }
@@ -363,7 +366,7 @@ export function EmosProposal() {
           <div className="ep-what-keep" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: K18, border: `1px solid ${K18}` }}>
             <div style={{ background: P2, padding: "16px 24px" }}>
               <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: K55, marginBottom: 6 }}>DONE FOR YOU · IN PARALLEL</div>
-              <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: K70, margin: 0 }}>Founder web presence · 2–4 authority articles · complete press kit. Articles cover your expertise only — nothing about the deal.</p>
+              <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: K70, margin: 0 }}>Founder web presence · 3 authority articles · complete press kit. Articles cover your expertise only — nothing about the deal.</p>
             </div>
             <div style={{ background: P2, padding: "16px 24px" }}>
               <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: K55, marginBottom: 6 }}>WHAT YOU KEEP · PERMANENTLY</div>
@@ -578,6 +581,114 @@ export function EmosProposal() {
               </div>
             </div>
           </div>
+        </section>
+
+        <div className="ep-divider" style={{ height: 1, background: K18, margin: "0 40px" }} />
+
+        {/* ══ §06 YOUR LIVE DASHBOARD ═══════════════════════════════════════ */}
+        <section className="ep-section ep-dark-hero" style={{ padding: "40px 40px 36px", background: K }}>
+          <SectionMast num="06" label="YOUR LIVE DASHBOARD · WHAT YOU'LL ACTUALLY SEE" dark />
+          <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, lineHeight: 1.6, color: OD70, margin: "0 0 8px", maxWidth: 640 }}>
+            The weekly call is the conversation. This is what backs it up in between — a private, always-current view of pitches, replies, and placements. No separate login to manage; it&apos;s live from the day we kick off.
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: OD45, border: `1px solid ${OD25}`, padding: "3px 9px" }}>ILLUSTRATIVE SNAPSHOT</span>
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: OD45 }}>— mid-Foundation, for a program shaped like yours</span>
+          </div>
+
+          {/* Mock browser chrome */}
+          <div style={{ border: `1px solid ${OD25}`, background: "#0d0c0a" }}>
+            {/* Chrome bar */}
+            <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderBottom: `1px solid ${OD12}`, background: "rgba(236,232,218,.03)" }}>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <div style={{ width: 9, height: 9, borderRadius: "50%", background: "rgba(236,232,218,.18)" }} />
+                <div style={{ width: 9, height: 9, borderRadius: "50%", background: "rgba(236,232,218,.18)" }} />
+                <div style={{ width: 9, height: 9, borderRadius: "50%", background: "rgba(236,232,218,.18)" }} />
+              </div>
+              <div style={{ flex: 1, background: "rgba(236,232,218,.05)", border: `1px solid ${OD12}`, borderRadius: 3, padding: "4px 12px", fontFamily: MONO, fontSize: 10, color: OD45, textAlign: "center" }}>
+                emos.syedirfanajmal.com/resourcex · private
+              </div>
+            </div>
+
+            {/* Dashboard header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, padding: "18px 24px", borderBottom: `1px solid ${OD12}`, flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 15, color: OD }}>Sajid Shah — Founder Authority Program</div>
+                <div style={{ fontFamily: SANS, fontSize: 11, color: OD45, marginTop: 2 }}>Foundation · Week 4 of 8 · Day 19</div>
+              </div>
+              <span style={{ fontFamily: MONO, fontSize: 10, color: OD45 }}>UPDATED 2 HOURS AGO</span>
+            </div>
+
+            {/* KPI strip */}
+            <div className="ep-dash-kpis" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 1, background: OD12 }}>
+              {[
+                { n: "52", l: "PITCHES SENT" },
+                { n: "11", l: "REPLIES · 21%" },
+                { n: "2", l: "PLACEMENTS LIVE" },
+                { n: "1", l: "PENDING PUBLISH" },
+                { n: "6", l: "NON-RESPONSIVE, LISTED" },
+              ].map(k => (
+                <div key={k.l} style={{ background: K, padding: "18px 14px", textAlign: "center" }}>
+                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 30, color: Y, lineHeight: 1 }}>{k.n}</div>
+                  <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 9, letterSpacing: "0.1em", textTransform: "uppercase", color: OD45, marginTop: 8 }}>{k.l}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Two column: checklist + activity feed */}
+            <div className="ep-dash-body" style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 1, background: OD12 }}>
+              {/* Checklist */}
+              <div style={{ background: "rgba(26,23,18,.88)", padding: "20px 20px" }}>
+                <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, marginBottom: 14 }}>CURRICULUM PROGRESS</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {[
+                    { w: "01", t: "Foundation, web presence & setup", s: "done" },
+                    { w: "02", t: "Pitch writing mastery", s: "done" },
+                    { w: "03", t: "Pitch at scale · track & optimise", s: "active" },
+                    { w: "04", t: "Advanced strategies, VA & scale", s: "upcoming" },
+                  ].map(row => (
+                    <div key={row.w} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                      <span style={{
+                        fontFamily: SANS, fontWeight: 800, fontSize: 10, flexShrink: 0, width: 18, height: 18, borderRadius: "50%",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        background: row.s === "done" ? Y : row.s === "active" ? "rgba(245,197,24,.15)" : "rgba(236,232,218,.08)",
+                        color: row.s === "done" ? K : row.s === "active" ? Y : OD45,
+                        border: row.s === "active" ? `1px solid ${Y}` : "none",
+                      }}>{row.s === "done" ? "✓" : row.w}</span>
+                      <span style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.4, color: row.s === "upcoming" ? OD45 : OD70 }}>{row.t}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Activity feed */}
+              <div style={{ background: K, padding: "20px 24px" }}>
+                <div style={{ fontFamily: SANS, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: OD45, marginBottom: 14 }}>RECENT ACTIVITY</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                  {[
+                    { d: "JUN 29", t: "Pitch sent — Melia Russell, Business Insider", n: "Bootstrapped-exit narrative" },
+                    { d: "JUN 28", t: "Reply — Freya Pratty, Sifted", n: "Passed for now; open to a Q3 revisit" },
+                    { d: "JUN 26", t: "TechCrunch quote confirmed", n: "Publishes next week · Global South AI founders piece" },
+                    { d: "JUN 24", t: "Outreach checklist v2 shipped", n: "Non-responsive list crossed 6 contacts" },
+                    { d: "JUN 22", t: "Startup Grind Pakistan — podcast recorded", n: "Ep. 84, also airs on Spotify" },
+                    { d: "JUN 18", t: "Press kit v1 delivered for review", n: "Founder bio, headshots, boilerplate" },
+                  ].map((row, i, arr) => (
+                    <div key={row.t} style={{ display: "flex", gap: 14, padding: "10px 0", borderBottom: i < arr.length - 1 ? `1px solid ${OD12}` : "none" }}>
+                      <span style={{ fontFamily: MONO, fontSize: 10, color: OD45, flexShrink: 0, width: 44, paddingTop: 2 }}>{row.d}</span>
+                      <div>
+                        <div style={{ fontFamily: SANS, fontWeight: 700, fontSize: 13, color: OD }}>{row.t}</div>
+                        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: OD45, marginTop: 2 }}>{row.n}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: OD45, margin: "16px 0 0", maxWidth: 640 }}>
+            Numbers above are illustrative — built to show the shape of the view, not a forecast. Your actual dashboard fills in with your real activity from Week 1.
+          </p>
         </section>
 
         <div className="ep-divider" style={{ height: 1, background: K18, margin: "0 40px" }} />

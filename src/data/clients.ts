@@ -133,8 +133,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "Online addiction-treatment provider. Programme combined technical SEO, " +
       "content, and digital PR; published case study details a 7× traffic lift.",
     role: "Strategy + execution",
-    caseStudy:
-      "https://dmr.agency/case-studies/how-dmr-agency-increased-the-organic-traffic-of-an-addiction-treatment-center-by-more-than-700/",
+    caseStudy: "https://dmr.agency/case-studies/addiction-treatment-center-seo/",
     logo: "/assets/clients/curednation.png",
     services: ["EMOS"],
   },
@@ -149,7 +148,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "US rug e-commerce sourcing from Pakistan. Earned-media + SEO programme " +
       "tripled revenue inside the engagement window.",
     role: "Strategy + outreach",
-    caseStudy: "https://dmr.agency/case-studies/alrug-case-study/",
+    caseStudy: "https://dmr.agency/case-studies/rugs-retailer-seo/",
     logo: "/assets/clients/alrug.png",
     services: ["EMOS"],
   },
@@ -164,7 +163,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "Collaborated with NYC and Dubai teams on a Gulf government portal. " +
       "Earned citations from MSN, Reader's Digest, and other top-tier outlets.",
     role: "Outreach + media strategy",
-    caseStudy: "https://dmr.agency/case-studies/dinar-standard-case-study/",
+    caseStudy: "https://dmr.agency/case-studies/government-portal-seo/",
     logo: "/assets/clients/dinar_standard.png",
     services: ["EMOS"],
   },
@@ -179,7 +178,7 @@ export const CLIENTS_TIER1: ReadonlyArray<Client> = [
       "US media property covering the gig economy. Earned-media + editorial " +
       "programme grew organic visitors to 30K/month.",
     role: "Strategy + outreach",
-    caseStudy: "https://dmr.agency/case-studies/gigworker-case-study/",
+    caseStudy: "https://dmr.agency/case-studies/gigworker-dr-0-to-63/",
     logo: "/assets/clients/gigworker.png",
     services: ["EMOS"],
   },

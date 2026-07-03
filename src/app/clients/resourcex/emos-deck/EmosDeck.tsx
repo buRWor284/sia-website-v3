@@ -292,7 +292,7 @@ function Slide06() {
       <div style={{ flexShrink: 0, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1, background: K18, borderTop: `1.5px solid ${K18}` }}>
         <div style={{ background: P2, padding: "20px 52px 20px 80px" }}>
           <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: K55, display: "block", marginBottom: 8 }}>DONE FOR YOU · IN PARALLEL</span>
-          <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.5, color: K70, margin: 0 }}>Founder web presence · 2–4 authority articles · complete press kit. Articles cover your expertise only — nothing about the deal.</p>
+          <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.5, color: K70, margin: 0 }}>Founder web presence · 3 authority articles · complete press kit. Articles cover your expertise only — nothing about the deal.</p>
         </div>
         <div style={{ background: P2, padding: "20px 80px 20px 52px" }}>
           <span style={{ fontFamily: SANS, fontWeight: 800, fontSize: 11, letterSpacing: "0.16em", textTransform: "uppercase", color: K55, display: "block", marginBottom: 8 }}>WHAT YOU KEEP · PERMANENTLY</span>
