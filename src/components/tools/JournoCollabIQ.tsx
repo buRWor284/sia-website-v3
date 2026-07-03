@@ -6,7 +6,7 @@
  * Route: /tools/journocollabiq
  */
 
-import { useState, useEffect, useReducer, useRef, useCallback } from "react";
+import { useState, useEffect, useReducer, useRef } from "react";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
@@ -22,6 +22,11 @@ const TX4  = "rgba(26,20,16,0.50)";
 const ACC  = "#f5b81f";
 const SUCC = "#2d8a4e";
 const ERR  = "#c0392b";
+
+// Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered
+// and generation works exactly as before. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY (+
+// the server TURNSTILE_SECRET_KEY) to enforce the human check end-to-end.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const INFO = "#3a7bd5";
 const AMB2 = "#c4900a";
 
@@ -211,239 +216,14 @@ const GLOBAL_CSS = `
   .v2-tooltip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1c1a16}
 `;
 
-// ── Stage 0: Animated Explainer ────────────────────────────────────────────────
-function Stage0({ onStart }: { onStart: () => void }) {
-  const SCENES = [
-    { dur: 3500, label: "Intro" },
-    { dur: 5000, label: "Client" },
-    { dur: 5500, label: "Discovery" },
-    { dur: 5500, label: "Strategy" },
-    { dur: 5000, label: "Result" },
-    { dur: 5000, label: "Proof" },
-    { dur: 0,    label: "JournoCollabIQ" },
-  ];
-  const [scene, setScene] = useState(-1);
-  const [playing, setPlaying] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const play = useCallback(() => { setPlaying(true); setScene(0); }, []);
-  useEffect(() => { const t = setTimeout(play, 600); return () => clearTimeout(t); }, [play]);
-  useEffect(() => {
-    if (!playing || scene < 0) return;
-    if (scene >= SCENES.length || SCENES[scene].dur === 0) { setPlaying(false); return; }
-    timer.current = setTimeout(() => setScene(s => s + 1), SCENES[scene].dur);
-    return () => { if (timer.current) clearTimeout(timer.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, scene]);
-
-  const fade = (idx: number): React.CSSProperties => ({
-    position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-    alignItems: "center", justifyContent: "center", padding: "clamp(20px,5%,40px)",
-    opacity: scene === idx ? 1 : 0, transform: scene === idx ? "translateY(0)" : "translateY(8px)",
-    transition: "opacity 0.5s ease, transform 0.5s ease",
-    pointerEvents: scene === idx ? "auto" : "none",
-  });
-
-  function stag(items: React.ReactNode[], active: boolean, d = 150) {
-    return items.map((item, i) => (
-      <div key={i} style={{ opacity: active ? 1 : 0, transform: active ? "translateY(0)" : "translateY(14px)", transition: `all .45s ease ${i * d}ms` }}>{item}</div>
-    ));
-  }
-
-  const cTx  = "#f1ebde", cTx2 = "rgba(241,235,222,.6)", cTx3 = "rgba(241,235,222,.3)", cTx4 = "rgba(241,235,222,.15)";
-  const cBg2 = "#1a1714", cBd = "#2a2318";
-  const vis   = (i: number) => scene === i;
-  const done  = scene >= SCENES.length;
-
-  return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
-      <div style={{ textAlign: "center", marginBottom: 20 }}>
-        <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TX4 }}>JournoCollabIQ · Journalist Beat Matcher</span>
-      </div>
-
-      {/* Cinema viewport */}
-      <div style={{ width: "100%", maxWidth: 760, aspectRatio: "16/9", background: "#0c0b09", border: "1px solid #2a2318", position: "relative", overflow: "hidden", margin: "0 auto" }}>
-
-        {/* Scene 0 */}
-        <div style={fade(0)}>
-          {stag([
-            <div key="logo" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-              <div style={{ width: 28, height: 28, background: ACC, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GF, fontWeight: 900, fontSize: 10, color: "#0c0b09" }}>SIA</div>
-              <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: cTx3, textTransform: "uppercase" }}>Syed Irfan Ajmal · DMR.agency</span>
-            </div>,
-            <h2 key="h" style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,36px)", fontWeight: 700, color: cTx, textAlign: "center", lineHeight: 1.1, letterSpacing: "-0.025em", maxWidth: 520, margin: "0 0 20px" }}>
-              What if growth wasn&rsquo;t about competing, but <em style={{ color: ACC, fontStyle: "italic" }}>collaborating</em>?
-            </h2>,
-            <div key="bar" style={{ width: 40, height: 2, background: ACC }} />,
-          ], vis(0), 200)}
-        </div>
-
-        {/* Scene 1 */}
-        <div style={fade(1)}>
-          {stag([
-            <span key="ov" style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, marginBottom: 10, display: "block" }}>Case Study</span>,
-            <h2 key="h" style={{ fontFamily: SF, fontSize: "clamp(20px,4vw,34px)", fontWeight: 700, color: cTx, textAlign: "center", lineHeight: 1.1, margin: "0 0 20px" }}>National Tyres &amp; Autocare</h2>,
-            <div key="meta" style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center" }}>
-              {[["Industry","Automotive"],["Market","United Kingdom"],["Challenge","Scale organic revenue"]].map(([k,v]) => (
-                <div key={k} style={{ textAlign: "center" }}>
-                  <div style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 3 }}>{k}</div>
-                  <div style={{ fontFamily: GF, fontSize: 13, color: cTx2, fontWeight: 600 }}>{v}</div>
-                </div>
-              ))}
-            </div>,
-            <p key="q" style={{ fontFamily: SF, fontSize: 14, fontStyle: "italic", color: cTx3, textAlign: "center", maxWidth: 420, marginTop: 16, lineHeight: 1.55 }}>
-              &ldquo;We needed a strategy that went beyond traditional link building and paid ads.&rdquo;
-            </p>,
-          ], vis(1), 200)}
-        </div>
-
-        {/* Scene 2 */}
-        <div style={{ ...fade(2), gap: 16 }}>
-          <span style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, marginBottom: 16, display: "block" }}>The Insight</span>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "clamp(12px,3vw,28px)", width: "100%", flexWrap: "wrap" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ width: 80, height: 80, background: cBg2, border: `2px solid ${ACC}`, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-                <span style={{ fontFamily: GF, fontWeight: 900, fontSize: 16, color: ACC }}>NTA</span>
-                <span style={{ fontFamily: MF, fontSize: 6, color: cTx3, letterSpacing: "0.06em", marginTop: 2 }}>National Tyres</span>
-              </div>
-              <span style={{ fontFamily: MF, fontSize: 7, color: cTx4, display: "block", marginTop: 4, letterSpacing: "0.08em" }}>Your client</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-              <span style={{ fontFamily: SF, fontSize: 11, fontStyle: "italic", color: cTx3 }}>same drivers</span>
-              <div style={{ width: 50, height: 0, borderTop: `2px dashed ${ACC}` }} />
-              <span style={{ fontFamily: SF, fontSize: 11, fontStyle: "italic", color: cTx3 }}>zero competition</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              {stag([
-                <div key="a" style={{ padding: "7px 14px", background: cBg2, border: `1px solid ${cBd}`, fontFamily: GF, fontSize: 11, fontWeight: 600, color: cTx2 }}>Car Insurance Companies</div>,
-                <div key="b" style={{ padding: "7px 14px", background: cBg2, border: `1px solid ${cBd}`, fontFamily: GF, fontSize: 11, fontWeight: 600, color: cTx2 }}>Car Leasing Companies</div>,
-                <div key="c" style={{ padding: "7px 14px", background: cBg2, border: `1px solid ${cBd}`, fontFamily: GF, fontSize: 11, fontWeight: 600, color: cTx2 }}>Fleet Management Firms</div>,
-              ], vis(2), 250)}
-            </div>
-          </div>
-          <p style={{ fontFamily: SF, fontSize: 13, fontStyle: "italic", color: cTx3, textAlign: "center", maxWidth: 420, marginTop: 16, lineHeight: 1.5 }}>
-            DMR.agency identified companies serving the same UK car owners, then offered their customers exclusive discounts.
-          </p>
-        </div>
-
-        {/* Scene 3 */}
-        <div style={{ ...fade(3), gap: 16 }}>
-          <span style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, display: "block" }}>The three-way win</span>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, width: "100%", maxWidth: 480 }}>
-            {stag([
-              <div key="c" style={{ padding: "14px 10px", background: cBg2, borderTop: `3px solid ${SUCC}`, textAlign: "center" }}>
-                <div style={{ fontFamily: GF, fontSize: 10, fontWeight: 800, color: SUCC, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>Customers</div>
-                <div style={{ fontFamily: GF, fontSize: 11, color: cTx2, lineHeight: 1.45 }}>Exclusive discounts on tyres &amp; services</div>
-              </div>,
-              <div key="p" style={{ padding: "14px 10px", background: cBg2, borderTop: `3px solid ${INFO}`, textAlign: "center" }}>
-                <div style={{ fontFamily: GF, fontSize: 10, fontWeight: 800, color: INFO, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>Partners</div>
-                <div style={{ fontFamily: GF, fontSize: 11, color: cTx2, lineHeight: 1.45 }}>Added value at zero cost for their audience</div>
-              </div>,
-              <div key="n" style={{ padding: "14px 10px", background: cBg2, borderTop: `3px solid ${ACC}`, textAlign: "center" }}>
-                <div style={{ fontFamily: GF, fontSize: 10, fontWeight: 800, color: ACC, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>NTA</div>
-                <div style={{ fontFamily: GF, fontSize: 11, color: cTx2, lineHeight: 1.45 }}>Referral traffic, partnerships &amp; authority</div>
-              </div>,
-            ], vis(3), 300)}
-          </div>
-          <p style={{ fontFamily: MF, fontSize: 9, color: cTx4, textAlign: "center", marginTop: 14, letterSpacing: "0.06em" }}>
-            Strategy by Syed Irfan Ajmal · Executed by DMR.agency
-          </p>
-        </div>
-
-        {/* Scene 4 */}
-        <div style={fade(4)}>
-          {stag([
-            <span key="ov" style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: cTx4, marginBottom: 8, display: "block" }}>National Tyres &amp; Autocare · Organic Revenue</span>,
-            <div key="nums" style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-              <span style={{ fontFamily: SF, fontSize: "clamp(22px,4vw,32px)", fontWeight: 700, color: cTx3, textDecoration: "line-through", textDecorationColor: cTx4 }}>$160K/mo</span>
-              <span style={{ fontSize: 20, color: cTx3 }}>→</span>
-              <span style={{ fontFamily: SF, fontSize: "clamp(36px,7vw,56px)", fontWeight: 700, color: ACC, letterSpacing: "-0.03em", lineHeight: 1 }}>$1.2M/mo</span>
-            </div>,
-            <div key="bar" style={{ width: 40, height: 2, background: ACC, margin: "14px 0" }} />,
-            <p key="cap" style={{ fontFamily: SF, fontSize: 13, fontStyle: "italic", color: cTx2, textAlign: "center", maxWidth: 400, lineHeight: 1.5 }}>
-              From organic traffic alone. No paid ads. Just strategic partnerships built by DMR.agency.
-            </p>,
-          ], vis(4), 200)}
-        </div>
-
-        {/* Scene 5 */}
-        <div style={{ ...fade(5), gap: 12 }}>
-          <div style={{ maxWidth: 440, width: "100%", padding: "18px 20px", background: cBg2, borderLeft: `3px solid ${ACC}`, marginBottom: 16 }}>
-            <p style={{ fontFamily: SF, fontSize: 14, fontStyle: "italic", color: cTx2, lineHeight: 1.6, marginBottom: 10 }}>
-              &ldquo;Can not thank Syed Irfan Ajmal and the team enough for getting it ranked — they are getting 100s of keywords for this site ranked. Exceptional professionalism.&rdquo;
-            </p>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <img src="/assets/testimonials/Azzam_Sheikh_NTA_Testimonial_LinkedIn.png" alt="Azzam Sheikh" style={{ width: 32, height: 32, objectFit: "cover", objectPosition: "top", flexShrink: 0 }} />
-              <span style={{ fontFamily: GF, fontSize: 11, fontWeight: 700, color: cTx }}>Azzam Sheikh</span>
-              <span style={{ fontFamily: MF, fontSize: 8, color: cTx3, marginLeft: 4 }}>Client · LinkedIn</span>
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "center", marginBottom: 6 }}>
-            <span style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.1em", textTransform: "uppercase" }}>Featured in</span>
-            {["FORBES","SEMrush","HBR"].map(n => (
-              <span key={n} style={{ fontFamily: GF, fontWeight: 800, fontSize: n === "FORBES" ? 14 : 12, color: cTx3, letterSpacing: n === "FORBES" ? "0.06em" : "0.02em" }}>{n}</span>
-            ))}
-          </div>
-          <span style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.08em", textAlign: "center", display: "block" }}>
-            Presented at SEMrush webinar to 1,000+ marketers
-          </span>
-        </div>
-
-        {/* Scene 6 */}
-        <div style={fade(6)}>
-          {stag([
-            <span key="ov" style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: cTx4, marginBottom: 10, display: "block" }}>Now it&rsquo;s your turn</span>,
-            <div key="name" style={{ fontFamily: SF, fontSize: "clamp(26px,5vw,42px)", fontWeight: 700, color: cTx, textAlign: "center", letterSpacing: "-0.025em", lineHeight: 1.1, marginBottom: 10 }}>
-              Collab<em style={{ color: ACC, fontStyle: "italic" }}>IQ</em>
-            </div>,
-            <p key="sub" style={{ fontFamily: GF, fontSize: 14, color: cTx2, textAlign: "center", lineHeight: 1.6, maxWidth: 380, marginBottom: 20 }}>
-              AI-powered journalist beat matching. Find the reporters writing about your story right now, score them by fit, and get a media targeting brief in minutes.
-            </p>,
-            <div key="btns" style={{ display: "flex", gap: 10 }}>
-              <button onClick={play} style={{ ...ghostBtn(), fontSize: 10, padding: "10px 16px", color: cTx3, borderColor: cBd }}>Replay</button>
-              <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 13, padding: "14px 32px" }}>Get started →</button>
-            </div>,
-          ], vis(6) || done, 200)}
-        </div>
-
-        {/* Scrubber */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(12,11,9,0.9)", borderTop: `1px solid ${cBd}` }}>
-          <div style={{ height: 2, background: "#1a1714" }}>
-            <div style={{ height: "100%", background: ACC, width: scene >= 0 ? `${((scene + 1) / SCENES.length) * 100}%` : "0%", transition: "width 0.5s ease" }} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 12px" }}>
-            {SCENES.map((s, i) => (
-              <button key={i} onClick={() => { setScene(i); setPlaying(i < SCENES.length - 1); }}
-                style={{ background: "transparent", border: "none", cursor: "pointer",
-                  fontFamily: MF, fontSize: 7, fontWeight: 700, letterSpacing: "0.08em",
-                  textTransform: "uppercase", padding: "2px 4px",
-                  color: i === scene ? ACC : i < scene ? cTx3 : cTx4 }}>
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* CTA below cinema */}
-      <div style={{ textAlign: "center", marginTop: 28 }}>
-        <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 14, padding: "16px 40px" }}>Try JournoCollabIQ free →</button>
-        <p style={{ fontFamily: MF, fontSize: 9, color: TX4, marginTop: 10, letterSpacing: "0.1em" }}>No signup required · Results in under 2 minutes</p>
-      </div>
-      <div style={{ textAlign: "center", marginTop: 20 }}>
-        <span style={{ fontFamily: MF, fontSize: 8, color: TX4, letterSpacing: "0.1em" }}>Built by Syed Irfan Ajmal · DMR.agency</span>
-      </div>
-    </div>
-  );
-}
-
 // ── Stage Wrapper ──────────────────────────────────────────────────────────────
-function StageWrapper({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function StageWrapper({ title, subtitle, heroExtra, children }: { title: string; subtitle?: string; heroExtra?: React.ReactNode; children: React.ReactNode }) {
   return (
     <div style={{ minHeight: "100vh", paddingTop: 80, paddingBottom: 80, display: "flex", flexDirection: "column", alignItems: "center" }}>
       <div className="v2-stage-animate" style={{ width: "100%", maxWidth: 680, padding: "0 24px" }}>
         <h1 style={{ fontFamily: SF, fontSize: "clamp(28px,5vw,44px)", fontWeight: 700, color: TX, lineHeight: 1.1, letterSpacing: "-0.025em", marginBottom: 16 }}>{title}</h1>
-        {subtitle && <p style={{ fontFamily: GF, fontSize: 15, color: TX2, lineHeight: 1.6, marginBottom: 40, marginTop: 0 }}>{subtitle}</p>}
+        {subtitle && <p style={{ fontFamily: GF, fontSize: 15, color: TX2, lineHeight: 1.6, marginBottom: heroExtra ? 18 : 40, marginTop: 0 }}>{subtitle}</p>}
+        {heroExtra}
         {children}
       </div>
     </div>
@@ -454,7 +234,20 @@ function StageWrapper({ title, subtitle, children }: { title: string; subtitle?:
 function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispatch<Action> }) {
   const { biz, domain, desc, industry, customInd } = state;
   return (
-    <StageWrapper title="Find the journalists who'll actually cover this." subtitle="JournoCollabIQ surfaces the reporters who cover your beat — grounded in their recent work — then gives you the angle, a media list, and a targeting brief to land the story.">
+    <StageWrapper
+      title="Find the journalists who'll actually cover this."
+      subtitle="JournoCollabIQ surfaces the reporters who cover your beat — grounded in their recent work — then gives you the angle, a media list, and a targeting brief to land the story."
+      heroExtra={
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 40 }}>
+          <a href="/tools/journocollabiq/how-it-works" style={{ ...ghostBtn(), padding: "10px 18px", fontSize: 11, textDecoration: "none" }}>
+            See a worked example →
+          </a>
+          <span style={{ fontFamily: MF, fontSize: 10, fontWeight: 700, color: TX3, letterSpacing: "0.14em", textTransform: "uppercase" }}>
+            8 fit criteria · 5 stages · 3 tiers
+          </span>
+        </div>
+      }
+    >
       <div style={{ marginBottom: 48 }}>
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
@@ -1042,6 +835,78 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     return ()=>clearInterval(t);
   }, [loading]);
 
+  // Cloudflare Turnstile (same managed-widget pattern as PressIQ/SignalIQ).
+  // Fix (2026-07-03): tokens were expiring (~5 min) while users filled stages
+  // 1–2, and "Generate partners" didn't wait for a token — the API then 403'd
+  // with "Verification failed". Now: a ref mirrors the token for async reads,
+  // expiry auto-resets the widget, and API calls wait for a fresh token.
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileTokenRef = useRef("");
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+  const setToken = (tok: string) => { turnstileTokenRef.current = tok; setTurnstileToken(tok); };
+
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY) return;
+    const render = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
+      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: theme === "dark" ? "dark" : "light",
+        callback: (token: string) => setToken(token),
+        // Token expired mid-session — reset so the managed widget re-solves.
+        "expired-callback": () => {
+          setToken("");
+          try { if (turnstileWidgetId.current) w.turnstile.reset(turnstileWidgetId.current); } catch { /* noop */ }
+        },
+        "error-callback": () => setToken(""),
+      });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((window as any).turnstile) { render(); return; }
+    const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
+    if (!s) {
+      s = document.createElement("script");
+      s.src = SRC; s.async = true; s.defer = true;
+      document.head.appendChild(s);
+    }
+    s.addEventListener("load", render);
+    return () => { s?.removeEventListener("load", render); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Turnstile tokens are single-use — refresh after every API call.
+  function resetTurnstile() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
+      w.turnstile.reset(turnstileWidgetId.current);
+      setToken("");
+    }
+  }
+
+  // Wait (briefly) for a valid token before hitting the API. If the current
+  // token is gone (expired/consumed), reset the widget — the managed flow
+  // usually re-solves without user interaction — and poll for the new token.
+  async function waitForToken(ms = 8000): Promise<string> {
+    if (!TURNSTILE_SITE_KEY) return "";
+    if (turnstileTokenRef.current) return turnstileTokenRef.current;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (turnstileWidgetId.current && w.turnstile) {
+      try { w.turnstile.reset(turnstileWidgetId.current); } catch { /* noop */ }
+    }
+    const t0 = Date.now();
+    while (Date.now() - t0 < ms) {
+      await new Promise(r => setTimeout(r, 250));
+      if (turnstileTokenRef.current) return turnstileTokenRef.current;
+    }
+    return "";
+  }
+
   // Scroll to top when journalist results finish loading so content isn't hidden
   useEffect(()=>{
     if (!loading && partners.length > 0) {
@@ -1057,9 +922,10 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     // they were matched live. Show a real error + retry instead.
     setLoading(true); setPartners([]); setLoadingIdx(0); setPartnersError(null);
     try {
+      const token = await waitForToken();
       const res = await fetch("/api/journo-ai", {
         method:"POST", headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy } }),
+        body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy }, turnstileToken: token || undefined }),
       });
       const json = await res.json().catch(() => ({})) as { result?: string; error?: string };
       if (res.ok && json.result) {
@@ -1080,6 +946,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
       setPartnersError("Couldn't reach the AI research service. Check your connection and try again.");
     } finally {
       setLoading(false);
+      resetTurnstile();
     }
   }
 
@@ -1452,9 +1319,10 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
                partner:state.scPartner,       // field name the API prompt expects
                partnerCat:state.scCat,
                scorePct },
+        turnstileToken: (await waitForToken()) || undefined,
       })});
       if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiEmail(j.result);setAiEmailLoading(false);return;}}
-    } catch { /* fallback */ }
+    } catch { /* fallback */ } finally { resetTurnstile(); }
     setAiEmail(`Subject: Partnership idea — [PARTNER] × ${state.biz}\n\nHi [FIRST NAME],\n\nI'm reaching out from ${state.biz} — we ${state.desc||"[what you do]"}.\n\nI came across [PARTNER] while researching companies that serve the same audience, and there's a natural fit.\n\nProposal: we create an exclusive offer for your customers — [SPECIFIC OFFER]. In return, a mention on your partner page with a link.\n\nThree-way win:\n→ Your customers get exclusive value\n→ You deepen loyalty\n→ We get warm referral traffic\n\n15 minutes this week?\n\nBest,\n[YOUR NAME]\n${state.biz} · ${state.domain||"[website]"}`);
     setAiEmailLoading(false);
   }
@@ -1473,9 +1341,10 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
                selNiches:state.selNiches,
                partner:state.scPartner, partnerCat:state.scCat,
                scorePct, verdictText },
+        turnstileToken: (await waitForToken()) || undefined,
       })});
       if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiBrief(j.result);setAiBriefLoading(false);return;}}
-    } catch { /* fallback */ }
+    } catch { /* fallback */ } finally { resetTurnstile(); }
     setAiBrief(`# 90-Day Collab Link Building Brief\n\n## Executive Summary\nA 90-day campaign for ${state.biz} using ${V2_STRATEGIES[state.strategy]?.label} in ${ind}.\n\n## Phase 1: Foundation (Days 1-14)\n- Audit backlink profile (Ahrefs/SEMrush)\n- Identify 20-30 target partners across 3-4 categories\n- Create landing pages or discount codes per tier\n- Personalise outreach for top 10 targets\n\n## Phase 2: Outreach (Days 15-45)\n- Send to Tier A partners first\n- Follow up after 5-7 business days\n- Begin Tier B outreach in parallel\n- Track in spreadsheet\n\n## Phase 3: Execution (Days 46-75)\n- Negotiate link placements\n- Provide assets (codes, badges, content)\n- Monitor new backlinks in Ahrefs\n- Begin Tier C for volume\n\n## Phase 4: Optimisation (Days 76-90)\n- Review metrics: links, DA, referral traffic\n- Share performance data with partners\n- Identify top categories for expansion\n- Document playbook`);
     setAiBriefLoading(false);
   }
@@ -1492,7 +1361,9 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   const canAdvance = [
     ()=>true,
     ()=>!!state.biz&&!!ind,
-    ()=>true,
+    // Step 2 → 3 fires the AI call: require the human check to have solved
+    // first (PressIQ pattern) so the API never 403s with "Verification failed".
+    ()=>!TURNSTILE_SITE_KEY||!!turnstileToken,
     ()=>partners.length>0&&!loading,
     ()=>true,
     ()=>true,
@@ -1513,13 +1384,21 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         {step>0 && <WizardProgress step={step===5 && !!aiBrief ? step : step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:1})} topOffset={toolHeaderHeight} />}
 
         <div key={`stage-${step}`}>
-          {step===0 && <Stage0 onStart={()=>dispatch({type:"GO",step:1})} />}
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
           {step===3 && <Stage3 partners={partners} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} />}
           {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
           {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} />}
         </div>
+
+        {/* Cloudflare Turnstile human check — renders only when the site key is
+            set. Pinned above the fixed wizard footer so an interactive challenge
+            is actually visible (it used to sit below the page fold). */}
+        {TURNSTILE_SITE_KEY && step>0 && (
+          <div style={{ position:"fixed", bottom:76, right:24, zIndex:89 }}>
+            <div ref={turnstileRef} />
+          </div>
+        )}
 
         {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} theme={theme} />}
 
