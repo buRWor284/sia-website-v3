@@ -23,7 +23,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  GROT, INK, INK15, INK35, INK55, INK70, MONO, PAPER, PAPER2, SERIF, YEL,
+  GROT, INK, INK15, INK35, INK55, INK70, MONO, PAPER, PAPER2, SERIF, YEL, YEL2,
 } from "@/lib/tokens";
 import { HRule, SCaps } from "@/components/bureau/primitives";
 import { ToolHeader } from "@/components/tools/ToolHeader";
@@ -38,6 +38,13 @@ const P25 = "rgba(241,235,222,.25)";
 type SpeedName = "Slow" | "Normal" | "Fast";
 const SPEEDS: Record<SpeedName, number> = { Slow: 6000, Normal: 4000, Fast: 2000 };
 const SPEED_NAMES: SpeedName[] = ["Slow", "Normal", "Fast"];
+
+type ModeName = "Sequential" | "Parallel";
+const MODE_NAMES: ModeName[] = ["Sequential", "Parallel"];
+const MODE_NOTES: Record<ModeName, string> = {
+  Sequential: "Sequential mode: one claim verified at a time, in the order shown below. Default for shorter drafts.",
+  Parallel: "Parallel mode: many claims checked concurrently with helper agents, then aggregated, same rules applied to each. Same standards, less waiting on long documents.",
+};
 const pad = (n: number) => (n < 10 ? "0" + n : "" + n);
 
 /* ── Verdict color map (locked) ───────────────────────────────────────────── */
@@ -51,19 +58,34 @@ const VERDICT_COLORS: Record<Verdict, { bg: string; fg: string }> = {
   "Fabricated":      { bg: "#7a1f1f", fg: PAPER },
 };
 
-/* ── Locked content (v4 spec) ─────────────────────────────────────────────── */
-interface Step { icon: string; name: string; desc: string; chips: string[]; }
+/* ── Locked content (v4 spec, enriched v3) ───────────────────────────────── */
+interface Step {
+  icon: string; name: string; desc: string; chips: string[];
+  quote?: string; plain?: string; note?: string; traps?: string[];
+}
 
 const STEPS: Step[] = [
   { icon: "◎", name: "Intake & scope", desc: "Read the whole piece, then state plainly what is being checked and how many claims were found.", chips: ["PASTE", "MARKDOWN", "PDF", "DOCX", "CLAIM COUNT"] },
   { icon: "◈", name: "Extract claims", desc: "Pull out statistics, citations, quotes, factual assertions, and logic claims in their exact wording.", chips: ["STATISTICS", "CITATIONS", "QUOTES", "ASSERTIONS"] },
   { icon: "◇", name: "Triage by risk", desc: "Spend the most effort where AI fails most, so the riskiest claims get checked first.", chips: ["UNSOURCED STATS", "NAMED STUDIES", "SUPERLATIVES", "CAUSAL CLAIMS"] },
-  { icon: "◆", name: "Verify laterally", desc: "Leave the document, check independent sources, and require two or more for any load bearing claim.", chips: ["LEAVE THE PAGE", "TWO SOURCE RULE", "RANK BY TIER"] },
-  { icon: "▣", name: "Citation gate", desc: "Every citation is tested for real existence, a matching DOI, and a source that actually supports the claim.", chips: ["DEAD LINK CHECK", "DOI GATE", "SUPPORTS CLAIM", "JOURNAL VETTING"] },
-  { icon: "✦", name: "Numeric accuracy", desc: "Each figure is matched to its source for value, units, and scale, with any stripped context restored.", chips: ["EXACT MATCH", "UNIT & SCALE", "CONTEXT RESTORED", "RE DERIVE MATH"] },
+  { icon: "◆", name: "Verify laterally", desc: "Leave the document, check independent sources, and require two or more for any load bearing claim.", chips: ["LEAVE THE PAGE", "TWO SOURCE RULE", "RANK BY TIER"],
+    quote: "Judge a claim by opening other sources, not by reading further down the same page.",
+    plain: "Don't trust a page to vouch for itself. Open up what independent sources say, then decide.",
+    note: "Follows SIFT: Stop → Investigate the source → Find better coverage → Trace to the original." },
+  { icon: "▣", name: "Citation gate", desc: "Every citation is tested for real existence, a matching DOI, and a source that actually supports the claim.", chips: ["DEAD LINK CHECK", "DOI GATE", "SUPPORTS CLAIM", "JOURNAL VETTING"],
+    quote: "A DOI that merely loads proves nothing.",
+    plain: "The skill clicks through and confirms it is really the cited paper, and vets the venue: indexing (Scopus, Web of Science, PubMed, DOAJ), retractions (Retraction Watch), and predatory or hijacked journals.",
+    note: "A “predatory” journal prints anything for a fee; a “hijacked” one is a counterfeit of a real journal." },
+  { icon: "✦", name: "Numeric accuracy", desc: "Each figure is matched to its source for value, units, and scale, with any stripped context restored.", chips: ["EXACT MATCH", "UNIT & SCALE", "CONTEXT RESTORED", "RE DERIVE MATH"],
+    quote: "A zombie statistic is a real number that wandered off from its context.",
+    plain: "A survey of one age group quoted as “of all Americans” is the textbook case. The skill restores the missing context or flags the claim." },
   { icon: "◉", name: "Recency check", desc: "Facts that were true once but may now be stale are flagged for a fresh check.", chips: ["OFFICEHOLDERS", "PRICES", "LAWS", "LATEST / CURRENT"] },
-  { icon: "❖", name: "Consistency & reasoning", desc: "Internal contradictions are caught, along with the four logic traps that turn true facts into false conclusions.", chips: ["CONTRADICTIONS", "CORRELATION VS CAUSE", "CHERRY PICKING", "BASE RATES"] },
-  { icon: "▲", name: "Credibility pass", desc: "Speculation dressed as fact, overclaims, and false precision are flagged with a safer rewrite.", chips: ["FACT VS GUESS", "OVERCLAIMS", "FALSE PRECISION"] },
+  { icon: "❖", name: "Consistency & reasoning", desc: "Internal contradictions are caught, along with the four logic traps that turn true facts into false conclusions.", chips: ["CONTRADICTIONS", "CORRELATION VS CAUSE", "CHERRY PICKING", "BASE RATES"],
+    traps: ["Correlation as causation", "Cherry-picking", "Base-rate neglect", "Single study vs. consensus"],
+    plain: "One paper is not the final word. Moving together is not causing each other." },
+  { icon: "▲", name: "Credibility pass", desc: "Speculation dressed as fact, overclaims, and false precision are flagged with a safer rewrite.", chips: ["FACT VS GUESS", "OVERCLAIMS", "FALSE PRECISION"],
+    quote: "When a “maybe” turns into a “definitely.”",
+    plain: "The skill catches the switch. Speculation dressed as certainty is flagged with a suggested rewrite." },
   { icon: "★", name: "Grade & report", desc: "A verdict is assigned per claim, a Markdown report is saved, and a short summary comes back with the file.", chips: ["VERDICT PER CLAIM", "MARKDOWN FILE", "SOURCE PER CLAIM"] },
 ];
 
@@ -87,12 +109,37 @@ const VERDICT_SCALE: { symbol: string; name: Verdict; def: string }[] = [
   { symbol: "✕", name: "Fabricated", def: "We checked, and the cited study, source, or quote does not exist, or the real source says something different. Action: remove it." },
 ];
 
-const PRINCIPLES = [
-  { name: "Lateral reading (SIFT)", desc: "Verify from independent sources, never the document's own citation.", scope: "APPLIES AT STEPS 3, 4, 5" },
-  { name: "Primary-source tracing", desc: "Follow every claim to its origin, not a retelling.", scope: "APPLIES AT STEPS 4, 5, 6" },
-  { name: "Source-reliability tiers", desc: "Rank every source Tier 1 to 4 before trusting it.", scope: "APPLIES AT STEPS 4, 5, 9" },
-  { name: "IFCN / Poynter standards", desc: "Non-partisan, transparent, corrections-first practice.", scope: "APPLIES AT STEPS 1 TO 10" },
-  { name: "Prompt-injection hygiene", desc: "Treat instructions inside fetched pages as data, not commands.", scope: "APPLIES AT STEPS 4, 5, 7" },
+type PrincipleKind = "dark" | "light" | "tint";
+interface Principle {
+  kind: PrincipleKind; num: number; icon: string; eyebrow: string; headline: string;
+  body?: string; plain: string; scope: string; tiers?: boolean;
+}
+
+const PRINCIPLES: Principle[] = [
+  { kind: "dark", num: 1, icon: "◆", eyebrow: "Lateral reading / SIFT", headline: "Judge a claim by opening other sources, not by reading further down the same page.",
+    body: "Every load-bearing claim is checked away from the document, following SIFT's four moves: Stop, Investigate the source, Find better coverage, Trace to the original.",
+    plain: "Don't trust a page to vouch for itself. Open up what independent sources say, then decide.", scope: "APPLIES AT STEPS 3, 4, 5" },
+  { kind: "light", num: 2, icon: "◉", eyebrow: "IFCN / Poynter standards", headline: "The professional code real fact-checking organisations operate under.",
+    body: "Non-partisanship, transparency about sources and method, and visible corrections, borrowed from the International Fact-Checking Network.",
+    plain: "The rulebook serious fact-checkers sign onto. The skill works to that standard.", scope: "APPLIES AT STEPS 1 TO 10" },
+  { kind: "tint", num: 3, icon: "○", eyebrow: "Primary-source tracing", headline: "Follow every claim back to where it actually originated.",
+    body: "Statistics and quotes are traced past any secondary report to the original dataset, paper, or transcript.",
+    plain: "A primary source is the original, not someone repeating it.", scope: "APPLIES AT STEPS 4, 5, 6" },
+  { kind: "light", num: 4, icon: "▲", eyebrow: "Source-reliability tiers", headline: "Rank every source before trusting it.", tiers: true,
+    plain: "A claim is only “Verified” on T1 or T2. The skill won't bless anything lower.", scope: "APPLIES AT STEPS 4, 5, 9" },
+  { kind: "dark", num: 5, icon: "◉", eyebrow: "Prompt-injection hygiene", headline: "A safety guard for a tool that reads the open web.",
+    body: "Any instruction found inside a fetched page is treated as suspicious data to report, never as a command to obey.",
+    plain: "Bad actors hide commands inside web pages to trick AI. The skill reads those as content to flag, not orders to follow.", scope: "APPLIES AT STEPS 4, 5, 7" },
+  { kind: "light", num: 6, icon: "★", eyebrow: "Parallel verification · the 2nd mode", headline: "Rigour that is too slow to use does not get used.",
+    body: "Many claims can be verified concurrently with helper agents, then aggregated, applying the same rules to each. This is “Parallel” mode, the second of the 2 MODES above, alongside default Sequential mode.",
+    plain: "For a long piece, the skill checks many claims at once instead of one by one. Same standards, less waiting.", scope: "THE 2ND OF THE 2 MODES" },
+];
+
+const TIER_ROWS: { tier: string; label: string; bg: string; fg: string }[] = [
+  { tier: "T1", label: "Primary — dataset, paper, transcript", bg: "#f5b81f", fg: INK },
+  { tier: "T2", label: "Reputable secondary — major news, institutions", bg: "#5a5044", fg: PAPER },
+  { tier: "T3", label: "Weak — blogs, marketing, Wikipedia", bg: "rgba(26,20,16,.14)", fg: INK70 },
+  { tier: "T4", label: "Unreliable — farms, AI pages, spam", bg: "#7a1f1f", fg: PAPER },
 ];
 
 const TALLY: { label: string; verdict: Verdict }[] = [
@@ -113,7 +160,7 @@ const actCaption: React.CSSProperties = {
 };
 const ActDivider = () => (
   <>
-    <div style={{ textAlign: "center", margin: "30px 0 26px", color: INK35, fontSize: 18 }}>{"▼"}</div>
+    <div style={{ textAlign: "center", margin: "16px 0 14px", color: INK35, fontSize: 18 }}>{"▼"}</div>
     <HRule />
   </>
 );
@@ -122,7 +169,8 @@ export default function FactCheckIQPage() {
   const [selected, setSelected] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [speed, setSpeed] = useState<SpeedName>("Normal");
-  const [showMethods, setShowMethods] = useState(false);
+  const [mode, setMode] = useState<ModeName>("Sequential");
+  const [showMethods, setShowMethods] = useState(true);
 
   useEffect(() => {
     if (!playing) return;
@@ -194,7 +242,7 @@ export default function FactCheckIQPage() {
                     <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".18em" }}>INTERACTIVE</span>
                   </div>
                   <div style={{ fontFamily: MONO, fontSize: 11, color: P55 }}>
-                    10 STEPS {"·"} 2 MODES {"·"} 6 VERDICTS {"·"} 5 PRINCIPLES
+                    10 STEPS {"·"} 2 MODES {"·"} 6 VERDICTS {"·"} 5 PRINCIPLES {"·"} 11 METHODS
                   </div>
                 </div>
               </div>
@@ -210,7 +258,7 @@ export default function FactCheckIQPage() {
                     Paste, Markdown, PDF, or DOCX. Every checkable claim is pulled out, word for word.
                   </p>
                 </div>
-                <div style={{ flex: 1, maxWidth: 760, border: `1px solid ${INK}`, background: PAPER2, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 14 }}>
+                <div style={{ flex: 1, maxWidth: 760, border: `1px solid ${INK}`, background: PAPER2, padding: "14px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
                   <div>
                     <SCaps size={9.5} ls=".16em" color={INK55} style={{ display: "block", marginBottom: 8 }}>Pasted draft + 2 files</SCaps>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -222,7 +270,7 @@ export default function FactCheckIQPage() {
                       </span>
                     </div>
                   </div>
-                  <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.85, margin: 0 }}>
+                  <p style={{ fontFamily: SERIF, fontSize: 9.5, lineHeight: 1.5, margin: 0 }}>
                     Nielsen{" "}
                     <span style={{ background: VERDICT_COLORS["Verified"].bg, color: VERDICT_COLORS["Verified"].fg, padding: ".03em .18em" }}>surveyed more than 28,000 people across 56 countries</span>,
                     finding that{" "}
@@ -301,10 +349,27 @@ export default function FactCheckIQPage() {
                       </button>
                     ))}
                   </div>
+                  <div style={{ width: 1, height: 18, background: P25 }} />
+                  <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".16em", color: P55 }}>MODE</span>
+                  <div style={{ display: "flex", gap: 0 }}>
+                    {MODE_NAMES.map((md) => (
+                      <button
+                        key={md}
+                        type="button"
+                        onClick={() => setMode(md)}
+                        style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", background: mode === md ? YEL : "transparent", color: mode === md ? INK : PAPER, border: `1px solid ${mode === md ? YEL : P35}`, padding: "7px 13px", cursor: "pointer", marginLeft: -1 }}
+                      >
+                        {md}
+                      </button>
+                    ))}
+                  </div>
                   <span style={{ flex: 1 }} />
                   <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11, letterSpacing: ".08em", color: YEL }}>
                     STEP {pad(selected + 1)} / 10 {"·"} {playing ? "PLAYING" : "PAUSED"}
                   </span>
+                  <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: P72, flexBasis: "100%", margin: "8px 0 0", paddingTop: 6, borderTop: `1px dashed ${P25}` }}>
+                    {MODE_NOTES[mode]}
+                  </p>
                 </div>
 
                 {/* Detail panel */}
@@ -327,6 +392,33 @@ export default function FactCheckIQPage() {
                         </span>
                       ))}
                     </div>
+                    {(active.quote || active.plain || active.traps) && (
+                      <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}` }}>
+                        {active.quote && (
+                          <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 600, fontSize: 15, color: INK, borderLeft: `3px solid ${YEL}`, paddingLeft: 12, margin: "0 0 10px" }}>
+                            “{active.quote}”
+                          </p>
+                        )}
+                        {active.traps && (
+                          <ul style={{ margin: "0 0 10px", padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: "8px 18px" }}>
+                            {active.traps.map((t) => (
+                              <li key={t} style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".04em", color: INK55 }}>
+                                <span style={{ color: YEL2, fontWeight: 900 }}>{"→ "}</span>{t}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                        {active.plain && (
+                          <p style={{ fontFamily: SERIF, fontSize: 13.5, color: INK70, margin: 0, maxWidth: "70ch" }}>
+                            <span style={{ fontFamily: GROT, fontStyle: "normal", fontWeight: 800, textTransform: "uppercase", fontSize: 12.5, color: INK }}>In plain terms: </span>
+                            {active.plain}
+                          </p>
+                        )}
+                        {active.note && (
+                          <p style={{ fontFamily: SERIF, fontSize: 13.5, color: INK70, margin: "6px 0 0", maxWidth: "70ch" }}>{active.note}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -423,11 +515,11 @@ export default function FactCheckIQPage() {
                 </div>
               </div>
 
-              {/* ── CROSS-CUTTING PRINCIPLES (collapsible) ──────────────────── */}
+              {/* ── VERIFICATION FRAMEWORKS (was "cross-cutting principles", now the 5-card mosaic + capstone) ── */}
               <div style={{ marginTop: 30 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", borderTop: `3px solid ${INK}`, paddingTop: 14 }}>
-                  <span style={actPill}>Cross-cutting principles</span>
-                  <span style={actCaption}>the standards applied across every step</span>
+                  <span style={actPill}>Verification frameworks</span>
+                  <span style={actCaption}>5 cross-cutting principles {"·"} the heart of the skill</span>
                   <span style={{ flex: 1 }} />
                   <button
                     type="button"
@@ -440,24 +532,59 @@ export default function FactCheckIQPage() {
                 {showMethods && (
                   <div style={{ marginTop: 16 }}>
                     <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK70, marginBottom: 14 }}>
-                      The steps are the sequence. These five principles are the standards applied across every step.
+                      The ten steps are the sequence claims move through. These five principles are the standards applied at every step, plus six more woven directly into steps 04, 05, 06, 08 and 09 above, and one (parallel verification) behind the 2 MODES stat up top. Eleven methods, one skill.
                     </p>
-                    <div className="fciqfw-principles" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 1, background: INK15 }}>
-                      {PRINCIPLES.map((p, i) => (
-                        <div key={p.name} style={{ background: PAPER2, padding: "14px 15px" }}>
-                          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
-                            <span style={{ background: INK, color: YEL, fontFamily: MONO, fontWeight: 700, fontSize: 11, padding: "2px 6px" }}>{pad(i + 1)}</span>
-                            <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, textTransform: "uppercase" }}>{p.name}</span>
+                    <div className="fciqfw-principles" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 1, background: INK }}>
+                      {PRINCIPLES.map((p) => {
+                        const isDark = p.kind === "dark";
+                        const bg = isDark ? INK : p.kind === "tint" ? "#e4dcc4" : PAPER2;
+                        const fg = isDark ? PAPER : INK;
+                        return (
+                          <div key={p.eyebrow} style={{ background: bg, color: fg, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 10 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".12em", textTransform: "uppercase", color: isDark ? YEL : INK55 }}>
+                              <span style={{ background: isDark ? YEL : INK, color: isDark ? INK : YEL, fontFamily: MONO, fontWeight: 700, fontSize: 11, padding: "2px 6px" }}>{p.num}</span>
+                              {p.eyebrow}
+                            </div>
+                            <p style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, lineHeight: 1.3, margin: 0 }}>{p.headline}</p>
+                            {p.tiers ? (
+                              <div>
+                                {TIER_ROWS.map((t) => (
+                                  <div key={t.tier} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontFamily: MONO, fontWeight: 700, fontSize: 10.5, padding: "5px 8px", marginBottom: 2, background: t.bg, color: t.fg }}>
+                                    <span>{t.tier}</span><span>{t.label}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.5, color: isDark ? P72 : INK70, margin: 0 }}>{p.body}</p>
+                            )}
+                            <p style={{ fontFamily: SERIF, fontSize: 12.5, lineHeight: 1.45, color: isDark ? P72 : INK70, borderTop: `1px solid ${isDark ? P25 : INK15}`, paddingTop: 10, margin: 0 }}>
+                              <span style={{ fontFamily: GROT, fontStyle: "normal", fontWeight: 800, textTransform: "uppercase", fontSize: 11, color: isDark ? PAPER : INK }}>In plain terms: </span>
+                              {p.plain}
+                            </p>
+                            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".05em", color: isDark ? P45 : INK55, textTransform: "uppercase", marginTop: "auto" }}>
+                              {p.scope}
+                            </div>
                           </div>
-                          <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.4, margin: 0 }}>{p.desc}</p>
-                          <div style={{ borderTop: `1px solid ${INK15}`, marginTop: 10, paddingTop: 8, fontFamily: MONO, fontWeight: 700, fontSize: 8.5, color: INK55 }}>
-                            {p.scope}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* ── CAPSTONE QUOTE ───────────────────────────────────────────── */}
+              <div style={{ marginTop: 1, background: INK, color: PAPER, padding: "34px 38px", display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 14 }}>
+                <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 24, lineHeight: 1.3, maxWidth: "32ch", margin: 0 }}>
+                  Rigour that is too slow to use does not get used.
+                </p>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: P45 }}>
+                    The design principle behind all 11 methods
+                  </div>
+                  <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 56, color: P25, lineHeight: 1, marginTop: 6 }}>
+                    11 {"×"}
+                  </div>
+                </div>
               </div>
 
               {/* ── POSITIONING BAND ─────────────────────────────────────────── */}
@@ -472,27 +599,6 @@ export default function FactCheckIQPage() {
                 <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P45, marginTop: 18 }}>
                   For human writers and AI drafts alike
                 </div>
-              </div>
-
-              {/* ── PLATFORM CTA BAND ───────────────────────────────────────── */}
-              <div style={{ marginTop: 24, marginBottom: 16, background: INK, borderTop: `3px solid ${YEL}`, padding: "36px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
-                <div style={{ maxWidth: 620 }}>
-                  <span style={{ display: "inline-block", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", padding: "4px 9px", marginBottom: 12 }}>
-                    Platform only
-                  </span>
-                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, color: PAPER, lineHeight: 1.2 }}>
-                    FactCheck IQ is available to EMOS Platform members.
-                  </div>
-                  <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: P72, marginTop: 8 }}>
-                    Join the platform to grade and source-check every draft before it goes out.
-                  </p>
-                </div>
-                <Link
-                  href="/emos"
-                  style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "15px 26px", whiteSpace: "nowrap", textDecoration: "none" }}
-                >
-                  Explore the EMOS Platform {"→"}
-                </Link>
               </div>
 
               {/* ── FOOTER (colophon rule) ──────────────────────────────────── */}
