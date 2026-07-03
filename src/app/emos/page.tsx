@@ -230,7 +230,7 @@ export default function EmosPage() {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src="/assets/headshot-circle.png" alt="Syed Irfan Ajmal" className="pc-photo" />
                     <div className="pc-name">Syed Irfan Ajmal</div>
-                    <div className="pc-title">Columnist · Agency Operator · 13+ Years</div>
+                    <div className="pc-title">Columnist · Agency Operator · ~13 Years</div>
                   </div>
                   <div className="pc-creds">
                     <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text">Forbes, HBR, HuffPost, World Bank, SEJ, Entrepreneur, The Next Web, Yahoo, MSN, SEMrush, SERPed <em>+ more</em></div></div>
@@ -247,10 +247,10 @@ export default function EmosPage() {
                   </p>
                   {/* CHANGE 10: bio lightly condensed (facts unchanged) */}
                   <p className="emos-bio-body">
-                    Founded an earned media agency 13+ years ago. Earlier, co-founded an award-winning geo-spatial intelligence startup and led marketing at two more ventures, all bootstrapped to profitability. Hosts <em>The SIA Business Podcast</em> (7+ years). Clients across the US, Canada, Europe, Australia, and the Gulf.
+                    Founded an earned media agency ~13 years ago. Earlier, co-founded an award-winning geo-spatial intelligence startup and led marketing at two more ventures, all bootstrapped to profitability. Hosts <em>The SIA Business Podcast</em> (7+ years). Clients across the US, Canada, Europe, Australia, and the Gulf.
                   </p>
                   <div className="emos-stats-strip">
-                    {[["13+","Years"],["100+","Publications"],["$1.2M","Client rev/mo"],["4","Continents"]].map(([v,k]) => (
+                    {[["~13","Years, Agency"],["100+","Publications"],["$1.2M","Client rev/mo"],["4","Continents"]].map(([v,k]) => (
                       <div className="emos-stat-cell" key={k}><div className="emos-stat-val">{v}</div><div className="emos-stat-key">{k}</div></div>
                     ))}
                   </div>
@@ -485,7 +485,7 @@ export default function EmosPage() {
                 {[
                   { num:"01", stat:"The Journo Outreach Checklist", beta:false, statSub:"Pitch tracking · Follow-ups · Placement log", name:"Every pitch and follow-up in one place", sector:"Tool 01 · Replaces scattered spreadsheets", body:"Track every pitch, follow-up, and response in one place. Submission count, follow-up dates, and placement status at a glance.", replaces:"Scattered HARO exports and manual follow-up tracking" },
                   { num:"02", stat:"PressIQ", beta:true, statSub:"PR pitch scorer · Mechanics · Personalization", name:"Score and fix your pitch before you send", sector:"Tool 02 · Replaces sending blind", body:"Scores your media pitch across mechanics, personalization, and strength, then shows you exactly how to fix it before you hit send.", replaces:"Sending pitches blind and hoping they land" },
-                  { num:"03", stat:"JournoCollabIQ", beta:true, statSub:"Journalist matching · Beat · Coverage fit", name:"The journalists most likely to respond", sector:"Tool 03 · Replaces cold guesswork", body:"Identify the journalists and editors most likely to respond, based on beat, recent coverage, publication fit, and engagement history. Built from 13+ years of outreach data.", replaces:"Manual press-page trawling and cold inbox roulette" },
+                  { num:"03", stat:"JournoCollabIQ", beta:true, statSub:"Journalist matching · Beat · Coverage fit", name:"The journalists most likely to respond", sector:"Tool 03 · Replaces cold guesswork", body:"Identify the journalists and editors most likely to respond, based on beat, recent coverage, publication fit, and engagement history. Built from ~13 years of outreach data.", replaces:"Manual press-page trawling and cold inbox roulette" },
                 ].map(tool => (
                   <div className="emos-t1" key={tool.stat}>
                     <div className="emos-t1-top">
@@ -685,7 +685,7 @@ export default function EmosPage() {
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span><strong style={{ color: PAPER }}>Foundation:</strong> 1 verified placement within 60 days of cohort end</span></div>
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span><strong style={{ color: PAPER }}>Accelerate:</strong> 2 verified placements within 90 days</span></div>
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span>If I miss either: <strong style={{ color: PAPER }}>full refund of the investment</strong></span></div>
-                  <p className="emos-commit-note">EMOS is new, but the playbook behind it isn&#39;t. It&#39;s the same earned-media approach my agency has used for 13+ years, and clients who work it consistently earn placements.</p>
+                  <p className="emos-commit-note">EMOS is new, but the playbook behind it isn&#39;t. It&#39;s the same earned-media approach my agency has used for ~13 years, and clients who work it consistently earn placements.</p>
                 </div>
               </div>
             </div>
