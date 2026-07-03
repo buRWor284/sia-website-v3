@@ -1388,7 +1388,7 @@ export default function PressIQPage() {
               <button onClick={analyze} disabled={!canAnalyze} style={{ width: "100%", padding: 14, border: "none", background: canAnalyze ? YEL : ra(YEL, 0.35), color: canAnalyze ? DARK : ra(DARK, 0.4), fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: canAnalyze ? "pointer" : "not-allowed", transition: "opacity .12s", borderRadius: 0 }}>
                 {view === "loading" ? "Scoring your pitch…" : "Analyze pitch →"}
               </button>
-              <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(PAPER, 0.16), textAlign: "center", lineHeight: 1.9 }}>
+              <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(PAPER, 0.45), textAlign: "center", lineHeight: 1.9 }}>
                 {FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research
               </div>
             </div>
@@ -1407,7 +1407,7 @@ export default function PressIQPage() {
         </div>
 
         {/* ── Pipeline footer — inside shell so it's always visible ── */}
-        <ToolPipelineFooter currentTool="pressiq" compact />
+        <ToolPipelineFooter currentTool="pressiq" compact onDark />
 
       </div>
 

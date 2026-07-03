@@ -79,9 +79,14 @@ interface Props {
   currentTool?: ToolId;
   /** Remove top margin — use when inside a fixed-height shell (e.g. PressIQ) */
   compact?: boolean;
+  /** Set when the footer sits on a dark page background (e.g. PressIQ's
+   * ink-shell layout) — flips the label row from ink-on-dark (invisible)
+   * to paper-on-dark. The card grid itself is unaffected: cards are always
+   * light, regardless of page background. */
+  onDark?: boolean;
 }
 
-export function ToolPipelineFooter({ currentTool, compact }: Props) {
+export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
   // Hairline borders via a 1px-gap grid on an ink-15 bed, rather than a
   // border-right chain + nth-child overrides — this stays correct at any
   // column count / wrap point, which matters now that 5 free-tool steps
@@ -143,12 +148,12 @@ export function ToolPipelineFooter({ currentTool, compact }: Props) {
     }}>
       <style dangerouslySetInnerHTML={{ __html: css }} />
 
-      <DoubleRule style={{ marginBottom: compact ? 12 : 16 }} />
+      <DoubleRule dark={onDark} style={{ marginBottom: compact ? 12 : 16 }} />
 
       <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: compact ? 8 : 12, flexWrap: "wrap" }}>
-        <SCaps size={8.5} ls="0.20em" color={INK55}>The SIA earned-media pipeline</SCaps>
-        <div style={{ flex: 1, height: 1, background: INK15, minWidth: 16 }} />
-        <Link href="/tools" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, textDecoration: "none" }}>
+        <SCaps size={8.5} ls="0.20em" color={onDark ? "rgba(241,235,222,.55)" : INK55}>The SIA earned-media pipeline</SCaps>
+        <div style={{ flex: 1, height: 1, background: onDark ? "rgba(241,235,222,.18)" : INK15, minWidth: 16 }} />
+        <Link href="/tools" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: onDark ? "rgba(241,235,222,.55)" : INK55, textDecoration: "none" }}>
           How they fit together ↗
         </Link>
       </div>
