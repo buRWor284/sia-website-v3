@@ -1272,7 +1272,7 @@ export default function CoverageIQ() {
         subtitle="Pitch Tracking CRM · EMOS Tool Suite"
         rightContent={
           <>
-            <a href="/tools/coverageiq/how-it-works" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
+            <a href="/tools/coverageiq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
               How it works →
             </a>
             <button

@@ -239,7 +239,7 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
       subtitle="JournoCollabIQ surfaces the reporters who cover your beat — grounded in their recent work — then gives you the angle, a media list, and a targeting brief to land the story."
       heroExtra={
         <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginBottom: 40 }}>
-          <a href="/tools/journocollabiq/how-it-works" style={{ ...ghostBtn(), padding: "10px 18px", fontSize: 11, textDecoration: "none" }}>
+          <a href="/tools/journocollabiq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ ...ghostBtn(), padding: "10px 18px", fontSize: 11, textDecoration: "none" }}>
             See a worked example →
           </a>
           <span style={{ fontFamily: MF, fontSize: 10, fontWeight: 700, color: TX3, letterSpacing: "0.14em", textTransform: "uppercase" }}>

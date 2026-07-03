@@ -36,6 +36,8 @@ export default function JournoCollabIQPage() {
         rightExtra={
           <Link
             href="/tools/journocollabiq/how-it-works"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{ fontFamily: "var(--font-grot)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "#f5b81f", textDecoration: "none", whiteSpace: "nowrap" }}
           >
             How it works →

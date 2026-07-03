@@ -1288,7 +1288,7 @@ export default function PressIQPage() {
           subtitle="Journalist Pitch Score · SIA Wire"
           rightContent={
             <>
-              <Link href="/tools/pressiq/how-it-works" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
+              <Link href="/tools/pressiq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
                 How it works →
               </Link>
               <Link href="/" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
