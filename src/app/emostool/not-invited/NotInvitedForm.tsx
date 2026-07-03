@@ -162,7 +162,7 @@ export default function NotInvitedForm() {
         )}
 
         <a
-          href="/tools"
+          href="/resources"
           style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, textDecoration: "none" }}
         >
           Explore the free tools →

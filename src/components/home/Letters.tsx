@@ -21,7 +21,7 @@ const TESTIMONIALS: ReadonlyArray<Testimonial> = [
     name: "Brett Helling",
     role: "Enterprise SEO Lead, ClickUp",
     place: "Omaha, NE",
-    photo: "/assets/testimonials/brett-helling.jpg",
+    photo: "/assets/testimonials/brett-helling.jpeg",
     stat: "0 to 1.5M monthly visitors",
   },
   {

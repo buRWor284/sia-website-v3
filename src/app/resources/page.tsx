@@ -4,7 +4,7 @@ import { Colophon, Subscriptions } from "@/components/bureau";
 export const metadata: Metadata = {
   title: "Resources · Playbooks, Guides & Tools",
   description:
-    "Free playbooks: personal branding, neuromarketing, storytelling, and SEO-PR tools. Practical guides from a fractional CMO with 20+ years in digital marketing.",
+    "Free playbooks: personal branding, neuromarketing, storytelling, and SEO-PR tools. Practical guides from a fractional CMO with 22+ years in digital marketing.",
   openGraph: {
     title: "Resources · Playbooks, Guides & Tools",
     description: "Free playbooks and tools on personal branding, neuromarketing, storytelling, and SEO-PR.",
