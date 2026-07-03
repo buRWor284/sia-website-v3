@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 // the large page.tsx stays untouched. Overrides the section card from /emos.
 export const metadata: Metadata = {
   openGraph: {
-    title: "Apply for EMOS Cohort 1 · 5 Seats",
+    title: "Apply for EMOS Academy · Cohort 1 · 5 Seats",
     description:
       "One short application, reviewed personally within 48 hours. If it's a fit, we'll send a link to talk through the details.",
   },

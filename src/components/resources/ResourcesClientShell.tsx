@@ -1284,9 +1284,9 @@ function GuidedPipeline() {
 
       <div className="gp-wrap">
         <div className="gp-head">
-          <div className="gp-kicker">A guided view · Organised by the EMOS curriculum</div>
-          <h2 className="gp-title">The EMOS curriculum, tool by tool</h2>
-          <p className="gp-sub">This view maps the free tools to the <b>EMOS</b> curriculum, so you can see how they fit together. Start with the <b>Foundation</b> — the science first, then the case for earned media — then work the <b>Reactive</b> and <b>Proactive</b> phases below. Each tool is a free, self-serve taste of one EMOS module; the full program sequences them with you. Just want the tools on their own? Switch to <b>Browse All</b> above.</p>
+          <div className="gp-kicker">A guided view · Organised by the EMOS Academy curriculum</div>
+          <h2 className="gp-title">The EMOS Academy curriculum, tool by tool</h2>
+          <p className="gp-sub">This view maps the free tools to the <b>EMOS Academy</b> curriculum, so you can see how they fit together. Start with the <b>Foundation</b> — the science first, then the case for earned media — then work the <b>Reactive</b> and <b>Proactive</b> phases below. Each tool is a free, self-serve taste of one EMOS module; the full EMOS Academy program sequences them with you. Just want the tools on their own? Switch to <b>Browse All</b> above.</p>
           <div className="gp-ladder"><b>Access</b> — every tool gives a taste <span>free</span>, more when you <span>join the newsletter</span>, and the full tool <span>inside EMOS</span>.</div>
         </div>
 
@@ -1358,7 +1358,7 @@ function GuidedPipeline() {
 
         <a className="gp-cta" href="/emos">
           <span className="gp-cta-txt">Try the pieces free. <em>Want the whole sequence, done with you?</em></span>
-          <span className="gp-cta-btn">Explore EMOS →</span>
+          <span className="gp-cta-btn">Explore EMOS Academy →</span>
         </a>
       </div>
     </section>
@@ -1372,7 +1372,7 @@ function GuidedPipeline() {
 function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v: "guided" | "browse") => void }) {
   const tabs: { key: "guided" | "browse"; label: string }[] = [
     { key: "browse", label: "Browse All" },
-    { key: "guided", label: "EMOS Curriculum" },
+    { key: "guided", label: "EMOS Academy" },
   ];
   return (
     <div style={{ background: PAPER, borderBottom: `1px solid ${INK15}` }}>

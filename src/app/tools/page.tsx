@@ -124,21 +124,36 @@ export default function ToolsIndexPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section style={{ background: PAPER, borderBottom: `1px solid ${INK}`, padding: "56px 56px 44px" }}>
-        <div style={{ maxWidth: 900 }}>
-          <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: INK55, marginBottom: 16 }}>
-            EMOS Tools · Free · Public · No login
-          </div>
-          <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(32px,4.2vw,52px)", lineHeight: 1.05, letterSpacing: "-0.025em", color: INK, margin: "0 0 20px" }}>
-            The earned-media pipeline, <em>one tool at a time.</em>
-          </h1>
-          <p style={{ fontFamily: SERIF, fontSize: 17, lineHeight: 1.65, color: INK70, maxWidth: 620, margin: "0 0 28px" }}>
-            Six tools, in the order they&rsquo;re meant to be used — find the story, build the asset, verify it, find the journalist, score the pitch, track the placement. Each one here is a free, self-serve taste of a module inside the paid <Link href="/emos" style={{ color: INK }}>EMOS Platform</Link>, which sequences all six for you.
-          </p>
-          <a href="/emos" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>
-            Explore the full EMOS system →
-          </a>
-        </div>
+      {/* Compact single-bar masthead — matches /resources hero pattern. */}
+      <section
+        style={{
+          background: PAPER,
+          borderBottom: `1px solid ${INK}`,
+          padding: "18px 56px",
+          display: "flex",
+          alignItems: "center",
+          gap: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", flexShrink: 0 }}>
+          6 Tools · Free
+        </span>
+
+        <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.3vw,28px)", lineHeight: 1.15, letterSpacing: "-0.02em", color: INK, margin: 0, flexShrink: 0 }}>
+          The earned-media pipeline, <em style={{ fontStyle: "italic" }}>one tool at a time.</em>
+        </h1>
+
+        <p style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.5, color: INK70, margin: 0, maxWidth: 340, flex: "1 1 260px" }}>
+          Six free tools, in the order they&rsquo;re meant to be used. <Link href="/emos" style={{ color: INK }}>EMOS Academy</Link> sequences all six for you, guided.
+        </p>
+
+        <a
+          href="/emos"
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none", flexShrink: 0, marginLeft: "auto" }}
+        >
+          Explore EMOS Academy →
+        </a>
       </section>
 
       {/* ── Pipeline grid ────────────────────────────────────────────────── */}

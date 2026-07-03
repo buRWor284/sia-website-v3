@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 // the large page.tsx stays untouched. The page itself stays noindex.
 export const metadata: Metadata = {
   openGraph: {
-    title: "Complete Your EMOS Payment",
+    title: "Complete Your EMOS Academy Payment",
     description:
-      "Secure your seat in EMOS Cohort 1: Foundation or Accelerate. One-time investment, capability you keep forever.",
+      "Secure your seat in EMOS Academy Cohort 1: Foundation or Accelerate. One-time investment, capability you keep forever.",
   },
 };
 

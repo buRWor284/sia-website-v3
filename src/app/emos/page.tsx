@@ -24,7 +24,7 @@ import {
   YEL,
 } from "@/lib/tokens";
 
-const OG_TITLE = "EMOS · Build the Media Presence Investors Check";
+const OG_TITLE = "EMOS Academy · Build the Media Presence Investors Check";
 const OG_DESC =
   "A guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.";
 
@@ -34,9 +34,9 @@ const OG_DESC =
 // opengraph-image.tsx / twitter-image.tsx in this folder supply the image with
 // width/height/type automatically.
 export const metadata: Metadata = {
-  title: "EMOS · Earned Media OS for Founders",
+  title: "EMOS Academy · Earned Media OS for Founders",
   description:
-    "EMOS is a guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.",
+    "EMOS Academy is a guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.",
   alternates: { canonical: "/emos" },
   openGraph: {
     type: "website",
@@ -130,7 +130,7 @@ export default function EmosPage() {
               </div>
 
               <p className="emos-hero-sub">
-                <strong>EMOS</strong>, the Earned Media Operating System, is a
+                <strong>EMOS Academy</strong>, built on EMOS — the Earned Media Operating System — is a
                 Guided Implementation System for founders <strong>3 to 12 months from a Series A</strong>.
               </p>
 

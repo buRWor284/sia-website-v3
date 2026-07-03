@@ -52,7 +52,7 @@ const emosJsonLd = {
   "@graph": [
     {
       "@type": "Service",
-      name: "EMOS · Earned Media OS",
+      name: "EMOS Academy · Earned Media OS",
       serviceType: "Earned media implementation program",
       provider: { "@id": "https://www.syedirfanajmal.com/#person" },
       areaServed: "Worldwide",
