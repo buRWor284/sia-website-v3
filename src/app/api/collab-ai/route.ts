@@ -96,12 +96,17 @@ Write a concise, high-converting outreach email that:
 - Sounds like a real person wrote it — warm, direct, not salesy
 - Is under 200 words in the body (subject line excluded)
 
+Formatting rules — follow exactly:
+- Plain text only. No markdown of any kind: no asterisks, no bold/italic markers, no markdown links (never write "[text](url)").
+- Do not use em dashes (—) or en dashes (–) anywhere, including the sign-off. Use a comma, period, or the word "and" instead.
+- Write the website as plain text, e.g. www.syedirfanajmal.com/EMOS — not as a link.
+
 Format:
 Subject: [subject line]
 
 [email body]
 
-Sign-off with placeholder: [Your Name] | [Role] · [Brand] · [Website]`;
+Sign-off with placeholder: [Your Name] | [Role] | [Brand] | [Website, plain text]`;
 }
 
 function buildBriefPrompt(d: Record<string, unknown>): string {

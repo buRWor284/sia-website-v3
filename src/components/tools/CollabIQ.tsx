@@ -702,6 +702,34 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
 }) {
   const { strategy, biz, domain, desc } = state;
   const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
+  const [emailCopied, setEmailCopied] = useState(false);
+
+  const copyEmail = () => {
+    const text = aiEmail || "";
+    const done = (ok: boolean) => { setEmailCopied(ok); setTimeout(()=>setEmailCopied(false), 2000); };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).then(()=>done(true)).catch(()=>{
+        // Fallback for browsers that block the async clipboard API
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.focus(); ta.select();
+          const ok = document.execCommand("copy");
+          document.body.removeChild(ta);
+          done(ok);
+        } catch { done(false); }
+      });
+    } else {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        const ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        done(ok);
+      } catch { done(false); }
+    }
+  };
 
   const templates: Record<Strategy, string> = {
     discount:    `Subject: Partnership idea — [THEIR BRAND] × ${biz||"[YOUR BRAND]"}\n\nHi [FIRST NAME],\n\nI'm [YOUR NAME] from ${biz||"[BRAND]"} — we ${desc||"[DESCRIPTION]"}.\n\nI noticed you serve the same audience — [SHARED AUDIENCE] — from a different angle.\n\nProposal: we offer your clients an exclusive [X]% discount. You mention us on your partner page with a link.\n\nThree-way win.\n\n15 minutes to explore this?\n\n[YOUR NAME]\n${biz||"[BRAND]"} · ${domain||"[WEBSITE]"}`,
@@ -748,8 +776,8 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
             <pre style={{ background:BG2, border:`1px solid ${BD}`, borderLeft:`3px solid ${ACC}`, padding:20, fontSize:13, lineHeight:1.8, color:TX2, whiteSpace:"pre-wrap", fontFamily:GF }}>
               {aiEmail}
             </pre>
-            <button onClick={()=>navigator.clipboard.writeText(aiEmail)}
-              style={{ ...ghostBtn(), fontSize:9, padding:"8px 14px", marginTop:10 }}>Copy email</button>
+            <button onClick={copyEmail}
+              style={{ ...ghostBtn(), fontSize:9, padding:"8px 14px", marginTop:10 }}>{emailCopied ? "Copied ✓" : "Copy email"}</button>
           </div>
         )}
       </div>
