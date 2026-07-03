@@ -405,7 +405,7 @@ function TabNav({ current, setTab, onReset }: { current: Tab; setTab: (t: Tab) =
   const next = idx < TABS.length - 1 ? TABS[idx + 1] : null;
   function goNext(id: Tab) {
     setTab(id);
-    document.querySelector(".piq-right")?.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 28, paddingTop: 18, borderTop: `1px solid ${ra(INK, 0.1)}` }}>
@@ -929,7 +929,7 @@ export default function PressIQPage() {
       const res = await fetch("/api/pitch-score", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pitch, query: pitchMode === "standalone" ? journalistBeat : query, subject, platform, brandSignals: brand, store, pitchMode, turnstileToken }) });
       const data = (await res.json()) as { error?: string } & ScoreResponse;
       if (!res.ok) { setError(data.error || "Something went wrong scoring your pitch."); setView("pre"); }
-      else { setResult(data); setView("post"); setTimeout(() => rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }), 50); }
+      else { setResult(data); setView("post"); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50); }
     } catch { setError("Network error. Please try again."); setView("pre"); }
     finally {
       // Turnstile tokens are single-use — refresh for the next submission.
@@ -942,7 +942,7 @@ export default function PressIQPage() {
     }
   }
 
-  function reset() { setView("pre"); setResult(null); setError(null); setTab("score"); rightRef.current?.scrollTo({ top: 0, behavior: "smooth" }); }
+  function reset() { setView("pre"); setResult(null); setError(null); setTab("score"); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
   // PDF generation
   const generatePDF = useCallback(async () => {
@@ -1288,7 +1288,7 @@ export default function PressIQPage() {
       <style>{PAGE_CSS}</style>
       <EmailGate show={showGate} onClose={() => setShowGate(false)} onUnlock={() => { setShowGate(false); generatePDF(); }} result={result} />
 
-      <div className="piq-shell">
+      <div className="piq-page">
 
         {/* ── Header ───────────────────────────────────────────────── */}
         <ToolHeader
@@ -1306,107 +1306,116 @@ export default function PressIQPage() {
           }
         />
 
-        {/* ── Body ─────────────────────────────────────────────────── */}
-        <div className="piq-body">
+        {/* ── Step bar ─────────────────────────────────────────────── */}
+        <nav className="piq-step-bar">
+          <span className={`piq-step ${view !== "pre" ? "past" : "active"}`} onClick={() => view === "post" && reset()}>
+            <span className="piq-step-no">{view !== "pre" ? "✓" : "1"}</span> Your pitch
+          </span>
+          <span className="piq-step-connector" />
+          <span className={`piq-step ${view === "post" ? "active" : ""}`}>
+            <span className="piq-step-no">2</span> Score
+          </span>
+        </nav>
 
-          {/* Left panel */}
-          <aside className="piq-left">
-            <div style={{ padding: "22px 22px 16px", borderBottom: `1px solid ${DARK_BD}` }}>
-              <div style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: PAPER, letterSpacing: "-.025em", lineHeight: 1 }}>
-                Press<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
+        {/* ── Single scrolling column ─────────────────────────────── */}
+        <main ref={rightRef} className="piq-col">
+
+          {view !== "post" && (
+            <section className="piq-form-card">
+              <div style={{ padding: "22px 22px 16px", borderBottom: `1px solid ${DARK_BD}` }}>
+                <div style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: PAPER, letterSpacing: "-.025em", lineHeight: 1 }}>
+                  Press<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
+                </div>
+                <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 600, letterSpacing: ".18em", textTransform: "uppercase", color: ra(PAPER, 0.50), marginTop: 8, lineHeight: 1.7 }}>
+                  Journalist pitch score<br />by Syed Irfan Ajmal
+                </div>
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 600, letterSpacing: ".18em", textTransform: "uppercase", color: ra(PAPER, 0.50), marginTop: 8, lineHeight: 1.7 }}>
-                Journalist pitch score<br />by Syed Irfan Ajmal
+
+              {/* ── Pitch type toggle ──────────────────────────────── */}
+              <div style={LSEC}>
+                <span style={LSEC_LBL}>Pitch type</span>
+                <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                  <button onClick={() => setPitchMode("standalone")} style={chipStyle(pitchMode === "standalone")}>Standalone outreach</button>
+                  <button onClick={() => setPitchMode("query")} style={chipStyle(pitchMode === "query")}>Answering a query</button>
+                </div>
+                <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block", marginTop: 10 }}>
+                  {pitchMode === "standalone"
+                    ? "Proactive pitch to a journalist you’ve targeted. Relevance is scored against their known beat."
+                    : "Response to a HARO / Qwoted / Featured source request. Relevance is scored against their specific ask."}
+                </em>
               </div>
-            </div>
 
-            {/* ── Pitch type toggle ──────────────────────────────── */}
-            <div style={LSEC}>
-              <span style={LSEC_LBL}>Pitch type</span>
-              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                <button onClick={() => setPitchMode("standalone")} style={chipStyle(pitchMode === "standalone")}>Standalone outreach</button>
-                <button onClick={() => setPitchMode("query")} style={chipStyle(pitchMode === "query")}>Answering a query</button>
+              {/* ── Journalist context (beat or query) ────────────── */}
+              <div style={LSEC}>
+                {pitchMode === "standalone" ? (
+                  <>
+                    <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, what topics they cover</span></span>
+                    <textarea value={journalistBeat} onChange={e => setJournalistBeat(e.target.value)} placeholder="e.g. Covers SaaS growth, founder stories, and future-of-work data. Writes for TechCrunch’s Startups desk." className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
+                  </>
+                ) : (
+                  <>
+                    <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
+                    <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted / Featured query here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
+                  </>
+                )}
               </div>
-              <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block", marginTop: 10 }}>
-                {pitchMode === "standalone"
-                  ? "Proactive pitch to a journalist you’ve targeted. Relevance is scored against their known beat."
-                  : "Response to a HARO / Qwoted / Featured source request. Relevance is scored against their specific ask."}
-              </em>
-            </div>
 
-            {/* ── Journalist context (beat or query) ────────────── */}
-            <div style={LSEC}>
-              {pitchMode === "standalone" ? (
-                <>
-                  <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, what topics they cover</span></span>
-                  <textarea value={journalistBeat} onChange={e => setJournalistBeat(e.target.value)} placeholder="e.g. Covers SaaS growth, founder stories, and future-of-work data. Writes for TechCrunch’s Startups desk." className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
-                </>
-              ) : (
-                <>
-                  <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
-                  <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted / Featured query here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
-                </>
-              )}
-            </div>
-
-            <div style={LSEC}>
-              <span style={LSEC_LBL}>Your pitch</span>
-              <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
-              <div style={{ marginTop: 6 }}><button onClick={loadSample} className="piq-ghost">↻ Load a sample pitch</button></div>
-            </div>
-
-            <div style={LSEC}>
-              <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, else parsed from line 1</span></span>
-              <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
-            </div>
-
-            <div style={LSEC}>
-              <span style={LSEC_LBL}>Platform</span>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {PLATFORMS.map(p => <button key={p.id} onClick={() => setPlatform(p.id)} style={chipStyle(platform === p.id)}>{p.label}</button>)}
+              <div style={LSEC}>
+                <span style={LSEC_LBL}>Your pitch</span>
+                <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
+                <div style={{ marginTop: 6 }}><button onClick={loadSample} className="piq-ghost">↻ Load a sample pitch</button></div>
               </div>
-            </div>
 
-            <div style={LSEC}>
-              <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                {BRAND_LABELS.map(({ key, label }) => (
-                  <button key={key} onClick={() => setBrand(b => ({ ...b, [key]: !b[key] }))} style={chipStyle(brand[key])}>{label}</button>
-                ))}
+              <div style={LSEC}>
+                <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, else parsed from line 1</span></span>
+                <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
               </div>
-            </div>
 
-            <div style={{ ...LSEC, borderBottom: "none" }}>
-              <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 14, cursor: "pointer" }}>
-                <input type="checkbox" checked={store} onChange={e => setStore(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
-                <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.65), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
-              </label>
-              {TURNSTILE_SITE_KEY && <div ref={turnstileRef} style={{ marginBottom: 12 }} />}
-              {error && (
-                <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>{error}</div>
-              )}
-              <button onClick={analyze} disabled={!canAnalyze} style={{ width: "100%", padding: 14, border: "none", background: canAnalyze ? YEL : ra(YEL, 0.35), color: canAnalyze ? DARK : ra(DARK, 0.4), fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: canAnalyze ? "pointer" : "not-allowed", transition: "opacity .12s", borderRadius: 0 }}>
-                {view === "loading" ? "Scoring your pitch…" : "Analyze pitch →"}
-              </button>
-              <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(PAPER, 0.6), textAlign: "center", lineHeight: 1.9 }}>
-                {FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research
+              <div style={LSEC}>
+                <span style={LSEC_LBL}>Platform</span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {PLATFORMS.map(p => <button key={p.id} onClick={() => setPlatform(p.id)} style={chipStyle(platform === p.id)}>{p.label}</button>)}
+                </div>
               </div>
-            </div>
-          </aside>
 
-          {/* Right panel */}
-          <main ref={rightRef} className="piq-right">
-            {view === "pre"     && <PreScorePanel live={live} />}
-            {view === "loading" && <LoadingPanel />}
-            {view === "post"    && result && (
-              <PostScorePanel result={result} tab={tab} setTab={setTab}
-                email={email} setEmail={setEmail} emailDone={emailDone} setEmailDone={setEmailDone}
-                onDownload={() => setShowGate(true)} onReset={reset} pitchMode={pitchMode} />
-            )}
-          </main>
-        </div>
+              <div style={LSEC}>
+                <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                  {BRAND_LABELS.map(({ key, label }) => (
+                    <button key={key} onClick={() => setBrand(b => ({ ...b, [key]: !b[key] }))} style={chipStyle(brand[key])}>{label}</button>
+                  ))}
+                </div>
+              </div>
 
-        {/* ── Pipeline footer — inside shell so it's always visible ── */}
+              <div style={{ ...LSEC, borderBottom: "none" }}>
+                <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 14, cursor: "pointer" }}>
+                  <input type="checkbox" checked={store} onChange={e => setStore(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
+                  <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.65), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
+                </label>
+                {TURNSTILE_SITE_KEY && <div ref={turnstileRef} style={{ marginBottom: 12 }} />}
+                {error && (
+                  <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>{error}</div>
+                )}
+                <button onClick={analyze} disabled={!canAnalyze} style={{ width: "100%", padding: 14, border: "none", background: canAnalyze ? YEL : ra(YEL, 0.35), color: canAnalyze ? DARK : ra(DARK, 0.4), fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: canAnalyze ? "pointer" : "not-allowed", transition: "opacity .12s", borderRadius: 0 }}>
+                  {view === "loading" ? "Scoring your pitch…" : "Analyze pitch →"}
+                </button>
+                <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(PAPER, 0.6), textAlign: "center", lineHeight: 1.9 }}>
+                  {FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research
+                </div>
+              </div>
+            </section>
+          )}
+
+          {view === "pre" && <PreScorePanel live={live} />}
+          {view === "loading" && <LoadingPanel />}
+          {view === "post" && result && (
+            <PostScorePanel result={result} tab={tab} setTab={setTab}
+              email={email} setEmail={setEmail} emailDone={emailDone} setEmailDone={setEmailDone}
+              onDownload={() => setShowGate(true)} onReset={reset} pitchMode={pitchMode} />
+          )}
+        </main>
+
+        {/* ── Pipeline footer ──────────────────────────────────────── */}
         <ToolPipelineFooter currentTool="pressiq" compact onDark />
 
       </div>
@@ -1417,16 +1426,17 @@ export default function PressIQPage() {
 
 // ── Scoped CSS ────────────────────────────────────────────────────────────────
 const PAGE_CSS = `
-  .piq-shell{display:flex;flex-direction:column;height:100dvh;background:${DARK};overflow:hidden}
-  .piq-body{display:flex;flex:1;overflow:hidden;min-height:0}
-  .piq-left{width:360px;flex-shrink:0;background:${DARK2};border-right:1px solid ${DARK_BD};overflow-y:auto;height:100%}
-  .piq-right{flex:1;background:${PAPER};overflow-y:auto;height:100%}
-  .piq-left::-webkit-scrollbar{width:6px}
-  .piq-left::-webkit-scrollbar-track{background:${DARK}}
-  .piq-left::-webkit-scrollbar-thumb{background:${DARK_BD}}
-  .piq-right::-webkit-scrollbar{width:8px}
-  .piq-right::-webkit-scrollbar-track{background:${PAPER}}
-  .piq-right::-webkit-scrollbar-thumb{background:${ra(INK,0.18)};border:2px solid ${PAPER}}
+  .piq-page{background:${PAPER};min-height:100dvh;display:flex;flex-direction:column}
+  .piq-step-bar{display:flex;align-items:center;justify-content:center;gap:0;background:${PAPER};border-bottom:1px solid ${ra(INK,0.1)};padding:12px 20px;flex-wrap:wrap}
+  .piq-step{display:flex;align-items:center;gap:8px;padding:4px 16px;font-family:${GROT};font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${ra(INK,0.35)};white-space:nowrap}
+  .piq-step.past{cursor:pointer;color:${ra(INK,0.55)}}
+  .piq-step.active{color:${INK}}
+  .piq-step-no{width:18px;height:18px;border-radius:50%;border:1.5px solid ${ra(INK,0.25)};display:flex;align-items:center;justify-content:center;font-size:9px}
+  .piq-step.active .piq-step-no{background:${YEL};border-color:${YEL};color:${INK}}
+  .piq-step.past .piq-step-no{background:${INK};border-color:${INK};color:${YEL}}
+  .piq-step-connector{width:28px;height:1px;background:${ra(INK,0.12)}}
+  .piq-col{max-width:860px;width:100%;margin:0 auto;padding:32px 20px 64px;display:flex;flex-direction:column;gap:28px;flex:1}
+  .piq-form-card{background:${DARK2};border:1px solid ${DARK_BD};border-radius:6px;overflow:hidden}
   .piq-field:focus{border-color:${ra(YEL,0.5)} !important;outline:none}
   .piq-field::placeholder{color:${ra(PAPER,0.22)}}
   .piq-ghost{background:none;border:none;cursor:pointer;font-family:${MONO};font-size:9px;color:${ra(PAPER,0.35)};padding:0;transition:color .1s}
@@ -1444,10 +1454,9 @@ const PAGE_CSS = `
   .piq-field:focus-visible{outline:2px solid ${YEL};outline-offset:1px}
   .piq-tab:focus-visible,.piq-ghost:focus-visible{outline:2px solid ${INK};outline-offset:2px}
   @media (max-width:768px){
-    .piq-shell{height:auto;min-height:100dvh;overflow:visible}
-    .piq-body{flex-direction:column;overflow:visible;min-height:0}
-    .piq-left{width:100%;flex-shrink:1;height:auto;border-right:none;border-bottom:1px solid ${DARK_BD}}
-    .piq-right{height:auto;overflow:visible}
+    .piq-col{padding:20px 14px 48px;gap:20px}
+    .piq-step-bar{padding:10px 12px}
+    .piq-step{padding:4px 10px;font-size:9px}
   }
   @media (prefers-reduced-motion:reduce){
     .piq-dot{animation:none;opacity:.6}
