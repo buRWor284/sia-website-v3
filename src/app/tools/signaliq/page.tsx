@@ -1323,27 +1323,38 @@ export default function SignalIQPage() {
   const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
 
-  // Cloudflare Turnstile (same managed-widget pattern as PressIQ)
-  const [turnstileToken, setTurnstileToken] = useState("");
+  // Cloudflare Turnstile (same hardened pattern as JournoCollabIQ: token ref
+  // for async reads, expired-callback auto-reset, waitForToken before calls)
+  const turnstileTokenRef = useRef("");
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
+  const setToken = (tok: string) => { turnstileTokenRef.current = tok; };
+
+  // Render is retried whenever the conditionally-mounted container appears.
+  // The old run-once effect fired while the intro screen was still up, found
+  // no container, and never tried again — so no token was ever issued and
+  // every scan 403'd once server-side verification was enabled.
+  function tryRenderTurnstile() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (!TURNSTILE_SITE_KEY || !w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
+    turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
+      sitekey: TURNSTILE_SITE_KEY,
+      theme: "dark",
+      callback: (token: string) => setToken(token),
+      // Token expired mid-session — reset so the managed widget re-solves.
+      "expired-callback": () => {
+        setToken("");
+        try { if (turnstileWidgetId.current) w.turnstile.reset(turnstileWidgetId.current); } catch { /* noop */ }
+      },
+      "error-callback": () => setToken(""),
+    });
+  }
 
   useEffect(() => {
     if (!TURNSTILE_SITE_KEY) return;
-    const render = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = window as any;
-      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
-      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
-        sitekey: TURNSTILE_SITE_KEY,
-        theme: "dark",
-        callback: (token: string) => setTurnstileToken(token),
-        "expired-callback": () => setTurnstileToken(""),
-        "error-callback": () => setTurnstileToken(""),
-      });
-    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).turnstile) { render(); return; }
+    if ((window as any).turnstile) { tryRenderTurnstile(); return; }
     const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
     let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
     if (!s) {
@@ -1351,8 +1362,10 @@ export default function SignalIQPage() {
       s.src = SRC; s.async = true; s.defer = true;
       document.head.appendChild(s);
     }
-    s.addEventListener("load", render);
-    return () => { s?.removeEventListener("load", render); };
+    const onLoad = () => tryRenderTurnstile();
+    s.addEventListener("load", onLoad);
+    return () => { s?.removeEventListener("load", onLoad); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Turnstile tokens are single-use — refresh after every API call.
@@ -1361,12 +1374,50 @@ export default function SignalIQPage() {
     const w = window as any;
     if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
       w.turnstile.reset(turnstileWidgetId.current);
-      setTurnstileToken("");
+      setToken("");
     }
+  }
+
+  // Wait (briefly) for a valid token before hitting the API. If the current
+  // token is gone (expired/consumed), reset the widget — the managed flow
+  // usually re-solves without user interaction — and poll for the new token.
+  async function waitForToken(ms = 8000): Promise<string> {
+    if (!TURNSTILE_SITE_KEY) return "";
+    if (turnstileTokenRef.current) return turnstileTokenRef.current;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (turnstileWidgetId.current && w.turnstile) {
+      try { w.turnstile.reset(turnstileWidgetId.current); } catch { /* noop */ }
+    }
+    const t0 = Date.now();
+    while (Date.now() - t0 < ms) {
+      await new Promise(r => setTimeout(r, 250));
+      if (turnstileTokenRef.current) return turnstileTokenRef.current;
+    }
+    return "";
   }
 
   // Step 0: intro/landing screen (click-through before step 1)
   const [intro, setIntro] = useState(true);
+
+  // The widget container mounts only after the intro is dismissed — attempt a
+  // (re-)render whenever that happens, and tear the widget down when the user
+  // returns to the intro so it can render cleanly next time.
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
+    if (intro) {
+      if (turnstileWidgetId.current && w.turnstile) {
+        try { w.turnstile.remove(turnstileWidgetId.current); } catch { /* noop */ }
+        turnstileWidgetId.current = null;
+        setToken("");
+      }
+      return;
+    }
+    tryRenderTurnstile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intro]);
   // Step 2: opportunities hidden until user adds context or clicks skip
   const [oppsRevealed, setOppsRevealed] = useState(false);
   const [usedContext, setUsedContext] = useState(false); // whether context was provided when revealing
@@ -1417,7 +1468,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat, turnstileToken: turnstileToken || undefined }),
+        body: JSON.stringify({ beat, turnstileToken: (await waitForToken()) || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setScanError(data.error || "Scan failed.");
@@ -1441,7 +1492,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat, companyContext: companyContext.trim(), turnstileToken: turnstileToken || undefined }),
+        body: JSON.stringify({ beat, companyContext: companyContext.trim(), turnstileToken: (await waitForToken()) || undefined }),
       });
       const data = await res.json();
       if (res.ok) { setScan(data as ScanResponse); setUsedContext(true); }
@@ -1465,7 +1516,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/pack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ opportunity: opp, store: true, companyContext: companyContext.trim() || undefined, turnstileToken: turnstileToken || undefined }),
+        body: JSON.stringify({ opportunity: opp, store: true, companyContext: companyContext.trim() || undefined, turnstileToken: (await waitForToken()) || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setPackError(data.error || "Could not generate the pack.");
@@ -1598,6 +1649,15 @@ export default function SignalIQPage() {
           </>
         )}
 
+        {/* Cloudflare Turnstile human check — fixed bottom-right so it stays
+            mounted across steps 1-3 (scan, personalise, asset pack) and an
+            interactive challenge is always visible (JournoCollabIQ pattern) */}
+        {TURNSTILE_SITE_KEY && !intro && (
+          <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 89 }}>
+            <div ref={turnstileRef} />
+          </div>
+        )}
+
         {/* ── Detail view (step 3) ──────────────────────────────────────── */}
         {selected && (
           <DetailView
@@ -1632,13 +1692,6 @@ export default function SignalIQPage() {
               )}
             </div>
             <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); setOppsRevealed(false); }} onScan={runScan} scanning={scanning} />
-
-            {/* Cloudflare Turnstile human check — renders only when the site key is set */}
-            {TURNSTILE_SITE_KEY && (
-              <div style={{ display: "flex", justifyContent: "center", marginTop: 14 }}>
-                <div ref={turnstileRef} />
-              </div>
-            )}
 
             {scanning && <ScanLoader />}
 
