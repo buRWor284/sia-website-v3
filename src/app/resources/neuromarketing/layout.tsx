@@ -17,6 +17,8 @@ const jsonLd = {
       author: { "@id": "https://www.syedirfanajmal.com/#person" },
       publisher: { "@id": "https://www.syedirfanajmal.com/#person" },
       mainEntityOfPage: "https://www.syedirfanajmal.com/resources/neuromarketing",
+      datePublished: "2026-05-29",
+      dateModified: "2026-06-26",
       inLanguage: "en",
     },
     {

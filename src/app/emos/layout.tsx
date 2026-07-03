@@ -19,11 +19,11 @@ const FAQ = [
   },
   {
     q: "I tried PR before and it didn't work. Why is this different?",
-    a: "Most failed PR efforts share four traits: generic mass pitching, no founder POV, no consistent system, and total dependency on an agency that takes the knowledge with them. EMOS is built specifically to remove all four.",
+    a: "Short version: most failed efforts share four traits (generic mass pitching, no founder POV, no consistent system, agency dependency). EMOS removes all four, and because the coverage is earned, it compounds instead of evaporating when you stop paying. The full breakdown is in The Real Problem above.",
   },
   {
-    q: "Is this really better than just hiring a PR agency?",
-    a: "Different thing. An agency runs pitches on your behalf for $24K to $60K per year indefinitely, and the knowledge leaves when the relationship does. EMOS is a one-time investment that builds the capability inside your company. Some clients do both; most don't need to.",
+    q: "Is this really better than hiring agencies for content, SEO, and PR?",
+    a: "Agencies run $60,000 to $240,000 a year and the knowledge leaves when the relationship does. EMOS is a one-time investment that builds the capability inside your company. Some clients do both; most don't need to. See the 3-year cost comparison in Investment above, and run your own numbers in the calculator.",
   },
   {
     q: "Will this work for my industry?",
@@ -35,15 +35,15 @@ const FAQ = [
   },
   {
     q: "Will this still work as AI changes search?",
-    a: "Earned media is the most resilient channel against AI-driven shifts. LLMs cite credible publications. When your name appears in Forbes, HBR, or Business Insider, AI systems cite you as a source. EMOS benefits from the AI shift rather than being threatened by it.",
+    a: "Earned media is the most resilient channel against AI-driven shifts. For AI visibility, brand mentions matter even more than backlinks: ChatGPT, Perplexity, and Google's AI Overviews surface the names credible publications talk about, linked or not. Earned coverage gets you both at once: the brand mentions AI cites you for, and the high-authority backlinks that lift your SEO and rank your domain for the terms your buyers use. EMOS doesn't just survive the AI shift; it's built to benefit from it.",
   },
   {
     q: "How exactly does the placement guarantee work?",
-    a: "Foundation: 15 pitches, 1 placement in 60 days. Accelerate: 30 pitches, 2 placements in 90 days. Proof of effort is your tracking spreadsheet. Miss the target and the full investment is refunded.",
+    a: "Foundation: 15 pitches, 1 placement in 60 days. Accelerate: 30 pitches, 2 in 90 days. Miss it and I refund in full. Full terms, and what each side commits to, are in The Guarantee above.",
   },
   {
-    q: "What are the EMOS tools, and do I really get them free?",
-    a: "Yes. Cohort 1 founding members get permanent free access to all three tools. The Journo Outreach Checklist Tracker tracks every pitch and follow-up, JournoCollabIQ identifies high-fit journalists by beat and coverage history, and QuerySniper provides real-time journalist query monitoring.",
+    q: "What are the EMOS tools? And do I really get them free?",
+    a: "Yes. Cohort 1 founding members get free 3-month access. The Journo Outreach Checklist tracks every pitch, follow-up, and placement, and is included on both tracks. Accelerate adds the full suite: PressIQ [Beta], the PR pitch scorer that grades your pitch on mechanics, personalization, and strength; and JournoCollabIQ [Beta], which surfaces the journalists most likely to respond by beat and coverage fit.",
   },
 ];
 

@@ -11,6 +11,28 @@ export const metadata: Metadata = {
   alternates: { canonical: "/infographics" },
 };
 
+// Breadcrumb structured data for the infographics hub page.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://www.syedirfanajmal.com" },
+        { "@type": "ListItem", position: 2, name: "Infographics", item: "https://www.syedirfanajmal.com/infographics" },
+      ],
+    },
+  ],
+};
+
 export default function InfographicsLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {children}
+    </>
+  );
 }

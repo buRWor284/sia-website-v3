@@ -8,7 +8,7 @@ export default async function Image() {
   return ogCard({
     eyebrow: "NEWSLETTER · SYEDIRFANAJMAL.COM",
     title: "Earned-media lessons,\ntwice a month",
-    subtitle: "Real case studies and unfiltered lessons from 20+ years in the trenches.",
+    subtitle: "Real case studies and unfiltered lessons from 22+ years in the trenches.",
     variant: "dark",
   });
 }

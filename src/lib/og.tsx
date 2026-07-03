@@ -315,7 +315,7 @@ export async function ogCard({
                 border: "2px solid rgba(232,226,214,0.45)",
               }}
             >
-              <img src={hs} width={100} height={100} style={{ objectFit: "cover" }} />
+              <img src={hs} width={100} height={100} alt="Syed Irfan Ajmal headshot" style={{ objectFit: "cover" }} />
             </div>
           ) : null}
 

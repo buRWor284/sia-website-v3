@@ -13,6 +13,31 @@ export const metadata: Metadata = {
   alternates: { canonical: "/tools/signaliq/about" },
 };
 
+// Breadcrumb structured data reflecting the page's real position in the site
+// hierarchy: Home → SignalIQ → Methodology (nested under the tool, not /tools,
+// which is not a real route).
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: "https://www.syedirfanajmal.com" },
+        { "@type": "ListItem", position: 2, name: "SignalIQ", item: "https://www.syedirfanajmal.com/tools/signaliq" },
+        { "@type": "ListItem", position: 3, name: "Methodology & Data Sources", item: "https://www.syedirfanajmal.com/tools/signaliq/about" },
+      ],
+    },
+  ],
+};
+
 export default function SignalIQAboutLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {children}
+    </>
+  );
 }

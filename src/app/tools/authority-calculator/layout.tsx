@@ -31,7 +31,7 @@ const jsonLd = {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://www.syedirfanajmal.com" },
-        { "@type": "ListItem", position: 2, name: "Tools", item: "https://www.syedirfanajmal.com/tools/authority-calculator" },
+        { "@type": "ListItem", position: 2, name: "Resources", item: "https://www.syedirfanajmal.com/resources" },
         { "@type": "ListItem", position: 3, name: "Authority ROI Calculator", item: "https://www.syedirfanajmal.com/tools/authority-calculator" },
       ],
     },
