@@ -106,11 +106,11 @@ const FACTORS = [
 ];
 
 const PIPELINE_STRIP = [
-  { name: "SignalIQ", current: true },
-  { name: "AssetIQ", current: false },
-  { name: "JournoCollabIQ", current: false },
-  { name: "PressIQ", current: false },
-  { name: "CoverageIQ", current: false },
+  { name: "SignalIQ", current: true, href: null, platform: false },
+  { name: "AssetIQ", current: false, href: "/tools/assetiq", platform: true },
+  { name: "JournoCollabIQ", current: false, href: null, platform: false },
+  { name: "PressIQ", current: false, href: null, platform: false },
+  { name: "CoverageIQ", current: false, href: null, platform: false },
 ];
 
 /* ── Shared style fragments ───────────────────────────────────────────────── */
@@ -598,14 +598,15 @@ export default function SignalIQHowItWorksPage() {
                     </div>
                   </div>
 
-                  <div style={{ padding: "14px 20px", display: "flex", justifyContent: "flex-end" }}>
-                    <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", borderBottom: `2px solid ${YEL}`, paddingBottom: 2, cursor: "pointer" }}>
+                  <div style={{ padding: "14px 20px", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", color: INK35 }}>PLATFORM</span>
+                    <Link href="/tools/assetiq" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", color: INK, borderBottom: `2px solid ${YEL}`, paddingBottom: 2, textDecoration: "none" }}>
                       Build asset from this pack {"→"}
-                    </span>
+                    </Link>
                   </div>
                 </div>
                 <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.5, color: INK70, margin: "14px 0 0", maxWidth: 700 }}>
-                  Click {"“"}Build asset from this pack{"”"} to continue Fairground{"’"}s story in AssetIQ {"→"}
+                  Click {"“"}Build asset from this pack{"”"} to continue Fairground{"’"}s story in <Link href="/tools/assetiq" style={{ color: INK, fontStyle: "normal", textDecoration: "underline", textDecorationColor: YEL }}>AssetIQ</Link> {"→"}
                 </p>
               </div>
 
@@ -664,21 +665,30 @@ export default function SignalIQHowItWorksPage() {
               <div style={{ marginTop: 24, borderTop: `1px solid ${INK}`, borderBottom: `3px solid ${INK}`, padding: "22px 0 6px" }}>
                 <SCaps size={10} ls=".2em" color={INK55} style={{ display: "block", marginBottom: 14 }}>The EMOS pipeline</SCaps>
                 <div className="sigfw-strip" style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", border: `1px solid ${INK}` }}>
-                  {PIPELINE_STRIP.map((t) => (
-                    <div
-                      key={t.name}
-                      style={{ padding: "14px 12px", borderRight: `1px solid ${INK15}`, background: t.current ? INK : PAPER, color: t.current ? PAPER : INK55, display: "flex", alignItems: "center", gap: 8 }}
-                    >
-                      <span style={{ fontFamily: MONO, fontSize: 11, color: t.current ? YEL : "transparent" }}>{t.current ? "▸" : ""}</span>
-                      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".04em" }}>{t.name}</span>
-                    </div>
-                  ))}
+                  {PIPELINE_STRIP.map((t) => {
+                    const inner = (
+                      <>
+                        <span style={{ fontFamily: MONO, fontSize: 11, color: t.current ? YEL : "transparent" }}>{t.current ? "▸" : ""}</span>
+                        <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".04em" }}>{t.name}</span>
+                        {t.platform && (
+                          <span style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: ".14em", color: INK35 }}>PLATFORM</span>
+                        )}
+                      </>
+                    );
+                    const style: React.CSSProperties = { padding: "14px 12px", borderRight: `1px solid ${INK15}`, background: t.current ? INK : PAPER, color: t.current ? PAPER : INK55, display: "flex", alignItems: "center", gap: 8, textDecoration: "none" };
+                    return t.href ? (
+                      <Link key={t.name} href={t.href} style={style}>{inner}</Link>
+                    ) : (
+                      <div key={t.name} style={style}>{inner}</div>
+                    );
+                  })}
                 </div>
 
                 <div style={{ background: INK, color: PAPER, marginTop: 18, padding: "24px 26px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
                   <div style={{ maxWidth: 560 }}>
-                    <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: YEL, marginBottom: 10 }}>
+                    <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: YEL, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
                       Next step in the pipeline
+                      <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", color: P55 }}>PLATFORM</span>
                     </div>
                     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.2, marginBottom: 8 }}>
                       AssetIQ {"—"} Linkable Asset Builder
@@ -687,12 +697,12 @@ export default function SignalIQHowItWorksPage() {
                       Turn a signal into a linkable asset: report, calculator, quiz.
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, border: "none", padding: "14px 24px", cursor: "pointer", whiteSpace: "nowrap" }}
+                  <Link
+                    href="/tools/assetiq"
+                    style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "14px 24px", whiteSpace: "nowrap", textDecoration: "none" }}
                   >
                     Go to AssetIQ {"→"}
-                  </button>
+                  </Link>
                 </div>
               </div>
 

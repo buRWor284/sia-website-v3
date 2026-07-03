@@ -78,6 +78,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { route: "tools/authority-calculator",      changeFrequency: "yearly"  as const, priority: 0.5 },
     { route: "tools/journocollabiq",            changeFrequency: "monthly" as const, priority: 0.7 },
     { route: "tools/signaliq/about",            changeFrequency: "yearly"  as const, priority: 0.4 },
+    // Platform teaser pages (marketing explainers for EMOS-Platform-only tools)
+    { route: "tools/assetiq",                   changeFrequency: "monthly" as const, priority: 0.6 },
+    { route: "tools/factcheckiq",               changeFrequency: "monthly" as const, priority: 0.6 },
   ];
 
   const staticEntries = pages.map(({ route, changeFrequency, priority }) => ({

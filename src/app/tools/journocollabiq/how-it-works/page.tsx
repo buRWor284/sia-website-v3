@@ -695,6 +695,11 @@ export default function JournoCollabIQHowItWorksPage() {
             <div style={{ display: "flex", alignItems: "center", gap: 0, flexWrap: "wrap", marginBottom: 22 }}>
               <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.12em", color: GREEN }}>✓ SIGNALIQ</span>
               <span style={{ color: INK35, margin: "0 12px" }}>·</span>
+              <Link href="/tools/assetiq" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.12em", color: INK55, textDecoration: "none" }}>
+                ASSETIQ
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7, letterSpacing: ".14em", color: INK35 }}>PLATFORM</span>
+              </Link>
+              <span style={{ color: INK35, margin: "0 12px" }}>·</span>
               <span style={{ background: INK, color: PAPER, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.12em", padding: "5px 10px" }}>JOURNOCOLLABIQ</span>
               <span style={{ color: INK35, margin: "0 12px" }}>·</span>
               <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.12em", color: INK55 }}>PRESSIQ</span>

@@ -2,8 +2,21 @@
 
 /**
  * ToolPipelineFooter — shared earned-media pipeline footer.
- * Used on SignalIQ, PressIQ, JournoCollabIQ, CoverageIQ.
+ * Used on SignalIQ, PressIQ, JournoCollabIQ, CoverageIQ, and the two
+ * platform teaser pages (AssetIQ, FactCheckIQ).
  * NOT used on PartnerCollabIQ (separate tool, outside EMOS workflow).
+ *
+ * The strip mixes two card kinds:
+ *   - Free tools (SignalIQ, JournoCollabIQ, PressIQ, CoverageIQ): numbered
+ *     01–04, unchanged from before — no renumbering, so no copy elsewhere
+ *     that references "step 01–04" breaks.
+ *   - Platform tools (AssetIQ, FactCheckIQ): visually distinct "PLATFORM"
+ *     cards with an ink-on-yellow tag in place of a step number, so it's
+ *     unmistakable that these live inside the paid EMOS Platform, not the
+ *     free lead-magnet tools.
+ *
+ * Order (the Fairground journey): SignalIQ → AssetIQ → FactCheckIQ →
+ * JournoCollabIQ → PressIQ → CoverageIQ → EMOS.
  *
  * Pass `currentTool` to highlight "You are here".
  * Pass `compact` when inside a fixed-height shell (removes top margin, reduces padding).
@@ -15,7 +28,13 @@ import {
   GROT, INK, INK15, INK35, INK55, INK70, MONO, PAPER, PAPER2, SERIF, YEL,
 } from "@/lib/tokens";
 
-export type ToolId = "signaliq" | "pressiq" | "journocollabiq" | "coverageiq";
+export type ToolId =
+  | "signaliq"
+  | "assetiq"
+  | "factcheckiq"
+  | "journocollabiq"
+  | "pressiq"
+  | "coverageiq";
 
 interface PipelineCard {
   step: string;
@@ -24,27 +43,32 @@ interface PipelineCard {
   toolId: ToolId | "emos";
   role: string;
   comingSoon?: boolean;
+  /** Platform-only tool (ships inside the paid EMOS Platform, not a free lead magnet). */
+  platform?: boolean;
 }
 
 const PIPELINE: PipelineCard[] = [
   { step: "01", tool: "SignalIQ",        href: "/tools/signaliq",        toolId: "signaliq",        role: "Find the story" },
+  { step: "PLATFORM", tool: "AssetIQ",       href: "/tools/assetiq",       toolId: "assetiq",       role: "Build the asset",   platform: true },
+  { step: "PLATFORM", tool: "FactCheckIQ",   href: "/tools/factcheckiq",   toolId: "factcheckiq",   role: "Verify the claims", platform: true },
   { step: "02", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
   { step: "03", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
   { step: "04", tool: "CoverageIQ",      href: "/tools/coverageiq",      toolId: "coverageiq",      role: "Track the placement" },
   { step: "05", tool: "EMOS",            href: "/emos",                  toolId: "emos",            role: "Run the full system" },
 ];
 
+const ORDER: (ToolId | "emos")[] = ["signaliq", "assetiq", "factcheckiq", "journocollabiq", "pressiq", "coverageiq", "emos"];
+
 function getBadge(card: PipelineCard, currentTool: ToolId | undefined): string {
   if (card.comingSoon) return "Coming soon";
   if (card.toolId === currentTool) return "You are here";
 
   if (currentTool) {
-    const order: (ToolId | "emos")[] = ["signaliq", "journocollabiq", "pressiq", "coverageiq", "emos"];
-    const ci = order.indexOf(currentTool);
-    const ki = order.indexOf(card.toolId);
+    const ci = ORDER.indexOf(currentTool);
+    const ki = ORDER.indexOf(card.toolId);
     if (ci !== -1 && ki !== -1) {
       if (ki === ci + 1) return "Next step";
-      if (ki > ci + 1)  return ki === order.length - 1 ? "The system" : "Then this";
+      if (ki > ci + 1)  return ki === ORDER.length - 1 ? "The system" : "Then this";
       if (ki < ci)      return "Previous";
     }
   }
@@ -58,16 +82,20 @@ interface Props {
 }
 
 export function ToolPipelineFooter({ currentTool, compact }: Props) {
+  // Hairline borders via a 1px-gap grid on an ink-15 bed, rather than a
+  // border-right chain + nth-child overrides — this stays correct at any
+  // column count / wrap point, which matters now that 5 free-tool steps
+  // share the strip with 2 platform cards (7 cards total).
   const css = `
     .tpf-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      background: ${INK15};
+      border: 1px solid ${INK15};
       position: relative;
     }
     .tpf-card {
-      border: 1px solid ${INK15};
-      border-right: none;
       padding: ${compact ? "10px 12px 12px" : "13px 14px 15px"};
       position: relative;
       background: ${PAPER};
@@ -75,10 +103,12 @@ export function ToolPipelineFooter({ currentTool, compact }: Props) {
       text-decoration: none;
       display: block;
     }
-    .tpf-card:last-child { border-right: 1px solid ${INK15}; }
     .tpf-card:hover:not(.tpf-soon) { background: ${PAPER2}; }
-    .tpf-card.active { background: ${PAPER2}; border-color: ${INK35}; }
+    .tpf-card.active { background: ${PAPER2}; }
     .tpf-card.tpf-soon { cursor: default; opacity: 0.5; }
+    .tpf-card.tpf-platform { background: #faf3df; }
+    .tpf-card.tpf-platform:hover:not(.tpf-soon) { background: ${PAPER2}; }
+    .tpf-card.tpf-platform.active { background: ${INK}; }
     .tpf-arrow {
       position: absolute;
       right: -9px;
@@ -96,21 +126,13 @@ export function ToolPipelineFooter({ currentTool, compact }: Props) {
       color: ${INK35};
       z-index: 1;
     }
-    .tpf-card.active .tpf-arrow { background: ${PAPER2}; border-color: ${INK35}; }
-    @media (max-width: 900px) {
-      .tpf-grid { grid-template-columns: repeat(3, 1fr); }
-      .tpf-card:nth-child(3) { border-right: 1px solid ${INK15}; }
-      .tpf-card:nth-child(4),
-      .tpf-card:nth-child(5) { border-top: none; }
-      .tpf-card:nth-child(5) { border-right: 1px solid ${INK15}; }
+    .tpf-card.active .tpf-arrow { background: ${PAPER2}; }
+    @media (max-width: 980px) {
+      .tpf-grid { grid-template-columns: repeat(4, 1fr); }
       .tpf-arrow { display: none; }
     }
     @media (max-width: 560px) {
       .tpf-grid { grid-template-columns: 1fr 1fr; }
-      .tpf-card { border-right: none; border-bottom: none; }
-      .tpf-card:nth-child(2n) { border-right: 1px solid ${INK15}; }
-      .tpf-card:last-child { border-right: 1px solid ${INK15}; border-bottom: 1px solid ${INK15}; }
-      .tpf-card:nth-child(n+3) { border-top: none; }
     }
   `;
 
@@ -135,24 +157,37 @@ export function ToolPipelineFooter({ currentTool, compact }: Props) {
         {PIPELINE.map((card, idx) => {
           const isActive = card.toolId === currentTool;
           const badge    = getBadge(card, currentTool);
-          const cardStyle = `tpf-card${isActive ? " active" : ""}${card.comingSoon ? " tpf-soon" : ""}`;
+          const cardStyle = `tpf-card${card.platform ? " tpf-platform" : ""}${isActive ? " active" : ""}${card.comingSoon ? " tpf-soon" : ""}`;
+          const onDark = card.platform && isActive; // platform card flips to ink when active
 
           const inner = (
             <>
               <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 6 }}>
-                <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: isActive ? YEL : INK35, letterSpacing: "-0.02em", lineHeight: 1 }}>
-                  {card.step}
-                </span>
+                {card.platform ? (
+                  <span
+                    style={{
+                      fontFamily: GROT, fontWeight: 900, fontSize: 8.5, letterSpacing: ".14em",
+                      textTransform: "uppercase", padding: "3px 6px",
+                      background: onDark ? YEL : INK, color: onDark ? INK : YEL,
+                    }}
+                  >
+                    Platform
+                  </span>
+                ) : (
+                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: isActive ? YEL : INK35, letterSpacing: "-0.02em", lineHeight: 1 }}>
+                    {card.step}
+                  </span>
+                )}
                 {badge && (
-                  <span style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: isActive ? YEL : INK35 }}>
+                  <span style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: onDark ? YEL : isActive ? YEL : INK35 }}>
                     {badge}
                   </span>
                 )}
               </div>
-              <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase", color: isActive ? INK : INK55, marginBottom: 2 }}>
-                {isActive ? <Mark>{card.tool}</Mark> : card.tool}
+              <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase", color: onDark ? PAPER : isActive ? INK : INK55, marginBottom: 2 }}>
+                {isActive && !card.platform ? <Mark>{card.tool}</Mark> : card.tool}
               </div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: isActive ? INK70 : INK35 }}>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: onDark ? "rgba(241,235,222,.72)" : isActive ? INK70 : INK35 }}>
                 {card.role}
               </div>
               {idx < PIPELINE.length - 1 && !card.comingSoon && (

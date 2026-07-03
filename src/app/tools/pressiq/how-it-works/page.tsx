@@ -819,9 +819,10 @@ Newsroom-ready: (100 − 90) × 0.12 = 1.20`}</pre>
               <div style={{ flex: "1 1 auto", borderRight: `1px solid ${INK}`, padding: "14px 18px", background: PAPER3, display: "flex", alignItems: "center", gap: 8, fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", color: "rgba(26,20,16,.6)" }}>
                 <span style={{ color: GREEN }}>✓</span>SIGNALIQ
               </div>
-              <div style={{ flex: "1 1 auto", borderRight: `1px solid ${INK}`, padding: "14px 18px", background: PAPER3, display: "flex", alignItems: "center", gap: 8, fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", color: "rgba(26,20,16,.6)" }}>
+              <Link href="/tools/assetiq" style={{ flex: "1 1 auto", borderRight: `1px solid ${INK}`, padding: "14px 18px", background: PAPER3, display: "flex", alignItems: "center", gap: 8, fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", color: "rgba(26,20,16,.6)", textDecoration: "none" }}>
                 <span style={{ color: GREEN }}>✓</span>ASSETIQ
-              </div>
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7, letterSpacing: ".14em", color: "rgba(26,20,16,.35)" }}>PLATFORM</span>
+              </Link>
               <div style={{ flex: "1 1 auto", borderRight: `1px solid ${INK}`, padding: "14px 18px", background: PAPER3, display: "flex", alignItems: "center", gap: 8, fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", color: "rgba(26,20,16,.6)" }}>
                 <span style={{ color: GREEN }}>✓</span>JOURNOCOLLABIQ
               </div>

@@ -743,11 +743,25 @@ export default function CoverageIQHowItWorksPage() {
           <div style={{ marginTop: 44 }}>
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".16em", color: INK55, marginBottom: 12 }}>THE EMOS PIPELINE</div>
             <div className="ciq-foot5" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", border: `1px solid ${INK}` }}>
-              {["SIGNALIQ", "ASSETIQ", "JOURNOCOLLABIQ", "PRESSIQ"].map((t) => (
-                <div key={t} style={{ padding: "13px 16px", borderRight: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".06em", color: INK55 }}>
-                  <span style={{ color: GREEN }}>✓</span> {t}
-                </div>
-              ))}
+              {[
+                { name: "SIGNALIQ", href: null },
+                { name: "ASSETIQ", href: "/tools/assetiq" },
+                { name: "JOURNOCOLLABIQ", href: null },
+                { name: "PRESSIQ", href: null },
+              ].map((t) => {
+                const style: CSSProperties = { padding: "13px 16px", borderRight: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".06em", color: INK55, display: "flex", alignItems: "center", gap: 6, textDecoration: "none" };
+                const inner = (
+                  <>
+                    <span style={{ color: GREEN }}>✓</span> {t.name}
+                    {t.href && <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7, letterSpacing: ".14em", color: INK35 }}>PLATFORM</span>}
+                  </>
+                );
+                return t.href ? (
+                  <Link key={t.name} href={t.href} style={style}>{inner}</Link>
+                ) : (
+                  <div key={t.name} style={style}>{inner}</div>
+                );
+              })}
               <div style={{ padding: "13px 16px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".06em" }}>COVERAGEIQ</div>
             </div>
             {/* End-state banner: CoverageIQ is the last tool in the pipeline */}
@@ -759,7 +773,9 @@ export default function CoverageIQHowItWorksPage() {
                 {`You've worked through every stage. Keep logging and tracking to compound your results.`}
               </div>
               <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: P40, marginTop: 14 }}>
-                {`Fairground's full sample journey: SignalIQ signal → AssetIQ asset → JournoCollabIQ shortlist → PressIQ score → CoverageIQ placement.`}
+                {"Fairground's full sample journey: SignalIQ signal → "}
+                <Link href="/tools/assetiq" style={{ color: P40, fontStyle: "italic" }}>AssetIQ asset</Link>
+                {" → JournoCollabIQ shortlist → PressIQ score → CoverageIQ placement."}
               </div>
             </div>
           </div>
