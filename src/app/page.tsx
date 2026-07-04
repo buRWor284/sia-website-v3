@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Subscriptions, CTATicker } from '@/components/bureau';
+import { Subscriptions, CTATicker, Colophon } from '@/components/bureau';
 import { Reveal } from '@/components/motion/Reveal';
 
 /**
@@ -469,42 +469,6 @@ const css = `
   }
   .newsletter__note span { color: var(--RED); font-weight: 700; }
 
-  /* ── FOOTER ─────────────────────────────────────────────── */
-  .footer { background: var(--BG); padding: 56px 56px 28px; border-top: 2px solid var(--INK); }
-  .footer__grid {
-    display: grid; grid-template-columns: 1.1fr 1fr 1fr 1fr;
-    gap: 40px; padding-bottom: 40px; border-bottom: 2px solid var(--INK);
-  }
-  .footer__wordmark {
-    font-family: var(--sans); font-style: italic; font-weight: 900;
-    font-size: 56px; color: var(--INK); line-height: 1; letter-spacing: -.02em;
-  }
-  .footer__about {
-    margin-top: 14px; font-family: var(--sans); font-size: 15px;
-    color: var(--I70); line-height: 1.5; max-width: 320px;
-  }
-  .footer__col-head {
-    font-family: var(--mono); font-size: 11px; color: var(--I70);
-    letter-spacing: .18em; font-weight: 700; margin-bottom: 16px;
-  }
-  .footer__links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .footer__link {
-    font-family: var(--sans); font-size: 14px; color: var(--INK); font-weight: 600;
-  }
-  .footer__link:hover { color: var(--RED); }
-  .footer__bottom {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-top: 22px; gap: 32px; flex-wrap: wrap;
-  }
-  .footer__copy {
-    font-family: var(--mono); font-size: 11px; color: var(--I70); letter-spacing: .12em;
-  }
-  .footer__contact {
-    font-family: var(--mono); font-size: 11px; color: var(--I70);
-    letter-spacing: .04em; display: flex; gap: 24px;
-  }
-  .footer__open { color: var(--RED); font-weight: 700; }
-
   /* ── SPACER ─────────────────────────────────────────────── */
   .spacer-100 { height: 100px; }
 
@@ -585,7 +549,6 @@ const css = `
     .casework, .testimonials, .speaking, .kits { padding: 72px 32px; }
     .newsletter__inner { padding: 56px 32px; }
     .press { padding: 36px 32px; }
-    .footer { padding: 48px 32px 24px; }
     .hero-h1 { font-size: 64px; }
     .section-h2 { font-size: 64px; }
     .stat__num { font-size: 56px; }
@@ -658,12 +621,6 @@ const css = `
     .newsletter__input { border-right: 2px solid var(--Y); border-bottom: none; }
     .newsletter__btn { width: 100%; }
 
-    /* Footer */
-    .footer { padding: 40px 20px 24px; }
-    .footer__grid { grid-template-columns: 1fr 1fr; gap: 28px; }
-    .footer__bottom { flex-direction: column; gap: 12px; align-items: flex-start; }
-    .footer__contact { flex-direction: column; gap: 6px; }
-    .footer__wordmark { font-size: 42px; }
   }
 
   /* ── Small phones 480px ────────────────────────────────── */
@@ -673,8 +630,6 @@ const css = `
     .stats-strip { grid-template-columns: 1fr 1fr; }
     .stat__num { font-size: 36px; }
     .stat__mo { font-size: 18px; }
-    .footer__grid { grid-template-columns: 1fr; }
-    .footer__copy { font-size: 10px; }
     .testi__quote { font-size: 18px; }
     .newsletter__h2 { font-size: 38px; }
     .newsletter__sub { font-size: 15px; }
@@ -683,7 +638,6 @@ const css = `
     .hero { padding: 20px 16px 0; }
     .services { padding: 44px 16px 0; }
     .casework, .testimonials, .speaking, .kits { padding: 44px 16px; }
-    .footer { padding: 36px 16px 20px; }
     .press { padding: 28px 16px; }
     .speaking-grid .section-h2 { font-size: 40px; }
     .stage-row { grid-template-columns: 1fr; gap: 4px; }
@@ -1126,65 +1080,7 @@ export default function HomePage() {
       <ScrollButtons />
 
       {/* ══ FOOTER ══ */}
-      <footer className="footer">
-        <div className="footer__grid">
-          <div>
-            <div className="footer__wordmark">Syed Irfan Ajmal</div>
-            <p className="footer__about">
-              Syed Irfan Ajmal is a serial entrepreneur, marketing maverick, author, int&apos;l speaker, and CEO of <strong>DMR.agency</strong>.
-            </p>
-          </div>
-          <div>
-            <div className="footer__col-head">THE WORK</div>
-            <ul className="footer__links">
-              <li><a href="/fractional-cmo" className="footer__link">Fractional CMO</a></li>
-              <li><a href="/speaking" className="footer__link">Speaking</a></li>
-              <li><a href="/emos" className="footer__link">EMOS Academy</a></li>
-              <li><a href="https://dmr.agency" target="_blank" rel="noopener noreferrer" className="footer__link">DMR.agency ↗</a></li>
-              <li><a href="/ventures" className="footer__link">Ventures</a></li>
-              <li><a href="/clients" className="footer__link">Clients</a></li>
-              <li><a href="/case-studies" className="footer__link">Case Studies</a></li>
-            </ul>
-          </div>
-          <div>
-            <div className="footer__col-head">NAVIGATE</div>
-            <ul className="footer__links">
-              <li><a href="/" className="footer__link">Home</a></li>
-              <li><a href="/about" className="footer__link">About</a></li>
-              <li><a href="/podcast" className="footer__link">Podcast</a></li>
-              <li><a href="/gallery" className="footer__link">Gallery</a></li>
-              <li><a href="/press-kit" className="footer__link">Press Kit</a></li>
-              <li><a href="/tools" className="footer__link">Tools</a></li>
-              <li><a href="/resources" className="footer__link">Resources</a></li>
-            </ul>
-          </div>
-          <div>
-            <div className="footer__col-head">CONNECT</div>
-            <ul className="footer__links">
-              <li><a href="/contact" className="footer__link">Contact</a></li>
-              <li><a href="/newsletter" className="footer__link">Newsletter</a></li>
-              <li><a href="https://x.com/syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">Twitter / X ↗</a></li>
-              <li><a href="https://www.linkedin.com/in/syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn ↗</a></li>
-              <li><a href="https://www.youtube.com/watch?v=9Zn9TE6Nz6Y&list=PLY3hQIOPokONs4kpRS0d9rLQ6gjv6Hlij" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>
-              <li><a href="https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" target="_blank" rel="noopener noreferrer" className="footer__link">Apple Podcasts ↗</a></li>
-              <li><a href="https://open.spotify.com/show/4ZUfaOaYVckXQ7Q9JnMS92" target="_blank" rel="noopener noreferrer" className="footer__link">Spotify ↗</a></li>
-            </ul>
-          </div>
-        </div>
-        <div className="footer__bottom">
-          <div className="footer__copy">© 2026 SYED IRFAN AJMAL · SIA ENTERPRISES (PK SOLE PROP.) · SIA ENTERPRISES INC (WY C-CORP)</div>
-          <div className="footer__contact">
-            <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
-            <a href="/fractional-cmo" className="footer__open">● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
-            <a href="/emos" className="footer__open">● EMOS FOUNDING CLASS · APPLY NOW</a>
-          </div>
-          <div className="footer__contact">
-            <a href="/privacy" className="footer__copy" style={{ textDecoration: "none" }}>PRIVACY POLICY</a>
-            <a href="/terms" className="footer__copy" style={{ textDecoration: "none" }}>TERMS</a>
-            <a href="/refund-policy" className="footer__copy" style={{ textDecoration: "none" }}>REFUND POLICY</a>
-          </div>
-        </div>
-      </footer>
+      <Colophon />
     </>
   );
 }
