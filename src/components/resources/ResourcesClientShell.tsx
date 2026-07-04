@@ -215,7 +215,7 @@ const CONTENT: ContentItem[] = [
     badge: "Interactive Tool",
     beta: true,
     topics: ["backlinks", "seo", "strategy"],
-    title: "Partner Collab IQ — Partnership Intelligence Tool",
+    title: "PartnerCollabIQ — Partnership Intelligence Tool",
     sub: "Find co-marketing and distribution opportunities by industry.",
     blurb:
       "Surface co-marketing allies, content collaborators, referral networks, and distribution partners — with qualification scoring and outreach templates. 15+ industries mapped.",

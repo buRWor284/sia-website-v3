@@ -1351,7 +1351,7 @@ const ToolsBand = () => (
         </h3>
         <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 16, color: INK70, lineHeight: 1.6, fontStyle: "italic", maxWidth: 620 }}>
           Run the tools my clients use, free in the library: PressIQ,
-          SignalIQ, JournoCollabIQ, Partner Collab IQ, and 14 more kits,
+          SignalIQ, JournoCollabIQ, PartnerCollabIQ, and 14 more kits,
           playbooks, and calculators.
         </p>
       </div>

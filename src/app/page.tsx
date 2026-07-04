@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Subscriptions, CTATicker } from '@/components/bureau';
+import { Reveal } from '@/components/motion/Reveal';
 
 /**
  * Homepage v4 Cream edition (SIA-homepage-v3 design)
@@ -507,6 +508,72 @@ const css = `
   /* ── SPACER ─────────────────────────────────────────────── */
   .spacer-100 { height: 100px; }
 
+  /* ── SCROLL REVEAL ──────────────────────────────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+    will-change: opacity, transform;
+  }
+  .reveal--visible { opacity: 1; transform: none; }
+
+  /* ── HERO HEADLINE STAGGER (on load) ───────────────────────*/
+  @keyframes heroLineIn {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-h1 .line {
+    display: inline-block;
+    opacity: 0;
+    animation: heroLineIn .7s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  .hero-h1 .line:nth-child(1) { animation-delay: .05s; }
+  .hero-h1 .line:nth-child(2) { animation-delay: .18s; }
+  .hero-h1 .line:nth-child(3) { animation-delay: .31s; }
+  .hero-h1 .line:nth-child(4) { animation-delay: .44s; }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .hero-h1 .line { opacity: 1; animation: none; }
+  }
+
+  /* ── HOVER MICRO-INTERACTIONS ───────────────────────────── */
+  .kit-card, .case-card, .service-card {
+    transition: transform .28s cubic-bezier(.16,1,.3,1), box-shadow .28s ease;
+  }
+  .kit-card:hover, .case-card:hover, .service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(14,13,10,.14);
+    position: relative;
+    z-index: 1;
+  }
+  .casework .case-card:hover { box-shadow: 0 16px 32px rgba(0,0,0,.35); }
+  .btn-primary, .btn-outline, .speaking__cta, .newsletter__btn {
+    transition: transform .2s cubic-bezier(.16,1,.3,1), background .15s, box-shadow .2s ease;
+  }
+  .btn-primary:hover, .btn-outline:hover, .speaking__cta:hover, .newsletter__btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(14,13,10,.18);
+  }
+  .btn-primary:active, .btn-outline:active { transform: translateY(-1px); }
+  .stage-row { transition: padding-left .25s ease, background .25s ease; }
+  .stage-row:hover { padding-left: 8px; background: rgba(245,197,24,.05); }
+  .testi-row { transition: background .25s ease; }
+  .testi-row:hover { background: rgba(14,13,10,.03); }
+
+  /* Auto scroll-reveal targets (handled by useScrollReveal hook below) */
+  .testi-row, .case-card, .service-card, .stage-row {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1), background .25s ease, padding-left .25s ease;
+  }
+  .testi-row.is-revealed, .case-card.is-revealed, .service-card.is-revealed, .stage-row.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .testi-row, .case-card, .service-card, .stage-row { opacity: 1; transform: none; }
+  }
+
   /* ══════════════════════════════════════════════════════════
      RESPONSIVE BREAKPOINTS
   ══════════════════════════════════════════════════════════ */
@@ -625,6 +692,43 @@ const css = `
   }
 `;
 
+/**
+ * useScrollReveal
+ * Dependency-free scroll-reveal: watches all elements matching `selector`
+ * and adds `.is-revealed` (with a small stagger) as they enter the viewport.
+ * Pairs with the CSS block above targeting .testi-row/.case-card/etc.
+ */
+function useScrollReveal(selector: string) {
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
+    if (!els.length) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      els.forEach((el) => el.classList.add('is-revealed'));
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            const siblings = Array.from(el.parentElement?.children || []);
+            const i = siblings.indexOf(el);
+            el.style.transitionDelay = `${Math.min(i, 5) * 70}ms`;
+            el.classList.add('is-revealed');
+            observer.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    els.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, [selector]);
+}
+
 function ScrollButtons() {
   const [atBottom, setAtBottom] = useState(false);
   useEffect(() => {
@@ -663,6 +767,8 @@ function ScrollButtons() {
 }
 
 export default function HomePage() {
+  useScrollReveal('.testi-row, .case-card, .service-card, .stage-row');
+
   return (
     <>
       {/* eslint-disable-next-line react/no-danger */}
@@ -677,10 +783,10 @@ export default function HomePage() {
         <div className="hero-grid">
           <div>
             <h1 className="hero-h1">
-              WHY <span className="strike">PAY</span><br />
-              FOR ATTENTION<br />
-              WHEN YOU CAN<br />
-              <span className="earn">EARN</span> IT?
+              <span className="line">WHY <span className="strike">PAY</span></span><br />
+              <span className="line">FOR ATTENTION</span><br />
+              <span className="line">WHEN YOU CAN</span><br />
+              <span className="line"><span className="earn">EARN</span> IT?</span>
             </h1>
           </div>
 
@@ -727,16 +833,16 @@ export default function HomePage() {
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">FREE RESOURCES</span>
         </div>
-        <div className="kits-header">
+        <Reveal className="kits-header">
           <div>
             <h2 className="section-h2" style={{margin:0}}>Resources.</h2>
             <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Kits · Playbooks · Calculators</p>
             <p style={{fontFamily:'var(--sans)',fontWeight:400,fontStyle:'italic',fontSize:'15px',color:'var(--I70)',marginTop:'6px',marginBottom:0}}>Might not stay free for too long.</p>
           </div>
-          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>18 TOTAL IN THE LIBRARY →</a>
-        </div>
+          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>22 TOTAL IN THE LIBRARY →</a>
+        </Reveal>
         <div className="kits-grid">
-          <div className="kit-card">
+          <Reveal className="kit-card">
             <div className="kit-card__badge">INTERACTIVE KIT</div>
             <div className="kit-card__paper">
               <div className="kit-card__paper-header">
@@ -755,8 +861,8 @@ export default function HomePage() {
               <span className="kit-card__year">2026</span>
               <a href="/infographics/journo-outreach-checklist" className="kit-card__cta">OPEN THE KIT ↗</a>
             </div>
-          </div>
-          <div className="kit-card">
+          </Reveal>
+          <Reveal className="kit-card" delay={120}>
             <div className="kit-card__badge">AI-POWERED TOOL</div>
             <div className="kit-card__paper">
               <div className="kit-card__paper-header">
@@ -769,13 +875,13 @@ export default function HomePage() {
                 <div className="kit-card__paper-col">syedirfanajmal.com</div>
               </div>
             </div>
-            <h3 className="kit-card__title">Partner Collab IQ</h3>
-            <p className="kit-card__body">Go beyond links. Drop in your niche and Partner Collab IQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
+            <h3 className="kit-card__title">PartnerCollabIQ</h3>
+            <p className="kit-card__body">Go beyond links. Drop in your niche and PartnerCollabIQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
             <div className="kit-card__footer">
               <span className="kit-card__year">2026</span>
               <a href="/tools/partnercollabiq" className="kit-card__cta">OPEN THE TOOL ↗</a>
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -1043,16 +1149,19 @@ export default function HomePage() {
             <div className="footer__col-head">NAVIGATE</div>
             <ul className="footer__links">
               <li><a href="/" className="footer__link">Home</a></li>
-              <li><a href="/resources" className="footer__link">Resources</a></li>
               <li><a href="/about" className="footer__link">About</a></li>
               <li><a href="/podcast" className="footer__link">Podcast</a></li>
               <li><a href="/gallery" className="footer__link">Gallery</a></li>
+              <li><a href="/tools" className="footer__link">Tools</a></li>
+              <li><a href="/resources" className="footer__link">Resources</a></li>
+              <li><a href="/press-kit" className="footer__link">Press Kit</a></li>
               <li><a href="/newsletter" className="footer__link">Newsletter</a></li>
             </ul>
           </div>
           <div>
-            <div className="footer__col-head">ELSEWHERE</div>
+            <div className="footer__col-head">CONNECT</div>
             <ul className="footer__links">
+              <li><a href="/contact" className="footer__link">Contact</a></li>
               <li><a href="https://x.com/syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">Twitter / X ↗</a></li>
               <li><a href="https://www.linkedin.com/in/syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn ↗</a></li>
               <li><a href="https://www.youtube.com/watch?v=9Zn9TE6Nz6Y&list=PLY3hQIOPokONs4kpRS0d9rLQ6gjv6Hlij" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>

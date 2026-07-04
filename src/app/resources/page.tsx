@@ -33,7 +33,8 @@ const Hero = () => (
     }}
   >
     <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", flexShrink: 0 }}>
-      20 Resources
+      {/* Keep in sync with CONTENT in ResourcesClientShell.tsx (currently 22 items) */}
+      22 Resources
     </span>
 
     <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.3vw,28px)", lineHeight: 1.15, letterSpacing: "-0.02em", color: INK, margin: 0, flexShrink: 0 }}>

@@ -116,7 +116,7 @@ export default function PrivacyPolicyPage() {
             Last updated: {LAST_UPDATED}
           </p>
           <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 17, color: INK70, lineHeight: 1.65, maxWidth: 600 }}>
-            SIA Enterprises ("we", "us", "our") operates syedirfanajmal.com and provides EMOS — the Expert Media Outreach System (the "Service"). This policy explains what personal information we collect, how we use it, who we share it with, and your rights.
+            SIA Enterprises ("we", "us", "our") operates syedirfanajmal.com and provides EMOS — the Earned Media Operating System (the "Service"). This policy explains what personal information we collect, how we use it, who we share it with, and your rights.
           </p>
         </div>
       </section>

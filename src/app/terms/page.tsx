@@ -19,7 +19,7 @@ const sections: { n: string; heading: string; body: React.ReactNode }[] = [
     heading: "The Service",
     body: (
       <p>
-        EMOS — the Expert Media Outreach System — is a cohort-based program teaching founders and executives how to earn verified media placements through a repeatable outreach system. Upon purchase, you receive access to curriculum, tools, and (depending on your tier) live coaching calls and 1-on-1 support, delivered digitally over the cohort period.
+        EMOS — the Earned Media Operating System — is a cohort-based program teaching founders and executives how to earn verified media placements through a repeatable outreach system. Upon purchase, you receive access to curriculum, tools, and (depending on your tier) live coaching calls and 1-on-1 support, delivered digitally over the cohort period.
       </p>
     ),
   },
@@ -151,7 +151,7 @@ export default function TermsofServicePage() {
             Last updated: {LAST_UPDATED}
           </p>
           <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 17, color: INK70, lineHeight: 1.65, maxWidth: 600 }}>
-            These Terms govern your access to and use of syedirfanajmal.com and EMOS — the Expert Media Outreach System (the "Service"), provided by SIA Enterprises ("we", "us", "our"). By purchasing or using the Service, you agree to these Terms.
+            These Terms govern your access to and use of syedirfanajmal.com and EMOS — the Earned Media Operating System (the "Service"), provided by SIA Enterprises ("we", "us", "our"). By purchasing or using the Service, you agree to these Terms.
           </p>
         </div>
       </section>
