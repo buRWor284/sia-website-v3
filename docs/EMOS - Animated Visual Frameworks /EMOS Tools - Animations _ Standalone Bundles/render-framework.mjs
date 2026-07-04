@@ -93,11 +93,14 @@ function startFfmpeg() {
   const candidates = ['ffmpeg', '/usr/local/bin/ffmpeg', '/opt/homebrew/bin/ffmpeg', '/usr/bin/ffmpeg'];
   const ffmpegBin = candidates.find(p => p === 'ffmpeg' || existsSync(p)) || 'ffmpeg';
 
-  // crop filter for the 1:1 cut takes the centered CAP_WIDTHxCAP_HEIGHT square region;
-  // for 16:9 it's a no-op scale/pad (capture already matches output size).
-  const vf = ASPECT === '1:1'
-    ? `crop=${CAP_HEIGHT}:${CAP_HEIGHT}:(${CAP_WIDTH}-${CAP_HEIGHT})/2:0,scale=${OUT_WIDTH}:${OUT_HEIGHT}`
-    : `scale=${OUT_WIDTH}:${OUT_HEIGHT}:force_original_aspect_ratio=decrease,pad=${OUT_WIDTH}:${OUT_HEIGHT}:(ow-iw)/2:(oh-ih)/2:color=black`;
+  // These pages use full 1920px-wide multi-column layouts (hero meta columns,
+  // pipeline footer strip, etc). A square CROP of any kind — even centered —
+  // permanently cuts real fields/columns off both edges. So for the 1:1 cut
+  // we scale the whole 1920x1080 capture DOWN to fit inside 1080x1080 and pad
+  // with black bars top/bottom instead of cropping — nothing gets lost, it's
+  // just letterboxed. Same scale/pad approach for 16:9 (a no-op there since
+  // capture already matches output size).
+  const vf = `scale=${OUT_WIDTH}:${OUT_HEIGHT}:force_original_aspect_ratio=decrease,pad=${OUT_WIDTH}:${OUT_HEIGHT}:(ow-iw)/2:(oh-ih)/2:color=black`;
 
   const proc = spawn(ffmpegBin, [
     '-y', '-f', 'image2pipe', '-framerate', String(FPS), '-i', 'pipe:0',
