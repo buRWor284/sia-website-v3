@@ -18,7 +18,7 @@ const COLS: ReadonlyArray<FooterCol> = [
     items: [
       { label: "Fractional CMO", href: "/fractional-cmo" },
       { label: "Speaking",       href: "/speaking" },
-      { label: "EMOS",           href: "/emos" },
+      { label: "EMOS Academy",   href: "/emos" },
       { label: "DMR.agency",     href: "https://dmr.agency", external: true },
       { label: "Ventures",       href: "/ventures" },
       { label: "Clients",        href: "/clients" },
@@ -31,16 +31,16 @@ const COLS: ReadonlyArray<FooterCol> = [
       { label: "About",      href: "/about" },
       { label: "Podcast",    href: "/podcast" },
       { label: "Gallery",    href: "/gallery" },
+      { label: "Press Kit",  href: "/press-kit" },
       { label: "Tools",      href: "/tools" },
       { label: "Resources",  href: "/resources" },
-      { label: "Press Kit",  href: "/press-kit" },
-      { label: "Newsletter", href: "/newsletter" },
     ],
   },
   {
     head: "Connect",
     items: [
       { label: "Contact",           href: "/contact" },
+      { label: "Newsletter",       href: "/newsletter" },
       { label: "Twitter / X ↗",    href: "https://x.com/syedirfanajmal",                                    external: true },
       { label: "LinkedIn ↗",       href: "https://www.linkedin.com/in/syedirfanajmal/",                     external: true },
       { label: "YouTube ↗",        href: "https://youtube.com/@syedirfanajmal/",                             external: true },
