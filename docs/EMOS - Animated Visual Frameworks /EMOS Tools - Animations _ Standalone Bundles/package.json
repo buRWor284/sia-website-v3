@@ -1,0 +1,9 @@
+{
+  "name": "emos-framework-renderer",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Batch Playwright renderer for the 6 EMOS 'why it works' framework bundles",
+  "dependencies": {
+    "playwright": "^1.44.0"
+  }
+}

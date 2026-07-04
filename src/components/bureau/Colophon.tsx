@@ -22,6 +22,7 @@ const COLS: ReadonlyArray<FooterCol> = [
       { label: "DMR.agency",     href: "https://dmr.agency", external: true },
       { label: "Ventures",       href: "/ventures" },
       { label: "Clients",        href: "/clients" },
+      { label: "Case Studies",   href: "/case-studies" },
     ],
   },
   {
