@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
-import { GROT, INK, INK15, INK35, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
+import { GROT, INK, PAPER, SERIF, YEL, INK70 } from "@/lib/tokens";
+import { ToolsClientShell, type PipelineTool, type AdjacentTool } from "@/components/tools/ToolsClientShell";
 
 const OG_TITLE = "EMOS Tools · The Earned-Media Pipeline, Free";
 const OG_DESC =
@@ -16,17 +17,6 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: OG_TITLE, description: OG_DESC },
 };
 
-type Status = "live" | "platform";
-
-interface PipelineTool {
-  step: string;
-  name: string;
-  role: string;
-  blurb: string;
-  href: string;
-  status: Status;
-}
-
 const PIPELINE: PipelineTool[] = [
   {
     step: "01",
@@ -35,6 +25,7 @@ const PIPELINE: PipelineTool[] = [
     blurb:
       "Scans open, primary-source signals — SEC filings, research preprints, search and news-coverage data — and ranks the stories rising fastest before the press catches up.",
     href: "/tools/signaliq",
+    howItWorksHref: "/tools/signaliq/how-it-works",
     status: "live",
   },
   {
@@ -44,6 +35,7 @@ const PIPELINE: PipelineTool[] = [
     blurb:
       "Turns a SignalIQ opportunity into a linkable asset — report, calculator, or quiz — with a 6-step builder engine.",
     href: "/tools/assetiq",
+    howItWorksHref: "/tools/assetiq",
     status: "platform",
   },
   {
@@ -53,6 +45,7 @@ const PIPELINE: PipelineTool[] = [
     blurb:
       "Runs every claim and stat in the asset through a 10-step verification pipeline before a journalist can poke a hole in it.",
     href: "/tools/factcheckiq",
+    howItWorksHref: "/tools/factcheckiq",
     status: "platform",
   },
   {
@@ -62,6 +55,7 @@ const PIPELINE: PipelineTool[] = [
     blurb:
       "Surfaces the journalists who actively cover your topic, scores their fit, and drafts a tailored pitch angle for each.",
     href: "/tools/journocollabiq",
+    howItWorksHref: "/tools/journocollabiq/how-it-works",
     status: "live",
   },
   {
@@ -71,6 +65,7 @@ const PIPELINE: PipelineTool[] = [
     blurb:
       "Scores a HARO, Qwoted, or Featured pitch against a 32-point system and the EMOS framework, with the three fixes that move it most.",
     href: "/tools/pressiq",
+    howItWorksHref: "/tools/pressiq/how-it-works",
     status: "live",
   },
   {
@@ -80,11 +75,12 @@ const PIPELINE: PipelineTool[] = [
     blurb:
       "Logs every pitch from drafted to placed, tracks journalist relationships and follow-ups, and shows your PESO coverage mix.",
     href: "/tools/coverageiq",
+    howItWorksHref: "/tools/coverageiq/how-it-works",
     status: "live",
   },
 ];
 
-const ADJACENT = [
+const ADJACENT: AdjacentTool[] = [
   {
     name: "PartnerCollabIQ",
     role: "Partnership Intelligence",
@@ -100,25 +96,6 @@ const ADJACENT = [
     href: "/tools/authority-calculator",
   },
 ];
-
-function StatusTag({ status }: { status: Status }) {
-  return (
-    <span
-      style={{
-        fontFamily: GROT,
-        fontWeight: 800,
-        fontSize: 8.5,
-        letterSpacing: "0.14em",
-        textTransform: "uppercase",
-        padding: "3px 7px",
-        background: status === "live" ? "#3e6b45" : INK,
-        color: status === "live" ? "#fff" : YEL,
-      }}
-    >
-      {status === "live" ? "Live · Free" : "Teaser · Inside EMOS"}
-    </span>
-  );
-}
 
 export default function ToolsIndexPage() {
   return (
@@ -156,61 +133,7 @@ export default function ToolsIndexPage() {
         </a>
       </section>
 
-      {/* ── Pipeline grid ────────────────────────────────────────────────── */}
-      <section style={{ padding: "48px 56px 20px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 28 }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: INK }}>The Pipeline</span>
-          <div style={{ flex: 1, height: 1, background: INK15 }} />
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55 }}>6 Steps</span>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
-          {PIPELINE.map((tool, i) => (
-            <a
-              key={tool.name}
-              href={tool.href}
-              style={{
-                display: "block",
-                background: PAPER,
-                padding: "22px 22px 24px",
-                textDecoration: "none",
-                color: INK,
-                position: "relative",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK35, letterSpacing: "-0.02em" }}>{tool.step}</span>
-                <StatusTag status={tool.status} />
-              </div>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, marginBottom: 4 }}>{tool.name}</div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>{tool.role}</div>
-              <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: INK70, margin: 0 }}>{tool.blurb}</p>
-              {i < PIPELINE.length - 1 && (
-                <div style={{ position: "absolute", right: -1, top: "50%", transform: "translateY(-50%)", fontFamily: SERIF, fontSize: 14, color: INK35, background: PAPER, border: `1px solid ${INK15}`, width: 22, height: 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
-                  →
-                </div>
-              )}
-            </a>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Adjacent tools ───────────────────────────────────────────────── */}
-      <section style={{ padding: "20px 56px 60px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>Also Public · Outside This Pipeline</span>
-          <div style={{ flex: 1, height: 1, background: INK15 }} />
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
-          {ADJACENT.map((tool) => (
-            <a key={tool.name} href={tool.href} style={{ display: "block", border: `1px solid ${INK15}`, background: PAPER2, padding: "18px 20px 20px", textDecoration: "none", color: INK }}>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17 }}>{tool.name}</div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, margin: "4px 0 8px" }}>{tool.role}</div>
-              <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, lineHeight: 1.55, color: INK70, margin: 0 }}>{tool.blurb}</p>
-            </a>
-          ))}
-        </div>
-      </section>
+      <ToolsClientShell pipeline={PIPELINE} adjacent={ADJACENT} />
 
       <Subscriptions sectionNumber="07" />
       <Colophon />
