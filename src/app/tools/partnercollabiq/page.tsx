@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { PartnerCollabIQ } from "@/components/tools/CollabIQ";
+import PartnerCollabIQ from "@/components/tools/PartnerCollabIQClient";
 import Link from "next/link";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 

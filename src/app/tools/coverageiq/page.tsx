@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import CoverageIQ from "@/components/tools/CoverageIQ";
+import CoverageIQ from "@/components/tools/CoverageIQClient";
 
 export const metadata: Metadata = {
   title: "CoverageIQ · Pitch Tracking CRM",
