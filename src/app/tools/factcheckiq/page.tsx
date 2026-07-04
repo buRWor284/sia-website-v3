@@ -92,12 +92,12 @@ const STEPS: Step[] = [
 interface Claim { n: number; text: string; verdict: Verdict; found: string; source: string; url: string | null; highlight: string; }
 
 const CLAIMS: Claim[] = [
-  { n: 1, text: "Nielsen surveyed more than 28,000 people across 56 countries", verdict: "Verified", found: "Nielsen's 2012 Global Trust in Advertising surveyed 28,000+ internet respondents in 56 countries.", source: "Nielsen 2012", url: "https://www.nielsen.com/insights/2012/global-trust-in-advertising-and-brand-messages-2/", highlight: "surveyed more than 28,000 people across 56 countries" },
-  { n: 2, text: "92% trust earned media (meaning press coverage) above all advertising", verdict: "Partly accurate", found: "The 92% figure is real, but Nielsen defines it as recommendations from friends and family (word of mouth), not press coverage, and it is a 2012 number.", source: "Nielsen 2012", url: "https://www.nielsen.com/insights/2012/global-trust-in-advertising-and-brand-messages-2/", highlight: "92 percent of consumers trust earned media, meaning press and media coverage, above every other form of advertising" },
-  { n: 3, text: "Online reviews were the least trusted source of brand information", verdict: "Inaccurate", found: "The same Nielsen study found online consumer reviews were the second most trusted source, at 70%.", source: "Nielsen 2012", url: "https://www.nielsen.com/insights/2012/global-trust-in-advertising-and-brand-messages-2/", highlight: "online reviews ranked as the least trusted source of brand information" },
-  { n: 4, text: "Content marketing costs 62% less and generates 3x the leads", verdict: "Unverifiable", found: "Traces only to a DemandMetric infographic with no published sample, method, or year. Widely repeated, never sourced to primary data.", source: "none found (DemandMetric infographic only)", url: "https://www.demandmetric.com/", highlight: "costs 62 percent less than traditional marketing while generating three times the leads" },
-  { n: 5, text: "Companies that blog get 67% more leads, which proves blogging drives growth", verdict: "Misleading", found: "The 67% benchmark is correlational and variously attributed (HubSpot, DemandMetric, InsideView). “Proves blogging drives growth” is causation claimed from correlation.", source: "HubSpot / DemandMetric (correlational)", url: "https://www.hubspot.com/marketing-statistics", highlight: "Companies that blog get 67 percent more leads, which proves that blogging drives growth" },
-  { n: 6, text: "A 2023 Harvard Business School study found PR-driven leads convert 5x better than paid", verdict: "Fabricated", found: "No such study exists. A search of HBS faculty research and the web returns nothing matching this claim.", source: "none found", url: null, highlight: "a 2023 Harvard Business School study found that PR-driven leads convert five times better than paid ones" },
+  { n: 1, text: "The top 100 online marketplaces grew 2.9% in 2022 to $3.2 trillion in GMV", verdict: "Verified", found: "Digital Commerce 360's Top 100 Marketplaces tracker recorded 2.9% growth to $3.2 trillion in combined third-party GMV for 2022.", source: "Digital Commerce 360", url: "https://www.digitalcommerce360.com/article/global-marketplace-sales/", highlight: "the top 100 online marketplaces grew 2.9 percent in 2022 to $3.2 trillion in GMV" },
+  { n: 2, text: "67% of B2B buyers prefer a rep-free buying experience, proving marketplaces are how B2B commerce will be transacted", verdict: "Partly accurate", found: "The 67% figure is real, from Gartner's 2026 B2B buying survey, but it measures preference for self-service, rep-free purchasing in general. Gartner's survey doesn't single out marketplaces as the channel buyers want; that leap is the draft's, not Gartner's.", source: "Gartner 2026 B2B Buying Survey", url: "https://www.gartner.com/en/newsroom/press-releases/2026-03-09-gartner-sales-survey-finds-67-percent-of-b2b-buyers-prefer-a-rep-free-experience", highlight: "67 percent of B2B buyers prefer a rep-free buying experience, proving marketplaces are how B2B commerce will be transacted" },
+  { n: 3, text: "Digital Commerce 360 found the top 100 B2B marketplaces' GMV grew 10.1% in 2024", verdict: "Inaccurate", found: "Digital Commerce 360's 10.1% figure is a projected growth rate for 2025 (to $3.2 trillion), not a result reported for 2024. The year is misstated.", source: "Digital Commerce 360", url: "https://www.digitalcommerce360.com/top-online-marketplaces-data-stats/", highlight: "the top 100 B2B marketplaces' GMV grew 10.1 percent in 2024" },
+  { n: 4, text: "The average B2B marketplace take rate is 15%, and onboarding a new vendor takes three days industry-wide", verdict: "Unverifiable", found: "Both figures circulate across marketplace-SaaS marketing blogs with no named study, sample, or methodology behind either one. Widely repeated, never traced to primary data.", source: "none found (marketplace-SaaS blog consensus only)", url: "https://www.shipturtle.com/blog/multi-vendor-marketplace-statistics", highlight: "the average B2B marketplace take rate is 15 percent, and onboarding a new vendor takes three days industry-wide" },
+  { n: 5, text: "Sellers offered flexible onboarding and payout schedules see 20% higher retention, which proves fast onboarding is why marketplaces are outgrowing traditional B2B sales", verdict: "Misleading", found: "The 20% retention figure traces to real marketplace seller-retention research, but it's a correlation between onboarding flexibility and seller retention, not evidence that onboarding speed explains marketplace growth over traditional sales channels. “Proves” claims causation the underlying data doesn't support.", source: "Marketplace seller-retention research (correlational)", url: null, highlight: "sellers offered flexible onboarding and payout schedules see 20 percent higher retention, which proves fast onboarding is why marketplaces are outgrowing traditional B2B sales" },
+  { n: 6, text: "A 2025 Gartner study found marketplace infrastructure providers cut vendor onboarding time by 80%", verdict: "Fabricated", found: "No such study exists. A search of Gartner's published research and newsroom returns nothing matching this claim.", source: "none found", url: null, highlight: "a 2025 Gartner study found marketplace infrastructure providers cut vendor onboarding time by 80 percent" },
 ];
 
 const VERDICT_SCALE: { symbol: string; name: Verdict; def: string }[] = [
@@ -268,25 +268,26 @@ export default function FactcheckIQPage() {
                     <SCaps size={9.5} ls=".16em" color={INK55} style={{ display: "block", marginBottom: 8 }}>Fairground&apos;s draft blog post + 2 files</SCaps>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: 7, border: `1px solid ${INK}`, background: PAPER, fontFamily: MONO, fontWeight: 500, fontSize: 11, padding: "5px 9px" }}>
-                        <span style={{ color: "#9b2c2c" }}>{"▣"}</span> nielsen-trust.pdf
+                        <span style={{ color: "#9b2c2c" }}>{"▣"}</span> dc360-marketplace-gmv.pdf
                       </span>
                       <span style={{ display: "inline-flex", alignItems: "center", gap: 7, border: `1px solid ${INK}`, background: PAPER, fontFamily: MONO, fontWeight: 500, fontSize: 11, padding: "5px 9px" }}>
-                        <span style={{ color: "#2a5db0" }}>{"▣"}</span> fairground-earned-media-post.docx
+                        <span style={{ color: "#2a5db0" }}>{"▣"}</span> fairground-onboarding-post.docx
                       </span>
                     </div>
                   </div>
                   <p style={{ fontFamily: SERIF, fontSize: 9.5, lineHeight: 1.5, margin: 0 }}>
-                    Nielsen{" "}
-                    <span style={{ background: VERDICT_COLORS["Verified"].bg, color: VERDICT_COLORS["Verified"].fg, padding: ".03em .18em" }}>surveyed more than 28,000 people across 56 countries</span>,
-                    finding that{" "}
-                    <span style={{ background: VERDICT_COLORS["Partly accurate"].bg, color: VERDICT_COLORS["Partly accurate"].fg, padding: ".03em .18em" }}>92 percent of consumers trust earned media, meaning press and media coverage, above every other form of advertising</span>.
-                    The same study found{" "}
-                    <span style={{ background: VERDICT_COLORS["Inaccurate"].bg, color: VERDICT_COLORS["Inaccurate"].fg, padding: ".03em .18em" }}>online reviews ranked as the least trusted source of brand information</span>.
-                    Content marketing{" "}
-                    <span style={{ background: VERDICT_COLORS["Unverifiable"].bg, color: VERDICT_COLORS["Unverifiable"].fg, padding: ".03em .18em" }}>costs 62 percent less than traditional marketing while generating three times the leads</span>, and{" "}
-                    <span style={{ background: VERDICT_COLORS["Misleading"].bg, color: VERDICT_COLORS["Misleading"].fg, padding: ".03em .18em" }}>companies that blog get 67 percent more leads, which proves that blogging drives growth</span>.
+                    Marketplace infrastructure keeps attracting investment because{" "}
+                    <span style={{ background: VERDICT_COLORS["Verified"].bg, color: VERDICT_COLORS["Verified"].fg, padding: ".03em .18em" }}>the top 100 online marketplaces grew 2.9 percent in 2022 to $3.2 trillion in GMV</span>.
+                    That tracks with the buyer side too:{" "}
+                    <span style={{ background: VERDICT_COLORS["Partly accurate"].bg, color: VERDICT_COLORS["Partly accurate"].fg, padding: ".03em .18em" }}>67 percent of B2B buyers prefer a rep-free buying experience, proving marketplaces are how B2B commerce will be transacted</span>.
+                    The momentum hasn&rsquo;t slowed:{" "}
+                    <span style={{ background: VERDICT_COLORS["Inaccurate"].bg, color: VERDICT_COLORS["Inaccurate"].fg, padding: ".03em .18em" }}>the top 100 B2B marketplaces&rsquo; GMV grew 10.1 percent in 2024</span>.
+                    Every operator we talk to already knows{" "}
+                    <span style={{ background: VERDICT_COLORS["Unverifiable"].bg, color: VERDICT_COLORS["Unverifiable"].fg, padding: ".03em .18em" }}>the average B2B marketplace take rate is 15 percent, and onboarding a new vendor takes three days industry-wide</span>.
+                    That&rsquo;s no accident:{" "}
+                    <span style={{ background: VERDICT_COLORS["Misleading"].bg, color: VERDICT_COLORS["Misleading"].fg, padding: ".03em .18em" }}>sellers offered flexible onboarding and payout schedules see 20 percent higher retention, which proves fast onboarding is why marketplaces are outgrowing traditional B2B sales</span>.
                     In fact,{" "}
-                    <span style={{ background: VERDICT_COLORS["Fabricated"].bg, color: VERDICT_COLORS["Fabricated"].fg, padding: ".03em .18em" }}>a 2023 Harvard Business School study found that PR-driven leads convert five times better than paid ones</span>.
+                    <span style={{ background: VERDICT_COLORS["Fabricated"].bg, color: VERDICT_COLORS["Fabricated"].fg, padding: ".03em .18em" }}>a 2025 Gartner study found marketplace infrastructure providers cut vendor onboarding time by 80 percent</span>.
                     <span className="fc-caret">{"▍"}</span>
                   </p>
                 </div>
