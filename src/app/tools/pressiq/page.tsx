@@ -831,7 +831,7 @@ export default function PressIQPage() {
   const [subject,  setSubject]  = useState("");
   const [platform, setPlatform] = useState<Platform>("haro");
   const [brand,    setBrand]    = useState<BrandSignals>(EMPTY_BRAND);
-  const [store,    setStore]    = useState(true);
+  const [store,    setStore]    = useState(false);
   const [pitchMode, setPitchMode] = useState<"standalone" | "query">("standalone");
   const [journalistBeat, setJournalistBeat] = useState("");
   const [view,     setView]     = useState<"pre" | "loading" | "post">("pre");
@@ -899,7 +899,11 @@ export default function PressIQPage() {
     }
     s.addEventListener("load", render);
     return () => { s?.removeEventListener("load", render); };
-  }, []);
+    // Re-run when formStep changes: the widget's container div only exists in the
+    // DOM once formStep === 2, so the first mount (formStep 1) finds a null ref and
+    // bails. Retrying on formStep change lets it mount as soon as the container
+    // appears, matching the fix already applied to SignalIQ/JournoCollabIQ.
+  }, [formStep]);
 
   const live = useMemo(() => {
     if (pitch.trim().length < 15) return null;

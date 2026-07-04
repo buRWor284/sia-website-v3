@@ -920,11 +920,59 @@ function ReceiptsPanel({ opp }: { opp: Opportunity }) {
 
 // ── pack view ─────────────────────────────────────────────────────────────────
 
+// Minimal Markdown renderer for AI-generated text (## headings, **bold**, "- " lists).
+// The model output for pack.brief is lightly-formatted Markdown; this renders it
+// properly instead of showing the raw "##"/"**" syntax as literal characters.
+function inlineMd(text: string, keyPrefix: string): React.ReactNode[] {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+      return <strong key={`${keyPrefix}-${i}`}>{part.slice(2, -2)}</strong>;
+    }
+    return <React.Fragment key={`${keyPrefix}-${i}`}>{part}</React.Fragment>;
+  });
+}
+
+function MarkdownLite({ text, textColor }: { text: string; textColor: string }) {
+  const blocks = text.split(/\n{2,}/).filter(Boolean);
+  return (
+    <>
+      {blocks.map((block, i) => {
+        const lines = block.split("\n").filter(Boolean);
+        const isList = lines.length > 0 && lines.every(l => /^\s*-\s+/.test(l));
+        if (/^#{1,6}\s+/.test(block)) {
+          const heading = block.replace(/^#{1,6}\s+/, "");
+          return (
+            <p key={i} style={{ margin: "14px 0 0", fontFamily: "inherit", fontSize: 13, fontWeight: 700, letterSpacing: ".02em", color: textColor }}>
+              {inlineMd(heading, `h${i}`)}
+            </p>
+          );
+        }
+        if (isList) {
+          return (
+            <ul key={i} style={{ margin: "10px 0 0", paddingLeft: 20, color: textColor }}>
+              {lines.map((l, j) => (
+                <li key={j} style={{ marginTop: j === 0 ? 0 : 4, lineHeight: 1.6 }}>
+                  {inlineMd(l.replace(/^\s*-\s+/, ""), `li${i}-${j}`)}
+                </li>
+              ))}
+            </ul>
+          );
+        }
+        return (
+          <p key={i} style={{ margin: "10px 0 0", lineHeight: 1.6, color: textColor }}>
+            {inlineMd(block, `p${i}`)}
+          </p>
+        );
+      })}
+    </>
+  );
+}
+
 function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownloadPDF: () => void; emailDone: boolean }) {
   const copy = (text: string) => {
     try { navigator.clipboard?.writeText(text); } catch { /* noop */ }
   };
-  const briefParas = pack.brief.split(/\n{2,}/).filter(Boolean);
 
   return (
     <div>
@@ -979,9 +1027,9 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
       {/* Data brief */}
       <div style={{ marginTop: 18, padding: "18px 20px", border: `1px solid ${INK15}`, background: PAPER2 }}>
         <SCaps size={10} ls="0.16em" color={INK}>Data brief</SCaps>
-        {briefParas.map((p, i) => (
-          <p key={i} style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.6, color: INK70 }}>{p}</p>
-        ))}
+        <div style={{ fontFamily: SERIF, fontSize: 15.5 }}>
+          <MarkdownLite text={pack.brief} textColor={INK70} />
+        </div>
       </div>
 
       {/* Pitch angle */}
