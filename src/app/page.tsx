@@ -472,7 +472,7 @@ const css = `
   /* ── FOOTER ─────────────────────────────────────────────── */
   .footer { background: var(--BG); padding: 56px 56px 28px; border-top: 2px solid var(--INK); }
   .footer__grid {
-    display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    display: grid; grid-template-columns: 1.1fr 1fr 1fr 1fr;
     gap: 40px; padding-bottom: 40px; border-bottom: 2px solid var(--INK);
   }
   .footer__wordmark {
@@ -1139,10 +1139,11 @@ export default function HomePage() {
             <ul className="footer__links">
               <li><a href="/fractional-cmo" className="footer__link">Fractional CMO</a></li>
               <li><a href="/speaking" className="footer__link">Speaking</a></li>
-              <li><a href="/emos" className="footer__link">EMOS</a></li>
+              <li><a href="/emos" className="footer__link">EMOS Academy</a></li>
               <li><a href="https://dmr.agency" target="_blank" rel="noopener noreferrer" className="footer__link">DMR.agency ↗</a></li>
               <li><a href="/ventures" className="footer__link">Ventures</a></li>
               <li><a href="/clients" className="footer__link">Clients</a></li>
+              <li><a href="/case-studies" className="footer__link">Case Studies</a></li>
             </ul>
           </div>
           <div>
@@ -1152,16 +1153,16 @@ export default function HomePage() {
               <li><a href="/about" className="footer__link">About</a></li>
               <li><a href="/podcast" className="footer__link">Podcast</a></li>
               <li><a href="/gallery" className="footer__link">Gallery</a></li>
+              <li><a href="/press-kit" className="footer__link">Press Kit</a></li>
               <li><a href="/tools" className="footer__link">Tools</a></li>
               <li><a href="/resources" className="footer__link">Resources</a></li>
-              <li><a href="/press-kit" className="footer__link">Press Kit</a></li>
-              <li><a href="/newsletter" className="footer__link">Newsletter</a></li>
             </ul>
           </div>
           <div>
             <div className="footer__col-head">CONNECT</div>
             <ul className="footer__links">
               <li><a href="/contact" className="footer__link">Contact</a></li>
+              <li><a href="/newsletter" className="footer__link">Newsletter</a></li>
               <li><a href="https://x.com/syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">Twitter / X ↗</a></li>
               <li><a href="https://www.linkedin.com/in/syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn ↗</a></li>
               <li><a href="https://www.youtube.com/watch?v=9Zn9TE6Nz6Y&list=PLY3hQIOPokONs4kpRS0d9rLQ6gjv6Hlij" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>
