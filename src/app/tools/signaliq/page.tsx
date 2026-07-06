@@ -14,6 +14,9 @@
 
 import React, { useState, useMemo, useEffect, useRef, useId } from "react";
 import Link from "next/link";
+import Script from "next/script";
+import { getJsPDF } from "@/lib/pdf/house-style";
+import { buildSignalIqReport } from "@/lib/pdf/signaliq-report";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
@@ -1678,36 +1681,23 @@ export default function SignalIQPage() {
     }
   }
 
-  async function downloadPDF() {
-    if (!emailDone || !selected) return;
+  function downloadPDF() {
+    if (!emailDone || !selected || !pack) return;
+    const JsPDF = getJsPDF();
+    if (!JsPDF) { alert("PDF library still loading — try again in a moment."); return; }
     try {
-      const res = await fetch("/api/signaliq/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          beat,
-          companyContext: companyContext.trim() || undefined,
-          opportunities: scan?.opportunities ?? [],
-          opportunity: selected,
-          pack,
-        }),
+      const doc = new JsPDF({ unit: "mm", format: "a4" });
+      buildSignalIqReport(doc, {
+        beatLabel: BEATS.find((b) => b.id === beat)?.label ?? String(beat),
+        companyContext: companyContext.trim(),
+        opportunities: scan?.opportunities ?? [],
+        selected,
+        pack,
+        generatedAt: scan?.generatedAt ?? new Date().toISOString(),
       });
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.error || "Could not generate PDF.");
-        return;
-      }
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `signaliq-report-${Date.now()}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      doc.save(`signaliq-report-${Date.now()}.pdf`);
     } catch {
-      alert("Network error. Could not generate PDF.");
+      alert("Could not generate the PDF. Please try again.");
     }
   }
 
@@ -1751,6 +1741,7 @@ export default function SignalIQPage() {
   return (
     <>
       <style>{PAGE_CSS}</style>
+      <Script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" strategy="lazyOnload" />
       <ToolHeader
         toolPrefix="Signal"
         subtitle="Story Radar"
