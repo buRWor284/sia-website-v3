@@ -541,36 +541,6 @@ function SourcesSidebar() {
 
 // ── step bar ──────────────────────────────────────────────────────────────────
 
-function StepBar({ step, onGoStep }: { step: 0 | 1 | 2 | 3; onGoStep: (n: 0 | 1 | 2 | 3) => void }) {
-  // Step 0 (intro) — show just a minimal "back to start" bar; full bar appears at steps 1-3
-  if (step === 0) return null;
-  const STEPS: { n: 1 | 2 | 3; label: string }[] = [
-    { n: 1, label: "Pick your beat" },
-    { n: 2, label: "Scan the radar" },
-    { n: 3, label: "Asset pack" },
-  ];
-  return (
-    <nav className="siq-step-bar">
-      <button className="siq-step past" onClick={() => onGoStep(0)} style={{ maxWidth: 48, fontSize: 8 }}>
-        ←
-      </button>
-      {STEPS.map((s) => {
-        const active = s.n === step;
-        const past = s.n < step;
-        return (
-          <button
-            key={s.n}
-            className={`siq-step${active ? " active" : ""}${past ? " past" : ""}`}
-            onClick={() => past && onGoStep(s.n)}
-          >
-            <span className="siq-step-no">0{s.n}</span> · {s.label}
-          </button>
-        );
-      })}
-    </nav>
-  );
-}
-
 // ── footer: now a shared component ───────────────────────────────────────────
 // SIQFooter removed; use <ToolPipelineFooter currentTool="signaliq" /> below.
 
@@ -670,11 +640,13 @@ function BeatPicker({
   setBeat,
   onScan,
   scanning,
+  wizardMode = false,
 }: {
   beat: BeatId;
   setBeat: (b: BeatId) => void;
-  onScan: () => void;
-  scanning: boolean;
+  onScan?: () => void;
+  scanning?: boolean;
+  wizardMode?: boolean;
 }) {
   const currentBeat = BEATS.find((b) => b.id === beat);
   return (
@@ -710,18 +682,20 @@ function BeatPicker({
         A health-AI company should pick <strong>Health &amp; Wellness</strong> (reporters at STAT News, Health Affairs, and general science desks cover GLP-1 surges, digital therapeutics, and chronic-condition research, not the SaaS beat).
         Only choose <strong>SaaS &amp; Startups</strong> if the story you&rsquo;re pitching is the startup itself: a funding round or product launch to tech press like TechCrunch or The Verge.
       </p>
-      <div style={{ textAlign: "center", margin: "24px 0" }}>
-        <button
-          onClick={onScan}
-          disabled={scanning}
-          className="siq-scan-btn"
-        >
-          {scanning ? "Scanning the radar…" : `Scan ${currentBeat?.label} →`}
-        </button>
-        <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
-          {FREE_SCANS} free scans / month, or {EMAIL_SCANS} with your email · live open-data sources
-        </p>
-      </div>
+      {!wizardMode && (
+        <div style={{ textAlign: "center", margin: "24px 0" }}>
+          <button
+            onClick={onScan}
+            disabled={scanning}
+            className="siq-scan-btn"
+          >
+            {scanning ? "Scanning the radar…" : `Scan ${currentBeat?.label} →`}
+          </button>
+          <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+            {FREE_SCANS} free scans / month, or {EMAIL_SCANS} with your email · live open-data sources
+          </p>
+        </div>
+      )}
     </section>
   );
 }
@@ -735,32 +709,19 @@ const SIGNAL_SOURCES: Array<{ id: "sec" | "arxiv" | "wikipedia" | "hackernews"; 
   { id: "hackernews", label: "Hacker News" },
 ];
 
-function FitBadge({ fit }: { fit?: Opportunity["fit"] }) {
-  if (!fit) return null;
-  const color = fit === "high" ? GREEN : fit === "medium" ? AMBER : RED;
-  const label = fit === "high" ? "High fit" : fit === "medium" ? "Medium fit" : "Low fit";
-  return (
-    <span style={{
-      fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase",
-      color, border: `1px solid ${color}`, padding: "2px 7px",
-    }}>
-      {label}
-    </span>
-  );
-}
-
 function OppCard({
   opp,
   onGenerate,
+  onSelect,
 }: {
   opp: Opportunity;
   onGenerate: () => void;
+  onSelect?: () => void;
 }) {
   const [showSources, setShowSources] = useState(false);
-  const c = bandColor(opp.band);
   const signalBySource = Object.fromEntries(opp.signals.map(s => [s.source, s]));
   return (
-    <div className="siq-card">
+    <div className={`siq-card${onSelect ? " siq-card-click" : ""}`} onClick={onSelect}>
       {/* INK header strip — one verdict: band label + score, read as a single rating */}
       <div className="siq-card-head">
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
@@ -826,6 +787,7 @@ function OppCard({
                 href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=8-K&dateb=&owner=include&count=40"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
                 className="siq-chip"
                 title="SEC EDGAR: no direct link for this result. Click to search EDGAR filings."
               >
@@ -837,6 +799,7 @@ function OppCard({
                 href={s.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
                 className="siq-chip"
               >
                 {SRC_LABEL[s.source] ?? s.source.toUpperCase()} ↗
@@ -853,7 +816,7 @@ function OppCard({
         {/* Sources checked — toggle */}
         <div style={{ borderTop: `1px solid ${INK15}`, marginTop: 12, paddingTop: 10 }}>
           <button
-            onClick={() => setShowSources(v => !v)}
+            onClick={(e) => { e.stopPropagation(); setShowSources(v => !v); }}
             style={{
               background: "none", border: "none", cursor: "pointer", padding: 0,
               fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".13em",
@@ -903,7 +866,7 @@ function OppCard({
           )}
         </div>
       </div>
-      <button onClick={onGenerate} className="siq-gen-btn">
+      <button onClick={(e) => { e.stopPropagation(); onGenerate(); }} className="siq-gen-btn">
         <span>Generate asset pack →</span>
         <span className="siq-gen-sub">pitch angle · data brief · who to pitch</span>
       </button>
@@ -1295,44 +1258,17 @@ function EmosCTA() {
 
 // ── detail view ───────────────────────────────────────────────────────────────
 
-function DetailView({
-  opp,
-  pack,
-  packing,
-  packError,
-  onBack,
-  onRetry,
-  email,
-  setEmail,
-  emailDone,
-  unlockEmail,
-  onDownloadPDF,
-}: {
-  opp: Opportunity;
-  pack: AssetPack | null;
-  packing: boolean;
-  packError: string | null;
-  onBack: () => void;
-  onRetry: () => void;
-  email: string;
-  setEmail: (v: string) => void;
-  emailDone: boolean;
-  unlockEmail: (e: React.FormEvent) => void;
-  onDownloadPDF: () => void;
-}) {
+// Stage 4 — the Angle: why SignalIQ flagged this one opportunity.
+function AngleView({ opp }: { opp: Opportunity }) {
   const c = bandColor(opp.band);
+  const whyTag: React.CSSProperties = { flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 };
   return (
-    <section style={{ padding: "10px clamp(22px,5vw,56px) 32px" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
-        <button onClick={onBack} className="siq-back">
-          ← Back to the radar
-        </button>
-        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
-          Step 3 | Asset pack
-        </span>
-      </div>
-
+    <section style={{ padding: "18px clamp(22px,5vw,56px) 32px" }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <p style={{ margin: "0 0 14px", fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+          Step 4 of 5 · the angle
+        </p>
+
         {/* Opportunity header */}
         <div style={{ display: "flex", gap: "clamp(16px,3vw,32px)", flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
           <ScoreRing score={opp.score} color={c} size={110} />
@@ -1350,16 +1286,30 @@ function DetailView({
               <span style={{ fontFamily: MONO, fontSize: 8, color: INK55, letterSpacing: ".10em", textTransform: "uppercase" }}>
                 · {opp.beat}
               </span>
-              {opp.fit && <FitBadge fit={opp.fit} />}
             </span>
             <h2 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3.5vw,38px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: INK }}>
               {opp.headline}
             </h2>
-            <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK55, lineHeight: 1.4 }}>
-              A lead/whitespace score: how far ahead of the coverage you are.
-              Not a prediction the story breaks.
-            </p>
           </div>
+        </div>
+
+        {/* Why now / Why you */}
+        <div style={{ maxWidth: 540, marginTop: 18, display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+            <span style={whyTag}>Why&nbsp;now</span>
+            <div style={{ flex: 1 }}><GapBar value={opp.components.coverageGap} /></div>
+          </div>
+          {opp.fit && (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={whyTag}>Why&nbsp;you</span>
+              <span style={{ fontFamily: GROT, fontSize: 12, color: INK70 }}>
+                Fit for your startup:{" "}
+                <span style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: opp.fit === "high" ? GREEN : opp.fit === "medium" ? AMBER : RED }}>
+                  {opp.fit === "high" ? "High" : opp.fit === "medium" ? "Medium" : "Low"}
+                </span>
+              </span>
+            </div>
+          )}
         </div>
 
         {/* § 01 — Why SignalIQ flagged this */}
@@ -1371,8 +1321,49 @@ function DetailView({
           </div>
         </div>
 
-        {/* § 02 — Your asset pack */}
-        <div style={{ marginTop: 36 }}>
+        <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: INK55, lineHeight: 1.4 }}>
+          A lead/whitespace score: how far ahead of the coverage you are. Not a prediction the story breaks.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+// Stage 5 — the generated Asset Pack for the chosen opportunity.
+function PackStage({
+  opp,
+  pack,
+  packing,
+  packError,
+  onRetry,
+  email,
+  setEmail,
+  emailDone,
+  unlockEmail,
+  onDownloadPDF,
+}: {
+  opp: Opportunity;
+  pack: AssetPack | null;
+  packing: boolean;
+  packError: string | null;
+  onRetry: () => void;
+  email: string;
+  setEmail: (v: string) => void;
+  emailDone: boolean;
+  unlockEmail: (e: React.FormEvent) => void;
+  onDownloadPDF: () => void;
+}) {
+  return (
+    <section style={{ padding: "18px clamp(22px,5vw,56px) 32px" }}>
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <p style={{ margin: "0 0 6px", fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+          Step 5 of 5 · your asset pack
+        </p>
+        <h2 style={{ margin: "0 0 4px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.6vw,28px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: INK }}>
+          {opp.headline}
+        </h2>
+
+        <div style={{ marginTop: 20 }}>
           <SectionMast n="02" label="Your asset pack" />
           {packing && (
             <div style={{ padding: 30, textAlign: "center", border: `1px solid ${INK15}`, background: PAPER2, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }}>
@@ -1396,6 +1387,71 @@ function DetailView({
         </div>
       </div>
     </section>
+  );
+}
+
+// ── wizard chrome (stepper + footer, JCIQ pattern in SignalIQ tokens) ──────────
+
+const WIZ_STEPS = ["Beat", "Context", "Radar", "Angle", "Pack"] as const;
+type WizStage = 1 | 2 | 3 | 4 | 5;
+
+function SiqWizardProgress({ stage, onGoStage }: { stage: WizStage; onGoStage: (n: WizStage) => void }) {
+  return (
+    <div style={{ background: DARK, borderBottom: `1px solid ${DARK_BD}`, position: "sticky", top: 52, zIndex: 49, padding: "10px clamp(20px,4vw,28px) 12px" }}>
+      <div style={{ height: 2, background: "rgba(241,235,222,.14)", marginBottom: 12 }}>
+        <div style={{ height: "100%", background: YEL, width: `${(stage / 5) * 100}%`, transition: "width .5s ease" }} />
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 6 }}>
+        {WIZ_STEPS.map((label, i) => {
+          const n = (i + 1) as WizStage;
+          const active = n === stage, done = n < stage, reachable = n <= stage;
+          return (
+            <button
+              key={label}
+              onClick={() => { if (reachable) onGoStage(n); }}
+              disabled={!reachable}
+              style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", padding: 0, cursor: reachable ? "pointer" : "default" }}
+            >
+              <span style={{
+                width: 22, height: 22, borderRadius: "50%", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
+                fontFamily: MONO, fontWeight: 700, fontSize: 10,
+                background: active ? YEL : done ? "rgba(245,184,31,.18)" : "transparent",
+                color: active ? INK : done ? YEL : "rgba(241,235,222,.55)",
+                border: `1px solid ${active ? YEL : done ? "rgba(245,184,31,.4)" : "rgba(241,235,222,.28)"}`,
+              }}>
+                {done ? "✓" : n}
+              </span>
+              <span className="siq-wiz-label" style={{
+                fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase",
+                color: active ? "rgba(241,235,222,.95)" : done ? "rgba(241,235,222,.55)" : "rgba(241,235,222,.35)",
+              }}>
+                {label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SiqWizardFooter({ stage, onBack, onNext, nextLabel, nextDisabled = false, onSkip }: {
+  stage: WizStage;
+  onBack: () => void;
+  onNext: () => void;
+  nextLabel: string;
+  nextDisabled?: boolean;
+  onSkip?: () => void;
+}) {
+  return (
+    <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: DARK, borderTop: `1px solid ${DARK_BD}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px clamp(20px,4vw,28px)", zIndex: 60 }}>
+      <button onClick={onBack} disabled={stage === 1} className="siq-wiz-ghost">← Back</button>
+      <span style={{ fontFamily: MONO, fontSize: 11, color: "rgba(241,235,222,.55)", letterSpacing: ".08em" }}>{stage} of 5</span>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {onSkip && <button onClick={onSkip} className="siq-wiz-link">Skip →</button>}
+        <button onClick={onNext} disabled={nextDisabled} className="siq-wiz-next">{nextLabel}</button>
+      </div>
+    </div>
   );
 }
 
@@ -1482,7 +1538,11 @@ export default function SignalIQPage() {
     if (turnstileWidgetId.current && w.turnstile) {
       try { w.turnstile.reset(turnstileWidgetId.current); } catch { /* noop */ }
     }
+    // waitForToken only runs inside async event handlers (scan/pack), never
+    // during render, so these clock reads are not a render-purity concern.
+    // eslint-disable-next-line react-hooks/purity
     const t0 = Date.now();
+    // eslint-disable-next-line react-hooks/purity
     while (Date.now() - t0 < ms) {
       await new Promise(r => setTimeout(r, 250));
       if (turnstileTokenRef.current) return turnstileTokenRef.current;
@@ -1491,16 +1551,19 @@ export default function SignalIQPage() {
   }
 
   // Step 0: intro/landing screen (click-through before step 1)
-  const [intro, setIntro] = useState(true);
+  // Explicit wizard stage — 0 = intro/landing, 1..5 = Beat/Context/Radar/Angle/Pack
+  const [stage, setStage] = useState<0 | WizStage>(0);
 
-  // The widget container mounts only after the intro is dismissed — attempt a
-  // (re-)render whenever that happens, and tear the widget down when the user
-  // returns to the intro so it can render cleanly next time.
+  const scrollTop = () => { if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+  // Turnstile widget mounts across the wizard (stages 1-5) and tears down on the
+  // intro so it renders cleanly next time. It must stay mounted before the scan
+  // (stage 2→3) and pack (stage 4→5) calls, or no token is ever issued.
   useEffect(() => {
     if (!TURNSTILE_SITE_KEY) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const w = window as any;
-    if (intro) {
+    if (stage === 0) {
       if (turnstileWidgetId.current && w.turnstile) {
         try { w.turnstile.remove(turnstileWidgetId.current); } catch { /* noop */ }
         turnstileWidgetId.current = null;
@@ -1510,13 +1573,10 @@ export default function SignalIQPage() {
     }
     tryRenderTurnstile();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [intro]);
-  // Step 2: opportunities hidden until user adds context or clicks skip
-  const [oppsRevealed, setOppsRevealed] = useState(false);
-  const [usedContext, setUsedContext] = useState(false); // whether context was provided when revealing
+  }, [stage]);
 
-  // Derived step
-  const step: 0 | 1 | 2 | 3 = intro ? 0 : selected ? 3 : scan ? 2 : 1;
+  // Whether the scan was personalised (context provided) — drives result copy.
+  const usedContext = !!companyContext.trim();
 
   // Option 3: re-rank opportunities by relevance to company context (client-side, instant)
   const rankedOpps = useMemo(() => {
@@ -1543,25 +1603,46 @@ export default function SignalIQPage() {
       .map((s) => s.opp);
   }, [scan, companyContext]);
 
-  function handleGoStep(n: 0 | 1 | 2 | 3) {
-    if (n === 0) { setIntro(true); setSelected(null); setPack(null); setPackError(null); setScan(null); }
-    if (n === 1) { setIntro(false); setSelected(null); setPack(null); setPackError(null); setScan(null); }
-    if (n === 2) { setSelected(null); setPack(null); setPackError(null); }
+  // ── wizard navigation ──────────────────────────────────────────────────────
+  function goStage(n: WizStage) {
+    if (n <= 3) { setSelected(null); setPack(null); setPackError(null); }
+    setStage(n);
+    scrollTop();
   }
+  function goBack() {
+    if (stage <= 1) return;
+    goStage((stage - 1) as WizStage);
+  }
+  async function goNext() {
+    if (stage === 1) { setStage(2); scrollTop(); return; }
+    if (stage === 2) { setStage(3); scrollTop(); await runScan(); return; }   // context-before-scan
+    if (stage === 3) { if (selected) { setStage(4); scrollTop(); } return; }
+    if (stage === 4) { if (selected) { setStage(5); scrollTop(); await generatePack(selected); } return; }
+    if (stage === 5) { startOver(); return; }
+  }
+  function startOver() {
+    setSelected(null); setPack(null); setPackError(null); setScan(null); setScanError(null);
+    setStage(1); scrollTop();
+  }
+  // Radar card actions: inspect → Angle (stage 4); Generate → straight to Pack (stage 5).
+  function pickForAngle(opp: Opportunity) { setSelected(opp); setStage(4); scrollTop(); }
+  function pickForPack(opp: Opportunity) { setSelected(opp); setStage(5); scrollTop(); generatePack(opp); }
 
-  async function runScan() {
+  // Single scan — always includes context when provided (context-before-scan),
+  // so there's only ever one /scan call per run (no generic-then-personalise
+  // double hit against quota).
+  async function runScan(ctxOverride?: string) {
+    const ctx = (ctxOverride !== undefined ? ctxOverride : companyContext).trim();
     setScanError(null);
     setScanning(true);
     setScan(null);
     setSelected(null);
     setPack(null);
-    setOppsRevealed(false);
-    setUsedContext(false);
     try {
       const res = await fetch("/api/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat, turnstileToken: (await waitForToken()) || undefined }),
+        body: JSON.stringify({ beat, companyContext: ctx || undefined, turnstileToken: (await waitForToken()) || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setScanError(data.error || "Scan failed.");
@@ -1570,31 +1651,6 @@ export default function SignalIQPage() {
       setScanError("Network error. Please try again.");
     } finally {
       setScanning(false);
-      resetTurnstile();
-    }
-  }
-
-  // When the visitor adds context, re-scan WITH it so the engine tailors the
-  // seeds + relevance scoring (not just a client-side re-rank). Opt-in only —
-  // the default "Show results" path is unchanged.
-  async function personalizeAndReveal() {
-    if (!companyContext.trim()) { setUsedContext(false); setOppsRevealed(true); return; }
-    setScanError(null);
-    setScanning(true);
-    try {
-      const res = await fetch("/api/signaliq/scan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat, companyContext: companyContext.trim(), turnstileToken: (await waitForToken()) || undefined }),
-      });
-      const data = await res.json();
-      if (res.ok) { setScan(data as ScanResponse); setUsedContext(true); }
-      else setScanError(data.error || "Scan failed.");
-    } catch {
-      setScanError("Network error. Please try again.");
-    } finally {
-      setScanning(false);
-      setOppsRevealed(true);
       resetTurnstile();
     }
   }
@@ -1684,6 +1740,14 @@ export default function SignalIQPage() {
     setEmailDone(true);
   }
 
+  const footerNextLabel =
+    stage === 1 ? "Next: your context →" :
+    stage === 2 ? (companyContext.trim() ? "Scan with my context →" : "Scan →") :
+    stage === 3 ? (selected ? "View the angle →" : "Pick an opportunity") :
+    stage === 4 ? "Generate asset pack →" :
+    stage === 5 ? "Start over ↻" : "Next →";
+  const footerNextDisabled = (stage === 3 && !selected) || scanning || packing;
+
   return (
     <>
       <style>{PAGE_CSS}</style>
@@ -1701,23 +1765,21 @@ export default function SignalIQPage() {
           </>
         }
       />
-      <StepBar step={step} onGoStep={handleGoStep} />
+      {stage > 0 && <SiqWizardProgress stage={stage as WizStage} onGoStage={goStage} />}
 
-      <div style={{ background: PAPER, color: INK, fontFamily: SERIF, minHeight: "100vh" }}>
+      <div style={{ background: PAPER, color: INK, fontFamily: SERIF, minHeight: "100vh", paddingBottom: stage > 0 ? 84 : 0 }}>
 
-        {/* ── Step 0: Intro / landing ───────────────────────────────────── */}
-        {step === 0 && (
+        {/* ── Stage 0: Intro / landing ───────────────────────────────────── */}
+        {stage === 0 && (
           <>
-            <SIQHero onStart={() => setIntro(false)} />
-            {/* Ticker sits tight below the hero, above the CTA */}
+            <SIQHero onStart={() => setStage(1)} />
             <div style={{ marginTop: 12 }}>
               <SourcesTicker />
             </div>
-            {/* Proof bar — the numbers behind the method */}
             <ProofStrip />
             <div style={{ textAlign: "center", padding: "clamp(20px,3vw,36px) clamp(22px,5vw,56px)" }}>
               <button
-                onClick={() => { setIntro(false); }}
+                onClick={() => setStage(1)}
                 style={{
                   padding: "18px 52px", border: "none", background: YEL, color: INK,
                   fontFamily: GROT, fontWeight: 900, fontSize: 17, letterSpacing: ".10em",
@@ -1742,142 +1804,104 @@ export default function SignalIQPage() {
           </>
         )}
 
-        {/* Cloudflare Turnstile human check — fixed at mid-right so it stays
-            mounted and visible across steps 1-3 (scan, personalise, asset pack)
-            without ever landing on the ToolPipelineFooter cards at the bottom
-            of the page (previous bottom-right anchor overlapped them once
-            scrolled to the end). Do not move this back into normal page flow —
-            it must stay visible in the viewport or the token never fires. */}
-        {TURNSTILE_SITE_KEY && !intro && (
+        {/* Cloudflare Turnstile — fixed mid-right, mounted across the wizard
+            (stages 1-5). Must stay in the viewport or the token never fires. */}
+        {TURNSTILE_SITE_KEY && stage > 0 && (
           <div style={{ position: "fixed", top: "50%", right: 24, transform: "translateY(-50%)", zIndex: 89 }}>
             <div ref={turnstileRef} />
           </div>
         )}
 
-        {/* ── Detail view (step 3) ──────────────────────────────────────── */}
-        {selected && (
-          <DetailView
-            opp={selected}
-            pack={pack}
-            packing={packing}
-            packError={packError}
-            onBack={() => { setSelected(null); setPack(null); setPackError(null); }}
-            onRetry={() => generatePack(selected)}
-            email={email}
-            setEmail={setEmail}
-            emailDone={emailDone}
-            unlockEmail={unlockEmail}
-            onDownloadPDF={downloadPDF}
-          />
+        {/* ── Stage 1: Beat ──────────────────────────────────────────────── */}
+        {stage === 1 && (
+          <section style={{ padding: "0 0 40px" }}>
+            <div style={{ padding: "24px clamp(22px,5vw,56px) 0" }}>
+              <p style={{ margin: "0 0 8px", fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+                Step 1 of 5 · pick your beat
+              </p>
+              <h2 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(26px,4vw,38px)", lineHeight: 1.08, letterSpacing: "-0.02em", color: INK }}>
+                Pick your <em style={{ fontStyle: "italic", fontWeight: 600 }}>beat.</em>
+              </h2>
+              <p style={{ margin: 0, maxWidth: 620, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
+                Choose the vertical your <em>target journalists</em> cover — that&rsquo;s where filings, research and news actually discuss your space.
+              </p>
+            </div>
+            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); }} wizardMode />
+          </section>
         )}
 
-        {/* ── Radar (steps 1 & 2) ───────────────────────────────────────── */}
-        {!intro && !selected && (
-          <section style={{ padding: "0 0 40px" }}>
-            {/* Concise step header */}
-            <div style={{ padding: "20px clamp(22px,5vw,56px) 0" }}>
-              {step === 1 && (
-                <p style={{ margin: 0, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
-                  Step 1 | Pick your beat, then scan the live radar
+        {/* ── Stage 2: Context ───────────────────────────────────────────── */}
+        {stage === 2 && (
+          <section style={{ padding: "24px clamp(22px,5vw,56px) 40px" }}>
+            <div style={{ maxWidth: 680 }}>
+              <p style={{ margin: "0 0 8px", fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+                Step 2 of 5 · optional
+              </p>
+              <h2 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(26px,4vw,38px)", lineHeight: 1.08, letterSpacing: "-0.02em", color: INK }}>
+                Tell us about your <em style={{ fontStyle: "italic", fontWeight: 600 }}>startup.</em>
+              </h2>
+              <p style={{ margin: "0 0 22px", fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
+                We expand this into company-specific topics and score every result by how well it fits you — then personalise your pitch pack. Or skip straight to the full radar.
+              </p>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+                  Your startup context
+                </label>
+                <InfoTooltip text="Your context tailors the scan itself: we expand it into company-specific topics and score every result by how well it fits you, then personalise your pitch pack. Takes a few extra seconds." />
+              </div>
+              <textarea
+                value={companyContext}
+                onChange={e => setCompanyContext(e.target.value)}
+                maxLength={400}
+                rows={4}
+                placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital. We have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
+                style={{
+                  width: "100%", boxSizing: "border-box",
+                  fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK,
+                  background: PAPER2, border: `1px solid ${INK15}`,
+                  padding: "14px 16px", resize: "vertical", outline: "none",
+                  lineHeight: 1.6,
+                }}
+              />
+              {companyContext.trim() && (
+                <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
+                  {companyContext.trim().length}/400
                 </p>
               )}
-              {step === 2 && (
-                <p style={{ margin: 0, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
-                  Step 2 | {oppsRevealed ? (usedContext ? "Results personalised to your startup" : "Full radar results") : "Tell us about your startup to personalise your results"}
-                </p>
-              )}
+              <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, borderLeft: `2px solid ${AMBER}`, paddingLeft: 10 }}>
+                Works best when your company operates <em>inside</em> one of these beats (health, fintech, SaaS, AI, etc.). Service or agency businesses (e.g. a marketing/PR firm) will see thinner results.
+              </p>
             </div>
-            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); setOppsRevealed(false); }} onScan={runScan} scanning={scanning} />
+          </section>
+        )}
+
+        {/* ── Stage 3: Radar ─────────────────────────────────────────────── */}
+        {stage === 3 && (
+          <section style={{ padding: "24px 0 40px" }}>
+            <div style={{ padding: "0 clamp(22px,5vw,56px)" }}>
+              <p style={{ margin: 0, fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+                Step 3 of 5 · the radar
+              </p>
+            </div>
 
             {scanning && <ScanLoader />}
 
-            {scanError && (
+            {scanError && !scanning && (
               <div style={{ maxWidth: 620, margin: "20px auto 0", padding: "12px 14px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
                 {scanError}
               </div>
             )}
 
-            {scan && scan.notes.length > 0 && (
+            {!scanning && scan && scan.notes.length > 0 && (
               <p style={{ maxWidth: 620, margin: "18px auto 0", padding: "0 clamp(22px,5vw,56px)", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, textAlign: "center" }}>
                 {scan.notes.join(" ")}
               </p>
             )}
 
-            {scan && scan.opportunities.length > 0 && (
-              <div style={{ padding: "0 clamp(22px,5vw,56px)" }}>
-                <DoubleRule style={{ marginTop: 24, maxWidth: 1400, margin: "24px auto 0" }} />
-
-                {/* Context gate — shown until user reveals opps */}
-                {!oppsRevealed && (
-                  <div style={{ maxWidth: 700, margin: "32px auto 0", textAlign: "center" }}>
-                    <h2 style={{ margin: "0 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px,3vw,32px)", lineHeight: 1.1, color: INK }}>
-                      {scan.opportunities.length} opportunities found
-                    </h2>
-                    <p style={{ margin: "0 0 14px", fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
-                      Add your startup context to personalise the results and your pitch pack, or skip straight to the full radar.
-                    </p>
-                    <p style={{ margin: "0 0 24px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.5, borderLeft: `2px solid ${AMBER}`, paddingLeft: 10, textAlign: "left" }}>
-                      Works best when your company operates <em>inside</em> one of these beats (health, fintech, SaaS, AI, etc.) where SEC filings, research, and news actually discuss your space. Service or agency businesses (e.g. a marketing/PR firm) will see thinner results.
-                    </p>
-                    <div style={{ textAlign: "left", marginBottom: 16 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                        <label style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
-                          Your startup context
-                        </label>
-                        <InfoTooltip text="Your context now tailors the scan itself: we expand it into company-specific topics and score every result by how well it fits you, then personalise your pitch pack. Takes a few extra seconds." />
-                      </div>
-                      <textarea
-                        value={companyContext}
-                        onChange={e => setCompanyContext(e.target.value)}
-                        maxLength={400}
-                        rows={4}
-                        placeholder="e.g. 'We're a B2B SaaS helping SMBs access working capital. We have proprietary data on 10,000+ lending decisions. Our founder is a former Goldman analyst.'"
-                        style={{
-                          width: "100%", boxSizing: "border-box",
-                          fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK,
-                          background: PAPER2, border: `1px solid ${INK15}`,
-                          padding: "12px 14px", resize: "vertical", outline: "none",
-                          lineHeight: 1.6,
-                        }}
-                      />
-                      {companyContext.trim() && (
-                        <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
-                          {companyContext.trim().length}/400
-                        </p>
-                      )}
-                    </div>
-                    <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-                      <button
-                        onClick={personalizeAndReveal}
-                        disabled={scanning}
-                        className="siq-scan-btn"
-                        style={{ fontSize: 13 }}
-                      >
-                        {scanning ? "Personalising…" : companyContext.trim() ? "Show my personalised results →" : "Show results →"}
-                      </button>
-                      <button
-                        onClick={() => { setOppsRevealed(true); setUsedContext(false); }}
-                        style={{
-                          padding: "14px 20px", border: `1px solid ${INK15}`, background: "transparent",
-                          fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".08em",
-                          textTransform: "uppercase", color: INK55, cursor: "pointer",
-                        }}
-                      >
-                        Just browsing →
-                      </button>
-                    </div>
-                    <p style={{ margin: "14px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".08em", textAlign: "center" }}>
-                      {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left this month ·{" "}
-                      <Link href="/tools/signaliq/about" style={{ color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>About the data</Link>
-                    </p>
-                  </div>
-                )}
-
-                {/* Cards + sidebar — revealed after context gate */}
-                {oppsRevealed && (
-                <>
+            {!scanning && scan && scan.opportunities.length > 0 && (
+              <div style={{ padding: "16px clamp(22px,5vw,56px) 0" }}>
                 <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "16px 0 12px", flexWrap: "wrap", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "0 0 12px", flexWrap: "wrap", gap: 8 }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
                       <Pill size={10} ls="0.14em">Radar</Pill>
                       <SCaps size={11} ls="0.14em" color={INK}>
@@ -1902,13 +1926,16 @@ export default function SignalIQPage() {
                     <span><strong style={{ color: INK }}>Coverage gap</strong> = how little press exists yet (Wide = your best pitch window)</span>
                     <Link href="/tools/signaliq/about" style={{ fontWeight: 700, color: INK70, textDecoration: "underline", textDecorationColor: INK15 }}>Full methodology →</Link>
                   </div>
+                  <p style={{ margin: "0 0 14px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+                    Click any opportunity to see the angle, or jump straight to its asset pack.
+                  </p>
                   <HRule style={{ marginBottom: 20 }} />
                 </div>
                 <div className="siq-results-wrap">
                   <div className="siq-cards-col">
                     <div className="siq-cards">
                       {rankedOpps.map((opp) => (
-                        <OppCard key={opp.id} opp={opp} onGenerate={() => generatePack(opp)} />
+                        <OppCard key={opp.id} opp={opp} onSelect={() => pickForAngle(opp)} onGenerate={() => pickForPack(opp)} />
                       ))}
                     </div>
                     {/* Compact newsletter CTA — after results */}
@@ -1939,15 +1966,43 @@ export default function SignalIQPage() {
                   </div>
                   <SourcesSidebar />
                 </div>
-                </>
-                )}
               </div>
             )}
           </section>
         )}
 
-        <ToolPipelineFooter currentTool="signaliq" />
+        {/* ── Stage 4: Angle ─────────────────────────────────────────────── */}
+        {stage === 4 && selected && <AngleView opp={selected} />}
+
+        {/* ── Stage 5: Pack ──────────────────────────────────────────────── */}
+        {stage === 5 && selected && (
+          <PackStage
+            opp={selected}
+            pack={pack}
+            packing={packing}
+            packError={packError}
+            onRetry={() => generatePack(selected)}
+            email={email}
+            setEmail={setEmail}
+            emailDone={emailDone}
+            unlockEmail={unlockEmail}
+            onDownloadPDF={downloadPDF}
+          />
+        )}
+
+        {stage === 0 && <ToolPipelineFooter currentTool="signaliq" />}
       </div>
+
+      {stage > 0 && (
+        <SiqWizardFooter
+          stage={stage as WizStage}
+          onBack={goBack}
+          onNext={goNext}
+          nextLabel={footerNextLabel}
+          nextDisabled={footerNextDisabled}
+          onSkip={stage === 2 ? () => { setCompanyContext(""); setStage(3); scrollTop(); runScan(""); } : undefined}
+        />
+      )}
     </>
   );
 }
@@ -2078,6 +2133,31 @@ const PAGE_CSS = `
     display: flex;
     flex-direction: column;
   }
+  .siq-card-click { cursor: pointer; transition: border-color .12s ease, transform .12s ease, box-shadow .12s ease; }
+  .siq-card-click:hover { border-color: ${INK}; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,20,16,.08); }
+
+  /* wizard footer buttons */
+  .siq-wiz-ghost {
+    background: transparent; border: 1px solid rgba(241,235,222,.3); color: rgba(241,235,222,.9);
+    font-family: ${GROT}; font-weight: 700; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 10px 20px; cursor: pointer; transition: opacity .12s ease;
+  }
+  .siq-wiz-ghost:hover:not(:disabled) { opacity: .8; }
+  .siq-wiz-ghost:disabled { opacity: .3; cursor: default; }
+  .siq-wiz-link {
+    background: transparent; border: none; color: rgba(241,235,222,.55);
+    font-family: ${GROT}; font-weight: 700; font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 10px 12px; cursor: pointer; text-decoration: underline;
+  }
+  .siq-wiz-link:hover { color: rgba(241,235,222,.85); }
+  .siq-wiz-next {
+    background: ${YEL}; border: none; color: ${INK};
+    font-family: ${GROT}; font-weight: 800; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    padding: 11px 26px; cursor: pointer; transition: opacity .12s ease;
+  }
+  .siq-wiz-next:hover:not(:disabled) { opacity: .85; }
+  .siq-wiz-next:disabled { opacity: .4; cursor: default; }
+  @media (max-width: 560px) { .siq-wiz-label { display: none; } }
   .siq-card-head {
     background: ${INK};
     padding: 12px 16px;
