@@ -903,11 +903,9 @@ function OppCard({
           )}
         </div>
       </div>
-      <p style={{ margin: "0 16px 8px", fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: INK55 }}>
-        <span style={{ color: INK }}>In the pack:</span> pitch angle · data brief · who to pitch
-      </p>
       <button onClick={onGenerate} className="siq-gen-btn">
-        Generate asset pack →
+        <span>Generate asset pack →</span>
+        <span className="siq-gen-sub">pitch angle · data brief · who to pitch</span>
       </button>
     </div>
   );
@@ -2098,7 +2096,7 @@ const PAGE_CSS = `
   }
   .siq-gen-btn {
     margin: 0 16px 16px;
-    padding: 12px 14px;
+    padding: 11px 14px;
     border: none;
     background: ${INK};
     color: ${PAPER};
@@ -2109,6 +2107,18 @@ const PAGE_CSS = `
     text-transform: uppercase;
     cursor: pointer;
     transition: opacity 0.12s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .siq-gen-sub {
+    font-family: ${MONO};
+    font-weight: 700;
+    font-size: 8px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: rgba(241,235,222,.55);
   }
   .siq-gen-btn:hover { opacity: 0.85; }
 
