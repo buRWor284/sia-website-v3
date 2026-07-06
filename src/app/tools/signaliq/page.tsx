@@ -761,9 +761,9 @@ function OppCard({
   const signalBySource = Object.fromEntries(opp.signals.map(s => [s.source, s]));
   return (
     <div className="siq-card">
-      {/* INK header strip */}
+      {/* INK header strip — one verdict: band label + score, read as a single rating */}
       <div className="siq-card-head">
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
           <span style={{
             fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em",
             textTransform: "uppercase",
@@ -774,24 +774,48 @@ function OppCard({
           }}>
             {opp.bandLabel}
           </span>
+          <span style={{ color: "rgba(241,235,222,.35)", fontSize: 12 }}>·</span>
+          <span style={{ display: "inline-flex", alignItems: "baseline", gap: 3 }}>
+            <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, letterSpacing: "-0.02em" }}>
+              {opp.score}
+            </span>
+            <span style={{ fontFamily: SERIF, fontSize: 11, color: "rgba(241,235,222,.5)" }}>/ 100</span>
+          </span>
           <InfoTooltip text={BAND_TOOLTIP[opp.band]} dark />
         </span>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginLeft: "auto" }}>
-          <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, letterSpacing: "-0.02em" }}>
-            {opp.score}
-          </span>
-          <span style={{ fontFamily: SERIF, fontSize: 11, color: "rgba(241,235,222,.5)" }}>/ 100</span>
-        </div>
       </div>
       {/* PAPER2 body */}
       <div className="siq-card-body">
         <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 17, lineHeight: 1.2, color: INK, letterSpacing: "-0.01em" }}>
           {opp.headline}
         </h3>
+        {/* Why now — market-timing driver (coverage gap) */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+          <span style={{ flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
+            Why&nbsp;now
+          </span>
+          <div style={{ flex: 1 }}>
+            <GapBar value={opp.components.coverageGap} />
+          </div>
+        </div>
+
+        {/* Why you — relevance to the user's startup (only when personalized) */}
         {opp.fit && (
-          <div><FitBadge fit={opp.fit} /></div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ flexShrink: 0, width: 48, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
+              Why&nbsp;you
+            </span>
+            <span style={{ fontFamily: GROT, fontSize: 11, color: INK70 }}>
+              Fit for your startup:{" "}
+              <span style={{
+                fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em",
+                color: opp.fit === "high" ? GREEN : opp.fit === "medium" ? AMBER : RED,
+              }}>
+                {opp.fit === "high" ? "High" : opp.fit === "medium" ? "Medium" : "Low"}
+              </span>
+            </span>
+          </div>
         )}
-        <GapBar value={opp.components.coverageGap} />
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {opp.signals.map((s, i) =>
             s.source === "sec" ? (
@@ -880,7 +904,7 @@ function OppCard({
         </div>
       </div>
       <p style={{ margin: "0 16px 8px", fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: INK55 }}>
-        Pitch angle · data brief · who to pitch
+        <span style={{ color: INK }}>In the pack:</span> pitch angle · data brief · who to pitch
       </p>
       <button onClick={onGenerate} className="siq-gen-btn">
         Generate asset pack →
