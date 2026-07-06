@@ -1445,7 +1445,7 @@ function SiqWizardFooter({ stage, onBack, onNext, nextLabel, nextDisabled = fals
 }) {
   return (
     <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: DARK, borderTop: `1px solid ${DARK_BD}`, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px clamp(20px,4vw,28px)", zIndex: 60 }}>
-      <button onClick={onBack} disabled={stage === 1} className="siq-wiz-ghost">← Back</button>
+      <button onClick={onBack} className="siq-wiz-ghost">{stage === 1 ? "← Landing" : "← Back"}</button>
       <span style={{ fontFamily: MONO, fontSize: 11, color: "rgba(241,235,222,.55)", letterSpacing: ".08em" }}>{stage} of 5</span>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {onSkip && <button onClick={onSkip} className="siq-wiz-link">Skip →</button>}
@@ -1610,7 +1610,7 @@ export default function SignalIQPage() {
     scrollTop();
   }
   function goBack() {
-    if (stage <= 1) return;
+    if (stage === 1) { setStage(0); scrollTop(); return; }  // Beat → landing
     goStage((stage - 1) as WizStage);
   }
   async function goNext() {
@@ -1804,14 +1804,6 @@ export default function SignalIQPage() {
           </>
         )}
 
-        {/* Cloudflare Turnstile — fixed mid-right, mounted across the wizard
-            (stages 1-5). Must stay in the viewport or the token never fires. */}
-        {TURNSTILE_SITE_KEY && stage > 0 && (
-          <div style={{ position: "fixed", top: "50%", right: 24, transform: "translateY(-50%)", zIndex: 89 }}>
-            <div ref={turnstileRef} />
-          </div>
-        )}
-
         {/* ── Stage 1: Beat ──────────────────────────────────────────────── */}
         {stage === 1 && (
           <section style={{ padding: "0 0 40px" }}>
@@ -1988,6 +1980,15 @@ export default function SignalIQPage() {
             unlockEmail={unlockEmail}
             onDownloadPDF={downloadPDF}
           />
+        )}
+
+        {/* Cloudflare Turnstile — docked in the page flow (not floating) so it
+            never overlaps content on any screen size. Mounted across stages 1-5;
+            managed widget solves on render. Bottom padding clears the fixed footer. */}
+        {TURNSTILE_SITE_KEY && stage > 0 && (
+          <div style={{ display: "flex", justifyContent: "center", padding: "8px 0 32px" }}>
+            <div ref={turnstileRef} />
+          </div>
         )}
 
         {stage === 0 && <ToolPipelineFooter currentTool="signaliq" />}

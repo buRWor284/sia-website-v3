@@ -1369,13 +1369,12 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
           {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} />}
         </div>
 
-        {/* Cloudflare Turnstile human check — renders only when the site key is
-            set. Fixed at mid-right (not bottom-right) so it stays visible above
-            the fixed wizard footer AND never lands on the ToolPipelineFooter
-            cards further down the page. Do not move this into normal page
-            flow — it used to sit below the fold there and never rendered. */}
+        {/* Cloudflare Turnstile human check — docked in the page flow (centered,
+            with bottom padding to clear the fixed wizard footer) so it never
+            overlaps content on any screen size. Matches the PartnerCollabIQ /
+            PressIQ in-flow pattern, which renders reliably in this framework. */}
         {TURNSTILE_SITE_KEY && step>0 && (
-          <div style={{ position:"fixed", top:"50%", right:24, transform:"translateY(-50%)", zIndex:89 }}>
+          <div style={{ display:"flex", justifyContent:"center", padding:"8px 0 96px" }}>
             <div ref={turnstileRef} />
           </div>
         )}
