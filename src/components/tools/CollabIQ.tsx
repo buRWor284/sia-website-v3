@@ -907,10 +907,6 @@ function WizardProgress({ step, onLogoClick, topOffset = 0 }: {
             </button>
           );
         })}
-        <button onClick={onLogoClick} title="Back to intro"
-          style={{ width:24, height:24, background:ACC, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:GF, fontWeight:900, fontSize:9, color:BG0, border:"none", cursor:"pointer", borderRadius:0 }}>
-          SIA
-        </button>
       </div>
     </div>
   );
