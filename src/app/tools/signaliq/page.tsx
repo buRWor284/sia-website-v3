@@ -576,7 +576,7 @@ function StepBar({ step, onGoStep }: { step: 0 | 1 | 2 | 3; onGoStep: (n: 0 | 1 
 
 // ── hero ──────────────────────────────────────────────────────────────────────
 
-function SIQHero() {
+function SIQHero({ onStart }: { onStart: () => void }) {
   return (
     <section style={{ padding: "clamp(12px,2vw,24px) clamp(22px,5vw,56px) 0", position: "relative", overflow: "hidden" }}>
       <div
@@ -615,6 +615,26 @@ function SIQHero() {
           <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 13, color: INK55, lineHeight: 1.5 }}>
             Early signals, not predictions: every opportunity links back to its source.
           </p>
+          {/* Above-the-fold primary CTA — repeated lower on the page after the proof strip */}
+          <div style={{ marginTop: "clamp(18px,2.4vw,26px)" }}>
+            <button
+              onClick={onStart}
+              style={{
+                padding: "15px 40px", border: "none", background: YEL, color: INK,
+                fontFamily: GROT, fontWeight: 900, fontSize: 15, letterSpacing: ".10em",
+                textTransform: "uppercase", cursor: "pointer",
+                boxShadow: "0 4px 20px rgba(245,184,31,.35)",
+                transition: "opacity 0.15s ease",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = "0.88")}
+              onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+            >
+              Start scanning →
+            </button>
+            <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+              {FREE_SCANS} free scans / month, or {EMAIL_SCANS} with your email · no API key needed
+            </p>
+          </div>
         </div>
 
         {/* Right: "How it works" editorial panel */}
@@ -699,7 +719,7 @@ function BeatPicker({
           {scanning ? "Scanning the radar…" : `Scan ${currentBeat?.label} →`}
         </button>
         <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
-          {FREE_SCANS} free scans / month · {EMAIL_SCANS} with your email · live open-data sources
+          {FREE_SCANS} free scans / month, or {EMAIL_SCANS} with your email · live open-data sources
         </p>
       </div>
     </section>
@@ -859,6 +879,9 @@ function OppCard({
           )}
         </div>
       </div>
+      <p style={{ margin: "0 16px 8px", fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: INK55 }}>
+        Pitch angle · data brief · who to pitch
+      </p>
       <button onClick={onGenerate} className="siq-gen-btn">
         Generate asset pack →
       </button>
@@ -1663,7 +1686,7 @@ export default function SignalIQPage() {
         {/* ── Step 0: Intro / landing ───────────────────────────────────── */}
         {step === 0 && (
           <>
-            <SIQHero />
+            <SIQHero onStart={() => setIntro(false)} />
             {/* Ticker sits tight below the hero, above the CTA */}
             <div style={{ marginTop: 12 }}>
               <SourcesTicker />
@@ -1686,7 +1709,7 @@ export default function SignalIQPage() {
                 Start scanning →
               </button>
               <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-                {FREE_SCANS} free scans / month · {EMAIL_SCANS} with your email · no API key needed
+                {FREE_SCANS} free scans / month, or {EMAIL_SCANS} with your email · no API key needed
               </p>
               <p style={{ margin: "8px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".10em" }}>
                 <Link href="/tools/signaliq/about" style={{ color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
@@ -1822,7 +1845,7 @@ export default function SignalIQPage() {
                       </button>
                     </div>
                     <p style={{ margin: "14px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".08em", textAlign: "center" }}>
-                      {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left ·{" "}
+                      {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left this month ·{" "}
                       <Link href="/tools/signaliq/about" style={{ color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>About the data</Link>
                     </p>
                   </div>
@@ -1842,12 +1865,20 @@ export default function SignalIQPage() {
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <SCaps size={10} ls="0.14em" color={INK55}>
-                        {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left
+                        {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left this month
                       </SCaps>
                       <Link href="/tools/signaliq/about" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
                         About the data
                       </Link>
                     </div>
+                  </div>
+                  {/* Legend — explains the band + gap labels at the point of use */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", paddingBottom: 12, fontFamily: MONO, fontSize: 9, letterSpacing: ".04em", color: INK55 }}>
+                    <span style={{ fontWeight: 700, color: INK70, textTransform: "uppercase", letterSpacing: ".10em" }}>How to read this:</span>
+                    <span><strong style={{ color: INK }}>Score</strong> = signal vs. press coverage · Hot ≥80 · Worth a look 60–79 · Early 40–59 · Noise/late &lt;40</span>
+                    <span style={{ color: INK35 }}>|</span>
+                    <span><strong style={{ color: INK }}>Coverage gap</strong> = how little press exists yet (Wide = your best pitch window)</span>
+                    <Link href="/tools/signaliq/about" style={{ fontWeight: 700, color: INK70, textDecoration: "underline", textDecorationColor: INK15 }}>Full methodology →</Link>
                   </div>
                   <HRule style={{ marginBottom: 20 }} />
                 </div>
@@ -1862,7 +1893,7 @@ export default function SignalIQPage() {
                     {!emailDone && (
                       <form onSubmit={unlockEmail} style={{ marginTop: 28, maxWidth: 1100, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
                         <span style={{ fontFamily: SERIF, fontSize: 14, color: INK70, flex: 1, minWidth: 220 }}>
-                          Get <strong>{EMAIL_SCANS} scans/month</strong> + the full earned-media playbook, free.
+                          Get <strong>{EMAIL_SCANS} scans/month</strong> (up from {FREE_SCANS}) + the full earned-media playbook — free.
                         </span>
                         <input
                           type="email"

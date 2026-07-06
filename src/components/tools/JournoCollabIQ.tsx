@@ -30,11 +30,6 @@ const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 const INFO = "#3a7bd5";
 const AMB2 = "#c4900a";
 
-const DARK_T = {
-  BG0: "#0a0908", BG1: "#12110e", BG2: "#1c1a16", BG3: "#262320",
-  BD:  "#2e2820", BDS: "#1e1a14",
-  TX:  "#f1ebde", TX2: "rgba(241,235,222,0.65)", TX3: "rgba(241,235,222,0.38)", TX4: "rgba(241,235,222,0.18)",
-};
 const LIGHT_T = { BG0, BG1, BG2, BG3: BG0, BD, BDS, TX, TX2, TX3, TX4 };
 
 const SF = "var(--font-serif)";
@@ -114,7 +109,6 @@ const V2_GENERIC: AiPartner[] = [
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 type Strategy = "discount" | "institution" | "badge";
-type Theme    = "light" | "dark";
 
 interface AiPartner {
   name: string; url: string; why: string;
@@ -150,7 +144,6 @@ type Action =
 // (2026-07 QA finding). Own keys now; PartnerCollabIQ keeps the old ones.
 const V2_STORE = "journocollabiq_v1_state";
 const V2_SUB   = "journocollabiq_v1_sub";
-const V2_THEME = "journocollabiq_v1_theme";
 
 function initState(): CollabState {
   try {
@@ -655,7 +648,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         <div>
           <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.14em", textTransform:"uppercase", display:"block", marginBottom:6 }}>Want someone to execute this for you?</span>
           <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, fontStyle:"italic", letterSpacing:"-0.01em" }}>Earned Media OS</span>
-          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>the full partnership system, done with you.</span>
+          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>the full system for collaborating with journalists, done with you.</span>
         </div>
         <a href="https://www.syedirfanajmal.com/emos/" target="_blank" rel="noopener noreferrer"
           style={{ ...primaryBtn(), textDecoration:"none", fontSize:11, padding:"12px 22px" }}>
@@ -667,13 +660,12 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
 }
 
 // ── Progress Bar ───────────────────────────────────────────────────────────────
-function WizardProgress({ step, theme, onThemeChange, onLogoClick, topOffset = 0 }: {
-  step: number; theme: Theme;
-  onThemeChange: (t: Theme) => void;
+function WizardProgress({ step, onLogoClick, topOffset = 0 }: {
+  step: number;
   onLogoClick: () => void;
   topOffset?: number;
 }) {
-  const t = theme === "dark" ? DARK_T : LIGHT_T;
+  const t = LIGHT_T;
   const STEPS = ["Story","Offer","Journalists","Angle","Media Brief"];
   return (
     <div style={{ position:"fixed", top:topOffset, left:0, right:0, zIndex:90, background:t.BG0, borderBottom:`1px solid ${t.BDS}` }}>
@@ -695,29 +687,17 @@ function WizardProgress({ step, theme, onThemeChange, onLogoClick, topOffset = 0
             </button>
           );
         })}
-        <div style={{ display:"flex", gap:4, marginLeft:12 }}>
-          {(["light","dark"] as Theme[]).map(m=>(
-            <button key={m} onClick={()=>onThemeChange(m)} aria-label={`${m} theme`}
-              style={{ width:20, height:20, border:`1px solid ${theme===m?ACC:t.BD}`,
-                background:m==="light"?"#f1ebde":"#1a1410", cursor:"pointer",
-                outline:theme===m?`2px solid ${ACC}`:"none", outlineOffset:1, borderRadius:0 }} />
-          ))}
-        </div>
-        <button onClick={onLogoClick} title="Back to intro"
-          style={{ width:24, height:24, background:ACC, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:GF, fontWeight:900, fontSize:9, color:BG0, border:"none", cursor:"pointer", borderRadius:0 }}>
-          SIA
-        </button>
       </div>
     </div>
   );
 }
 
 // ── Footer Nav ─────────────────────────────────────────────────────────────────
-function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled, theme }: {
+function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled }: {
   step: number; onBack: ()=>void; onNext: ()=>void;
-  nextLabel: string; nextDisabled: boolean; theme: Theme;
+  nextLabel: string; nextDisabled: boolean;
 }) {
-  const t = theme === "dark" ? DARK_T : LIGHT_T;
+  const t = LIGHT_T;
   return (
     <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:90,
       background:t.BG0, borderTop:`1px solid ${t.BDS}`, padding:"14px 32px",
@@ -781,7 +761,7 @@ function EmailGate({ show, onClose, onSubscribe }: { show: boolean; onClose: ()=
         ) : (
           <form onSubmit={handleSubmit}>
             <span style={{ ...lbl(TX4), marginBottom:14 }}>One step to download</span>
-            <h3 style={{ fontFamily:SF, fontSize:24, fontWeight:700, color:TX, marginBottom:8, letterSpacing:"-0.02em" }}>Join 2,400+ marketers.</h3>
+            <h3 style={{ fontFamily:SF, fontSize:24, fontWeight:700, color:TX, marginBottom:8, letterSpacing:"-0.02em" }}>Join founders and marketers.</h3>
             <p style={{ fontFamily:GF, fontSize:14, color:TX3, marginBottom:24, lineHeight:1.6 }}>
               Subscribe to unlock your PDF download. Real case studies, zero filler. One or two emails a month.
             </p>
@@ -815,19 +795,16 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
   const [isSub, setIsSub]   = useState(()=>{ try { return !!localStorage.getItem(V2_SUB); } catch { return false; } });
-  const [theme, setTheme]   = useState<Theme>(()=>{ try { return (localStorage.getItem(V2_THEME) as Theme)||"light"; } catch { return "light"; } });
 
   const ind  = state.customInd || state.industry;
   const step = state.step;
 
-  // Apply theme to DOM
+  // Lock to light theme
   useEffect(()=>{
-    const t = theme==="dark"?DARK_T:LIGHT_T;
-    document.documentElement.style.background = t.BG1;
-    document.body.style.background = t.BG1;
-    document.body.style.color = t.TX;
-    try { localStorage.setItem(V2_THEME, theme); } catch { /* noop */ }
-  }, [theme]);
+    document.documentElement.style.background = BG1;
+    document.body.style.background = BG1;
+    document.body.style.color = TX;
+  }, []);
 
   // Persist state
   useEffect(()=>{ try { localStorage.setItem(V2_STORE, JSON.stringify(state)); } catch { /* noop */ } }, [state]);
@@ -858,7 +835,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
       if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
       turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
         sitekey: TURNSTILE_SITE_KEY,
-        theme: theme === "dark" ? "dark" : "light",
+        theme: "light",
         callback: (token: string) => setToken(token),
         // Token expired mid-session — reset so the managed widget re-solves.
         "expired-callback": () => {
@@ -1376,13 +1353,13 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   function goBack() { if(step>0) dispatch({type:"GO",step:step-1}); }
 
   const nextLabels = ["","Continue →","Generate partners →","Continue to outreach →","Build your playbook →",""];
-  const t = theme==="dark"?DARK_T:LIGHT_T;
+  const t = LIGHT_T;
 
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <div className="v2-collabiq" style={{ background:t.BG1, color:t.TX, minHeight:"100vh" }}>
-        {step>0 && <WizardProgress step={step===5 && !!aiBrief ? step : step-1} theme={theme} onThemeChange={setTheme} onLogoClick={()=>dispatch({type:"GO",step:1})} topOffset={toolHeaderHeight} />}
+        {step>0 && <WizardProgress step={step===5 && !!aiBrief ? step : step-1} onLogoClick={()=>dispatch({type:"GO",step:1})} topOffset={toolHeaderHeight} />}
 
         <div key={`stage-${step}`}>
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
@@ -1403,7 +1380,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
           </div>
         )}
 
-        {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} theme={theme} />}
+        {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} />}
 
         {/* Pipeline footer — shown only on the final step as a "what's next?" prompt */}
         {step > 0 && <div style={{ paddingBottom: 72 }}><ToolPipelineFooter currentTool="journocollabiq" compact /></div>}
