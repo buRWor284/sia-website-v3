@@ -358,7 +358,7 @@ function EmailGate({ show, onClose, onUnlock, result }: {
                 One step to download
               </div>
               <p style={{ fontFamily: SERIF, fontSize: 14, color: ra(INK, 0.62), marginBottom: 18, lineHeight: 1.55 }}>
-                Join 2,400+ marketers. Real earned-media playbooks, zero filler. One or two emails a month.
+                Join founders and marketers. Real earned-media playbooks, zero filler. One or two emails a month.
               </p>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
                 style={{ width: "100%", padding: "10px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.6)}`, fontFamily: GROT, fontSize: 13, color: INK, outline: "none", borderRadius: 0, marginBottom: 12 }} />
