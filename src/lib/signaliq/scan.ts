@@ -125,6 +125,14 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
   if (opportunities.length === 0) {
     notes.push("No live signals cleared the bar for this beat right now — try again later.");
   }
+  // Thin-results caution: if a company profile is present but this beat only
+  // cleared a handful of matches, the beat choice itself may be the limiter
+  // (boundary-vertical companies can get starved under the "wrong" beat).
+  if (expansion && opportunities.length > 0 && opportunities.length < 5) {
+    notes.push(
+      `Only ${opportunities.length} strong ${opportunities.length === 1 ? "match" : "matches"} under ${beatById(beat).label} — if your company sits between categories, a different beat may surface more.`,
+    );
+  }
 
   return { opportunities, partial, notes, expansion };
 }

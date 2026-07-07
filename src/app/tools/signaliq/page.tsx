@@ -1907,6 +1907,8 @@ export default function SignalIQPage() {
                     <span><strong style={{ color: INK }}>Score</strong> = signal vs. press coverage · Hot ≥80 · Worth a look 60–79 · Early 40–59 · Noise/late &lt;40</span>
                     <span style={{ color: INK35 }}>|</span>
                     <span><strong style={{ color: INK }}>Coverage gap</strong> = how little press exists yet (Wide = your best pitch window)</span>
+                    <span style={{ color: INK35 }}>|</span>
+                    <span>Wide gap means under-covered, not well-substantiated — check signal count before pitching</span>
                     <Link href="/tools/signaliq/about" style={{ fontWeight: 700, color: INK70, textDecoration: "underline", textDecorationColor: INK15 }}>Full methodology →</Link>
                   </div>
                   <p style={{ margin: "0 0 14px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>

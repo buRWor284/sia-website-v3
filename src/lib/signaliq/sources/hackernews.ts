@@ -33,12 +33,25 @@ export async function hnSignal(seed: string): Promise<Signal | null> {
 
     // Algolia search is fuzzy — keep only stories whose title actually contains
     // a meaningful seed term, so loosely-matched noise (e.g. an unrelated
-    // "Show HN" post) isn't surfaced as the headline.
+    // "Show HN" post) isn't surfaced as the headline. A single generic buzzword
+    // (e.g. "open", "platform") isn't enough on its own — that's how an
+    // unrelated "open-source game platform" post once got attached to the seed
+    // "open banking" (it only shares the word "open"). Require either 2+
+    // distinct seed tokens in the title, or a single match that isn't generic.
+    const GENERIC_TOKENS = new Set([
+      "open", "smart", "digital", "cloud", "mobile", "data", "platform",
+      "market", "service", "services", "tech", "technology", "app", "apps",
+      "software", "system", "systems", "based", "using", "startup", "startups",
+      "growth", "new", "next",
+    ]);
     const seedTokens = seed.toLowerCase().split(/\W+/).filter((w) => w.length > 3);
     const hits = seedTokens.length
       ? all.filter((h) => {
           const t = h.title.toLowerCase();
-          return seedTokens.some((tok) => t.includes(tok));
+          const matched = seedTokens.filter((tok) => t.includes(tok));
+          if (matched.length === 0) return false;
+          if (matched.length === 1) return !GENERIC_TOKENS.has(matched[0]);
+          return true;
         })
       : all;
     if (!hits.length) return null;

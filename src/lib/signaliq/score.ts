@@ -98,7 +98,11 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
       fitTier = rated;
     } else {
       const r = companyRelevance(relText, expansion, false);
-      fitTier = r >= 0.4 ? "medium" : "low";
+      // Threshold raised from 0.4 → 0.6: two incidental generic-theme-word
+      // hits (0.2 each) used to be enough to earn "medium" for an otherwise
+      // unrelated, non-tailored topic. Now needs ~3 real theme hits (or 2 +
+      // partial signal) before we call it medium instead of low.
+      fitTier = r >= 0.6 ? "medium" : "low";
     }
     relevance = fitTier === "high" ? 0.9 : fitTier === "medium" ? 0.55 : 0.2;
   }
