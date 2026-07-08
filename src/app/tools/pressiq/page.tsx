@@ -540,7 +540,8 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
 // ── Loading panel ─────────────────────────────────────────────────────────────
 function LoadingPanel() {
   // Elapsed-time counter + expectation setting: the AI scoring call routinely
-  // takes 20-30s and QA flagged that users assume the tool froze without it.
+  // takes 30-60s in practice (real-world testing ran 1.5-2x past the original
+  // 20-30s estimate) and QA flagged that users assume the tool froze without it.
   const [secs, setSecs] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setSecs(s => s + 1), 1000);
@@ -552,7 +553,7 @@ function LoadingPanel() {
         Scoring against 32 factors across 7 dimensions…
       </div>
       <div style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.45), marginBottom: 24, textAlign: "center" }}>
-        {secs}s elapsed · a full analysis typically takes 20-30 seconds
+        {secs}s elapsed · a full analysis typically takes 30-60 seconds
       </div>
       <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.5), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
         Cision State of the Media 2026 (n≈1,800)<br />
@@ -853,28 +854,27 @@ export default function PressIQPage() {
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
 
-  // localStorage persist
+  // localStorage persist — preferences only (platform/brand/pitchMode/store).
+  // Pitch, query, subject, and journalistBeat are the pitch's actual content, not
+  // a preference — restoring those made every fresh visit reopen with a stale
+  // pitch from a previous session, so they're intentionally excluded here.
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         const d = JSON.parse(raw) as Record<string, unknown>;
-        if (typeof d.pitch    === "string") setPitch(d.pitch);
-        if (typeof d.query    === "string") setQuery(d.query);
-        if (typeof d.subject  === "string") setSubject(d.subject);
         if (typeof d.platform === "string") setPlatform(d.platform as Platform);
         if (d.brand && typeof d.brand === "object") setBrand({ ...EMPTY_BRAND, ...(d.brand as Partial<BrandSignals>) });
         if (d.pitchMode === "standalone" || d.pitchMode === "query") setPitchMode(d.pitchMode as "standalone" | "query");
-        if (typeof d.journalistBeat === "string") setJournalistBeat(d.journalistBeat);
         if (typeof d.store === "boolean") setStore(d.store);
       }
     } catch { /* ignore */ }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ pitch, query, subject, platform, brand, pitchMode, journalistBeat, store })); } catch { /* ignore */ }
-  }, [pitch, query, subject, platform, brand, pitchMode, journalistBeat, store]);
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ platform, brand, pitchMode, store })); } catch { /* ignore */ }
+  }, [platform, brand, pitchMode, store]);
 
   // Cloudflare Turnstile: render the human-check widget when configured. No-op when
   // NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset, so the tool keeps working without it.

@@ -76,6 +76,20 @@ const V2_LOADING = [
   { h: "Almost there.",                                      s: "Compiling a media list that would take an agency a week." },
 ];
 
+// Elapsed-time counter, matching the pattern rolled out to PressIQ/SignalIQ —
+// a standalone component so it resets naturally each time it mounts (i.e. each
+// time a fresh loading run starts), with no manual reset call needed. No
+// "typically Xs" claim here yet since JournoCollabIQ's real-world research time
+// hasn't been measured the way PressIQ's was; add that once observed.
+function ElapsedSecs() {
+  const [secs, setSecs] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSecs(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return <>{secs}</>;
+}
+
 // Fallback mock journalists — only shown if the API key is missing or Claude returns invalid JSON.
 // These are plausible beat reporters used for UI demonstration only.
 // Verify names, outlets, and contacts before any real outreach.
@@ -365,7 +379,7 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
         <div style={{ background: BG2, border: `1px solid ${BD}`, padding: 28, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(245,184,31,0.6)" }}>JournoCollabIQ · Live Research</span>
-            <span style={{ fontFamily: MF, fontSize: 9, color: TX4 }}>Step {(loadingIdx % V2_LOADING.length) + 1}/{V2_LOADING.length}</span>
+            <span style={{ fontFamily: MF, fontSize: 9, color: TX4 }}><ElapsedSecs />s elapsed · Step {(loadingIdx % V2_LOADING.length) + 1}/{V2_LOADING.length}</span>
           </div>
           <div className="v2-stage-animate">
             <div style={{ fontFamily: SF, fontSize: 20, fontWeight: 700, color: TX, marginBottom: 6 }}>{msg.h}</div>

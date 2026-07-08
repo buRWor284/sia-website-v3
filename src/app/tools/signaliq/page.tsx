@@ -239,6 +239,15 @@ function ScanLoader() {
     const id = setInterval(() => setI((n) => (n + 1) % SCAN_STATS.length), 5000);
     return () => clearInterval(id);
   }, []);
+  // Elapsed-time counter, matching the pattern rolled out to PressIQ — QA found
+  // users assume a long-running AI call has frozen without one. No "typically Xs"
+  // claim here yet since SignalIQ's real-world scan time hasn't been measured
+  // the way PressIQ's was; add that once observed.
+  const [secs, setSecs] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setSecs(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
   const s = SCAN_STATS[i];
   return (
     <div className="siq-loader" role="status" aria-live="polite">
@@ -247,6 +256,9 @@ function ScanLoader() {
           Scanning 5 live sources
         </span>
         <div className="siq-loader-bar"><span /></div>
+      </div>
+      <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: INK55, textAlign: "center", marginTop: 8 }}>
+        {secs}s elapsed
       </div>
       <div className="siq-loader-feeds">
         {SOURCES_DATA.map((src, idx) => (
@@ -1550,23 +1562,24 @@ function SiqWizardFooter({ stage, onBack, onNext, nextLabel, nextDisabled = fals
 export default function SignalIQPage() {
   const [beat, setBeat] = useState<BeatId>("saas");
   const [companyContext, setCompanyContext] = useState("");
-  // Persist the chosen beat + startup context across reloads (PressIQ does the
-  // same with the pitch). Restore on mount, save on change.
+  // Persist the chosen beat (a preference) across reloads. companyContext is the
+  // user's actual free-text input, not a preference — restoring it made every
+  // fresh visit reopen with stale company context from a previous session, so
+  // it's intentionally excluded here (same fix applied to PressIQ's pitch/beat).
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     try {
       const raw = localStorage.getItem("signaliq_v1_input");
       if (raw) {
-        const d = JSON.parse(raw) as { beat?: string; companyContext?: string };
+        const d = JSON.parse(raw) as { beat?: string };
         if (typeof d.beat === "string" && BEATS.some((b) => b.id === d.beat)) setBeat(d.beat as BeatId);
-        if (typeof d.companyContext === "string") setCompanyContext(d.companyContext);
       }
     } catch { /* ignore */ }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
-    try { localStorage.setItem("signaliq_v1_input", JSON.stringify({ beat, companyContext })); } catch { /* ignore */ }
-  }, [beat, companyContext]);
+    try { localStorage.setItem("signaliq_v1_input", JSON.stringify({ beat })); } catch { /* ignore */ }
+  }, [beat]);
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);
