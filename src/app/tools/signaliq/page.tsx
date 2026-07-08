@@ -240,9 +240,10 @@ function ScanLoader() {
     return () => clearInterval(id);
   }, []);
   // Elapsed-time counter, matching the pattern rolled out to PressIQ — QA found
-  // users assume a long-running AI call has frozen without one. No "typically Xs"
-  // claim here yet since SignalIQ's real-world scan time hasn't been measured
-  // the way PressIQ's was; add that once observed.
+  // users assume a long-running AI call has frozen without one. The "typically
+  // 30-60 seconds" estimate reuses PressIQ's observed range as a placeholder
+  // (Irfan's call, 08 Jul) since SignalIQ's own real-world scan time hasn't been
+  // separately measured yet — revisit once it has.
   const [secs, setSecs] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setSecs(s => s + 1), 1000);
@@ -258,7 +259,7 @@ function ScanLoader() {
         <div className="siq-loader-bar"><span /></div>
       </div>
       <div style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: INK55, textAlign: "center", marginTop: 8 }}>
-        {secs}s elapsed
+        {secs}s elapsed · typically takes 30-60 seconds
       </div>
       <div className="siq-loader-feeds">
         {SOURCES_DATA.map((src, idx) => (

@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
     pitch,
     query: typeof raw.query === "string" ? raw.query : undefined,
     subject: typeof raw.subject === "string" ? raw.subject : undefined,
-    platform: (["haro", "qwoted", "sos", "featured", "b2bwriter"].includes(String(raw.platform))
+    platform: (["haro", "qwoted", "sos", "featured", "b2bwriter", "direct"].includes(String(raw.platform))
       ? raw.platform
       : "haro") as PitchInput["platform"],
     brandSignals: raw.brandSignals ? coerceBrand(raw.brandSignals) : EMPTY_BRAND,

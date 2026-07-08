@@ -876,6 +876,18 @@ export default function PressIQPage() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify({ platform, brand, pitchMode, store })); } catch { /* ignore */ }
   }, [platform, brand, pitchMode, store]);
 
+  // Standalone pitches don't go through a source-request platform, so keep the
+  // platform value in sync with pitchMode: "direct" while standalone (no
+  // HARO/Qwoted-style chips shown, so the value has to be set programmatically),
+  // and reset off "direct" back to the default request-platform once the user
+  // switches to answering a query.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (pitchMode === "standalone") setPlatform("direct");
+    else setPlatform(p => (p === "direct" ? "haro" : p));
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [pitchMode]);
+
   // Cloudflare Turnstile: render the human-check widget when configured. No-op when
   // NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset, so the tool keeps working without it.
   useEffect(() => {
@@ -1338,7 +1350,7 @@ export default function PressIQPage() {
             </span>
             <span className="piq-step-connector" />
             <span className={`piq-step ${view === "post" ? "active" : ""}`}>
-              <span className="piq-step-no">3</span> Score
+              <span className="piq-step-no">3</span> Results
             </span>
           </nav>
         )}
@@ -1409,12 +1421,21 @@ export default function PressIQPage() {
                   <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
                 </div>
 
-                <div style={LSEC}>
-                  <span style={LSEC_LBL}>Platform</span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                    {PLATFORMS.map(p => <button key={p.id} onClick={() => setPlatform(p.id)} style={chipStyle(platform === p.id)}>{p.label}</button>)}
+                {pitchMode === "query" ? (
+                  <div style={LSEC}>
+                    <span style={LSEC_LBL}>Platform</span>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                      {PLATFORMS.filter(p => p.id !== "direct").map(p => <button key={p.id} onClick={() => setPlatform(p.id)} style={chipStyle(platform === p.id)}>{p.label}</button>)}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div style={LSEC}>
+                    <span style={LSEC_LBL}>Platform</span>
+                    <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block" }}>
+                      Scored as direct outreach (email, social, DM) — professional tone assumed. Switch to &ldquo;Answering a query&rdquo; on the previous step if you&rsquo;re responding to a HARO / Qwoted / Featured request instead.
+                    </em>
+                  </div>
+                )}
 
                 <div style={LSEC}>
                   <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
@@ -1423,6 +1444,9 @@ export default function PressIQPage() {
                       <button key={key} onClick={() => setBrand(b => ({ ...b, [key]: !b[key] }))} style={chipStyle(brand[key])}>{label}</button>
                     ))}
                   </div>
+                  <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block", marginTop: 10 }}>
+                    Selecting these doesn&rsquo;t add points on its own — your pitch text still has to show the proof (a link, a named outlet, a mention of a talk) for it to count. Only affects Personal Branding, the smallest-weighted of your 7 score dimensions.
+                  </em>
                 </div>
 
                 <div style={{ ...LSEC, borderBottom: "none" }}>
@@ -1482,6 +1506,7 @@ const PAGE_CSS = `
   .piq-step-connector{width:28px;height:1px;background:${ra(INK,0.12)}}
   .piq-col{max-width:860px;width:100%;margin:0 auto;padding:32px 20px 64px;display:flex;flex-direction:column;gap:28px;flex:1}
   .piq-form-card{background:${DARK2};border:1px solid ${DARK_BD};border-radius:6px;overflow:hidden}
+  .piq-form-card ::selection{background:${YEL};color:${DARK}}
   .piq-field:focus{border-color:${ra(YEL,0.5)} !important;outline:none}
   .piq-field::placeholder{color:${ra(PAPER,0.22)}}
   .piq-ghost{background:none;border:none;cursor:pointer;font-family:${MONO};font-size:9px;color:${ra(PAPER,0.35)};padding:0;transition:color .1s}

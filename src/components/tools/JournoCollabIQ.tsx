@@ -78,9 +78,10 @@ const V2_LOADING = [
 
 // Elapsed-time counter, matching the pattern rolled out to PressIQ/SignalIQ —
 // a standalone component so it resets naturally each time it mounts (i.e. each
-// time a fresh loading run starts), with no manual reset call needed. No
-// "typically Xs" claim here yet since JournoCollabIQ's real-world research time
-// hasn't been measured the way PressIQ's was; add that once observed.
+// time a fresh loading run starts), with no manual reset call needed. The
+// "typically 30-60s" estimate reuses PressIQ's observed range as a placeholder
+// (Irfan's call, 08 Jul) since JournoCollabIQ's own research time hasn't been
+// separately measured yet — revisit once it has.
 function ElapsedSecs() {
   const [secs, setSecs] = useState(0);
   useEffect(() => {
@@ -379,7 +380,7 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
         <div style={{ background: BG2, border: `1px solid ${BD}`, padding: 28, marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(245,184,31,0.6)" }}>JournoCollabIQ · Live Research</span>
-            <span style={{ fontFamily: MF, fontSize: 9, color: TX4 }}><ElapsedSecs />s elapsed · Step {(loadingIdx % V2_LOADING.length) + 1}/{V2_LOADING.length}</span>
+            <span style={{ fontFamily: MF, fontSize: 9, color: TX4 }}><ElapsedSecs />s elapsed (typically 30-60s) · Step {(loadingIdx % V2_LOADING.length) + 1}/{V2_LOADING.length}</span>
           </div>
           <div className="v2-stage-animate">
             <div style={{ fontFamily: SF, fontSize: 20, fontWeight: 700, color: TX, marginBottom: 6 }}>{msg.h}</div>

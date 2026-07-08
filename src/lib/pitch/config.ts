@@ -17,13 +17,18 @@ export const EMOS_APPLY = "https://dmr.agency/earnedmediaos/apply/";
 export const FREE_LIMIT = 3; // scores / month, anonymous
 export const EMAIL_LIMIT = 10; // scores / month, with email
 
-/** D-7: one rubric + light per-platform overrides. */
+/** D-7: one rubric + light per-platform overrides.
+ *  "direct" (added 08 Jul 2026) covers standalone outreach with no source-request
+ *  platform involved — cold email, social/DM, etc. Not shown as a pickable chip
+ *  (query-mode platforms don't apply to standalone pitches); the tool sets it
+ *  automatically when pitchMode === "standalone". See src/app/tools/pressiq/page.tsx. */
 export const PLATFORMS: { id: Platform; label: string; formal: boolean }[] = [
   { id: "haro", label: "HARO / Connectively", formal: true },
   { id: "qwoted", label: "Qwoted", formal: true },
   { id: "sos", label: "Source of Sources", formal: true },
   { id: "featured", label: "Featured", formal: true },
   { id: "b2bwriter", label: "Help a B2B Writer", formal: false },
+  { id: "direct", label: "Direct outreach (email, social, DM)", formal: true },
 ];
 
 /** Composite weights (sum = 1.0). LIVE — read by composite.ts. Relevance redistributes

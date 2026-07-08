@@ -3,7 +3,7 @@
  * See docs/PressIQ-RFP.md for the full spec.
  */
 
-export type Platform = "haro" | "qwoted" | "sos" | "featured" | "b2bwriter";
+export type Platform = "haro" | "qwoted" | "sos" | "featured" | "b2bwriter" | "direct";
 
 export interface BrandSignals {
   website: boolean;
