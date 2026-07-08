@@ -19,6 +19,27 @@ import { RELEVANCE_FLOOR, WEIGHTS, bandFor, beatById, isSensitive } from "./conf
 const clamp01 = (n: number): number => Math.max(0, Math.min(1, Number.isFinite(n) ? n : 0));
 const maxOr0 = (xs: number[]): number => (xs.length ? Math.max(...xs) : 0);
 
+// Trend-direction guard (found 2026-07-08, see SignalIQ-Notes-and-TODOs.md "Scoring
+// logic gap"): a falling coverage.volume used to score identically whether the
+// underlying signals were rising (real whitespace — you're ahead of the coverage) or
+// also falling (the topic has peaked and is cooling off). |trend| below this is noise.
+const COOLING_TREND_EPS = 0.05;
+// Residual credit given to the coverage gap when the topic is cooling — not zeroed
+// entirely (data is noisy / short windows), but heavily discounted vs. real whitespace.
+const COOLING_GAP_DISCOUNT = 0.15;
+
+/**
+ * True when press coverage is trending down AND no signal source shows real upward
+ * movement (each source's `trend` if known, else its `velocity` — which is always
+ * >= 0 — as a conservative fallback). In that state, low/falling coverage is NOT
+ * whitespace; it's a topic that already peaked. See notes above.
+ */
+export function isCooling(coverage: Coverage | null, signals: Signal[]): boolean {
+  if (!coverage) return false; // unknown coverage → don't penalise
+  const bestTrend = maxOr0(signals.map((s) => s.trend ?? s.velocity));
+  return coverage.trend < -COOLING_TREND_EPS && bestTrend <= COOLING_TREND_EPS;
+}
+
 /** Beat-fit: overlap between the topic text and the beat's seed vocabulary. */
 export function beatFit(topic: string, beat: BeatId): number {
   const seeds = new Set(
@@ -80,7 +101,11 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
   const velocity = clamp01(maxOr0(signals.map((s) => s.velocity)));
   const credibility = clamp01(maxOr0(signals.map((s) => s.credibility)));
   // Unknown coverage → neutral 0.5 (don't reward or punish the gap blindly).
-  const coverageGap = coverage ? clamp01(1 - coverage.volume) : 0.5;
+  const rawCoverageGap = coverage ? clamp01(1 - coverage.volume) : 0.5;
+  // Cooling topic (falling coverage + nothing rising) → discount the gap heavily so
+  // it isn't framed as whitespace. See isCooling() above.
+  const cooling = isCooling(coverage, signals);
+  const coverageGap = cooling ? clamp01(rawCoverageGap * COOLING_GAP_DISCOUNT) : rawCoverageGap;
   const fit = beatFit(topic, beat);
   const corr = corroboration(signals);
 
@@ -135,6 +160,7 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     relevanceMultiplier: rankWeight,
     tailored,
     fit: fitTier,
+    cooling,
     coverage,
     signals,
     sensitive,

@@ -12,6 +12,7 @@ Rules you MUST follow:
 - This is an early signal, NOT a prediction. Never claim the story will break or use forecast language. Frame it as being "ahead of the coverage."
 - Ground everything in the SIGNAL DATA provided. Do not invent statistics, quotes, studies, or events. You may add widely-known context, but never fabricate specifics.
 - Never invent the names of specific real journalists, and never make allegations about named private individuals. For outreach targets, give the OUTLET and the DESK/beat (e.g. "Consumer-finance reporter at American Banker"), not a fabricated person.
+- Whitespace only exists when the underlying activity is rising (or steady) while press coverage lags behind it. If the signal data says this topic is COOLING (falling or flat activity AND falling press coverage), do NOT call it whitespace, a lead, or "ahead of the coverage" — that framing is backwards. Instead frame it as retrospective/analysis context at most, and say plainly in "cautions" that coverage of this topic already peaked.
 - Write in the founder's first-person voice: direct, specific, no hype, no corporate fluff.
 - If the data is thin or ambiguous, say so plainly in "cautions".
 - The pitch must give a journalist a reason to care now AND offer something only this founder can add (original data, a customer example, or a distinctive point of view).`;
@@ -70,7 +71,11 @@ export function buildPackPrompt(opp: Opportunity, companyContext?: string): stri
   const cov = opp.coverage
     ? `Press coverage so far: ${(opp.coverage.volume * 100).toFixed(0)}% of saturation (trend ${
         opp.coverage.trend >= 0 ? "+" : ""
-      }${(opp.coverage.trend * 100).toFixed(0)}%). Lower = bigger gap = more headroom.`
+      }${(opp.coverage.trend * 100).toFixed(0)}%). ${
+        opp.cooling
+          ? "This trend is FALLING alongside flat-or-falling signal activity — the topic is cooling off, not building toward a lead. Do NOT frame this as whitespace or a story about to break."
+          : "Lower coverage + rising/steady signal activity = real headroom (you are ahead of the coverage)."
+      }`
     : "Press coverage so far: unknown.";
 
   const contextBlock = companyContext?.trim()

@@ -6,7 +6,7 @@
  */
 import type { Signal } from "../types";
 import { SOURCE_CREDIBILITY } from "../config";
-import { clamp01, getJson, isoDaysAgo } from "./http";
+import { clamp, clamp01, getJson, isoDaysAgo } from "./http";
 import { createLimiter } from "./throttle";
 
 const FTS = "https://efts.sec.gov/LATEST/search-index?q=";
@@ -38,9 +38,13 @@ export async function secSignal(seed: string): Promise<Signal | null> {
     const priorMonthly = prior / 2;
 
     const magnitude = clamp01(recent / FILINGS_CAP);
-    const velocity = clamp01(
-      priorMonthly > 0 ? (recent - priorMonthly) / Math.max(priorMonthly, 1) : recent > 3 ? 1 : 0.5,
-    );
+    const rawVelocity =
+      priorMonthly > 0 ? (recent - priorMonthly) / Math.max(priorMonthly, 1) : recent > 3 ? 1 : 0.5;
+    const velocity = clamp01(rawVelocity);
+    // `velocity` floors any decline at 0 (same as "flat") so the scorer can compare
+    // magnitudes. `trend` keeps the sign so a genuine decline isn't lost — see
+    // SignalIQ-Notes-and-TODOs.md, "Scoring logic gap" (2026-07-08).
+    const trend = priorMonthly > 0 ? clamp(rawVelocity, -1, 1) : velocity;
 
     return {
       source: "sec",
@@ -50,6 +54,7 @@ export async function secSignal(seed: string): Promise<Signal | null> {
       observedAt: new Date().toISOString(),
       magnitude,
       velocity,
+      trend,
       credibility: SOURCE_CREDIBILITY.sec,
       detail: `${recent} filings vs ~${priorMonthly.toFixed(0)}/mo prior`,
     };

@@ -28,7 +28,13 @@ export interface Signal {
   url: string;          // primary-source link (the receipt)
   observedAt: string;   // ISO timestamp
   magnitude: number;    // 0..1 — how large/unusual vs the source's own baseline
-  velocity: number;     // 0..1 — how fast it's accelerating
+  velocity: number;     // 0..1 — how fast it's accelerating (floored at 0; a real decline
+                         // looks identical to "flat" here — use `trend` for direction)
+  /** Signed direction when the source can compute it: -1 (falling) .. 0 (flat) .. 1 (rising).
+   *  Optional — sources that can't tell direction omit it, and callers fall back to
+   *  `velocity` (non-negative). Added so a genuinely falling signal isn't indistinguishable
+   *  from a flat one in scoring. See SignalIQ-Notes-and-TODOs.md, "Scoring logic gap" (2026-07-08). */
+  trend?: number;
   credibility: number;  // 0..1 — source trust weight (from config)
   detail?: string;      // one-line human context (counts, points, etc.)
   raw?: Record<string, unknown>;
@@ -69,6 +75,10 @@ export interface Opportunity {
   tailored?: boolean;
   /** Fit tier shown as a badge — only set when a company profile is present. */
   fit?: "high" | "medium" | "low";
+  /** True when press coverage AND every signal source are flat-or-falling — the topic is
+   *  cooling off, not building toward a lead. Whitespace / "ahead of the coverage" framing
+   *  should not apply. See SignalIQ-Notes-and-TODOs.md, "Scoring logic gap" (2026-07-08). */
+  cooling?: boolean;
   coverage: Coverage | null;
   signals: Signal[];       // the receipts
   sensitive: boolean;      // tasteful-newsjacking flag (RFP §11.4)
