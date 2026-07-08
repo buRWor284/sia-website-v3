@@ -37,6 +37,15 @@ export interface Signal {
   trend?: number;
   credibility: number;  // 0..1 — source trust weight (from config)
   detail?: string;      // one-line human context (counts, points, etc.)
+  /** True when the recent/baseline counts are too small to responsibly headline a
+   *  % change (e.g. "64% decline" off a handful of filings). Copy/prompts should
+   *  fall back to "sample too small to call a trend" instead. Baseline sanity check
+   *  v1, see SignalIQ-Notes-and-TODOs.md (2026-07-08). */
+  lowSample?: boolean;
+  /** True (SEC only) when one filer accounts for most of the sampled baseline
+   *  filings — the baseline may reflect one company's disclosure schedule, not a
+   *  market-wide pattern. Same v1 baseline sanity check as `lowSample`. */
+  singleFilerDominant?: boolean;
   raw?: Record<string, unknown>;
 }
 
@@ -47,6 +56,9 @@ export interface Coverage {
   trend: number;        // -1..1 — coverage rising (+) or falling (-)
   articleCount: number;
   source: "gdelt";
+  /** True when too few days of history are available to responsibly state a trend
+   *  %. Baseline sanity check v1, see SignalIQ-Notes-and-TODOs.md (2026-07-08). */
+  lowSample?: boolean;
 }
 
 export type OppBand = "hot" | "look" | "early" | "noise";

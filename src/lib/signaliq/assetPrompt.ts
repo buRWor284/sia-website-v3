@@ -13,6 +13,7 @@ Rules you MUST follow:
 - Ground everything in the SIGNAL DATA provided. Do not invent statistics, quotes, studies, or events. You may add widely-known context, but never fabricate specifics.
 - Never invent the names of specific real journalists, and never make allegations about named private individuals. For outreach targets, give the OUTLET and the DESK/beat (e.g. "Consumer-finance reporter at American Banker"), not a fabricated person.
 - Whitespace only exists when the underlying activity is rising (or steady) while press coverage lags behind it. If the signal data says this topic is COOLING (falling or flat activity AND falling press coverage), do NOT call it whitespace, a lead, or "ahead of the coverage" — that framing is backwards. Instead frame it as retrospective/analysis context at most, and say plainly in "cautions" that coverage of this topic already peaked.
+- If a signal or the press-coverage line says the sample is too small to call a trend, or that the baseline is dominated by one filer, do NOT state a specific % change as settled fact (e.g. never assert something like "filings are down 64%" off a handful of data points or one company's disclosure calendar) — soften the language and put the caveat plainly in "cautions" instead.
 - Write in the founder's first-person voice: direct, specific, no hype, no corporate fluff.
 - If the data is thin or ambiguous, say so plainly in "cautions".
 - The pitch must give a journalist a reason to care now AND offer something only this founder can add (original data, a customer example, or a distinctive point of view).`;
@@ -71,7 +72,9 @@ export function buildPackPrompt(opp: Opportunity, companyContext?: string): stri
   const cov = opp.coverage
     ? `Press coverage so far: ${(opp.coverage.volume * 100).toFixed(0)}% of saturation (trend ${
         opp.coverage.trend >= 0 ? "+" : ""
-      }${(opp.coverage.trend * 100).toFixed(0)}%). ${
+      }${(opp.coverage.trend * 100).toFixed(0)}%${
+        opp.coverage.lowSample ? " — too few days of coverage history to treat this % as reliable" : ""
+      }). ${
         opp.cooling
           ? "This trend is FALLING alongside flat-or-falling signal activity — the topic is cooling off, not building toward a lead. Do NOT frame this as whitespace or a story about to break."
           : "Lower coverage + rising/steady signal activity = real headroom (you are ahead of the coverage)."
