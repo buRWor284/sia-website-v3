@@ -7,7 +7,7 @@
 
 import type { AssetPack, Opportunity } from "@/lib/signaliq/types";
 import {
-  PAGE, C, fitLine, coverPage, runningHeader, sectionMast, badge, renderRich, stampFooters,
+  PAGE, C, fitLine, coverPage, runningHeader, sectionMast, badge, renderRich, stampFooters, installSanitizer,
   type PdfDoc, type RGB, type HeaderOpts,
 } from "./house-style";
 
@@ -33,6 +33,7 @@ function gap(v: number): { label: string; color: RGB } {
 }
 
 export function buildSignalIqReport(doc: PdfDoc, d: SignalIqReportData): void {
+  installSanitizer(doc);
   const { W, H, M } = PAGE;
   const date = new Date(d.generatedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 

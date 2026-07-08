@@ -1150,28 +1150,22 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
         </div>
       </div>
 
-      {/* PDF download — email gated */}
+      {/* PDF download — first click opens a one-step email unlock, same pattern as PressIQ */}
       <div style={{ marginTop: 20, padding: "16px 20px", border: `1px solid ${INK15}`, background: PAPER2, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div>
           <SCaps size={10} ls="0.14em" color={INK}>Download full report</SCaps>
           <p style={{ margin: "4px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.4 }}>
             PDF covering all three steps: opportunities, asset pack, sources, and pitch angle.
-            {!emailDone && " Requires newsletter subscription."}
+            {!emailDone && " First download asks for your email — one step, then it's yours."}
           </p>
         </div>
-        {emailDone ? (
-          <button
-            onClick={onDownloadPDF}
-            className="siq-scan-btn"
-            style={{ fontSize: 12, padding: "12px 22px", whiteSpace: "nowrap" }}
-          >
-            Download PDF →
-          </button>
-        ) : (
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase", color: INK35 }}>
-            Unlock with email above ↑
-          </span>
-        )}
+        <button
+          onClick={onDownloadPDF}
+          className="siq-scan-btn"
+          style={{ fontSize: 12, padding: "12px 22px", whiteSpace: "nowrap" }}
+        >
+          Download PDF →
+        </button>
       </div>
     </div>
   );
@@ -1222,6 +1216,99 @@ function EmailGate({
         </button>
       </div>
     </form>
+  );
+}
+
+// ── PDF download gate (modal) ───────────────────────────────────────────────
+// Same pattern as PressIQ: clicking "Download PDF" always works. The first
+// click opens this one-step modal (report preview + a single email field);
+// submitting unlocks and downloads immediately, no separate box to go hunt for.
+function PdfDownloadGate({
+  show,
+  onClose,
+  email,
+  setEmail,
+  submitting,
+  onSubmit,
+  opp,
+  pack,
+}: {
+  show: boolean;
+  onClose: () => void;
+  email: string;
+  setEmail: (v: string) => void;
+  submitting: boolean;
+  onSubmit: (e: React.FormEvent) => void;
+  opp: Opportunity | null;
+  pack: AssetPack | null;
+}) {
+  if (!show) return null;
+  return (
+    <div
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+    >
+      <div role="dialog" aria-modal="true" aria-label="Download your SignalIQ report" style={{ background: PAPER2, border: `1px solid ${INK}`, maxWidth: 480, width: "100%", overflow: "hidden" }}>
+        {/* Preview header */}
+        <div style={{ background: INK, padding: "24px 28px" }}>
+          <div style={{ fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".20em", textTransform: "uppercase", color: YEL, marginBottom: 10 }}>
+            SignalIQ · Asset Pack Report
+          </div>
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, lineHeight: 1.3, color: PAPER, marginBottom: 4 }}>
+            {opp?.headline ?? pack?.headline ?? "Your asset pack"}
+          </div>
+          {opp && (
+            <div style={{ fontFamily: GROT, fontSize: 10, letterSpacing: ".08em", color: "rgba(241,235,222,.55)" }}>
+              {opp.bandLabel} · {opp.score}/100
+            </div>
+          )}
+          <div style={{ marginTop: 14, display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {["Radar Results", "Selected Opportunity", "Asset Pack", "Sources"].map((s) => (
+              <span key={s} style={{ padding: "3px 8px", border: "1px solid rgba(250,250,250,.15)", fontFamily: MONO, fontSize: 7.5, color: "rgba(241,235,222,.4)", letterSpacing: ".10em", textTransform: "uppercase" }}>{s}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Form */}
+        <div style={{ padding: "24px 28px" }}>
+          {submitting ? (
+            <div style={{ textAlign: "center", padding: "16px 0", fontFamily: SERIF, fontSize: 16, color: GREEN, fontWeight: 600 }}>
+              ✓ Generating your PDF…
+            </div>
+          ) : (
+            <form onSubmit={onSubmit}>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: INK, marginBottom: 6, letterSpacing: "-.015em" }}>
+                One step to download
+              </div>
+              <p style={{ fontFamily: SERIF, fontSize: 13.5, color: INK55, marginBottom: 16, lineHeight: 1.55 }}>
+                Add your email to unlock this PDF, plus {EMAIL_SCANS} scans/month and SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.
+              </p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                  className="siq-input"
+                  style={{ flex: 1, minWidth: 200 }}
+                />
+                <button type="submit" className="siq-scan-btn" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+                  Unlock &amp; download →
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{ marginTop: 12, background: "none", border: "none", padding: 0, fontFamily: GROT, fontSize: 10.5, letterSpacing: ".06em", color: INK35, cursor: "pointer", textDecoration: "underline" }}
+              >
+                Not now
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1474,6 +1561,8 @@ export default function SignalIQPage() {
 
   const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
+  const [showPdfGate, setShowPdfGate] = useState(false);
+  const [pdfGateSubmitting, setPdfGateSubmitting] = useState(false);
 
   // Cloudflare Turnstile (same hardened pattern as JournoCollabIQ: token ref
   // for async reads, expired-callback auto-reset, waitForToken before calls)
@@ -1681,8 +1770,10 @@ export default function SignalIQPage() {
     }
   }
 
-  function downloadPDF() {
-    if (!emailDone || !selected || !pack) return;
+  // Actually builds + saves the PDF. Assumes the email gate has already
+  // cleared — call downloadPDF() (below) from UI, not this directly.
+  function generateAndDownloadPDF() {
+    if (!selected || !pack) return;
     const JsPDF = getJsPDF();
     if (!JsPDF) { alert("PDF library still loading — try again in a moment."); return; }
     try {
@@ -1701,9 +1792,17 @@ export default function SignalIQPage() {
     }
   }
 
-  async function unlockEmail(e: React.FormEvent) {
+  // Download button handler (PressIQ pattern): always clickable. First click,
+  // pre-email, opens the one-step gate modal instead of a disabled state.
+  function downloadPDF() {
+    if (!selected || !pack) return;
+    if (!emailDone) { setShowPdfGate(true); return; }
+    generateAndDownloadPDF();
+  }
+
+  async function unlockEmail(e: React.FormEvent): Promise<boolean> {
     e.preventDefault();
-    if (!email) return;
+    if (!email) return false;
     try {
       const res = await fetch("/api/newsletter-subscribe", {
         method: "POST",
@@ -1714,11 +1813,11 @@ export default function SignalIQPage() {
       if (!data.success) {
         // Surface the error so the user knows something went wrong
         alert(data.error || "Subscription failed. Please try again.");
-        return;
+        return false;
       }
     } catch {
       alert("Network error. Please check your connection and try again.");
-      return;
+      return false;
     }
     // H7 (2026-07-02 review): the tier cookie is HMAC-signed server-side.
     // Setting it via document.cookie produced an unsigned value that fails
@@ -1728,6 +1827,18 @@ export default function SignalIQPage() {
       await fetch("/api/pitch-tier", { method: "POST" });
     } catch { /* non-fatal — the subscribe succeeded; tier just won't unlock this session */ }
     setEmailDone(true);
+    return true;
+  }
+
+  async function handlePdfGateSubmit(e: React.FormEvent) {
+    setPdfGateSubmitting(true);
+    const ok = await unlockEmail(e);
+    if (!ok) { setPdfGateSubmitting(false); return; }
+    setTimeout(() => {
+      setShowPdfGate(false);
+      setPdfGateSubmitting(false);
+      generateAndDownloadPDF();
+    }, 500);
   }
 
   const footerNextLabel =
@@ -1997,6 +2108,17 @@ export default function SignalIQPage() {
           onSkip={stage === 2 ? () => { setCompanyContext(""); setStage(3); scrollTop(); runScan(""); } : undefined}
         />
       )}
+
+      <PdfDownloadGate
+        show={showPdfGate}
+        onClose={() => setShowPdfGate(false)}
+        email={email}
+        setEmail={setEmail}
+        submitting={pdfGateSubmitting}
+        onSubmit={handlePdfGateSubmit}
+        opp={selected}
+        pack={pack}
+      />
     </>
   );
 }

@@ -1,4 +1,12 @@
 /**
+ * DEAD CODE — not called from anywhere in the app. Left over from the first
+ * SignalIQ PDF implementation (pdfkit, plain Helvetica). The PDF report is
+ * now built entirely client-side via src/lib/pdf/signaliq-report.ts +
+ * src/lib/pdf/house-style.ts (buildSignalIqReport, called from the
+ * `downloadPDF` handler in src/app/tools/signaliq/page.tsx). Sandbox tooling
+ * couldn't delete this file outright — safe to `git rm` this route in your
+ * next commit (2026-07-07 SignalIQ gate/PDF fix).
+ *
  * POST /api/signaliq/pdf
  *
  * Generates a branded PDF report covering all three SignalIQ steps:

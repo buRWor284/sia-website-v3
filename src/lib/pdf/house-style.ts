@@ -42,6 +42,55 @@ export function getJsPDF(): any | null {
   return (window as any).jspdf?.jsPDF ?? null;
 }
 
+/** Convert typographic / unicode characters that jsPDF's core fonts render as
+ *  garbage (and that we don't want in reports) into safe ASCII. Removes em/en
+ *  dashes, smart quotes, arrows, bullets, and any remaining non-Latin1 glyph. */
+export function sanitizeText(s: string): string {
+  return String(s)
+    .replace(/—/g, " - ")                     // em dash — → spaced hyphen
+    .replace(/[–‐‑−]/g, "-")   // en dash / hyphen variants / minus
+    .replace(/[‘’‚‛]/g, "'")   // curly single quotes → '
+    .replace(/[“”„‟]/g, '"')   // curly double quotes → "
+    .replace(/…/g, "...")                      // ellipsis → ...
+    .replace(/[→⟶➔➙➜➙›➙]/g, "->") // right arrows / ›
+    .replace(/[←⟵‹]/g, "<-")        // left arrows / ‹
+    .replace(/[•‣◦⁃·]/g, "-") // bullets / middot
+    .replace(/ /g, " ")                        // nbsp → space
+    .replace(/­/g, "")                         // soft hyphen → drop
+    .replace(/[^\x00-\xFF]/g, "")                   // drop anything else non-Latin1
+    .replace(/ {2,}/g, " ");                        // collapse double spaces
+}
+
+/** Strip markdown to plain prose AND sanitize unicode — for tools that draw
+ *  AI-generated text directly (no rich renderer). Removes #, **bold**, *italic*,
+ *  [text](url), `code`, list markers, and stray table pipes. */
+export function plainText(s: string): string {
+  const md = String(s)
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*\n]+)\*/g, "$1")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/^\s{0,3}[-*+]\s+/gm, "")
+    .replace(/\s*\|\s*/g, "  ");
+  return sanitizeText(md);
+}
+
+/** Patch a jsPDF doc so every text draw is sanitized. Call once, right after
+ *  creating the doc, before drawing anything. */
+export function installSanitizer(doc: PdfDoc): void {
+  const orig = doc.text.bind(doc);
+  doc.text = (t: unknown, ...rest: unknown[]) =>
+    orig(
+      typeof t === "string" ? sanitizeText(t)
+        : Array.isArray(t) ? t.map((x) => (typeof x === "string" ? sanitizeText(x) : x))
+        : t,
+      ...rest,
+    );
+}
+
 /** Truncate a single line to maxW (mm), appending an ellipsis. */
 export function fitLine(doc: PdfDoc, text: string, maxW: number, fs: number): string {
   doc.setFontSize(fs);

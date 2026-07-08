@@ -9,6 +9,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { installSanitizer, plainText } from "@/lib/pdf/house-style";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
@@ -230,7 +231,10 @@ function DimBlock({ dim, score, analysis, subSignals, evidenceKeys, expanded, on
           <div style={{ width: 72, height: 4, background: ra(INK, 0.06) }}>
             <div style={{ width: `${score}%`, height: "100%", background: tc }} />
           </div>
-          <span style={{ fontSize: 16, fontWeight: 700, color: ra(INK, 0.6), width: 16, textAlign: "center" }}>{expanded ? "–" : "+"}</span>
+          <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.6), display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
+            {expanded ? "Collapse" : "Expand"}
+            <span style={{ fontSize: 13, fontWeight: 700 }}>{expanded ? "–" : "+"}</span>
+          </span>
         </div>
       </div>
       {expanded && (
@@ -951,6 +955,7 @@ export default function PressIQPage() {
     try { JsPDF = await loadJsPDF(); } catch { alert("PDF library failed to load. Check your connection and try again."); return; }
 
     const doc = new JsPDF({ unit: "mm", format: "a4" });
+    installSanitizer(doc); // strip em/en dashes, arrows, smart quotes, non-Latin1 glyphs from every text draw
     const W = 210, H = 297;
     const ML = 22, MR = 22;          // left / right margin
     const CW = W - ML - MR;          // content width = 166mm
@@ -1148,7 +1153,7 @@ export default function PressIQPage() {
       doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iMID);
       doc.text("YOUR STRONGEST LINE", ML + 7, y + 5);
       doc.setFont("helvetica","italic"); doc.setFontSize(8.5); doc.setTextColor(...iDIM);
-      const sLine = doc.splitTextToSize(`"${result.strongestLine}"`, CW - 10) as string[];
+      const sLine = doc.splitTextToSize(`"${plainText(result.strongestLine)}"`, CW - 10) as string[];
       doc.text(sLine[0] || "", ML + 7, y + 13);
     }
 
@@ -1181,7 +1186,7 @@ export default function PressIQPage() {
       // Fix body
       doc.setFillColor(...iCREAM2); doc.rect(ML, y, CW, 0.4, "F");
       doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...iDIM);
-      const fLines = doc.splitTextToSize(f.text, CW - 6) as string[];
+      const fLines = doc.splitTextToSize(plainText(f.text), CW - 6) as string[];
       const fH = fLines.length * 5.2 + 10;
       doc.setFillColor(236, 229, 213); doc.rect(ML, y, CW, fH, "F");
       doc.text(fLines, ML + 4, y + 6);
@@ -1211,7 +1216,7 @@ export default function PressIQPage() {
       })();
       const s = area.score;
       const [dr,dg,db] = tierRGB(s >= 75 ? GREEN : s >= 45 ? AMBER : RED);
-      const aLines = area.analysis ? doc.splitTextToSize(area.analysis, CW - 4) as string[] : [];
+      const aLines = area.analysis ? doc.splitTextToSize(plainText(area.analysis), CW - 4) as string[] : [];
       const blockH = 8 + 5 + (aLines.length > 0 ? aLines.slice(0,4).length * 4.8 + 4 : 0) + 4;
 
       if (y + blockH > H - 24) {
