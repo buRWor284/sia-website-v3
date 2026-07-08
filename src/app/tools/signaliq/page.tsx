@@ -1550,6 +1550,23 @@ function SiqWizardFooter({ stage, onBack, onNext, nextLabel, nextDisabled = fals
 export default function SignalIQPage() {
   const [beat, setBeat] = useState<BeatId>("saas");
   const [companyContext, setCompanyContext] = useState("");
+  // Persist the chosen beat + startup context across reloads (PressIQ does the
+  // same with the pitch). Restore on mount, save on change.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    try {
+      const raw = localStorage.getItem("signaliq_v1_input");
+      if (raw) {
+        const d = JSON.parse(raw) as { beat?: string; companyContext?: string };
+        if (typeof d.beat === "string" && BEATS.some((b) => b.id === d.beat)) setBeat(d.beat as BeatId);
+        if (typeof d.companyContext === "string") setCompanyContext(d.companyContext);
+      }
+    } catch { /* ignore */ }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem("signaliq_v1_input", JSON.stringify({ beat, companyContext })); } catch { /* ignore */ }
+  }, [beat, companyContext]);
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);

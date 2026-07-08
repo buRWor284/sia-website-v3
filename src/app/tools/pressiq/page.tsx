@@ -1095,6 +1095,22 @@ export default function PressIQPage() {
     // ── PAGE 2: SCORE SUMMARY ─────────────────────────────────────────────────
     doc.addPage(); y = innerPageSetup("Score Summary");
 
+    // Your pitch — the input this score is based on (context for the report).
+    if (pitch && pitch.trim()) {
+      doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iMID);
+      doc.text("YOUR PITCH", ML, y); y += 4;
+      doc.setFont("helvetica","normal"); doc.setFontSize(7.5); doc.setTextColor(...iDIM);
+      const pLines = doc.splitTextToSize(pitch.trim(), CW - 8) as string[];
+      const shown = pLines.slice(0, 10);
+      const boxH = shown.length * 4 + 6;
+      doc.setFillColor(236, 229, 213); doc.rect(ML, y, CW, boxH, "F");
+      doc.setFillColor(...iGOLD); doc.rect(ML, y, 2.5, boxH, "F");
+      shown.forEach((l, i) => doc.text(l, ML + 5, y + i * 4 + 5));
+      y += boxH;
+      if (pLines.length > 10) { doc.setFont("helvetica","italic"); doc.setFontSize(6.5); doc.setTextColor(...iMID); doc.text("... full pitch continues in the app", ML + 5, y + 4); y += 5; }
+      y += 8;
+    }
+
     const dimOrder = (result.relevanceAssessed ? DIMS : DIMS.filter(d => d.key !== "relevance")) as typeof DIMS[number][];
     const scoreMap2: Record<string, number> = {};
     if (result.areas.relevance) scoreMap2.relevance = result.areas.relevance.score;

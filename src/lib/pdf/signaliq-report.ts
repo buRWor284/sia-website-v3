@@ -60,8 +60,22 @@ export function buildSignalIqReport(doc: PdfDoc, d: SignalIqReportData): void {
   runningHeader(doc, { wordMain: "Signal", wordAccent: "IQ", context: d.beatLabel, rightLabel: "Story Radar" });
   let y = sectionMast(doc, "01", `${d.opportunities.length} Opportunities Ranked`, 28);
   doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...C.GREY);
-  doc.text("Ranked by signal-vs-coverage gap. Scores are lead / whitespace measures — not predictions.", M, y);
+  doc.text("Ranked by signal-vs-coverage gap. Scores are lead / whitespace measures - not predictions.", M, y);
   y += 8;
+
+  // Your startup context — the input the scan was personalised against.
+  if (d.companyContext) {
+    const ctxLines = (doc.splitTextToSize(d.companyContext, W - M * 2 - 14) as string[]).slice(0, 6);
+    const boxH = ctxLines.length * 4.6 + 12;
+    doc.setDrawColor(210, 205, 195); doc.setFillColor(245, 243, 238); doc.setLineWidth(0.3);
+    doc.rect(M, y, W - M * 2, boxH, "FD");
+    doc.setFillColor(...C.GOLD); doc.rect(M, y, 2.5, boxH, "F");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(6.5); doc.setTextColor(...C.GREY);
+    doc.text("YOUR STARTUP CONTEXT", M + 8, y + 6);
+    doc.setFont("helvetica", "italic"); doc.setFontSize(8.5); doc.setTextColor(...C.DGREY);
+    ctxLines.forEach((l, i) => doc.text(l, M + 8, y + 11 + i * 4.6));
+    y += boxH + 8;
+  }
 
   const cW = (W - M * 2 - 8) / 2, cH = 30;
   d.opportunities.forEach((o, i) => {
