@@ -13,7 +13,7 @@
  * bespoke gates for now; migrating them onto EmailCaptureStrip is a follow-up.
  */
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { GROT, INK, PAPER, SERIF, YEL } from "@/lib/tokens";
 
 const PAPER72 = "rgba(241,235,222,.72)";
@@ -83,26 +83,72 @@ export function EmailCaptureStrip({ toolName, benefit }: { toolName: string; ben
   );
 }
 
-export function EmosCTAStrip({ toolName, pitch }: { toolName: string; pitch: string }) {
+interface EmosCTAStripProps {
+  toolName: string;
+  pitch: ReactNode;
+  /** Overrides the "WHERE THIS FITS" label — e.g. PressIQ swaps this for a
+   * score-dependent line ("WHERE THIS SCORING COMES FROM" vs "YOU'VE GOT
+   * THE STANDARD | NOW SCALE IT"). */
+  eyebrow?: ReactNode;
+  /** Overrides the whole headline. Defaults to the generic
+   * "{toolName} tracks the coverage. EMOS earns it." pairing — tools whose
+   * job isn't "tracking" (SignalIQ finds stories, PressIQ scores pitches)
+   * should pass their own. */
+  heading?: ReactNode;
+  applyHref?: string;
+  applyLabel?: ReactNode;
+  applyTarget?: string;
+  exploreHref?: string;
+  exploreLabel?: ReactNode;
+  exploreTarget?: string;
+  /** Suppress the secondary Explore button — e.g. PressIQ shows one
+   * score-gated primary button (Apply above threshold, Explore below it)
+   * rather than both at once. */
+  hideExplore?: boolean;
+  /** Extra button rendered after Explore — e.g. PressIQ's "Share score on X". */
+  extraAction?: ReactNode;
+}
+
+export function EmosCTAStrip({
+  toolName,
+  pitch,
+  eyebrow = "Where this fits",
+  heading,
+  applyHref = "/emos/apply",
+  applyLabel = "Apply to EMOS",
+  applyTarget,
+  exploreHref = "/emos",
+  exploreLabel = "Explore EMOS",
+  exploreTarget,
+  hideExplore = false,
+  extraAction,
+}: EmosCTAStripProps) {
   return (
     <section style={{ background: INK, color: PAPER, padding: "clamp(22px,4vw,38px)", margin: "24px 0 48px" }}>
       <p style={{ margin: 0, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".20em", textTransform: "uppercase", color: YEL }}>
-        Where this fits
+        {eyebrow}
       </p>
       <h3 style={{ margin: "12px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px,3.2vw,34px)", lineHeight: 1.06, color: PAPER }}>
-        {toolName} tracks the coverage.<br />
-        <span style={{ fontStyle: "italic", color: YEL }}>EMOS</span> earns it.
+        {heading ?? (
+          <>
+            {toolName} tracks the coverage.<br />
+            <span style={{ fontStyle: "italic", color: YEL }}>EMOS</span> earns it.
+          </>
+        )}
       </h3>
       <p style={{ margin: "14px 0 22px", fontFamily: SERIF, fontSize: 16, color: PAPER72, lineHeight: 1.55, maxWidth: 560 }}>
         {pitch}
       </p>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <a href="/emos/apply" style={{ display: "inline-flex", alignItems: "center", gap: 12, background: YEL, color: INK, textDecoration: "none", padding: "14px 24px", fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-          Apply to EMOS <span style={{ fontFamily: SERIF, fontSize: 19, fontWeight: 400 }}>↗</span>
+        <a href={applyHref} target={applyTarget} rel={applyTarget ? "noopener noreferrer" : undefined} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: YEL, color: INK, textDecoration: "none", padding: "14px 24px", fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+          {applyLabel} <span style={{ fontFamily: SERIF, fontSize: 19, fontWeight: 400 }}>↗</span>
         </a>
-        <a href="/emos" style={{ display: "inline-flex", alignItems: "center", gap: 10, border: `1px solid ${PAPER30}`, color: PAPER, textDecoration: "none", padding: "14px 22px", fontFamily: GROT, fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-          Explore EMOS
-        </a>
+        {!hideExplore && (
+          <a href={exploreHref} target={exploreTarget} rel={exploreTarget ? "noopener noreferrer" : undefined} style={{ display: "inline-flex", alignItems: "center", gap: 10, border: `1px solid ${PAPER30}`, color: PAPER, textDecoration: "none", padding: "14px 22px", fontFamily: GROT, fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+            {exploreLabel}
+          </a>
+        )}
+        {extraAction}
       </div>
       <p aria-hidden style={{ margin: "18px 0 0", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: PAPER45 }}>
         The Earned Media Operating System

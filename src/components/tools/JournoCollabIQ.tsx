@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useReducer, useRef } from "react";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import { EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const BG0  = "#f1ebde";   // warm cream — matches tokens.PAPER
@@ -76,12 +77,12 @@ const V2_LOADING = [
   { h: "Almost there.",                                      s: "Compiling a media list that would take an agency a week." },
 ];
 
-// Elapsed-time counter, matching the pattern rolled out to PressIQ/SignalIQ —
-// a standalone component so it resets naturally each time it mounts (i.e. each
+// Elapsed-time counter, matching the pattern rolled out to PressIQ/SignalIQ.
+// A standalone component so it resets naturally each time it mounts (i.e. each
 // time a fresh loading run starts), with no manual reset call needed. The
 // "typically 30-60s" estimate reuses PressIQ's observed range as a placeholder
 // (Irfan's call, 08 Jul) since JournoCollabIQ's own research time hasn't been
-// separately measured yet — revisit once it has.
+// separately measured yet. Revisit once it has.
 function ElapsedSecs() {
   const [secs, setSecs] = useState(0);
   useEffect(() => {
@@ -658,17 +659,21 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
         </div>
       )}
 
-      {/* EMOS CTA */}
-      <div style={{ marginTop:aiBrief?0:16, padding:"24px 28px", background:BG2, border:`1px solid ${BD}`, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
-        <div>
-          <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.14em", textTransform:"uppercase", display:"block", marginBottom:6 }}>Want someone to execute this for you?</span>
-          <span style={{ fontFamily:SF, fontSize:18, fontWeight:700, color:TX, fontStyle:"italic", letterSpacing:"-0.01em" }}>Earned Media OS</span>
-          <span style={{ fontSize:13, color:TX3, marginLeft:10, fontFamily:GF }}>the full system for collaborating with journalists, done with you.</span>
-        </div>
-        <a href="https://www.syedirfanajmal.com/emos/" target="_blank" rel="noopener noreferrer"
-          style={{ ...primaryBtn(), textDecoration:"none", fontSize:11, padding:"12px 22px" }}>
-          Learn more ↗
-        </a>
+      {/* EMOS CTA — shared skeleton (ToolCTAStrips.EmosCTAStrip), same
+          component SignalIQ/PressIQ/CoverageIQ use. Was previously a bespoke
+          light-background bar; content is unchanged, just re-skinned onto
+          the standard dark ink strip so all four tools read the same way. */}
+      <div style={{ marginTop: aiBrief ? 0 : 16 }}>
+        <EmosCTAStrip
+          toolName="JournoCollabIQ"
+          eyebrow="Want someone to execute this for you?"
+          heading={<span style={{ fontStyle: "italic" }}>Earned Media OS</span>}
+          pitch="The full system for collaborating with journalists, done with you."
+          applyHref="https://www.syedirfanajmal.com/emos/"
+          applyLabel="Learn more"
+          applyTarget="_blank"
+          hideExplore
+        />
       </div>
     </StageWrapper>
   );

@@ -18,6 +18,7 @@ import Script from "next/script";
 import { getJsPDF } from "@/lib/pdf/house-style";
 import { buildSignalIqReport } from "@/lib/pdf/signaliq-report";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import { EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
   DoubleRule,
@@ -26,7 +27,6 @@ import {
   Pill,
   SCaps,
   SectionMast,
-  SiaLogo,
 } from "@/components/bureau/primitives";
 import {
   DARK,
@@ -239,11 +239,11 @@ function ScanLoader() {
     const id = setInterval(() => setI((n) => (n + 1) % SCAN_STATS.length), 5000);
     return () => clearInterval(id);
   }, []);
-  // Elapsed-time counter, matching the pattern rolled out to PressIQ — QA found
+  // Elapsed-time counter, matching the pattern rolled out to PressIQ. QA found
   // users assume a long-running AI call has frozen without one. The "typically
   // 30-60 seconds" estimate reuses PressIQ's observed range as a placeholder
   // (Irfan's call, 08 Jul) since SignalIQ's own real-world scan time hasn't been
-  // separately measured yet — revisit once it has.
+  // separately measured yet. Revisit once it has.
   const [secs, setSecs] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setSecs(s => s + 1), 1000);
@@ -1325,40 +1325,6 @@ function PdfDownloadGate({
   );
 }
 
-// ── EMOS CTA ──────────────────────────────────────────────────────────────────
-
-function EmosCTA() {
-  return (
-    <div style={{ background: INK, color: PAPER, padding: "clamp(22px,4vw,38px)", position: "relative", overflow: "hidden" }}>
-      <div aria-hidden style={{ position: "absolute", top: -30, right: -40, opacity: 0.06 }}>
-        <SiaLogo height={200} />
-      </div>
-      <div style={{ position: "relative" }}>
-        <SCaps size={11} ls="0.20em" color={YEL}>Where this fits</SCaps>
-        <h3 style={{ margin: "12px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px,3.2vw,34px)", lineHeight: 1.06, color: PAPER }}>
-          {PRODUCT} finds the story.<br />
-          <span style={{ fontStyle: "italic", color: YEL }}>EMOS</span> turns it into coverage.
-        </h3>
-        <p style={{ margin: "14px 0 22px", fontFamily: SERIF, fontSize: 16, color: "rgba(241,235,222,.72)", lineHeight: 1.55, maxWidth: 560 }}>
-          {PRODUCT} powers two of the three EMOS pillars:{" "}
-          <strong style={{ color: PAPER }}>Linkable Assets</strong> and{" "}
-          <strong style={{ color: PAPER }}>Proactive PR</strong>. The full Earned Media
-          Operating System gives your team the playbooks, journalist system, and
-          guarantee to earn coverage in-house.
-        </p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <a href={EMOS_APPLY} style={{ display: "inline-flex", alignItems: "center", gap: 12, background: YEL, color: INK, textDecoration: "none", padding: "14px 24px", fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            Apply to EMOS <span style={{ fontFamily: SERIF, fontSize: 19, fontWeight: 400 }}>↗</span>
-          </a>
-          <a href={EMOS_URL} style={{ display: "inline-flex", alignItems: "center", gap: 10, border: "1px solid rgba(241,235,222,.3)", color: PAPER, textDecoration: "none", padding: "14px 22px", fontFamily: GROT, fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-            Explore EMOS
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── detail view ───────────────────────────────────────────────────────────────
 
 // Stage 4 — the Angle: why SignalIQ flagged this one opportunity.
@@ -1488,6 +1454,29 @@ function PackStage({
         <div style={{ marginTop: 32 }}>
           <EmailGate email={email} setEmail={setEmail} done={emailDone} onUnlock={unlockEmail} />
         </div>
+
+        {/* EMOS pitch — fires once the user has their asset pack in hand,
+            same "where this fits" pattern shared with PressIQ/CoverageIQ. */}
+        <EmosCTAStrip
+          toolName={PRODUCT}
+          heading={
+            <>
+              {PRODUCT} finds the story.<br />
+              <span style={{ fontStyle: "italic", color: YEL }}>EMOS</span> turns it into coverage.
+            </>
+          }
+          pitch={
+            <>
+              {PRODUCT} powers two of the three EMOS pillars:{" "}
+              <strong style={{ color: PAPER }}>Linkable Assets</strong> and{" "}
+              <strong style={{ color: PAPER }}>Proactive PR</strong>. The full Earned Media
+              Operating System gives your team the playbooks, journalist system, and
+              guarantee to earn coverage in-house.
+            </>
+          }
+          applyHref={EMOS_APPLY}
+          exploreHref={EMOS_URL}
+        />
       </div>
     </section>
   );

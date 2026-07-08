@@ -11,6 +11,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link";
 import { installSanitizer, plainText } from "@/lib/pdf/house-style";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import { EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
   DIMENSION_EVIDENCE,
@@ -233,7 +234,7 @@ function DimBlock({ dim, score, analysis, subSignals, evidenceKeys, expanded, on
           </div>
           <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.6), display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
             {expanded ? "Collapse" : "Expand"}
-            <span style={{ fontSize: 13, fontWeight: 700 }}>{expanded ? "–" : "+"}</span>
+            <span style={{ fontSize: 13, fontWeight: 700 }}>{expanded ? "-" : "+"}</span>
           </span>
         </div>
       </div>
@@ -317,7 +318,7 @@ function EmailGate({ show, onClose, onUnlock, result }: {
 
   const score = result?.composite ?? 0;
   const tierColor = result?.tier?.color ?? BLUE;
-  const tierLabel = result?.tier?.label ?? "—";
+  const tierLabel = result?.tier?.label ?? "-";
 
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
@@ -429,11 +430,11 @@ function LiveMechanics({ live }: { live: ReturnType<typeof scoreLayer1> | null }
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 28px" }}>
         <LiveMeter label="Word count" val={live ? String(live.bands.wordCount.value) : "0"} band={st(live?.bands.wordCount.status)} hint={live ? live.bands.wordCount.hint : "Type to measure"} />
         <LiveMeter label="Subject length" val={live ? `${live.bands.subjectWords.value} word${live.bands.subjectWords.value !== 1 ? "s" : ""}` : "0 words"} band={st(live?.bands.subjectWords.status)} hint={live ? live.bands.subjectWords.hint : "Add a subject line"} />
-        <LiveMeter label="Reading level" val={live ? `Grade ${Math.round(live.bands.readingGrade.value)}` : "—"} band={st(live?.bands.readingGrade.status)} hint={live ? live.bands.readingGrade.hint : "Need more text"} />
-        <LiveMeter label="Closing question" val={live ? (live.metrics.hasClosingQuestion ? "Yes" : "No") : "—"} band={st(live?.bands.questions.status)} hint={live ? live.bands.questions.hint : "Need more text"} />
+        <LiveMeter label="Reading level" val={live ? `Grade ${Math.round(live.bands.readingGrade.value)}` : "-"} band={st(live?.bands.readingGrade.status)} hint={live ? live.bands.readingGrade.hint : "Need more text"} />
+        <LiveMeter label="Closing question" val={live ? (live.metrics.hasClosingQuestion ? "Yes" : "No") : "-"} band={st(live?.bands.questions.status)} hint={live ? live.bands.questions.hint : "Need more text"} />
         <div style={{ gridColumn: "1/-1" }}>
           <LiveMeter label="Tone / subjectivity"
-            val={live ? (live.bands.subjectivity.status === "ideal" ? "Clean" : live.bands.subjectivity.status === "ok" ? "Mild" : "Flagged") : "—"}
+            val={live ? (live.bands.subjectivity.status === "ideal" ? "Clean" : live.bands.subjectivity.status === "ok" ? "Mild" : "Flagged") : "-"}
             band={st(live?.bands.subjectivity.status)} hint={live ? live.bands.subjectivity.hint : "Need more text"} />
         </div>
       </div>
@@ -741,26 +742,28 @@ function PostScorePanel({
 
           <TabNav current={tab} setTab={setTab} onReset={onReset} />
 
-          {/* EMOS CTA */}
-          <div style={{ background: INK, padding: 22, marginTop: 22 }}>
-            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: YEL, marginBottom: 8 }}>
-              {composite >= 85 ? "YOU'VE GOT THE STANDARD | NOW SCALE IT" : "WHERE THIS SCORING COMES FROM"}
-            </div>
-            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: PAPER, letterSpacing: "-.01em", marginBottom: 6 }}>
-              This tool scores one pitch.<br /><span style={{ color: YEL }}>EMOS builds the whole pipeline.</span>
-            </div>
-            <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(PAPER, 0.55), lineHeight: 1.6, marginBottom: 14 }}>
-              PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently.
-            </div>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <a href={composite >= 65 ? EMOS_APPLY : EMOS_URL} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", padding: "10px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", textDecoration: "none" }}>
-                {composite >= 65 ? "Apply to EMOS ↗" : "Explore EMOS ↗"}
-              </a>
-              <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=https://syedirfanajmal.com/tools/pressiq`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", padding: "10px 16px", border: `1px solid ${ra(PAPER, 0.25)}`, color: ra(PAPER, 0.5), fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", textDecoration: "none" }}>
+          {/* EMOS CTA — shared skeleton (ToolCTAStrips.EmosCTAStrip), same
+              component CoverageIQ/SignalIQ use. Score-gated eyebrow/primary
+              button and the share button stay PressIQ-only via props. */}
+          <EmosCTAStrip
+            toolName="PressIQ"
+            eyebrow={composite >= 85 ? "YOU'VE GOT THE STANDARD | NOW SCALE IT" : "WHERE THIS SCORING COMES FROM"}
+            heading={
+              <>
+                This tool scores one pitch.<br /><span style={{ color: YEL }}>EMOS builds the whole pipeline.</span>
+              </>
+            }
+            pitch="PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently."
+            applyHref={composite >= 65 ? EMOS_APPLY : EMOS_URL}
+            applyLabel={composite >= 65 ? "Apply to EMOS" : "Explore EMOS"}
+            applyTarget="_blank"
+            hideExplore
+            extraAction={
+              <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=https://syedirfanajmal.com/tools/pressiq`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", padding: "14px 22px", border: `1px solid ${ra(PAPER, 0.25)}`, color: ra(PAPER, 0.5), fontFamily: GROT, fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
                 Share score on X
               </a>
-            </div>
-          </div>
+            }
+          />
         </div>
       )}
 
@@ -854,10 +857,11 @@ export default function PressIQPage() {
   const turnstileRef = useRef<HTMLDivElement>(null);
   const turnstileWidgetId = useRef<string | null>(null);
 
-  // localStorage persist — preferences only (platform/brand/pitchMode/store).
-  // Pitch, query, subject, and journalistBeat are the pitch's actual content, not
-  // a preference — restoring those made every fresh visit reopen with a stale
-  // pitch from a previous session, so they're intentionally excluded here.
+  // localStorage persist: preferences only (platform/pitchMode/store).
+  // Pitch, query, subject, journalistBeat, and brand (authority signals) are all
+  // specific to the pitch being worked on right now, not a general preference, so
+  // restoring any of them made every fresh visit reopen with stale selections
+  // from a previous session. All intentionally excluded here.
   useEffect(() => {
     /* eslint-disable react-hooks/set-state-in-effect */
     try {
@@ -865,7 +869,6 @@ export default function PressIQPage() {
       if (raw) {
         const d = JSON.parse(raw) as Record<string, unknown>;
         if (typeof d.platform === "string") setPlatform(d.platform as Platform);
-        if (d.brand && typeof d.brand === "object") setBrand({ ...EMPTY_BRAND, ...(d.brand as Partial<BrandSignals>) });
         if (d.pitchMode === "standalone" || d.pitchMode === "query") setPitchMode(d.pitchMode as "standalone" | "query");
         if (typeof d.store === "boolean") setStore(d.store);
       }
@@ -873,8 +876,8 @@ export default function PressIQPage() {
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ platform, brand, pitchMode, store })); } catch { /* ignore */ }
-  }, [platform, brand, pitchMode, store]);
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ platform, pitchMode, store })); } catch { /* ignore */ }
+  }, [platform, pitchMode, store]);
 
   // Standalone pitches don't go through a source-request platform, so keep the
   // platform value in sync with pitchMode: "direct" while standalone (no
@@ -1432,7 +1435,7 @@ export default function PressIQPage() {
                   <div style={LSEC}>
                     <span style={LSEC_LBL}>Platform</span>
                     <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block" }}>
-                      Scored as direct outreach (email, social, DM) — professional tone assumed. Switch to &ldquo;Answering a query&rdquo; on the previous step if you&rsquo;re responding to a HARO / Qwoted / Featured request instead.
+                      Scored as direct outreach (email, social, DM). Professional tone assumed. Switch to &ldquo;Answering a query&rdquo; on the previous step if you&rsquo;re responding to a HARO / Qwoted / Featured request instead.
                     </em>
                   </div>
                 )}
@@ -1445,7 +1448,7 @@ export default function PressIQPage() {
                     ))}
                   </div>
                   <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block", marginTop: 10 }}>
-                    Selecting these doesn&rsquo;t add points on its own — your pitch text still has to show the proof (a link, a named outlet, a mention of a talk) for it to count. Only affects Personal Branding, the smallest-weighted of your 7 score dimensions.
+                    Selecting these doesn&rsquo;t add points on its own. Your pitch text still has to show the proof (a link, a named outlet, a mention of a talk) for it to count. Only affects Personal Branding, the smallest-weighted of your 7 score dimensions.
                   </em>
                 </div>
 
