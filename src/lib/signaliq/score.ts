@@ -40,6 +40,26 @@ export function isCooling(coverage: Coverage | null, signals: Signal[]): boolean
   return coverage.trend < -COOLING_TREND_EPS && bestTrend <= COOLING_TREND_EPS;
 }
 
+/**
+ * UI-facing coverage-gap state, derived from fields already on Opportunity so every
+ * surface (radar cards, angle detail, receipts panel, EMOS dashboard) reads it the
+ * same way instead of re-deriving it:
+ *   "no-data" — GDELT returned nothing; `components.coverageGap` is the neutral 0.5
+ *               default, not a real reading. Don't show it as "medium."
+ *   "cooling" — coverage exists but `isCooling()` discounted the gap (see above).
+ *   "normal"  — a real, undiscounted coverage-gap reading.
+ * Added 2026-07-08 because the discount/no-data cases were computed correctly but
+ * invisible on screen — a real "medium" gap and an unknown one rendered identically.
+ * See SignalIQ-Notes-and-TODOs.md.
+ */
+export type CoverageState = "no-data" | "cooling" | "normal";
+
+export function coverageState(opp: Pick<Opportunity, "coverage" | "cooling">): CoverageState {
+  if (!opp.coverage) return "no-data";
+  if (opp.cooling) return "cooling";
+  return "normal";
+}
+
 /** Beat-fit: overlap between the topic text and the beat's seed vocabulary. */
 export function beatFit(topic: string, beat: BeatId): number {
   const seeds = new Set(

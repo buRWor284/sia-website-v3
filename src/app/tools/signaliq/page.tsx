@@ -44,6 +44,7 @@ import {
   YEL,
 } from "@/lib/tokens";
 import { BEATS, EMAIL_SCANS, FREE_SCANS, PRODUCT } from "@/lib/signaliq/config";
+import { coverageState } from "@/lib/signaliq/score";
 import type {
   AssetPack,
   BeatId,
@@ -405,10 +406,40 @@ function ScoreRing({
   );
 }
 
-function GapBar({ value }: { value: number }) {
+/** Small note explaining a non-"normal" coverage-gap reading. Shared by every
+ * surface that shows the coverage gap so "no data" and "cooling" don't silently
+ * look like a real medium/narrow reading. See coverageState() in lib/signaliq/score.ts. */
+function CoverageNote({ opp }: { opp: Opportunity }) {
+  const state = coverageState(opp);
+  if (state === "no-data") {
+    return (
+      <p style={{ margin: "3px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10, color: INK55 }}>
+        No press data returned for this topic (GDELT) — this is a neutral default, not a real coverage reading.
+      </p>
+    );
+  }
+  if (state === "cooling") {
+    return (
+      <p style={{ margin: "3px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10, color: INK55 }}>
+        Press coverage is falling and nothing here is rising — discounted, not real whitespace.
+      </p>
+    );
+  }
+  return null;
+}
+
+function GapBar({ opp }: { opp: Opportunity }) {
+  const value = opp.components.coverageGap;
   const pct = Math.round(value * 100);
-  const label = value >= 0.7 ? "Wide" : value >= 0.4 ? "Medium" : "Narrow";
-  const c = value >= 0.7 ? GREEN : value >= 0.4 ? AMBER : RED;
+  const state = coverageState(opp);
+  const label =
+    state === "no-data" ? "No data" :
+    state === "cooling" ? "Cooling" :
+    value >= 0.7 ? "Wide" : value >= 0.4 ? "Medium" : "Narrow";
+  const c =
+    state === "no-data" ? INK35 :
+    state === "cooling" ? AMBER :
+    value >= 0.7 ? GREEN : value >= 0.4 ? AMBER : RED;
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
@@ -417,9 +448,12 @@ function GapBar({ value }: { value: number }) {
           {label}
         </span>
       </div>
-      <div style={{ height: 6, background: PAPER2, border: `1px solid ${INK15}` }}>
-        <div style={{ height: "100%", width: `${pct}%`, background: c, transition: "width .6s ease" }} />
+      <div style={{ height: 6, background: PAPER2, border: `1px ${state === "no-data" ? "dashed" : "solid"} ${INK15}` }}>
+        {state !== "no-data" && (
+          <div style={{ height: "100%", width: `${pct}%`, background: c, transition: "width .6s ease" }} />
+        )}
       </div>
+      <CoverageNote opp={opp} />
     </div>
   );
 }
@@ -772,7 +806,7 @@ function OppCard({
             Why&nbsp;now
           </span>
           <div style={{ flex: 1 }}>
-            <GapBar value={opp.components.coverageGap} />
+            <GapBar opp={opp} />
           </div>
         </div>
 
@@ -900,6 +934,7 @@ function ScorePanel({ opp }: { opp: Opportunity }) {
         <CompBar label="Magnitude" value={opp.components.magnitude} />
         <CompBar label="Velocity" value={opp.components.velocity} />
         <CompBar label="Coverage gap" value={opp.components.coverageGap} />
+        <CoverageNote opp={opp} />
         {opp.relevanceMultiplier != null && opp.relevanceMultiplier < 0.999 && (
           <CompBar label="Startup fit" value={opp.components.relevance} />
         )}
@@ -932,11 +967,17 @@ function ReceiptsPanel({ opp }: { opp: Opportunity }) {
             )}
           </div>
         ))}
-        {opp.coverage && (
-          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, paddingTop: 6, borderTop: `1px solid ${INK15}` }}>
-            Press coverage so far: {Math.round(opp.coverage.volume * 100)}% of saturation (GDELT).
-          </div>
-        )}
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, paddingTop: 6, borderTop: `1px solid ${INK15}` }}>
+          {opp.coverage ? (
+            <>
+              Press coverage so far: {Math.round(opp.coverage.volume * 100)}% of saturation (GDELT)
+              {opp.coverage.lowSample ? " — thin history, treat the trend cautiously" : ""}.
+              {opp.cooling ? " Trending down alongside flat/falling signals — read as cooling, not whitespace." : ""}
+            </>
+          ) : (
+            "Press coverage: no GDELT data returned for this topic — the coverage gap above uses a neutral default, not a real reading."
+          )}
+        </div>
       </div>
     </div>
   );
@@ -1366,7 +1407,7 @@ function AngleView({ opp }: { opp: Opportunity }) {
         <div style={{ maxWidth: 540, marginTop: 18, display: "flex", flexDirection: "column", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
             <span style={whyTag}>Why&nbsp;now</span>
-            <div style={{ flex: 1 }}><GapBar value={opp.components.coverageGap} /></div>
+            <div style={{ flex: 1 }}><GapBar opp={opp} /></div>
           </div>
           {opp.fit && (
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

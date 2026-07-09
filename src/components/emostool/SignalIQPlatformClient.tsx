@@ -13,6 +13,7 @@ import React, { useState, useTransition } from "react";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import { BEATS } from "@/lib/signaliq/config";
+import { coverageState } from "@/lib/signaliq/score";
 import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emostool/actions/signaliq";
 import type { BeatId, Opportunity, ScanResponse, OppBand, AssetPack } from "@/lib/signaliq/types";
 import type { DbSignal } from "@/app/emostool/actions/signaliq";
@@ -60,10 +61,40 @@ const SRC_LABEL: Record<string, string> = {
 
 // ── sub-components ─────────────────────────────────────────────────────────────
 
-function GapBar({ value }: { value: number }) {
+/** Small note explaining a non-"normal" coverage-gap reading — see coverageState()
+ * in lib/signaliq/score.ts. Keeps "no data" and "cooling" from silently looking
+ * like a real medium/narrow reading. */
+function CoverageNote({ opp }: { opp: Opportunity }) {
+  const state = coverageState(opp);
+  if (state === "no-data") {
+    return (
+      <p style={{ margin: "3px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10, color: INK55 }}>
+        No press data returned for this topic (GDELT) — neutral default, not a real reading.
+      </p>
+    );
+  }
+  if (state === "cooling") {
+    return (
+      <p style={{ margin: "3px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 10, color: INK55 }}>
+        Coverage is falling and nothing here is rising — discounted, not real whitespace.
+      </p>
+    );
+  }
+  return null;
+}
+
+function GapBar({ opp }: { opp: Opportunity }) {
+  const value = opp.components.coverageGap;
   const pct = Math.round(value * 100);
-  const label = value >= 0.7 ? "Wide" : value >= 0.4 ? "Medium" : "Narrow";
-  const c = value >= 0.7 ? GREEN : value >= 0.4 ? AMBER : RED;
+  const state = coverageState(opp);
+  const label =
+    state === "no-data" ? "No data" :
+    state === "cooling" ? "Cooling" :
+    value >= 0.7 ? "Wide" : value >= 0.4 ? "Medium" : "Narrow";
+  const c =
+    state === "no-data" ? INK35 :
+    state === "cooling" ? AMBER :
+    value >= 0.7 ? GREEN : value >= 0.4 ? AMBER : RED;
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
@@ -71,8 +102,9 @@ function GapBar({ value }: { value: number }) {
         <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, color: c }}>{label}</span>
       </div>
       <div style={{ height: 5, background: "rgba(26,20,16,.08)" }}>
-        <div style={{ height: "100%", width: `${pct}%`, background: c }} />
+        {state !== "no-data" && <div style={{ height: "100%", width: `${pct}%`, background: c }} />}
       </div>
+      <CoverageNote opp={opp} />
     </div>
   );
 }
@@ -186,7 +218,7 @@ function ScanCard({
             {FIT_LABEL[opp.fit]}
           </span>
         )}
-        <GapBar value={opp.components.coverageGap} />
+        <GapBar opp={opp} />
 
         {/* Source chips */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
@@ -223,6 +255,7 @@ function ScanCard({
             <CompBar label="Magnitude" value={opp.components.magnitude} />
             <CompBar label="Velocity" value={opp.components.velocity} />
             <CompBar label="Coverage gap" value={opp.components.coverageGap} />
+            <CoverageNote opp={opp} />
             <CompBar label="Startup relevance" value={opp.components.relevance} accent />
             <CompBar label="Beat fit" value={opp.components.fit} />
             <CompBar label="Corroboration" value={opp.components.corroboration} />
