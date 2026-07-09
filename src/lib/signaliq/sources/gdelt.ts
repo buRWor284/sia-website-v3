@@ -38,7 +38,7 @@ const MIN_COVERAGE_DAYS = 10;
 // scan.ts caps how many seeds reach here so a cold scan stays under maxDuration.
 const gdeltLimit = createLimiter({ concurrency: 4 });
 
-const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6h — volume is a slow-moving signal (now ~13-month window)
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6h — volume is a slow-moving signal (now ~12-month window)
 const cache = new Map<string, { at: number; val: Coverage }>();
 
 interface TimelineResp {
@@ -82,16 +82,18 @@ export async function gdeltCoverage(topic: string): Promise<Coverage | null> {
   const hit = cache.get(cacheKey);
   if (hit && Date.now() - hit.at < CACHE_TTL_MS) return hit.val;
 
-  // Widened from 2m to 13m (2026-07-08 — baseline sanity check v1, see
+  // Widened from 2m to 12m (2026-07-08 — baseline sanity check v1, see
   // SignalIQ-Notes-and-TODOs.md) so parseTimeline has ~12 months of baseline to
   // compare the recent 2 weeks against, instead of just the 4 weeks prior.
-  // NOT verified against a live response in this sandbox (no outbound access to
-  // GDELT here) — same caveat as the VOLUME_CAP calibration note above; confirm
-  // response shape/latency on the next real scan and adjust if GDELT enforces a
-  // shorter max timespan for timelinevol than documented.
+  // BUG FOUND SAME DAY: originally shipped as 13m ("padding" past 12) — GDELT's
+  // documented max for the months unit on this endpoint IS 12, so 13m exceeded
+  // it and the API failed the request outright on every single topic (100%
+  // "no coverage data" in production, not intermittent — confirmed by Irfan).
+  // Fixed to the documented max of 12m. If this still misbehaves live, the next
+  // suspect is per-call latency at this span, not the value itself.
   const url =
     `${BASE}?query=${encodeURIComponent(`"${topic}"`)}` +
-    `&mode=timelinevol&format=json&timespan=13m`;
+    `&mode=timelinevol&format=json&timespan=12m`;
 
   try {
     // Single attempt only — no synchronous retry (a 5s back-off per seed could
