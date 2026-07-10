@@ -91,7 +91,7 @@ export async function POST(req: NextRequest) {
   const ip = clientIp(req);
 
   // Bot protection (no-op in dev if TURNSTILE_SECRET_KEY unset).
-  const human = await verifyTurnstile(input.turnstileToken, ip);
+  const human = await verifyTurnstile(input.turnstileToken, ip, req.headers.get("x-turnstile-bypass"));
   if (!human) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }

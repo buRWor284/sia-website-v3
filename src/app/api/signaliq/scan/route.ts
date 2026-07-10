@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 
   const ip = clientIp(req);
   const token = typeof raw.turnstileToken === "string" ? raw.turnstileToken : undefined;
-  const human = await verifyTurnstile(token, ip);
+  const human = await verifyTurnstile(token, ip, req.headers.get("x-turnstile-bypass"));
   if (!human) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }

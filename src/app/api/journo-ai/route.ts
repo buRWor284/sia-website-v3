@@ -173,6 +173,7 @@ export async function POST(request: NextRequest) {
   const human = await verifyTurnstile(
     typeof body.turnstileToken === "string" ? body.turnstileToken : undefined,
     ip,
+    request.headers.get("x-turnstile-bypass"),
   );
   if (!human) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });

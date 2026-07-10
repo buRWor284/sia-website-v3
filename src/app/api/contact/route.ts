@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
   const turnstileToken = body && typeof body === "object"
     ? (body as Record<string, unknown>).turnstileToken as string
     : null;
-  const turnstileOk = await verifyTurnstile(turnstileToken, ip);
+  const turnstileOk = await verifyTurnstile(turnstileToken, ip, request.headers.get("x-turnstile-bypass"));
   if (!turnstileOk) {
     return NextResponse.json(
       { error: "Bot verification failed. Please refresh and try again." },

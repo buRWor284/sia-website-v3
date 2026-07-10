@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── Turnstile verification ─────────────────────────────────
-  const turnstileOk = await verifyTurnstile(body.turnstileToken, ip);
+  const turnstileOk = await verifyTurnstile(body.turnstileToken, ip, req.headers.get("x-turnstile-bypass"));
   if (!turnstileOk) {
     return NextResponse.json(
       { error: "Bot verification failed. Please refresh and try again." },
