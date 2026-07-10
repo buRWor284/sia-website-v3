@@ -152,10 +152,9 @@ const V2_STORE = "collabiq_v2_state";
 const V2_SUB   = "collabiq_v2_sub";
 
 function initState(): CollabState {
-  try {
-    const s = localStorage.getItem(V2_STORE);
-    if (s) { const p = JSON.parse(s) as CollabState; p.step = 0; return p; }
-  } catch { /* noop */ }
+  // Always start blank — do not rehydrate form fields from a previous
+  // session's localStorage. Old business/domain/desc text was showing up
+  // as "stale data" on fresh visits (2026-07 QA finding).
   return { biz:"",domain:"",desc:"",industry:"",customInd:"",strategy:"discount",
     audType:"",geo:"",audDesc:"",selNiches:[],scPartner:"",scCat:"",scores:{},step:0 };
 }

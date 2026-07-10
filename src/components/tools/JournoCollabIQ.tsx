@@ -162,18 +162,9 @@ const V2_STORE = "journocollabiq_v1_state";
 const V2_SUB   = "journocollabiq_v1_sub";
 
 function initState(): CollabState {
-  try {
-    const s = localStorage.getItem(V2_STORE);
-    if (s) {
-      const p = JSON.parse(s) as CollabState;
-      // Always restart at step 1 — partners/results aren't persisted,
-      // so resuming mid-wizard leaves the Continue button permanently disabled.
-      // Form fields (biz, industry, strategy etc.) are preserved so the user
-      // doesn't have to retype them.
-      p.step = 1;
-      return p;
-    }
-  } catch { /* noop */ }
+  // Always start blank — do not rehydrate form fields from a previous
+  // session's localStorage. Old business/industry/desc text was showing up
+  // as "stale data" on fresh visits (2026-07 QA finding).
   return { biz:"",domain:"",desc:"",industry:"",customInd:"",strategy:"discount",
     audType:"",geo:"",audDesc:"",selNiches:[],scPartner:"",scCat:"",scores:{},step:1 };
 }
