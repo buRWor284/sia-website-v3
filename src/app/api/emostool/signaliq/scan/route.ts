@@ -16,7 +16,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // extra headroom for the company-profile expansion call
 
-const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity"];
+const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity", "agency"];
 
 /**
  * Prefer the new `beats` array (1–3, primary first); fall back to the legacy

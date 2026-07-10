@@ -661,7 +661,7 @@ function SIQHero({ onStart }: { onStart: () => void }) {
           <SCaps size={9} ls="0.20em" color={INK55}>How it works</SCaps>
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 0 }}>
             {([
-              ["01", "Pick a beat", "Choose your industry vertical: SaaS, Fintech, Health, Climate, AI, or Cybersecurity."],
+              ["01", "Pick a beat", "Choose your industry vertical: SaaS, Fintech, Health, Climate, AI, Cybersecurity, or Agency & Marketing."],
               ["02", "Scan the radar", "5 live open-data sources scanned in seconds. No API key. No cost."],
               ["03", "Get an asset pack", "Pitch angle, data brief, journalist list: ready to send."],
             ] as [string, string, string][]).map(([n, title, desc], idx, arr) => (
@@ -2339,7 +2339,10 @@ const PAGE_CSS = `
     white-space: nowrap;
   }
   .siq-tab:nth-child(3n)       { border-right: none; }
-  .siq-tab:nth-last-child(-n+3) { border-bottom: none; }
+  /* 7 beats in a 3-col grid: the 7th (Agency) spans the full last row so there's
+     no dangling half-row. Bottom border only comes off the very last tab. */
+  .siq-tab:nth-child(7)        { grid-column: 1 / -1; border-right: none; }
+  .siq-tab:last-child          { border-bottom: none; }
   .siq-tab.active { background: ${INK}; color: ${PAPER}; }
   .siq-tab-no {
     font-family: ${SERIF};
@@ -2593,10 +2596,10 @@ const PAGE_CSS = `
   }
   @media (max-width: 600px) {
     .siq-beat-tabs { grid-template-columns: repeat(2, 1fr); }
+    /* 2-col recompute (bottom borders already correct from the desktop rules:
+       only the last tab drops its bottom). The 7th tab stays full-width. */
     .siq-tab:nth-child(3n)        { border-right: 1px solid ${INK15}; }
-    .siq-tab:nth-last-child(-n+3) { border-bottom: 1px solid ${INK15}; }
     .siq-tab:nth-child(2n)        { border-right: none; }
-    .siq-tab:nth-last-child(-n+2) { border-bottom: none; }
     .siq-cards { grid-template-columns: 1fr; }
     .siq-step { padding: 10px 12px; font-size: 8.5px; }
     .siq-hide-sm { display: none; }

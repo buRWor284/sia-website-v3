@@ -105,6 +105,10 @@ export const BEATS: Beat[] = [
       "SaaS churn", "no-code platform", "API economy", "enterprise software consolidation", "cloud cost optimization",
       "platform engineering", "open source monetization", "SaaS valuation", "developer experience", "startup funding",
       "B2B marketplace", "software security breach", "subscription fatigue", "AI productivity software", "startup acquisition",
+      // — widened 2026-07-10 (Fix B1) —
+      "usage-based pricing", "remote work software", "product analytics", "customer success", "sales automation",
+      "marketing automation", "workflow automation", "AI copilot", "app store fees", "SOC 2 compliance",
+      "venture capital", "seed funding", "micro SaaS", "integration platform", "low-code development", "tech IPO",
     ],
     blurb: "Software, product, and go-to-market stories.",
   },
@@ -116,6 +120,10 @@ export const BEATS: Beat[] = [
       "embedded finance", "open banking", "crypto regulation", "financial inclusion", "credit scoring AI",
       "insurtech", "remittance", "banking as a service", "BNPL regulation", "central bank digital currency",
       "fraud detection", "payroll fintech", "wealth management AI", "debit card startup", "lending discrimination",
+      // — widened 2026-07-10 (Fix B1) —
+      "digital wallet", "real-time payments", "cross-border payments", "mortgage technology", "robo-advisor",
+      "small business lending", "invoice financing", "expense management", "financial compliance", "KYC verification",
+      "anti-money laundering", "interchange fees", "crypto custody", "tokenized assets", "financial literacy", "credit builder",
     ],
     blurb: "Payments, lending, crypto-adjacent, and consumer-finance stories.",
   },
@@ -127,6 +135,11 @@ export const BEATS: Beat[] = [
       "chronic disease management", "mental health app", "wearable health", "FDA approval", "hospital consolidation",
       "drug pricing", "clinical AI", "remote patient monitoring", "health data privacy", "obesity treatment",
       "clinical trial", "biosensor", "patient engagement", "preventive care", "personalized medicine",
+      // — widened 2026-07-10 (Fix B1) —
+      "gene therapy", "genetic testing", "allergy treatment", "asthma", "fertility treatment",
+      "women's health", "sleep health", "medical devices", "vaccine development", "rare disease",
+      "cancer screening", "immunotherapy", "microbiome", "eldercare", "home health care",
+      "medical imaging", "hospital staffing shortage", "addiction treatment",
     ],
     blurb: "Care delivery, digital health, and consumer-health stories.",
   },
@@ -138,6 +151,11 @@ export const BEATS: Beat[] = [
       "offshore wind", "nuclear energy", "green hydrogen", "carbon credit", "ESG investing",
       "climate risk", "circular economy", "sustainable packaging", "water technology", "solar panel",
       "grid modernization", "clean transportation", "methane reduction", "biodiversity loss", "climate litigation",
+      // — widened 2026-07-10 (Fix B1) —
+      "battery recycling", "geothermal energy", "small modular reactor", "carbon capture", "climate insurance",
+      "precision agriculture", "alternative protein", "food waste", "vertical farming", "microgrid",
+      "green building", "sustainable aviation fuel", "e-waste recycling", "carbon accounting", "climate disclosure",
+      "EV battery supply chain", "energy efficiency",
     ],
     blurb: "Energy, sustainability, and the physical economy (great for mapographics).",
   },
@@ -149,6 +167,10 @@ export const BEATS: Beat[] = [
       "foundation model", "AI safety", "generative AI copyright", "AI bias", "autonomous vehicles",
       "AI chip shortage", "enterprise AI adoption", "AI governance", "RAG retrieval", "AI in healthcare",
       "AI hallucination", "model fine-tuning", "AI in education", "AI surveillance", "AI product liability",
+      // — widened 2026-07-10 (Fix B1) —
+      "AI coding assistant", "AI video generation", "small language model", "edge AI", "GPU cloud",
+      "synthetic data", "multimodal AI", "AI companion apps", "AI in legal", "AI drug discovery",
+      "humanoid robot", "robotics automation", "deepfake detection", "AI inference cost", "AI talent shortage", "AI evaluation",
     ],
     blurb: "Models, applications, and the policy fight around them.",
   },
@@ -161,8 +183,30 @@ export const BEATS: Beat[] = [
       "AI voice scam", "identity verification bypass", "cryptocurrency theft hack", "zero trust mobile",
       "mobile carrier fraud", "data broker privacy", "cybersecurity insurance", "biometric authentication",
       "social engineering attack", "digital privacy regulation", "MVNO market growth", "password manager breach",
+      // — widened 2026-07-10 (Fix B1) —
+      "ransomware", "phishing", "supply chain attack", "passkey adoption", "API security",
+      "IoT security", "children's online privacy", "age verification", "facial recognition", "spyware",
+      "encrypted messaging", "post-quantum encryption", "bug bounty", "insider threat", "critical infrastructure security", "cloud security",
     ],
     blurb: "Mobile security, identity fraud, privacy, and the policy fight around them.",
+  },
+  {
+    id: "agency",
+    label: "Agency & Marketing",
+    // New beat 2026-07-10 (Irfan): marketing, SEO/GEO, digital PR, content, and
+    // web/app-dev agency stories. Real market phrases that return SEC/news/research
+    // hits (never brand/product names). Note: pure service/agency companies still
+    // tend to get thinner signal than product companies — see the Stage-2 caveat.
+    seeds: [
+      "digital advertising", "programmatic advertising", "retail media", "influencer marketing", "creator economy",
+      "content marketing", "search engine optimization", "generative engine optimization", "answer engine optimization", "AI search",
+      "zero-click search", "local SEO", "digital PR", "earned media", "media relations",
+      "public relations", "brand reputation", "crisis communications", "performance marketing", "growth marketing",
+      "conversion rate optimization", "customer acquisition cost", "marketing attribution", "first-party data", "cookie deprecation",
+      "ad fraud", "brand safety", "connected TV advertising", "web development", "app development",
+      "app store optimization", "headless CMS", "web design", "user generated content", "video marketing", "email marketing",
+    ],
+    blurb: "Marketing, SEO/GEO, digital PR, content, and web/app agency stories.",
   },
 ];
 

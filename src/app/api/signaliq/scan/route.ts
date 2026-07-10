@@ -24,7 +24,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60; // extra headroom when a company profile is expanded
 
 const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
-const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity"];
+const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity", "agency"];
 
 function clientIp(req: NextRequest): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";

@@ -711,10 +711,13 @@ export default function SignalIQPlatformClient({
                 onClick={() => setPrimary(b.id)}
                 style={{
                   padding: "10px 14px",
+                  // 7 beats in a 3-col grid: the 7th (Agency, i===6) spans the full
+                  // last row; bottom borders run under rows 1–2 only.
+                  gridColumn: i === 6 ? "1 / -1" : undefined,
                   background: active ? INK : "transparent",
                   border: "none",
-                  borderRight: (i % 3 !== 2) ? `1px solid ${INK15}` : "none",
-                  borderBottom: i < 3 ? `1px solid ${INK15}` : "none",
+                  borderRight: (i % 3 !== 2 && i !== 6) ? `1px solid ${INK15}` : "none",
+                  borderBottom: i < 6 ? `1px solid ${INK15}` : "none",
                   fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".07em", textTransform: "uppercase",
                   color: active ? PAPER : "rgba(26,20,16,.45)",
                   cursor: "pointer",
