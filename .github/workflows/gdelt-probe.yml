@@ -1,0 +1,56 @@
+# SignalIQ — TEMPORARY GDELT egress probe (delete after the experiment)
+#
+# Question this answers: do GitHub-hosted runners get through to GDELT
+# reliably, unlike Vercel's shared egress IPs (which GDELT mostly rejects)?
+# If yes → migrating the GDELT fetch into the runner is worth building.
+#
+# Every ~3 hours it makes 6 polite requests (6.5s apart, well under GDELT's
+# ~1 req/5s limit) across 3 sample topics and reports a success tally in the
+# job summary + a warning annotation when everything was blocked.
+#
+# No secrets needed. Does not touch the site, Supabase, or the cursor.
+
+name: GDELT Probe (temporary)
+
+on:
+  schedule:
+    - cron: '11 */3 * * *'   # 8x/day, offset minute to dodge scheduler congestion
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Probe GDELT from this runner
+        run: |
+          TOPICS=("clinical trial" "open banking" "startup funding")
+          OK=0; THROTTLED=0; FAILED=0; TOTAL=0
+          echo "Runner egress IP: $(curl -s --max-time 10 https://api.ipify.org || echo unknown)"
+          for round in 1 2; do
+            for topic in "${TOPICS[@]}"; do
+              TOTAL=$((TOTAL+1))
+              ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote('\"'+sys.argv[1]+'\"'))" "$topic")
+              BODY=$(curl -s --max-time 15 -w "\nHTTP_STATUS:%{http_code}" \
+                -H "User-Agent: SignalIQBot/0.1 (+https://www.syedirfanajmal.com; sia@syedirfanajmal.com)" \
+                "https://api.gdeltproject.org/api/v2/doc/doc?query=${ENC}&mode=timelinevol&format=json&timespan=2m" || echo "HTTP_STATUS:000")
+              STATUS=$(echo "$BODY" | grep "HTTP_STATUS:" | cut -d: -f2)
+              CONTENT=$(echo "$BODY" | sed '/HTTP_STATUS:/d')
+              if [ "$STATUS" = "200" ] && echo "$CONTENT" | grep -qi "timeline"; then
+                OK=$((OK+1)); RESULT="ok"
+              elif [ "$STATUS" = "429" ] || echo "$CONTENT" | grep -qiE "limit requests|too many requests"; then
+                THROTTLED=$((THROTTLED+1)); RESULT="throttled"
+              else
+                FAILED=$((FAILED+1)); RESULT="failed"
+              fi
+              echo "[$RESULT] round $round | \"$topic\" | HTTP $STATUS | ${#CONTENT} bytes"
+              sleep 6.5
+            done
+          done
+          echo "## GDELT probe: $OK/$TOTAL ok, $THROTTLED throttled, $FAILED failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "Tally: ok=$OK throttled=$THROTTLED failed=$FAILED total=$TOTAL"
+          if [ "$OK" = "0" ]; then
+            echo "::warning::GDELT probe: 0/$TOTAL requests succeeded from this runner (throttled=$THROTTLED, failed=$FAILED)"
+          else
+            echo "::notice::GDELT probe: $OK/$TOTAL requests succeeded from this runner"
+          fi
