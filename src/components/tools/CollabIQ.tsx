@@ -76,11 +76,11 @@ const V2_LOADING = [
 ];
 
 // Elapsed-time counter, matching the pattern rolled out to PressIQ/SignalIQ/
-// JournoCollabIQ — a standalone component so it resets naturally each time it
+// JournoCollabIQ. A standalone component so it resets naturally each time it
 // mounts (i.e. each time a fresh loading run starts), with no manual reset call
 // needed. The "typically 30-60s" estimate reuses PressIQ's observed range as a
 // placeholder (Irfan's call, 08 Jul) since PartnerCollabIQ's own research time
-// hasn't been separately measured yet — revisit once it has.
+// hasn't been separately measured yet. Revisit once it has.
 function ElapsedSecs() {
   const [secs, setSecs] = useState(0);
   useEffect(() => {

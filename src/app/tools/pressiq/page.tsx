@@ -16,7 +16,6 @@ import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
   DIMENSION_EVIDENCE,
   EMAIL_LIMIT,
-  EMOS_APPLY,
   EMOS_URL,
   EVIDENCE,
   FREE_LIMIT,
@@ -750,13 +749,12 @@ function PostScorePanel({
             eyebrow={composite >= 85 ? "YOU'VE GOT THE STANDARD | NOW SCALE IT" : "WHERE THIS SCORING COMES FROM"}
             heading={
               <>
-                This tool scores one pitch.<br /><span style={{ color: YEL }}>EMOS builds the whole pipeline.</span>
+                PressIQ scores one pitch.<br /><span style={{ color: YEL }}>EMOS builds the whole pipeline.</span>
               </>
             }
             pitch="PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently."
-            applyHref={composite >= 65 ? EMOS_APPLY : EMOS_URL}
+            applyHref={EMOS_URL}
             applyLabel={composite >= 65 ? "Apply to EMOS" : "Explore EMOS"}
-            applyTarget="_blank"
             hideExplore
             extraAction={
               <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=https://syedirfanajmal.com/tools/pressiq`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", padding: "14px 22px", border: `1px solid ${ra(PAPER, 0.25)}`, color: ra(PAPER, 0.5), fontFamily: GROT, fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>

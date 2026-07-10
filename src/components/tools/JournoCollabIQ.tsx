@@ -660,18 +660,22 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
       )}
 
       {/* EMOS CTA — shared skeleton (ToolCTAStrips.EmosCTAStrip), same
-          component SignalIQ/PressIQ/CoverageIQ use. Was previously a bespoke
-          light-background bar; content is unchanged, just re-skinned onto
-          the standard dark ink strip so all four tools read the same way. */}
+          component SignalIQ/PressIQ/CoverageIQ use. Copy rewritten to match
+          their "[Tool] does X. EMOS does Y" pattern (2026-07-08 copy pass);
+          the done-with-you angle moved into the pitch line instead of
+          standing alone as the eyebrow. */}
       <div style={{ marginTop: aiBrief ? 0 : 16 }}>
         <EmosCTAStrip
           toolName="JournoCollabIQ"
-          eyebrow="Want someone to execute this for you?"
-          heading={<span style={{ fontStyle: "italic" }}>Earned Media OS</span>}
-          pitch="The full system for collaborating with journalists, done with you."
-          applyHref="https://www.syedirfanajmal.com/emos/"
-          applyLabel="Learn more"
-          applyTarget="_blank"
+          heading={
+            <>
+              JournoCollabIQ finds the journalist.<br />
+              <span style={{ fontStyle: "italic", color: ACC }}>EMOS</span> gets the pitch in their inbox.
+            </>
+          }
+          pitch="JournoCollabIQ builds the target list, the outreach sequence, and the per-journalist angles. The full Earned Media Operating System hands your team the story signals and pitch system that feed this list, and can run the whole outreach for you if you'd rather not do it in-house."
+          applyHref="/emos"
+          applyLabel="Explore EMOS"
           hideExplore
         />
       </div>

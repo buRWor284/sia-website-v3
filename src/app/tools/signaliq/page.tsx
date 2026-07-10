@@ -148,7 +148,6 @@ const EMOS_URL = "/emos";
 // (H7, 2026-07-02 review: SignalIQ previously had no Turnstile wiring at all, so
 // enabling the secret for PressIQ would have 403'd every SignalIQ user.)
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-const EMOS_APPLY = "/emos/apply";
 
 // ── stats: the value/effort behind SignalIQ ──────────────────────────────────
 // Per-feed scale figures (verified June 2026). Keyed to SOURCES_DATA.id.
@@ -1509,14 +1508,15 @@ function PackStage({
           pitch={
             <>
               {PRODUCT} powers two of the three EMOS pillars:{" "}
-              <strong style={{ color: PAPER }}>Linkable Assets</strong> and{" "}
+              <strong style={{ color: PAPER }}>Authority Assets</strong> and{" "}
               <strong style={{ color: PAPER }}>Proactive PR</strong>. The full Earned Media
               Operating System gives your team the playbooks, journalist system, and
               guarantee to earn coverage in-house.
             </>
           }
-          applyHref={EMOS_APPLY}
-          exploreHref={EMOS_URL}
+          applyHref={EMOS_URL}
+          applyLabel="Explore EMOS"
+          hideExplore
         />
       </div>
     </section>

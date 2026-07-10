@@ -137,7 +137,7 @@ export const SCORE_TOOL = {
 } as const;
 
 export const SYSTEM_PROMPT =
-  "You are PressIQ, an expert evaluator of PR pitches — whether sent through source-request platforms " +
+  "You are PressIQ, an expert evaluator of PR pitches, whether sent through source-request platforms " +
   "(HARO/Connectively, Qwoted, Source of Sources, Featured, Help a B2B Writer) or as direct outreach (cold email, " +
   "social/DM) to a journalist. You score pitches against a proven " +
   "32-point system, the EMOS framework (Personal Branding x Storytelling x Neuromarketing), and Newsroom-Ready " +
