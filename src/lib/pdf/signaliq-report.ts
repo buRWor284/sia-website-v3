@@ -6,6 +6,7 @@
  */
 
 import type { AssetPack, Opportunity } from "@/lib/signaliq/types";
+import { coverageState } from "@/lib/signaliq/score";
 import {
   PAGE, C, fitLine, coverPage, runningHeader, sectionMast, badge, renderRich, stampFooters, installSanitizer,
   type PdfDoc, type RGB, type HeaderOpts,
@@ -30,6 +31,23 @@ function gap(v: number): { label: string; color: RGB } {
   return v >= 0.7 ? { label: "Wide", color: C.GREEN }
        : v >= 0.4 ? { label: "Medium", color: C.AMBER }
        : { label: "Narrow", color: C.RED };
+}
+/** Coverage-gap display for a card/label, mirroring the on-screen GapBar (see
+ * coverageState() in lib/signaliq/score.ts): a "no data" (neutral 0.5 default)
+ * or "cooling" (discounted) reading must NOT render as a real Wide/Medium/Narrow. */
+function gapDisplay(o: Opportunity): { label: string; color: RGB } {
+  const state = coverageState(o);
+  if (state === "no-data") return { label: "No data", color: C.GREY };
+  if (state === "cooling") return { label: "Cooling", color: C.AMBER };
+  return gap(o.components.coverageGap);
+}
+/** CoverageNote-equivalent caption (mirrors the on-screen CoverageNote). Null when
+ * the reading is a real, undiscounted one. */
+function coverageNote(o: Opportunity): string | null {
+  const state = coverageState(o);
+  if (state === "no-data") return "No press data returned for this topic (GDELT) - this is a neutral default, not a real coverage reading.";
+  if (state === "cooling") return "Press coverage is falling and nothing here is rising - discounted, not real whitespace.";
+  return null;
 }
 
 export function buildSignalIqReport(doc: PdfDoc, d: SignalIqReportData): void {
@@ -98,8 +116,8 @@ export function buildSignalIqReport(doc: PdfDoc, d: SignalIqReportData): void {
     doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...C.INK);
     const hl = (doc.splitTextToSize(o.headline, cW - 14) as string[]).slice(0, 2);
     doc.text(hl, cx + 11, cy + 9 + 6);
-    // coverage gap
-    const g = gap(o.components.coverageGap);
+    // coverage gap - honest no-data/cooling states, mirroring the on-screen GapBar
+    const g = gapDisplay(o);
     doc.setFont("helvetica", "bold"); doc.setFontSize(6.5); doc.setTextColor(...g.color);
     doc.text(`COVERAGE GAP: ${g.label.toUpperCase()}`, cx + 5, cy + cH - 4);
     if (o.fit) {
@@ -127,6 +145,7 @@ export function buildSignalIqReport(doc: PdfDoc, d: SignalIqReportData): void {
   doc.text(selHl, M, y); y += selHl.length * 7 + 4;
 
   // score breakdown bars
+  const selGapState = coverageState(sel);
   const comps: [string, number][] = [
     ["Coverage gap", sel.components.coverageGap],
     ["Magnitude", sel.components.magnitude],
@@ -138,17 +157,37 @@ export function buildSignalIqReport(doc: PdfDoc, d: SignalIqReportData): void {
   doc.text("HOW THIS SCORE IS BUILT", M, y); y += 6;
   const barW = W - M * 2 - 40;
   comps.forEach(([label, v]) => {
+    // The coverage-gap row is the honesty-sensitive component: a "no data" reading
+    // is a neutral 0.5 default (not a real 50), so draw it as an empty track rather
+    // than a fake bar; "cooling" is a discounted-but-real value shown in amber.
+    // Mirrors the on-screen GapBar / CoverageNote treatment.
+    const isGap = label === "Coverage gap";
+    const noData = isGap && selGapState === "no-data";
     const pct = Math.round(v * 100);
-    const col: RGB = v >= 0.7 ? C.GREEN : v >= 0.4 ? C.AMBER : C.RED;
+    const col: RGB = noData ? C.GREY
+      : isGap && selGapState === "cooling" ? C.AMBER
+      : v >= 0.7 ? C.GREEN : v >= 0.4 ? C.AMBER : C.RED;
     doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...C.DGREY);
     doc.text(label, M, y + 2.5);
     doc.setDrawColor(220, 215, 205); doc.setFillColor(245, 243, 238); doc.setLineWidth(0.2);
-    doc.rect(M + 34, y, barW, 3.4, "F");
-    doc.setFillColor(...col); doc.rect(M + 34, y, barW * v, 3.4, "F");
+    if (noData) {
+      // empty, unfilled track - no fake reading drawn
+      doc.setDrawColor(190, 185, 175); doc.rect(M + 34, y, barW, 3.4, "S");
+    } else {
+      doc.rect(M + 34, y, barW, 3.4, "F");
+      doc.setFillColor(...col); doc.rect(M + 34, y, barW * v, 3.4, "F");
+    }
     doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(...col);
-    doc.text(`${pct}`, W - M, y + 2.8, { align: "right" });
+    doc.text(noData ? "No data" : `${pct}`, W - M, y + 2.8, { align: "right" });
     y += 6.5;
   });
+  // coverage-gap honesty caption (no-data / cooling), matching the on-screen CoverageNote
+  const selNote = coverageNote(sel);
+  if (selNote) {
+    doc.setFont("helvetica", "italic"); doc.setFontSize(7); doc.setTextColor(...C.GREY);
+    const nl = doc.splitTextToSize(selNote, W - M * 2) as string[];
+    doc.text(nl, M, y); y += nl.length * 3.6 + 1;
+  }
   y += 6;
 
   // ── §03 asset pack ────────────────────────────────────────────────────────
