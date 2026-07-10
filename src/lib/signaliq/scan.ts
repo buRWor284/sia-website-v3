@@ -11,7 +11,7 @@
  * THAT company — so results are genuinely personalised, not just re-ordered.
  */
 import type { BeatId, Opportunity, ProfileExpansion, Signal } from "./types";
-import { MAX_OPPORTUNITIES, beatById } from "./config";
+import { BEAT_SLOTS, MAX_OPPORTUNITIES, beatById } from "./config";
 import { SIGNAL_SOURCES } from "./sources";
 import { getStoredCoverage } from "./coverage-store";
 import { expandCompanyProfile } from "./profile";
@@ -21,8 +21,34 @@ export interface ScanResult {
   opportunities: Opportunity[];
   partial: boolean;
   notes: string[];
+  /** Normalised beat selection actually scanned (primary first, deduped, ≤3). */
+  beats: BeatId[];
   /** Surfaced so the UI/library can show what the scan was tuned to. */
   expansion?: ProfileExpansion | null;
+}
+
+/** A single seed to scan, tagged with the beat it came from (for card badges). */
+interface SeedEntry {
+  seed: string;
+  tailored: boolean;
+  beat: BeatId;
+}
+
+/**
+ * Normalise a beat selection: dedup (order-preserving), drop unknowns, cap at 3,
+ * and guarantee at least one beat (falls back to "saas", the default primary).
+ */
+function normalizeBeats(beats: BeatId[]): BeatId[] {
+  const seen = new Set<string>();
+  const out: BeatId[] = [];
+  for (const b of beats ?? []) {
+    if (!b || seen.has(b)) continue;
+    if (!beatById(b) || beatById(b).id !== b) continue; // guard against unknown ids
+    seen.add(b);
+    out.push(b);
+    if (out.length >= 3) break;
+  }
+  return out.length ? out : ["saas"];
 }
 
 export interface ScanOptions {
@@ -33,31 +59,57 @@ export interface ScanOptions {
 /** Max distinct seeds scanned per run (keeps external fan-out bounded). */
 const MAX_SEEDS = 18;
 
-export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<ScanResult> {
-  const beatSeeds = beatById(beat).seeds;
+export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise<ScanResult> {
+  const beatList = normalizeBeats(beats);
+  const primary = beatList[0];
   const ctx = (opts.companyContext ?? "").trim();
 
-  // 1) Expand the company profile into tailored seeds + relevance lexicon.
-  let expansion: ProfileExpansion | null = null;
-  if (ctx) expansion = await expandCompanyProfile(ctx, beat);
+  // Lowercased seed → source beat, built across ALL selected beats in user order
+  // (first beat wins on an overlapping seed). Used to badge tailored cards with
+  // the beat the model selected them from; invented extraTopics fall back to primary.
+  const seedBeatOf = new Map<string, BeatId>();
+  for (const b of beatList) {
+    for (const s of beatById(b).seeds) {
+      const k = s.toLowerCase();
+      if (!seedBeatOf.has(k)) seedBeatOf.set(k, b);
+    }
+  }
 
-  // 2) Build the seed list: tailored first (flagged), then beat seeds for breadth.
+  // 1) Expand the company profile into tailored seeds + relevance lexicon, using
+  //    the union of all selected beats' candidate seeds (grouped per beat inside).
+  let expansion: ProfileExpansion | null = null;
+  if (ctx) expansion = await expandCompanyProfile(ctx, beatList);
+
+  // 2) Build the seed list: tailored first (flagged), then generic beat seeds for
+  //    breadth — weighted per BEAT_SLOTS so the primary beat keeps most of the
+  //    budget. Total is always capped at MAX_SEEDS, so N beats cost the same as 1.
+  const slots = BEAT_SLOTS[beatList.length] ?? BEAT_SLOTS[3];
   const seen = new Set<string>();
-  const seedList: { seed: string; tailored: boolean }[] = [];
+  const seedList: SeedEntry[] = [];
+
+  // Tailored (company-specific) seeds fill first, cap 16 (matches the profile
+  // parser's own cap). Tag each with its origin beat, defaulting to primary.
   for (const s of expansion?.seeds ?? []) {
+    if (seedList.length >= 16) break;
     const k = s.toLowerCase();
     if (seen.has(k)) continue;
     seen.add(k);
-    seedList.push({ seed: s, tailored: true });
-    if (seedList.length >= MAX_SEEDS) break;
+    seedList.push({ seed: s, tailored: true, beat: seedBeatOf.get(k) ?? primary });
   }
-  for (const s of beatSeeds) {
-    if (seedList.length >= MAX_SEEDS) break;
-    const k = s.toLowerCase();
-    if (seen.has(k)) continue;
-    seen.add(k);
-    seedList.push({ seed: s, tailored: false });
-  }
+
+  // Generic backfill, primary beat first, each beat limited to its slot quota.
+  beatList.forEach((b, i) => {
+    const quota = slots[i] ?? 0;
+    let taken = 0;
+    for (const s of beatById(b).seeds) {
+      if (seedList.length >= MAX_SEEDS || taken >= quota) break;
+      const k = s.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      seedList.push({ seed: s, tailored: false, beat: b });
+      taken++;
+    }
+  });
 
   let failures = 0;
 
@@ -67,7 +119,7 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
   // and coverage collapsed to neutral on nearly every topic.
   const seedsWithSignals = (
     await Promise.all(
-      seedList.map(async ({ seed, tailored }) => {
+      seedList.map(async ({ seed, tailored, beat }) => {
         const signalResults = await Promise.allSettled(SIGNAL_SOURCES.map((fn) => fn(seed)));
 
         const signals: Signal[] = [];
@@ -83,10 +135,10 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
         // Drop ultra-weak lone signals (e.g. a single 1-paper arXiv hit) — noise.
         const maxMag = Math.max(...signals.map((s) => s.magnitude));
         if (signals.length === 1 && maxMag < 0.12) return null;
-        return { seed, tailored, signals };
+        return { seed, tailored, beat, signals };
       }),
     )
-  ).filter((x): x is { seed: string; tailored: boolean; signals: Signal[] } => x !== null);
+  ).filter((x): x is { seed: string; tailored: boolean; beat: BeatId; signals: Signal[] } => x !== null);
 
   // Phase 2 — read pre-fetched coverage from the Supabase store (instant lookup).
   // Coverage is refreshed in the background by the /api/signaliq/refresh-coverage
@@ -94,8 +146,10 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
   // If a topic isn't in the store yet (e.g. first hour after deploy), coverage
   // comes back null and the scorer treats the gap as neutral — no crash, no wait.
   const perSeed = await Promise.all(
-    seedsWithSignals.map(async ({ seed, tailored, signals }) => {
+    seedsWithSignals.map(async ({ seed, tailored, beat, signals }) => {
       const coverage = await getStoredCoverage(seed);
+      // `beat` here is the seed's OWN source beat (per-seed), so mixed-beat
+      // radars carry the correct badge and beat-fit on every card.
       return scoreOpportunity({ topic: seed, beat, signals, coverage, expansion, tailored });
     }),
   );
@@ -122,17 +176,28 @@ export async function scanBeat(beat: BeatId, opts: ScanOptions = {}): Promise<Sc
     notes.push("Couldn't tailor topics this time — showing the standard beat. Try again in a moment.");
   }
   if (partial) notes.push("Some sources were unavailable; this scan may be incomplete.");
+  const beatLabels = beatList.map((b) => beatById(b).label).join(" + ");
   if (opportunities.length === 0) {
-    notes.push("No live signals cleared the bar for this beat right now — try again later.");
-  }
-  // Thin-results caution: if a company profile is present but this beat only
-  // cleared a handful of matches, the beat choice itself may be the limiter
-  // (boundary-vertical companies can get starved under the "wrong" beat).
-  if (expansion && opportunities.length > 0 && opportunities.length < 5) {
     notes.push(
-      `Only ${opportunities.length} strong ${opportunities.length === 1 ? "match" : "matches"} under ${beatById(beat).label} — if your company sits between categories, a different beat may surface more.`,
+      `No live signals cleared the bar for ${beatList.length > 1 ? "these beats" : "this beat"} right now — try again later.`,
     );
   }
+  // Thin-results caution: if a company profile is present but the selection only
+  // cleared a handful of matches, adding a beat can widen the radar — boundary-
+  // vertical companies get starved under a single "wrong" beat. Multi-beat is the
+  // fix, so the copy now nudges toward ADDING a beat (still one scan) rather than
+  // swapping to a different one.
+  if (expansion && opportunities.length > 0 && opportunities.length < 5) {
+    if (beatList.length < 3) {
+      notes.push(
+        `Only ${opportunities.length} strong ${opportunities.length === 1 ? "match" : "matches"} under ${beatLabels} — if your company straddles categories, add ${beatList.length === 1 ? "a secondary" : "a third"} beat to widen the radar (still one scan).`,
+      );
+    } else {
+      notes.push(
+        `Only ${opportunities.length} strong ${opportunities.length === 1 ? "match" : "matches"} across ${beatLabels} right now — try broadening your company description or check back later.`,
+      );
+    }
+  }
 
-  return { opportunities, partial, notes, expansion };
+  return { opportunities, partial, notes, beats: beatList, expansion };
 }

@@ -89,13 +89,24 @@ export const EXPAND_TOOL = {
   },
 } as const;
 
-export function buildExpandPrompt(description: string, beat?: BeatId): string {
-  const b = beatById(beat ?? "saas");
+export function buildExpandPrompt(description: string, beats: BeatId[]): string {
+  const list = beats && beats.length ? beats : (["saas"] as BeatId[]);
+  const beatLabels = list.map((id) => beatById(id).label).join(" + ");
+  // Candidates are listed GROUPED per beat so the model can pick across a
+  // multi-beat (boundary-vertical) selection without losing which beat a topic
+  // belongs to. Still one small prompt even at 2–3 beats.
+  const groups = list
+    .map((id) => {
+      const b = beatById(id);
+      return `CANDIDATE TOPICS (${b.label}):\n${b.seeds.join(", ")}`;
+    })
+    .join("\n\n");
   return `COMPANY DESCRIPTION (from the founder):
 ${description.trim()}
 
-CANDIDATE TOPICS for the ${b.label} beat — select the ones that fit this company and rate each:
-${b.seeds.join(", ")}
+The founder chose ${list.length > 1 ? `these beats: ${beatLabels}` : `the ${beatLabels} beat`}. Select the candidate topics — from ANY group below — that genuinely fit this company and rate each (copy each topic verbatim):
+
+${groups}
 
 Produce the topics and relevance lexicon via the emit_profile tool. Selecting the relevant candidates matters most — they reliably return signals. Add new topics only if they are real market/research terms (not product features). Rate fit honestly.`;
 }
@@ -192,12 +203,15 @@ const cacheKey = (s: string): string => {
  */
 export async function expandCompanyProfile(
   companyContext: string,
-  beat?: BeatId,
+  beats: BeatId[],
 ): Promise<ProfileExpansion | null> {
   const desc = (companyContext ?? "").trim();
   if (desc.length < 12) return null; // too thin to tailor on
 
-  const key = cacheKey(`${beat ?? ""}|${desc}`);
+  const beatList = beats && beats.length ? beats : (["saas"] as BeatId[]);
+  // Cache key includes ALL selected beats in order — a Health+AI selection must
+  // not collide with a Health-only one.
+  const key = cacheKey(`${beatList.join(",")}|${desc}`);
   const hit = cache.get(key);
   if (hit) return hit;
 
@@ -219,7 +233,7 @@ export async function expandCompanyProfile(
         system: EXPAND_SYSTEM,
         tools: [EXPAND_TOOL],
         tool_choice: { type: "tool", name: EXPAND_TOOL.name },
-        messages: [{ role: "user", content: buildExpandPrompt(desc, beat) }],
+        messages: [{ role: "user", content: buildExpandPrompt(desc, beatList) }],
       }),
     });
     if (!res.ok) {

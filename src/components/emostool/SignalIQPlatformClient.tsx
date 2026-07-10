@@ -588,7 +588,11 @@ export default function SignalIQPlatformClient({
 }: {
   initialSignals: DbSignal[];
 }) {
-  const [beat, setBeat] = useState<BeatId>("saas");
+  // Ordered beat selection (primary first), length 1–3. All tiers are free.
+  const [beats, setBeats] = useState<BeatId[]>(["saas"]);
+  const beat = beats[0]; // derived primary
+  const secondary = beats[1] as BeatId | undefined;
+  const tertiary = beats[2] as BeatId | undefined;
   const [companyContext, setCompanyContext] = useCompanyContext();
   const [companyName, setCompanyName] = useCompanyName();
   const [scanning, setScanning] = useState(false);
@@ -599,6 +603,19 @@ export default function SignalIQPlatformClient({
   const [refreshKey, setRefreshKey] = useState(0);
 
   const currentBeat = BEATS.find(b => b.id === beat);
+
+  // Multi-beat selection handlers (mirror the public tool). Setting primary keeps
+  // any secondary/tertiary that don't collide; removing secondary drops tertiary.
+  const clearScan = () => { setScan(null); setScanError(null); };
+  const setPrimary = (id: BeatId) => { setBeats([id, ...beats.slice(1).filter(b => b !== id)]); clearScan(); };
+  const secondaryOptions = BEATS.filter(b => b.id !== beat && b.id !== tertiary);
+  const tertiaryOptions = BEATS.filter(b => b.id !== beat && b.id !== secondary);
+  const addSecondary = () => { const f = secondaryOptions[0]; if (f) { setBeats([beat, f.id]); clearScan(); } };
+  const changeSecondary = (id: BeatId) => { setBeats([beat, id, ...(tertiary && tertiary !== id ? [tertiary] : [])]); clearScan(); };
+  const removeSecondary = () => { setBeats([beat]); clearScan(); };
+  const addTertiary = () => { const f = tertiaryOptions[0]; if (f && secondary) { setBeats([beat, secondary, f.id]); clearScan(); } };
+  const changeTertiary = (id: BeatId) => { if (secondary) { setBeats([beat, secondary, id]); clearScan(); } };
+  const removeTertiary = () => { if (secondary) { setBeats([beat, secondary]); clearScan(); } };
 
   // The server now personalises + ranks by relevance to the company profile,
   // so we render its ordering directly (no more client-side re-rank).
@@ -612,7 +629,7 @@ export default function SignalIQPlatformClient({
       const res = await fetch("/api/emostool/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat, companyContext: companyContext.trim() || undefined }),
+        body: JSON.stringify({ beats, companyContext: companyContext.trim() || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setScanError(data.error || "Scan failed.");
@@ -681,17 +698,17 @@ export default function SignalIQPlatformClient({
           </div>
         </div>
 
-        {/* Step 2 — beat */}
+        {/* Step 2 — beat(s) */}
         <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>
-          Step 2 · Pick a beat <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}> — the general area we explore around your company</span>
+          Step 2 · Pick your main beat <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}> — the general area we explore; add up to two more if you straddle categories (still one scan)</span>
         </label>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${INK15}`, marginBottom: 18 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", border: `1px solid ${INK15}`, marginBottom: 12 }}>
           {BEATS.map((b, i) => {
             const active = b.id === beat;
             return (
               <button
                 key={b.id}
-                onClick={() => { setBeat(b.id); setScan(null); setScanError(null); }}
+                onClick={() => setPrimary(b.id)}
                 style={{
                   padding: "10px 14px",
                   background: active ? INK : "transparent",
@@ -710,6 +727,41 @@ export default function SignalIQPlatformClient({
           })}
         </div>
 
+        {/* Secondary / tertiary beats — progressive disclosure (all tiers free) */}
+        {(() => {
+          const rowStyle: React.CSSProperties = { display: "inline-flex", alignItems: "center", gap: 8, border: `1px solid ${INK15}`, padding: "5px 6px 5px 10px" };
+          const lblStyle: React.CSSProperties = { fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 };
+          const selStyle: React.CSSProperties = { fontFamily: GROT, fontWeight: 700, fontSize: 11, color: INK, background: PAPER, border: `1px solid ${INK15}`, padding: "5px 8px", cursor: "pointer", outline: "none" };
+          const xStyle: React.CSSProperties = { width: 22, height: 22, display: "inline-flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", fontSize: 16, lineHeight: 1, color: INK55, cursor: "pointer" };
+          const addStyle: React.CSSProperties = { background: "transparent", border: `1px dashed ${INK15}`, padding: "7px 12px", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", textTransform: "uppercase", color: INK55, cursor: "pointer" };
+          return (
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px 14px", marginBottom: 18 }}>
+              {!secondary ? (
+                <button type="button" style={addStyle} onClick={addSecondary}>+ Add a secondary beat <span style={{ opacity: 0.6, fontWeight: 600 }}>(optional)</span></button>
+              ) : (
+                <div style={rowStyle}>
+                  <span style={lblStyle}>Secondary</span>
+                  <select style={selStyle} value={secondary} onChange={(e) => changeSecondary(e.target.value as BeatId)}>
+                    {secondaryOptions.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
+                  </select>
+                  <button type="button" style={xStyle} onClick={removeSecondary} aria-label="Remove secondary beat">×</button>
+                </div>
+              )}
+              {secondary && (!tertiary ? (
+                <button type="button" style={addStyle} onClick={addTertiary}>+ Add a third beat <span style={{ opacity: 0.6, fontWeight: 600 }}>(optional)</span></button>
+              ) : secondary && tertiary ? (
+                <div style={rowStyle}>
+                  <span style={lblStyle}>Tertiary</span>
+                  <select style={selStyle} value={tertiary} onChange={(e) => changeTertiary(e.target.value as BeatId)}>
+                    {tertiaryOptions.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
+                  </select>
+                  <button type="button" style={xStyle} onClick={removeTertiary} aria-label="Remove third beat">×</button>
+                </div>
+              ) : null)}
+            </div>
+          );
+        })()}
+
         {/* Step 3 — scan */}
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <button
@@ -723,7 +775,7 @@ export default function SignalIQPlatformClient({
               cursor: scanning ? "wait" : companyContext.trim().length < 12 ? "not-allowed" : "pointer",
             }}
           >
-            {scanning ? "Scanning the radar…" : `Scan ${currentBeat?.label ?? ""} →`}
+            {scanning ? "Scanning the radar…" : beats.length > 1 ? `Scan ${beats.length} beats →` : `Scan ${currentBeat?.label ?? ""} →`}
           </button>
           <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
             {scanning ? "Expanding your profile + scanning sources…" : "Platform scan — unlimited, tailored to your company"}
@@ -745,7 +797,7 @@ export default function SignalIQPlatformClient({
               Radar results
             </span>
             <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-              {scan.opportunities.length} opportunities · {currentBeat?.label} beat
+              {scan.opportunities.length} opportunities · {(scan.beats ?? beats).map((id) => BEATS.find((b) => b.id === id)?.label ?? id).join(" + ")}
               {companyContext.trim() && " · personalised to your startup"}
             </span>
             {scan.partial && (
@@ -766,7 +818,7 @@ export default function SignalIQPlatformClient({
               <ScanCard
                 key={opp.id}
                 opp={opp}
-                beatLabel={currentBeat?.label ?? beat}
+                beatLabel={BEATS.find((b) => b.id === opp.beat)?.label ?? currentBeat?.label ?? beat}
                 companyContext={companyContext}
                 companyName={companyName}
                 savedIds={savedOppIds}

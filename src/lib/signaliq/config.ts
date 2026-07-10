@@ -20,6 +20,20 @@ export const EMAIL_PACKS = 5; // with email
 /** How many opportunities a scan returns. */
 export const MAX_OPPORTUNITIES = 12;
 
+/**
+ * Seed slots per selected beat, keyed by how many beats the user chose (total
+ * always ≤ MAX_SEEDS=18 in scan.ts). Weighted, NOT even: the primary beat keeps
+ * most of the budget so a single-focus scan stays coherent, while a secondary /
+ * tertiary beat is additive breadth rather than dilution. One multi-beat scan is
+ * still one /api/signaliq/scan call (one quota decrement) — the extra beats just
+ * widen the candidate pool the same 18 slots sample from.
+ */
+export const BEAT_SLOTS: Record<number, number[]> = {
+  1: [18],
+  2: [12, 6],
+  3: [10, 5, 3],
+};
+
 /** Source credibility weights (0..1) — a federal filing outranks a forum. */
 export const SOURCE_CREDIBILITY: Record<SourceId, number> = {
   sec: 0.95,

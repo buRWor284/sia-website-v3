@@ -124,7 +124,16 @@ export interface ProfileExpansion {
 }
 
 export interface ScanInput {
-  beat: BeatId;
+  /**
+   * DEPRECATED single-beat field — kept so older clients / the EMOS surface keep
+   * working mid-deploy. Prefer `beats`. When both are sent, `beats` wins.
+   */
+  beat?: BeatId;
+  /**
+   * Ordered beat selection (primary first), length 1–3. All tiers are free.
+   * The API maps a bare `beat` to `[beat]` for back-compat.
+   */
+  beats?: BeatId[];
   /** Founder's company description — tailors seeds + relevance scoring. */
   companyContext?: string;
   /** Pro/custom keywords (v2). Accepted but preset beats drive the MVP. */
@@ -133,7 +142,10 @@ export interface ScanInput {
 }
 
 export interface ScanResponse {
+  /** Primary beat (beats[0]) — retained for any client reading the old field. */
   beat: BeatId;
+  /** Full ordered beat selection echoed back (primary first). */
+  beats: BeatId[];
   generatedAt: string;
   opportunities: Opportunity[];
   usage: { remaining: number; tier: UsageTier };

@@ -685,24 +685,48 @@ function SIQHero({ onStart }: { onStart: () => void }) {
 // ── beat picker ───────────────────────────────────────────────────────────────
 
 function BeatPicker({
-  beat,
-  setBeat,
+  beats,
+  setBeats,
   onScan,
   scanning,
   wizardMode = false,
 }: {
-  beat: BeatId;
-  setBeat: (b: BeatId) => void;
+  beats: BeatId[];
+  setBeats: (b: BeatId[]) => void;
   onScan?: () => void;
   scanning?: boolean;
   wizardMode?: boolean;
 }) {
-  const currentBeat = BEATS.find((b) => b.id === beat);
+  const primary = beats[0];
+  const secondary = beats[1] as BeatId | undefined;
+  const tertiary = beats[2] as BeatId | undefined;
+  const currentBeat = BEATS.find((b) => b.id === primary);
+
+  // Primary is the required tab-grid choice; secondary/tertiary are optional,
+  // additive (weighted, still one scan). Setting primary keeps any secondary /
+  // tertiary that don't collide with the new primary.
+  const setPrimary = (id: BeatId) => setBeats([id, ...beats.slice(1).filter((b) => b !== id)]);
+  const secondaryOptions = BEATS.filter((b) => b.id !== primary && b.id !== tertiary);
+  const tertiaryOptions = BEATS.filter((b) => b.id !== primary && b.id !== secondary);
+  const addSecondary = () => {
+    const first = secondaryOptions[0];
+    if (first) setBeats([primary, first.id]);
+  };
+  const changeSecondary = (id: BeatId) =>
+    setBeats([primary, id, ...(tertiary && tertiary !== id ? [tertiary] : [])]);
+  const removeSecondary = () => setBeats([primary]); // drops tertiary too
+  const addTertiary = () => {
+    const first = tertiaryOptions[0];
+    if (first && secondary) setBeats([primary, secondary, first.id]);
+  };
+  const changeTertiary = (id: BeatId) => secondary && setBeats([primary, secondary, id]);
+  const removeTertiary = () => secondary && setBeats([primary, secondary]);
+
   return (
     <section style={{ padding: "clamp(16px,3vw,28px) clamp(22px,5vw,56px) 0" }}>
       <div className="siq-beat-tabs">
         {BEATS.map((b, i) => {
-          const isActive = b.id === beat;
+          const isActive = b.id === primary;
           const seedsNode = (
             <span>
               <span style={{ fontStyle: "normal", fontWeight: 700 }}>Seed Phrases: </span>{b.seeds.join(", ")}
@@ -711,7 +735,7 @@ function BeatPicker({
           return (
             <button
               key={b.id}
-              onClick={() => setBeat(b.id)}
+              onClick={() => setPrimary(b.id)}
               className={`siq-tab${isActive ? " active" : ""}`}
             >
               <span style={{ display: "flex", alignItems: "center", gap: 5, justifyContent: "center" }}>
@@ -727,10 +751,39 @@ function BeatPicker({
       {/* Beat selection tip */}
       <p style={{ maxWidth: 800, marginTop: 10, marginBottom: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, lineHeight: 1.6 }}>
         <span style={{ fontFamily: GROT, fontWeight: 700, fontStyle: "normal", fontSize: 9.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK70 }}>Tip:</span>{" "}
-        Pick the vertical your <em>target journalists</em> cover, not just your industry category.
-        A health-AI company should pick <strong>Health &amp; Wellness</strong> (reporters at STAT News, Health Affairs, and general science desks cover GLP-1 surges, digital therapeutics, and chronic-condition research, not the SaaS beat).
-        Only choose <strong>SaaS &amp; Startups</strong> if the story you&rsquo;re pitching is the startup itself: a funding round or product launch to tech press like TechCrunch or The Verge.
+        Pick the vertical your <em>target journalists</em> cover as your <strong>main beat</strong>.
+        Straddling two worlds &mdash; say health <em>and</em> AI? Add a second (and third) beat below and we scan all of them in one pass. It still counts as a single scan against your quota.
       </p>
+
+      {/* Secondary / tertiary beats — progressive disclosure (all tiers free) */}
+      <div className="siq-multibeat">
+        {!secondary ? (
+          <button type="button" className="siq-addbeat" onClick={addSecondary}>
+            + Add a secondary beat <span className="siq-addbeat-opt">(optional)</span>
+          </button>
+        ) : (
+          <div className="siq-beatrow">
+            <span className="siq-beatrow-lbl">Secondary</span>
+            <select className="siq-beatsel" value={secondary} onChange={(e) => changeSecondary(e.target.value as BeatId)}>
+              {secondaryOptions.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
+            </select>
+            <button type="button" className="siq-beatx" onClick={removeSecondary} aria-label="Remove secondary beat">×</button>
+          </div>
+        )}
+        {secondary && (!tertiary ? (
+          <button type="button" className="siq-addbeat" onClick={addTertiary}>
+            + Add a third beat <span className="siq-addbeat-opt">(optional)</span>
+          </button>
+        ) : secondary && tertiary ? (
+          <div className="siq-beatrow">
+            <span className="siq-beatrow-lbl">Tertiary</span>
+            <select className="siq-beatsel" value={tertiary} onChange={(e) => changeTertiary(e.target.value as BeatId)}>
+              {tertiaryOptions.map((b) => <option key={b.id} value={b.id}>{b.label}</option>)}
+            </select>
+            <button type="button" className="siq-beatx" onClick={removeTertiary} aria-label="Remove third beat">×</button>
+          </div>
+        ) : null)}
+      </div>
       {!wizardMode && (
         <div style={{ textAlign: "center", margin: "24px 0" }}>
           <button
@@ -738,7 +791,7 @@ function BeatPicker({
             disabled={scanning}
             className="siq-scan-btn"
           >
-            {scanning ? "Scanning the radar…" : `Scan ${currentBeat?.label} →`}
+            {scanning ? "Scanning the radar…" : beats.length > 1 ? `Scan ${beats.length} beats →` : `Scan ${currentBeat?.label} →`}
           </button>
           <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
             {FREE_SCANS} free scans / month, or {EMAIL_SCANS} with your email · live open-data sources
@@ -1393,7 +1446,7 @@ function AngleView({ opp }: { opp: Opportunity }) {
               </span>
               <InfoTooltip text={BAND_TOOLTIP[opp.band]} />
               <span style={{ fontFamily: MONO, fontSize: 8, color: INK55, letterSpacing: ".10em", textTransform: "uppercase" }}>
-                · {opp.beat}
+                · {BEATS.find((b) => b.id === opp.beat)?.label ?? opp.beat}
               </span>
             </span>
             <h2 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3.5vw,38px)", lineHeight: 1.05, letterSpacing: "-0.02em", color: INK }}>
@@ -1591,9 +1644,11 @@ function SiqWizardFooter({ stage, onBack, onNext, nextLabel, nextDisabled = fals
 // ── page ──────────────────────────────────────────────────────────────────────
 
 export default function SignalIQPage() {
-  const [beat, setBeat] = useState<BeatId>("saas");
+  // Ordered beat selection (primary first), length 1–3. All tiers are free.
+  const [beats, setBeats] = useState<BeatId[]>(["saas"]);
+  const beat = beats[0]; // derived primary — used for the PDF label etc.
   const [companyContext, setCompanyContext] = useState("");
-  // Persist the chosen beat (a preference) across reloads. companyContext is the
+  // Persist the chosen beat(s) (a preference) across reloads. companyContext is the
   // user's actual free-text input, not a preference — restoring it made every
   // fresh visit reopen with stale company context from a previous session, so
   // it's intentionally excluded here (same fix applied to PressIQ's pitch/beat).
@@ -1602,15 +1657,26 @@ export default function SignalIQPage() {
     try {
       const raw = localStorage.getItem("signaliq_v1_input");
       if (raw) {
-        const d = JSON.parse(raw) as { beat?: string };
-        if (typeof d.beat === "string" && BEATS.some((b) => b.id === d.beat)) setBeat(d.beat as BeatId);
+        const d = JSON.parse(raw) as { beat?: string; beats?: string[] };
+        // New multi-beat shape first; fall back to the legacy single `beat`.
+        const source = Array.isArray(d.beats) ? d.beats : typeof d.beat === "string" ? [d.beat] : [];
+        const valid: BeatId[] = [];
+        const seen = new Set<string>();
+        for (const b of source) {
+          if (typeof b === "string" && BEATS.some((x) => x.id === b) && !seen.has(b)) {
+            seen.add(b);
+            valid.push(b as BeatId);
+          }
+          if (valid.length >= 3) break;
+        }
+        if (valid.length) setBeats(valid);
       }
     } catch { /* ignore */ }
     /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
   useEffect(() => {
-    try { localStorage.setItem("signaliq_v1_input", JSON.stringify({ beat })); } catch { /* ignore */ }
-  }, [beat]);
+    try { localStorage.setItem("signaliq_v1_input", JSON.stringify({ beats })); } catch { /* ignore */ }
+  }, [beats]);
   const [scanning, setScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
   const [scan, setScan] = useState<ScanResponse | null>(null);
@@ -1795,7 +1861,7 @@ export default function SignalIQPage() {
       const res = await fetch("/api/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ beat, companyContext: ctx || undefined, turnstileToken: (await waitForToken()) || undefined }),
+        body: JSON.stringify({ beats, companyContext: ctx || undefined, turnstileToken: (await waitForToken()) || undefined }),
       });
       const data = await res.json();
       if (!res.ok) setScanError(data.error || "Scan failed.");
@@ -1840,7 +1906,7 @@ export default function SignalIQPage() {
     try {
       const doc = new JsPDF({ unit: "mm", format: "a4" });
       buildSignalIqReport(doc, {
-        beatLabel: BEATS.find((b) => b.id === beat)?.label ?? String(beat),
+        beatLabel: beats.map((id) => BEATS.find((b) => b.id === id)?.label ?? String(id)).join(" + "),
         companyContext: companyContext.trim(),
         opportunities: scan?.opportunities ?? [],
         selected,
@@ -1981,7 +2047,7 @@ export default function SignalIQPage() {
                 Choose the vertical your <em>target journalists</em> cover — that&rsquo;s where filings, research and news actually discuss your space.
               </p>
             </div>
-            <BeatPicker beat={beat} setBeat={(b) => { setBeat(b); setScan(null); setScanError(null); }} wizardMode />
+            <BeatPicker beats={beats} setBeats={(bs) => { setBeats(bs); setScan(null); setScanError(null); }} wizardMode />
           </section>
         )}
 
@@ -2282,6 +2348,71 @@ const PAGE_CSS = `
     opacity: 0.6;
     margin-right: 4px;
   }
+
+  /* multi-beat: secondary / tertiary controls (progressive disclosure) */
+  .siq-multibeat {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    margin-top: 14px;
+  }
+  .siq-addbeat {
+    background: transparent;
+    border: 1px dashed ${INK15};
+    padding: 7px 12px;
+    font-family: ${GROT};
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: ${INK55};
+    cursor: pointer;
+    transition: color 0.12s ease, border-color 0.12s ease;
+  }
+  .siq-addbeat:hover { color: ${INK}; border-color: ${INK}; }
+  .siq-addbeat-opt { opacity: 0.6; font-weight: 600; }
+  .siq-beatrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid ${INK15};
+    padding: 5px 6px 5px 10px;
+  }
+  .siq-beatrow-lbl {
+    font-family: ${MONO};
+    font-weight: 700;
+    font-size: 8.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: ${INK55};
+  }
+  .siq-beatsel {
+    font-family: ${GROT};
+    font-weight: 700;
+    font-size: 11px;
+    color: ${INK};
+    background: ${PAPER};
+    border: 1px solid ${INK15};
+    padding: 5px 8px;
+    cursor: pointer;
+    outline: none;
+  }
+  .siq-beatx {
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    line-height: 1;
+    color: ${INK55};
+    cursor: pointer;
+    transition: color 0.12s ease;
+  }
+  .siq-beatx:hover { color: ${RED}; }
 
   /* scan button */
   .siq-scan-btn {
