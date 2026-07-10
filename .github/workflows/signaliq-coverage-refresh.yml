@@ -1,7 +1,14 @@
 # SignalIQ — Coverage Refresher
-# Triggers the background GDELT poller every 30 minutes.
-# Each run fetches coverage for the next 10 seeds (rotating cursor) and saves
-# to Supabase. 12 runs cover all 120 seeds in ~6 hours, then repeats.
+# Triggers the background GDELT poller (src/app/api/signaliq/refresh-coverage).
+# Each run works a rotating cursor over the 120 preset seeds with a ~40s time
+# budget and per-seed retries (see the route's header comment for the rules).
+#
+# Scheduled at :07 and :37 — NOT :00/:30. GitHub heavily delays or skips
+# scheduled workflows queued at round minutes (peak load); offset minutes fire
+# far more reliably. Even so, expect throttling: ~15-30 actual runs/day, not 48.
+#
+# The step emits a ::warning:: annotation when a run fetched 0 topics, so a
+# "green but useless" run is visible from the Actions list without opening logs.
 #
 # Required GitHub secret: CRON_SECRET (same value as the Vercel env var)
 # Add it at: Settings → Secrets and variables → Actions → New repository secret
@@ -10,13 +17,13 @@ name: SignalIQ Coverage Refresh
 
 on:
   schedule:
-    - cron: '*/30 * * * *'   # every 30 minutes
+    - cron: '7,37 * * * *'    # twice hourly, offset from peak :00/:30 slots
   workflow_dispatch:           # allow manual trigger from the Actions tab
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 3
     steps:
       - name: Trigger coverage refresh
         run: |
@@ -29,4 +36,11 @@ jobs:
           echo "Response body: $BODY"
           if [ "$STATUS" != "200" ]; then
             echo "Unexpected status $STATUS" && exit 1
+          fi
+          OK=$(echo "$BODY" | jq -r '.ok // 0' 2>/dev/null || echo 0)
+          FAILED=$(echo "$BODY" | jq -r '.failed // 0' 2>/dev/null || echo 0)
+          THROTTLED=$(echo "$BODY" | jq -r '.throttled // 0' 2>/dev/null || echo 0)
+          echo "Fetched OK: $OK | failed: $FAILED | throttled: $THROTTLED"
+          if [ "$OK" = "0" ]; then
+            echo "::warning::Coverage refresh run fetched 0 topics (failed=$FAILED, throttled=$THROTTLED) — GDELT likely rejecting Vercel egress this run"
           fi
