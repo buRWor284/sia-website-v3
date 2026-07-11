@@ -1026,6 +1026,21 @@ function AlertsFeed() {
           />
         ))}
       </div>
+      <div style={{
+        display: "flex", gap: 14, flexWrap: "wrap", alignItems: "center",
+        marginBottom: 12, fontFamily: GROT, fontSize: 10, color: INK55,
+      }}>
+        {([
+          ["SYN", "Syndication — your coverage republished elsewhere"],
+          ["MEN", "Mention — you or your client referenced without a full pickup"],
+          ["AMP", "Amplification — your content shared/boosted by someone else"],
+        ] as const).map(([code, desc]) => (
+          <span key={code}>
+            <span style={{ fontFamily: GROT, fontWeight: 800, letterSpacing: "0.08em", color: INK }}>{code}</span>
+            {" = " + desc}
+          </span>
+        ))}
+      </div>
       <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
        <div style={{ minWidth: 640 }}>
         {filtered.length > 0 && (
