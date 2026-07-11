@@ -289,9 +289,9 @@ function Stage0({ onStart }: { onStart: () => void }) {
               &ldquo;Can not thank Syed Irfan Ajmal and the team enough for getting it ranked — they are getting 100s of keywords for this site ranked. Exceptional professionalism.&rdquo;
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <img src="/assets/testimonials/Azzam_Sheikh_NTA_Testimonial_LinkedIn.png" alt="Azzam Sheikh" style={{ width: 32, height: 32, objectFit: "cover", objectPosition: "top", flexShrink: 0 }} />
-              <span style={{ fontFamily: GF, fontSize: 11, fontWeight: 700, color: cTx }}>Azzam Sheikh</span>
-              <span style={{ fontFamily: MF, fontSize: 8, color: cTx3, marginLeft: 4 }}>Client · LinkedIn</span>
+              <img src="/assets/testimonials/Azzam_Sheikh_NTA_Testimonial_LinkedIn.png" alt="Azzam Sheikh" style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${cBd}`, objectFit: "cover", objectPosition: "top", flexShrink: 0 }} />
+              <span style={{ fontFamily: GF, fontSize: 13, fontWeight: 700, color: cTx }}>Azzam Sheikh</span>
+              <span style={{ fontFamily: MF, fontSize: 9, color: cTx3, marginLeft: 4 }}>Client · LinkedIn</span>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
