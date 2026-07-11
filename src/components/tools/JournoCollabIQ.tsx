@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useReducer, useRef } from "react";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
-import { EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
+import { EmailGateModal, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
 const BG0  = "#f1ebde";   // warm cream — matches tokens.PAPER
@@ -733,68 +733,9 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled }: {
 }
 
 // ── Email Gate Modal ───────────────────────────────────────────────────────────
-function EmailGate({ show, onClose, onSubscribe }: { show: boolean; onClose: ()=>void; onSubscribe: (email: string)=>void }) {
-  const [email, setEmail]     = useState("");
-  const [consent, setConsent] = useState(false);
-  const [error, setError]     = useState("");
-  const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  if (!show) return null;
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email."); return; }
-    if (!consent) { setError("Please accept to continue."); return; }
-    setError("");
-    setLoading(true);
-    try {
-      const res = await fetch("/api/newsletter-subscribe", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email }) });
-      const data = await res.json() as { success?: boolean; error?: string };
-      if (!data.success) { setError(data.error || "Subscription failed — please try again."); setLoading(false); return; }
-    } catch {
-      setError("Network error — please check your connection and try again.");
-      setLoading(false);
-      return;
-    }
-    setLoading(false);
-    setSuccess(true);
-    onSubscribe(email);
-    setTimeout(()=>{ onClose(); setSuccess(false); setEmail(""); setConsent(false); }, 1200);
-  }
-
-  return (
-    <div onClick={e=>{if(e.target===e.currentTarget)onClose();}}
-      style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.75)", zIndex:200,
-        display:"flex", alignItems:"center", justifyContent:"center", padding:20, animation:"v2-fade 0.2s ease" }}>
-      <div style={{ background:BG1, border:`1px solid ${BD}`, maxWidth:420, width:"100%", padding:36 }}>
-        {success ? (
-          <div style={{ textAlign:"center", padding:"24px 0" }}>
-            <div style={{ fontFamily:SF, fontSize:24, fontWeight:700, color:TX, marginBottom:8 }}>You&rsquo;re in.</div>
-            <p style={{ fontFamily:GF, fontSize:14, color:TX3 }}>Unlocking your download…</p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit}>
-            <span style={{ ...lbl(TX4), marginBottom:14 }}>One step to download</span>
-            <h3 style={{ fontFamily:SF, fontSize:24, fontWeight:700, color:TX, marginBottom:8, letterSpacing:"-0.02em" }}>Join founders and marketers.</h3>
-            <p style={{ fontFamily:GF, fontSize:14, color:TX3, marginBottom:24, lineHeight:1.6 }}>
-              Subscribe to unlock your PDF download. Real case studies, zero filler. One or two emails a month.
-            </p>
-            <input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="your@email.com"
-              style={{ ...inp(), borderBottom:`1px solid ${BD}`, marginBottom:18, fontSize:15 }} />
-            <label style={{ display:"flex", gap:10, alignItems:"flex-start", marginBottom:18, cursor:"pointer" }}>
-              <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} style={{ marginTop:3, accentColor:ACC }} />
-              <span style={{ fontFamily:GF, fontSize:12, color:TX3, lineHeight:1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
-            </label>
-            {error && <div style={{ fontFamily:MF, fontSize:10, color:ERR, marginBottom:14 }}>{error}</div>}
-            <button type="submit" disabled={loading} style={{ ...primaryBtn(), width:"100%", justifyContent:"center", fontSize:13, opacity: loading ? 0.6 : 1 }}>{loading ? "Subscribing…" : "Subscribe & download"}</button>
-            <p style={{ fontFamily:MF, fontSize:9, color:TX4, textAlign:"center", marginTop:14, letterSpacing:"0.08em" }}>No spam · One-click unsubscribe</p>
-          </form>
-        )}
-      </div>
-    </div>
-  );
-}
+// Migrated to the shared EmailGateModal (components/tools/ToolCTAStrips.tsx,
+// 2026-07-10) — was byte-identical to PartnerCollabIQ's copy of this same modal.
+// See usage below (variant="subscribe", the default).
 
 // ── Main export ────────────────────────────────────────────────────────────────
 export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }) {
@@ -1399,7 +1340,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         {/* Pipeline footer — shown only on the final step as a "what's next?" prompt */}
         {step > 0 && <div style={{ paddingBottom: 72 }}><ToolPipelineFooter currentTool="journocollabiq" compact /></div>}
 
-        <EmailGate show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
+        <EmailGateModal variant="subscribe" show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>
     </>
   );

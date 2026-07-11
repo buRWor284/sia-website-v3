@@ -11,7 +11,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link";
 import { installSanitizer, plainText } from "@/lib/pdf/house-style";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
-import { EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
+import { EmailGateModal, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
   DIMENSION_EVIDENCE,
@@ -293,97 +293,8 @@ function LiveMeter({ label, val, band, hint }: { label: string; val: string; ban
 }
 
 // ── Email gate modal ──────────────────────────────────────────────────────────
-function EmailGate({ show, onClose, onUnlock, result }: {
-  show: boolean; onClose: () => void;
-  onUnlock: () => void; result: ScoreResponse | null;
-}) {
-  const [email, setEmail]     = useState("");
-  const [consent, setConsent] = useState(false);
-  const [err, setErr]         = useState("");
-  const [done, setDone]       = useState(false);
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr("Enter a valid email."); return; }
-    if (!consent) { setErr("Please accept to continue."); return; }
-    setErr("");
-    fetch("/api/newsletter-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).catch(() => {});
-    fetch("/api/pitch-tier", { method: "POST" }).catch(() => {});
-    setDone(true);
-    setTimeout(() => { onUnlock(); onClose(); setDone(false); setEmail(""); setConsent(false); }, 900);
-  }
-
-  if (!show) return null;
-
-  const score = result?.composite ?? 0;
-  const tierColor = result?.tier?.color ?? BLUE;
-  const tierLabel = result?.tier?.label ?? "-";
-
-  return (
-    <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div role="dialog" aria-modal="true" aria-label="Download your PressIQ report" style={{ background: PAPER2, border: `1px solid ${INK}`, maxWidth: 480, width: "100%", overflow: "hidden" }}>
-
-        {/* Preview header */}
-        <div style={{ background: INK, padding: "24px 28px" }}>
-          <div style={{ fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".20em", textTransform: "uppercase", color: YEL, marginBottom: 10 }}>
-            PRESSIQ · PITCH SCORE REPORT
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontFamily: SERIF, fontSize: 52, fontWeight: 700, color: tierColor, lineHeight: 1 }}>{score}</div>
-              <div style={{ fontFamily: GROT, fontSize: 9, color: ra(PAPER, 0.65), letterSpacing: ".14em" }}>/ 100</div>
-            </div>
-            <div>
-              <span style={{ display: "inline-block", padding: "4px 10px", background: tierColor, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", marginBottom: 8 }}>
-                {tierLabel.toUpperCase()}
-              </span>
-              <div style={{ fontFamily: SERIF, fontSize: 14, color: PAPER, lineHeight: 1.4 }}>
-                Your full report includes the radar, top fixes, per-dimension breakdown with evidence, and EMOS recommendations.
-              </div>
-            </div>
-          </div>
-          <div style={{ marginTop: 16, display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {["Cover + Score", "Top 3 Fixes", "Full Breakdown", "Research + EMOS"].map(s => (
-              <span key={s} style={{ padding: "3px 8px", border: `1px solid ${ra(PAPER, 0.15)}`, fontFamily: MONO, fontSize: 7.5, color: ra(PAPER, 0.4), letterSpacing: ".10em", textTransform: "uppercase" }}>{s}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* Form */}
-        <div style={{ padding: "24px 28px" }}>
-          {done ? (
-            <div style={{ textAlign: "center", padding: "16px 0", fontFamily: SERIF, fontSize: 18, color: GREEN, fontWeight: 600 }}>
-              ✓ Generating your PDF…
-            </div>
-          ) : (
-            <form onSubmit={submit}>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, marginBottom: 6, letterSpacing: "-.015em" }}>
-                One step to download
-              </div>
-              <p style={{ fontFamily: SERIF, fontSize: 14, color: ra(INK, 0.62), marginBottom: 18, lineHeight: 1.55 }}>
-                Join founders and marketers. Real earned-media playbooks, zero filler. One or two emails a month.
-              </p>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
-                style={{ width: "100%", padding: "10px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.6)}`, fontFamily: GROT, fontSize: 13, color: INK, outline: "none", borderRadius: 0, marginBottom: 12 }} />
-              <label style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 14, cursor: "pointer" }}>
-                <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3, accentColor: INK }} />
-                <span style={{ fontFamily: GROT, fontSize: 11, color: ra(INK, 0.62), lineHeight: 1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
-              </label>
-              {err && <div style={{ fontFamily: MONO, fontSize: 10, color: RED, marginBottom: 10 }}>{err}</div>}
-              <button type="submit" style={{ width: "100%", padding: "13px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", border: "none", cursor: "pointer", borderRadius: 0 }}>
-                Subscribe &amp; download PDF →
-              </button>
-              <div style={{ fontFamily: MONO, fontSize: 9, color: ra(INK, 0.62), textAlign: "center", marginTop: 10, letterSpacing: ".08em" }}>
-                No spam · One-click unsubscribe
-              </div>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+// Migrated to the shared EmailGateModal (components/tools/ToolCTAStrips.tsx,
+// 2026-07-10) — see usage below (variant="score").
 
 // ── Per-tab step navigation ───────────────────────────────────────────────────
 function TabNav({ current, setTab, onReset }: { current: Tab; setTab: (t: Tab) => void; onReset: () => void }) {
@@ -1319,7 +1230,7 @@ export default function PressIQPage() {
   return (
     <>
       <style>{PAGE_CSS}</style>
-      <EmailGate show={showGate} onClose={() => setShowGate(false)} onUnlock={() => { setShowGate(false); generatePDF(); }} result={result} />
+      <EmailGateModal variant="score" show={showGate} onClose={() => setShowGate(false)} onUnlock={() => { setShowGate(false); generatePDF(); }} result={result} />
 
       <div className="piq-page">
 
