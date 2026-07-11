@@ -359,6 +359,8 @@ function PipelineView({
         // the whole page to scroll horizontally). minmax() gives the flexible
         // column a floor it won't shrink past, so once the row's true width
         // exceeds the viewport this wrapper scrolls on its own instead.
+        <>
+        <div className="ciq-scroll-hint"><span>⇆</span> Swipe table to see more columns</div>
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           {/* Header */}
           <div style={{
@@ -502,6 +504,7 @@ function PipelineView({
             );
           })}
         </div>
+        </>
       )}
 
       <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -587,13 +590,17 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
         <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 12, opacity: 0.6 }}>{items.length}</span>
         {subtitle && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, marginLeft: "auto", opacity: 0.7 }}>{subtitle}</span>}
       </div>
-      <div style={{ border: `1px solid ${INK}`, borderTop: "none" }}>
+      {/* 2026-07-11: this section was missed in the first horizontal-scroll
+          pass (it uses its own wrapper pattern, no header row) — same fix as
+          the other three tables. */}
+      <div className="ciq-scroll-hint"><span>⇆</span> Swipe table to see more columns</div>
+      <div style={{ border: `1px solid ${INK}`, borderTop: "none", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
         {items.map((pitch, idx) => {
           const daysDiff = pitch.follow_up_due ? Math.round((new Date(pitch.follow_up_due).getTime() - today.getTime()) / 86400000) : null;
           const daysSinceSent = pitch.sent_date ? Math.round((today.getTime() - new Date(pitch.sent_date).getTime()) / 86400000) : null;
           return (
             <div key={pitch.id} style={{
-              display: "grid", gridTemplateColumns: "1fr 160px 100px 120px 160px",
+              display: "grid", gridTemplateColumns: "minmax(200px,1fr) 160px 100px 120px 160px",
               borderBottom: idx < items.length - 1 ? `1px solid ${INK15}` : "none",
               alignItems: "center",
             }}>
@@ -704,6 +711,8 @@ function CoverageLogView({ pitches }: { pitches: DbPitch[] }) {
         <EmptyState message="No placements yet. Pitches marked as Placed or Amplified will appear here." />
       ) : (
         // 2026-07-11: horizontal-scroll fix, same as the Pipeline table above.
+        <>
+        <div className="ciq-scroll-hint"><span>⇆</span> Swipe table to see more columns</div>
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
             {cols.map((col, i) => (
@@ -746,6 +755,7 @@ function CoverageLogView({ pitches }: { pitches: DbPitch[] }) {
             );
           })}
         </div>
+        </>
       )}
 
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
@@ -822,6 +832,8 @@ function ContactsView({
         <EmptyState message="No journalists yet. Click '+ Add Contact' to start building your media list." />
       ) : (
         // 2026-07-11: horizontal-scroll fix, same as the Pipeline table above.
+        <>
+        <div className="ciq-scroll-hint"><span>⇆</span> Swipe table to see more columns</div>
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
             {headers.map((col, i) => (
@@ -939,6 +951,7 @@ function ContactsView({
             );
           })}
         </div>
+        </>
       )}
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
         {journalists.length} contacts · Click a row to expand · Click column headers to sort
@@ -1534,6 +1547,20 @@ export default function CoverageIQPlatform({
     .ciq-tab:hover { opacity: 0.8; }
     @media (max-width: 700px) {
       .ciq-funnel { grid-template-columns: repeat(3, 1fr) !important; }
+    }
+    /* 2026-07-11: the four data tables scroll horizontally on mobile now,
+       but nothing signals that — they just look cut off at the right edge,
+       which reads as broken rather than "swipe for more". Show a small hint
+       above each table on narrow screens only; desktop never needs it since
+       everything fits without scrolling. */
+    .ciq-scroll-hint { display: none; }
+    @media (max-width: 700px) {
+      .ciq-scroll-hint {
+        display: flex; align-items: center; gap: 6px;
+        font-family: var(--font-grot), sans-serif; font-weight: 700; font-size: 9px;
+        letter-spacing: 0.14em; text-transform: uppercase; color: rgba(26,20,16,.5);
+        padding: 6px 2px;
+      }
     }
   `;
 
