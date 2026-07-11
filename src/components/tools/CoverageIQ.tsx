@@ -345,10 +345,8 @@ function PipelineView() {
   return (
     <div>
       {/* Stage funnel strip */}
-      <div style={{
-        display: "grid", gridTemplateColumns: `repeat(${PIPELINE_STAGES.length}, 1fr)`,
-        border: `1px solid ${INK}`, marginBottom: 28,
-      }}>
+      <div style={{ border: `1px solid ${INK}`, marginBottom: 28, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+       <div style={{ display: "grid", gridTemplateColumns: `repeat(${PIPELINE_STAGES.length}, minmax(96px, 1fr))`, minWidth: 620 }}>
         {PIPELINE_STAGES.map((stage, i) => {
           const active = stageFilter === stage.id;
           return (
@@ -381,6 +379,7 @@ function PipelineView() {
             </button>
           );
         })}
+       </div>
       </div>
 
       {/* Table — horizontal scroll container so the fixed-width columns don't
@@ -549,7 +548,8 @@ function FollowUpsView() {
   return (
     <div>
       {/* Summary strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", border: `1px solid ${INK}`, marginBottom: 28 }}>
+      <div style={{ border: `1px solid ${INK}`, marginBottom: 28, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+       <div style={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(84px, 1fr))", minWidth: 460 }}>
         {summary.map((item, i) => (
           <div key={i} style={{
             padding: "18px 14px",
@@ -560,6 +560,7 @@ function FollowUpsView() {
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", color: item.highlight ? INK : INK55, marginTop: 5 }}>{item.label}</div>
           </div>
         ))}
+       </div>
       </div>
 
       {totalActions === 0
@@ -604,14 +605,15 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
         <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 12, opacity: 0.6 }}>{items.length}</span>
         {subtitle && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, marginLeft: "auto", opacity: 0.7 }}>{subtitle}</span>}
       </div>
-      <div style={{ border: `1px solid ${INK}`, borderTop: "none" }}>
+      <div style={{ border: `1px solid ${INK}`, borderTop: "none", overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+       <div style={{ minWidth: 700 }}>
         {items.map((pitch, idx) => {
           const journalist = getJournalist(pitch.journalist);
           const daysDiff = pitch.followUpDue ? Math.round((new Date(pitch.followUpDue).getTime() - today.getTime()) / 86400000) : null;
           const daysSinceSent = pitch.sentDate ? Math.round((today.getTime() - new Date(pitch.sentDate).getTime()) / 86400000) : null;
           return (
             <div key={pitch.id} style={{
-              display: "grid", gridTemplateColumns: "1fr 160px 100px 120px 160px",
+              display: "grid", gridTemplateColumns: "minmax(200px, 1fr) 160px 100px 120px 160px",
               borderBottom: idx < items.length - 1 ? `1px solid ${INK15}` : "none",
               alignItems: "center",
             }}>
@@ -667,6 +669,7 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
             </div>
           );
         })}
+       </div>
       </div>
     </div>
   );
@@ -708,7 +711,7 @@ function CoverageLogView() {
   const cols: { key: CoverageLogKey; label: string; w: string }[] = [
     { key: "placedDate",  label: "Date",        w: "90px" },
     { key: "outlet",      label: "Publication", w: "150px" },
-    { key: "anchorText",  label: "Anchor Text", w: "1fr" },
+    { key: "anchorText",  label: "Anchor Text", w: "minmax(160px, 1fr)" },
     { key: "dr",          label: "DR",          w: "80px" },
     { key: "peso",        label: "PESO",        w: "72px" },
     { key: "linkType",    label: "Link",        w: "82px" },
@@ -735,7 +738,8 @@ function CoverageLogView() {
       </div>
 
       {/* Table */}
-      <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
+      <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+       <div style={{ minWidth: 780 }}>
         <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
           {cols.map((col, i) => (
             <div key={col.key} onClick={() => handleSort(col.key)} style={{
@@ -777,6 +781,7 @@ function CoverageLogView() {
             <div style={logCell(true)}><PointsBadge points={entry.points} /></div>
           </div>
         ))}
+       </div>
       </div>
 
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
@@ -816,7 +821,7 @@ function ContactsView() {
   };
   const arrow = (col: ContactKey) => sortBy === col ? (sortDir === "asc" ? " ↑" : " ↓") : "";
 
-  const grid = "1.3fr 1fr 110px 52px 52px 72px 100px";
+  const grid = "minmax(200px, 1.3fr) minmax(120px, 1fr) 110px 52px 52px 72px 100px";
   const headers: { key: ContactKey; label: string }[] = [
     { key: "name",        label: "Journalist / Publication" },
     { key: "beat",        label: "Beat" },
@@ -829,7 +834,8 @@ function ContactsView() {
 
   return (
     <div>
-      <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
+      <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+       <div style={{ minWidth: 820 }}>
         {/* Header */}
         <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
           {headers.map((col, i) => (
@@ -890,6 +896,7 @@ function ContactsView() {
             </div>
           );
         })}
+       </div>
       </div>
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
         {JOURNALISTS.length} contacts · Click column headers to sort
@@ -933,7 +940,8 @@ function PESODashboard() {
   return (
     <div>
       {/* 4-card PESO grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", border: `1px solid ${INK}`, marginBottom: 32 }}>
+      <div style={{ border: `1px solid ${INK}`, marginBottom: 32, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(220px, 1fr))", minWidth: 880 }}>
         {pesoData.map((p, i) => {
           const earned = p.type === "Earned";
           return (
@@ -963,6 +971,7 @@ function PESODashboard() {
             </div>
           );
         })}
+       </div>
       </div>
 
       {/* Conversion + Distribution */}
