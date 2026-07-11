@@ -228,41 +228,20 @@ function Stage0({ onStart }: { onStart: () => void }) {
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px" }}>
-      <div style={{ textAlign: "center", marginBottom: 20 }}>
-        <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TX4 }}>PartnerCollabIQ · Partnership Intelligence</span>
-      </div>
 
       {/* Static explainer panel */}
+      {/* 2026-07-11: trimmed per Irfan's phone-QA feedback — dropped the
+          eyebrow line (redundant with the header, which already shows the
+          tool name), the SIA/DMR.agency logo row, and the whole Case Study
+          block (industry/market/challenge + quote) so the hero gets to the
+          proof + CTA faster instead of front-loading throat-clearing. */}
       <div style={{ width: "100%", maxWidth: 760, background: "#0c0b09", border: "1px solid #2a2318", padding: "clamp(28px,6vw,48px) clamp(20px,5vw,40px)", display: "flex", flexDirection: "column", alignItems: "center", gap: 28 }}>
 
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 28, height: 28, background: ACC, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GF, fontWeight: 900, fontSize: 10, color: "#0c0b09" }}>SIA</div>
-            <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: cTx3, textTransform: "uppercase" }}>Syed Irfan Ajmal · DMR.agency</span>
-          </div>
           <h2 style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,36px)", fontWeight: 700, color: cTx, lineHeight: 1.15, letterSpacing: "-0.025em", maxWidth: 520, margin: "0 0 12px" }}>
             What if growth wasn&rsquo;t about competing, but <em style={{ color: ACC, fontStyle: "italic" }}>collaborating</em>?
           </h2>
           <div style={{ width: 40, height: 2, background: ACC }} />
-        </div>
-
-        <div style={{ width: "100%", maxWidth: 480, height: 1, background: cBd }} />
-
-        {/* Case study */}
-        <div style={{ textAlign: "center" }}>
-          <span style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, marginBottom: 10, display: "block" }}>Case Study</span>
-          <h3 style={{ fontFamily: SF, fontSize: "clamp(18px,3.5vw,28px)", fontWeight: 700, color: cTx, lineHeight: 1.15, margin: "0 0 16px" }}>National Tyres &amp; Autocare</h3>
-          <div style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
-            {[["Industry","Automotive"],["Market","United Kingdom"],["Challenge","Scale organic revenue"]].map(([k,v]) => (
-              <div key={k} style={{ textAlign: "center" }}>
-                <div style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 3 }}>{k}</div>
-                <div style={{ fontFamily: GF, fontSize: 13, color: cTx2, fontWeight: 600 }}>{v}</div>
-              </div>
-            ))}
-          </div>
-          <p style={{ fontFamily: SF, fontSize: 14, fontStyle: "italic", color: cTx3, maxWidth: 420, lineHeight: 1.55, margin: "0 auto" }}>
-            &ldquo;We needed a strategy that went beyond traditional link building and paid ads.&rdquo; DMR.agency identified companies serving the same UK car owners, then offered their customers exclusive discounts — the same drivers, zero competition.
-          </p>
         </div>
 
         <div style={{ width: "100%", maxWidth: 480, height: 1, background: cBd }} />
@@ -319,9 +298,6 @@ function Stage0({ onStart }: { onStart: () => void }) {
         </p>
         <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 14, padding: "16px 40px" }}>Try PartnerCollabIQ free →</button>
         <p style={{ fontFamily: MF, fontSize: 9, color: TX4, marginTop: 10, letterSpacing: "0.1em" }}>No signup required · Results in under 2 minutes</p>
-      </div>
-      <div style={{ textAlign: "center", marginTop: 20 }}>
-        <span style={{ fontFamily: MF, fontSize: 8, color: TX4, letterSpacing: "0.1em" }}>Built by Syed Irfan Ajmal · DMR.agency</span>
       </div>
     </div>
   );

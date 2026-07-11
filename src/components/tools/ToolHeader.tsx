@@ -30,6 +30,7 @@ interface ToolHeaderProps {
 export function ToolHeader({ toolPrefix, subtitle, rightContent }: ToolHeaderProps) {
   return (
     <header
+      className="tool-header-bar"
       style={{
         background: DARK,
         borderBottom: `1px solid ${DARK_BD}`,
@@ -79,6 +80,7 @@ export function ToolHeader({ toolPrefix, subtitle, rightContent }: ToolHeaderPro
         </span>
 
         <div
+          className="tool-header-subtitle"
           style={{
             width: 1,
             height: 18,
@@ -88,6 +90,7 @@ export function ToolHeader({ toolPrefix, subtitle, rightContent }: ToolHeaderPro
         />
 
         <span
+          className="tool-header-subtitle"
           style={{
             fontFamily: MONO,
             fontSize: 8,
@@ -95,6 +98,7 @@ export function ToolHeader({ toolPrefix, subtitle, rightContent }: ToolHeaderPro
             letterSpacing: ".18em",
             textTransform: "uppercase",
             color: DIM,
+            whiteSpace: "nowrap",
           }}
         >
           {subtitle}
@@ -103,10 +107,19 @@ export function ToolHeader({ toolPrefix, subtitle, rightContent }: ToolHeaderPro
 
       {/* Right: optional slot */}
       {rightContent && (
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0, marginLeft: 12 }}>
           {rightContent}
         </div>
       )}
+      <style dangerouslySetInnerHTML={{ __html: `
+        /* Below ~600px the left group (logo+name+subtitle) and the right-side
+           back-link were crowding into each other with no visible gap — the
+           subtitle text and "← syedirfanajmal.com" read as one run-on word.
+           Drop the subtitle (redundant with the tool name) to give the back
+           link its own clear space. */
+        @media(max-width:600px){.tool-header-subtitle{display:none!important}}
+      `}} />
+
     </header>
   );
 }
