@@ -391,22 +391,6 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
         </p>
       </div>
 
-      {/* Explainer video */}
-      <div style={{ padding: "24px 32px", borderBottom: `1px solid ${ra(INK, 0.1)}` }}>
-        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 12 }}>
-          HOW IT WORKS
-        </div>
-        <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden" }}>
-          <iframe
-            src="https://www.youtube.com/embed/HaXSuks2l54"
-            title="PressIQ Explainer"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
-          />
-        </div>
-      </div>
-
       {/* WHAT JOURNALISTS SAY — rotating ticker */}
       <div style={{ padding: "24px 32px 0" }}>
         <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 16 }}>
@@ -419,8 +403,15 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
         </div>
       </div>
 
+      {/* CTA into the form */}
+      <div style={{ padding: "24px 32px 20px", display: "flex", justifyContent: "flex-end" }}>
+        <button onClick={onStart} style={{ padding: "14px 28px", border: "none", background: INK, color: YEL, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", borderRadius: 0 }}>
+          Start scoring your pitch →
+        </button>
+      </div>
+
       {/* SCORED AGAINST — source pills */}
-      <div style={{ padding: "20px 32px 28px", borderTop: `1px solid ${ra(INK, 0.08)}`, marginTop: 20 }}>
+      <div style={{ padding: "16px 32px 28px", borderTop: `1px solid ${ra(INK, 0.08)}` }}>
         <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>
           SCORED AGAINST
         </div>
@@ -436,13 +427,6 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
             <span key={s} style={{ padding: "4px 8px", border: `1px solid ${ra(INK, 0.08)}`, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{s}</span>
           ))}
         </div>
-      </div>
-
-      {/* CTA into the form */}
-      <div style={{ padding: "24px 32px 32px", display: "flex", justifyContent: "flex-end" }}>
-        <button onClick={onStart} style={{ padding: "14px 28px", border: "none", background: INK, color: YEL, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", borderRadius: 0 }}>
-          Start scoring your pitch →
-        </button>
       </div>
     </div>
   );
@@ -1244,7 +1228,7 @@ export default function PressIQPage() {
                 How it works →
               </Link>
               <Link href="/" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
-                ← syedirfanajmal.com
+                ← Main SIA Site
               </Link>
             </>
           }
