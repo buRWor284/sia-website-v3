@@ -867,6 +867,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
   const [aiBriefLoading, setAiBriefLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfDone, setPdfDone] = useState(false);
+  const pdfDoneTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [partnersError, setPartnersError]   = useState<string|null>(null);
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
@@ -1035,14 +1036,17 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     // wrapper the button never visibly changes state — the doc just appears
     // in Downloads with no "it's working" or "it's done" feedback. Defer the
     // heavy build by a tick so React can paint the loading state first, then
-    // flip to a brief "Downloaded ✓" confirmation.
+    // flip to a "Downloaded ✓" confirmation that stays up long enough to
+    // actually register (a prior stray timer could cut this short, so clear
+    // any pending hide-timer before scheduling a new one).
+    if (pdfDoneTimer.current) clearTimeout(pdfDoneTimer.current);
     setPdfLoading(true);
     setPdfDone(false);
     setTimeout(() => {
       try { generatePDF(); } finally {
         setPdfLoading(false);
         setPdfDone(true);
-        setTimeout(() => setPdfDone(false), 2600);
+        pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 4000);
       }
     }, 50);
   }
