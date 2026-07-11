@@ -18,7 +18,7 @@
  *    modeled on SignalIQ's inline EmosCTA.
  */
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { GROT, INK, INK15, MONO, PAPER, PAPER2, SERIF, YEL } from "@/lib/tokens";
 
 const PAPER72 = "rgba(241,235,222,.72)";
@@ -97,6 +97,35 @@ export function EmailGateModal({
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // A11y: Escape-to-close, focus trapped inside the dialog while open, and
+  // the email field auto-focused on open (2026-07-11 accessibility pass —
+  // none of this existed in the 3 original bespoke gates either; added here
+  // since all 3 now share this one component).
+  useEffect(() => {
+    if (!show) return;
+    const focusTimer = setTimeout(() => emailInputRef.current?.focus(), 0);
+
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab") return;
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusables = root.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => { clearTimeout(focusTimer); document.removeEventListener("keydown", onKeyDown); };
+  }, [show, onClose]);
+
   if (!show) return null;
 
   async function handleSubmit(e: React.FormEvent) {
@@ -138,7 +167,11 @@ export function EmailGateModal({
     return (
       <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
         style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-        <div role="dialog" aria-modal="true" aria-label="Download your PressIQ report" style={{ background: PAPER2, border: `1px solid ${INK}`, maxWidth: 480, width: "100%", overflow: "hidden" }}>
+        <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Download your PressIQ report" style={{ position: "relative", background: PAPER2, border: `1px solid ${INK}`, maxWidth: 480, width: "100%", overflow: "hidden" }}>
+          <button type="button" onClick={onClose} aria-label="Close"
+            style={{ position: "absolute", top: 14, right: 14, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", cursor: "pointer", fontFamily: GROT, fontSize: 20, lineHeight: 1, color: PAPER, zIndex: 1 }}>
+            ×
+          </button>
           <div style={{ background: INK, padding: "24px 28px" }}>
             <div style={{ fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".20em", textTransform: "uppercase", color: YEL, marginBottom: 10 }}>
               PRESSIQ · PITCH SCORE REPORT
@@ -176,7 +209,7 @@ export function EmailGateModal({
                 <p style={{ fontFamily: SERIF, fontSize: 14, color: gateRa(INK, 0.62), marginBottom: 18, lineHeight: 1.55 }}>
                   Join founders and marketers. Real earned-media playbooks, zero filler. One or two emails a month.
                 </p>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
+                <input ref={emailInputRef} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
                   style={{ width: "100%", padding: "10px 12px", background: PAPER, border: `1px solid ${gateRa(INK, 0.6)}`, fontFamily: GROT, fontSize: 13, color: INK, outline: "none", borderRadius: 0, marginBottom: 12 }} />
                 <label style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 14, cursor: "pointer" }}>
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3, accentColor: INK }} />
@@ -204,7 +237,11 @@ export function EmailGateModal({
         position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 200,
         display: "flex", alignItems: "center", justifyContent: "center", padding: 20, animation: "v2-fade 0.2s ease",
       }}>
-      <div style={{ background: PAPER2, border: `1px solid ${INK15}`, maxWidth: 420, width: "100%", padding: 36 }}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Subscribe to unlock your download" style={{ position: "relative", background: PAPER2, border: `1px solid ${INK15}`, maxWidth: 420, width: "100%", padding: 36 }}>
+        <button type="button" onClick={onClose} aria-label="Close"
+          style={{ position: "absolute", top: 14, right: 14, width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", background: "transparent", border: "none", cursor: "pointer", fontFamily: GROT, fontSize: 20, lineHeight: 1, color: INK, zIndex: 1 }}>
+          ×
+        </button>
         {done ? (
           <div style={{ textAlign: "center", padding: "24px 0" }}>
             <div style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: INK, marginBottom: 8 }}>You&rsquo;re in.</div>
@@ -217,7 +254,7 @@ export function EmailGateModal({
             <p style={{ fontFamily: GROT, fontSize: 14, color: GATE_TX3, marginBottom: 24, lineHeight: 1.6 }}>
               Subscribe to unlock your PDF download. Real case studies, zero filler. One or two emails a month.
             </p>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
+            <input ref={emailInputRef} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
               style={{ ...gateInp(), borderBottom: `1px solid ${INK15}`, marginBottom: 18, fontSize: 15 }} />
             <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 18, cursor: "pointer" }}>
               <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
