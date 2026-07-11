@@ -353,10 +353,16 @@ function PipelineView({
       {pitches.length === 0 ? (
         <EmptyState message="No pitches yet. Add your first pitch to get started." />
       ) : (
-        <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
+        // 2026-07-11: was `overflow:"hidden"` with a bare "1fr" first column —
+        // on mobile the 1fr track just shrank to nothing instead of scrolling,
+        // squishing every column into unreadable widths (or, worse, forcing
+        // the whole page to scroll horizontally). minmax() gives the flexible
+        // column a floor it won't shrink past, so once the row's true width
+        // exceeds the viewport this wrapper scrolls on its own instead.
+        <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           {/* Header */}
           <div style={{
-            display: "grid", gridTemplateColumns: "1fr 150px 96px 80px 64px 72px",
+            display: "grid", gridTemplateColumns: "minmax(200px,1fr) 150px 96px 80px 64px 72px",
             background: INK, color: PAPER,
             fontFamily: GROT, fontWeight: 700, fontSize: 9,
             letterSpacing: "0.18em", textTransform: "uppercase",
@@ -382,7 +388,7 @@ function PipelineView({
                 <div
                   onClick={() => setExpandedId(isExpanded ? null : pitch.id)}
                   style={{
-                    display: "grid", gridTemplateColumns: "1fr 150px 96px 80px 64px 72px",
+                    display: "grid", gridTemplateColumns: "minmax(200px,1fr) 150px 96px 80px 64px 72px",
                     borderBottom: `1px solid ${INK15}`, cursor: "pointer",
                     background: isExpanded ? PAPER2 : "transparent",
                     transition: "background 0.12s",
@@ -669,7 +675,7 @@ function CoverageLogView({ pitches }: { pitches: DbPitch[] }) {
   const cols: { key: CoverageLogKey; label: string; w: string }[] = [
     { key: "placed_date",      label: "Date",        w: "90px" },
     { key: "journalist_outlet",label: "Publication", w: "150px" },
-    { key: "anchor_text",      label: "Anchor Text", w: "1fr" },
+    { key: "anchor_text",      label: "Anchor Text", w: "minmax(160px,1fr)" },
     { key: "domain_rating",    label: "DR",          w: "80px" },
     { key: "peso_type",        label: "PESO",        w: "72px" },
     { key: "link_type",        label: "Link",        w: "82px" },
@@ -697,7 +703,8 @@ function CoverageLogView({ pitches }: { pitches: DbPitch[] }) {
       {coverageLog.length === 0 ? (
         <EmptyState message="No placements yet. Pitches marked as Placed or Amplified will appear here." />
       ) : (
-        <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
+        // 2026-07-11: horizontal-scroll fix, same as the Pipeline table above.
+        <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
             {cols.map((col, i) => (
               <div key={col.key} onClick={() => handleSort(col.key)} style={{
@@ -788,7 +795,7 @@ function ContactsView({
   };
   const arrow = (col: ContactKey) => sortBy === col ? (sortDir === "asc" ? " ↑" : " ↓") : "";
 
-  const grid = "1.3fr 1fr 110px 52px 52px 72px 100px";
+  const grid = "minmax(180px,1.3fr) minmax(90px,1fr) 110px 52px 52px 72px 100px";
   const headers: { key: ContactKey; label: string }[] = [
     { key: "name",         label: "Journalist / Publication" },
     { key: "beat",         label: "Beat" },
@@ -814,7 +821,8 @@ function ContactsView({
       {journalists.length === 0 ? (
         <EmptyState message="No journalists yet. Click '+ Add Contact' to start building your media list." />
       ) : (
-        <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
+        // 2026-07-11: horizontal-scroll fix, same as the Pipeline table above.
+        <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
             {headers.map((col, i) => (
               <div key={col.label} onClick={() => handleSort(col.key)} style={{
