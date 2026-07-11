@@ -936,7 +936,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...CREAM);
         doc.text("JournoCollabIQ",M,footY);
         doc.setFont("helvetica","normal"); doc.setTextColor(80,70,60);
-        doc.text("  ·  syedirfanajmal.com/tools/journocollabiq  ·  Syed Irfan Ajmal  ·  DMR.agency",M+18,footY);
+        doc.text("  ·  syedirfanajmal.com/tools/journocollabiq  ·  Syed Irfan Ajmal",M+18,footY);
         doc.setTextColor(80,70,60);
       } else {
         doc.setFillColor(...CREAM); doc.rect(0,H-16,W,16,"F");
@@ -944,7 +944,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...INK);
         doc.text("JournoCollabIQ",M,footY);
         doc.setFont("helvetica","normal"); doc.setTextColor(...GREY);
-        doc.text("  ·  syedirfanajmal.com/tools/journocollabiq  ·  Syed Irfan Ajmal  ·  DMR.agency",M+18,footY);
+        doc.text("  ·  syedirfanajmal.com/tools/journocollabiq  ·  Syed Irfan Ajmal",M+18,footY);
         doc.setTextColor(...GREY);
       }
       doc.setFont("helvetica","normal"); doc.setFontSize(6);
@@ -988,7 +988,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...INK);
     doc.text("SIA", M+6, 22.5, {align:"center"});
     doc.setFontSize(8); doc.setFont("helvetica","normal"); doc.setTextColor(...CREAM);
-    doc.text("Syed Irfan Ajmal  ·  DMR.agency", M+16, 22);
+    doc.text("Syed Irfan Ajmal  ·  syedirfanajmal.com", M+16, 22);
     doc.setTextColor(70,60,50); doc.setFontSize(7);
     doc.text("syedirfanajmal.com", W-M, 22, {align:"right"});
     let y=68;
