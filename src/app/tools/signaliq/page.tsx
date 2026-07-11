@@ -1988,7 +1988,7 @@ export default function SignalIQPage() {
             <Link href="/tools/signaliq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
               How it works →
             </Link>
-            <span className="siq-hide-sm" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)" }}>
+            <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)" }}>
               ← Main Site
             </span>
           </>
@@ -2602,7 +2602,6 @@ const PAGE_CSS = `
     .siq-tab:nth-child(2n)        { border-right: none; }
     .siq-cards { grid-template-columns: 1fr; }
     .siq-step { padding: 10px 12px; font-size: 8.5px; }
-    .siq-hide-sm { display: none; }
   }
 
   /* ── wire-feed ticker ───────────────────────────────────────────── */

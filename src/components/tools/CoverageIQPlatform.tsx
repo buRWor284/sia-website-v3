@@ -1574,21 +1574,12 @@ export default function CoverageIQPlatform({
         subtitle="Pitch Tracking CRM · EMOS Platform"
         rightContent={
           <>
-            <button
-              onClick={() => setShowModal(true)}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}
+            <a
+              href="/"
+              style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)", textDecoration: "none" }}
             >
-              + New Pitch
-            </button>
-            {followUpCount > 0 && (
-              <button
-                onClick={() => setActiveTab("followups")}
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: YEL, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, cursor: "pointer" }}
-              >
-                <span style={{ width: 6, height: 6, background: INK, display: "inline-block" }} />
-                {followUpCount} ACTION{followUpCount !== 1 ? "S" : ""} DUE
-              </button>
-            )}
+              ← Main Site
+            </a>
             <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}>
               <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%", display: "inline-block" }} />
               LIVE · SUPABASE
@@ -1596,6 +1587,27 @@ export default function CoverageIQPlatform({
           </>
         }
       />
+
+      {/* Action row: New Pitch + follow-up alert, moved below the header */}
+      <div style={{ borderBottom: `1px solid ${INK35}`, background: PAPER }}>
+        <div style={{ maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)", paddingBlock: 10, display: "flex", justifyContent: "flex-end", gap: 10, flexWrap: "wrap" }}>
+          <button
+            onClick={() => setShowModal(true)}
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}
+          >
+            + New Pitch
+          </button>
+          {followUpCount > 0 && (
+            <button
+              onClick={() => setActiveTab("followups")}
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", background: YEL, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, cursor: "pointer" }}
+            >
+              <span style={{ width: 6, height: 6, background: INK, display: "inline-block" }} />
+              {followUpCount} ACTION{followUpCount !== 1 ? "S" : ""} DUE
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Tab nav */}
       <div style={{ borderBottom: `1px solid ${INK35}`, background: PAPER, position: "sticky", top: 52, zIndex: 49 }}>

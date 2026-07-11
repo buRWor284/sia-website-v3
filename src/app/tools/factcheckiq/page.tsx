@@ -36,9 +36,7 @@ const P35 = "rgba(241,235,222,.35)";
 const P25 = "rgba(241,235,222,.25)";
 
 type SpeedName = "Slow" | "Normal" | "Fast";
-// 2026-07-11: Slow kept as-is; Normal and Fast sped up per Irfan feedback —
-// the auto-advance felt sluggish, especially on Fast which should feel snappy.
-const SPEEDS: Record<SpeedName, number> = { Slow: 6000, Normal: 2600, Fast: 1100 };
+const SPEEDS: Record<SpeedName, number> = { Slow: 6000, Normal: 4000, Fast: 2000 };
 const SPEED_NAMES: SpeedName[] = ["Slow", "Normal", "Fast"];
 
 type ModeName = "Sequential" | "Parallel";
@@ -189,10 +187,10 @@ export default function FactcheckIQPage() {
         subtitle="How it works · Verification pipeline"
         rightContent={
           <Link
-            href="/emos"
-            style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: YEL, textDecoration: "none" }}
+            href="/"
+            style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)", textDecoration: "none" }}
           >
-            Join the EMOS Platform {"→"}
+            ← Main Site
           </Link>
         }
       />
@@ -216,21 +214,6 @@ export default function FactcheckIQPage() {
             .fciqfw-scale { grid-template-columns: 1fr 1fr !important; }
             .fciqfw-principles { grid-template-columns: 1fr !important; }
             .fciqfw-table { font-size: 12px !important; }
-          }
-          /* 2026-07-11: both the ten-step pipeline row and the claims table are
-             wider than a phone screen and scroll horizontally within their own
-             box — but with no visual signal, that read as text "running off"
-             the page instead of an intentional swipe area. Same fix pattern
-             as CoverageIQ's .ciq-scroll-hint: a small swipe hint shown only on
-             narrow screens, directly above each scrollable table. */
-          .fciqfw-scroll-hint { display: none; }
-          @media (max-width: 900px) {
-            .fciqfw-scroll-hint {
-              display: flex; align-items: center; gap: 6px;
-              font-family: var(--font-grot), sans-serif; font-weight: 700; font-size: 9px;
-              letter-spacing: 0.14em; text-transform: uppercase; color: rgba(26,20,16,.5);
-              padding: 6px 2px;
-            }
           }
         `}</style>
 
@@ -319,8 +302,7 @@ export default function FactcheckIQPage() {
                   <span style={actCaption}>the box below shows the step it is parked on. drive it with the player, or click any number</span>
                 </div>
 
-                <div className="fciqfw-scroll-hint" style={{ marginTop: 24 }}><span>⇆</span> Swipe to see all 10 steps</div>
-                <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch", marginTop: 24 }}>
+                <div style={{ overflowX: "auto", marginTop: 24 }}>
                   <div className="fciqfw-steps" style={{ display: "grid", gridTemplateColumns: "repeat(10, 1fr)", minWidth: 760, position: "relative", paddingTop: 10 }}>
                     <div style={{ position: "absolute", left: "5%", right: "5%", top: 42, height: 2, background: "rgba(26,20,16,.2)" }} />
                     {STEPS.map((s, i) => {
@@ -341,7 +323,7 @@ export default function FactcheckIQPage() {
                             </span>
                           </span>
                           <span style={{ width: 0, height: 0, borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: `6px solid ${YEL}`, opacity: on ? 1 : 0, marginTop: 5 }} />
-                          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".05em", textTransform: "uppercase", minHeight: 26, marginTop: 4, color: on ? INK : INK55, overflowWrap: "break-word", wordBreak: "break-word", maxWidth: 78 }}>
+                          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".05em", textTransform: "uppercase", minHeight: 26, marginTop: 4, color: on ? INK : INK55 }}>
                             {s.name}
                           </span>
                         </button>
@@ -481,8 +463,7 @@ export default function FactcheckIQPage() {
                     </div>
 
                     {/* Claims table */}
-                    <div className="fciqfw-scroll-hint"><span>⇆</span> Swipe table to see more columns</div>
-                    <div className="fciqfw-table" style={{ border: `1px solid ${INK}`, marginBottom: 26, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+                    <div className="fciqfw-table" style={{ border: `1px solid ${INK}`, marginBottom: 26, overflowX: "auto" }}>
                       <div style={{ display: "grid", gridTemplateColumns: "30px 1.55fr 118px 1.9fr 150px", minWidth: 720, background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase" }}>
                         <div style={{ padding: "9px 8px" }}>{"#"}</div>
                         <div style={{ padding: "9px 8px" }}>Claim as written</div>

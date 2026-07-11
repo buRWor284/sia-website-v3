@@ -127,10 +127,10 @@ export default function AssetIQPage() {
         subtitle="How it works · Linkable asset builder"
         rightContent={
           <Link
-            href="/emos"
-            style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: YEL, textDecoration: "none" }}
+            href="/"
+            style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)", textDecoration: "none" }}
           >
-            Join the EMOS Platform {"→"}
+            ← Main Site
           </Link>
         }
       />
