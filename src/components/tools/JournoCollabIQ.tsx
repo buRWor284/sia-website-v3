@@ -212,6 +212,10 @@ const GLOBAL_CSS = `
   .v2-shimmer{background:linear-gradient(90deg,rgba(26,20,16,.06) 25%,rgba(26,20,16,.10) 50%,rgba(26,20,16,.06) 75%);background-size:200% 100%;animation:v2shim 1.4s infinite}
   @keyframes v2shim{from{background-position:200% 0}to{background-position:-200% 0}}
   @keyframes v2-fade{from{opacity:0}to{opacity:1}}
+  .v2-spin{animation:v2spin .7s linear infinite}
+  @keyframes v2spin{to{transform:rotate(360deg)}}
+  .v2-unlock{animation:v2unlock 1.4s ease}
+  @keyframes v2unlock{0%{box-shadow:0 0 0 0 rgba(245,184,31,.6)}60%{box-shadow:0 0 0 8px rgba(245,184,31,0)}100%{box-shadow:0 0 0 0 rgba(245,184,31,0)}}
   .v2-step-label{display:block}
   @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}}
   .v2-collabiq *{box-sizing:border-box}
@@ -566,14 +570,29 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
 }
 
 // ── Stage 5: 90-Day Playbook ───────────────────────────────────────────────────
-function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
+function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }: {
   state: CollabState;
   onGated: (action: string) => void;
   aiBrief: string; aiBriefLoading: boolean;
+  pdfLoading: boolean; pdfDone: boolean;
 }) {
   const { biz, domain, strategy, industry, customInd, selNiches, audType, geo } = state;
   const ind   = customInd || industry;
   const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
+
+  const [justUnlocked, setJustUnlocked] = useState(false);
+  const downloadBtnRef = useRef<HTMLButtonElement | null>(null);
+  const prevAiBrief = useRef(false);
+  useEffect(() => {
+    if (aiBrief && !prevAiBrief.current) {
+      setJustUnlocked(true);
+      downloadBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const t = setTimeout(() => setJustUnlocked(false), 1500);
+      prevAiBrief.current = true;
+      return () => clearTimeout(t);
+    }
+    prevAiBrief.current = !!aiBrief;
+  }, [aiBrief]);
 
   return (
     <StageWrapper title="Your media targeting brief." subtitle="Generate your tiered journalist list, outreach sequence, and per-journalist angles. Download or copy it when you're done.">
@@ -642,13 +661,24 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
               Full analysis, partner table, outreach template and methodology in the PDF
             </p>
           </div>
-          {/* Download / copy — prominent */}
-          <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-            <button onClick={()=>onGated("pdf")} style={{ ...primaryBtn(), fontSize:13, padding:"14px 32px" }}>Download full PDF playbook</button>
-            <button onClick={()=>onGated("copy")} style={{ ...ghostBtn(), fontSize:13, padding:"14px 20px" }}>Copy brief text</button>
-          </div>
         </div>
       )}
+
+      {/* Download / copy — always visible; download unlocks once the brief is generated above */}
+      <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap", marginBottom:32 }}>
+        <button ref={downloadBtnRef} onClick={()=>onGated("pdf")} disabled={pdfLoading || !aiBrief}
+          className={justUnlocked ? "v2-unlock" : undefined}
+          style={{ ...primaryBtn(), fontSize:13, padding:"14px 32px", opacity:!aiBrief?0.4:(pdfLoading?0.75:1), cursor:!aiBrief?"not-allowed":(pdfLoading?"wait":"pointer"), display:"flex", alignItems:"center", gap:10 }}>
+          {pdfLoading && <span className="v2-spin" style={{ width:14, height:14, border:"2px solid rgba(26,20,16,.3)", borderTopColor:"#1a1410", borderRadius:"50%", display:"inline-block" }} />}
+          {pdfDone ? "Downloaded ✓" : pdfLoading ? "Preparing PDF…" : "Download full PDF playbook"}
+        </button>
+        {aiBrief && <button onClick={()=>onGated("copy")} style={{ ...ghostBtn(), fontSize:13, padding:"14px 20px" }}>Copy brief text</button>}
+        {!aiBrief && (
+          <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.08em" }}>
+            🔒 Unlocks once your brief is generated above
+          </span>
+        )}
+      </div>
 
       {/* EMOS CTA — shared skeleton (ToolCTAStrips.EmosCTAStrip), same
           component SignalIQ/PressIQ/CoverageIQ use. Copy rewritten to match
@@ -751,6 +781,9 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
   const [isSub, setIsSub]   = useState(()=>{ try { return !!localStorage.getItem(V2_SUB); } catch { return false; } });
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfDone, setPdfDone] = useState(false);
+  const pdfDoneTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const ind  = state.customInd || state.industry;
   const step = state.step;
@@ -905,7 +938,33 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   function handleSub(email: string) {
     try { localStorage.setItem(V2_SUB, JSON.stringify({ email, ts:Date.now() })); } catch { /* noop */ }
     setIsSub(true);
-    setTimeout(()=>{ if(gatedAction) perform(gatedAction); setGatedAction(null); }, 1300);
+    if (gatedAction) perform(gatedAction);
+    setGatedAction(null);
+  }
+
+  function downloadPdfWithFeedback() {
+    // jsPDF's doc.save() runs synchronously on the click, so without this
+    // wrapper the button never visibly changes state. Defer the heavy build
+    // by two animation frames so React can paint the loading state before
+    // the synchronous build blocks the thread, then guarantee the loading
+    // state stays visible for a minimum ~600ms so a human can register it
+    // even when the real work finishes instantly.
+    if (pdfDoneTimer.current) clearTimeout(pdfDoneTimer.current);
+    setPdfLoading(true);
+    setPdfDone(false);
+    const started = Date.now();
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      try { generatePDF(); }
+      finally {
+        const elapsed = Date.now() - started;
+        const wait = Math.max(0, 600 - elapsed);
+        setTimeout(() => {
+          setPdfLoading(false);
+          setPdfDone(true);
+          pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 4000);
+        }, wait);
+      }
+    }));
   }
 
   function generatePDF() {
@@ -1286,7 +1345,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   function perform(action: string) {
     if (action==="copy") {
       navigator.clipboard.writeText(`JournoCollabIQ Brief\nBusiness: ${state.biz}\nIndustry: ${ind}\nStrategy: ${V2_STRATEGIES[state.strategy]?.label}\n\nSelected Partners:\n${state.selNiches.join(", ")||"None"}\n\n${aiBrief||""}`);
-    } else if (action==="pdf")   { generatePDF(); }
+    } else if (action==="pdf")   { downloadPdfWithFeedback(); }
     else if (action==="email")   { generateAiEmail(); }
     else if (action==="brief")   { generateAiBrief(); }
     else if (action==="csv")     { downloadCsv(); }
@@ -1322,7 +1381,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
           {step===3 && <Stage3 partners={partners} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} />}
           {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
-          {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} />}
+          {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} pdfLoading={pdfLoading} pdfDone={pdfDone} />}
         </div>
 
         {/* Cloudflare Turnstile human check — docked in the page flow (centered,

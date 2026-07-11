@@ -205,6 +205,8 @@ const GLOBAL_CSS = `
   .v2-spin{animation:v2spin .7s linear infinite}
   @keyframes v2spin{to{transform:rotate(360deg)}}
   @keyframes v2-fade{from{opacity:0}to{opacity:1}}
+  .v2-unlock{animation:v2unlock 1.4s ease}
+  @keyframes v2unlock{0%{box-shadow:0 0 0 0 rgba(245,184,31,.6)}60%{box-shadow:0 0 0 8px rgba(245,184,31,0)}100%{box-shadow:0 0 0 0 rgba(245,184,31,0)}}
   .v2-step-label{display:block}
   .v2-footer-attribution{}
   @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}.v2-footer-attribution{display:none!important}.v2-wizard-footer{padding:10px 12px!important}.v2-footer-stepcount{display:none!important}.v2-footer-next{font-size:11px!important;padding:9px 14px!important;letter-spacing:0.04em!important}}
@@ -675,6 +677,20 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
   const ind   = customInd || industry;
   const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
 
+  const [justUnlocked, setJustUnlocked] = useState(false);
+  const downloadBtnRef = useRef<HTMLButtonElement | null>(null);
+  const prevAiBrief = useRef(false);
+  useEffect(() => {
+    if (aiBrief && !prevAiBrief.current) {
+      setJustUnlocked(true);
+      downloadBtnRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      const t = setTimeout(() => setJustUnlocked(false), 1500);
+      prevAiBrief.current = true;
+      return () => clearTimeout(t);
+    }
+    prevAiBrief.current = !!aiBrief;
+  }, [aiBrief]);
+
   return (
     <StageWrapper title="Your 90-day playbook." subtitle="Generate your full partnership execution plan. Download or copy it when you're done.">
 
@@ -742,17 +758,24 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
               Full analysis, partner table, outreach template and methodology in the PDF
             </p>
           </div>
-          {/* Download / copy — prominent */}
-          <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-            <button onClick={()=>onGated("pdf")} disabled={pdfLoading}
-              style={{ ...primaryBtn(), fontSize:13, padding:"14px 32px", opacity:pdfLoading?0.75:1, cursor:pdfLoading?"wait":"pointer", display:"flex", alignItems:"center", gap:10 }}>
-              {pdfLoading && <span className="v2-spin" style={{ width:14, height:14, border:"2px solid rgba(26,20,16,.3)", borderTopColor:"#1a1410", borderRadius:"50%", display:"inline-block" }} />}
-              {pdfDone ? "Downloaded ✓" : pdfLoading ? "Preparing PDF…" : "Download full PDF playbook"}
-            </button>
-            <button onClick={()=>onGated("copy")} style={{ ...ghostBtn(), fontSize:13, padding:"14px 20px" }}>Copy brief text</button>
-          </div>
         </div>
       )}
+
+      {/* Download / copy — always visible; download unlocks once the brief is generated above */}
+      <div style={{ display:"flex", gap:10, alignItems:"center", flexWrap:"wrap", marginBottom:32 }}>
+        <button ref={downloadBtnRef} onClick={()=>onGated("pdf")} disabled={pdfLoading || !aiBrief}
+          className={justUnlocked ? "v2-unlock" : undefined}
+          style={{ ...primaryBtn(), fontSize:13, padding:"14px 32px", opacity:!aiBrief?0.4:(pdfLoading?0.75:1), cursor:!aiBrief?"not-allowed":(pdfLoading?"wait":"pointer"), display:"flex", alignItems:"center", gap:10 }}>
+          {pdfLoading && <span className="v2-spin" style={{ width:14, height:14, border:"2px solid rgba(26,20,16,.3)", borderTopColor:"#1a1410", borderRadius:"50%", display:"inline-block" }} />}
+          {pdfDone ? "Downloaded ✓" : pdfLoading ? "Preparing PDF…" : "Download full PDF playbook"}
+        </button>
+        {aiBrief && <button onClick={()=>onGated("copy")} style={{ ...ghostBtn(), fontSize:13, padding:"14px 20px" }}>Copy brief text</button>}
+        {!aiBrief && (
+          <span style={{ fontFamily:MF, fontSize:9, color:TX4, letterSpacing:"0.08em" }}>
+            🔒 Unlocks once your brief is generated above
+          </span>
+        )}
+      </div>
 
       {/* DMR.agency CTA */}
       <div style={{ marginTop:aiBrief?0:16, padding:"24px 28px", background:BG2, border:`1px solid ${BD}`, display:"flex", alignItems:"center", justifyContent:"space-between", gap:16, flexWrap:"wrap" }}>
@@ -1012,27 +1035,36 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
   function handleSub(email: string) {
     try { localStorage.setItem(V2_SUB, JSON.stringify({ email, ts:Date.now() })); } catch { /* noop */ }
     setIsSub(true);
-    setTimeout(()=>{ if(gatedAction) perform(gatedAction); setGatedAction(null); }, 1300);
+    if (gatedAction) perform(gatedAction);
+    setGatedAction(null);
   }
 
   function downloadPdfWithFeedback() {
     // jsPDF's doc.save() runs synchronously on the click, so without this
     // wrapper the button never visibly changes state — the doc just appears
     // in Downloads with no "it's working" or "it's done" feedback. Defer the
-    // heavy build by a tick so React can paint the loading state first, then
-    // flip to a "Downloaded ✓" confirmation that stays up long enough to
-    // actually register (a prior stray timer could cut this short, so clear
-    // any pending hide-timer before scheduling a new one).
+    // heavy build by two animation frames so React can actually paint the
+    // loading state before the synchronous build blocks the thread, then
+    // guarantee the loading state stays visible for a minimum ~600ms so a
+    // human can register it even when the real work finishes instantly (a
+    // prior stray timer could cut this short, so clear any pending
+    // hide-timer before scheduling a new one).
     if (pdfDoneTimer.current) clearTimeout(pdfDoneTimer.current);
     setPdfLoading(true);
     setPdfDone(false);
-    setTimeout(() => {
-      try { generatePDF(); } finally {
-        setPdfLoading(false);
-        setPdfDone(true);
-        pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 4000);
+    const started = Date.now();
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      try { generatePDF(); }
+      finally {
+        const elapsed = Date.now() - started;
+        const wait = Math.max(0, 600 - elapsed);
+        setTimeout(() => {
+          setPdfLoading(false);
+          setPdfDone(true);
+          pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 4000);
+        }, wait);
       }
-    }, 50);
+    }));
   }
 
   function generatePDF() {
