@@ -44,8 +44,8 @@ export default function JournoCollabIQPage() {
             >
               How it works →
             </Link>
-            <Link href="/" style={{ fontFamily: "var(--font-mono)", fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "none" }}>
-              ← syedirfanajmal.com
+            <Link href="/" style={{ fontFamily: "var(--font-mono)", fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)", textDecoration: "none" }}>
+              ← Main Site
             </Link>
           </>
         }
