@@ -6,7 +6,7 @@
  * Route: /tools/collabiq
  */
 
-import { useState, useEffect, useReducer, useRef, useCallback } from "react";
+import { useState, useEffect, useReducer, useRef } from "react";
 import { EmailGateModal } from "@/components/tools/ToolCTAStrips";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
@@ -204,171 +204,84 @@ const GLOBAL_CSS = `
   @keyframes v2shim{from{background-position:200% 0}to{background-position:-200% 0}}
   @keyframes v2-fade{from{opacity:0}to{opacity:1}}
   .v2-step-label{display:block}
-  @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}}
+  .v2-footer-attribution{}
+  @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}.v2-footer-attribution{display:none!important}.v2-wizard-footer{padding:12px 16px!important}}
   .v2-collabiq *{box-sizing:border-box}
   .v2-collabiq input,.v2-collabiq textarea,.v2-collabiq select{font-family:var(--font-grot),sans-serif}
   .v2-contact-tip:hover .v2-tooltip{display:block!important}
   .v2-tooltip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1c1a16}
 `;
 
-// ── Stage 0: Animated Explainer ────────────────────────────────────────────────
+// ── Stage 0: Static Explainer ──────────────────────────────────────────────────
+// 2026-07-11: replaced the 7-scene animated "cinema" explainer with a static,
+// normal-flow layout — the animation broke on mobile (illegible text on some
+// scenes, one scene's grid running off the edge of the screen) and was worth
+// simplifying rather than patching, since most other tools in the suite don't
+// carry a video/animated intro at all. Same proof points (case study, revenue
+// lift, testimonial), just laid out top-to-bottom instead of as timed scenes.
 function Stage0({ onStart }: { onStart: () => void }) {
-  const SCENES = [
-    { dur: 3500, label: "Intro" },
-    { dur: 5000, label: "Client" },
-    { dur: 5500, label: "Discovery" },
-    { dur: 5500, label: "Strategy" },
-    { dur: 5000, label: "Result" },
-    { dur: 5000, label: "Proof" },
-    { dur: 0,    label: "PartnerCollabIQ" },
-  ];
-  const [scene, setScene] = useState(-1);
-  const [playing, setPlaying] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const play = useCallback(() => { setPlaying(true); setScene(0); }, []);
-  useEffect(() => { const t = setTimeout(play, 600); return () => clearTimeout(t); }, [play]);
-  useEffect(() => {
-    if (!playing || scene < 0) return;
-    if (scene >= SCENES.length || SCENES[scene].dur === 0) { setPlaying(false); return; }
-    timer.current = setTimeout(() => setScene(s => s + 1), SCENES[scene].dur);
-    return () => { if (timer.current) clearTimeout(timer.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, scene]);
-
-  const fade = (idx: number): React.CSSProperties => ({
-    position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-    alignItems: "center", justifyContent: "center", padding: "clamp(20px,5%,40px)",
-    opacity: scene === idx ? 1 : 0, transform: scene === idx ? "translateY(0)" : "translateY(8px)",
-    transition: "opacity 0.5s ease, transform 0.5s ease",
-    pointerEvents: scene === idx ? "auto" : "none",
-  });
-
-  function stag(items: React.ReactNode[], active: boolean, d = 150) {
-    return items.map((item, i) => (
-      <div key={i} style={{ opacity: active ? 1 : 0, transform: active ? "translateY(0)" : "translateY(14px)", transition: `all .45s ease ${i * d}ms` }}>{item}</div>
-    ));
-  }
-
   const cTx  = "#f1ebde", cTx2 = "rgba(241,235,222,.6)", cTx3 = "rgba(241,235,222,.3)", cTx4 = "rgba(241,235,222,.15)";
   const cBg2 = "#1a1714", cBd = "#2a2318";
-  const vis   = (i: number) => scene === i;
-  const done  = scene >= SCENES.length;
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px" }}>
       <div style={{ textAlign: "center", marginBottom: 20 }}>
         <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: TX4 }}>PartnerCollabIQ · Partnership Intelligence</span>
       </div>
 
-      {/* Cinema viewport */}
-      <div style={{ width: "100%", maxWidth: 760, aspectRatio: "16/9", background: "#0c0b09", border: "1px solid #2a2318", position: "relative", overflow: "hidden", margin: "0 auto" }}>
+      {/* Static explainer panel */}
+      <div style={{ width: "100%", maxWidth: 760, background: "#0c0b09", border: "1px solid #2a2318", padding: "clamp(28px,6vw,48px) clamp(20px,5vw,40px)", display: "flex", flexDirection: "column", alignItems: "center", gap: 28 }}>
 
-        {/* Scene 0 */}
-        <div style={fade(0)}>
-          {stag([
-            <div key="logo" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-              <div style={{ width: 28, height: 28, background: ACC, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GF, fontWeight: 900, fontSize: 10, color: "#0c0b09" }}>SIA</div>
-              <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: cTx3, textTransform: "uppercase" }}>Syed Irfan Ajmal · DMR.agency</span>
-            </div>,
-            <h2 key="h" style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,36px)", fontWeight: 700, color: cTx, textAlign: "center", lineHeight: 1.1, letterSpacing: "-0.025em", maxWidth: 520, margin: "0 0 20px" }}>
-              What if growth wasn&rsquo;t about competing, but <em style={{ color: ACC, fontStyle: "italic" }}>collaborating</em>?
-            </h2>,
-            <div key="bar" style={{ width: 40, height: 2, background: ACC }} />,
-          ], vis(0), 200)}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 28, height: 28, background: ACC, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GF, fontWeight: 900, fontSize: 10, color: "#0c0b09" }}>SIA</div>
+            <span style={{ fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", color: cTx3, textTransform: "uppercase" }}>Syed Irfan Ajmal · DMR.agency</span>
+          </div>
+          <h2 style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,36px)", fontWeight: 700, color: cTx, lineHeight: 1.15, letterSpacing: "-0.025em", maxWidth: 520, margin: "0 0 12px" }}>
+            What if growth wasn&rsquo;t about competing, but <em style={{ color: ACC, fontStyle: "italic" }}>collaborating</em>?
+          </h2>
+          <div style={{ width: 40, height: 2, background: ACC }} />
         </div>
 
-        {/* Scene 1 */}
-        <div style={fade(1)}>
-          {stag([
-            <span key="ov" style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, marginBottom: 10, display: "block" }}>Case Study</span>,
-            <h2 key="h" style={{ fontFamily: SF, fontSize: "clamp(20px,4vw,34px)", fontWeight: 700, color: cTx, textAlign: "center", lineHeight: 1.1, margin: "0 0 20px" }}>National Tyres &amp; Autocare</h2>,
-            <div key="meta" style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center" }}>
-              {[["Industry","Automotive"],["Market","United Kingdom"],["Challenge","Scale organic revenue"]].map(([k,v]) => (
-                <div key={k} style={{ textAlign: "center" }}>
-                  <div style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 3 }}>{k}</div>
-                  <div style={{ fontFamily: GF, fontSize: 13, color: cTx2, fontWeight: 600 }}>{v}</div>
-                </div>
-              ))}
-            </div>,
-            <p key="q" style={{ fontFamily: SF, fontSize: 14, fontStyle: "italic", color: cTx3, textAlign: "center", maxWidth: 420, marginTop: 16, lineHeight: 1.55 }}>
-              &ldquo;We needed a strategy that went beyond traditional link building and paid ads.&rdquo;
-            </p>,
-          ], vis(1), 200)}
-        </div>
+        <div style={{ width: "100%", maxWidth: 480, height: 1, background: cBd }} />
 
-        {/* Scene 2 */}
-        <div style={{ ...fade(2), gap: 16 }}>
-          <span style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, marginBottom: 16, display: "block" }}>The Insight</span>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "clamp(12px,3vw,28px)", width: "100%", flexWrap: "wrap" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ width: 80, height: 80, background: cBg2, border: `2px solid ${ACC}`, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-                <span style={{ fontFamily: GF, fontWeight: 900, fontSize: 16, color: ACC }}>NTA</span>
-                <span style={{ fontFamily: MF, fontSize: 6, color: cTx3, letterSpacing: "0.06em", marginTop: 2 }}>National Tyres</span>
+        {/* Case study */}
+        <div style={{ textAlign: "center" }}>
+          <span style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, marginBottom: 10, display: "block" }}>Case Study</span>
+          <h3 style={{ fontFamily: SF, fontSize: "clamp(18px,3.5vw,28px)", fontWeight: 700, color: cTx, lineHeight: 1.15, margin: "0 0 16px" }}>National Tyres &amp; Autocare</h3>
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
+            {[["Industry","Automotive"],["Market","United Kingdom"],["Challenge","Scale organic revenue"]].map(([k,v]) => (
+              <div key={k} style={{ textAlign: "center" }}>
+                <div style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: 3 }}>{k}</div>
+                <div style={{ fontFamily: GF, fontSize: 13, color: cTx2, fontWeight: 600 }}>{v}</div>
               </div>
-              <span style={{ fontFamily: MF, fontSize: 7, color: cTx4, display: "block", marginTop: 4, letterSpacing: "0.08em" }}>Your client</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-              <span style={{ fontFamily: SF, fontSize: 11, fontStyle: "italic", color: cTx3 }}>same drivers</span>
-              <div style={{ width: 50, height: 0, borderTop: `2px dashed ${ACC}` }} />
-              <span style={{ fontFamily: SF, fontSize: 11, fontStyle: "italic", color: cTx3 }}>zero competition</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
-              {stag([
-                <div key="a" style={{ padding: "7px 14px", background: cBg2, border: `1px solid ${cBd}`, fontFamily: GF, fontSize: 11, fontWeight: 600, color: cTx2 }}>Car Insurance Companies</div>,
-                <div key="b" style={{ padding: "7px 14px", background: cBg2, border: `1px solid ${cBd}`, fontFamily: GF, fontSize: 11, fontWeight: 600, color: cTx2 }}>Car Leasing Companies</div>,
-                <div key="c" style={{ padding: "7px 14px", background: cBg2, border: `1px solid ${cBd}`, fontFamily: GF, fontSize: 11, fontWeight: 600, color: cTx2 }}>Fleet Management Firms</div>,
-              ], vis(2), 250)}
-            </div>
+            ))}
           </div>
-          <p style={{ fontFamily: SF, fontSize: 13, fontStyle: "italic", color: cTx3, textAlign: "center", maxWidth: 420, marginTop: 16, lineHeight: 1.5 }}>
-            DMR.agency identified companies serving the same UK car owners, then offered their customers exclusive discounts.
+          <p style={{ fontFamily: SF, fontSize: 14, fontStyle: "italic", color: cTx3, maxWidth: 420, lineHeight: 1.55, margin: "0 auto" }}>
+            &ldquo;We needed a strategy that went beyond traditional link building and paid ads.&rdquo; DMR.agency identified companies serving the same UK car owners, then offered their customers exclusive discounts — the same drivers, zero competition.
           </p>
         </div>
 
-        {/* Scene 3 */}
-        <div style={{ ...fade(3), gap: 16 }}>
-          <span style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: ACC, display: "block" }}>The three-way win</span>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, width: "100%", maxWidth: 480 }}>
-            {stag([
-              <div key="c" style={{ padding: "14px 10px", background: cBg2, borderTop: `3px solid ${SUCC}`, textAlign: "center" }}>
-                <div style={{ fontFamily: GF, fontSize: 10, fontWeight: 800, color: SUCC, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>Customers</div>
-                <div style={{ fontFamily: GF, fontSize: 11, color: cTx2, lineHeight: 1.45 }}>Exclusive discounts on tyres &amp; services</div>
-              </div>,
-              <div key="p" style={{ padding: "14px 10px", background: cBg2, borderTop: `3px solid ${INFO}`, textAlign: "center" }}>
-                <div style={{ fontFamily: GF, fontSize: 10, fontWeight: 800, color: INFO, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>Partners</div>
-                <div style={{ fontFamily: GF, fontSize: 11, color: cTx2, lineHeight: 1.45 }}>Added value at zero cost for their audience</div>
-              </div>,
-              <div key="n" style={{ padding: "14px 10px", background: cBg2, borderTop: `3px solid ${ACC}`, textAlign: "center" }}>
-                <div style={{ fontFamily: GF, fontSize: 10, fontWeight: 800, color: ACC, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 5 }}>NTA</div>
-                <div style={{ fontFamily: GF, fontSize: 11, color: cTx2, lineHeight: 1.45 }}>Referral traffic, partnerships &amp; authority</div>
-              </div>,
-            ], vis(3), 300)}
+        <div style={{ width: "100%", maxWidth: 480, height: 1, background: cBd }} />
+
+        {/* Result */}
+        <div style={{ textAlign: "center" }}>
+          <span style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: cTx4, marginBottom: 8, display: "block" }}>National Tyres &amp; Autocare · Organic Revenue</span>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", flexWrap: "wrap", gap: 12, marginBottom: 12 }}>
+            <span style={{ fontFamily: SF, fontSize: "clamp(20px,4vw,28px)", fontWeight: 700, color: cTx3, textDecoration: "line-through", textDecorationColor: cTx4 }}>$160K/mo</span>
+            <span style={{ fontSize: 18, color: cTx3 }}>→</span>
+            <span style={{ fontFamily: SF, fontSize: "clamp(30px,6vw,48px)", fontWeight: 700, color: ACC, letterSpacing: "-0.03em", lineHeight: 1 }}>$1.2M/mo</span>
           </div>
-          <p style={{ fontFamily: MF, fontSize: 9, color: cTx4, textAlign: "center", marginTop: 14, letterSpacing: "0.06em" }}>
-            Strategy by Syed Irfan Ajmal · Executed by DMR.agency
+          <p style={{ fontFamily: SF, fontSize: 13, fontStyle: "italic", color: cTx2, maxWidth: 400, lineHeight: 1.5, margin: "0 auto" }}>
+            From organic traffic alone. No paid ads. Just strategic partnerships built by DMR.agency.
           </p>
         </div>
 
-        {/* Scene 4 */}
-        <div style={fade(4)}>
-          {stag([
-            <span key="ov" style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: cTx4, marginBottom: 8, display: "block" }}>National Tyres &amp; Autocare · Organic Revenue</span>,
-            <div key="nums" style={{ display: "flex", alignItems: "baseline", gap: 14 }}>
-              <span style={{ fontFamily: SF, fontSize: "clamp(22px,4vw,32px)", fontWeight: 700, color: cTx3, textDecoration: "line-through", textDecorationColor: cTx4 }}>$160K/mo</span>
-              <span style={{ fontSize: 20, color: cTx3 }}>→</span>
-              <span style={{ fontFamily: SF, fontSize: "clamp(36px,7vw,56px)", fontWeight: 700, color: ACC, letterSpacing: "-0.03em", lineHeight: 1 }}>$1.2M/mo</span>
-            </div>,
-            <div key="bar" style={{ width: 40, height: 2, background: ACC, margin: "14px 0" }} />,
-            <p key="cap" style={{ fontFamily: SF, fontSize: 13, fontStyle: "italic", color: cTx2, textAlign: "center", maxWidth: 400, lineHeight: 1.5 }}>
-              From organic traffic alone. No paid ads. Just strategic partnerships built by DMR.agency.
-            </p>,
-          ], vis(4), 200)}
-        </div>
+        <div style={{ width: "100%", maxWidth: 480, height: 1, background: cBd }} />
 
-        {/* Scene 5 */}
-        <div style={{ ...fade(5), gap: 12 }}>
-          <div style={{ maxWidth: 440, width: "100%", padding: "18px 20px", background: cBg2, borderLeft: `3px solid ${ACC}`, marginBottom: 16 }}>
+        {/* Testimonial + proof */}
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+          <div style={{ maxWidth: 440, width: "100%", padding: "18px 20px", background: cBg2, borderLeft: `3px solid ${ACC}` }}>
             <p style={{ fontFamily: SF, fontSize: 14, fontStyle: "italic", color: cTx2, lineHeight: 1.6, marginBottom: 10 }}>
               &ldquo;Can not thank Syed Irfan Ajmal and the team enough for getting it ranked — they are getting 100s of keywords for this site ranked. Exceptional professionalism.&rdquo;
             </p>
@@ -378,55 +291,26 @@ function Stage0({ onStart }: { onStart: () => void }) {
               <span style={{ fontFamily: MF, fontSize: 8, color: cTx3, marginLeft: 4 }}>Client · LinkedIn</span>
             </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "center", marginBottom: 6 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
             <span style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.1em", textTransform: "uppercase" }}>Featured in</span>
             {["FORBES","SEMrush","HBR"].map(n => (
               <span key={n} style={{ fontFamily: GF, fontWeight: 800, fontSize: n === "FORBES" ? 14 : 12, color: cTx3, letterSpacing: n === "FORBES" ? "0.06em" : "0.02em" }}>{n}</span>
             ))}
           </div>
-          <span style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.08em", textAlign: "center", display: "block" }}>
+          <span style={{ fontFamily: MF, fontSize: 8, color: cTx4, letterSpacing: "0.08em", textAlign: "center" }}>
             Presented at SEMrush webinar to 1,000+ marketers
           </span>
         </div>
-
-        {/* Scene 6 */}
-        <div style={fade(6)}>
-          {stag([
-            <span key="ov" style={{ fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.16em", textTransform: "uppercase", color: cTx4, marginBottom: 10, display: "block" }}>Now it&rsquo;s your turn</span>,
-            <div key="name" style={{ fontFamily: SF, fontSize: "clamp(26px,5vw,42px)", fontWeight: 700, color: cTx, textAlign: "center", letterSpacing: "-0.025em", lineHeight: 1.1, marginBottom: 10 }}>
-              Collab<em style={{ color: ACC, fontStyle: "italic" }}>IQ</em>
-            </div>,
-            <p key="sub" style={{ fontFamily: GF, fontSize: 14, color: cTx2, textAlign: "center", lineHeight: 1.6, maxWidth: 380, marginBottom: 20 }}>
-              AI-powered partnership intelligence. Find non-obvious partners, score them, and get your campaign brief in minutes.
-            </p>,
-            <div key="btns" style={{ display: "flex", gap: 10 }}>
-              <button onClick={play} style={{ ...ghostBtn(), fontSize: 10, padding: "10px 16px", color: cTx3, borderColor: cBd }}>Replay</button>
-              <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 13, padding: "14px 32px" }}>Get started →</button>
-            </div>,
-          ], vis(6) || done, 200)}
-        </div>
-
-        {/* Scrubber */}
-        <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(12,11,9,0.9)", borderTop: `1px solid ${cBd}` }}>
-          <div style={{ height: 2, background: "#1a1714" }}>
-            <div style={{ height: "100%", background: ACC, width: scene >= 0 ? `${((scene + 1) / SCENES.length) * 100}%` : "0%", transition: "width 0.5s ease" }} />
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 12px" }}>
-            {SCENES.map((s, i) => (
-              <button key={i} onClick={() => { setScene(i); setPlaying(i < SCENES.length - 1); }}
-                style={{ background: "transparent", border: "none", cursor: "pointer",
-                  fontFamily: MF, fontSize: 7, fontWeight: 700, letterSpacing: "0.08em",
-                  textTransform: "uppercase", padding: "2px 4px",
-                  color: i === scene ? ACC : i < scene ? cTx3 : cTx4 }}>
-                {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
 
-      {/* CTA below cinema */}
+      {/* CTA below panel */}
       <div style={{ textAlign: "center", marginTop: 28 }}>
+        <div style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,32px)", fontWeight: 700, color: TX, letterSpacing: "-0.025em", lineHeight: 1.1, marginBottom: 10 }}>
+          Collab<em style={{ color: ACC, fontStyle: "italic" }}>IQ</em>
+        </div>
+        <p style={{ fontFamily: GF, fontSize: 14, color: TX2, lineHeight: 1.6, maxWidth: 380, margin: "0 auto 20px" }}>
+          AI-powered partnership intelligence. Find non-obvious partners, score them, and get your campaign brief in minutes.
+        </p>
         <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 14, padding: "16px 40px" }}>Try PartnerCollabIQ free →</button>
         <p style={{ fontFamily: MF, fontSize: 9, color: TX4, marginTop: 10, letterSpacing: "0.1em" }}>No signup required · Results in under 2 minutes</p>
       </div>
@@ -934,19 +818,19 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled }: {
 }) {
   const t = LIGHT_T;
   return (
-    <div style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:90,
+    <div className="v2-wizard-footer" style={{ position:"fixed", bottom:0, left:0, right:0, zIndex:90,
       background:t.BG0, borderTop:`1px solid ${t.BDS}`, padding:"14px 32px",
       display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-      <div style={{ display:"flex", alignItems:"center", gap:16 }}>
-        {step>0 && <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px" }}>← Back</button>}
-        <a href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX3, textDecoration:"none", fontWeight:600 }}>A free tool by Syed Irfan Ajmal · syedirfanajmal.com ↗</a>
-        <span style={{ display:"flex", alignItems:"center", gap:7 }}>
+      <div style={{ display:"flex", alignItems:"center", gap:16, minWidth:0 }}>
+        {step>0 && <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px", flexShrink:0 }}>← Back</button>}
+        <a className="v2-footer-attribution" href="https://www.syedirfanajmal.com" target="_blank" rel="noopener noreferrer" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX3, textDecoration:"none", fontWeight:600, whiteSpace:"nowrap" }}>A free tool by Syed Irfan Ajmal · syedirfanajmal.com ↗</a>
+        <span className="v2-footer-attribution" style={{ display:"flex", alignItems:"center", gap:7 }}>
           <a href="/privacy" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX4, textDecoration:"none", fontWeight:600 }}>Privacy</a>
           <span style={{ fontFamily:MF, fontSize:11, color:t.TX4 }}>·</span>
           <a href="/terms" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX4, textDecoration:"none", fontWeight:600 }}>Terms</a>
         </span>
       </div>
-      <span style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em" }}>{`${step + 1} of 5`}</span>
+      <span style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em", flexShrink:0 }}>{`${step + 1} of 5`}</span>
       {nextLabel
         ? <button onClick={onNext} disabled={nextDisabled}
             style={{ ...primaryBtn(), padding:"10px 24px", opacity:nextDisabled?0.4:1, cursor:nextDisabled?"not-allowed":"pointer" }}>
