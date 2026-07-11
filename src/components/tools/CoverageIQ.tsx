@@ -1026,18 +1026,33 @@ function AlertsFeed() {
           />
         ))}
       </div>
-      <div style={{ border: `1px solid ${INK}` }}>
+      <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+       <div style={{ minWidth: 640 }}>
+        {filtered.length > 0 && (
+          <div style={{ display: "grid", gridTemplateColumns: "90px 80px minmax(220px, 1fr) 120px", background: INK, color: PAPER }}>
+            {["Date", "Type", "Alert", "Source"].map((h, i) => (
+              <div key={h} style={{
+                padding: "11px 14px",
+                borderLeft: i > 0 ? "1px solid rgba(241,235,222,.15)" : "none",
+                fontFamily: GROT, fontWeight: 700, fontSize: 9,
+                letterSpacing: "0.16em", textTransform: "uppercase",
+              }}>
+                {h}
+              </div>
+            ))}
+          </div>
+        )}
         {filtered.map((alert, idx) => (
           <div key={alert.id} style={{
-            display: "grid", gridTemplateColumns: "80px 60px 1fr 100px",
+            display: "grid", gridTemplateColumns: "90px 80px minmax(220px, 1fr) 120px",
             borderBottom: idx < filtered.length - 1 ? `1px solid ${INK15}` : "none",
             background: alert.status === "new" ? "oklch(97% .03 80 / .5)" : "transparent",
           }}>
-            <div style={{ padding: "12px 14px", fontFamily: MONO, fontSize: 12 }}>{fmt(alert.date)}</div>
+            <div style={{ padding: "12px 14px", fontFamily: MONO, fontSize: 12, display: "flex", alignItems: "center" }}>{fmt(alert.date)}</div>
             <div style={{ padding: "12px 10px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
               <AlertTypeBadge type={alert.type} />
             </div>
-            <div style={{ padding: "12px 14px", borderLeft: `1px solid ${INK15}` }}>
+            <div style={{ padding: "12px 14px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center", overflow: "hidden", minWidth: 0 }}>
               <a href={alert.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: SERIF, fontSize: 14, color: INK, borderBottom: `1px solid ${YEL}`, textDecoration: "none" }}>
                 {alert.title}
               </a>
@@ -1048,6 +1063,7 @@ function AlertsFeed() {
           </div>
         ))}
         {filtered.length === 0 && <EmptyState message="No alerts matching this filter." />}
+       </div>
       </div>
     </div>
   );
