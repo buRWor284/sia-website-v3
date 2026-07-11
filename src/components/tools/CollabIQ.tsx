@@ -241,7 +241,12 @@ function Stage0({ onStart }: { onStart: () => void }) {
           <h2 style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,36px)", fontWeight: 700, color: cTx, lineHeight: 1.15, letterSpacing: "-0.025em", maxWidth: 520, margin: "0 0 12px" }}>
             What if growth wasn&rsquo;t about competing, but <em style={{ color: ACC, fontStyle: "italic" }}>collaborating</em>?
           </h2>
-          <div style={{ width: 40, height: 2, background: ACC }} />
+          <div style={{ width: 40, height: 2, background: ACC, marginBottom: 20 }} />
+          {/* 2026-07-11: added per Irfan's feedback — the only CTA used to
+              sit below the whole proof panel (case study, stat, testimonial),
+              so on mobile the action was a long scroll away. Same button,
+              just also offered right up top. */}
+          <button onClick={onStart} style={{ ...primaryBtn(), fontSize: 13, padding: "13px 30px" }}>Try PartnerCollabIQ free →</button>
         </div>
 
         <div style={{ width: "100%", maxWidth: 480, height: 1, background: cBd }} />
@@ -291,7 +296,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
       {/* CTA below panel */}
       <div style={{ textAlign: "center", marginTop: 28 }}>
         <div style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,32px)", fontWeight: 700, color: TX, letterSpacing: "-0.025em", lineHeight: 1.1, marginBottom: 10 }}>
-          Collab<em style={{ color: ACC, fontStyle: "italic" }}>IQ</em>
+          Ready to find <em style={{ color: ACC, fontStyle: "italic" }}>yours</em>?
         </div>
         <p style={{ fontFamily: GF, fontSize: 14, color: TX2, lineHeight: 1.6, maxWidth: 380, margin: "0 auto 20px" }}>
           AI-powered partnership intelligence. Find non-obvious partners, score them, and get your campaign brief in minutes.
