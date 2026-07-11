@@ -289,7 +289,14 @@ function Stage0({ onStart }: { onStart: () => void }) {
               &ldquo;Can not thank Syed Irfan Ajmal and the team enough for getting it ranked — they are getting 100s of keywords for this site ranked. Exceptional professionalism.&rdquo;
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <img src="/assets/testimonials/Azzam_Sheikh_NTA_Testimonial_LinkedIn.png" alt="Azzam Sheikh" style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${cBd}`, objectFit: "cover", objectPosition: "top", flexShrink: 0 }} />
+              {/* 2026-07-11: the source PNG is a full LinkedIn post screenshot
+                  (1866x918), not a headshot — any crop of it into a small
+                  circle just grabbed a random sliver of text. Initials avatar
+                  reads cleanly at any size instead of depending on a crop that
+                  was never going to show a face. */}
+              <div aria-hidden="true" style={{ width: 44, height: 44, borderRadius: "50%", border: `1px solid ${cBd}`, background: "#1a1714", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <span style={{ fontFamily: GF, fontSize: 15, fontWeight: 800, color: ACC }}>AS</span>
+              </div>
               <span style={{ fontFamily: GF, fontSize: 13, fontWeight: 700, color: cTx }}>Azzam Sheikh</span>
               <span style={{ fontFamily: MF, fontSize: 9, color: cTx3, marginLeft: 4 }}>Client · LinkedIn</span>
             </div>
