@@ -305,6 +305,24 @@ export default function PressIQHowItWorksPage() {
 
         <div style={{ maxWidth: 1360, margin: "0 auto", padding: "0 clamp(20px,4vw,56px)" }}>
 
+          {/* ===== EXPLAINER VIDEO ===== */}
+          <section style={{ padding: "48px 0 8px" }}>
+            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: INK55, marginBottom: 14 }}>
+              WATCH · 90-SECOND WALKTHROUGH
+            </div>
+            <div style={{ maxWidth: 760, border: `1px solid ${INK15}`, background: "#000" }}>
+              <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden" }}>
+                <iframe
+                  src="https://www.youtube.com/embed/HaXSuks2l54"
+                  title="PressIQ Explainer"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
+                />
+              </div>
+            </div>
+          </section>
+
           {/* ===== ACT 1 ===== */}
           <section style={{ padding: "64px 0 20px" }}>
             <StartRule />
