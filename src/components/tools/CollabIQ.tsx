@@ -202,10 +202,13 @@ const GLOBAL_CSS = `
   @keyframes v2fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
   .v2-shimmer{background:linear-gradient(90deg,rgba(26,20,16,.06) 25%,rgba(26,20,16,.10) 50%,rgba(26,20,16,.06) 75%);background-size:200% 100%;animation:v2shim 1.4s infinite}
   @keyframes v2shim{from{background-position:200% 0}to{background-position:-200% 0}}
+  .v2-spin{animation:v2spin .7s linear infinite}
+  @keyframes v2spin{to{transform:rotate(360deg)}}
   @keyframes v2-fade{from{opacity:0}to{opacity:1}}
   .v2-step-label{display:block}
   .v2-footer-attribution{}
-  @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}.v2-footer-attribution{display:none!important}.v2-wizard-footer{padding:12px 16px!important}}
+  @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}.v2-footer-attribution{display:none!important}.v2-wizard-footer{padding:10px 12px!important}.v2-footer-stepcount{display:none!important}.v2-footer-next{font-size:11px!important;padding:9px 14px!important;letter-spacing:0.04em!important}}
+  @media(max-width:380px){.v2-footer-next{font-size:10px!important;padding:8px 10px!important}}
   .v2-collabiq *{box-sizing:border-box}
   .v2-collabiq input,.v2-collabiq textarea,.v2-collabiq select{font-family:var(--font-grot),sans-serif}
   .v2-contact-tip:hover .v2-tooltip{display:block!important}
@@ -220,7 +223,7 @@ const GLOBAL_CSS = `
 // carry a video/animated intro at all. Same proof points (case study, revenue
 // lift, testimonial), just laid out top-to-bottom instead of as timed scenes.
 function Stage0({ onStart }: { onStart: () => void }) {
-  const cTx  = "#f1ebde", cTx2 = "rgba(241,235,222,.6)", cTx3 = "rgba(241,235,222,.3)", cTx4 = "rgba(241,235,222,.15)";
+  const cTx  = "#f1ebde", cTx2 = "rgba(241,235,222,.6)", cTx3 = "rgba(241,235,222,.55)", cTx4 = "rgba(241,235,222,.4)";
   const cBg2 = "#1a1714", cBd = "#2a2318";
 
   return (
@@ -678,10 +681,11 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
 }
 
 // ── Stage 5: 90-Day Playbook ───────────────────────────────────────────────────
-function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
+function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }: {
   state: CollabState;
   onGated: (action: string) => void;
   aiBrief: string; aiBriefLoading: boolean;
+  pdfLoading: boolean; pdfDone: boolean;
 }) {
   const { biz, domain, strategy, industry, customInd, selNiches, audType, geo } = state;
   const ind   = customInd || industry;
@@ -756,7 +760,11 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading }: {
           </div>
           {/* Download / copy — prominent */}
           <div style={{ display:"flex", gap:10, alignItems:"center" }}>
-            <button onClick={()=>onGated("pdf")} style={{ ...primaryBtn(), fontSize:13, padding:"14px 32px" }}>Download full PDF playbook</button>
+            <button onClick={()=>onGated("pdf")} disabled={pdfLoading}
+              style={{ ...primaryBtn(), fontSize:13, padding:"14px 32px", opacity:pdfLoading?0.75:1, cursor:pdfLoading?"wait":"pointer", display:"flex", alignItems:"center", gap:10 }}>
+              {pdfLoading && <span className="v2-spin" style={{ width:14, height:14, border:"2px solid rgba(26,20,16,.3)", borderTopColor:"#1a1410", borderRadius:"50%", display:"inline-block" }} />}
+              {pdfDone ? "Downloaded ✓" : pdfLoading ? "Preparing PDF…" : "Download full PDF playbook"}
+            </button>
             <button onClick={()=>onGated("copy")} style={{ ...ghostBtn(), fontSize:13, padding:"14px 20px" }}>Copy brief text</button>
           </div>
         </div>
@@ -830,10 +838,10 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled }: {
           <a href="/terms" style={{ fontFamily:MF, fontSize:11, letterSpacing:"0.08em", color:t.TX4, textDecoration:"none", fontWeight:600 }}>Terms</a>
         </span>
       </div>
-      <span style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em", flexShrink:0 }}>{`${step + 1} of 5`}</span>
+      <span className="v2-footer-stepcount" style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em", flexShrink:0 }}>{`${step + 1} of 5`}</span>
       {nextLabel
-        ? <button onClick={onNext} disabled={nextDisabled}
-            style={{ ...primaryBtn(), padding:"10px 24px", opacity:nextDisabled?0.4:1, cursor:nextDisabled?"not-allowed":"pointer" }}>
+        ? <button className="v2-footer-next" onClick={onNext} disabled={nextDisabled}
+            style={{ ...primaryBtn(), padding:"10px 24px", opacity:nextDisabled?0.4:1, cursor:nextDisabled?"not-allowed":"pointer", whiteSpace:"nowrap", flexShrink:0 }}>
             {nextLabel}
           </button>
         : <div />
@@ -857,6 +865,8 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
   const [aiBrief, setAiBrief]       = useState("");
   const [aiEmailLoading, setAiEmailLoading] = useState(false);
   const [aiBriefLoading, setAiBriefLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfDone, setPdfDone] = useState(false);
   const [partnersError, setPartnersError]   = useState<string|null>(null);
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
@@ -1018,6 +1028,23 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     try { localStorage.setItem(V2_SUB, JSON.stringify({ email, ts:Date.now() })); } catch { /* noop */ }
     setIsSub(true);
     setTimeout(()=>{ if(gatedAction) perform(gatedAction); setGatedAction(null); }, 1300);
+  }
+
+  function downloadPdfWithFeedback() {
+    // jsPDF's doc.save() runs synchronously on the click, so without this
+    // wrapper the button never visibly changes state — the doc just appears
+    // in Downloads with no "it's working" or "it's done" feedback. Defer the
+    // heavy build by a tick so React can paint the loading state first, then
+    // flip to a brief "Downloaded ✓" confirmation.
+    setPdfLoading(true);
+    setPdfDone(false);
+    setTimeout(() => {
+      try { generatePDF(); } finally {
+        setPdfLoading(false);
+        setPdfDone(true);
+        setTimeout(() => setPdfDone(false), 2600);
+      }
+    }, 50);
   }
 
   function generatePDF() {
@@ -1397,7 +1424,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
   function perform(action: string) {
     if (action==="copy") {
       navigator.clipboard.writeText(`PartnerCollabIQ Brief\nBusiness: ${state.biz}\nIndustry: ${ind}\nStrategy: ${V2_STRATEGIES[state.strategy]?.label}\n\nSelected Partners:\n${state.selNiches.join(", ")||"None"}\n\n${aiBrief||""}`);
-    } else if (action==="pdf")   { generatePDF(); }
+    } else if (action==="pdf")   { downloadPdfWithFeedback(); }
     else if (action==="email")   { generateAiEmail(); }
     else if (action==="brief")   { generateAiBrief(); }
     else if (action==="csv")     { downloadCsv(); }
@@ -1432,7 +1459,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
           {step===3 && <Stage3 partners={partners} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} />}
           {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
-          {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} />}
+          {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} pdfLoading={pdfLoading} pdfDone={pdfDone} />}
         </div>
 
         {/* Cloudflare Turnstile human check — renders only when the site key is set */}
