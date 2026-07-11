@@ -187,10 +187,10 @@ export default function FactcheckIQPage() {
         subtitle="How it works · Verification pipeline"
         rightContent={
           <Link
-            href="/"
-            style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)", textDecoration: "none" }}
+            href="/emos"
+            style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: YEL, textDecoration: "none" }}
           >
-            ← Main Site
+            Join the EMOS Platform {"→"}
           </Link>
         }
       />
@@ -605,6 +605,27 @@ export default function FactcheckIQPage() {
                 <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P45, marginTop: 18 }}>
                   For human writers and AI drafts alike
                 </div>
+              </div>
+
+              {/* ── PLATFORM CTA BAND ───────────────────────────────────────── */}
+              <div style={{ marginTop: 24, marginBottom: 16, background: INK, borderTop: `3px solid ${YEL}`, padding: "36px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
+                <div style={{ maxWidth: 620 }}>
+                  <span style={{ display: "inline-block", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", padding: "4px 9px", marginBottom: 12 }}>
+                    Platform only
+                  </span>
+                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, color: PAPER, lineHeight: 1.2 }}>
+                    FactcheckIQ is available to EMOS Platform members.
+                  </div>
+                  <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: P72, marginTop: 8 }}>
+                    Join the platform to verify drafts and AI-assisted copy before they publish.
+                  </p>
+                </div>
+                <Link
+                  href="/emos"
+                  style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "15px 26px", whiteSpace: "nowrap", textDecoration: "none" }}
+                >
+                  Explore the EMOS Platform {"→"}
+                </Link>
               </div>
 
               {/* ── FOOTER (colophon rule) ──────────────────────────────────── */}
