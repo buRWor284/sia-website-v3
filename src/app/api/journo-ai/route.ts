@@ -22,6 +22,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 import { capToolInput, clientIp } from "@/lib/public-tool-guard";
+import { consumeQuota } from "@/lib/gate/quota";
+import { PREVIEW_REVEAL } from "@/lib/gate/quota-limits";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -146,6 +148,35 @@ Write in plain, direct prose — no fluff. Tone: expert consultant. Length: 400�
 }
 
 // ─────────────────────────────────────────────────────────────
+// Preview-gate helpers (Phase P3, RFP §5)
+// ─────────────────────────────────────────────────────────────
+
+/** Strip the markdown code fences the model sometimes wraps JSON in. */
+function stripFences(s: string): string {
+  return s.replace(/^```json?\s*/i, "").replace(/```\s*$/, "").trim();
+}
+
+/**
+ * Clamp the model's JSON array of journalist matches to `limit` rows for the
+ * caller's tier. Anonymous callers receive only their top slice; the withheld
+ * rows never leave the server, so there is nothing to scrape from the payload
+ * and no fake scarcity — the matches are real, just gated. On any parse failure
+ * we fail OPEN (return the text untouched, total unknown) so a formatting hiccup
+ * never blanks a genuine result.
+ */
+function clampResults(raw: string, limit: number): { text: string; total: number; revealed: number } {
+  let arr: unknown;
+  try { arr = JSON.parse(stripFences(raw)); } catch { return { text: raw, total: -1, revealed: -1 }; }
+  if (!Array.isArray(arr)) return { text: raw, total: -1, revealed: -1 };
+  const total = arr.length;
+  if (!Number.isFinite(limit) || total <= limit) {
+    return { text: JSON.stringify(arr), total, revealed: total };
+  }
+  const sliced = arr.slice(0, limit);
+  return { text: JSON.stringify(sliced), total, revealed: sliced.length };
+}
+
+// ─────────────────────────────────────────────────────────────
 // Handler
 // ─────────────────────────────────────────────────────────────
 
@@ -179,13 +210,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }
 
-  // DB-backed rate limit — holds across serverless instances.
+  // DB-backed rate limit — holds across serverless instances. This is the
+  // per-IP abuse brake on ALL three call types (protects the Anthropic budget);
+  // it stays in place alongside the identity quota below.
   const rl = await rateLimitDb(`journo-ai:${ip}`, { limit: DAILY_LIMIT, windowMs: DAY_MS });
   if (!rl.ok) {
     return NextResponse.json(
       { error: "You've hit today's limit for AI generations on this tool. Try again tomorrow." },
       { status: 429 },
     );
+  }
+
+  // P3 (RFP §5): per-identity monthly quota on the PREVIEW SEARCH only
+  // (partner-suggestions = the journalist search). The downstream angle-writer /
+  // media-plan calls are per-journalist actions and stay on the shared IP brake
+  // above — only the search is metered. Keyed by the sia_sub wristband when present
+  // (counts follow the user across devices), else hardened IP. Metered →
+  // fail-open-with-logging (P2 pattern).
+  let previewTier: "anonymous" | "email" = "anonymous";
+  let previewRemaining = 0;
+  if (type === "partner-suggestions") {
+    const quota = await consumeQuota(request, "jciq-preview");
+    previewTier = quota.tier;
+    previewRemaining = quota.remaining;
+    if (!quota.ok) {
+      return NextResponse.json(
+        {
+          error: quota.tier === "email"
+            ? "You've used all 30 journalist searches this month. Unlimited runs live in the EMOS platform."
+            : "You've used your 3 free journalist searches this month. Add your email for 30 a month, free.",
+          usage: { remaining: 0, tier: quota.tier },
+        },
+        { status: 429 },
+      );
+    }
   }
 
   const capped = capToolInput(data);
@@ -225,6 +283,22 @@ export async function POST(request: NextRequest) {
       .filter(b => b.type === "text")
       .map(b => b.text)
       .join("\n");
+
+    // Preview search (P3): withhold the rows beyond the caller's tier reveal cap
+    // server-side, and tell the client the tier + how many are held back so it can
+    // render the blur/unlock overlay. Anonymous → top 3; subscriber → all.
+    if (type === "partner-suggestions") {
+      const revealLimit = PREVIEW_REVEAL["jciq-preview"][previewTier];
+      const clamped = clampResults(result, revealLimit);
+      return NextResponse.json({
+        result: clamped.text,
+        tier: previewTier,
+        total: clamped.total,
+        revealed: clamped.revealed,
+        hidden: clamped.total >= 0 ? Math.max(0, clamped.total - clamped.revealed) : 0,
+        usage: { remaining: previewRemaining, tier: previewTier },
+      });
+    }
 
     return NextResponse.json({ result });
   } catch (e) {

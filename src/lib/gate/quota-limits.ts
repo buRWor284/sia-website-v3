@@ -14,7 +14,12 @@
  * anonymous, unlimited for subscribers), enforced by getPublicTier().
  */
 
-export type QuotaTool = "signaliq-scan" | "signaliq-pack" | "pressiq-score";
+export type QuotaTool =
+  | "signaliq-scan"
+  | "signaliq-pack"
+  | "pressiq-score"
+  | "pciq-preview"
+  | "jciq-preview";
 
 export interface QuotaTier {
   /** Anonymous (no verified email) allowance per rolling 30 days. */
@@ -28,6 +33,22 @@ export const QUOTA_LIMITS: Record<QuotaTool, QuotaTier> = {
   "signaliq-scan": { anonymous: 3, email: 10 },
   "signaliq-pack": { anonymous: 1, email: 5 },
   "pressiq-score": { anonymous: 3, email: 10 },
+  // P3 (RFP §5): PCIQ/JCIQ preview-search runs. Anonymous gets 3 free searches
+  // per rolling 30 days; a verified subscriber gets 30. The per-run visibility
+  // cap (anonymous sees the top 3 of 8 results, subscriber sees all) is enforced
+  // separately in the routes via getPublicTier — it is NOT metered here.
+  "pciq-preview": { anonymous: 3, email: 30 },
+  "jciq-preview": { anonymous: 3, email: 30 },
+};
+
+/**
+ * How many result rows a caller may see per preview search, by tier (P3).
+ * Anonymous callers get a genuine taste (the top slice); the rest are withheld
+ * server-side and revealed once they verify an email. `Infinity` = no cap.
+ */
+export const PREVIEW_REVEAL: Record<"pciq-preview" | "jciq-preview", QuotaTier> = {
+  "pciq-preview": { anonymous: 3, email: Infinity },
+  "jciq-preview": { anonymous: 3, email: Infinity },
 };
 
 /** Rolling quota window, in milliseconds (30 days). */

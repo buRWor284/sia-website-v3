@@ -429,8 +429,67 @@ function Stage2({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
 }
 
 // ── Stage 3: Partners ──────────────────────────────────────────────────────────
-function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNiches, onToggle, onScore, onGatedCsv, error, onRetry }: {
-  partners: AiPartner[]; loading: boolean; loadingIdx: number;
+// ── P3 preview gate: locked placeholder card + unlock overlay ─────────────────
+// Anonymous callers see their top matches in full; the rest are withheld
+// server-side and represented here by blurred, non-interactive placeholders sitting
+// behind the unlock overlay. No real data is present in these cards (nothing to
+// scrape) — and nothing is fabricated, so there's no fake scarcity.
+function LockedPreviewCard() {
+  return (
+    <div aria-hidden style={{ borderBottom: `1px solid ${BDS}`, padding: "22px 0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 22, height: 22, border: `2px solid ${BD}`, flexShrink: 0 }} />
+          <div>
+            <div style={{ fontFamily: SF, fontSize: 18, fontWeight: 700, color: TX }}>Locked match</div>
+            <span style={{ fontFamily: MF, fontSize: 9, color: TX4, letterSpacing: "0.04em" }}>••••••••••</span>
+          </div>
+        </div>
+        <span style={{ color: TX3, border: `1px solid ${BD}`, fontFamily: MF, fontSize: 8, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px", flexShrink: 0 }}>Tier •</span>
+      </div>
+      <div style={{ background: BG2, borderLeft: `3px solid ${BD}`, padding: "12px 14px", marginBottom: 14 }}>
+        <p style={{ fontSize: 13, color: TX2, lineHeight: 1.65, margin: 0, fontFamily: GF }}>
+          This match is ready. Add your email to reveal why it fits, the link placement, and the contact.
+        </p>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px 16px" }}>
+        {["Link placement", "Contact", "Authority"].map(l => (
+          <div key={l}>
+            <span style={{ fontFamily: MF, fontSize: 8, letterSpacing: "0.1em", textTransform: "uppercase", color: TX4, display: "block", marginBottom: 4 }}>{l}</span>
+            <span style={{ fontSize: 12, color: TX3, fontFamily: GF }}>••••••••</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function UnlockOverlay({ hidden, kind, onUnlock }: { hidden: number; kind: "partners" | "journalists"; onUnlock: () => void }) {
+  return (
+    <div style={{ background: BG2, border: `1px solid ${BD}`, borderTop: `3px solid ${ACC}`, boxShadow: "0 10px 40px rgba(26,20,16,0.18)", maxWidth: 440, width: "100%", padding: "28px 26px", textAlign: "center" }}>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "#1c1a16", color: "#fff", fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", padding: "5px 11px", marginBottom: 16 }}>
+        <span style={{ width: 7, height: 7, borderRadius: "50%", background: ACC }} />
+        {hidden} more {kind} matched
+      </span>
+      <h3 style={{ fontFamily: SF, fontSize: 22, fontWeight: 700, color: TX, margin: "0 0 10px", letterSpacing: "-0.01em" }}>
+        See the other {hidden} {kind}.
+      </h3>
+      <p style={{ fontFamily: GF, fontSize: 14, color: TX2, lineHeight: 1.6, margin: "0 0 18px" }}>
+        You&apos;re viewing your top 3 matches. Add your email to unlock all {hidden + 3}, plus 30 {kind} searches every month. Free, no password.
+      </p>
+      <button onClick={onUnlock} style={{ background: ACC, color: TX, border: 0, fontFamily: MF, fontSize: 12, fontWeight: 800, letterSpacing: "0.06em", padding: "13px 26px", cursor: "pointer", textTransform: "uppercase" }}>
+        Unlock all {kind} →
+      </button>
+      <p style={{ fontFamily: MF, fontSize: 9, color: TX3, letterSpacing: "0.04em", margin: "14px 0 0" }}>
+        One verified email. Works across every tool on this site. One or two emails a month, unsubscribe anytime.
+      </p>
+    </div>
+  );
+}
+
+function Stage3({ partners, hiddenCount, onUnlock, loading, loadingIdx, industry, strategy, biz, selNiches, onToggle, onScore, onGatedCsv, error, onRetry }: {
+  partners: AiPartner[]; hiddenCount: number; onUnlock: () => void;
+  loading: boolean; loadingIdx: number;
   industry: string; strategy: string; biz: string;
   selNiches: string[];
   onToggle: (n: string) => void;
@@ -487,7 +546,7 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
   const selCount = selNiches.length;
 
   return (
-    <StageWrapper title="Your partner intelligence." subtitle={`${partners.length} targets found for ${industry} using ${strat.label}. Select the partners you want in your campaign brief.`}>
+    <StageWrapper title="Your partner intelligence." subtitle={`${partners.length + hiddenCount} targets found for ${industry} using ${strat.label}. Select the partners you want in your campaign brief.`}>
       <div style={{ background: "rgba(245,184,31,0.06)", border: `1px solid rgba(245,184,31,0.2)`, padding: "10px 14px", marginBottom: 16, display: "flex", gap: 10, alignItems: "center" }}>
         <span style={{ background: ACC, fontFamily: MF, fontSize: 8, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", padding: "3px 8px", color: TX, flexShrink: 0 }}>AI</span>
         <span style={{ fontFamily: GF, fontSize: 12, color: TX2 }}>Each suggestion has been scored by PartnerCollabIQ against 8 partnership criteria: audience overlap, non-competition, domain authority, link placement availability, value exchange potential, existing linking behaviour, contact findability, and brand quality.</span>
@@ -562,6 +621,16 @@ function Stage3({ partners, loading, loadingIdx, industry, strategy, biz, selNic
           </div>
         );
       })}
+      {hiddenCount > 0 && (
+        <div style={{ position: "relative", marginTop: 4 }}>
+          <div aria-hidden style={{ filter: "blur(5px)", opacity: 0.55, userSelect: "none", pointerEvents: "none" }}>
+            {Array.from({ length: Math.min(hiddenCount, 5) }).map((_, i) => <LockedPreviewCard key={i} />)}
+          </div>
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+            <UnlockOverlay hidden={hiddenCount} kind="partners" onUnlock={onUnlock} />
+          </div>
+        </div>
+      )}
       <div style={{ padding: "16px 0", display: "flex", gap: 14, flexWrap: "wrap" }}>
         {([["A","Highest priority",TC.A],["B","Strong candidate",TC.B],["C","Good to include",TC.C]] as [string,string,string][]).map(([t,l,c]) => (
           <div key={t} style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -872,6 +941,9 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled }: {
 export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: number }) {
   const [state, dispatch]           = useReducer(reducer, null, initState);
   const [partners, setPartners]     = useState<AiPartner[]>([]);
+  // P3: how many partners the server withheld from an anonymous preview search
+  // (0 = all shown, i.e. subscriber tier). Drives the blur/unlock overlay.
+  const [hiddenCount, setHiddenCount] = useState(0);
   const [loading, setLoading]       = useState(false);
   const [loadingIdx, setLoadingIdx] = useState(0);
   const [aiEmail, setAiEmail]       = useState("");
@@ -1006,13 +1078,21 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     // PartnerCollabIQ · Personalised to {biz}" whenever the API failed — users
     // could act on stale, non-personalised data believing it was live. Now we
     // show a real error + retry instead.
-    setLoading(true); setPartners([]); setLoadingIdx(0); setPartnersError(null);
+    setLoading(true); setPartners([]); setHiddenCount(0); setLoadingIdx(0); setPartnersError(null);
     try {
       const res = await fetch("/api/collab-ai", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy }, turnstileToken: (await waitForToken()) || undefined }),
       });
-      const json = await res.json().catch(() => ({})) as { result?: string; error?: string };
+      const json = await res.json().catch(() => ({})) as { result?: string; error?: string; hidden?: number };
+      // P3: monthly search quota exhausted. For an anonymous caller, surface the
+      // shared gate so they can convert on the spot; a subscriber has hit the hard
+      // 30/mo cap, so just show the message.
+      if (res.status === 429) {
+        setPartnersError(json.error || "You've reached this month's search limit.");
+        if (!isSub) { setGatedAction("unlock-preview"); setShowGate(true); }
+        return;
+      }
       if (res.ok && json.result) {
         // Strip markdown fences if present
         const cleaned = json.result.replace(/^```json?\s*/i,"").replace(/```\s*$/,"").trim();
@@ -1020,6 +1100,9 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
         if (Array.isArray(list) && list.length > 0) {
           const sliced = list.slice(0, 8);
           setPartners(sliced);
+          // P3: server withheld the rest for anonymous callers — record how many so
+          // Stage3 can render the blurred/locked cards behind the unlock overlay.
+          setHiddenCount(typeof json.hidden === "number" ? json.hidden : 0);
           // Auto-select all + clear stale email target from previous session
           dispatch({ type: "SET_NICHES", val: sliced.map(p => p.name) });
           dispatch({ type: "SET", key: "scPartner", val: sliced[0]?.name || "" });
@@ -1054,8 +1137,14 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     // The gate modal has already verified the email and set the signed wristband
     // cookie server-side (P1) — no localStorage flag to write. Just unlock locally.
     setIsSub(true);
-    if (gatedAction) perform(gatedAction);
+    const pending = gatedAction;
     setGatedAction(null);
+    // P3: if the anonymous search was truncated (or they clicked the unlock
+    // overlay), re-run as a subscriber so the server returns the full set and the
+    // blur/overlay clears. This supersedes the pending gated action (CSV/PDF), which
+    // is one click away once the complete results are in.
+    if (pending === "unlock-preview" || hiddenCount > 0) { generatePartners(); return; }
+    if (pending) perform(pending);
   }
 
   function downloadPdfWithFeedback() {
@@ -1496,7 +1585,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
           {step===0 && <Stage0 onStart={()=>dispatch({type:"GO",step:1})} />}
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
-          {step===3 && <Stage3 partners={partners} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} />}
+          {step===3 && <Stage3 partners={partners} hiddenCount={hiddenCount} onUnlock={()=>{setGatedAction("unlock-preview");setShowGate(true);}} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} />}
           {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
           {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} pdfLoading={pdfLoading} pdfDone={pdfDone} />}
         </div>
@@ -1510,7 +1599,12 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
 
         {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} />}
 
-        <EmailGateModal variant="subscribe" tool="pciq" show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
+        <EmailGateModal variant="subscribe" tool="pciq"
+          heading={gatedAction === "unlock-preview" ? "Unlock all your matches." : undefined}
+          blurb={gatedAction === "unlock-preview"
+            ? "Verify your email to reveal every partner and lift your limit to 30 searches a month. No password, no dashboard. One email, honored across every tool here."
+            : undefined}
+          show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>
     </>
   );
