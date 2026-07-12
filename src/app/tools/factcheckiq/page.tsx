@@ -187,10 +187,10 @@ export default function FactcheckIQPage() {
         subtitle="How it works · Verification pipeline"
         rightContent={
           <Link
-            href="/emos"
-            style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: YEL, textDecoration: "none" }}
+            href="/"
+            style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)", textDecoration: "none" }}
           >
-            Join the EMOS Platform {"→"}
+            ← Main Site
           </Link>
         }
       />
@@ -208,9 +208,19 @@ export default function FactcheckIQPage() {
           @media (max-width: 900px) {
             .fciqfw-steps { grid-template-columns: repeat(5, 1fr) !important; }
           }
+          .fciqfw-steps-mobile { display: none; }
           @media (max-width: 680px) {
             .fciqfw-lane1 { flex-direction: column !important; }
-            .fciqfw-steps { grid-template-columns: repeat(3, 1fr) !important; }
+            /* Below 680px the 10-step grid only ever showed its first column
+               (the grid stayed at minWidth:760 inside an overflow-x:auto box,
+               so on a ~390px phone only steps 1/4/7/10 were visible with no
+               obvious scroll affordance). Hide the grid entirely and drive
+               the same `selected` state from a one-step-at-a-time pager
+               instead, so mobile always shows exactly one step + its detail
+               panel below. */
+            .fciqfw-steps-desktop { display: none !important; }
+            .fciqfw-steps-mobile { display: flex !important; }
+            .fciqfw-detail { grid-template-columns: 1fr !important; }
             .fciqfw-scale { grid-template-columns: 1fr 1fr !important; }
             .fciqfw-principles { grid-template-columns: 1fr !important; }
             .fciqfw-table { font-size: 12px !important; }
@@ -302,7 +312,7 @@ export default function FactcheckIQPage() {
                   <span style={actCaption}>the box below shows the step it is parked on. drive it with the player, or click any number</span>
                 </div>
 
-                <div style={{ overflowX: "auto", marginTop: 24 }}>
+                <div className="fciqfw-steps-desktop" style={{ overflowX: "auto", marginTop: 24 }}>
                   <div className="fciqfw-steps" style={{ display: "grid", gridTemplateColumns: "repeat(10, 1fr)", minWidth: 760, position: "relative", paddingTop: 10 }}>
                     <div style={{ position: "absolute", left: "5%", right: "5%", top: 42, height: 2, background: "rgba(26,20,16,.2)" }} />
                     {STEPS.map((s, i) => {
@@ -330,6 +340,34 @@ export default function FactcheckIQPage() {
                       );
                     })}
                   </div>
+                </div>
+
+                {/* Mobile pager — one step at a time (grid above is hidden <680px) */}
+                <div className="fciqfw-steps-mobile" style={{ alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 24, background: INK, border: `1px solid ${INK}`, padding: "12px 14px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setSelected((s) => Math.max(0, s - 1))}
+                    disabled={selected === 0}
+                    style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", background: "transparent", color: PAPER, border: `1px solid ${P35}`, padding: "9px 14px", cursor: selected === 0 ? "default" : "pointer", opacity: selected === 0 ? 0.35 : 1 }}
+                  >
+                    {"‹ Prev"}
+                  </button>
+                  <span style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+                    <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11, letterSpacing: ".1em", color: YEL }}>
+                      STEP {pad(selected + 1)} / 10
+                    </span>
+                    <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".06em", textTransform: "uppercase", color: P72 }}>
+                      {STEPS[selected].name}
+                    </span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setSelected((s) => Math.min(STEPS.length - 1, s + 1))}
+                    disabled={selected === STEPS.length - 1}
+                    style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", background: YEL, color: INK, border: `1px solid ${YEL}`, padding: "9px 14px", cursor: selected === STEPS.length - 1 ? "default" : "pointer", opacity: selected === STEPS.length - 1 ? 0.35 : 1 }}
+                  >
+                    {"Next ›"}
+                  </button>
                 </div>
 
                 {/* Player bar */}
@@ -379,7 +417,7 @@ export default function FactcheckIQPage() {
                 </div>
 
                 {/* Detail panel */}
-                <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", border: `1px solid ${INK}`, borderTop: "none", background: PAPER2, minHeight: 150 }}>
+                <div className="fciqfw-detail" style={{ display: "grid", gridTemplateColumns: "120px 1fr", border: `1px solid ${INK}`, borderTop: "none", background: PAPER2, minHeight: 150 }}>
                   <div style={{ background: INK, color: YEL, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8 }}>
                     <span style={{ fontSize: 44 }}>{active.icon}</span>
                     <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 12, color: P72 }}>STEP {pad(selected + 1)}</span>
@@ -409,7 +447,7 @@ export default function FactcheckIQPage() {
                           <ul style={{ margin: "0 0 10px", padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: "8px 18px" }}>
                             {active.traps.map((t) => (
                               <li key={t} style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".04em", color: INK55 }}>
-                                <span style={{ color: INK, fontWeight: 900 }}>{"→ "}</span>{t}
+                                <span style={{ color: YEL2, fontWeight: 900 }}>{"→ "}</span>{t}
                               </li>
                             ))}
                           </ul>
@@ -448,10 +486,7 @@ export default function FactcheckIQPage() {
                     {/* Tally row */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "14px 22px", marginBottom: 16 }}>
                       {TALLY.map((t) => (
-                        // a11y: label text is INK (readable on light); verdict hue shown as a swatch.
-                        // Several verdict colors (amber/olive/translucent) fail as text on light.
-                        <span key={t.label} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: MONO, fontWeight: 700, fontSize: 11.5, color: INK }}>
-                          <span aria-hidden style={{ width: 8, height: 8, background: VERDICT_COLORS[t.verdict].bg, flexShrink: 0 }} />
+                        <span key={t.label} style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11.5, color: VERDICT_COLORS[t.verdict].bg === PAPER ? INK : VERDICT_COLORS[t.verdict].bg }}>
                           {t.label}
                         </span>
                       ))}
@@ -570,7 +605,7 @@ export default function FactcheckIQPage() {
                               <span style={{ fontFamily: GROT, fontStyle: "normal", fontWeight: 800, textTransform: "uppercase", fontSize: 11, color: isDark ? PAPER : INK }}>In plain terms: </span>
                               {p.plain}
                             </p>
-                            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".05em", color: isDark ? P72 : INK55, textTransform: "uppercase", marginTop: "auto" }}>
+                            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".05em", color: isDark ? P45 : INK55, textTransform: "uppercase", marginTop: "auto" }}>
                               {p.scope}
                             </div>
                           </div>
@@ -587,7 +622,7 @@ export default function FactcheckIQPage() {
                   Rigour that is too slow to use does not get used.
                 </p>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: P72 }}>
+                  <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: P45 }}>
                     The design principle behind all 11 methods
                   </div>
                   <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 56, color: P25, lineHeight: 1, marginTop: 6 }}>
@@ -605,7 +640,7 @@ export default function FactcheckIQPage() {
                 <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.6, color: P72, maxWidth: "76ch", margin: "18px 0 0" }}>
                   Spell-check caught typos. Grammar-check caught grammar. FactcheckIQ catches the false claim and the invented source, before your reader does. It works the same whether a person or an AI wrote the draft: it verifies, and it never writes for you. Like the typewriter, spell-check, and Grammarly before it, this is a tool that makes writers more trustworthy, not obsolete.
                 </p>
-                <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P72, marginTop: 18 }}>
+                <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P45, marginTop: 18 }}>
                   For human writers and AI drafts alike
                 </div>
               </div>
