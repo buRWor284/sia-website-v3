@@ -1097,6 +1097,18 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
         {pack.headline}
       </h3>
 
+      {/* Quick download — mirrors the full report bar lower down, surfaced up top */}
+      <div style={{ marginTop: 12, marginBottom: 4, padding: "10px 14px", border: `1px solid ${INK15}`, background: PAPER2, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+        <SCaps size={9.5} ls="0.14em" color={INK}>Download full report — opportunities, asset pack, sources, pitch angle</SCaps>
+        <button
+          onClick={onDownloadPDF}
+          className="siq-scan-btn"
+          style={{ fontSize: 11.5, padding: "9px 18px", whiteSpace: "nowrap" }}
+        >
+          Download PDF →
+        </button>
+      </div>
+
       {/* How to use this pack */}
       <div style={{ marginTop: 16, border: `1px solid ${INK}`, background: PAPER }}>
         <div style={{ padding: "14px 20px 0" }}>
@@ -1112,7 +1124,7 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
             {([
               ["01", "Score the pitch angle in PressIQ before you send it"],
               ["02", "Use the journalist shortlist in this pack, personalise your outreach to each one before sending"],
-              ["03", "Build the linkable asset using the EMOS playbook and cadence"],
+              ["03", "Build the Authority Asset using the EMOS playbook and cadence"],
               ["04", "Run the full earned-media play: EMOS handles the system around it"],
             ] as [string, string][]).map(([n, t]) => (
               <div key={n} style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "baseline" }}>
@@ -1129,7 +1141,7 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
             {([
               ["01", "Use the data brief as your research base: cite the numbers directly"],
               ["02", "Personalise the pitch angle for each journalist and outlet you contact"],
-              ["03", "Build the linkable asset on your site before you pitch: give them something to link to"],
+              ["03", "Build the Authority Asset on your site before you pitch: give them something to link to"],
               ["04", "Verify every caution and fact-check the sources before sending anything"],
             ] as [string, string][]).map(([n, t]) => (
               <div key={n} style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "baseline" }}>
@@ -1166,9 +1178,9 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
         </a>
       </div>
 
-      {/* Linkable asset idea */}
+      {/* Authority asset idea */}
       <div style={{ marginTop: 16, padding: "16px 20px", borderLeft: `3px solid ${YEL}`, background: hexA(YEL, 0.08) }}>
-        <SCaps size={10} ls="0.16em" color={INK}>Linkable asset to build</SCaps>
+        <SCaps size={10} ls="0.16em" color={INK}>Authority Asset</SCaps>
         <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 15, lineHeight: 1.55, color: INK }}>
           {pack.linkableAssetIdea}
         </p>
