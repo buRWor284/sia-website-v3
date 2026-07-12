@@ -11,6 +11,14 @@ create table if not exists public.rate_limits (
 alter table public.rate_limits enable row level security;
 -- Intentionally NO public/anon policies: only the service-role client may read/write.
 
+-- Service-role needs explicit TABLE privileges too. check_rate_limit() is NOT
+-- SECURITY DEFINER, so it runs as the caller (service_role), and Supabase's
+-- default-privilege grants don't reliably cover tables created via the SQL editor.
+-- Without this, the function fails at runtime with "permission denied for table
+-- rate_limits" and callers silently fail (rateLimitDb → in-memory; quota.ts →
+-- fail-open). Same fix pattern as gate.sql. (Added 2026-07-12 after the P2 smoke test.)
+grant select, insert, update, delete on public.rate_limits to service_role;
+
 -- Atomic check-and-increment. Returns whether this request is allowed and how many
 -- remain in the current window. Resets the counter once the window has elapsed.
 create or replace function public.check_rate_limit(
