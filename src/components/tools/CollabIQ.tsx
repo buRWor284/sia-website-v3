@@ -150,7 +150,6 @@ type Action =
 
 // ── State ──────────────────────────────────────────────────────────────────────
 const V2_STORE = "collabiq_v2_state";
-const V2_SUB   = "collabiq_v2_sub";
 
 function initState(): CollabState {
   // Always start blank — do not rehydrate form fields from a previous
@@ -724,7 +723,8 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
         PartnerCollabIQ builds a full 90-day execution plan: phased outreach, success metrics, partner categories, and risk mitigation, tailored to your business and strategy.
       </p>
       <button onClick={()=>onGated("brief")} disabled={aiBriefLoading||!biz}
-        style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32 }}>
+        style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32, display:"inline-flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+        {aiBriefLoading && <span className="v2-spin" style={{ width:14, height:14, border:"2px solid rgba(26,20,16,.3)", borderTopColor:"#1a1410", borderRadius:"50%", display:"inline-block" }} />}
         {aiBriefLoading ? "Generating your brief…" : "Generate 90-day brief →"}
       </button>
 
@@ -878,7 +878,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
   const [partnersError, setPartnersError]   = useState<string|null>(null);
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
-  const [isSub, setIsSub]   = useState(()=>{ try { return !!localStorage.getItem(V2_SUB); } catch { return false; } });
+  const [isSub, setIsSub]   = useState(false);
 
   const ind  = state.customInd || state.industry;
   const step = state.step;
@@ -892,6 +892,18 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
 
   // Persist state
   useEffect(()=>{ try { localStorage.setItem(V2_STORE, JSON.stringify(state)); } catch { /* noop */ } }, [state]);
+
+  // Unified gate (P1): subscriber status is server-side now. Ask /api/gate/status on
+  // mount (honors the signed wristband + legacy pp_tier) instead of a per-browser
+  // localStorage flag, so one verified email unlocks across every tool and device.
+  useEffect(()=>{
+    let alive = true;
+    fetch("/api/gate/status", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (alive && d?.subscriber) setIsSub(true); })
+      .catch(()=>{});
+    return ()=>{ alive = false; };
+  }, []);
 
   // Loading cycle
   useEffect(()=>{
@@ -1032,8 +1044,9 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
     a.download = `PartnerCollabIQ-Partners-${state.biz||"List"}.csv`; a.click();
   }
-  function handleSub(email: string) {
-    try { localStorage.setItem(V2_SUB, JSON.stringify({ email, ts:Date.now() })); } catch { /* noop */ }
+  function handleSub() {
+    // The gate modal has already verified the email and set the signed wristband
+    // cookie server-side (P1) — no localStorage flag to write. Just unlock locally.
     setIsSub(true);
     if (gatedAction) perform(gatedAction);
     setGatedAction(null);
@@ -1061,7 +1074,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
         setTimeout(() => {
           setPdfLoading(false);
           setPdfDone(true);
-          pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 4000);
+          pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 12000);
         }, wait);
       }
     }));
@@ -1491,7 +1504,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
 
         {step>0 && <WizardFooter step={step-1} onBack={goBack} onNext={goNext} nextLabel={nextLabels[step]} nextDisabled={!canAdvance[step]()} />}
 
-        <EmailGateModal variant="subscribe" show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
+        <EmailGateModal variant="subscribe" tool="pciq" show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>
     </>
   );

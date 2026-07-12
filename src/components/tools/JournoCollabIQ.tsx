@@ -159,7 +159,6 @@ type Action =
 // business names typed into one showed up "pre-filled" in the other
 // (2026-07 QA finding). Own keys now; PartnerCollabIQ keeps the old ones.
 const V2_STORE = "journocollabiq_v1_state";
-const V2_SUB   = "journocollabiq_v1_sub";
 
 function initState(): CollabState {
   // Always start blank — do not rehydrate form fields from a previous
@@ -217,7 +216,7 @@ const GLOBAL_CSS = `
   .v2-unlock{animation:v2unlock 1.4s ease}
   @keyframes v2unlock{0%{box-shadow:0 0 0 0 rgba(245,184,31,.6)}60%{box-shadow:0 0 0 8px rgba(245,184,31,0)}100%{box-shadow:0 0 0 0 rgba(245,184,31,0)}}
   .v2-step-label{display:block}
-  @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}}
+  @media(max-width:600px){.v2-step-label{display:none!important}.v2-meta-grid{grid-template-columns:1fr!important}.v2-footer-stepcount{display:none!important}}
   .v2-collabiq *{box-sizing:border-box}
   .v2-collabiq input,.v2-collabiq textarea,.v2-collabiq select{font-family:var(--font-grot),sans-serif}
   .v2-contact-tip:hover .v2-tooltip{display:block!important}
@@ -582,7 +581,11 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
 
   const [justUnlocked, setJustUnlocked] = useState(false);
   const downloadBtnRef = useRef<HTMLButtonElement | null>(null);
-  const prevAiBrief = useRef(false);
+  // Seed with the current aiBrief value (not false) so re-mounting this stage with
+  // a brief already generated (e.g. navigating back to stage 4 and forward again)
+  // doesn't re-fire the "just unlocked" scroll — that should only fire the moment
+  // the brief actually finishes generating during this mount's lifetime.
+  const prevAiBrief = useRef(!!aiBrief);
   useEffect(() => {
     if (aiBrief && !prevAiBrief.current) {
       setJustUnlocked(true);
@@ -594,8 +597,14 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
     prevAiBrief.current = !!aiBrief;
   }, [aiBrief]);
 
+  // Always land at the top of this stage on mount, so the heading is visible
+  // instead of wherever the viewport happened to be scrolled on the previous stage.
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   return (
-    <StageWrapper title="Your media targeting brief." subtitle="Generate your tiered journalist list, outreach sequence, and per-journalist angles. Download or copy it when you're done.">
+    <StageWrapper title="Your media targeting brief." subtitle="Generate your tiered journalist list, outreach sequence, and per-journalist angles. Download or copy it when you're done. Scroll down for your downloadable PDF playbook.">
 
       {/* Campaign at a glance */}
       <div style={{ background:BG2, border:`1px solid ${BD}`, padding:24, marginBottom:32 }}>
@@ -627,7 +636,8 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
         JournoCollabIQ builds your media brief: a tiered journalist list, an outreach sequence (exclusive → embargo → wide), per-journalist angles, and a verify-before-you-send checklist.
       </p>
       <button onClick={()=>onGated("brief")} disabled={aiBriefLoading||!biz}
-        style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32 }}>
+        style={{ ...primaryBtn(), opacity:(!biz||aiBriefLoading)?0.4:1, fontSize:14, padding:"16px 32px", marginBottom:32, display:"inline-flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+        {aiBriefLoading && <span className="v2-spin" style={{ width:14, height:14, border:"2px solid rgba(26,20,16,.3)", borderTopColor:"#1a1410", borderRadius:"50%", display:"inline-block" }} />}
         {aiBriefLoading ? "Generating your brief…" : "Generate 90-day brief →"}
       </button>
 
@@ -750,7 +760,7 @@ function WizardFooter({ step, onBack, onNext, nextLabel, nextDisabled }: {
       <div style={{ display:"flex", alignItems:"center", gap:16 }}>
         {step>0 && <button onClick={onBack} style={{ ...ghostBtn(), padding:"10px 20px" }}>← Back</button>}
       </div>
-      <span style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em" }}>{`${step + 1} of 5`}</span>
+      <span className="v2-footer-stepcount" style={{ fontFamily:MF, fontSize:11, color:t.TX4, letterSpacing:"0.08em" }}>{`${step + 1} of 5`}</span>
       {nextLabel
         ? <button onClick={onNext} disabled={nextDisabled}
             style={{ ...primaryBtn(), padding:"10px 24px", opacity:nextDisabled?0.4:1, cursor:nextDisabled?"not-allowed":"pointer" }}>
@@ -780,7 +790,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   const [partnersError, setPartnersError]   = useState<string|null>(null);
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
-  const [isSub, setIsSub]   = useState(()=>{ try { return !!localStorage.getItem(V2_SUB); } catch { return false; } });
+  const [isSub, setIsSub]   = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [pdfDone, setPdfDone] = useState(false);
   const pdfDoneTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -797,6 +807,18 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
 
   // Persist state
   useEffect(()=>{ try { localStorage.setItem(V2_STORE, JSON.stringify(state)); } catch { /* noop */ } }, [state]);
+
+  // Unified gate (P1): subscriber status is server-side now. Ask /api/gate/status on
+  // mount (honors the signed wristband + legacy pp_tier) instead of a per-browser
+  // localStorage flag, so one verified email unlocks across every tool and device.
+  useEffect(()=>{
+    let alive = true;
+    fetch("/api/gate/status", { credentials: "include" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (alive && d?.subscriber) setIsSub(true); })
+      .catch(()=>{});
+    return ()=>{ alive = false; };
+  }, []);
 
   // Loading cycle
   useEffect(()=>{
@@ -935,8 +957,9 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
     a.download = `JournoCollabIQ-Partners-${state.biz||"List"}.csv`; a.click();
   }
-  function handleSub(email: string) {
-    try { localStorage.setItem(V2_SUB, JSON.stringify({ email, ts:Date.now() })); } catch { /* noop */ }
+  function handleSub() {
+    // The gate modal has already verified the email and set the signed wristband
+    // cookie server-side (P1) — no localStorage flag to write. Just unlock locally.
     setIsSub(true);
     if (gatedAction) perform(gatedAction);
     setGatedAction(null);
@@ -961,7 +984,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         setTimeout(() => {
           setPdfLoading(false);
           setPdfDone(true);
-          pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 4000);
+          pdfDoneTimer.current = setTimeout(() => setPdfDone(false), 12000);
         }, wait);
       }
     }));
@@ -1399,7 +1422,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         {/* Pipeline footer — shown only on the final step as a "what's next?" prompt */}
         {step > 0 && <div style={{ paddingBottom: 72 }}><ToolPipelineFooter currentTool="journocollabiq" compact /></div>}
 
-        <EmailGateModal variant="subscribe" show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
+        <EmailGateModal variant="subscribe" tool="jciq" show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>
     </>
   );

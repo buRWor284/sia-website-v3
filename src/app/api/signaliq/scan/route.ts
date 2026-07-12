@@ -13,7 +13,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
-import { verifyTier } from "@/lib/pitch/tier-cookie";
+import { getPublicTier } from "@/lib/gate/public-tier";
 import { EMAIL_SCANS, FREE_SCANS } from "@/lib/signaliq/config";
 import { scanBeat } from "@/lib/signaliq/scan";
 import { logScan } from "@/lib/signaliq/log";
@@ -74,9 +74,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }
 
-  // H7 (2026-07-02 review): verify the HMAC-signed cookie (same helper as
-  // PressIQ) instead of comparing the raw value, which anyone could hand-set.
-  const isEmail = verifyTier(req.cookies.get("pp_tier")?.value) === "email";
+  // Unified gate (P1): email tier from the verified subscriber wristband, or the
+  // legacy signed pp_tier cookie during the grace period. Same HMAC-verified trust
+  // as before (H7, 2026-07-02) — no hand-settable raw value is accepted.
+  const isEmail = getPublicTier(req) === "email";
   const limit = isEmail ? EMAIL_SCANS : FREE_SCANS;
   const tier: UsageTier = isEmail ? "email" : "anonymous";
   const rl = rateLimit(`signaliq-scan:${ip}`, { limit, windowMs: MONTH_MS });

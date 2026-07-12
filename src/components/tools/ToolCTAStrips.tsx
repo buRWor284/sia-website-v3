@@ -5,17 +5,16 @@
  *
  *  - EmailCaptureStrip: passive newsletter capture posting to
  *    /api/newsletter-subscribe. Used by CoverageIQ, which has no gated
- *    action to unlock (nothing to download, no quota to raise) — it's a
- *    footer nudge, not a gate.
+ *    action to unlock — a footer nudge, not a gate.
  *  - EmailGateModal: the *gating* pattern (PDF download / subscribe-to-unlock
- *    modal). Consolidates the formerly-duplicated PartnerCollabIQ (CollabIQ.tsx)
- *    and JournoCollabIQ modals (byte-identical) plus PressIQ's score-preview
- *    variant, behind one component (2026-07-10 migration). SignalIQ's gate is
- *    intentionally NOT part of this — it's an inline quota-unlock card, not a
- *    modal, and folding it in here would be a visible UX change to a
- *    feature-frozen public tool rather than a pure refactor. Left as-is.
- *  - EmosCTAStrip: "where this fits" EMOS pitch with Apply/Explore buttons,
- *    modeled on SignalIQ's inline EmosCTA.
+ *    modal), shared by PressIQ (score variant) and PartnerCollabIQ / JournoCollabIQ
+ *    (subscribe variant). As of the Unified Gate P1 migration it runs a two-step
+ *    email → 6-digit-code verification against /api/gate/* and sets a signed,
+ *    domain-wide subscriber "wristband" cookie server-side (one verified email =
+ *    one identity across every tool and device). A previously-verified email skips
+ *    the code step. SignalIQ's gate is intentionally NOT part of this — it's an
+ *    inline quota-unlock card, folded onto the shared modal in a later phase.
+ *  - EmosCTAStrip: "where this fits" EMOS pitch with Apply/Explore buttons.
  */
 
 import { ReactNode, useEffect, useRef, useState } from "react";
@@ -71,16 +70,16 @@ interface EmailGateModalProps {
   show: boolean;
   onClose: () => void;
   /** "subscribe" (default) = PCIQ/JCIQ behavior: plain subscribe-to-unlock modal.
-   *  "score" = PressIQ behavior: adds the report-preview header, posts to
-   *  /api/pitch-tier too, and unlocks fire-and-forget rather than awaiting the
-   *  subscribe response. */
+   *  "score" = PressIQ behavior: adds the report-preview header. */
   variant?: "subscribe" | "score";
-  /** "subscribe" variant: fires with the email once the newsletter POST reports success. */
+  /** "subscribe" variant: fires with the email once unlocked. */
   onSubscribe?: (email: string) => void;
-  /** "score" variant: fires once the (fire-and-forget) requests are sent. */
+  /** "score" variant: fires once unlocked. */
   onUnlock?: () => void;
   /** "score" variant: drives the report-preview header. */
   result?: ScoreGateResult | null;
+  /** Tool id for subscriber source attribution, e.g. "pressiq", "pciq", "jciq". */
+  tool?: string;
 }
 
 export function EmailGateModal({
@@ -90,20 +89,23 @@ export function EmailGateModal({
   onSubscribe,
   onUnlock,
   result,
+  tool,
 }: EmailGateModalProps) {
+  const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [consent, setConsent] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [resent, setResent] = useState(false);
   const [done, setDone] = useState(false);
 
   const dialogRef = useRef<HTMLDivElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
+  const toolTag = tool || (variant === "score" ? "pressiq" : "collabiq");
 
-  // A11y: Escape-to-close, focus trapped inside the dialog while open, and
-  // the email field auto-focused on open (2026-07-11 accessibility pass —
-  // none of this existed in the 3 original bespoke gates either; added here
-  // since all 3 now share this one component).
+  // A11y: Escape-to-close, focus trapped inside the dialog while open, and the
+  // email field auto-focused on open.
   useEffect(() => {
     if (!show) return;
     const focusTimer = setTimeout(() => emailInputRef.current?.focus(), 0);
@@ -128,37 +130,105 @@ export function EmailGateModal({
 
   if (!show) return null;
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email."); return; }
-    if (!consent) { setError("Please accept to continue."); return; }
-    setError("");
-
-    if (variant === "score") {
-      // PressIQ behavior — fire-and-forget, always proceeds (unchanged from original).
-      fetch("/api/newsletter-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) }).catch(() => {});
-      fetch("/api/pitch-tier", { method: "POST" }).catch(() => {});
-      setDone(true);
-      setTimeout(() => { onUnlock?.(); onClose(); setDone(false); setEmail(""); setConsent(false); }, 900);
-      return;
-    }
-
-    // "subscribe" variant — PCIQ/JCIQ behavior: await + check JSON success.
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/newsletter-subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
-      const data = await res.json() as { success?: boolean; error?: string };
-      if (!data.success) { setError(data.error || "Subscription failed — please try again."); setSubmitting(false); return; }
-    } catch {
-      setError("Network error — please check your connection and try again.");
-      setSubmitting(false);
-      return;
-    }
-    setSubmitting(false);
-    setDone(true);
-    onSubscribe?.(email);
-    setTimeout(() => { onClose(); setDone(false); setEmail(""); setConsent(false); }, 1200);
+  function resetState() {
+    setStep("email"); setEmail(""); setCode(""); setConsent(false);
+    setError(""); setSubmitting(false); setResent(false); setDone(false);
   }
+
+  /** Fire the variant's unlock callback, then close + reset. */
+  function finishUnlock() {
+    setDone(true);
+    if (variant === "score") {
+      setTimeout(() => { onUnlock?.(); onClose(); resetState(); }, 900);
+    } else {
+      onSubscribe?.(email);
+      setTimeout(() => { onClose(); resetState(); }, 1200);
+    }
+  }
+
+  /** Step 1 — request a 6-digit code (or unlock immediately for a known email). */
+  async function requestCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("Enter a valid email."); return; }
+    if (!consent) { setError("Please accept to continue."); return; }
+    setError(""); setSubmitting(true);
+    try {
+      const res = await fetch("/api/gate/request-code", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, tool: toolTag }),
+      });
+      const data = (await res.json()) as { verified?: boolean; sent?: boolean; error?: string };
+      if (!res.ok) { setError(data.error || "Something went wrong. Please try again."); setSubmitting(false); return; }
+      setSubmitting(false);
+      if (data.verified) { finishUnlock(); return; } // known email — no code needed
+      setStep("code");
+    } catch {
+      setError("Network error — check your connection and try again."); setSubmitting(false);
+    }
+  }
+
+  /** Step 2 — verify the code. */
+  async function submitCode(e: React.FormEvent) {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(code)) { setError("Enter the 6-digit code from your email."); return; }
+    setError(""); setSubmitting(true);
+    try {
+      const res = await fetch("/api/gate/verify-code", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code, tool: toolTag }),
+      });
+      const data = (await res.json()) as { verified?: boolean; error?: string };
+      if (!res.ok || !data.verified) { setError(data.error || "That code isn't right."); setSubmitting(false); return; }
+      setSubmitting(false); finishUnlock();
+    } catch {
+      setError("Network error — check your connection and try again."); setSubmitting(false);
+    }
+  }
+
+  async function resendCode() {
+    setError(""); setResent(false); setSubmitting(true);
+    try {
+      const res = await fetch("/api/gate/request-code", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, tool: toolTag }),
+      });
+      const data = (await res.json()) as { sent?: boolean; verified?: boolean; error?: string };
+      setSubmitting(false);
+      if (!res.ok) { setError(data.error || "Couldn't resend just yet. Please wait a moment."); return; }
+      if (data.verified) { finishUnlock(); return; }
+      setResent(true);
+    } catch {
+      setError("Network error — check your connection."); setSubmitting(false);
+    }
+  }
+
+  // Shared step-2 (code entry) form, styled to fit both variants.
+  const codeStep = (
+    <form onSubmit={submitCode}>
+      <span style={{ ...gateLbl(GATE_TX4), marginBottom: 14 }}>Check your email</span>
+      <h3 style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, color: INK, marginBottom: 8, letterSpacing: "-0.02em" }}>Enter your code</h3>
+      <p style={{ fontFamily: GROT, fontSize: 14, color: GATE_TX3, marginBottom: 20, lineHeight: 1.6 }}>
+        We sent a 6-digit code to <strong style={{ color: INK }}>{email}</strong>. It expires in 10 minutes.
+      </p>
+      <input
+        inputMode="numeric" autoComplete="one-time-code" maxLength={6}
+        value={code}
+        onChange={e => { setCode(e.target.value.replace(/\D/g, "").slice(0, 6)); if (error) setError(""); }}
+        placeholder="000000"
+        aria-label="6-digit verification code"
+        style={{ ...gateInp(), textAlign: "center", letterSpacing: "0.5em", fontSize: 26, fontFamily: MONO, borderBottom: `1px solid ${INK15}`, marginBottom: 18 }}
+      />
+      {error && <div style={{ fontFamily: MONO, fontSize: 10, color: GATE_ERR, marginBottom: 12 }}>{error}</div>}
+      {resent && <div style={{ fontFamily: MONO, fontSize: 10, color: GATE_GREEN, marginBottom: 12 }}>A new code is on its way.</div>}
+      <button type="submit" disabled={submitting} style={{ ...gatePrimaryBtn(), width: "100%", justifyContent: "center", fontSize: 13, opacity: submitting ? 0.6 : 1 }}>
+        {submitting ? "Verifying…" : "Verify & unlock"}
+      </button>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14 }}>
+        <button type="button" onClick={() => { setStep("email"); setError(""); setCode(""); }} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: MONO, fontSize: 9, color: GATE_TX4, letterSpacing: "0.08em", padding: 0 }}>← Change email</button>
+        <button type="button" onClick={resendCode} disabled={submitting} style={{ background: "none", border: "none", cursor: submitting ? "wait" : "pointer", fontFamily: MONO, fontSize: 9, color: GATE_TX4, letterSpacing: "0.08em", padding: 0 }}>Resend code</button>
+      </div>
+    </form>
+  );
 
   if (variant === "score") {
     const score = result?.composite ?? 0;
@@ -201,23 +271,25 @@ export function EmailGateModal({
               <div style={{ textAlign: "center", padding: "16px 0", fontFamily: SERIF, fontSize: 18, color: GATE_GREEN, fontWeight: 600 }}>
                 ✓ Generating your PDF…
               </div>
+            ) : step === "code" ? (
+              codeStep
             ) : (
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={requestCode}>
                 <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, marginBottom: 6, letterSpacing: "-.015em" }}>
                   One step to download
                 </div>
                 <p style={{ fontFamily: SERIF, fontSize: 14, color: gateRa(INK, 0.62), marginBottom: 18, lineHeight: 1.55 }}>
                   Join founders and marketers. Real earned-media playbooks, zero filler. One or two emails a month.
                 </p>
-                <input ref={emailInputRef} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
+                <input ref={emailInputRef} type="email" value={email} onChange={e => { setEmail(e.target.value); if (error) setError(""); }} placeholder="your@email.com"
                   style={{ width: "100%", padding: "10px 12px", background: PAPER, border: `1px solid ${gateRa(INK, 0.6)}`, fontFamily: GROT, fontSize: 13, color: INK, outline: "none", borderRadius: 0, marginBottom: 12 }} />
                 <label style={{ display: "flex", gap: 9, alignItems: "flex-start", marginBottom: 14, cursor: "pointer" }}>
                   <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3, accentColor: INK }} />
                   <span style={{ fontFamily: GROT, fontSize: 11, color: gateRa(INK, 0.62), lineHeight: 1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
                 </label>
                 {error && <div style={{ fontFamily: MONO, fontSize: 10, color: GATE_ERR, marginBottom: 10 }}>{error}</div>}
-                <button type="submit" style={{ width: "100%", padding: "13px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", border: "none", cursor: "pointer", borderRadius: 0 }}>
-                  Subscribe &amp; download PDF →
+                <button type="submit" disabled={submitting} style={{ width: "100%", padding: "13px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", border: "none", cursor: "pointer", borderRadius: 0, opacity: submitting ? 0.6 : 1 }}>
+                  {submitting ? "Sending…" : "Continue →"}
                 </button>
                 <div style={{ fontFamily: MONO, fontSize: 9, color: gateRa(INK, 0.62), textAlign: "center", marginTop: 10, letterSpacing: ".08em" }}>
                   No spam · One-click unsubscribe
@@ -230,7 +302,7 @@ export function EmailGateModal({
     );
   }
 
-  // "subscribe" variant — PCIQ/JCIQ modal (identical markup in both original files).
+  // "subscribe" variant — PCIQ/JCIQ modal.
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose(); }}
       style={{
@@ -247,21 +319,23 @@ export function EmailGateModal({
             <div style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: INK, marginBottom: 8 }}>You&rsquo;re in.</div>
             <p style={{ fontFamily: GROT, fontSize: 14, color: GATE_TX3 }}>Unlocking your download…</p>
           </div>
+        ) : step === "code" ? (
+          codeStep
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={requestCode}>
             <span style={{ ...gateLbl(GATE_TX4), marginBottom: 14 }}>One step to download</span>
             <h3 style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: INK, marginBottom: 8, letterSpacing: "-0.02em" }}>Join founders and marketers.</h3>
             <p style={{ fontFamily: GROT, fontSize: 14, color: GATE_TX3, marginBottom: 24, lineHeight: 1.6 }}>
-              Subscribe to unlock your PDF download. Real case studies, zero filler. One or two emails a month.
+              Verify your email to unlock your PDF download. Real case studies, zero filler. One or two emails a month.
             </p>
-            <input ref={emailInputRef} type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com"
+            <input ref={emailInputRef} type="email" value={email} onChange={e => { setEmail(e.target.value); if (error) setError(""); }} placeholder="your@email.com"
               style={{ ...gateInp(), borderBottom: `1px solid ${INK15}`, marginBottom: 18, fontSize: 15 }} />
             <label style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 18, cursor: "pointer" }}>
               <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
               <span style={{ fontFamily: GROT, fontSize: 12, color: GATE_TX3, lineHeight: 1.5 }}>I agree to receive marketing emails from SIA Enterprises. Unsubscribe anytime.</span>
             </label>
             {error && <div style={{ fontFamily: MONO, fontSize: 10, color: GATE_ERR, marginBottom: 14 }}>{error}</div>}
-            <button type="submit" disabled={submitting} style={{ ...gatePrimaryBtn(), width: "100%", justifyContent: "center", fontSize: 13, opacity: submitting ? 0.6 : 1 }}>{submitting ? "Subscribing…" : "Subscribe & download"}</button>
+            <button type="submit" disabled={submitting} style={{ ...gatePrimaryBtn(), width: "100%", justifyContent: "center", fontSize: 13, opacity: submitting ? 0.6 : 1 }}>{submitting ? "Sending…" : "Continue"}</button>
             <p style={{ fontFamily: MONO, fontSize: 9, color: GATE_TX4, textAlign: "center", marginTop: 14, letterSpacing: "0.08em" }}>No spam · One-click unsubscribe</p>
           </form>
         )}
