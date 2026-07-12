@@ -436,7 +436,8 @@ function GapBar({ opp }: { opp: Opportunity }) {
     state === "cooling" ? "Cooling" :
     value >= 0.7 ? "Wide" : value >= 0.4 ? "Medium" : "Narrow";
   const c =
-    state === "no-data" ? INK35 :
+    // a11y: was INK35 (~2:1, failed WCAG). INK70 keeps it neutral but readable.
+    state === "no-data" ? INK70 :
     state === "cooling" ? AMBER :
     value >= 0.7 ? GREEN : value >= 0.4 ? AMBER : RED;
   return (
