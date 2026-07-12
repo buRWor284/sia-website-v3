@@ -212,15 +212,17 @@ export default function FactcheckIQPage() {
           @media (max-width: 680px) {
             .fciqfw-lane1 { flex-direction: column !important; }
             /* Below 680px the 10-step grid only ever showed its first column
-               (the grid stayed at minWidth:760 inside an overflow-x:auto box,
-               so on a ~390px phone only steps 1/4/7/10 were visible with no
-               obvious scroll affordance). Hide the grid entirely and drive
-               the same selected state from a one-step-at-a-time pager
-               instead, so mobile always shows exactly one step + its detail
-               panel below. */
+               (grid stayed at minWidth:760 inside an overflow-x:auto box, so
+               on a ~390px phone only steps 1/4/7/10 were visible with no
+               scroll affordance). Hide the grid, drive the same 'selected'
+               state from a one-step-at-a-time pager instead, and reorder the
+               stack so the pager + step detail come first — the Play/Speed/
+               Mode player bar (useful mainly when you can see all 10 steps
+               on desktop) drops below instead of blocking the content. */
             .fciqfw-steps-desktop { display: none !important; }
-            .fciqfw-steps-mobile { display: flex !important; }
-            .fciqfw-detail { grid-template-columns: 1fr !important; }
+            .fciqfw-steps-mobile { display: flex !important; order: 1; }
+            .fciqfw-detail { grid-template-columns: 1fr !important; order: 2; }
+            .fciqfw-player { order: 3; }
             .fciqfw-scale { grid-template-columns: 1fr 1fr !important; }
             .fciqfw-principles { grid-template-columns: 1fr !important; }
             .fciqfw-table { font-size: 12px !important; }
@@ -312,6 +314,8 @@ export default function FactcheckIQPage() {
                   <span style={actCaption}>the box below shows the step it is parked on. drive it with the player, or click any number</span>
                 </div>
 
+                <div className="fciqfw-lane2-stack" style={{ display: "flex", flexDirection: "column" }}>
+
                 <div className="fciqfw-steps-desktop" style={{ overflowX: "auto", marginTop: 24 }}>
                   <div className="fciqfw-steps" style={{ display: "grid", gridTemplateColumns: "repeat(10, 1fr)", minWidth: 760, position: "relative", paddingTop: 10 }}>
                     <div style={{ position: "absolute", left: "5%", right: "5%", top: 42, height: 2, background: "rgba(26,20,16,.2)" }} />
@@ -371,7 +375,7 @@ export default function FactcheckIQPage() {
                 </div>
 
                 {/* Player bar */}
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20, background: INK, color: PAPER, border: `1px solid ${INK}`, padding: "12px 16px", marginTop: 4 }}>
+                <div className="fciqfw-player" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 20, background: INK, color: PAPER, border: `1px solid ${INK}`, padding: "12px 16px", marginTop: 4 }}>
                   <button
                     type="button"
                     onClick={() => setPlaying((p) => !p)}
@@ -464,6 +468,8 @@ export default function FactcheckIQPage() {
                       </div>
                     )}
                   </div>
+                </div>
+
                 </div>
               </div>
 
@@ -643,27 +649,6 @@ export default function FactcheckIQPage() {
                 <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P45, marginTop: 18 }}>
                   For human writers and AI drafts alike
                 </div>
-              </div>
-
-              {/* ── PLATFORM CTA BAND ───────────────────────────────────────── */}
-              <div style={{ marginTop: 24, marginBottom: 16, background: INK, borderTop: `3px solid ${YEL}`, padding: "36px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
-                <div style={{ maxWidth: 620 }}>
-                  <span style={{ display: "inline-block", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", padding: "4px 9px", marginBottom: 12 }}>
-                    Platform only
-                  </span>
-                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, color: PAPER, lineHeight: 1.2 }}>
-                    FactcheckIQ is available to EMOS Platform members.
-                  </div>
-                  <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: P72, marginTop: 8 }}>
-                    Join the platform to verify drafts and AI-assisted copy before they publish.
-                  </p>
-                </div>
-                <Link
-                  href="/emos"
-                  style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "15px 26px", whiteSpace: "nowrap", textDecoration: "none" }}
-                >
-                  Explore the EMOS Platform {"→"}
-                </Link>
               </div>
 
               {/* ── FOOTER (colophon rule) ──────────────────────────────────── */}
