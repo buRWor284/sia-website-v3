@@ -215,7 +215,7 @@ export default function FactcheckIQPage() {
                (the grid stayed at minWidth:760 inside an overflow-x:auto box,
                so on a ~390px phone only steps 1/4/7/10 were visible with no
                obvious scroll affordance). Hide the grid entirely and drive
-               the same `selected` state from a one-step-at-a-time pager
+               the same selected state from a one-step-at-a-time pager
                instead, so mobile always shows exactly one step + its detail
                panel below. */
             .fciqfw-steps-desktop { display: none !important; }
