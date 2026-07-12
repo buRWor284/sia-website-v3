@@ -666,7 +666,7 @@ function SIQHero({ onStart }: { onStart: () => void }) {
               ["03", "Get an asset pack", "Pitch angle, data brief, journalist list: ready to send."],
             ] as [string, string, string][]).map(([n, title, desc], idx, arr) => (
               <div key={n} style={{ display: "flex", gap: 14, paddingBottom: 16, marginBottom: idx < arr.length - 1 ? 16 : 0, borderBottom: idx < arr.length - 1 ? `1px solid ${INK15}` : "none" }}>
-                <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: YEL, lineHeight: 1, flexShrink: 0, letterSpacing: "-0.02em" }}>{n}</span>
+                <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1, flexShrink: 0, letterSpacing: "-0.02em" }}>{n}</span>
                 <div>
                   <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".10em", textTransform: "uppercase", color: INK, marginBottom: 4 }}>{title}</div>
                   <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.45 }}>{desc}</p>
@@ -837,7 +837,7 @@ function OppCard({
           }}>
             {opp.bandLabel}
           </span>
-          <span style={{ color: "rgba(241,235,222,.35)", fontSize: 12 }}>·</span>
+          <span style={{ color: "rgba(241,235,222,.72)", fontSize: 12 }}>·</span>
           <span style={{ display: "inline-flex", alignItems: "baseline", gap: 3 }}>
             <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: PAPER, letterSpacing: "-0.02em" }}>
               {opp.score}
@@ -1511,7 +1511,7 @@ function SiqWizardProgress({ stage, onGoStage }: { stage: WizStage; onGoStage: (
               </span>
               <span className="siq-wiz-label" style={{
                 fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase",
-                color: active ? "rgba(241,235,222,.95)" : done ? "rgba(241,235,222,.55)" : "rgba(241,235,222,.35)",
+                color: active ? "rgba(241,235,222,.95)" : done ? "rgba(241,235,222,.70)" : "rgba(241,235,222,.55)",
               }}>
                 {label}
               </span>

@@ -179,12 +179,12 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
                     Platform
                   </span>
                 ) : (
-                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: isActive ? YEL : INK35, letterSpacing: "-0.02em", lineHeight: 1 }}>
+                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: onDark ? YEL : isActive ? INK : INK35, letterSpacing: "-0.02em", lineHeight: 1 }}>
                     {card.step}
                   </span>
                 )}
                 {badge && (
-                  <span style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: onDark ? YEL : isActive ? YEL : INK35 }}>
+                  <span style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: onDark ? YEL : isActive ? INK : INK35 }}>
                     {badge}
                   </span>
                 )}

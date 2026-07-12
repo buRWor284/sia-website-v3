@@ -413,7 +413,7 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
           WHAT JOURNALISTS SAY
         </div>
         <div style={{ opacity: tickOp, transition: "opacity .2s ease", minHeight: 78 }}>
-          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 32, color: YEL, letterSpacing: "-.02em", lineHeight: 1, marginBottom: 6 }}>{t.stat}</div>
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 32, color: INK, letterSpacing: "-.02em", lineHeight: 1, marginBottom: 6 }}>{t.stat}</div>
           <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.62), lineHeight: 1.4, marginBottom: 4 }}>{t.text}</div>
           <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{t.src}</div>
         </div>
@@ -1421,7 +1421,7 @@ const PAGE_CSS = `
   .piq-form-card ::selection{background:${YEL};color:${DARK}}
   .piq-field:focus{border-color:${ra(YEL,0.5)} !important;outline:none}
   .piq-field::placeholder{color:${ra(PAPER,0.22)}}
-  .piq-ghost{background:none;border:none;cursor:pointer;font-family:${MONO};font-size:9px;color:${ra(PAPER,0.35)};padding:0;transition:color .1s}
+  .piq-ghost{background:none;border:none;cursor:pointer;font-family:${MONO};font-size:9px;color:${ra(PAPER,0.72)};padding:0;transition:color .1s}
   .piq-ghost:hover{color:${YEL}}
   .piq-tabs{display:flex;align-items:stretch;border-bottom:2px solid ${ra(INK,0.12)};background:${PAPER};position:sticky;top:0;z-index:5;padding:0 4px}
   .piq-tab{padding:14px 16px;font-family:${GROT};font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;color:${ra(INK,0.38)};transition:all .15s}

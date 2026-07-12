@@ -409,7 +409,7 @@ export default function FactcheckIQPage() {
                           <ul style={{ margin: "0 0 10px", padding: 0, listStyle: "none", display: "flex", flexWrap: "wrap", gap: "8px 18px" }}>
                             {active.traps.map((t) => (
                               <li key={t} style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".04em", color: INK55 }}>
-                                <span style={{ color: YEL2, fontWeight: 900 }}>{"→ "}</span>{t}
+                                <span style={{ color: INK, fontWeight: 900 }}>{"→ "}</span>{t}
                               </li>
                             ))}
                           </ul>
@@ -448,7 +448,10 @@ export default function FactcheckIQPage() {
                     {/* Tally row */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "14px 22px", marginBottom: 16 }}>
                       {TALLY.map((t) => (
-                        <span key={t.label} style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11.5, color: VERDICT_COLORS[t.verdict].bg === PAPER ? INK : VERDICT_COLORS[t.verdict].bg }}>
+                        // a11y: label text is INK (readable on light); verdict hue shown as a swatch.
+                        // Several verdict colors (amber/olive/translucent) fail as text on light.
+                        <span key={t.label} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontFamily: MONO, fontWeight: 700, fontSize: 11.5, color: INK }}>
+                          <span aria-hidden style={{ width: 8, height: 8, background: VERDICT_COLORS[t.verdict].bg, flexShrink: 0 }} />
                           {t.label}
                         </span>
                       ))}
@@ -567,7 +570,7 @@ export default function FactcheckIQPage() {
                               <span style={{ fontFamily: GROT, fontStyle: "normal", fontWeight: 800, textTransform: "uppercase", fontSize: 11, color: isDark ? PAPER : INK }}>In plain terms: </span>
                               {p.plain}
                             </p>
-                            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".05em", color: isDark ? P45 : INK55, textTransform: "uppercase", marginTop: "auto" }}>
+                            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".05em", color: isDark ? P72 : INK55, textTransform: "uppercase", marginTop: "auto" }}>
                               {p.scope}
                             </div>
                           </div>
@@ -584,7 +587,7 @@ export default function FactcheckIQPage() {
                   Rigour that is too slow to use does not get used.
                 </p>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: P45 }}>
+                  <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase", color: P72 }}>
                     The design principle behind all 11 methods
                   </div>
                   <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 700, fontSize: 56, color: P25, lineHeight: 1, marginTop: 6 }}>
@@ -602,7 +605,7 @@ export default function FactcheckIQPage() {
                 <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.6, color: P72, maxWidth: "76ch", margin: "18px 0 0" }}>
                   Spell-check caught typos. Grammar-check caught grammar. FactcheckIQ catches the false claim and the invented source, before your reader does. It works the same whether a person or an AI wrote the draft: it verifies, and it never writes for you. Like the typewriter, spell-check, and Grammarly before it, this is a tool that makes writers more trustworthy, not obsolete.
                 </p>
-                <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P45, marginTop: 18 }}>
+                <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".2em", textTransform: "uppercase", color: P72, marginTop: 18 }}>
                   For human writers and AI drafts alike
                 </div>
               </div>

@@ -57,7 +57,8 @@ function gatePrimaryBtn(): React.CSSProperties {
     padding: "14px 28px", cursor: "pointer", fontFamily: GROT, fontSize: 12,
     fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase",
     transition: "all 0.15s", border: "none", borderRadius: 0,
-    background: YEL, color: PAPER,
+    // a11y: near-black ink on amber (~10:1). Cream on amber failed WCAG AA.
+    background: YEL, color: INK,
   };
 }
 
@@ -268,7 +269,7 @@ export function EmailGateModal({
             </div>
             <div style={{ marginTop: 16, display: "flex", gap: 6, flexWrap: "wrap" }}>
               {["Cover + Score", "Top 3 Fixes", "Full Breakdown", "Research + EMOS"].map(s => (
-                <span key={s} style={{ padding: "3px 8px", border: `1px solid ${gateRa(PAPER, 0.15)}`, fontFamily: MONO, fontSize: 7.5, color: gateRa(PAPER, 0.4), letterSpacing: ".10em", textTransform: "uppercase" }}>{s}</span>
+                <span key={s} style={{ padding: "3px 8px", border: `1px solid ${gateRa(PAPER, 0.15)}`, fontFamily: MONO, fontSize: 7.5, color: gateRa(PAPER, 0.72), letterSpacing: ".10em", textTransform: "uppercase" }}>{s}</span>
               ))}
             </div>
           </div>

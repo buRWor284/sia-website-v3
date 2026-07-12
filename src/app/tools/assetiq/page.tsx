@@ -195,7 +195,7 @@ export default function AssetIQPage() {
                   <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".14em", color: P55, marginBottom: 10 }}>
                     5 ASSET TYPES {"·"} 6 STEPS {"·"} 4 STATUSES
                   </div>
-                  <div style={{ fontFamily: GROT, fontWeight: 400, fontSize: 10, color: P35 }}>
+                  <div style={{ fontFamily: GROT, fontWeight: 400, fontSize: 10, color: P72 }}>
                     EMOS Platform members only
                   </div>
                 </div>
