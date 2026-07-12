@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   const email = (body.email || "").trim().toLowerCase();
+  const tool = typeof body.tool === "string" ? body.tool.slice(0, 40) : undefined;
   if (!EMAIL_RE.test(email)) return NextResponse.json({ error: "Enter a valid email." }, { status: 400 });
 
   // Abuse brake: per-IP cap on code requests (email sends are not free).
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not start verification. Please try again." }, { status: 500 });
   }
   try {
-    await sendCodeEmail(email, code);
+    await sendCodeEmail(email, code, tool);
   } catch (e) {
     console.error("[gate/request-code] email send failed:", e);
     return NextResponse.json({ error: "Could not send the code email. Please try again." }, { status: 502 });
