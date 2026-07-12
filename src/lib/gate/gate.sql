@@ -27,3 +27,9 @@ create table if not exists public.subscriber_verifications (
 alter table public.tool_subscribers        enable row level security;
 alter table public.subscriber_verifications enable row level security;
 -- Intentionally NO anon/public policies: only the service-role client may read/write.
+
+-- Service-role needs explicit table privileges: Supabase's default-privilege
+-- grants don't reliably cover tables created via the SQL editor, so without this
+-- the service client is denied and falls back to anon ("permission denied").
+grant select, insert, update, delete on public.tool_subscribers        to service_role;
+grant select, insert, update, delete on public.subscriber_verifications to service_role;
