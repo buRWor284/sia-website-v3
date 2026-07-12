@@ -80,6 +80,10 @@ interface EmailGateModalProps {
   result?: ScoreGateResult | null;
   /** Tool id for subscriber source attribution, e.g. "pressiq", "pciq", "jciq". */
   tool?: string;
+  /** "subscribe" variant only: override the headline (default "Join founders and marketers."). */
+  heading?: string;
+  /** "subscribe" variant only: override the sub-copy paragraph. */
+  blurb?: string;
 }
 
 export function EmailGateModal({
@@ -90,6 +94,8 @@ export function EmailGateModal({
   onUnlock,
   result,
   tool,
+  heading,
+  blurb,
 }: EmailGateModalProps) {
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
@@ -324,9 +330,9 @@ export function EmailGateModal({
         ) : (
           <form onSubmit={requestCode}>
             <span style={{ ...gateLbl(GATE_TX4), marginBottom: 14 }}>One step to download</span>
-            <h3 style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: INK, marginBottom: 8, letterSpacing: "-0.02em" }}>Join founders and marketers.</h3>
+            <h3 style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: INK, marginBottom: 8, letterSpacing: "-0.02em" }}>{heading ?? "Join founders and marketers."}</h3>
             <p style={{ fontFamily: GROT, fontSize: 14, color: GATE_TX3, marginBottom: 24, lineHeight: 1.6 }}>
-              Verify your email to unlock your PDF download. Real case studies, zero filler. One or two emails a month.
+              {blurb ?? "Verify your email to unlock your PDF download. Real case studies, zero filler. One or two emails a month."}
             </p>
             <input ref={emailInputRef} type="email" value={email} onChange={e => { setEmail(e.target.value); if (error) setError(""); }} placeholder="your@email.com"
               style={{ ...gateInp(), borderBottom: `1px solid ${INK15}`, marginBottom: 18, fontSize: 15 }} />

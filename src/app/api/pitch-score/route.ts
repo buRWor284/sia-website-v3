@@ -12,10 +12,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { rateLimitDb } from "@/lib/rate-limit-db";
 import { verifyTurnstile } from "@/lib/turnstile";
-import { getPublicTier } from "@/lib/gate/public-tier";
-import { EMAIL_LIMIT, FREE_LIMIT, PITCH_MODEL } from "@/lib/pitch/config";
+import { consumeQuota } from "@/lib/gate/quota";
+import { EMAIL_LIMIT, PITCH_MODEL } from "@/lib/pitch/config";
 import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
 import { buildUserPrompt, parseAiResult, SCORE_TOOL, SYSTEM_PROMPT } from "@/lib/pitch/scorePrompt";
 import { composeScore } from "@/lib/pitch/composite";
@@ -24,7 +23,6 @@ import type { BrandSignals, PitchInput } from "@/lib/pitch/types";
 import { EMPTY_BRAND } from "@/lib/pitch/types";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const MAX_PITCH_CHARS = 8000;
 
 function clientIp(req: NextRequest): string {
@@ -96,18 +94,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }
 
-  // Gating: email tier (verified subscriber wristband, or legacy pp_tier during the
-  // P1 grace period) raises the cap. Identity now lives in the unified gate service.
-  const isEmailTier = getPublicTier(req) === "email";
-  const limit = isEmailTier ? EMAIL_LIMIT : FREE_LIMIT;
-  const usageTier: "anonymous" | "email" = isEmailTier ? "email" : "anonymous";
-  const rl = await rateLimitDb(`pitch:${ip}`, { limit, windowMs: MONTH_MS });
-  if (!rl.ok) {
+  // Quota: the unified service (Phase P2) keys by subscriber identity when the
+  // signed sia_sub wristband is present (counts follow the user across devices),
+  // else by spoof-resistant IP. Email tier (wristband OR legacy pp_tier grace)
+  // raises the cap. Metered/free action → fail-open-with-logging on a DB outage.
+  const quota = await consumeQuota(req, "pressiq-score");
+  const usageTier = quota.tier;
+  if (!quota.ok) {
     return NextResponse.json(
       {
-        error: isEmailTier
+        error: usageTier === "email"
           ? "You've used all your scores this month. They reset on a rolling 30-day window."
-          : "You've used your 3 free scores this month. Add your email for 10/month.",
+          : `You've used your ${quota.limit} free scores this month. Add your email for ${EMAIL_LIMIT}/month.`,
         usage: { remaining: 0, tier: usageTier },
       },
       { status: 429 },
@@ -158,7 +156,7 @@ export async function POST(req: NextRequest) {
     const ai = parseAiResult(aiContent);
     result = composeScore(l1, ai, {
       hasQuery: Boolean(input.query?.trim()),
-      usage: { remaining: rl.remaining, tier: usageTier },
+      usage: { remaining: quota.remaining, tier: usageTier },
     });
   } catch (e) {
     console.error("pitch-score parse error:", e);

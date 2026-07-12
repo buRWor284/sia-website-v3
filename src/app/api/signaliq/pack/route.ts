@@ -10,10 +10,10 @@
  * POST body: { opportunity, store?, turnstileToken? }
  */
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
-import { verifyTier } from "@/lib/pitch/tier-cookie";
-import { EMAIL_PACKS, FREE_PACKS, SIGNALIQ_MODEL } from "@/lib/signaliq/config";
+import { consumeQuota } from "@/lib/gate/quota";
+import { clientIp } from "@/lib/public-tool-guard";
+import { SIGNALIQ_MODEL } from "@/lib/signaliq/config";
 import {
   PACK_SYSTEM,
   PACK_TOOL,
@@ -32,11 +32,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
-
-function clientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-}
 
 function coerceOpportunity(v: unknown): Opportunity | null {
   if (!v || typeof v !== "object") return null;
@@ -71,16 +66,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }
 
-  // H7 (2026-07-02 review): verify the HMAC-signed cookie (same helper as
-  // PressIQ) instead of comparing the raw value, which anyone could hand-set.
-  const isEmail = verifyTier(req.cookies.get("pp_tier")?.value) === "email";
-  const limit = isEmail ? EMAIL_PACKS : FREE_PACKS;
-  const tier: UsageTier = isEmail ? "email" : "anonymous";
-  const rl = rateLimit(`signaliq-pack:${ip}`, { limit, windowMs: MONTH_MS });
-  if (!rl.ok) {
+  // Unified quota (P2): identity-keyed, DB-backed, shared across serverless
+  // instances. This also migrates pack OFF the raw pp_tier check onto the unified
+  // gate seam — consumeQuota's getPublicTier honors the sia_sub wristband AND the
+  // legacy pp_tier cookie during the P1 grace period. Metered → fail-open-with-logging.
+  const quota = await consumeQuota(req, "signaliq-pack");
+  const tier: UsageTier = quota.tier;
+  if (!quota.ok) {
     return NextResponse.json(
       {
-        error: isEmail
+        error: tier === "email"
           ? "You've used all your asset packs this month."
           : "You've used your free asset pack this month. Add your email for more.",
         usage: { remaining: 0, tier },
@@ -131,7 +126,7 @@ export async function POST(req: NextRequest) {
     opportunityId: opp.id,
     chart: buildSignalChart(opp),
     sources: assembleSources(opp),
-    usage: { remaining: rl.remaining, tier },
+    usage: { remaining: quota.remaining, tier },
   };
 
   logPack(opp);

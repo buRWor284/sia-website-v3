@@ -4,6 +4,7 @@
  * src/lib/pitch/config.ts approach used by PressIQ.)
  */
 import type { Beat, BeatId, OppBand, SourceId } from "./types";
+import { QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 
 /** Working product name — rename in ONE place (RFP D-1). */
 export const PRODUCT = "SignalIQ";
@@ -11,11 +12,12 @@ export const PRODUCT = "SignalIQ";
 /** Model for asset-pack generation (env-overridable). Mirrors PressIQ. */
 export const SIGNALIQ_MODEL = process.env.SIGNALIQ_MODEL || "claude-sonnet-4-6";
 
-/** Freemium gating (mirrors PressIQ's pp_tier cookie pattern; see API routes). */
-export const FREE_SCANS = 3; // anonymous scans / month
-export const EMAIL_SCANS = 10; // with email
-export const FREE_PACKS = 1; // anonymous asset packs / month
-export const EMAIL_PACKS = 5; // with email
+// Freemium caps — single source of truth is lib/gate/quota-limits.ts (Phase P2).
+// Re-exported here so SignalIQ UI copy and the scan/pack routes read the same numbers.
+export const FREE_SCANS = QUOTA_LIMITS["signaliq-scan"].anonymous; // anonymous scans / month
+export const EMAIL_SCANS = QUOTA_LIMITS["signaliq-scan"].email; // with email
+export const FREE_PACKS = QUOTA_LIMITS["signaliq-pack"].anonymous; // anonymous asset packs / month
+export const EMAIL_PACKS = QUOTA_LIMITS["signaliq-pack"].email; // with email
 
 /** How many opportunities a scan returns. */
 export const MAX_OPPORTUNITIES = 12;

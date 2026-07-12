@@ -2,19 +2,18 @@
  * /api/signaliq/scan
  *
  * Returns ranked newsjacking opportunities for a beat. Scanning hits free,
- * no-key open data sources — gated to deter abuse, reusing the repo's
- * rateLimit + Turnstile and the shared `pp_tier` email cookie. If the caller
- * supplies `companyContext`, one LLM call tailors the seeds + relevance scoring
- * to that company (optional here; always on in the EMOS platform).
+ * no-key open data sources — metered via the unified quota service (Phase P2:
+ * consumeQuota, identity-keyed + DB-backed) and protected by Turnstile. If the
+ * caller supplies `companyContext`, one LLM call tailors the seeds + relevance
+ * scoring to that company (optional here; always on in the EMOS platform).
  *
  * POST body: { beats?: BeatId[] (1–3, primary first), beat?: BeatId (legacy,
  * mapped to [beat]), companyContext?, turnstileToken? }  (see src/lib/signaliq/types.ts)
  */
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
-import { getPublicTier } from "@/lib/gate/public-tier";
-import { EMAIL_SCANS, FREE_SCANS } from "@/lib/signaliq/config";
+import { consumeQuota } from "@/lib/gate/quota";
+import { clientIp } from "@/lib/public-tool-guard";
 import { scanBeat } from "@/lib/signaliq/scan";
 import { logScan } from "@/lib/signaliq/log";
 import type { BeatId, ScanResponse, UsageTier } from "@/lib/signaliq/types";
@@ -23,12 +22,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // extra headroom when a company profile is expanded
 
-const MONTH_MS = 30 * 24 * 60 * 60 * 1000;
 const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity", "agency"];
-
-function clientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-}
 
 /**
  * Parse the beat selection: prefer the new `beats` array (1–3, primary first),
@@ -74,17 +68,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Verification failed. Please retry." }, { status: 403 });
   }
 
-  // Unified gate (P1): email tier from the verified subscriber wristband, or the
-  // legacy signed pp_tier cookie during the grace period. Same HMAC-verified trust
-  // as before (H7, 2026-07-02) — no hand-settable raw value is accepted.
-  const isEmail = getPublicTier(req) === "email";
-  const limit = isEmail ? EMAIL_SCANS : FREE_SCANS;
-  const tier: UsageTier = isEmail ? "email" : "anonymous";
-  const rl = rateLimit(`signaliq-scan:${ip}`, { limit, windowMs: MONTH_MS });
-  if (!rl.ok) {
+  // Unified quota (P2): keyed by subscriber identity when the signed sia_sub
+  // wristband is present (counts follow the user across devices/IPs), else by
+  // spoof-resistant IP. Email tier (wristband OR legacy pp_tier grace) raises the
+  // cap. Now DB-backed and shared across serverless instances (the old in-memory
+  // limiter enforced nothing across instances). Metered → fail-open-with-logging.
+  const quota = await consumeQuota(req, "signaliq-scan");
+  const tier: UsageTier = quota.tier;
+  if (!quota.ok) {
     return NextResponse.json(
       {
-        error: isEmail
+        error: tier === "email"
           ? "You've used all your scans this month."
           : "You've used your free scans this month. Add your email for more.",
         usage: { remaining: 0, tier },
@@ -103,7 +97,7 @@ export async function POST(req: NextRequest) {
       beats: scanned,
       generatedAt: new Date().toISOString(),
       opportunities,
-      usage: { remaining: rl.remaining, tier },
+      usage: { remaining: quota.remaining, tier },
       partial,
       notes,
     };

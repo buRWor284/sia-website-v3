@@ -18,7 +18,7 @@ import Script from "next/script";
 import { getJsPDF } from "@/lib/pdf/house-style";
 import { buildSignalIqReport } from "@/lib/pdf/signaliq-report";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
-import { EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
+import { EmailGateModal, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import {
   DoubleRule,
@@ -1291,17 +1291,10 @@ function PackView({ pack, onDownloadPDF, emailDone }: { pack: AssetPack; onDownl
 
 // ── email gate ────────────────────────────────────────────────────────────────
 
-function EmailGate({
-  email,
-  setEmail,
-  done,
-  onUnlock,
-}: {
-  email: string;
-  setEmail: (v: string) => void;
-  done: boolean;
-  onUnlock: (e: React.FormEvent) => void;
-}) {
+// Inline "unlock more" card. Post-P2 it opens the shared unified gate modal
+// (6-digit verification, sets the domain-wide sia_sub wristband) instead of the
+// old inline email form that only set the legacy pp_tier cookie.
+function UnlockCard({ done, onOpen }: { done: boolean; onOpen: () => void }) {
   if (done) {
     return (
       <div style={{ padding: "14px 20px", border: `1px solid ${GREEN}`, background: hexA(GREEN, 0.06), fontFamily: SERIF, fontSize: 14.5, color: INK }}>
@@ -1310,125 +1303,26 @@ function EmailGate({
     );
   }
   return (
-    <form onSubmit={onUnlock} style={{ padding: "18px 20px", border: `1px solid ${INK}`, background: PAPER2 }}>
-      <SCaps size={10} ls="0.16em" color={INK}>Unlock more scans &amp; packs</SCaps>
+    <div style={{ padding: "18px 20px", border: `1px solid ${INK}`, background: PAPER2 }}>
+      <SCaps size={10} ls="0.16em" color={INK}>Unlock more scans &amp; downloads</SCaps>
       <p style={{ margin: "6px 0 10px", fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.5 }}>
-        Add your email for {EMAIL_SCANS} scans/month and SIA&rsquo;s earned-media playbooks.
-        One list, unsubscribe anytime.
+        Add your email for {EMAIL_SCANS} scans/month, PDF downloads, and SIA&rsquo;s earned-media playbooks.
+        Verify once — it works across every tool. One list, unsubscribe anytime.
       </p>
       <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55, lineHeight: 1.5, borderLeft: `2px solid ${YEL}`, paddingLeft: 10 }}>
         Enterprise media tools (Cision, Meltwater) run $15,000&ndash;$40,000 a year for contacts and monitoring. The story-discovery layer they don&rsquo;t have is free here.
       </p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <input
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@company.com"
-          className="siq-input"
-          style={{ flex: 1, minWidth: 200 }}
-        />
-        <button type="submit" className="siq-scan-btn" style={{ fontSize: 12 }}>
-          Unlock →
-        </button>
-      </div>
-    </form>
-  );
-}
-
-// ── PDF download gate (modal) ───────────────────────────────────────────────
-// Same pattern as PressIQ: clicking "Download PDF" always works. The first
-// click opens this one-step modal (report preview + a single email field);
-// submitting unlocks and downloads immediately, no separate box to go hunt for.
-function PdfDownloadGate({
-  show,
-  onClose,
-  email,
-  setEmail,
-  submitting,
-  onSubmit,
-  opp,
-  pack,
-}: {
-  show: boolean;
-  onClose: () => void;
-  email: string;
-  setEmail: (v: string) => void;
-  submitting: boolean;
-  onSubmit: (e: React.FormEvent) => void;
-  opp: Opportunity | null;
-  pack: AssetPack | null;
-}) {
-  if (!show) return null;
-  return (
-    <div
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-      style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
-    >
-      <div role="dialog" aria-modal="true" aria-label="Download your SignalIQ report" style={{ background: PAPER2, border: `1px solid ${INK}`, maxWidth: 480, width: "100%", overflow: "hidden" }}>
-        {/* Preview header */}
-        <div style={{ background: INK, padding: "24px 28px" }}>
-          <div style={{ fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".20em", textTransform: "uppercase", color: YEL, marginBottom: 10 }}>
-            SignalIQ · Asset Pack Report
-          </div>
-          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, lineHeight: 1.3, color: PAPER, marginBottom: 4 }}>
-            {opp?.headline ?? pack?.headline ?? "Your asset pack"}
-          </div>
-          {opp && (
-            <div style={{ fontFamily: GROT, fontSize: 10, letterSpacing: ".08em", color: "rgba(241,235,222,.55)" }}>
-              {opp.bandLabel} · {opp.score}/100
-            </div>
-          )}
-          <div style={{ marginTop: 14, display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {["Radar Results", "Selected Opportunity", "Asset Pack", "Sources"].map((s) => (
-              <span key={s} style={{ padding: "3px 8px", border: "1px solid rgba(250,250,250,.15)", fontFamily: MONO, fontSize: 7.5, color: "rgba(241,235,222,.4)", letterSpacing: ".10em", textTransform: "uppercase" }}>{s}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* Form */}
-        <div style={{ padding: "24px 28px" }}>
-          {submitting ? (
-            <div style={{ textAlign: "center", padding: "16px 0", fontFamily: SERIF, fontSize: 16, color: GREEN, fontWeight: 600 }}>
-              ✓ Generating your PDF…
-            </div>
-          ) : (
-            <form onSubmit={onSubmit}>
-              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: INK, marginBottom: 6, letterSpacing: "-.015em" }}>
-                One step to download
-              </div>
-              <p style={{ fontFamily: SERIF, fontSize: 13.5, color: INK55, marginBottom: 16, lineHeight: 1.55 }}>
-                Add your email to unlock this PDF, plus {EMAIL_SCANS} scans/month and SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.
-              </p>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
-                  className="siq-input"
-                  style={{ flex: 1, minWidth: 200 }}
-                />
-                <button type="submit" className="siq-scan-btn" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
-                  Unlock &amp; download →
-                </button>
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                style={{ marginTop: 12, background: "none", border: "none", padding: 0, fontFamily: GROT, fontSize: 10.5, letterSpacing: ".06em", color: INK35, cursor: "pointer", textDecoration: "underline" }}
-              >
-                Not now
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
+      <button type="button" onClick={onOpen} className="siq-scan-btn" style={{ fontSize: 12 }}>
+        Unlock →
+      </button>
     </div>
   );
 }
+
+// The SignalIQ PDF-download gate is now the shared unified EmailGateModal (see
+// the render near the end of the page). Phase P2 removed the old bespoke one-step
+// modal (single email field → legacy pp_tier cookie) in favor of one coherent
+// 6-digit flow shared with PressIQ / PCIQ / JCIQ.
 
 // ── detail view ───────────────────────────────────────────────────────────────
 
@@ -1510,10 +1404,8 @@ function PackStage({
   packing,
   packError,
   onRetry,
-  email,
-  setEmail,
   emailDone,
-  unlockEmail,
+  onOpenGate,
   onDownloadPDF,
 }: {
   opp: Opportunity;
@@ -1521,10 +1413,8 @@ function PackStage({
   packing: boolean;
   packError: string | null;
   onRetry: () => void;
-  email: string;
-  setEmail: (v: string) => void;
   emailDone: boolean;
-  unlockEmail: (e: React.FormEvent) => void;
+  onOpenGate: () => void;
   onDownloadPDF: () => void;
 }) {
   return (
@@ -1555,9 +1445,9 @@ function PackStage({
           {pack && !packing && <PackView pack={pack} emailDone={emailDone} onDownloadPDF={onDownloadPDF} />}
         </div>
 
-        {/* Email gate — primary CTA */}
+        {/* Unlock CTA — opens the shared unified gate modal (Phase P2) */}
         <div style={{ marginTop: 32 }}>
-          <EmailGate email={email} setEmail={setEmail} done={emailDone} onUnlock={unlockEmail} />
+          <UnlockCard done={emailDone} onOpen={onOpenGate} />
         </div>
 
         {/* EMOS pitch — fires once the user has their asset pack in hand,
@@ -1698,10 +1588,22 @@ export default function SignalIQPage() {
   const [packError, setPackError] = useState<string | null>(null);
   const [pack, setPack] = useState<AssetPack | null>(null);
 
-  const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
-  const [showPdfGate, setShowPdfGate] = useState(false);
-  const [pdfGateSubmitting, setPdfGateSubmitting] = useState(false);
+  const [showGate, setShowGate] = useState(false);
+  // When the gate is opened by the Download button, run the PDF once verified.
+  const pendingDownloadRef = useRef(false);
+
+  // Recognize a returning verified subscriber (the signed sia_sub wristband, or
+  // the legacy pp_tier cookie during the P1 grace period) so SignalIQ never
+  // re-asks — parity with PCIQ/JCIQ, which already read gate status on mount (P2).
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/gate/status", { headers: { "Cache-Control": "no-store" } })
+      .then((r) => r.json())
+      .then((d: { subscriber?: boolean }) => { if (alive && d?.subscriber) setEmailDone(true); })
+      .catch(() => { /* ignore — default to gated */ });
+    return () => { alive = false; };
+  }, []);
 
   // Cloudflare Turnstile (same hardened pattern as JournoCollabIQ: token ref
   // for async reads, expired-callback auto-reset, waitForToken before calls)
@@ -1931,53 +1833,25 @@ export default function SignalIQPage() {
     }
   }
 
-  // Download button handler (PressIQ pattern): always clickable. First click,
-  // pre-email, opens the one-step gate modal instead of a disabled state.
+  // Download button (PressIQ pattern): always clickable. Pre-verification it opens
+  // the shared unified gate modal and remembers to run the download once verified.
   function downloadPDF() {
     if (!selected || !pack) return;
-    if (!emailDone) { setShowPdfGate(true); return; }
+    if (!emailDone) { pendingDownloadRef.current = true; setShowGate(true); return; }
     generateAndDownloadPDF();
   }
 
-  async function unlockEmail(e: React.FormEvent): Promise<boolean> {
-    e.preventDefault();
-    if (!email) return false;
-    try {
-      const res = await fetch("/api/newsletter-subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const data = await res.json() as { success?: boolean; error?: string };
-      if (!data.success) {
-        // Surface the error so the user knows something went wrong
-        alert(data.error || "Subscription failed. Please try again.");
-        return false;
-      }
-    } catch {
-      alert("Network error. Please check your connection and try again.");
-      return false;
-    }
-    // H7 (2026-07-02 review): the tier cookie is HMAC-signed server-side.
-    // Setting it via document.cookie produced an unsigned value that fails
-    // verifyTier() once PITCH_TIER_SECRET is set — use the same endpoint
-    // PressIQ uses, which sets the signed, httpOnly cookie.
-    try {
-      await fetch("/api/pitch-tier", { method: "POST" });
-    } catch { /* non-fatal — the subscribe succeeded; tier just won't unlock this session */ }
+  // Fired by the shared EmailGateModal once the email is verified (6-digit code,
+  // or instantly for a known email). The signed sia_sub wristband is already set
+  // server-side by /api/gate/verify-code — here we just flip local UI state and
+  // run any download the user was waiting on.
+  function handleGateUnlocked() {
     setEmailDone(true);
-    return true;
-  }
-
-  async function handlePdfGateSubmit(e: React.FormEvent) {
-    setPdfGateSubmitting(true);
-    const ok = await unlockEmail(e);
-    if (!ok) { setPdfGateSubmitting(false); return; }
-    setTimeout(() => {
-      setShowPdfGate(false);
-      setPdfGateSubmitting(false);
+    setShowGate(false);
+    if (pendingDownloadRef.current) {
+      pendingDownloadRef.current = false;
       generateAndDownloadPDF();
-    }, 500);
+    }
   }
 
   const footerNextLabel =
@@ -2175,23 +2049,14 @@ export default function SignalIQPage() {
                     </div>
                     {/* Compact newsletter CTA — after results */}
                     {!emailDone && (
-                      <form onSubmit={unlockEmail} style={{ marginTop: 28, maxWidth: 1100, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
+                      <div style={{ marginTop: 28, maxWidth: 1100, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
                         <span style={{ fontFamily: SERIF, fontSize: 14, color: INK70, flex: 1, minWidth: 220 }}>
-                          Get <strong>{EMAIL_SCANS} scans/month</strong> (up from {FREE_SCANS}) + the full earned-media playbook — free.
+                          Get <strong>{EMAIL_SCANS} scans/month</strong> (up from {FREE_SCANS}) + PDF downloads + the full earned-media playbook — free.
                         </span>
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="you@company.com"
-                          className="siq-input"
-                          style={{ flex: 1, minWidth: 200, fontSize: 13 }}
-                        />
-                        <button type="submit" className="siq-scan-btn" style={{ fontSize: 12, padding: "12px 20px" }}>
+                        <button type="button" onClick={() => { pendingDownloadRef.current = false; setShowGate(true); }} className="siq-scan-btn" style={{ fontSize: 12, padding: "12px 20px" }}>
                           Unlock →
                         </button>
-                      </form>
+                      </div>
                     )}
                     {emailDone && (
                       <div style={{ marginTop: 28, maxWidth: 1100, padding: "12px 18px", border: `1px solid ${GREEN}`, background: hexA(GREEN, 0.05), fontFamily: SERIF, fontSize: 14, color: INK }}>
@@ -2217,10 +2082,8 @@ export default function SignalIQPage() {
             packing={packing}
             packError={packError}
             onRetry={() => generatePack(selected)}
-            email={email}
-            setEmail={setEmail}
             emailDone={emailDone}
-            unlockEmail={unlockEmail}
+            onOpenGate={() => { pendingDownloadRef.current = false; setShowGate(true); }}
             onDownloadPDF={downloadPDF}
           />
         )}
@@ -2248,15 +2111,14 @@ export default function SignalIQPage() {
         />
       )}
 
-      <PdfDownloadGate
-        show={showPdfGate}
-        onClose={() => setShowPdfGate(false)}
-        email={email}
-        setEmail={setEmail}
-        submitting={pdfGateSubmitting}
-        onSubmit={handlePdfGateSubmit}
-        opp={selected}
-        pack={pack}
+      <EmailGateModal
+        show={showGate}
+        onClose={() => { pendingDownloadRef.current = false; setShowGate(false); }}
+        variant="subscribe"
+        tool="signaliq"
+        heading="Unlock more scans & downloads"
+        blurb={`Add your email for ${EMAIL_SCANS} scans a month, PDF downloads, and SIA's earned-media playbooks. Verify once — it works across every tool. One list, unsubscribe anytime.`}
+        onSubscribe={handleGateUnlocked}
       />
     </>
   );

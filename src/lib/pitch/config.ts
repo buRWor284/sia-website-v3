@@ -5,6 +5,7 @@
  */
 
 import type { Platform } from "./types";
+import { QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 
 /** D-9: Sonnet by default, overridable via env. */
 export const PITCH_MODEL = process.env.PITCH_SCORE_MODEL || "claude-sonnet-4-6";
@@ -14,8 +15,10 @@ export const PRODUCT_NAME = "PressIQ";
 export const EMOS_URL = "/emos";
 export const EMOS_APPLY = "/emos/apply";
 
-export const FREE_LIMIT = 3; // scores / month, anonymous
-export const EMAIL_LIMIT = 10; // scores / month, with email
+// Freemium caps — single source of truth is lib/gate/quota-limits.ts (Phase P2).
+// Re-exported here so PressIQ UI copy and the score route read the same numbers.
+export const FREE_LIMIT = QUOTA_LIMITS["pressiq-score"].anonymous; // scores / month, anonymous
+export const EMAIL_LIMIT = QUOTA_LIMITS["pressiq-score"].email; // scores / month, with email
 
 /** D-7: one rubric + light per-platform overrides.
  *  "direct" (added 08 Jul 2026) covers standalone outreach with no source-request
