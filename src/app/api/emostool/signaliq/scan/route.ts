@@ -1,44 +1,22 @@
 /**
  * /api/emostool/signaliq/scan
  *
- * Authenticated version of the SignalIQ scan — no rate limit, no Turnstile.
+ * Authenticated version of the SignalIQ scan — no public quota, no Turnstile.
  * Requires a valid Clerk session (platform users only).
+ *
+ * P6: request handling shared with /api/signaliq/scan via
+ * lib/signaliq/route-core.ts — this file is only the EMOS guard around it.
  *
  * POST body: { beats?: BeatId[] (1–3, primary first), beat?: BeatId (legacy) }
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
-import { scanBeat } from "@/lib/signaliq/scan";
-import { logScan } from "@/lib/signaliq/log";
-import type { BeatId, ScanResponse } from "@/lib/signaliq/types";
+import { parseBeats, runScanRequest } from "@/lib/signaliq/route-core";
+import type { ScanResponse } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // extra headroom for the company-profile expansion call
-
-const BEATS_OK: BeatId[] = ["saas", "fintech", "health", "climate", "ai", "cybersecurity", "agency"];
-
-/**
- * Prefer the new `beats` array (1–3, primary first); fall back to the legacy
- * single `beat`. Validated, deduped, order-preserving, capped at 3.
- */
-function parseBeats(raw: Record<string, unknown>): BeatId[] {
-  const collected: unknown[] = Array.isArray(raw.beats)
-    ? raw.beats
-    : raw.beat !== undefined
-      ? [raw.beat]
-      : [];
-  const seen = new Set<string>();
-  const out: BeatId[] = [];
-  for (const v of collected) {
-    const b = String(v) as BeatId;
-    if (!BEATS_OK.includes(b) || seen.has(b)) continue;
-    seen.add(b);
-    out.push(b);
-    if (out.length >= 3) break;
-  }
-  return out;
-}
 
 export async function POST(req: NextRequest) {
   const guard = await requireEmosAccess({ rateLimitKey: "signaliq-scan" });
@@ -59,17 +37,11 @@ export async function POST(req: NextRequest) {
   const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 600) : undefined;
 
   try {
-    const { opportunities, partial, notes, beats: scanned } = await scanBeat(beats, { companyContext });
-    logScan(scanned.join("+"), opportunities.length);
+    const core = await runScanRequest(beats, companyContext);
     const body: ScanResponse = {
-      beat: scanned[0],
-      beats: scanned,
-      generatedAt: new Date().toISOString(),
-      opportunities,
+      ...core,
       // Platform users have unlimited scans
       usage: { remaining: 999, tier: "email" },
-      partial,
-      notes,
     };
     return NextResponse.json(body);
   } catch (e) {
