@@ -54,7 +54,9 @@ export default async function SignalIQPlatformPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1200, marginInline: "auto", padding: "32px clamp(20px,4vw,56px) 80px" }}>
+      {/* Bottom padding raised 80→150 (P6): the shared tool core's fixed wizard
+          footer would otherwise cover PipelineNav at the end of the page. */}
+      <div style={{ maxWidth: 1200, marginInline: "auto", padding: "32px clamp(20px,4vw,56px) 150px" }}>
 
         {/* Stats strip */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", border: `1px solid ${INK}`, marginBottom: 32 }}>
