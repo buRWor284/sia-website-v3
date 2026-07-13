@@ -21,7 +21,7 @@
  *   - Wrappers must render <style>{PIQ_CSS}</style> (see core-css.ts).
  */
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   PLATFORMS,
   TIERS,
@@ -393,7 +393,19 @@ export default function PressIQToolCore({
   // Report the step whenever the input form is on screen so the public wrapper
   // can (re)arm its Turnstile widget — including when the form comes back after a
   // score (view returns to "pre").
-  useEffect(() => { if (view === "pre") onStepChange?.(formStep); }, [formStep, view, onStepChange]);
+  //
+  // The callback is held in a ref and kept OUT of the effect deps on purpose. The
+  // public wrapper passes an inline onStepChange that bumps its `tsArm` counter;
+  // that state update re-renders the wrapper, which hands us a brand-new
+  // onStepChange identity every render. With onStepChange as a dep the effect
+  // re-runs on that new identity, calls it again, bumps tsArm again — an infinite
+  // render loop that froze the pitch step (this is what commit 89331638 tripped
+  // and 02666dc reverted). Keying only on [formStep, view] fires exactly once per
+  // real step change, which is all the re-arm needs.
+  const onStepChangeRef = useRef(onStepChange);
+  onStepChangeRef.current = onStepChange;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { if (view === "pre") onStepChangeRef.current?.(formStep); }, [formStep, view]);
 
   const live = useMemo(() => {
     if (pitch.trim().length < 15) return null;
