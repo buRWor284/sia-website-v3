@@ -21,7 +21,7 @@ export type Stage = "drafted" | "sent" | "opened" | "replied" | "placed" | "ampl
 export type PesoType = "Earned" | "Shared" | "Owned" | "Paid";
 export type LinkType = "Do Follow" | "No Follow" | "N/A";
 export type ContentType = "Original" | "Republished";
-export type DataSource = "manual" | "PressIQ" | "SignalIQ" | "Google Alerts";
+export type DataSource = "manual" | "PressIQ" | "SignalIQ" | "JournoCollabIQ" | "Google Alerts";
 export type AlertStatus = "new" | "reviewed" | "archived";
 export type AlertType = "syndication" | "mention" | "pickup";
 
@@ -204,8 +204,11 @@ export async function createPitch(input: CreatePitchInput): Promise<{ id: string
   }
 
   revalidatePath("/emostool/dashboard/coverageiq");
-  // Stage progression: pitch_logged event
-  void recordStageEvent("pitch_logged");
+  // Stage progression: pitch_logged event. MUST be awaited — a fire-and-forget
+  // call is dropped when the serverless function freezes after the response
+  // (same bug class as the PressIQ "Score History always empty" fix, see
+  // feedback-fire-and-forget-persistence).
+  await recordStageEvent("pitch_logged");
   return data as { id: string };
 }
 
@@ -245,6 +248,8 @@ export interface CreateJournalistInput {
   domain_rating?: number | null;
   notes?: string | null;
   tags?: string[];
+  /** Where this journalist came from (e.g. "JournoCollabIQ" AI saves). Default "manual". */
+  data_source?: DataSource;
 }
 
 export async function createJournalist(input: CreateJournalistInput): Promise<{ id: string } | null> {
@@ -265,7 +270,7 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
       domain_rating:  input.domain_rating ?? null,
       notes:          input.notes ?? null,
       tags:           input.tags ?? [],
-      data_source:    "manual",
+      data_source:    input.data_source ?? "manual",
     })
     .select("id")
     .single();
@@ -274,7 +279,8 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
 
   revalidatePath("/emostool/dashboard/coverageiq");
   revalidatePath("/emostool/dashboard/journocollabiq");
-  void recordStageEvent("journalist_saved");
+  // Awaited for the same fire-and-forget reason as pitch_logged above.
+  await recordStageEvent("journalist_saved");
   return data as { id: string };
 }
 

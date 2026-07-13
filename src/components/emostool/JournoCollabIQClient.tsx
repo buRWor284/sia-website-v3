@@ -179,13 +179,21 @@ function JournalistCard({
 
   function handleSave() {
     startSave(async () => {
+      // Parse the outlet authority score out of seoNote ("DA 94 · national
+      // business desk · …") so AI saves stop landing with domain_rating null —
+      // which left the CRM's DR column showing "—" and silently excluded every
+      // AI-saved journalist from the dashboard's avg-DR stat.
+      const drMatch = /\b(?:DA|DR)\s*:?\s*(\d{1,3})\b/i.exec(j.seoNote ?? "");
+      const parsedDr = drMatch ? Math.min(100, parseInt(drMatch[1], 10)) : null;
       const input: CreateJournalistInput = {
         name: j.name,
         outlet: j.url,
         beat: formData.industry || null,
         email: null,
         twitter_handle: j.contact?.startsWith("@") ? j.contact : null,
+        domain_rating: parsedDr,
         notes: j.why,
+        data_source: "JournoCollabIQ",
       };
       await createJournalist(input);
       onSaved(j.name);
