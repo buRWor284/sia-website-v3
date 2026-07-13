@@ -64,7 +64,7 @@ function StoryForm({
   searching,
 }: {
   initial: {
-    biz: string; desc: string; industry: string;
+    biz: string; domain: string; desc: string; industry: string;
     audDesc: string; geo: string; strategy: string;
   };
   onSearch: (form: typeof initial) => void;
@@ -79,10 +79,14 @@ function StoryForm({
         Tell us about your story
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Brand / company name</label>
           <input value={form.biz} onChange={e => set("biz", e.target.value)} placeholder="Acme Corp" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+        </div>
+        <div>
+          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Website</label>
+          <input value={form.domain} onChange={e => set("domain", e.target.value)} placeholder="acme.com" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
         </div>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Geography</label>
@@ -238,7 +242,9 @@ function JournalistCard({
             <span style={{ fontFamily: MONO, fontSize: 9.5, color: INK55 }}>{j.seoNote}</span>
           )}
           {j.contact && (
-            <span style={{ fontFamily: MONO, fontSize: 9.5, color: INK55 }}>Contact: {j.contact}</span>
+            <span style={{ fontFamily: MONO, fontSize: 9.5, color: INK55 }}>
+              Contact: {j.contact} · <a href={j.contactLinkedIn ? `https://${j.contactLinkedIn.replace(/^https?:\/\//, "")}` : `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(j.name)}`} target="_blank" rel="noopener noreferrer" style={{ color: BLUE, textDecoration: "none" }}>{j.contactLinkedIn ? "LinkedIn ↗" : "Find on LinkedIn ↗"}</a>
+            </span>
           )}
           {j.linkPage && j.linkPage !== "" && (
             <a href={j.linkPage} target="_blank" rel="noopener noreferrer"
@@ -247,6 +253,11 @@ function JournalistCard({
             </a>
           )}
         </div>
+        {j.contact && (
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: AMBER }}>
+            ⚠ Contact is AI-suggested — verify before you pitch.
+          </div>
+        )}
 
         {/* Angle */}
         {angle && (
@@ -350,6 +361,36 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
   );
 }
 
+// ── Loading panel (ported from the public tool — the search runs 30-60s on Opus
+// and the dashboard used to just sit on a disabled button) ──────────────────────
+const LOADING_LINES = [
+  { h: "Scanning coverage on your beat…",    s: "Finding who's writing about this topic now." },
+  { h: "Matching reporters to your story…",  s: "Ranking by beat fit and recent coverage." },
+  { h: "Checking outlet authority & reach…", s: "Only surfacing journalists worth your time." },
+  { h: "Profiling how to reach them…",       s: "Handles and section desks — verify before pitching." },
+  { h: "Almost there.",                      s: "Compiling a media list that would take an agency a week." },
+];
+
+function LoadingPanel() {
+  const [idx, setIdx] = useState(0);
+  const [secs, setSecs] = useState(0);
+  useEffect(() => {
+    const a = setInterval(() => setIdx(i => (i + 1) % LOADING_LINES.length), 2200);
+    const b = setInterval(() => setSecs(s => s + 1), 1000);
+    return () => { clearInterval(a); clearInterval(b); };
+  }, []);
+  const line = LOADING_LINES[idx];
+  return (
+    <div style={{ border: `1px solid ${INK15}`, background: PAPER2, padding: "28px 24px", textAlign: "center", marginBottom: 28 }}>
+      <span style={{ display: "inline-block", width: 16, height: 16, border: `2px solid ${INK15}`, borderTopColor: YEL, borderRadius: "50%", animation: "jciqspin .7s linear infinite", marginBottom: 12 }} />
+      <div style={{ fontFamily: SERIF, fontSize: 17, fontWeight: 700, color: INK }}>{line.h}</div>
+      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, marginTop: 3 }}>{line.s}</div>
+      <div style={{ fontFamily: MONO, fontSize: 9.5, color: INK35, marginTop: 10, letterSpacing: ".08em" }}>ELAPSED {secs}s · TYPICALLY 30–60s</div>
+      <style>{"@keyframes jciqspin{to{transform:rotate(360deg)}}"}</style>
+    </div>
+  );
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function JournoCollabIQClient({
@@ -402,6 +443,7 @@ export default function JournoCollabIQClient({
 
   const defaultForm = {
     biz: formBiz,
+    domain: "",
     desc: formDesc || companyContext,
     industry: prefillBeat,
     audDesc: enrichedStory,
@@ -475,10 +517,18 @@ export default function JournoCollabIQClient({
       <StoryForm initial={defaultForm} onSearch={handleSearch} searching={searching} />
 
       {searchError && (
-        <div style={{ marginBottom: 20, padding: "12px 16px", border: `1px solid ${RED}`, background: "rgba(193,74,50,.06)", fontFamily: SERIF, fontSize: 14, color: INK }}>
-          {searchError}
+        <div style={{ marginBottom: 20, padding: "12px 16px", border: `1px solid ${RED}`, background: "rgba(193,74,50,.06)", fontFamily: SERIF, fontSize: 14, color: INK, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <span>{searchError}</span>
+          {lastForm && (
+            <button onClick={() => handleSearch(lastForm as typeof defaultForm)}
+              style={{ padding: "7px 14px", border: `1px solid ${RED}`, background: "transparent", color: RED, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap" }}>
+              Retry →
+            </button>
+          )}
         </div>
       )}
+
+      {searching && <LoadingPanel />}
 
       {/* Results */}
       {results && (
@@ -496,6 +546,11 @@ export default function JournoCollabIQClient({
               style={{ padding: "8px 16px", border: `1px solid ${INK15}`, background: PAPER2, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", cursor: loadingBrief ? "wait" : "pointer" }}>
               {loadingBrief ? "Generating…" : "Generate media brief →"}
             </button>
+          </div>
+
+          <div style={{ display: "flex", gap: 9, alignItems: "flex-start", background: "rgba(245,184,31,.07)", border: `1px solid rgba(245,184,31,.3)`, padding: "10px 13px", marginBottom: 16 }}>
+            <span style={{ background: YEL, fontFamily: GROT, fontSize: 8, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", padding: "3px 7px", color: INK, flexShrink: 0 }}>AI</span>
+            <span style={{ fontFamily: SERIF, fontSize: 12, color: INK70, lineHeight: 1.5 }}>Each journalist is scored against 8 fit criteria: beat match, recent coverage, outlet authority, audience fit, responsiveness, exclusivity fit, contact findability, and brand-safety fit.</span>
           </div>
 
           {brief && (
@@ -520,6 +575,15 @@ export default function JournoCollabIQClient({
               prefillAssetIdea={prefillAssetIdea}
             />
           ))}
+
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 8 }}>
+            {([["A", "Highest priority", GREEN], ["B", "Strong candidate", BLUE], ["C", "Good to include", AMBER]] as [string, string, string][]).map(([t, l, c]) => (
+              <span key={t} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ color: c, border: `1px solid ${c}`, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", padding: "2px 7px" }}>Tier {t}</span>
+                <span style={{ fontFamily: MONO, fontSize: 9, color: INK55 }}>{l}</span>
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
