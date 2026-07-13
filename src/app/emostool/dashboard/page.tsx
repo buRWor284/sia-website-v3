@@ -187,7 +187,7 @@ export default async function EmosDashboardPage() {
               <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%" }} />
               LIVE
             </span>
-            <SignOutButton redirectUrl="/">
+            <SignOutButton redirectUrl="/emostool">
               <button style={{ background: "transparent", border: "1px solid rgba(241,235,222,.2)", color: "rgba(241,235,222,.55)", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", padding: "5px 12px", cursor: "pointer" }}>
                 Sign out
               </button>
