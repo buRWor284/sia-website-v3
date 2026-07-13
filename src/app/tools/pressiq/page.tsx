@@ -202,15 +202,27 @@ export default function PressIQPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...body, turnstileToken: turnstileTokenRef.current }),
       });
-      const data = await res.json();
-      // Turnstile tokens are single-use — refresh for the next submission.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = window as any;
-      if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
-        w.turnstile.reset(turnstileWidgetId.current);
-        turnstileTokenRef.current = "";
-        setTurnstileToken("");
+      // Never let a non-JSON body (504/HTML) throw here — degrade to {} so the
+      // core surfaces a clean error instead of a bogus "Network error".
+      const data = await res.json().catch(() => ({} as Record<string, unknown>));
+      // Turnstile tokens are single-use — refresh for the next submission. This
+      // MUST NOT throw: the widget's container is unmounted while the loading
+      // view is on screen, and turnstile.reset() throws "Nothing to reset" on a
+      // detached container — which would otherwise discard a perfectly good
+      // score and show "Network error". Guarded so it can never be fatal.
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const w = window as any;
+        if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
+          w.turnstile.reset(turnstileWidgetId.current);
+        }
+      } catch {
+        // Container detached mid-scan; drop the stale widget id so the effect
+        // re-renders a fresh widget when the form comes back.
+        turnstileWidgetId.current = null;
       }
+      turnstileTokenRef.current = "";
+      setTurnstileToken("");
       return { ok: res.ok, data };
     },
   };
