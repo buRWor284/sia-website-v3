@@ -143,7 +143,7 @@ function JournalistCard({
   j: AIJournalist;
   formData: Record<string, string>;
   savedNames: Set<string>;
-  onSaved: (name: string) => void;
+  onSaved: (name: string, journalist: DbJournalist) => void;
   prefillAssetTitle?: string;
   prefillAssetType?: string;
   prefillAssetIdea?: string;
@@ -195,8 +195,26 @@ function JournalistCard({
         notes: j.why,
         data_source: "JournoCollabIQ",
       };
-      await createJournalist(input);
-      onSaved(j.name);
+      const created = await createJournalist(input);
+      // Only mark saved + insert into the CRM list when the write actually
+      // succeeded (createJournalist returns null on failure). Prepending the new
+      // row makes it appear in the CRM table instantly — no page refresh needed.
+      if (created?.id) {
+        onSaved(j.name, {
+          id:             created.id,
+          name:           input.name,
+          outlet:         input.outlet ?? null,
+          beat:           input.beat ?? null,
+          email:          input.email ?? null,
+          twitter_handle: input.twitter_handle ?? null,
+          domain_rating:  input.domain_rating ?? null,
+          last_contact:   null,
+          pitches_sent:   0,
+          placements:     0,
+          notes:          input.notes ?? null,
+          tags:           input.tags ?? [],
+        });
+      }
     });
   }
 
@@ -493,7 +511,10 @@ export default function JournoCollabIQClient({
               j={j}
               formData={lastForm ?? {}}
               savedNames={savedNames}
-              onSaved={name => setSavedNames(prev => new Set([...prev, name]))}
+              onSaved={(name, nj) => {
+                setSavedNames(prev => new Set([...prev, name]));
+                setJournalists(prev => [nj, ...prev]);
+              }}
               prefillAssetTitle={prefillAssetTitle}
               prefillAssetType={prefillAssetType}
               prefillAssetIdea={prefillAssetIdea}
