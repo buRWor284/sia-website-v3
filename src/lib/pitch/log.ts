@@ -4,6 +4,9 @@
  * Saves scored pitches to pressiq_scores in Supabase using the service-role
  * client (bypasses RLS) so it works from the public tool without a full session.
  * When a Clerk user ID is provided we resolve the internal user + org and write them.
+ * Anonymous public scores (no session → no org) are stored too, with null
+ * org_id/user_id — approved 2026-07-13 for the outcome flywheel. The D-13
+ * store-toggle is honoured for them exactly like signed-in users.
  *
  * MUST be awaited by callers — a fire-and-forget call is dropped when the
  * serverless function freezes after the response (this was the "Score History
@@ -36,16 +39,11 @@ export async function logPitch(
       if (u) { orgId = u.org_id; internalUserId = u.id; }
     }
 
-    // pressiq_scores.org_id is NOT NULL, so a row can only be stored when we
-    // resolved an org (i.e. a signed-in platform user). Anonymous public scores
-    // have no org — skip cleanly rather than throwing a NOT-NULL violation.
-    // (Storing anonymous public scores for the flywheel would need a nullable
-    // org_id/pitch_text migration — a deliberate product decision, not done here.)
-    if (!orgId) {
-      console.log(`[pitch-score] no org resolved (anonymous) — skipping persistence, hash=${pitchHash}`);
-      return;
-    }
-
+    // Anonymous public scores are stored with null org_id/user_id (the
+    // `pressiq_scores_allow_anonymous` migration made org_id + pitch_text
+    // nullable). Null-org rows are invisible to every tenant — Score History
+    // reads run as `authenticated` under org_isolation RLS — they exist only
+    // for the aggregate flywheel.
     const areas = result.areas;
     const l3Score = areas.emos
       ? Math.round(
@@ -81,7 +79,7 @@ export async function logPitch(
     if (error) {
       console.error("[pitch-score] DB insert failed:", error.message);
     } else {
-      console.log(`[pitch-score] saved hash=${pitchHash} composite=${result.composite} tier=${result.tier.label}`);
+      console.log(`[pitch-score] saved hash=${pitchHash} composite=${result.composite} tier=${result.tier.label} org=${orgId ?? "anonymous"}`);
       // Stage progression: pitch_scored event. Awaited so it isn't dropped when
       // the function freezes after the response.
       if (clerkUserId) {
