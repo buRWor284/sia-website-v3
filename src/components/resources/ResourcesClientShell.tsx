@@ -1450,30 +1450,39 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
   // Default (no hash) still opens on Browse All. A shared #emos or #all link
   // forces the matching tab on load and scrolls past the hero to the toggle.
   useEffect(() => {
-    // URL hash isn't available during SSR, so the only way to honour a shared
-    // link (#emos / #all, or a content-type section like #videos) is to sync
-    // it once, right after mount — native hash-scroll doesn't fire reliably
-    // for this client-rendered ledger.
-    const hash = window.location.hash.replace("#", "").toLowerCase();
-    if (!hash) return;
+    // The URL hash isn't available during SSR, and the Browse All ledger
+    // renders client-side and can take several frames to mount. A fixed
+    // 2-frame wait missed the section on the heavier production page (the
+    // element didn't exist yet, so the scroll silently no-op'd) — so instead
+    // we POLL for the target and scroll as soon as it exists. Re-run on
+    // hashchange too, so in-page anchor links jump, not just full loads.
+    function syncToHash() {
+      const hash = window.location.hash.replace("#", "").toLowerCase();
+      if (!hash) return;
 
-    if (hash === "emos" || hash === "all") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL hash on first load, not a render-loop
-      setView(hash === "emos" ? "guided" : "browse");
-      document.getElementById("resources-view")?.scrollIntoView({ block: "start" });
-      return;
+      if (hash === "emos" || hash === "all") {
+        setView(hash === "emos" ? "guided" : "browse");
+        requestAnimationFrame(() =>
+          document.getElementById("resources-view")?.scrollIntoView({ block: "start" }),
+        );
+        return;
+      }
+
+      // Content-type section anchors (videos, tools, quizzes, playbooks,
+      // guides, infographics) live inside the Browse All ledger.
+      setView("browse");
+      let tries = 0;
+      const tryScroll = () => {
+        const el = document.getElementById(hash);
+        if (el) { el.scrollIntoView({ block: "start" }); return; }
+        if (tries++ < 40) requestAnimationFrame(tryScroll); // retry ~0.6s for a late-mounting ledger
+      };
+      requestAnimationFrame(tryScroll);
     }
 
-    // Content-type section anchors (videos, tools, quizzes, playbooks, guides,
-    // infographics) live inside the Browse All ledger — force that view, then
-    // scroll to the section once it has rendered.
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL hash on first load, not a render-loop
-    setView("browse");
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.getElementById(hash)?.scrollIntoView({ block: "start" });
-      });
-    });
+    syncToHash();
+    window.addEventListener("hashchange", syncToHash);
+    return () => window.removeEventListener("hashchange", syncToHash);
   }, []);
 
   const handleSetView = useCallback((v: "guided" | "browse") => {
