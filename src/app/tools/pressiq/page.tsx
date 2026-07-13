@@ -1,58 +1,33 @@
 "use client";
 
 /**
- * PressIQ — /tools/pressiq
- * Two-panel app layout: dark header · left input panel · right output panel.
- * Post-score: 4 tabs with prev/next footer nav, PDF report (email-gated).
- * Site header is suppressed for /tools/ routes (SiteHeader.tsx).
+ * PressIQ — /tools/pressiq  (THIN PUBLIC WRAPPER, Phase P6)
+ *
+ * The scoring tool itself (2-step form, live mechanics, loading, the 4 result
+ * views) now comes from the shared core (components/pressiq/PressIQToolCore) —
+ * the same component the dashboard uses. This wrapper owns ONLY the public-
+ * surface concerns:
+ *   - the intro/landing panel + site chrome (ToolHeader, ToolPipelineFooter)
+ *   - the hardened Cloudflare Turnstile widget (docked into the core via
+ *     `turnstileSlot`; token gates submission via `submitDisabled`)
+ *   - the email gate (EmailGateModal for the PDF + the legacy inline unlock)
+ *   - the jsPDF report (shared builder, email-gated here)
+ *   - quota copy + localStorage prefs (via the core's persistKey)
+ * Stateless / login-free — zero Clerk.
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { installSanitizer, plainText } from "@/lib/pdf/house-style";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { EmailGateModal, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 import { ToolHeader } from "@/components/tools/ToolHeader";
-import {
-  DIMENSION_EVIDENCE,
-  EMAIL_LIMIT,
-  EMOS_URL,
-  EVIDENCE,
-  FREE_LIMIT,
-  PLATFORMS,
-  TIERS,
-  WEIGHTS_V2,
-  tierFor,
-} from "@/lib/pitch/config";
-import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
-import { emosFrame } from "@/lib/pitch/feedback";
-import {
-  EMPTY_BRAND,
-  type BrandSignals,
-  type Platform,
-  type ScoreResponse,
-} from "@/lib/pitch/types";
-
-// ── Tokens from lib/tokens ─────────────────────────────────────────────────────
-import {
-  DARK, DARK_BD, DARK2,
-  GROT, INK, MONO, PAPER, PAPER2, SERIF, YEL,
-} from "@/lib/tokens";
-
-// ── Tool-specific colours (not in shared tokens) ───────────────────────────────
-const DARK3   = "#221e17";
-const GREEN   = "#3e6b45";
-const AMBER   = "#9a6a08";
-const RED     = "#c14a32";
-const BLUE    = "#2d5393";
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const ra = (hex: string, alpha: number) => {
-  const n = parseInt(hex.slice(1), 16);
-  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
-};
-function bandColor(s: number) { return s >= 75 ? GREEN : s >= 45 ? AMBER : RED; }
-// Per-dimension tier label + colour come from config TIERS (single source of truth).
+import { EMAIL_LIMIT, EMOS_URL, FREE_LIMIT } from "@/lib/pitch/config";
+import type { ScoreResponse } from "@/lib/pitch/types";
+import PressIQToolCore from "@/components/pressiq/PressIQToolCore";
+import { PIQ_CSS } from "@/components/pressiq/core-css";
+import { GREEN, ra } from "@/components/pressiq/cards";
+import { buildPressIqReport } from "@/lib/pdf/pressiq-report";
+import { GROT, INK, MONO, PAPER, SERIF, YEL } from "@/lib/tokens";
 
 // ── Lazy-load jsPDF (avoids next/script in "use client") ─────────────────────
 function loadJsPDF(): Promise<new (opts: object) => object> {
@@ -68,27 +43,6 @@ function loadJsPDF(): Promise<new (opts: object) => object> {
   });
 }
 
-// ── Tabs ──────────────────────────────────────────────────────────────────────
-type Tab = "score" | "fixes" | "breakdown" | "evidence";
-const TABS: { id: Tab; label: string; short: string }[] = [
-  { id: "score",     label: "01 · Score",     short: "Score"     },
-  { id: "fixes",     label: "02 · Top Fixes", short: "Top Fixes" },
-  { id: "breakdown", label: "03 · Breakdown", short: "Breakdown" },
-  { id: "evidence",  label: "04 · Evidence",  short: "Evidence"  },
-];
-
-// ── Dimensions ────────────────────────────────────────────────────────────────
-const DIMS = [
-  { key: "relevance",      name: "Answering the brief",  short: "Relevance",  mech: "Relevance: the #1 filter"            },
-  { key: "objective",      name: "Mechanics",             short: "Mechanics",  mech: "Mechanics (Respondable-style)"        },
-  { key: "checklist",      name: "SIA 7-Step Checklist", short: "SIA 7-step", mech: "SIA 7-step journo-outreach checklist" },
-  { key: "newsroomReady",  name: "Newsroom-ready",        short: "Newsroom",   mech: "Newsroom-ready: publishable material" },
-  { key: "storytelling",   name: "Storytelling",          short: "Story",      mech: "Narrative transportation"             },
-  { key: "neuromarketing", name: "Neuromarketing",        short: "Neuro",      mech: "System 1 + original data"             },
-  { key: "personalBrand",  name: "Personal brand",        short: "Personal",   mech: "E-E-A-T & the halo effect"            },
-] as const;
-type DimKey = typeof DIMS[number]["key"];
-
 // ── Ticker data ───────────────────────────────────────────────────────────────
 const TICKER = [
   { stat: "82%",   text: "of journalists delete off-beat pitches",        src: "Cision 2026"           },
@@ -101,263 +55,9 @@ const TICKER = [
   { stat: "53%",   text: "distrust generic, AI-sounding pitches",         src: "Cision 2026"           },
 ];
 
-const STORE_KEY = "sia.pressiq.v2";
-
 // Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered and
-// scoring works exactly as before. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY (+ the server
-// TURNSTILE_SECRET_KEY) to enforce the human check end-to-end.
+// scoring works exactly as before.
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-
-const BRAND_LABELS: { key: keyof BrandSignals; label: string }[] = [
-  { key: "website",     label: "Personal website"  },
-  { key: "bylines",     label: "Published bylines" },
-  { key: "youtube",     label: "YouTube / video"   },
-  { key: "speaking",    label: "Speaking history"  },
-  { key: "caseStudies", label: "Case studies"      },
-  { key: "linkedin",    label: "Active LinkedIn"   },
-];
-
-// ── Shared left-panel style atoms ─────────────────────────────────────────────
-const LSEC: React.CSSProperties = { padding: "18px 22px", borderBottom: `1px solid ${DARK_BD}` };
-const LSEC_LBL: React.CSSProperties = {
-  fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".20em",
-  textTransform: "uppercase", color: ra(PAPER, 0.5), marginBottom: 10, display: "block",
-};
-const LP_TEXTAREA: React.CSSProperties = {
-  width: "100%", padding: "9px 11px", background: DARK3, border: `1px solid ${DARK_BD}`,
-  fontFamily: GROT, fontSize: 12.5, color: PAPER, outline: "none", resize: "vertical", borderRadius: 0,
-};
-const LP_INPUT: React.CSSProperties = {
-  width: "100%", padding: "9px 11px", background: DARK3, border: `1px solid ${DARK_BD}`,
-  fontFamily: GROT, fontSize: 12.5, color: PAPER, outline: "none", borderRadius: 0,
-};
-function chipStyle(active: boolean): React.CSSProperties {
-  return {
-    display: "inline-block", padding: "5px 9px",
-    border: `1px solid ${active ? YEL : DARK_BD}`, background: active ? YEL : "transparent",
-    fontSize: 10.5, fontWeight: 600, cursor: "pointer",
-    color: active ? DARK : ra(PAPER, 0.6), transition: "all .1s", fontFamily: GROT, margin: 2, borderRadius: 0,
-  };
-}
-
-// ── SVG Gauge ─────────────────────────────────────────────────────────────────
-function Gauge({ score, color }: { score: number; color: string }) {
-  const r = 70, circ = 2 * Math.PI * r, d = (score / 100) * circ;
-  return (
-    <svg viewBox="0 0 180 180" role="img" aria-label={`Score ${score} out of 100`} style={{ width: 180, height: 180 }}>
-      <circle cx="90" cy="90" r={r} fill="none" stroke={ra(INK, 0.06)} strokeWidth="7" />
-      <circle cx="90" cy="90" r={r} fill="none" stroke={color} strokeWidth="7"
-        strokeDasharray={`${d.toFixed(1)} ${(circ - d).toFixed(1)}`} transform="rotate(-90 90 90)" />
-      <text x="90" y="82" textAnchor="middle" fontFamily={SERIF} fontSize="48" fontWeight="700" fill={INK}>{score}</text>
-      <text x="90" y="104" textAnchor="middle" fontFamily={GROT} fontSize="11" fontWeight="700" letterSpacing=".16em" fill={ra(INK, 0.62)}>/ 100</text>
-    </svg>
-  );
-}
-
-// ── Dimension bar chart (Score tab — handoff v2) ─────────────────────────────
-function DimBarChart({ scores, dims }: { scores: Record<string, number>; dims: readonly typeof DIMS[number][] }) {
-  return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      {dims.map((dim, i) => {
-        const s = scores[dim.key] ?? 0;
-        const t = tierFor(s);
-        return (
-          <div key={dim.key} style={{
-            display: "grid", gridTemplateColumns: "140px 42px 1fr", alignItems: "center",
-            gap: 12, padding: "11px 0", borderBottom: `1px solid ${ra(INK, 0.06)}`,
-            ...(i === 0 ? { borderTop: `1px solid ${ra(INK, 0.06)}` } : {}),
-          }}>
-            <div style={{ fontFamily: SERIF, fontSize: 14, fontWeight: 600, color: INK }}>{dim.name}</div>
-            <div style={{ fontFamily: MONO, fontSize: 13, fontWeight: 700, color: t.color, textAlign: "right" }}>{s}</div>
-            <div style={{ position: "relative", height: 18, background: ra(INK, 0.04) }}>
-              <div style={{ position: "absolute", inset: 0, width: `${s}%`, background: t.color, opacity: 0.18 }} />
-              <div style={{ position: "absolute", inset: 0, width: `${s}%`, borderRight: `2px solid ${t.color}` }} />
-              <div style={{ position: "absolute", right: 6, top: "50%", transform: "translateY(-50%)", fontFamily: GROT, fontSize: 7, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.6) }}>
-                {t.badge.toUpperCase()}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ── Signal chip ───────────────────────────────────────────────────────────────
-function SignalChip({ label, met }: { label: string; met: boolean }) {
-  return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 9px",
-      border: `1px solid ${met ? ra(GREEN, 0.4) : ra(RED, 0.35)}`, fontFamily: GROT, fontSize: 9.5, fontWeight: 600, color: met ? GREEN : RED }}>
-      {met ? "✓" : "✗"} {label}
-    </span>
-  );
-}
-
-// ── Evidence card ─────────────────────────────────────────────────────────────
-function EvidCard({ figKey }: { figKey: string }) {
-  const ev = EVIDENCE[figKey];
-  if (!ev) return null;
-  return (
-    <a href={ev.url} target="_blank" rel="noopener noreferrer"
-      style={{ display: "flex", gap: 10, padding: "9px 12px", background: ra(INK, 0.025), border: `1px solid ${ra(INK, 0.06)}`, textDecoration: "none", marginBottom: 5 }}>
-      <div style={{ width: 6, height: 6, background: YEL, marginTop: 5, flexShrink: 0 }} />
-      <div>
-        <div style={{ fontFamily: SERIF, fontSize: 13, fontWeight: 600, color: INK, lineHeight: 1.4 }}>{ev.figure}</div>
-        <div style={{ fontFamily: MONO, fontSize: 8, color: ra(INK, 0.75), marginTop: 2 }}>{ev.source}</div>
-      </div>
-    </a>
-  );
-}
-
-// ── Dimension block ───────────────────────────────────────────────────────────
-function DimBlock({ dim, score, analysis, subSignals, evidenceKeys, expanded, onToggle }: {
-  dim: typeof DIMS[number]; score: number; analysis?: string;
-  subSignals?: { label: string; met: boolean }[]; evidenceKeys?: string[];
-  expanded: boolean; onToggle: () => void;
-}) {
-  const tc = bandColor(score);
-  const band = score >= 75 ? "strong" : score >= 45 ? "weak" : ("missing" as const);
-  const frame = emosFrame(dim.key as Parameters<typeof emosFrame>[0], score);
-  const bandC = band === "strong" ? GREEN : band === "weak" ? AMBER : RED;
-  const evKeys = evidenceKeys?.length ? evidenceKeys : (DIMENSION_EVIDENCE[dim.key] ?? []);
-  return (
-    <div style={{ border: `1px solid ${ra(INK, 0.18)}`, marginBottom: 10 }}>
-      <div onClick={onToggle} role="button" tabIndex={0} aria-expanded={expanded} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); } }} style={{ padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: INK }}>{dim.name}</span>
-          <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700, color: tc }}>{score}</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 72, height: 4, background: ra(INK, 0.06) }}>
-            <div style={{ width: `${score}%`, height: "100%", background: tc }} />
-          </div>
-          <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.6), display: "inline-flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>
-            {expanded ? "Collapse" : "Expand"}
-            <span style={{ fontSize: 13, fontWeight: 700 }}>{expanded ? "-" : "+"}</span>
-          </span>
-        </div>
-      </div>
-      {expanded && (
-        <div style={{ borderTop: `1px solid ${ra(INK, 0.08)}`, padding: "16px 18px" }}>
-          {analysis && <div style={{ fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.65), lineHeight: 1.6, marginBottom: 14 }}>{analysis}</div>}
-          {subSignals && subSignals.length > 0 && (
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 14 }}>
-              {subSignals.map((s, j) => <SignalChip key={j} label={s.label} met={s.met} />)}
-            </div>
-          )}
-          <div style={{ borderTop: `1px solid ${ra(INK, 0.06)}`, paddingTop: 12 }}>
-            <span style={{ display: "inline-block", padding: "3px 8px", background: bandC, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 8 }}>
-              {dim.mech}
-            </span>
-            <div style={{ fontFamily: SERIF, fontSize: 13.5, fontStyle: "italic", color: ra(INK, 0.62), lineHeight: 1.6, marginBottom: 12 }}>{frame.text}</div>
-            {evKeys.map(k => <EvidCard key={k} figKey={k} />)}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Fix card ──────────────────────────────────────────────────────────────────
-function FixCard({ rank, fix }: { rank: number; fix: ScoreResponse["topFixes"][0] }) {
-  return (
-    <div style={{ border: `1px solid ${INK}`, marginBottom: 12, overflow: "hidden" }}>
-      <div style={{ background: INK, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 26, height: 26, background: YEL, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: GROT, fontWeight: 900, fontSize: 13, color: INK }}>{rank}</div>
-        <div>
-          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER }}>{fix.area}</div>
-          {fix.mechanism && <div style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(PAPER, 0.65), marginTop: 2 }}>{fix.mechanism}</div>}
-        </div>
-      </div>
-      <div style={{ padding: "14px 16px", fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.7), lineHeight: 1.6 }}>{fix.text}</div>
-    </div>
-  );
-}
-
-// ── Live meter ────────────────────────────────────────────────────────────────
-function LiveMeter({ label, val, band, hint }: { label: string; val: string; band: "green" | "amber" | "red" | "neutral"; hint: string }) {
-  const fill = band === "neutral" ? "0%" : band === "green" ? "100%" : band === "amber" ? "60%" : "30%";
-  const fillC = band === "green" ? GREEN : band === "amber" ? AMBER : band === "red" ? RED : ra(INK, 0.1);
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 5 }}>
-        <span style={{ fontFamily: SERIF, fontSize: 14, color: INK, fontWeight: 600 }}>{label}</span>
-        <span style={{ fontFamily: MONO, fontSize: 12, fontWeight: 700, color: INK }}>{val}</span>
-      </div>
-      <div style={{ height: 4, background: ra(INK, 0.06) }}>
-        <div style={{ width: fill, height: "100%", background: fillC, transition: "width .25s ease, background .25s ease" }} />
-      </div>
-      <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.72), marginTop: 3 }}>{hint}</div>
-    </div>
-  );
-}
-
-// ── Email gate modal ──────────────────────────────────────────────────────────
-// Migrated to the shared EmailGateModal (components/tools/ToolCTAStrips.tsx,
-// 2026-07-10) — see usage below (variant="score").
-
-// ── Per-tab step navigation ───────────────────────────────────────────────────
-function TabNav({ current, setTab, onReset }: { current: Tab; setTab: (t: Tab) => void; onReset: () => void }) {
-  const idx = TABS.findIndex(t => t.id === current);
-  const next = idx < TABS.length - 1 ? TABS[idx + 1] : null;
-  function goNext(id: Tab) {
-    setTab(id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 28, paddingTop: 18, borderTop: `1px solid ${ra(INK, 0.1)}` }}>
-      <div style={{ display: "flex", gap: 5 }}>
-        {TABS.map((t, i) => (
-          <div key={t.id} style={{ width: t.id === current ? 24 : 8, height: 4, background: (t.id === current || i < idx) ? INK : ra(INK, 0.12), transition: "all .15s" }} />
-        ))}
-      </div>
-      {next ? (
-        <button
-          onClick={() => goNext(next.id)}
-          style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}
-          onMouseOver={e => (e.currentTarget.style.opacity = ".85")} onMouseOut={e => (e.currentTarget.style.opacity = "1")}>
-          {next.label} →
-        </button>
-      ) : (
-        <button onClick={onReset} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "9px 16px", background: "transparent", border: `1px solid ${ra(INK, 0.3)}`, color: ra(INK, 0.65), fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", cursor: "pointer" }}>
-          ← Score another pitch
-        </button>
-      )}
-    </div>
-  );
-}
-
-// ── Live mechanics (standalone card, sits next to the pitch step) ────────────
-function LiveMechanics({ live }: { live: ReturnType<typeof scoreLayer1> | null }) {
-  function st(s?: "ideal" | "ok" | "off"): "green" | "amber" | "red" | "neutral" {
-    return !s ? "neutral" : s === "ideal" ? "green" : s === "ok" ? "amber" : "red";
-  }
-  return (
-    <section style={{ background: "#fff", border: `1px solid ${ra(INK, 0.1)}`, borderRadius: 6, padding: "24px 28px" }}>
-      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>
-        LIVE MECHANICS
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px 28px" }}>
-        <LiveMeter label="Word count" val={live ? String(live.bands.wordCount.value) : "0"} band={st(live?.bands.wordCount.status)} hint={live ? live.bands.wordCount.hint : "Type to measure"} />
-        <LiveMeter label="Subject length" val={live ? `${live.bands.subjectWords.value} word${live.bands.subjectWords.value !== 1 ? "s" : ""}` : "0 words"} band={st(live?.bands.subjectWords.status)} hint={live ? live.bands.subjectWords.hint : "Add a subject line"} />
-        <LiveMeter label="Reading level" val={live ? `Grade ${Math.round(live.bands.readingGrade.value)}` : "-"} band={st(live?.bands.readingGrade.status)} hint={live ? live.bands.readingGrade.hint : "Need more text"} />
-        <LiveMeter label="Closing question" val={live ? (live.metrics.hasClosingQuestion ? "Yes" : "No") : "-"} band={st(live?.bands.questions.status)} hint={live ? live.bands.questions.hint : "Need more text"} />
-        <div style={{ gridColumn: "1/-1" }}>
-          <LiveMeter label="Tone / subjectivity"
-            val={live ? (live.bands.subjectivity.status === "ideal" ? "Clean" : live.bands.subjectivity.status === "ok" ? "Mild" : "Flagged") : "-"}
-            band={st(live?.bands.subjectivity.status)} hint={live ? live.bands.subjectivity.hint : "Need more text"} />
-        </div>
-      </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 14, borderTop: `1px solid ${ra(INK, 0.06)}` }}>
-        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.62) }}>Mechanics score</span>
-        <div style={{ flex: 1, height: 4, background: ra(INK, 0.05) }}>
-          <div style={{ height: "100%", width: `${live?.score ?? 0}%`, background: BLUE, transition: "width .3s ease" }} />
-        </div>
-        <span style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: INK }}>{live?.score ?? 0}</span>
-      </div>
-    </section>
-  );
-}
 
 // ── Intro panel (step 0 — sells the tool before asking for input) ────────────
 function IntroPanel({ onStart }: { onStart: () => void }) {
@@ -448,82 +148,87 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
   );
 }
 
-// ── Loading panel ─────────────────────────────────────────────────────────────
-function LoadingPanel() {
-  // Elapsed-time counter + expectation setting: the AI scoring call routinely
-  // takes 30-60s in practice (real-world testing ran 1.5-2x past the original
-  // 20-30s estimate) and QA flagged that users assume the tool froze without it.
-  const [secs, setSecs] = useState(0);
+// ── Main page ─────────────────────────────────────────────────────────────────
+export default function PressIQPage() {
+  const [started, setStarted] = useState(false);
+  const [coreStep, setCoreStep] = useState(1);
+  const [result, setResult] = useState<ScoreResponse | null>(null);
+  const [email, setEmail] = useState("");
+  const [emailDone, setEmailDone] = useState(false);
+  const [showGate, setShowGate] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState("");
+
+  const turnstileTokenRef = useRef("");
+  const turnstileRef = useRef<HTMLDivElement>(null);
+  const turnstileWidgetId = useRef<string | null>(null);
+  // The pitch/subject behind the currently-shown result — captured for the PDF.
+  const lastCtx = useRef<{ pitch: string; subject: string }>({ pitch: "", subject: "" });
+
+  // Cloudflare Turnstile: render the widget when configured. No-op when the key
+  // is unset. Re-runs when the core step changes (the container only exists in
+  // the DOM once the pitch step is active) — matches the hardened SignalIQ mount.
   useEffect(() => {
-    const t = setInterval(() => setSecs(s => s + 1), 1000);
-    return () => clearInterval(t);
-  }, []);
-  return (
-    <div style={{ padding: "80px 32px 60px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, color: ra(INK, 0.62), marginBottom: 10, textAlign: "center" }}>
-        Scoring against 32 factors across 7 dimensions…
-      </div>
-      <div style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.45), marginBottom: 24, textAlign: "center" }}>
-        {secs}s elapsed · a full analysis typically takes 30-60 seconds
-      </div>
-      <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.5), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
-        Cision State of the Media 2026 (n≈1,800)<br />
-        Muck Rack State of Journalism 2026 (n≈900)<br />
-        Propel Media Barometer Q1 2024 (425k+ pitches)<br />
-        Backlinko · Fractl · Boomerang (40M emails)
-      </div>
-      <div style={{ display: "flex", gap: 6 }}>
-        {[0, 0.2, 0.4].map((delay, i) => (
-          <span key={i} className="piq-dot" style={{ animationDelay: `${delay}s` }} />
-        ))}
-      </div>
-    </div>
-  );
-}
+    if (!TURNSTILE_SITE_KEY) return;
+    const render = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
+      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
+        sitekey: TURNSTILE_SITE_KEY,
+        theme: "dark",
+        callback: (token: string) => { turnstileTokenRef.current = token; setTurnstileToken(token); },
+        "expired-callback": () => { turnstileTokenRef.current = ""; setTurnstileToken(""); },
+        "error-callback": () => { turnstileTokenRef.current = ""; setTurnstileToken(""); },
+      });
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((window as any).turnstile) { render(); return; }
+    const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
+    if (!s) {
+      s = document.createElement("script");
+      s.src = SRC; s.async = true; s.defer = true;
+      document.head.appendChild(s);
+    }
+    s.addEventListener("load", render);
+    return () => { s?.removeEventListener("load", render); };
+  }, [coreStep]);
 
-// ── Post-score panel ──────────────────────────────────────────────────────────
-function PostScorePanel({
-  result, tab, setTab, email, setEmail, emailDone, setEmailDone, onDownload, onReset, pitchMode,
-}: {
-  result: ScoreResponse; tab: Tab; setTab: (t: Tab) => void;
-  email: string; setEmail: (v: string) => void;
-  emailDone: boolean; setEmailDone: (v: boolean) => void;
-  onDownload: () => void; onReset: () => void;
-  pitchMode: "standalone" | "query";
-}) {
-  const [expanded, setExpanded] = useState<Set<DimKey>>(new Set());
-  const [showCalc, setShowCalc] = useState(false);
-  const { composite, tier, areas, relevanceAssessed, strongestLine, topFixes, authenticityRisk } = result;
+  // ── Transport: adds the Turnstile token, resets it single-use after the call ──
+  const api = {
+    score: async (body: Record<string, unknown>) => {
+      const res = await fetch("/api/pitch-score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...body, turnstileToken: turnstileTokenRef.current }),
+      });
+      const data = await res.json();
+      // Turnstile tokens are single-use — refresh for the next submission.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const w = window as any;
+      if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
+        w.turnstile.reset(turnstileWidgetId.current);
+        turnstileTokenRef.current = "";
+        setTurnstileToken("");
+      }
+      return { ok: res.ok, data };
+    },
+  };
 
-  const scoreMap: Record<string, number> = {};
-  if (areas.relevance) scoreMap.relevance = areas.relevance.score;
-  scoreMap.objective = areas.objective.score; scoreMap.checklist = areas.checklist.score;
-  scoreMap.newsroomReady = areas.newsroomReady.score; scoreMap.storytelling = areas.emos.storytelling.score;
-  scoreMap.neuromarketing = areas.emos.neuromarketing.score; scoreMap.personalBrand = areas.emos.personalBrand.score;
+  // ── PDF (shared builder; email-gated on the public surface) ───────────────────
+  const generatePDF = useCallback(async () => {
+    if (!result) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let JsPDF: any;
+    try { JsPDF = await loadJsPDF(); } catch { alert("PDF library failed to load. Check your connection and try again."); return; }
+    const doc = new JsPDF({ unit: "mm", format: "a4" });
+    buildPressIqReport(doc, { result, pitch: lastCtx.current.pitch, subject: lastCtx.current.subject });
+    const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (doc as any).save(`PressIQ-Report-${date.replace(/ /g, "-")}.pdf`);
+  }, [result]);
 
-  const radarDims = relevanceAssessed ? DIMS : DIMS.filter(d => d.key !== "relevance");
-
-  function areaFor(key: DimKey) {
-    if (key === "relevance")      return areas.relevance ?? { score: 0 };
-    if (key === "objective")      return areas.objective;
-    if (key === "checklist")      return areas.checklist;
-    if (key === "newsroomReady")  return areas.newsroomReady;
-    if (key === "storytelling")   return areas.emos.storytelling;
-    if (key === "neuromarketing") return areas.emos.neuromarketing;
-    if (key === "personalBrand")  return areas.emos.personalBrand;
-    return { score: 0 as number };
-  }
-
-  function toggleDim(key: DimKey) {
-    setExpanded(prev => {
-      const next = new Set(prev);
-      if (next.has(key)) { next.delete(key); } else { next.add(key); }
-      return next;
-    });
-  }
-
-  const shareText = encodeURIComponent(`My PR pitch scored ${composite}/100 (${tier.label}) on PressIQ by @syedirfanajmal. Score yours:`);
-
+  // ── Inline email unlock (Evidence tab) — kept verbatim (legacy pp_tier path) ──
   async function unlockEmail(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
@@ -542,699 +247,49 @@ function PostScorePanel({
     setEmailDone(true);
   }
 
-  return (
-    <div>
-      {/* Sticky tab bar — visually distinct, hover states via CSS */}
-      <div className="piq-tabs" role="tablist" aria-label="Score views">
-        <div style={{ fontFamily: MONO, fontSize: 7.5, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.62), padding: "0 18px", display: "flex", alignItems: "center", borderRight: `1px solid ${ra(INK, 0.08)}`, marginRight: 4, whiteSpace: "nowrap" }}>
-          View:
-        </div>
-        {TABS.map(tb => (
-          <button key={tb.id} onClick={() => setTab(tb.id)} role="tab" aria-selected={tab === tb.id} className={`piq-tab${tab === tb.id ? " piq-tab-active" : ""}`}>
-            {tb.label}
-          </button>
-        ))}
+  const emailUnlockNode = !emailDone ? (
+    <form onSubmit={unlockEmail} style={{ border: `1px solid ${INK}`, padding: 18 }}>
+      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 8 }}>UNLOCK {EMAIL_LIMIT} SCORES / MONTH</div>
+      <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.62), marginBottom: 12 }}>Add your email to raise your monthly limit and get SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.</div>
+      <div style={{ display: "flex", gap: 8 }}>
+        <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={{ flex: 1, padding: "9px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.18)}`, fontFamily: GROT, fontSize: 12, color: INK, outline: "none", borderRadius: 0 }} />
+        <button type="submit" style={{ padding: "9px 16px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>Unlock →</button>
       </div>
-
-      {/* ── Tab: Score ────────────────────────────────────────────────── */}
-      {tab === "score" && (
-        <div style={{ padding: "0 32px 28px" }}>
-          <div style={{ textAlign: "center", padding: "32px 0 20px" }}>
-            <Gauge score={composite} color={tier.color} />
-            <div style={{ marginTop: 14 }}>
-              <span style={{ display: "inline-block", padding: "5px 12px 6px", background: tier.color, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".16em", textTransform: "uppercase" }}>
-                {tier.badge.toUpperCase()} · {tier.label.toUpperCase()}
-              </span>
-            </div>
-            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 26, color: INK, marginTop: 12, letterSpacing: "-.015em" }}>
-              {composite >= 85 ? "Placement-grade." : composite >= 65 ? "Competitive: tighten it." : composite >= 40 ? "Real material, missing the system." : "This will get ignored."}
-            </div>
-          </div>
-
-          {/* §5A — transparency: estimate note + "how your score is calculated" (config-driven) */}
-          <div style={{ border: `1px solid ${ra(INK, 0.12)}`, background: ra(INK, 0.02), padding: "11px 14px", marginBottom: 16 }}>
-            <div style={{ fontFamily: SERIF, fontSize: 12.5, fontStyle: "italic", color: ra(INK, 0.62), lineHeight: 1.5 }}>
-              This is an estimate, not a verdict. Your Mechanics score is exact: the AI-judged dimensions can shift by about &plusmn;2 points if you re-score. PressIQ rates a pitch&rsquo;s quality and readiness, not your odds of placement.
-            </div>
-            <button onClick={() => setShowCalc(v => !v)} aria-expanded={showCalc} style={{ marginTop: 8, background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: MONO, fontSize: 9, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.62) }}>
-              {showCalc ? "− Hide how your score is calculated" : "+ How your score is calculated"}
-            </button>
-            {showCalc && (
-              <div style={{ marginTop: 12, borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 12 }}>
-                <div style={{ fontFamily: SERIF, fontSize: 12.5, color: ra(INK, 0.6), lineHeight: 1.55, marginBottom: 12 }}>
-                  Your composite is a weighted blend of up to 7 dimensions. Mechanics is computed directly from your text; the other six are scored by an AI evaluator against published journalist research. Relevance carries the most weight, and if you don&rsquo;t add the journalist&rsquo;s query or beat, its weight is shared across the other dimensions.
-                </div>
-                {([
-                  ["relevance", "Relevance"], ["checklist", "SIA 7-step checklist"], ["newsroomReady", "Newsroom-ready"],
-                  ["objective", "Mechanics"], ["storytelling", "Storytelling"], ["neuromarketing", "Neuromarketing"], ["personalBrand", "Personal brand"],
-                ] as [keyof typeof WEIGHTS_V2, string][])
-                  .slice()
-                  .sort((a, b) => WEIGHTS_V2[b[0]] - WEIGHTS_V2[a[0]])
-                  .map(([k, label]) => (
-                    <div key={k} style={{ display: "flex", alignItems: "baseline", gap: 10, padding: "3px 0", fontFamily: SERIF, fontSize: 12.5, color: ra(INK, 0.7) }}>
-                      <span style={{ fontFamily: MONO, fontWeight: 700, color: INK, width: 38 }}>{Math.round(WEIGHTS_V2[k] * 100)}%</span>
-                      <span style={{ flex: 1 }}>{label}</span>
-                      <span style={{ fontFamily: MONO, fontSize: 8, letterSpacing: ".1em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{k === "objective" ? "deterministic" : "AI-judged"}</span>
-                    </div>
-                  ))}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 12, borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 10 }}>
-                  {TIERS.map(t => (
-                    <span key={t.badge} style={{ fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: "#fff", background: t.color, padding: "2px 7px" }}>{t.min}-{t.max} {t.label}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {!relevanceAssessed && (
-            <div style={{ padding: "13px 16px", marginBottom: 18, border: `1px solid ${AMBER}`, background: "rgba(217,146,17,.05)", fontFamily: SERIF, fontSize: 13.5, fontStyle: "italic", color: ra(INK, 0.65) }}>
-              {pitchMode === "query"
-                ? "Scored without the journalist’s query, so relevance (the #1 driver of placement) wasn’t assessed. Add it for a full score."
-                : "No journalist beat was provided, so relevance (the #1 driver of placement) wasn’t assessed. Add the journalist’s beat for a fuller score."}
-            </div>
-          )}
-          {authenticityRisk?.flagged && (
-            <div style={{ padding: "13px 16px", marginBottom: 18, border: `1px solid ${RED}`, background: "rgba(193,74,50,.04)" }}>
-              <span style={{ display: "inline-block", padding: "3px 8px", background: RED, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 6 }}>READS TEMPLATED</span>
-              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.65) }}>{authenticityRisk.note || "This reads like a template anyone could send. Add a first-hand detail or a number only you have: 53% of journalists distrust generic, AI-sounding pitches."}</div>
-            </div>
-          )}
-
-          {strongestLine && (
-            <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 20, marginTop: 4 }}>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 8 }}>YOUR STRONGEST LINE</div>
-              <div style={{ fontFamily: SERIF, fontSize: 17, fontStyle: "italic", color: INK, lineHeight: 1.5, borderLeft: `3px solid ${YEL}`, paddingLeft: 16 }}>&ldquo;{strongestLine}&rdquo;</div>
-            </div>
-          )}
-
-          <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 22, marginTop: 22 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 14 }}>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62) }}>YOUR PITCH, BY DIMENSION</div>
-              <div style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(INK, 0.72) }}>Full breakdown in 03 →</div>
-            </div>
-            <DimBarChart scores={scoreMap} dims={radarDims} />
-          </div>
-
-          {/* Scored Against */}
-          <div style={{ borderTop: `1px solid ${ra(INK, 0.1)}`, paddingTop: 20, marginTop: 22 }}>
-            <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>SCORED AGAINST</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 6 }}>
-              {["SIA 7-STEP CHECKLIST", "SIA 32-FACTOR SCORING SYSTEM", "EMOS FRAMEWORK"].map(s => (
-                <span key={s} style={{ padding: "3px 7px", background: INK, fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: YEL }}>{s}</span>
-              ))}
-            </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-              {["Cision State of the Media 2026", "Muck Rack State of Journalism 2026", "Propel Media Barometer", "Backlinko Journalist Outreach", "Fractl Journalist Survey", "Boomerang Email Study (40M)"].map(s => (
-                <span key={s} style={{ padding: "3px 7px", border: `1px solid ${ra(INK, 0.1)}`, fontFamily: MONO, fontSize: 7, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: ra(INK, 0.62) }}>{s}</span>
-              ))}
-            </div>
-          </div>
-
-          <TabNav current={tab} setTab={setTab} onReset={onReset} />
-
-          {/* EMOS CTA — shared skeleton (ToolCTAStrips.EmosCTAStrip), same
-              component CoverageIQ/SignalIQ use. Score-gated eyebrow/primary
-              button and the share button stay PressIQ-only via props. */}
-          <EmosCTAStrip
-            toolName="PressIQ"
-            eyebrow={composite >= 85 ? "YOU'VE GOT THE STANDARD | NOW SCALE IT" : "WHERE THIS SCORING COMES FROM"}
-            heading={
-              <>
-                PressIQ scores one pitch.<br /><span style={{ color: YEL }}>EMOS builds the whole pipeline.</span>
-              </>
-            }
-            pitch="PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently."
-            applyHref={EMOS_URL}
-            applyLabel={composite >= 65 ? "Apply to EMOS" : "Explore EMOS"}
-            hideExplore
-            extraAction={
-              <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=https://syedirfanajmal.com/tools/pressiq`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", padding: "14px 22px", border: `1px solid ${ra(PAPER, 0.25)}`, color: ra(PAPER, 0.5), fontFamily: GROT, fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
-                Share score on X
-              </a>
-            }
-          />
-        </div>
-      )}
-
-      {/* ── Tab: Top Fixes ───────────────────────────────────────────── */}
-      {tab === "fixes" && (
-        <div style={{ padding: "24px 32px 28px" }}>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>THE 3 FIXES THAT MOVE YOUR SCORE MOST</div>
-          {topFixes.map((f, i) => <FixCard key={i} rank={i + 1} fix={f} />)}
-          <TabNav current={tab} setTab={setTab} onReset={onReset} />
-        </div>
-      )}
-
-      {/* ── Tab: Breakdown ───────────────────────────────────────────── */}
-      {tab === "breakdown" && (
-        <div style={{ padding: "24px 32px 28px" }}>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 18 }}>FULL BREAKDOWN</div>
-          {DIMS.filter(d => d.key !== "relevance" || relevanceAssessed).map(dim => {
-            const area = areaFor(dim.key);
-            return <DimBlock key={dim.key} dim={dim} score={area.score} analysis={area.analysis} subSignals={area.subSignals} evidenceKeys={area.evidence} expanded={expanded.has(dim.key)} onToggle={() => toggleDim(dim.key)} />;
-          })}
-          <TabNav current={tab} setTab={setTab} onReset={onReset} />
-        </div>
-      )}
-
-      {/* ── Tab: Evidence ────────────────────────────────────────────── */}
-      {tab === "evidence" && (
-        <div style={{ padding: "24px 32px 28px" }}>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 14 }}>THE RESEARCH BEHIND YOUR SCORE</div>
-          <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 22 }}>
-            Scored against published journalist research: Cision &amp; Muck Rack 2026, Propel, Backlinko, Fractl, Boomerang. Open any dimension in the Breakdown tab to see the exact figures and sources.
-          </div>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>WHY THIS IS WORTH MORE IN 2026</div>
-          <div style={{ fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 24 }}>
-            In an AI-answer world you don&rsquo;t just rank: you get cited. AI engines lean on earned media (Muck Rack: ~82% of AI citations come from earned coverage), and brand mentions out-predict backlinks for AI-Overview visibility ~3× (Ahrefs, 75k brands). The placement this pitch is aiming for is exactly that kind of citation, so a stronger pitch compounds.
-          </div>
-
-          {/* PDF report download (value-add beyond design spec) */}
-          <div style={{ padding: "16px 18px", border: `1px solid ${ra(INK, 0.15)}`, background: PAPER2, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12, marginBottom: 18 }}>
-            <div>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK, marginBottom: 3 }}>Download PDF report</div>
-              <div style={{ fontFamily: SERIF, fontSize: 13, color: ra(INK, 0.62) }}>Cover, score, top fixes, full breakdown, EMOS recommendations.</div>
-            </div>
-            <button onClick={onDownload} style={{ padding: "10px 18px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", border: "none", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
-              Download report ↓
-            </button>
-          </div>
-
-          {/* Email unlock */}
-          {!emailDone ? (
-            <form onSubmit={unlockEmail} style={{ border: `1px solid ${INK}`, padding: 18 }}>
-              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 8 }}>UNLOCK {EMAIL_LIMIT} SCORES / MONTH</div>
-              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.62), marginBottom: 12 }}>Add your email to raise your monthly limit and get SIA&rsquo;s earned-media playbooks. One list, unsubscribe anytime.</div>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={{ flex: 1, padding: "9px 12px", background: PAPER, border: `1px solid ${ra(INK, 0.18)}`, fontFamily: GROT, fontSize: 12, color: INK, outline: "none", borderRadius: 0 }} />
-                <button type="submit" style={{ padding: "9px 16px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".14em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>Unlock →</button>
-              </div>
-            </form>
-          ) : (
-            <div style={{ fontFamily: SERIF, fontSize: 14.5, color: GREEN, fontWeight: 600 }}>✓ Unlocked, you now have {EMAIL_LIMIT} scores a month. Check your inbox.</div>
-          )}
-
-          <TabNav current={tab} setTab={setTab} onReset={onReset} />
-        </div>
-      )}
-    </div>
+    </form>
+  ) : (
+    <div style={{ fontFamily: SERIF, fontSize: 14.5, color: GREEN, fontWeight: 600 }}>✓ Unlocked, you now have {EMAIL_LIMIT} scores a month. Check your inbox.</div>
   );
-}
 
-// ── Main page ─────────────────────────────────────────────────────────────────
-export default function PressIQPage() {
-  const [pitch,    setPitch]    = useState("");
-  const [query,    setQuery]    = useState("");
-  const [subject,  setSubject]  = useState("");
-  const [platform, setPlatform] = useState<Platform>("haro");
-  const [brand,    setBrand]    = useState<BrandSignals>(EMPTY_BRAND);
-  const [store,    setStore]    = useState(false);
-  const [pitchMode, setPitchMode] = useState<"standalone" | "query">("standalone");
-  const [journalistBeat, setJournalistBeat] = useState("");
-  const [view,     setView]     = useState<"pre" | "loading" | "post">("pre");
-  const [introDone, setIntroDone] = useState(false);
-  const [formStep, setFormStep] = useState<1 | 2>(1);
-  const [result,   setResult]   = useState<ScoreResponse | null>(null);
-  const [error,    setError]    = useState<string | null>(null);
-  const [tab,      setTab]      = useState<Tab>("score");
-  const [email,    setEmail]    = useState("");
-  const [emailDone, setEmailDone] = useState(false);
-  const [showGate, setShowGate]   = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
-
-  const rightRef = useRef<HTMLElement>(null);
-  const turnstileRef = useRef<HTMLDivElement>(null);
-  const turnstileWidgetId = useRef<string | null>(null);
-
-  // localStorage persist: preferences only (platform/pitchMode/store).
-  // Pitch, query, subject, journalistBeat, and brand (authority signals) are all
-  // specific to the pitch being worked on right now, not a general preference, so
-  // restoring any of them made every fresh visit reopen with stale selections
-  // from a previous session. All intentionally excluded here.
-  useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (raw) {
-        const d = JSON.parse(raw) as Record<string, unknown>;
-        if (typeof d.platform === "string") setPlatform(d.platform as Platform);
-        if (d.pitchMode === "standalone" || d.pitchMode === "query") setPitchMode(d.pitchMode as "standalone" | "query");
-        if (typeof d.store === "boolean") setStore(d.store);
-      }
-    } catch { /* ignore */ }
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, []);
-  useEffect(() => {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify({ platform, pitchMode, store })); } catch { /* ignore */ }
-  }, [platform, pitchMode, store]);
-
-  // Standalone pitches don't go through a source-request platform, so keep the
-  // platform value in sync with pitchMode: "direct" while standalone (no
-  // HARO/Qwoted-style chips shown, so the value has to be set programmatically),
-  // and reset off "direct" back to the default request-platform once the user
-  // switches to answering a query.
-  useEffect(() => {
-    /* eslint-disable react-hooks/set-state-in-effect */
-    if (pitchMode === "standalone") setPlatform("direct");
-    else setPlatform(p => (p === "direct" ? "haro" : p));
-    /* eslint-enable react-hooks/set-state-in-effect */
-  }, [pitchMode]);
-
-  // Cloudflare Turnstile: render the human-check widget when configured. No-op when
-  // NEXT_PUBLIC_TURNSTILE_SITE_KEY is unset, so the tool keeps working without it.
-  useEffect(() => {
-    if (!TURNSTILE_SITE_KEY) return;
-    const render = () => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = window as any;
-      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
-      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
-        sitekey: TURNSTILE_SITE_KEY,
-        theme: "dark",
-        callback: (token: string) => setTurnstileToken(token),
-        "expired-callback": () => setTurnstileToken(""),
-        "error-callback": () => setTurnstileToken(""),
-      });
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).turnstile) { render(); return; }
-    const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
-    if (!s) {
-      s = document.createElement("script");
-      s.src = SRC; s.async = true; s.defer = true;
-      document.head.appendChild(s);
-    }
-    s.addEventListener("load", render);
-    return () => { s?.removeEventListener("load", render); };
-    // Re-run when formStep changes: the widget's container div only exists in the
-    // DOM once formStep === 2, so the first mount (formStep 1) finds a null ref and
-    // bails. Retrying on formStep change lets it mount as soon as the container
-    // appears, matching the fix already applied to SignalIQ/JournoCollabIQ.
-  }, [formStep]);
-
-  const live = useMemo(() => {
-    if (pitch.trim().length < 15) return null;
-    return scoreLayer1(computeMetrics(pitch, subject));
-  }, [pitch, subject]);
-
-  const subjectPlaceholder = resolveSubject(pitch, subject) || "Re: [Query] - …";
-  const canAnalyze = pitch.trim().length >= 40 && view !== "loading" && (!TURNSTILE_SITE_KEY || !!turnstileToken);
-
-
-  async function analyze() {
-    if (!canAnalyze) return;
-    setError(null); setView("loading"); setResult(null); setTab("score");
-    try {
-      const res = await fetch("/api/pitch-score", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ pitch, query: pitchMode === "standalone" ? journalistBeat : query, subject, platform, brandSignals: brand, store, pitchMode, turnstileToken }) });
-      const data = (await res.json()) as { error?: string } & ScoreResponse;
-      if (!res.ok) { setError(data.error || "Something went wrong scoring your pitch."); setView("pre"); }
-      else { setResult(data); setView("post"); setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 50); }
-    } catch { setError("Network error. Please try again."); setView("pre"); }
-    finally {
-      // Turnstile tokens are single-use — refresh for the next submission.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const w = window as any;
-      if (TURNSTILE_SITE_KEY && turnstileWidgetId.current && w.turnstile) {
-        w.turnstile.reset(turnstileWidgetId.current);
-        setTurnstileToken("");
-      }
-    }
-  }
-
-  function reset() { setView("pre"); setResult(null); setError(null); setTab("score"); setFormStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }
-
-  // Step-bar navigation: only lets the user jump to a step they've already passed.
-  function goToStep(n: 0 | 1 | 2) {
-    if (n === 0) { setIntroDone(false); return; }
-    if (view === "post") { setView("pre"); setResult(null); }
-    setFormStep(n);
-  }
-
-  // PDF generation
-  const generatePDF = useCallback(async () => {
-    if (!result) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let JsPDF: any;
-    try { JsPDF = await loadJsPDF(); } catch { alert("PDF library failed to load. Check your connection and try again."); return; }
-
-    const doc = new JsPDF({ unit: "mm", format: "a4" });
-    installSanitizer(doc); // strip em/en dashes, arrows, smart quotes, non-Latin1 glyphs from every text draw
-    const W = 210, H = 297;
-    const ML = 22, MR = 22;          // left / right margin
-    const CW = W - ML - MR;          // content width = 166mm
-    const iINK:   [number,number,number] = [26, 20, 16];
-    const iGOLD:  [number,number,number] = [245, 184, 31];
-    const iCREAM: [number,number,number] = [241, 235, 222];
-    const iCREAM2:[number,number,number] = [232, 224, 204]; // PAPER2
-    const iMID:   [number,number,number] = [130, 120, 108];
-    const iDIM:   [number,number,number] = [80, 72, 62];
-    const iDARK:  [number,number,number] = [14, 13, 10];
-    const iDARKBD:[number,number,number] = [42, 35, 24];
-
-    const tierRGB = (color: string): [number,number,number] => {
-      const n = parseInt(color.slice(1), 16);
-      return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-    };
-    const [tR,tG,tB] = tierRGB(result.tier.color);
-    const date = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-    const pitchSubject = (subject || resolveSubject(pitch, subject) || "Pitch Review").substring(0, 72);
-
-    // ── Shared helpers ────────────────────────────────────────────────────────
-    function pgFooter(page: number, dark = false) {
-      const FOOT_H = 14, footY = H - 5;
-      if (dark) {
-        doc.setFillColor(...iDARK); doc.rect(0, H - FOOT_H, W, FOOT_H, "F");
-        doc.setDrawColor(...iDARKBD); doc.setLineWidth(0.4); doc.line(0, H - FOOT_H, W, H - FOOT_H);
-        doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iGOLD);
-        doc.text("PRESSIQ", ML, footY);
-        doc.setFont("helvetica","normal"); doc.setTextColor(70, 62, 50);
-        doc.text("  ·  EMOS TOOL SUITE  ·  SYEDIRFANAJMAL.COM", ML + 13, footY);
-      } else {
-        doc.setFillColor(...iCREAM2); doc.rect(0, H - FOOT_H, W, FOOT_H, "F");
-        doc.setDrawColor(210, 204, 190); doc.setLineWidth(0.4); doc.line(0, H - FOOT_H, W, H - FOOT_H);
-        doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iINK);
-        doc.text("PRESSIQ", ML, footY);
-        doc.setFont("helvetica","normal"); doc.setTextColor(...iMID);
-        doc.text("  ·  EMOS TOOL SUITE  ·  SYEDIRFANAJMAL.COM", ML + 13, footY);
-      }
-      doc.setFont("helvetica","normal"); doc.setFontSize(5.5);
-      doc.setTextColor(dark ? 70 : 130, dark ? 62 : 120, dark ? 50 : 108);
-      doc.text(`${page}`, W - MR, footY, { align: "right" });
-    }
-
-    function innerPageSetup(sectionLabel: string) {
-      // Full warm-cream background
-      doc.setFillColor(...iCREAM); doc.rect(0, 0, W, H, "F");
-      // Gold top rule (3mm)
-      doc.setFillColor(...iGOLD); doc.rect(0, 0, W, 3, "F");
-      // Header row
-      const hY = 13;
-      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...iINK);
-      doc.text("Press", ML, hY);
-      const pw = doc.getTextWidth("Press");
-      doc.setTextColor(...iGOLD); doc.text("IQ", ML + pw, hY);
-      doc.setFont("helvetica","normal"); doc.setFontSize(5.5); doc.setTextColor(...iMID);
-      doc.text(sectionLabel.toUpperCase(), W - MR, hY, { align: "right" });
-      // Full-width hairline under header
-      doc.setDrawColor(...iINK); doc.setLineWidth(0.6); doc.line(0, 16, W, 16);
-      return 24; // starting Y for content
-    }
-
-    // ── PAGE 1: DARK COVER ────────────────────────────────────────────────────
-    // Full dark background
-    doc.setFillColor(...iDARK); doc.rect(0, 0, W, H, "F");
-    // Gold top bar (5mm) + bottom bar (5mm)
-    doc.setFillColor(...iGOLD); doc.rect(0, 0, W, 5, "F");
-    doc.setFillColor(...iGOLD); doc.rect(0, H - 5, W, 5, "F");
-    // Subtle vertical gold accent strip (left edge)
-    doc.setFillColor(40, 32, 20); doc.rect(0, 5, 4, H - 10, "F");
-
-    // SIA mark (top-left)
-    doc.setFillColor(...iGOLD); doc.rect(ML, 14, 14, 14, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(7.5); doc.setTextColor(...iINK);
-    doc.text("SIA", ML + 7, 23, { align: "center" });
-    doc.setFont("helvetica","normal"); doc.setFontSize(6.5); doc.setTextColor(100, 90, 72);
-    doc.text("Syed Irfan Ajmal  ·  syedirfanajmal.com", ML + 18, 21);
-
-    // Eyebrow
-    let y = 72;
-    doc.setFillColor(...iGOLD); doc.rect(ML, y, 18, 1.2, "F");
-    doc.setFillColor(38, 30, 20); doc.rect(ML + 20, y, CW - 20, 1.2, "F");
-    y += 7;
-    doc.setFont("helvetica","bold"); doc.setFontSize(6.5); doc.setTextColor(...iGOLD);
-    doc.text("JOURNALIST PITCH SCORE REPORT", ML, y);
-
-    // Wordmark
-    y += 14;
-    doc.setFont("helvetica","bold"); doc.setFontSize(52); doc.setTextColor(...iCREAM);
-    doc.text("Press", ML, y);
-    const pressW = doc.getTextWidth("Press");
-    doc.setTextColor(...iGOLD); doc.text("IQ", ML + pressW, y);
-
-    // Tagline
-    y += 9;
-    doc.setFont("helvetica","normal"); doc.setFontSize(12); doc.setTextColor(150, 138, 118);
-    doc.text("Your personalised pitch analysis", ML, y);
-
-    // ── Score block ───────────────────────────────────────────────────────────
-    y += 20;
-    // Score number (large)
-    const scoreX = ML + 2;
-    doc.setFont("helvetica","bold"); doc.setFontSize(72); doc.setTextColor(...iGOLD);
-    doc.text(String(result.composite), scoreX, y + 22);
-    const scoreNumW = doc.getTextWidth(String(result.composite));
-    // "/100" next to score
-    doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(80, 72, 58);
-    doc.text("/ 100", scoreX + scoreNumW + 2, y + 18);
-    // Tier badge pill
-    doc.setFillColor(tR, tG, tB); doc.rect(scoreX, y + 26, 38, 7, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(255, 255, 255);
-    doc.text(result.tier.label.toUpperCase(), scoreX + 19, y + 31, { align: "center" });
-
-    // Verdict + subject (right of score)
-    const vX = scoreX + 56;
-    const vW = W - MR - vX;
-    doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...iCREAM);
-    const headText = result.composite >= 85 ? "Placement-grade." : result.composite >= 65 ? "Competitive: tighten it." : result.composite >= 40 ? "Real material, missing the system." : "This will get ignored.";
-    const headLines = doc.splitTextToSize(headText, vW) as string[];
-    headLines.forEach((l, i) => doc.text(l, vX, y + 6 + i * 8));
-
-    doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(100, 90, 72);
-    const subjLines = doc.splitTextToSize(pitchSubject, vW) as string[];
-    let subjY = y + 6 + headLines.length * 8 + 5;
-    subjLines.slice(0, 3).forEach(l => { doc.text(l, vX, subjY); subjY += 5.5; });
-
-    // Thin horizontal rule below score block
-    y += 40;
-    doc.setDrawColor(38, 30, 20); doc.setLineWidth(0.4); doc.line(ML, y, W - MR, y);
-
-    // Date
-    y += 5;
-    doc.setFont("helvetica","normal"); doc.setFontSize(6.5); doc.setTextColor(70, 62, 50);
-    doc.text(date, W - MR, y, { align: "right" });
-
-    pgFooter(1, true);
-
-    // ── PAGE 2: SCORE SUMMARY ─────────────────────────────────────────────────
-    doc.addPage(); y = innerPageSetup("Score Summary");
-
-    // Your pitch — the input this score is based on (context for the report).
-    if (pitch && pitch.trim()) {
-      doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iMID);
-      doc.text("YOUR PITCH", ML, y); y += 4;
-      doc.setFont("helvetica","normal"); doc.setFontSize(7.5); doc.setTextColor(...iDIM);
-      const pLines = doc.splitTextToSize(pitch.trim(), CW - 8) as string[];
-      const shown = pLines.slice(0, 10);
-      const boxH = shown.length * 4 + 6;
-      doc.setFillColor(236, 229, 213); doc.rect(ML, y, CW, boxH, "F");
-      doc.setFillColor(...iGOLD); doc.rect(ML, y, 2.5, boxH, "F");
-      shown.forEach((l, i) => doc.text(l, ML + 5, y + i * 4 + 5));
-      y += boxH;
-      if (pLines.length > 10) { doc.setFont("helvetica","italic"); doc.setFontSize(6.5); doc.setTextColor(...iMID); doc.text("... full pitch continues in the app", ML + 5, y + 4); y += 5; }
-      y += 8;
-    }
-
-    const dimOrder = (result.relevanceAssessed ? DIMS : DIMS.filter(d => d.key !== "relevance")) as typeof DIMS[number][];
-    const scoreMap2: Record<string, number> = {};
-    if (result.areas.relevance) scoreMap2.relevance = result.areas.relevance.score;
-    scoreMap2.objective = result.areas.objective.score;
-    scoreMap2.checklist = result.areas.checklist.score;
-    scoreMap2.newsroomReady = result.areas.newsroomReady.score;
-    scoreMap2.storytelling = result.areas.emos.storytelling.score;
-    scoreMap2.neuromarketing = result.areas.emos.neuromarketing.score;
-    scoreMap2.personalBrand = result.areas.emos.personalBrand.score;
-
-    // Section heading
-    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...iINK);
-    doc.text("Score by Dimension", ML, y); y += 4;
-    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iMID);
-    doc.text("How your pitch performs across each scoring area.", ML, y); y += 10;
-
-    // Dimension rows
-    const BAR_X = ML + 90, BAR_W = CW - 90, ROW_H = 14;
-    dimOrder.forEach((d, i) => {
-      const s = scoreMap2[d.key] ?? 0;
-      const [dr,dg,db] = tierRGB(s >= 75 ? GREEN : s >= 45 ? AMBER : RED);
-      const rowY = y + i * ROW_H;
-      // Alternating row tint
-      if (i % 2 === 0) { doc.setFillColor(236, 229, 213); doc.rect(ML - 2, rowY - 4, CW + 4, ROW_H, "F"); }
-      // Dimension name
-      doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(...iINK);
-      doc.text(d.name, ML, rowY + 4);
-      // Score number
-      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(dr,dg,db);
-      doc.text(String(s), BAR_X - 6, rowY + 4, { align: "right" });
-      // Bar track
-      doc.setFillColor(210, 204, 190); doc.rect(BAR_X, rowY, BAR_W, 5, "F");
-      // Bar fill
-      doc.setFillColor(dr,dg,db); doc.rect(BAR_X, rowY, BAR_W * s / 100, 5, "F");
-    });
-    y += dimOrder.length * ROW_H + 10;
-
-    // Composite score callout
-    doc.setFillColor(...iINK); doc.rect(ML, y, CW, 18, "F");
-    doc.setFillColor(...iGOLD); doc.rect(ML, y, 3, 18, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(22); doc.setTextColor(...iGOLD);
-    doc.text(String(result.composite), ML + 10, y + 13);
-    const compNumW = doc.getTextWidth(String(result.composite));
-    doc.setFontSize(7); doc.setTextColor(100, 90, 72);
-    doc.text("/ 100", ML + 11 + compNumW, y + 10);
-    doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...iCREAM);
-    doc.text("COMPOSITE SCORE", ML + 50, y + 7);
-    doc.setFont("helvetica","normal"); doc.setFontSize(7.5); doc.setTextColor(160, 148, 130);
-    doc.text(result.tier.label, ML + 50, y + 14);
-    y += 26;
-
-    // Strongest line callout
-    if (result.strongestLine) {
-      doc.setFillColor(...iCREAM2); doc.rect(ML, y, CW, 18, "F");
-      doc.setFillColor(...iGOLD); doc.rect(ML, y, 3, 18, "F");
-      doc.setFont("helvetica","bold"); doc.setFontSize(5.5); doc.setTextColor(...iMID);
-      doc.text("YOUR STRONGEST LINE", ML + 7, y + 5);
-      doc.setFont("helvetica","italic"); doc.setFontSize(8.5); doc.setTextColor(...iDIM);
-      const sLine = doc.splitTextToSize(`"${plainText(result.strongestLine)}"`, CW - 10) as string[];
-      doc.text(sLine[0] || "", ML + 7, y + 13);
-    }
-
-    pgFooter(2);
-
-    // ── PAGE 3: TOP FIXES ─────────────────────────────────────────────────────
-    doc.addPage(); y = innerPageSetup("Top 3 Fixes");
-
-    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...iINK);
-    doc.text("The 3 Fixes That Move Your Score Most", ML, y); y += 4;
-    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iMID);
-    doc.text("Address these in order: each one compounds the next.", ML, y); y += 12;
-
-    result.topFixes.slice(0, 3).forEach((f, i) => {
-      // Fix header bar (dark)
-      doc.setFillColor(...iINK); doc.rect(ML, y, CW, 12, "F");
-      // Gold rank square
-      doc.setFillColor(...iGOLD); doc.rect(ML, y, 12, 12, "F");
-      doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...iINK);
-      doc.text(String(i + 1), ML + 6, y + 8.5, { align: "center" });
-      // Fix name
-      doc.setFontSize(9.5); doc.setTextColor(...iCREAM);
-      doc.text(f.area, ML + 16, y + 8.5);
-      // Mechanism tag (right-aligned)
-      if (f.mechanism) {
-        doc.setFont("helvetica","normal"); doc.setFontSize(5.5); doc.setTextColor(100, 90, 72);
-        doc.text(f.mechanism.toUpperCase(), ML + CW, y + 8.5, { align: "right" });
-      }
-      y += 12;
-      // Fix body
-      doc.setFillColor(...iCREAM2); doc.rect(ML, y, CW, 0.4, "F");
-      doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...iDIM);
-      const fLines = doc.splitTextToSize(plainText(f.text), CW - 6) as string[];
-      const fH = fLines.length * 5.2 + 10;
-      doc.setFillColor(236, 229, 213); doc.rect(ML, y, CW, fH, "F");
-      doc.text(fLines, ML + 4, y + 6);
-      y += fH + 8;
-    });
-
-    pgFooter(3);
-
-    // ── PAGE 4: FULL BREAKDOWN ────────────────────────────────────────────────
-    doc.addPage(); y = innerPageSetup("Full Breakdown");
-    let breakdownPage = 4;
-
-    doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...iINK);
-    doc.text("Dimension-by-Dimension Analysis", ML, y); y += 4;
-    doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...iMID);
-    doc.text("Every scoring dimension explained, with AI-generated improvement guidance.", ML, y); y += 12;
-
-    for (const d of dimOrder) {
-      const area = (() => {
-        if (d.key === "relevance")      return result.areas.relevance ?? { score: 0, analysis: "" };
-        if (d.key === "objective")      return result.areas.objective;
-        if (d.key === "checklist")      return result.areas.checklist;
-        if (d.key === "newsroomReady")  return result.areas.newsroomReady;
-        if (d.key === "storytelling")   return result.areas.emos.storytelling;
-        if (d.key === "neuromarketing") return result.areas.emos.neuromarketing;
-        return result.areas.emos.personalBrand;
-      })();
-      const s = area.score;
-      const [dr,dg,db] = tierRGB(s >= 75 ? GREEN : s >= 45 ? AMBER : RED);
-      const aLines = area.analysis ? doc.splitTextToSize(plainText(area.analysis), CW - 4) as string[] : [];
-      const blockH = 8 + 5 + (aLines.length > 0 ? aLines.slice(0,4).length * 4.8 + 4 : 0) + 4;
-
-      if (y + blockH > H - 24) {
-        pgFooter(breakdownPage); doc.addPage(); breakdownPage++;
-        y = innerPageSetup("Full Breakdown (cont.)");
-      }
-
-      // Dim heading row
-      doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(...iINK);
-      doc.text(d.name, ML, y);
-      doc.setTextColor(dr,dg,db); doc.text(String(s), ML + CW, y, { align: "right" }); y += 4;
-      // Progress bar (6mm tall, full width)
-      doc.setFillColor(210, 204, 190); doc.rect(ML, y, CW, 4, "F");
-      doc.setFillColor(dr,dg,db); doc.rect(ML, y, CW * s / 100, 4, "F"); y += 7;
-      // Analysis text
-      if (aLines.length > 0) {
-        doc.setFont("helvetica","normal"); doc.setFontSize(7.5); doc.setTextColor(...iDIM);
-        aLines.slice(0, 4).forEach(l => { doc.text(l, ML, y); y += 4.8; });
-      }
-      // Hairline separator
-      doc.setDrawColor(210, 204, 190); doc.setLineWidth(0.2); doc.line(ML, y + 2, ML + CW, y + 2);
-      y += 8;
-    }
-    pgFooter(breakdownPage);
-
-    // ── PAGE 5: EMOS CTA (DARK) ───────────────────────────────────────────────
-    doc.addPage();
-    doc.setFillColor(...iDARK); doc.rect(0, 0, W, H, "F");
-    doc.setFillColor(...iGOLD); doc.rect(0, 0, W, 5, "F");
-    doc.setFillColor(...iGOLD); doc.rect(0, H - 5, W, 5, "F");
-    doc.setFillColor(22, 18, 12); doc.rect(0, 5, 4, H - 10, "F");
-
-    // SIA mark (centred)
-    y = 60;
-    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 18, y, 36, 36, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...iINK);
-    doc.text("SIA", W / 2, y + 22, { align: "center" }); y += 48;
-
-    // Eyebrow
-    doc.setFont("helvetica","bold"); doc.setFontSize(6.5); doc.setTextColor(...iGOLD);
-    doc.text("WANT RESULTS LIKE THESE AT SCALE?", W / 2, y, { align: "center" }); y += 5;
-    // Gold rule
-    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 20, y, 40, 0.8, "F"); y += 10;
-
-    // Headline
-    doc.setFont("helvetica","bold"); doc.setFontSize(28); doc.setTextColor(...iCREAM);
-    doc.text("Earned Media", W / 2, y, { align: "center" }); y += 9;
-    doc.setTextColor(...iGOLD); doc.text("Operating System", W / 2, y, { align: "center" }); y += 14;
-
-    // Body copy
-    doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(140, 128, 110);
-    const ctaBody = doc.splitTextToSize(
-      "The step-by-step system for founders who want press, partnerships, and authority before their Series A.",
-      110
-    ) as string[];
-    ctaBody.forEach(l => { doc.text(l, W / 2, y, { align: "center" }); y += 6; });
-    y += 8;
-
-    // CTA button (gold pill)
-    doc.setFillColor(...iGOLD); doc.rect(W / 2 - 56, y, 112, 14, "F");
-    doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...iINK);
-    doc.text("syedirfanajmal.com/emos", W / 2, y + 9.5, { align: "center" });
-
-    // Generated credit (bottom)
-    doc.setFont("helvetica","normal"); doc.setFontSize(6); doc.setTextColor(60, 52, 40);
-    doc.text(`Generated via PressIQ  ·  ${date}`, W / 2, H - 12, { align: "center" });
-
-    doc.save(`PressIQ-Report-${date.replace(/ /g,"-")}.pdf`);
-  }, [result, pitch, subject]);
+  const scoreTabCta = (r: ScoreResponse) => {
+    const shareText = encodeURIComponent(`My PR pitch scored ${r.composite}/100 (${r.tier.label}) on PressIQ by @syedirfanajmal. Score yours:`);
+    return (
+      <EmosCTAStrip
+        toolName="PressIQ"
+        eyebrow={r.composite >= 85 ? "YOU'VE GOT THE STANDARD | NOW SCALE IT" : "WHERE THIS SCORING COMES FROM"}
+        heading={
+          <>
+            PressIQ scores one pitch.<br /><span style={{ color: YEL }}>EMOS builds the whole pipeline.</span>
+          </>
+        }
+        pitch="PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently."
+        applyHref={EMOS_URL}
+        applyLabel={r.composite >= 65 ? "Apply to EMOS" : "Explore EMOS"}
+        hideExplore
+        extraAction={
+          <a href={`https://twitter.com/intent/tweet?text=${shareText}&url=https://syedirfanajmal.com/tools/pressiq`} target="_blank" rel="noopener noreferrer" style={{ display: "inline-flex", alignItems: "center", padding: "14px 22px", border: `1px solid ${ra(PAPER, 0.25)}`, color: ra(PAPER, 0.5), fontFamily: GROT, fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", textTransform: "uppercase", textDecoration: "none" }}>
+            Share score on X
+          </a>
+        }
+      />
+    );
+  };
 
   return (
     <>
-      <style>{PAGE_CSS}</style>
+      <style>{PIQ_CSS}</style>
       <EmailGateModal variant="score" show={showGate} onClose={() => setShowGate(false)} onUnlock={() => { setShowGate(false); generatePDF(); }} result={result} />
 
       <div className="piq-page">
-
-        {/* ── Header ───────────────────────────────────────────────── */}
         <ToolHeader
           toolPrefix="Press"
           subtitle="Journalist Pitch Score"
@@ -1250,198 +305,27 @@ export default function PressIQPage() {
           }
         />
 
-        {/* ── Step bar (hidden on the intro screen, like SignalIQ's) ── */}
-        {introDone && (
-          <nav className="piq-step-bar">
-            <span className={`piq-step past`} onClick={() => goToStep(1)}>
-              <span className="piq-step-no">✓</span> Pitch context
-            </span>
-            <span className="piq-step-connector" />
-            <span className={`piq-step ${view === "post" ? "past" : formStep === 2 ? "active" : ""}`} onClick={() => view === "post" && goToStep(2)}>
-              <span className="piq-step-no">{view === "post" ? "✓" : "2"}</span> Your pitch
-            </span>
-            <span className="piq-step-connector" />
-            <span className={`piq-step ${view === "post" ? "active" : ""}`}>
-              <span className="piq-step-no">3</span> Results
-            </span>
-          </nav>
+        {!started ? (
+          <main className="piq-col">
+            <IntroPanel onStart={() => setStarted(true)} />
+          </main>
+        ) : (
+          <PressIQToolCore
+            api={api}
+            persistKey="sia.pressiq.v2"
+            submitDisabled={!!TURNSTILE_SITE_KEY && !turnstileToken}
+            turnstileSlot={TURNSTILE_SITE_KEY ? <div ref={turnstileRef} style={{ marginBottom: 12 }} /> : null}
+            onStepChange={setCoreStep}
+            quotaLine={<>{FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research</>}
+            pdfAction={() => setShowGate(true)}
+            onScored={(scored, ctx) => { setResult(scored); lastCtx.current = { pitch: ctx.pitch, subject: ctx.subject }; }}
+            emailUnlockNode={emailUnlockNode}
+            scoreTabCta={scoreTabCta}
+          />
         )}
 
-        {/* ── Single scrolling column ─────────────────────────────── */}
-        <main ref={rightRef} className="piq-col">
-
-          {!introDone && <IntroPanel onStart={() => setIntroDone(true)} />}
-
-          {introDone && view === "pre" && formStep === 1 && (
-            <section className="piq-form-card">
-              <div style={{ padding: "22px 22px 16px", borderBottom: `1px solid ${DARK_BD}` }}>
-                <div style={{ fontFamily: SERIF, fontSize: 24, fontWeight: 700, color: PAPER, letterSpacing: "-.025em", lineHeight: 1 }}>
-                  Press<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
-                </div>
-                <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 600, letterSpacing: ".18em", textTransform: "uppercase", color: ra(PAPER, 0.50), marginTop: 8, lineHeight: 1.7 }}>
-                  Journalist pitch score<br />by Syed Irfan Ajmal
-                </div>
-              </div>
-
-              {/* ── Pitch type toggle ──────────────────────────────── */}
-              <div style={LSEC}>
-                <span style={LSEC_LBL}>Pitch type</span>
-                <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                  <button onClick={() => setPitchMode("standalone")} style={chipStyle(pitchMode === "standalone")}>Standalone outreach</button>
-                  <button onClick={() => setPitchMode("query")} style={chipStyle(pitchMode === "query")}>Answering a query</button>
-                </div>
-                <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block", marginTop: 10 }}>
-                  {pitchMode === "standalone"
-                    ? "Proactive pitch to a journalist you’ve targeted. Relevance is scored against their known beat."
-                    : "Response to a HARO / Qwoted / Featured source request. Relevance is scored against their specific ask."}
-                </em>
-              </div>
-
-              {/* ── Journalist context (beat or query) ────────────── */}
-              <div style={{ ...LSEC, borderBottom: "none" }}>
-                {pitchMode === "standalone" ? (
-                  <>
-                    <span style={LSEC_LBL}>Journalist&rsquo;s beat <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, what topics they cover</span></span>
-                    <textarea value={journalistBeat} onChange={e => setJournalistBeat(e.target.value)} placeholder="e.g. Covers SaaS growth, founder stories, and future-of-work data. Writes for TechCrunch’s Startups desk." className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
-                  </>
-                ) : (
-                  <>
-                    <span style={LSEC_LBL}>Journalist&rsquo;s query <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· the source request you&rsquo;re answering</span></span>
-                    <textarea value={query} onChange={e => setQuery(e.target.value)} placeholder="Paste the HARO / Qwoted / Featured query here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 72 }} />
-                  </>
-                )}
-              </div>
-
-              <div style={{ padding: "18px 22px 22px", display: "flex", justifyContent: "flex-end" }}>
-                <button onClick={() => setFormStep(2)} style={{ padding: "12px 24px", border: "none", background: YEL, color: DARK, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", borderRadius: 0 }}>
-                  Next: your pitch →
-                </button>
-              </div>
-            </section>
-          )}
-
-          {introDone && view === "pre" && formStep === 2 && (
-            <>
-              <section className="piq-form-card">
-                <div style={LSEC}>
-                  <span style={LSEC_LBL}>Your pitch</span>
-                  <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
-                </div>
-
-                <div style={LSEC}>
-                  <span style={LSEC_LBL}>Subject line <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· optional, else parsed from line 1</span></span>
-                  <input value={subject} onChange={e => setSubject(e.target.value)} placeholder={subjectPlaceholder} className="piq-field" style={{ ...LP_INPUT, marginBottom: 0 }} />
-                </div>
-
-                {pitchMode === "query" ? (
-                  <div style={LSEC}>
-                    <span style={LSEC_LBL}>Platform</span>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                      {PLATFORMS.filter(p => p.id !== "direct").map(p => <button key={p.id} onClick={() => setPlatform(p.id)} style={chipStyle(platform === p.id)}>{p.label}</button>)}
-                    </div>
-                  </div>
-                ) : (
-                  <div style={LSEC}>
-                    <span style={LSEC_LBL}>Platform</span>
-                    <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block" }}>
-                      Scored as direct outreach (email, social, DM). Professional tone assumed. Switch to &ldquo;Answering a query&rdquo; on the previous step if you&rsquo;re responding to a HARO / Qwoted / Featured request instead.
-                    </em>
-                  </div>
-                )}
-
-                <div style={LSEC}>
-                  <span style={LSEC_LBL}>Your authority signals <span style={{ color: ra(PAPER, 0.45), letterSpacing: ".08em", fontSize: 7.5, fontWeight: 400 }}>· for the personal-brand score</span></span>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                    {BRAND_LABELS.map(({ key, label }) => (
-                      <button key={key} onClick={() => setBrand(b => ({ ...b, [key]: !b[key] }))} style={chipStyle(brand[key])}>{label}</button>
-                    ))}
-                  </div>
-                  <em style={{ fontFamily: SERIF, fontSize: 11.5, fontStyle: "italic", color: ra(PAPER, 0.65), lineHeight: 1.5, display: "block", marginTop: 10 }}>
-                    Selecting these doesn&rsquo;t add points on its own. Your pitch text still has to show the proof (a link, a named outlet, a mention of a talk) for it to count. Only affects Personal Branding, the smallest-weighted of your 7 score dimensions.
-                  </em>
-                </div>
-
-                <div style={{ ...LSEC, borderBottom: "none" }}>
-                  <label style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 14, cursor: "pointer" }}>
-                    <input type="checkbox" checked={store} onChange={e => setStore(e.target.checked)} style={{ marginTop: 3, accentColor: YEL }} />
-                    <span style={{ fontFamily: SERIF, fontSize: 11.5, color: ra(PAPER, 0.65), lineHeight: 1.4 }}>Let SIA store this pitch (anonymised) to improve the tool.</span>
-                  </label>
-                  {TURNSTILE_SITE_KEY && <div ref={turnstileRef} style={{ marginBottom: 12 }} />}
-                  {error && (
-                    <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>{error}</div>
-                  )}
-                  <div style={{ display: "flex", gap: 8 }}>
-                    <button onClick={() => setFormStep(1)} style={{ padding: "14px 18px", border: `1px solid ${ra(PAPER, 0.3)}`, background: "transparent", color: ra(PAPER, 0.75), fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", cursor: "pointer" }}>
-                      ← Back
-                    </button>
-                    <button onClick={analyze} disabled={!canAnalyze} style={{ flex: 1, padding: 14, border: "none", background: canAnalyze ? YEL : ra(YEL, 0.35), color: canAnalyze ? DARK : ra(DARK, 0.4), fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: canAnalyze ? "pointer" : "not-allowed", transition: "opacity .12s", borderRadius: 0 }}>
-                      Analyze pitch →
-                    </button>
-                  </div>
-                  <div style={{ marginTop: 10, fontFamily: MONO, fontSize: 7.5, fontWeight: 600, letterSpacing: ".10em", textTransform: "uppercase", color: ra(PAPER, 0.6), textAlign: "center", lineHeight: 1.9 }}>
-                    {FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research
-                  </div>
-                </div>
-              </section>
-
-              <LiveMechanics live={live} />
-            </>
-          )}
-
-          {introDone && view === "loading" && <LoadingPanel />}
-          {introDone && view === "post" && result && (
-            <PostScorePanel result={result} tab={tab} setTab={setTab}
-              email={email} setEmail={setEmail} emailDone={emailDone} setEmailDone={setEmailDone}
-              onDownload={() => setShowGate(true)} onReset={reset} pitchMode={pitchMode} />
-          )}
-        </main>
-
-        {/* ── Pipeline footer ──────────────────────────────────────── */}
         <ToolPipelineFooter currentTool="pressiq" compact onDark />
-
       </div>
-
     </>
   );
 }
-
-// ── Scoped CSS ────────────────────────────────────────────────────────────────
-const PAGE_CSS = `
-  .piq-page{background:${PAPER};min-height:100dvh;display:flex;flex-direction:column}
-  .piq-step-bar{display:flex;align-items:center;justify-content:center;gap:0;background:${PAPER};border-bottom:1px solid ${ra(INK,0.1)};padding:12px 20px;flex-wrap:wrap}
-  .piq-step{display:flex;align-items:center;gap:8px;padding:4px 16px;font-family:${GROT};font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${ra(INK,0.35)};white-space:nowrap}
-  .piq-step.past{cursor:pointer;color:${ra(INK,0.55)}}
-  .piq-step.active{color:${INK}}
-  .piq-step-no{width:18px;height:18px;border-radius:50%;border:1.5px solid ${ra(INK,0.25)};display:flex;align-items:center;justify-content:center;font-size:9px}
-  .piq-step.active .piq-step-no{background:${YEL};border-color:${YEL};color:${INK}}
-  .piq-step.past .piq-step-no{background:${INK};border-color:${INK};color:${YEL}}
-  .piq-step-connector{width:28px;height:1px;background:${ra(INK,0.12)}}
-  .piq-col{max-width:860px;width:100%;margin:0 auto;padding:32px 20px 64px;display:flex;flex-direction:column;gap:28px;flex:1}
-  .piq-form-card{background:${DARK2};border:1px solid ${DARK_BD};border-radius:6px;overflow:hidden}
-  .piq-form-card ::selection{background:${YEL};color:${DARK}}
-  .piq-field:focus{border-color:${ra(YEL,0.5)} !important;outline:none}
-  .piq-field::placeholder{color:${ra(PAPER,0.22)}}
-  .piq-ghost{background:none;border:none;cursor:pointer;font-family:${MONO};font-size:9px;color:${ra(PAPER,0.72)};padding:0;transition:color .1s}
-  .piq-ghost:hover{color:${YEL}}
-  .piq-tabs{display:flex;align-items:stretch;border-bottom:2px solid ${ra(INK,0.12)};background:${PAPER};position:sticky;top:0;z-index:5;padding:0 4px}
-  .piq-tab{padding:14px 16px;font-family:${GROT};font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;color:${ra(INK,0.38)};transition:all .15s}
-  .piq-tab:hover{color:${INK};background:${ra(INK,0.04)}}
-  .piq-tab-active{color:${INK} !important;border-bottom-color:${INK} !important;background:${ra(INK,0.05)}}
-  .piq-foot-ghost{background:none;border:1px solid ${ra(INK,0.2)};cursor:pointer;font-family:${GROT};font-weight:700;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${ra(INK,0.5)};padding:6px 12px;transition:all .1s}
-  .piq-foot-ghost:hover{border-color:${INK};color:${INK}}
-  .piq-foot-next{background:${INK};border:none;cursor:pointer;font-family:${GROT};font-weight:800;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:${PAPER};padding:8px 16px;transition:opacity .1s}
-  .piq-foot-next:hover{opacity:.85}
-  @keyframes piq-pulse{0%,80%,100%{opacity:.15}40%{opacity:1}}
-  .piq-dot{display:inline-block;width:8px;height:8px;background:${YEL};animation:piq-pulse 1.2s infinite ease-in-out}
-  .piq-field:focus-visible{outline:2px solid ${YEL};outline-offset:1px}
-  .piq-tab:focus-visible,.piq-ghost:focus-visible{outline:2px solid ${INK};outline-offset:2px}
-  @media (max-width:768px){
-    .piq-col{padding:20px 14px 48px;gap:20px}
-    .piq-step-bar{padding:10px 12px}
-    .piq-step{padding:4px 10px;font-size:9px}
-  }
-  @media (prefers-reduced-motion:reduce){
-    .piq-dot{animation:none;opacity:.6}
-    *{transition:none !important;scroll-behavior:auto !important}
-  }
-`;
