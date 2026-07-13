@@ -725,10 +725,10 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
             {/* Phase summary */}
             <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:20 }}>
               {[
-                ["01","Foundation","Days 1-14","Research, partner list, outreach assets"],
-                ["02","Outreach","Days 15-45","Tier A first, follow-ups, Tier B parallel"],
-                ["03","Execution","Days 46-75","Negotiate placements, monitor backlinks"],
-                ["04","Optimise","Days 76-90","Review metrics, expand, document"],
+                ["01","Foundation","Days 1-14","Beat, tiered media list, pitch assets"],
+                ["02","Outreach","Days 15-45","Tier A first, exclusives, follow-ups"],
+                ["03","Coverage","Days 46-75","Quotes, interviews, confirm publication"],
+                ["04","Optimise","Days 76-90","Log coverage, nurture, document"],
               ].map(([num, title, days, desc])=>(
                 <div key={num} style={{ border:"1px solid rgba(250,250,250,0.1)", padding:"12px 14px" }}>
                   <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
@@ -741,7 +741,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
               ))}
             </div>
             <p style={{ fontFamily:MF, fontSize:9, color:"rgba(241,235,222,0.72)", letterSpacing:"0.08em", textAlign:"center" }}>
-              Full analysis, partner table, outreach template and methodology in the PDF
+              Full analysis, journalist table, outreach template and methodology in the PDF
             </p>
           </div>
         </div>
@@ -1038,7 +1038,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     if (isSub) { downloadCsv(); } else { setGatedAction("csv"); setShowGate(true); }
   }
   function downloadCsv() {
-    const rows = [["Name","URL","Tier","Why","Link Placement","Contact","LinkedIn","SEO"],...partners.map(p=>[p.name,p.url,p.tier,p.why,p.linkPage,p.contact,p.contactLinkedIn||"",p.seoNote])];
+    const rows = [["Name","Outlet","Tier","Why they fit","Recent article","Contact","LinkedIn","Authority"],...partners.map(p=>[p.name,p.url,p.tier,p.why,p.linkPage,p.contact,p.contactLinkedIn||"",p.seoNote])];
     const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
     const blob = new Blob([csv],{type:"text/csv"});
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
@@ -1098,7 +1098,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     const TBLUE:[number,number,number]= [58,123,213];
     const date = new Date().toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
     const bizName = state.biz||"Your Business";
-    const strat = V2_STRATEGIES[state.strategy]?.label||"Discount Partnership";
+    const strat = V2_STRATEGIES[state.strategy]?.label||"Expert Commentary";
     const pList = partners.length>0?partners:V2_GENERIC;
     const totalPages = aiBrief ? 5 : 4;
 
@@ -1130,8 +1130,8 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
       doc.setFillColor(...GOLD); doc.rect(0,0,W,3,"F");
       doc.setDrawColor(...INK); doc.setLineWidth(1.5); doc.line(0,15,W,15);
       doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...INK);
-      doc.text("Collab",M,12);
-      const cw=doc.getTextWidth("Collab");
+      doc.text("Journo",M,12);
+      const cw=doc.getTextWidth("Journo");
       doc.setTextColor(...GOLD); doc.text("IQ",M+cw,12);
       doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
       doc.text("  ·  "+bizName.substring(0,30), M+cw+8, 12);
@@ -1170,13 +1170,13 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     doc.setFillColor(...GOLD); doc.rect(M,y,22,1.5,"F");
     doc.setFillColor(40,32,24); doc.rect(M+24,y,W-M*2-24,1.5,"F");
     y+=9; doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...GOLD);
-    doc.text("PARTNERSHIP INTELLIGENCE REPORT", M, y); y+=20;
+    doc.text("MEDIA TARGETING REPORT", M, y); y+=20;
     doc.setFont("helvetica","bold"); doc.setFontSize(50); doc.setTextColor(...CREAM);
-    doc.text("Collab", M, y);
-    doc.setTextColor(...GOLD); doc.text("IQ", M+doc.getTextWidth("Collab"), y); y+=13;
+    doc.text("Journo", M, y);
+    doc.setTextColor(...GOLD); doc.text("IQ", M+doc.getTextWidth("Journo"), y); y+=13;
     doc.setFont("helvetica","normal"); doc.setFontSize(17); doc.setTextColor(180,165,145);
-    doc.text("Your personalised partnership", M, y); y+=7;
-    doc.text("campaign brief", M, y); y+=16;
+    doc.text("Your personalised media", M, y); y+=7;
+    doc.text("targeting brief", M, y); y+=16;
     doc.setFillColor(...GOLD); doc.rect(M,y,46,1.5,"F");
     doc.setFillColor(40,32,24); doc.rect(M+48,y,W-M*2-48,1.5,"F"); y+=14;
     // Business summary grid
@@ -1184,7 +1184,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     const summaryRows:[string,string,boolean][]=[
       ["Business",bizName,true],["Website",state.domain||"—",false],
       ["Industry",ind||"—",false],["Strategy",strat,true],
-      ["Audience",state.audType||"—",false],["Geography",state.geo||"—",false],
+      ["Target tier",state.audType||"—",false],["Geography",state.geo||"—",false],
     ];
     summaryRows.forEach(([label,val,accent],i)=>{
       const cx=M+(i%2)*cW2, cy=y+Math.floor(i/2)*22;
@@ -1200,7 +1200,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     // Selected partners
     if(state.selNiches.length>0){
       doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(100,88,70);
-      doc.text("SELECTED PARTNERS", M, y); y+=6;
+      doc.text("SELECTED JOURNALISTS", M, y); y+=6;
       let chipX=M;
       state.selNiches.slice(0,8).forEach(name=>{
         doc.setFont("helvetica","normal"); doc.setFontSize(7.5);
@@ -1219,9 +1219,9 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
 
     // ════ PAGE 2: PARTNER INTELLIGENCE — ALL 8 ═════════════════════
     doc.addPage();
-    lightHeader("Partner Intelligence");
+    lightHeader("Journalist Intelligence");
     y=28;
-    y=sectionNum("01", `${pList.length} Partnership Targets Identified`, y);
+    y=sectionNum("01", `${pList.length} Journalists Identified`, y);
     // Smaller cards (4 rows x 2 cols = 8 partners)
     const cW=(W-M*2-8)/2, cH=32;
     pList.slice(0,8).forEach((p,i)=>{
@@ -1265,9 +1265,9 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
       ? (state.desc.endsWith(".")?state.desc:state.desc+".")
       : "[Briefly describe what you do and who you help.]";
     const tplMap:{[k:string]:string}={
-      discount:`Subject: Partnership idea — [THEIR BRAND] x ${bizName}\n\nHi [FIRST NAME],\n\nI'm [YOUR NAME] from ${bizName}. ${descText}\n\nI noticed you serve the same audience from a different angle — and there's a natural fit.\n\nProposal: we offer your clients an exclusive [X]% discount on ${bizName}. You mention us on your partner page with a link.\n\nThree-way win.\n\n15 minutes to explore this?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
-      institution:`Subject: Exclusive discount for [INSTITUTION] members\n\nHi [CONTACT],\n\nI'm [YOUR NAME] from ${bizName}. ${descText}\n\nWe'd love to offer [INSTITUTION] members an exclusive [X]% discount. All we'd ask: a mention on your rebate page with a link.\n\nNo strings, no fees.\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
-      badge:`Subject: Featured in our [GUIDE TITLE]\n\nHi [EXPERT],\n\nI'm building a guide: [GUIDE TITLE] featuring [EXPERT TYPE]. You'd get a feature with credentials, a badge for your site, and promotion to [AUDIENCE].\n\nInterested?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
+      discount:`Subject: Expert source for your [TOPIC] story?\n\nHi [FIRST NAME],\n\nI've been following your coverage of [BEAT] — your recent piece on [ARTICLE] was spot-on.\n\nI'm [YOUR NAME] from ${bizName}. ${descText}\n\nI can offer a quotable expert take on [SPECIFIC ANGLE] — on-record commentary, background stats, or a quick call, whatever fits your deadline.\n\nAny interest?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
+      institution:`Subject: Exclusive data for your [TOPIC] coverage — embargo available\n\nHi [FIRST NAME],\n\nI've followed your [BEAT] reporting — your work on [ARTICLE] stood out.\n\nI'm [YOUR NAME] from ${bizName}. ${descText}\n\nWe've completed original research on [TOPIC]: [KEY FINDING], not published anywhere yet. Offering you first look — happy to embargo, share the full dataset, and set up a briefing.\n\nInterested in an exclusive?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
+      badge:`Subject: [TRENDING TOPIC] angle — quick reaction on record?\n\nHi [FIRST NAME],\n\nWith [TRENDING NEWS] dominating the conversation, you might want a quick expert reaction for your [BEAT] coverage.\n\nI'm [YOUR NAME] from ${bizName}. ${descText}\n\nMy take: [1-2 SENTENCE HOOK TIED TO THE TREND]. Happy to go on record — short quote, longer call, or written response to fit your deadline.\n\nWorth a quick chat?\n\n[YOUR NAME]  ·  ${bizName}  ·  ${state.domain||"[website]"}`,
     };
     const tplText=tplMap[state.strategy]||tplMap.discount;
     doc.setFillColor(...INK); doc.rect(M,y,W-M*2,54,"F");
@@ -1276,17 +1276,17 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     doc.text(tlines.slice(0,14),M+7,y+7);
     y+=58;
     doc.setFont("helvetica","normal"); doc.setFontSize(7); doc.setTextColor(...GREY);
-    doc.text("Replace [BRACKETED] text before sending. Personalise for each specific partner.", M, y); y+=10;
+    doc.text("Replace [BRACKETED] text before sending. Personalise for each specific journalist.", M, y); y+=10;
     // Section 03 — 90-Day Roadmap (fixed numbering)
-    y=sectionNum("03","90-Day Campaign Roadmap",y);
+    y=sectionNum("03","90-Day Outreach Roadmap",y);
     doc.setFillColor(...GOLD); doc.rect(M+130,y-19,10,8,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(6); doc.setTextColor(...INK);
     doc.text("AI",M+135,y-13,{align:"center"});
     const phases:[string,string,string,string[]][]=[
-      ["01","Foundation","DAYS 1-14",["Audit backlink profile","Identify 20-30 target partners","Create discount codes per tier","Personalise top 10 outreach"]],
-      ["02","Outreach","DAYS 15-45",["Send to Tier A partners first","Follow up after 5-7 days","Begin Tier B in parallel","Track in spreadsheet"]],
-      ["03","Execution","DAYS 46-75",["Negotiate link placements","Provide assets to partners","Monitor new backlinks","Begin Tier C for volume"]],
-      ["04","Optimise","DAYS 76-90",["Review links, DA, referral traffic","Share data with partners","Identify top categories","Document the playbook"]],
+      ["01","Foundation","DAYS 1-14",["Confirm your beat & angle","Build a tiered media list","Prepare your offer & evidence","Personalise top 10 pitches"]],
+      ["02","Outreach","DAYS 15-45",["Pitch Tier A journalists first","Offer exclusives / embargoes","Follow up after 3-5 days","Begin Tier B in parallel"]],
+      ["03","Coverage","DAYS 46-75",["Provide quotes, data, interviews","Hit every deadline fast","Confirm publication details","Begin Tier C for reach"]],
+      ["04","Optimise","DAYS 76-90",["Log coverage & links earned","Note which angles landed","Nurture responsive journalists","Document the playbook"]],
     ];
     const phW=(W-M*2-8)/2, phH=44;
     phases.forEach(([num,title,days,bullets],i)=>{
@@ -1308,7 +1308,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GREY);
     doc.text("ABOUT THIS METHOD",M+7,y+6);
     doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...DGREY);
-    const mtext=doc.splitTextToSize("The Collab Link Building method was developed by Syed Irfan Ajmal and executed by DMR.agency. It finds non-competing companies with overlapping audiences to create mutual-value partnerships generating referral traffic, brand authority, and high-quality backlinks.",W-M*2-14) as string[];
+    const mtext=doc.splitTextToSize("JournoCollabIQ was developed by Syed Irfan Ajmal and the team at DMR.agency. It matches your story to the journalists most likely to cover it — ranked by beat fit, recent coverage, and outlet authority — so your outreach earns real editorial coverage.",W-M*2-14) as string[];
     doc.text(mtext,M+7,y+12);
     pageFooter(3);
 
@@ -1321,7 +1321,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
       doc.setFont("helvetica","bold"); doc.setFontSize(7); doc.setTextColor(...GOLD);
       doc.text("AI",M+6,y,{align:"center"});
       doc.setFontSize(17); doc.setTextColor(...INK);
-      doc.text("Your 90-Day AI Campaign Brief",M+17,y); y+=14;
+      doc.text("Your Media Targeting Brief",M+17,y); y+=14;
 
       // Inline markdown renderer — handles **bold** spans with word-wrap
       function renderInlineMd(text: string, lx: number, ly: number, maxW: number, fs: number): number {
@@ -1392,7 +1392,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(140,128,110);
     const sub=doc.splitTextToSize("The step-by-step system for founders who want press, partnerships, and authority before their Series A.",120) as string[];
     doc.text(sub,W/2,cy,{align:"center"}); cy+=sub.length*7+14;
-    const inclusions=["Step-by-step earned media playbooks","Journalist & editor contact database","Collab link building templates & frameworks","Ongoing platform access, no cohort or course"];
+    const inclusions=["Step-by-step earned media playbooks","Journalist & editor contact database","Journalist pitch templates & frameworks","Ongoing platform access, no cohort or course"];
     const inclBoxH=16+inclusions.length*10+8;
     doc.setDrawColor(50,42,32); doc.setLineWidth(0.4);
     doc.rect(W/2-52,cy,104,inclBoxH);
@@ -1432,7 +1432,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
       })});
       if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiEmail(j.result);setAiEmailLoading(false);return;}}
     } catch { /* fallback */ } finally { resetTurnstile(); }
-    setAiEmail(`Subject: Partnership idea — [PARTNER] × ${state.biz}\n\nHi [FIRST NAME],\n\nI'm reaching out from ${state.biz} — we ${state.desc||"[what you do]"}.\n\nI came across [PARTNER] while researching companies that serve the same audience, and there's a natural fit.\n\nProposal: we create an exclusive offer for your customers — [SPECIFIC OFFER]. In return, a mention on your partner page with a link.\n\nThree-way win:\n→ Your customers get exclusive value\n→ You deepen loyalty\n→ We get warm referral traffic\n\n15 minutes this week?\n\nBest,\n[YOUR NAME]\n${state.biz} · ${state.domain||"[website]"}`);
+    setAiEmail(`Subject: Expert source for your [TOPIC] story?\n\nHi [FIRST NAME],\n\nI've been following your coverage of [BEAT] — your recent piece on [ARTICLE] stood out.\n\nI'm reaching out from ${state.biz} — we ${state.desc||"[what you do]"}.\n\nI can offer a quotable expert take on [SPECIFIC ANGLE]: on-record commentary, background data, or a quick call — whatever fits your deadline.\n\nAny interest? Happy to work to your timing.\n\nBest,\n[YOUR NAME]\n${state.biz} · ${state.domain||"[website]"}\n\n(Verify the journalist, outlet and contact before sending — then score the pitch in PressIQ.)`);
     setAiEmailLoading(false);
   }
 
@@ -1454,13 +1454,13 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
       })});
       if(res.ok){const j=await res.json() as {result?:string};if(j.result){setAiBrief(j.result);setAiBriefLoading(false);return;}}
     } catch { /* fallback */ } finally { resetTurnstile(); }
-    setAiBrief(`# 90-Day Collab Link Building Brief\n\n## Executive Summary\nA 90-day campaign for ${state.biz} using ${V2_STRATEGIES[state.strategy]?.label} in ${ind}.\n\n## Phase 1: Foundation (Days 1-14)\n- Audit backlink profile (Ahrefs/SEMrush)\n- Identify 20-30 target partners across 3-4 categories\n- Create landing pages or discount codes per tier\n- Personalise outreach for top 10 targets\n\n## Phase 2: Outreach (Days 15-45)\n- Send to Tier A partners first\n- Follow up after 5-7 business days\n- Begin Tier B outreach in parallel\n- Track in spreadsheet\n\n## Phase 3: Execution (Days 46-75)\n- Negotiate link placements\n- Provide assets (codes, badges, content)\n- Monitor new backlinks in Ahrefs\n- Begin Tier C for volume\n\n## Phase 4: Optimisation (Days 76-90)\n- Review metrics: links, DA, referral traffic\n- Share performance data with partners\n- Identify top categories for expansion\n- Document playbook`);
+    setAiBrief(`# 90-Day Media Targeting Brief\n\n## Executive Summary\nA 90-day earned-media campaign for ${state.biz} pitching ${V2_STRATEGIES[state.strategy]?.label} to journalists covering ${ind}.\n\n## Phase 1: Foundation (Days 1-14)\n- Confirm your beat, angle, and news hook\n- Build a tiered media list (Tier A/B/C)\n- Prepare your offer: expert take, data, or reaction\n- Personalise pitches for your top 10 journalists\n\n## Phase 2: Outreach (Days 15-45)\n- Pitch Tier A journalists first\n- Offer exclusives or embargoes where it fits\n- Follow up after 3-5 business days\n- Begin Tier B outreach in parallel\n\n## Phase 3: Coverage (Days 46-75)\n- Provide quotes, data, and interviews fast\n- Hit every journalist deadline\n- Confirm publication details and links\n- Begin Tier C for wider reach\n\n## Phase 4: Optimisation (Days 76-90)\n- Log coverage earned and links landed\n- Note which angles and offers worked\n- Nurture the journalists who responded\n- Document your outreach playbook`);
     setAiBriefLoading(false);
   }
 
   function perform(action: string) {
     if (action==="copy") {
-      navigator.clipboard.writeText(`JournoCollabIQ Brief\nBusiness: ${state.biz}\nIndustry: ${ind}\nStrategy: ${V2_STRATEGIES[state.strategy]?.label}\n\nSelected Partners:\n${state.selNiches.join(", ")||"None"}\n\n${aiBrief||""}`);
+      navigator.clipboard.writeText(`JournoCollabIQ Brief\nBusiness: ${state.biz}\nIndustry: ${ind}\nStrategy: ${V2_STRATEGIES[state.strategy]?.label}\n\nSelected Journalists:\n${state.selNiches.join(", ")||"None"}\n\n${aiBrief||""}`);
     } else if (action==="pdf")   { downloadPdfWithFeedback(); }
     else if (action==="email")   { generateAiEmail(); }
     else if (action==="brief")   { generateAiBrief(); }
