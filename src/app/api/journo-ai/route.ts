@@ -25,6 +25,13 @@ import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 import { consumeQuota } from "@/lib/gate/quota";
 import { PREVIEW_REVEAL } from "@/lib/gate/quota-limits";
 
+// Opus generations run 20-40s (esp. the 8-journalist search at max_tokens 3000).
+// Without this the platform default could cut a genuine generation short with a
+// 504 — the same latent bug the PressIQ routes were hardened against.
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
+
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
 const DAY_MS = 24 * 60 * 60 * 1000;

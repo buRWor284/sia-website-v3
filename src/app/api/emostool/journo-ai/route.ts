@@ -10,6 +10,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 
+// Match the public route: Opus generations run 20-40s, so lift the ceiling to
+// 60s to avoid a latent 504 cutting a real generation short.
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
+
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
 
