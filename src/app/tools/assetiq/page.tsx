@@ -553,7 +553,7 @@ export default function AssetIQPage() {
                   </p>
                 </div>
                 <Link
-                  href="/emos"
+                  href="/emostool"
                   style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "15px 26px", whiteSpace: "nowrap", textDecoration: "none" }}
                 >
                   Explore the EMOS Platform {"→"}

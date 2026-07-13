@@ -21,7 +21,7 @@ import Link from "next/link";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { EmailGateModal, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 import { ToolHeader } from "@/components/tools/ToolHeader";
-import { EMAIL_LIMIT, EMOS_URL, FREE_LIMIT } from "@/lib/pitch/config";
+import { EMAIL_LIMIT, FREE_LIMIT } from "@/lib/pitch/config";
 import type { ScoreResponse } from "@/lib/pitch/types";
 import PressIQToolCore from "@/components/pressiq/PressIQToolCore";
 import { PIQ_CSS } from "@/components/pressiq/core-css";
@@ -300,7 +300,7 @@ export default function PressIQPage() {
           </>
         }
         pitch="PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently."
-        applyHref={EMOS_URL}
+        applyHref="/emostool"
         applyLabel={r.composite >= 65 ? "Apply to EMOS" : "Explore EMOS"}
         hideExplore
         extraAction={
