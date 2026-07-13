@@ -193,19 +193,17 @@ const CONTENT: ContentItem[] = [
   // ── KITS ────────────────────────────────────────────────────────────────
   {
     id: "kit-journo",
-    type: "kit",
+    type: "infographic",
     badge: "Interactive Kit",
     beta: true,
     topics: ["pr", "seo"],
     title: "The Journo Outreach Checklist",
-    sub: "Seven steps to a pitch reporters actually use.",
     blurb:
       "The SIA system for HARO, Qwoted, Source of Sources, Featured, and Help a B2B Writer — with copy-clip snippets, a progress meter, and print mode.",
     href: "/infographics/journo-outreach-checklist",
     y: "2026",
     newsHeadline: "Pitch Perfect",
     newsDeck: "The seven-step system that gets reporters to say yes",
-    cta: "Open the Kit",
     hook: "Seven steps most founders quietly skip",
   },
 
@@ -248,12 +246,10 @@ const CONTENT: ContentItem[] = [
   },
   {
     id: "kit-writing",
-    type: "kit",
+    type: "infographic",
     badge: "Interactive Kit",
-    underReview: true,
     topics: ["writing", "content-marketing"],
     title: "Top 11 Scientific Benefits of Writing",
-    sub: "Eleven research-backed findings. Each with a prescription.",
     blurb:
       "Reduced anxiety, stronger memory, sharper thinking — the science of writing as a daily practice. Each finding paired with a study and something you can do this week.",
     href: "/infographics/writing-benefits",
@@ -261,7 +257,6 @@ const CONTENT: ContentItem[] = [
     updated: "2026",
     newsHeadline: "Writing Is Medicine",
     newsDeck: "Science confirms what the Ancients knew about the written word",
-    cta: "Open the Kit",
     hook: "Science says writing rewires the brain",
   },
   {
@@ -401,10 +396,12 @@ const CONTENT: ContentItem[] = [
   },
   {
     id: "guide-bing-seo-2026",
-    type: "guide",
+    type: "infographic",
     badge: "Guide + Infographic",
     topics: ["seo", "pr", "strategy"],
     title: "How to Win on Bing and the AI Answer Engines It Feeds",
+    blurb:
+      "Bing now feeds Microsoft Copilot and the AI answer engines. The 2026 field guide to submitting your site, earning the right links, and diversifying formats, with the illustrated original restored in full.",
     href: "/infographics/bing-seo",
     y: "2026",
     newsHeadline: "The Bing Desk",
@@ -431,7 +428,7 @@ const CONTENT: ContentItem[] = [
     type: "infographic",
     badge: "Infographic",
     topics: ["strategy"],
-    private: true,
+    underReview: true,
     title: "Managing Remote Teams with HubStaff",
     blurb:
       "Time tracking, trust, and async communication across distributed teams. Originally produced in partnership with HubStaff.",
@@ -452,7 +449,7 @@ const CONTENT: ContentItem[] = [
       "The science of habit formation applied to a daily writing practice — cues, routines, rewards, and the research behind each.",
     href: "https://syedirfanajmal.com/form-writing-habits-success-infographic/",
     y: "—",
-    private: true,
+    underReview: true,
     newsHeadline: "Rituals of the Masters",
     newsDeck: "The daily habits that made Hemingway, King, and Didion",
     hook: "Habits that made Hemingway, King, and Didion",
@@ -462,7 +459,7 @@ const CONTENT: ContentItem[] = [
     type: "infographic",
     badge: "Infographic",
     topics: ["content-marketing", "strategy"],
-    private: true,
+    underReview: true,
     title: "Getting Content Ideas from Your Customers",
     blurb:
       "Listening systems, surveys, and social mining — how to extract an endless editorial calendar from the people already talking to your business.",
@@ -480,7 +477,6 @@ const CONTENT: ContentItem[] = [
 
 const TYPE_TABS: { key: "all" | ContentType; label: string }[] = [
   { key: "all",          label: "All Resources" },
-  { key: "kit",          label: "Kits" },
   { key: "tool",         label: "Tools" },
   { key: "quiz",         label: "Quizzes" },
   { key: "playbook",     label: "Playbooks" },
@@ -574,7 +570,10 @@ function getCardHref(item: ContentItem): string | null {
     if (g.external) return `https://syedirfanajmal.com/${g.slug}/`;
     return g.slug ? `/resources/${g.slug}` : null;
   }
-  if (item.type === "infographic") return (item as InfographicContent).href;
+  if (item.type === "infographic") {
+    const ig = item as InfographicContent;
+    return ig.underReview ? null : ig.href;
+  }
   if (item.type === "video") return `https://youtu.be/${(item as VideoContent).youtubeId}`;
   const interactive = item as InteractiveContent;
   if (interactive.comingSoon) return null;
@@ -838,11 +837,9 @@ function ResourceLedger({
         );
       })}
 
-      {/* Infographics Desk link — the full gallery of all six lives at /infographics */}
+      {/* Infographics Desk link — the dedicated gallery lives at /infographics */}
       <div
-        id="infographics"
         style={{
-          scrollMarginTop: 120,
           marginTop: 44,
           padding: "22px 24px",
           border: `1px solid ${INK}`,
@@ -859,14 +856,14 @@ function ResourceLedger({
             The Infographics Desk
           </div>
           <div style={{ fontFamily: SERIF, fontSize: 17, color: INK, marginTop: 4 }}>
-            All six infographics in one place: interactive editions and restored originals.
+            Every infographic has a dedicated home, with the full interactive editions.
           </div>
         </div>
         <a
           href="/infographics"
           style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none", flexShrink: 0 }}
         >
-          View all 6 infographics →
+          Open the Infographics Desk →
         </a>
       </div>
 
@@ -1202,7 +1199,9 @@ const GUIDED_VIEW_USED_IDS = new Set<string>([
   "tool-collabiq",
 ]);
 
-const RELATED_ASSETS: ContentItem[] = CONTENT.filter((c) => !GUIDED_VIEW_USED_IDS.has(c.id) && !c.private);
+const RELATED_ASSETS: ContentItem[] = CONTENT.filter(
+  (c) => !GUIDED_VIEW_USED_IDS.has(c.id) && !c.private && !(c.type === "infographic" && c.underReview),
+);
 
 function resolveStepHref(step: PipeStep): string | null {
   if (step.contentId) {
@@ -1451,14 +1450,30 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
   // Default (no hash) still opens on Browse All. A shared #emos or #all link
   // forces the matching tab on load and scrolls past the hero to the toggle.
   useEffect(() => {
-    // URL hash isn't available during SSR, so the only way to honour a
-    // shared #emos / #all link is to sync it once, right after mount.
+    // URL hash isn't available during SSR, so the only way to honour a shared
+    // link (#emos / #all, or a content-type section like #videos) is to sync
+    // it once, right after mount — native hash-scroll doesn't fire reliably
+    // for this client-rendered ledger.
     const hash = window.location.hash.replace("#", "").toLowerCase();
+    if (!hash) return;
+
     if (hash === "emos" || hash === "all") {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL hash on first load, not a render-loop
       setView(hash === "emos" ? "guided" : "browse");
       document.getElementById("resources-view")?.scrollIntoView({ block: "start" });
+      return;
     }
+
+    // Content-type section anchors (videos, tools, quizzes, playbooks, guides,
+    // infographics) live inside the Browse All ledger — force that view, then
+    // scroll to the section once it has rendered.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time sync from the URL hash on first load, not a render-loop
+    setView("browse");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        document.getElementById(hash)?.scrollIntoView({ block: "start" });
+      });
+    });
   }, []);
 
   const handleSetView = useCallback((v: "guided" | "browse") => {
