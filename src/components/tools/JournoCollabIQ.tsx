@@ -846,7 +846,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
             </>
           }
           pitch="JournoCollabIQ builds the target list, the outreach sequence, and the per-journalist angles. The full Earned Media Operating System hands your team the story signals and pitch system that feed this list, and can run the whole outreach for you if you'd rather not do it in-house."
-          applyHref="/emos"
+          applyHref="/emostool"
           applyLabel="Explore EMOS"
           hideExplore
         />
