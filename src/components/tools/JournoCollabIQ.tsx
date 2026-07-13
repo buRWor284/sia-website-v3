@@ -584,6 +584,16 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
   const { strategy, biz, domain, desc } = state;
   const strat = V2_STRATEGIES[strategy] || V2_STRATEGIES.discount;
 
+  // Fit self-check — the 8-criteria scorecard. Each question is 0/1/2, so the
+  // score is total / 16. It feeds the AI angle (generateAiEmail reads state.scores).
+  const scoreTotal = Object.values(state.scores).reduce((a, b) => a + b, 0);
+  const answered   = Object.keys(state.scores).length;
+  const scorePct   = Math.round((scoreTotal / (V2_SCORECARD.length * 2)) * 100);
+  const verdict    = answered === 0 ? null
+    : scorePct >= 70 ? { t: "Strong fit — prioritise this journalist", c: SUCC }
+    : scorePct >= 45 ? { t: "Moderate fit — worth a shot", c: AMB2 }
+    : { t: "Weak fit — consider a stronger target", c: ERR };
+
   const templates: Record<Strategy, string> = {
     discount:    `Subject: Expert source for your [TOPIC] story?\n\nHi [FIRST NAME],\n\nI've been following your coverage of [BEAT/TOPIC] — your recent piece on [ARTICLE TITLE] was spot-on.\n\nI'm [YOUR NAME], [TITLE] at ${biz||"[BRAND]"} (${domain||"[WEBSITE]"}). We ${desc||"[DESCRIPTION]"}.\n\nI can offer a quotable expert take on [SPECIFIC ANGLE]. Happy to provide on-record commentary, background stats, or a quick on-the-record call — whatever format works for you.\n\nAny interest?\n\n[YOUR NAME]\n${biz||"[BRAND]"} · ${domain||"[WEBSITE]"}`,
     institution: `Subject: Exclusive data for your [TOPIC] coverage — embargo available\n\nHi [FIRST NAME],\n\nI've followed your [BEAT] reporting closely — your work on [RECENT ARTICLE] stood out.\n\nI'm [YOUR NAME] from ${biz||"[BRAND]"} (${domain||"[WEBSITE]"}). We ${desc||"[DESCRIPTION]"}.\n\nWe've just completed original research on [TOPIC]: [KEY FINDING]. The data hasn't been published anywhere.\n\nOffering you first look — happy to embargo to fit your schedule, share the full dataset, and arrange a briefing with our [EXPERT TITLE].\n\nInterested in an exclusive?\n\n[YOUR NAME]\n${biz||"[BRAND]"} · ${domain||"[WEBSITE]"}`,
@@ -599,6 +609,47 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
           <option value="">Select a journalist…</option>
           {partners.map(p => <option key={p.name} value={p.name}>{p.name} (Tier {p.tier}) · {p.url}</option>)}
         </select>
+      </div>
+
+      {/* Fit self-check — renders the 8-criteria scorecard (previously computed
+          but never shown, so every AI angle got "not yet scored"). */}
+      <div style={{ marginBottom: 32 }}>
+        <label style={lbl(TX2)}>Quick fit check{state.scPartner ? ` — ${state.scPartner}` : ""}</label>
+        <p style={{ fontSize: 13, color: TX3, margin: "0 0 12px", fontFamily: GF, lineHeight: 1.5 }}>
+          Rate this journalist against the 8 fit criteria. Your score sharpens the AI angle below — optional, but it helps.
+        </p>
+        {V2_SCORECARD.map((q, i) => {
+          const val = state.scores[i];
+          return (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, padding: "9px 0", borderBottom: `1px solid ${BDS}`, flexWrap: "wrap" }}>
+              <div style={{ flex: 1, minWidth: 190 }}>
+                <div style={{ fontFamily: SF, fontSize: 14, fontWeight: 600, color: TX }}>{q.q}</div>
+                <div style={{ fontFamily: GF, fontSize: 11.5, color: TX3, marginTop: 1 }}>{q.sub}</div>
+              </div>
+              <div style={{ display: "flex", gap: 4 }}>
+                {([["No", 0], ["Partly", 1], ["Yes", 2]] as [string, number][]).map(([lab, v]) => {
+                  const on = val === v;
+                  return (
+                    <button key={lab} onClick={() => dispatch({ type: "SET_SCORE", idx: i, val: v })}
+                      style={{ padding: "6px 12px", fontFamily: MF, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
+                        border: `1px solid ${on ? ACC : BD}`, background: on ? ACC : "transparent", color: on ? TX : TX3, cursor: "pointer", borderRadius: 0 }}>
+                      {lab}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+        {verdict && (
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginTop: 14, padding: "12px 16px", background: BG2, border: `1px solid ${BD}` }}>
+            <span style={{ fontFamily: MF, fontSize: 24, fontWeight: 700, color: verdict.c }}>{scorePct}%</span>
+            <div>
+              <div style={{ fontFamily: SF, fontSize: 14, fontWeight: 700, color: TX }}>{verdict.t}</div>
+              <div style={{ fontFamily: GF, fontSize: 11, color: TX3 }}>{answered}/8 answered · this score feeds the AI angle</div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Template */}
