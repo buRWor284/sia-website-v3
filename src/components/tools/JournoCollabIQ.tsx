@@ -1474,7 +1474,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     cy+=inclBoxH+14;
     doc.setFillColor(...GOLD); doc.rect(W/2-54,cy,108,14,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...INK);
-    doc.text("Learn more at syedirfanajmal.com/emos",W/2,cy+9,{align:"center"});
+    doc.text("Learn more at syedirfanajmal.com/emostool",W/2,cy+9,{align:"center"});
     // Attribution well above footer zone — no overlap
     doc.setFontSize(7); doc.setTextColor(55,46,36);
     doc.text(`Generated via JournoCollabIQ  ·  ${date}`,W/2,H-24,{align:"center"});
