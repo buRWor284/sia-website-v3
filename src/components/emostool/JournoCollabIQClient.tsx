@@ -45,6 +45,20 @@ const STRATEGIES = [
   { id: "badge",       label: "Trend reaction",     desc: "A timely reaction tied to a breaking trend or news hook. Newsjacking, done right." },
 ];
 
+// 8-criteria fit self-check — identical to the public tool's V2_SCORECARD so
+// both surfaces score journalists the same way. Each answer is 0/1/2, so a
+// perfect score is length*2. The per-card score feeds that card's AI angle.
+const V2_SCORECARD = [
+  { q: "Do they cover this beat?",                    sub: "Is this squarely in the topics they write about?" },
+  { q: "Have they written about it recently?",        sub: "A relevant article in the last few months." },
+  { q: "Does the outlet have real authority?",        sub: "Reach and domain strength (check the outlet)." },
+  { q: "Is your angle genuinely newsworthy to them?", sub: "A story their readers need — not an ad." },
+  { q: "Can you offer something specific?",            sub: "Expert take, exclusive data, or a timely hook." },
+  { q: "Are they open to pitches?",                   sub: "Some reporters say how to pitch them." },
+  { q: "Can you find a public contact?",              sub: "X handle or section desk, not a guessed email." },
+  { q: "Is the outlet brand-safe for you?",           sub: "You'll be associated with it." },
+];
+
 interface AIJournalist {
   name: string;
   url: string;
@@ -122,13 +136,22 @@ function StoryForm({
         </div>
       </div>
 
-      <button
-        onClick={() => onSearch(form)}
-        disabled={searching || !form.audDesc.trim() || !form.industry.trim()}
-        style={{ padding: "12px 28px", border: "none", background: searching || !form.audDesc.trim() ? "rgba(26,20,16,.12)" : INK, color: searching || !form.audDesc.trim() ? INK55 : PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", cursor: searching || !form.audDesc.trim() ? "wait" : "pointer" }}
-      >
-        {searching ? "Finding journalists…" : "Find journalists →"}
-      </button>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <button
+          onClick={() => onSearch(form)}
+          disabled={searching || !form.audDesc.trim() || !form.industry.trim()}
+          style={{ padding: "12px 28px", border: "none", background: searching || !form.audDesc.trim() ? "rgba(26,20,16,.12)" : INK, color: searching || !form.audDesc.trim() ? INK55 : PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", cursor: searching || !form.audDesc.trim() ? "wait" : "pointer" }}
+        >
+          {searching ? "Finding journalists…" : "Find journalists →"}
+        </button>
+        <button
+          onClick={() => setForm(p => ({ ...p, biz: "", domain: "", desc: "", industry: "", audDesc: "", geo: "" }))}
+          disabled={searching}
+          style={{ padding: "12px 20px", border: `1px solid ${INK15}`, background: "transparent", color: INK55, fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".08em", textTransform: "uppercase", cursor: searching ? "not-allowed" : "pointer" }}
+        >
+          Clear
+        </button>
+      </div>
     </div>
   );
 }
@@ -159,6 +182,19 @@ function JournalistCard({
   const alreadySaved = savedNames.has(j.name);
   const tc = TIER_COLOR[j.tier] ?? INK55;
 
+  // Per-card fit self-check. Compact + collapsed by default; expanding it lets
+  // the user score this journalist against the 8 criteria, and that score is
+  // fed into this card's AI angle call (replacing the old hardcoded 0).
+  const [showScorecard, setShowScorecard] = useState(false);
+  const [scores, setScores] = useState<Record<number, number>>({});
+  const scoreTotal = Object.values(scores).reduce((a, b) => a + b, 0);
+  const answered   = Object.keys(scores).length;
+  const scorePct   = Math.round((scoreTotal / (V2_SCORECARD.length * 2)) * 100);
+  const verdict    = answered === 0 ? null
+    : scorePct >= 70 ? { t: "Strong fit — prioritise this journalist", c: GREEN }
+    : scorePct >= 45 ? { t: "Moderate fit — worth a shot", c: AMBER }
+    : { t: "Weak fit — consider a stronger target", c: RED };
+
   async function getAngle() {
     setAngleError(null);
     setLoadingAngle(true);
@@ -168,7 +204,7 @@ function JournalistCard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "email-writer",
-          data: { ...formData, partner: j.name, partnerCat: `${j.url} · ${j.seoNote}`, scorePct: 0 },
+          data: { ...formData, partner: j.name, partnerCat: `${j.url} · ${j.seoNote}`, scorePct: answered > 0 ? scorePct : 0 },
         }),
       });
       const data = await res.json() as { result?: string; error?: string };
@@ -258,6 +294,55 @@ function JournalistCard({
             ⚠ Contact is AI-suggested — verify before you pitch.
           </div>
         )}
+
+        {/* Fit self-check — compact, expandable; the score sharpens this card's angle */}
+        <div style={{ border: `1px solid ${INK15}`, background: PAPER2 }}>
+          <button onClick={() => setShowScorecard(s => !s)}
+            style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, padding: "8px 12px", background: "transparent", border: "none", cursor: "pointer" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55 }}>Fit check</span>
+              {answered > 0
+                ? <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11, color: verdict?.c ?? INK }}>{scorePct}% · {answered}/8</span>
+                : <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK35 }}>optional — score to sharpen the angle</span>}
+            </span>
+            <span style={{ fontFamily: MONO, fontSize: 10, color: INK55 }}>{showScorecard ? "▲" : "▼"}</span>
+          </button>
+          {showScorecard && (
+            <div style={{ padding: "2px 12px 12px" }}>
+              {V2_SCORECARD.map((q, i) => {
+                const val = scores[i];
+                return (
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "7px 0", borderBottom: `1px solid ${INK15}`, flexWrap: "wrap" }}>
+                    <div style={{ flex: 1, minWidth: 170 }}>
+                      <div style={{ fontFamily: SERIF, fontSize: 12.5, fontWeight: 600, color: INK }}>{q.q}</div>
+                      <div style={{ fontFamily: GROT, fontSize: 10, color: INK55, marginTop: 1 }}>{q.sub}</div>
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      {([["No", 0], ["Partly", 1], ["Yes", 2]] as [string, number][]).map(([lab, v]) => {
+                        const on = val === v;
+                        return (
+                          <button key={lab} onClick={() => setScores(p => ({ ...p, [i]: v }))}
+                            style={{ padding: "5px 10px", fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", border: `1px solid ${on ? INK : INK15}`, background: on ? INK : "transparent", color: on ? PAPER : INK55, cursor: "pointer" }}>
+                            {lab}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+              {verdict && (
+                <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12, padding: "10px 14px", background: PAPER, border: `1px solid ${INK15}` }}>
+                  <span style={{ fontFamily: MONO, fontSize: 22, fontWeight: 700, color: verdict.c }}>{scorePct}%</span>
+                  <div>
+                    <div style={{ fontFamily: SERIF, fontSize: 13, fontWeight: 700, color: INK }}>{verdict.t}</div>
+                    <div style={{ fontFamily: GROT, fontSize: 10, color: INK55 }}>{answered}/8 answered · feeds the AI angle</div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* Angle */}
         {angle && (
