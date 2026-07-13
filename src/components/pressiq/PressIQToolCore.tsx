@@ -73,6 +73,14 @@ function chipStyle(active: boolean): React.CSSProperties {
   };
 }
 
+// Subtle "Clear" text button used on the two dark input steps. The tool never
+// auto-wipes typed input; Clear lets the user reset a step's fields on demand.
+const CLEAR_BTN: React.CSSProperties = {
+  background: "none", border: "none", padding: 0, cursor: "pointer",
+  fontFamily: MONO, fontSize: 8.5, fontWeight: 700, letterSpacing: ".14em",
+  textTransform: "uppercase", color: ra(PAPER, 0.5),
+};
+
 const BRAND_LABELS: { key: keyof BrandSignals; label: string }[] = [
   { key: "website",     label: "Personal website"  },
   { key: "bylines",     label: "Published bylines" },
@@ -183,6 +191,10 @@ function PostScorePanel({
             {tb.label}
           </button>
         ))}
+        {/* Always-visible "score another" so it isn't buried on the last tab. */}
+        <button onClick={onReset} style={{ marginLeft: "auto", alignSelf: "center", display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 13px", marginRight: 8, background: INK, color: PAPER, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
+          + Score another
+        </button>
       </div>
 
       {/* ── Tab: Score ────────────────────────────────────────────────── */}
@@ -455,6 +467,11 @@ export default function PressIQToolCore({
     if (result) { setView("post"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   }
 
+  // Per-step "Clear" — wipe just that step's typed input on demand. Scoring
+  // another pitch keeps your data unless you explicitly clear it here.
+  function clearContext() { setJournalistBeat(""); setQuery(""); }
+  function clearPitch()   { setPitch(""); setSubject(""); }
+
   return (
     <>
       {/* ── Step bar ────────────────────────────────────────────────── */}
@@ -516,7 +533,8 @@ export default function PressIQToolCore({
               )}
             </div>
 
-            <div style={{ padding: "18px 22px 22px", display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ padding: "18px 22px 22px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+              <button onClick={clearContext} style={CLEAR_BTN}>Clear</button>
               <button onClick={() => setFormStep(2)} style={{ padding: "12px 24px", border: "none", background: YEL, color: DARK, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", borderRadius: 0 }}>
                 Next: your pitch →
               </button>
@@ -529,7 +547,10 @@ export default function PressIQToolCore({
           <>
             <section className="piq-form-card">
               <div style={LSEC}>
-                <span style={LSEC_LBL}>Your pitch</span>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <span style={LSEC_LBL}>Your pitch</span>
+                  <button onClick={clearPitch} style={CLEAR_BTN}>Clear</button>
+                </div>
                 <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
               </div>
 
