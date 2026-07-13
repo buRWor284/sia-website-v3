@@ -151,7 +151,9 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function PressIQPage() {
   const [started, setStarted] = useState(false);
-  const [coreStep, setCoreStep] = useState(1);
+  // Bumps each time the pitch step becomes visible (incl. after a score) so the
+  // Turnstile widget re-arms without a page reload.
+  const [tsArm, setTsArm] = useState(0);
   const [result, setResult] = useState<ScoreResponse | null>(null);
   const [email, setEmail] = useState("");
   const [emailDone, setEmailDone] = useState(false);
@@ -164,25 +166,37 @@ export default function PressIQPage() {
   // The pitch/subject behind the currently-shown result — captured for the PDF.
   const lastCtx = useRef<{ pitch: string; subject: string }>({ pitch: "", subject: "" });
 
-  // Cloudflare Turnstile: render the widget when configured. No-op when the key
-  // is unset. Re-runs when the core step changes (the container only exists in
-  // the DOM once the pitch step is active) — matches the hardened SignalIQ mount.
+  // Cloudflare Turnstile: (re)render the widget every time the pitch step becomes
+  // visible (tsArm bumps on each step-2 entry, including after a score). No-op
+  // when the key is unset. Any prior widget is removed first — the loading view
+  // unmounts the old container, so on re-entry it's a fresh DOM node. This is
+  // what lets a user score a SECOND pitch without reloading.
   useEffect(() => {
     if (!TURNSTILE_SITE_KEY) return;
-    const render = () => {
+    let cancelled = false;
+    const mount = () => {
+      if (cancelled) return;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const w = window as any;
-      if (!w.turnstile || !turnstileRef.current || turnstileWidgetId.current) return;
-      turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
-        sitekey: TURNSTILE_SITE_KEY,
-        theme: "dark",
-        callback: (token: string) => { turnstileTokenRef.current = token; setTurnstileToken(token); },
-        "expired-callback": () => { turnstileTokenRef.current = ""; setTurnstileToken(""); },
-        "error-callback": () => { turnstileTokenRef.current = ""; setTurnstileToken(""); },
-      });
+      if (!w.turnstile || !turnstileRef.current) return;
+      if (turnstileWidgetId.current) {
+        try { w.turnstile.remove(turnstileWidgetId.current); } catch { /* already detached */ }
+        turnstileWidgetId.current = null;
+      }
+      turnstileTokenRef.current = "";
+      setTurnstileToken("");
+      try {
+        turnstileWidgetId.current = w.turnstile.render(turnstileRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          theme: "dark",
+          callback: (token: string) => { turnstileTokenRef.current = token; setTurnstileToken(token); },
+          "expired-callback": () => { turnstileTokenRef.current = ""; setTurnstileToken(""); },
+          "error-callback": () => { turnstileTokenRef.current = ""; setTurnstileToken(""); },
+        });
+      } catch { /* container not ready yet */ }
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if ((window as any).turnstile) { render(); return; }
+    if ((window as any).turnstile) { mount(); return () => { cancelled = true; }; }
     const SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
     let s = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile"]');
     if (!s) {
@@ -190,9 +204,9 @@ export default function PressIQPage() {
       s.src = SRC; s.async = true; s.defer = true;
       document.head.appendChild(s);
     }
-    s.addEventListener("load", render);
-    return () => { s?.removeEventListener("load", render); };
-  }, [coreStep]);
+    s.addEventListener("load", mount);
+    return () => { cancelled = true; s?.removeEventListener("load", mount); };
+  }, [tsArm]);
 
   // ── Transport: adds the Turnstile token, resets it single-use after the call ──
   const api = {
@@ -327,7 +341,7 @@ export default function PressIQPage() {
             persistKey="sia.pressiq.v2"
             submitDisabled={!!TURNSTILE_SITE_KEY && !turnstileToken}
             turnstileSlot={TURNSTILE_SITE_KEY ? <div ref={turnstileRef} style={{ marginBottom: 12 }} /> : null}
-            onStepChange={setCoreStep}
+            onStepChange={(step) => { if (step === 2) setTsArm((a) => a + 1); }}
             quotaLine={<>{FREE_LIMIT} free scores / month · {EMAIL_LIMIT} with your email<br />scored against published journalist research</>}
             pdfAction={() => setShowGate(true)}
             onScored={(scored, ctx) => { setResult(scored); lastCtx.current = { pitch: ctx.pitch, subject: ctx.subject }; }}
