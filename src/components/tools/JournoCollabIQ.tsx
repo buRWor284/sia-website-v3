@@ -307,7 +307,7 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
 function Stage2({ state, dispatch }: { state: CollabState; dispatch: React.Dispatch<Action> }) {
   const { strategy, audType, geo, audDesc } = state;
   return (
-    <StageWrapper title="What are you offering the journalist?" subtitle="Each angle lands differently. Pick the offer that fits your story, then tell us about the beat and your target tier.">
+    <StageWrapper title="What are you offering the journalist?" subtitle="Each angle lands differently. Pick the offer that fits your story, then add the story itself and your target outlet tier.">
       <div style={{ marginBottom: 48 }}>
         <label style={lbl(TX2)}>What are you offering the journalist?</label>
         <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 8 }}>
@@ -331,13 +331,18 @@ function Stage2({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
         </div>
       </div>
       <div>
-        <label style={lbl(TX2)}>Your audience</label>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginBottom: 20 }}>
+        <label style={lbl(TX2)}>Your story</label>
+        <div style={{ marginBottom: 20 }}>
+          <label style={{ ...lbl(TX4), fontSize: 9 }}>The story / angle you&rsquo;re pitching</label>
+          <textarea style={{ ...inp(), resize: "vertical", minHeight: 72 }} placeholder="e.g. We have proprietary data on 10,000+ lending decisions showing SMBs are rejected at 3× the 2022 rate, despite lower default rates — a story about the SMB credit crunch."
+            value={audDesc} onChange={e => dispatch({ type: "SET", key: "audDesc", val: e.target.value })} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           <div>
-            <label style={{ ...lbl(TX4), fontSize: 9 }}>Type</label>
+            <label style={{ ...lbl(TX4), fontSize: 9 }}>Target outlet tier <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>· optional</span></label>
             <select style={inp()} value={audType} onChange={e => dispatch({ type: "SET", key: "audType", val: e.target.value })}>
               <option value="">Select…</option>
-              {["B2C Consumers","B2B Small Businesses","B2B Mid-Market / Enterprise","Both B2B and B2C"].map(o => <option key={o} value={o}>{o}</option>)}
+              {["Tier-1 national (e.g. TechCrunch, Forbes)","Trade / industry press","Regional / local","Any relevant outlet"].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
           <div>
@@ -347,11 +352,6 @@ function Stage2({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
               {["Global","United Kingdom","United States","North America","Europe","Australia / NZ","Asia-Pacific"].map(o => <option key={o} value={o}>{o}</option>)}
             </select>
           </div>
-        </div>
-        <div>
-          <label style={{ ...lbl(TX4), fontSize: 9 }}>Describe your ideal customer (optional)</label>
-          <textarea style={{ ...inp(), resize: "vertical", minHeight: 60 }} placeholder="Who buys from you? What problem do they have?"
-            value={audDesc} onChange={e => dispatch({ type: "SET", key: "audDesc", val: e.target.value })} />
         </div>
       </div>
     </StageWrapper>
@@ -622,7 +622,7 @@ function Stage4({ state, dispatch, partners, onGated, aiEmail, aiEmailLoading }:
         </p>
         <button onClick={()=>onGated("email")} disabled={aiEmailLoading||!biz||!state.scPartner}
           style={{ ...primaryBtn(), opacity:(!biz||aiEmailLoading||!state.scPartner)?0.4:1, cursor:(!biz||!state.scPartner)?"not-allowed":"pointer", fontSize:13, padding:"14px 28px" }}>
-          {aiEmailLoading ? "Writing…" : state.scPartner ? `Write email for ${state.scPartner} →` : "Select a partner above first"}
+          {aiEmailLoading ? "Writing…" : state.scPartner ? `Write angle for ${state.scPartner} →` : "Select a journalist above first"}
         </button>
         {aiEmail && (
           <div style={{ marginTop:24 }}>
@@ -1042,7 +1042,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
     const blob = new Blob([csv],{type:"text/csv"});
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-    a.download = `JournoCollabIQ-Partners-${state.biz||"List"}.csv`; a.click();
+    a.download = `JournoCollabIQ-Journalists-${state.biz||"List"}.csv`; a.click();
   }
   function handleSub() {
     // The gate modal has already verified the email and set the signed wristband
@@ -1483,7 +1483,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   }
   function goBack() { if(step>0) dispatch({type:"GO",step:step-1}); }
 
-  const nextLabels = ["","Continue →","Generate partners →","Continue to outreach →","Build your playbook →",""];
+  const nextLabels = ["","Continue →","Find journalists →","Continue to outreach →","Build your playbook →",""];
   const t = LIGHT_T;
 
   return (
