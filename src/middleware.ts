@@ -67,6 +67,11 @@ const isClientUnauthorizedPage = createRouteMatcher(["/clients/unauthorized"]);
 // /emostool/not-invited is public (no redirect loop)
 const isNotInvitedRoute = createRouteMatcher(["/emostool/not-invited"]);
 
+// /emostool (exact root) is the PUBLIC platform landing + sign-out destination.
+// Only the root is public; everything BELOW it (/emostool/dashboard, tools, invite)
+// stays protected. The page itself forwards signed-in users to the dashboard.
+const isEmostoolLanding = createRouteMatcher(["/emostool", "/emostool/"]);
+
 export default clerkMiddleware(async (auth, req) => {
   // ── Legacy: PT (Basic Auth) ──────────────────────────────────────────────
   if (isClientPtRoute(req)) {
@@ -135,7 +140,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // ── EMOS tool: Clerk auth + emos_access metadata ─────────────────────────
-  if (isProtectedRoute(req) && !isNotInvitedRoute(req)) {
+  if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req)) {
     await auth.protect();
     // Invite-only: require emos_access = true in Clerk publicMetadata.
     // Fast path: read from JWT session claims (already in token).
