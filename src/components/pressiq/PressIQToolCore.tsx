@@ -390,8 +390,10 @@ export default function PressIQToolCore({
     /* eslint-enable react-hooks/set-state-in-effect */
   }, [pitchMode]);
 
-  // Report the step so the public wrapper can (re)mount its Turnstile widget.
-  useEffect(() => { onStepChange?.(formStep); }, [formStep, onStepChange]);
+  // Report the step whenever the input form is on screen so the public wrapper
+  // can (re)arm its Turnstile widget — including when the form comes back after a
+  // score (view returns to "pre").
+  useEffect(() => { if (view === "pre") onStepChange?.(formStep); }, [formStep, view, onStepChange]);
 
   const live = useMemo(() => {
     if (pitch.trim().length < 15) return null;
@@ -425,26 +427,35 @@ export default function PressIQToolCore({
     }
   }
 
-  function reset() { setView("pre"); setResult(null); setError(null); setTab("score"); setFormStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  // "Score another pitch" — return to the pitch step; KEEP the last result so the
+  // Results view stays reachable (no forced re-score just to see it again).
+  function reset() { setView("pre"); setError(null); setFormStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
+  // Free navigation between Pitch context / Your pitch / Results — never drops the
+  // typed input OR the last result.
   function goToStep(n: 1 | 2) {
-    if (view === "post") { setView("pre"); setResult(null); }
+    if (view === "loading") return;
+    setView("pre");
     setFormStep(n);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function goToResults() {
+    if (result) { setView("post"); window.scrollTo({ top: 0, behavior: "smooth" }); }
   }
 
   return (
     <>
       {/* ── Step bar ────────────────────────────────────────────────── */}
       <nav className="piq-step-bar">
-        <span className="piq-step past" onClick={() => goToStep(1)}>
-          <span className="piq-step-no">✓</span> Pitch context
+        <span className={`piq-step ${view !== "post" && formStep === 1 ? "active" : "past"}`} onClick={() => goToStep(1)}>
+          <span className="piq-step-no">{view !== "post" && formStep === 1 ? "1" : "✓"}</span> Pitch context
         </span>
         <span className="piq-step-connector" />
-        <span className={`piq-step ${view === "post" ? "past" : formStep === 2 ? "active" : ""}`} onClick={() => view === "post" && goToStep(2)}>
+        <span className={`piq-step ${view !== "post" && formStep === 2 ? "active" : "past"}`} onClick={() => goToStep(2)}>
           <span className="piq-step-no">{view === "post" ? "✓" : "2"}</span> Your pitch
         </span>
         <span className="piq-step-connector" />
-        <span className={`piq-step ${view === "post" ? "active" : ""}`}>
+        <span className={`piq-step ${view === "post" ? "active" : result ? "past" : ""}`} onClick={goToResults}>
           <span className="piq-step-no">3</span> Results
         </span>
       </nav>
