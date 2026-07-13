@@ -1,12 +1,12 @@
 /**
  * /api/pitch-score
  *
- * PressIQ — scores a PR pitch. Mirrors the repo's /api/collab-ai pattern
- * (direct fetch to the Anthropic Messages API, no SDK). One structured tool-use call
- * scores Relevance + the 32-point checklist + the three EMOS dimensions; Layer-1
- * metrics are computed deterministically server-side.
+ * PressIQ — scores a PR pitch (PUBLIC surface). Turnstile + unified quota guard.
+ * The scoring logic itself lives in the shared `lib/pitch/route-core.ts` (Phase
+ * P6) so the public and dashboard routes can never drift; this file owns only
+ * the public guard (human check + monthly quota) and its own `usage` block.
  *
- * Requires ANTHROPIC_API_KEY in .env.local.  Optional: PITCH_SCORE_MODEL, TURNSTILE_SECRET_KEY.
+ * Requires ANTHROPIC_API_KEY. Optional: PITCH_SCORE_MODEL, TURNSTILE_SECRET_KEY.
  * POST body: PitchInput (see src/lib/pitch/types.ts).
  */
 
@@ -14,16 +14,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { consumeQuota } from "@/lib/gate/quota";
-import { EMAIL_LIMIT, PITCH_MODEL } from "@/lib/pitch/config";
-import { computeMetrics, resolveSubject, scoreLayer1 } from "@/lib/pitch/metrics";
-import { buildUserPrompt, parseAiResult, SCORE_TOOL, SYSTEM_PROMPT } from "@/lib/pitch/scorePrompt";
-import { composeScore } from "@/lib/pitch/composite";
+import { EMAIL_LIMIT } from "@/lib/pitch/config";
+import { parsePitchInput, runScoreRequest } from "@/lib/pitch/route-core";
 import { logPitch } from "@/lib/pitch/log";
-import type { BrandSignals, PitchInput } from "@/lib/pitch/types";
-import { EMPTY_BRAND } from "@/lib/pitch/types";
 
-const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-const MAX_PITCH_CHARS = 8000;
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+// Scoring runs 30-60s live (see the tool's loader copy) — 60s ceiling on both
+// surfaces (this route previously declared none; the dashboard twin was on 30).
+export const maxDuration = 60;
 
 function clientIp(req: NextRequest): string {
   // On Vercel, x-real-ip is set by the platform to the true client IP and cannot be
@@ -39,25 +38,7 @@ function clientIp(req: NextRequest): string {
   return "unknown";
 }
 
-function coerceBrand(v: unknown): BrandSignals {
-  const o = (typeof v === "object" && v ? v : {}) as Record<string, unknown>;
-  return {
-    website: !!o.website,
-    bylines: !!o.bylines,
-    youtube: !!o.youtube,
-    speaking: !!o.speaking,
-    caseStudies: !!o.caseStudies,
-    linkedin: !!o.linkedin,
-  };
-}
-
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    console.error("pitch-score: ANTHROPIC_API_KEY is not set");
-    return NextResponse.json({ error: "Scoring is temporarily unavailable. Please try again later." }, { status: 500 });
-  }
-
   let raw: Record<string, unknown>;
   try {
     raw = (await req.json()) as Record<string, unknown>;
@@ -65,26 +46,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
 
-  const pitch = typeof raw.pitch === "string" ? raw.pitch : "";
-  if (!pitch.trim() || pitch.trim().length < 40) {
-    return NextResponse.json({ error: "Paste a pitch of at least a few sentences to score it." }, { status: 400 });
-  }
-  if (pitch.length > MAX_PITCH_CHARS) {
-    return NextResponse.json({ error: "That pitch is too long to score. Keep it under 8,000 characters (about 1,300 words)." }, { status: 400 });
-  }
-
-  const input: PitchInput = {
-    pitch,
-    query: typeof raw.query === "string" ? raw.query : undefined,
-    subject: typeof raw.subject === "string" ? raw.subject : undefined,
-    platform: (["haro", "qwoted", "sos", "featured", "b2bwriter", "direct"].includes(String(raw.platform))
-      ? raw.platform
-      : "haro") as PitchInput["platform"],
-    brandSignals: raw.brandSignals ? coerceBrand(raw.brandSignals) : EMPTY_BRAND,
-    store: raw.store !== false,
-    pitchMode: raw.pitchMode === "query" ? "query" : "standalone",
-    turnstileToken: typeof raw.turnstileToken === "string" ? raw.turnstileToken : undefined,
-  };
+  const parsed = parsePitchInput(raw, { withTurnstile: true });
+  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status });
+  const input = parsed.input;
 
   const ip = clientIp(req);
 
@@ -112,60 +76,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Layer 1 — deterministic.
-  const subject = resolveSubject(input.pitch, input.subject);
-  const metrics = computeMetrics(input.pitch, subject);
-  const l1 = scoreLayer1(metrics);
-
-  // Layers 2-3 + Relevance — one structured AI call.
-  let aiContent: Array<{ type: string; name?: string; input?: unknown }>;
-  try {
-    const res = await fetch(ANTHROPIC_API, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: PITCH_MODEL,
-        max_tokens: 3500,
-        temperature: 0.2,
-        system: SYSTEM_PROMPT,
-        tools: [SCORE_TOOL],
-        tool_choice: { type: "tool", name: SCORE_TOOL.name },
-        messages: [{ role: "user", content: buildUserPrompt(input, metrics) }],
-      }),
-    });
-
-    if (!res.ok) {
-      const err = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
-      console.error("pitch-score upstream error:", res.status, err?.error?.message);
-      return NextResponse.json({ error: "Couldn't score the pitch right now. Please try again in a moment." }, { status: 502 });
-    }
-
-    const json = (await res.json()) as { content?: Array<{ type: string; name?: string; input?: unknown }> };
-    aiContent = json.content ?? [];
-  } catch (e) {
-    console.error("pitch-score route error:", e);
-    return NextResponse.json({ error: "Internal server error scoring the pitch." }, { status: 500 });
-  }
-
-  let result;
-  try {
-    const ai = parseAiResult(aiContent);
-    result = composeScore(l1, ai, {
-      hasQuery: Boolean(input.query?.trim()),
-      usage: { remaining: quota.remaining, tier: usageTier },
-    });
-  } catch (e) {
-    console.error("pitch-score parse error:", e);
-    return NextResponse.json({ error: "Could not parse the score. Please try again." }, { status: 502 });
-  }
+  const run = await runScoreRequest(input, { remaining: quota.remaining, tier: usageTier });
+  if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
   // Flywheel (non-blocking) — pass Clerk user ID if session present so score gets org-scoped.
   const { userId: clerkUserId } = await auth();
-  void logPitch(input, result, clerkUserId ?? undefined);
+  void logPitch(input, run.result, clerkUserId ?? undefined);
 
-  return NextResponse.json(result);
+  return NextResponse.json(run.result);
 }
