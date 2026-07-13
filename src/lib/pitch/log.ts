@@ -4,6 +4,10 @@
  * Saves scored pitches to pressiq_scores in Supabase using the service-role
  * client (bypasses RLS) so it works from the public tool without a full session.
  * When a Clerk user ID is provided we resolve the internal user + org and write them.
+ *
+ * MUST be awaited by callers — a fire-and-forget call is dropped when the
+ * serverless function freezes after the response (this was the "Score History
+ * always empty" bug). See feedback-fire-and-forget-persistence.
  */
 
 import { createHash } from "crypto";
@@ -30,6 +34,16 @@ export async function logPitch(
         .eq("clerk_user_id", clerkUserId)
         .single();
       if (u) { orgId = u.org_id; internalUserId = u.id; }
+    }
+
+    // pressiq_scores.org_id is NOT NULL, so a row can only be stored when we
+    // resolved an org (i.e. a signed-in platform user). Anonymous public scores
+    // have no org — skip cleanly rather than throwing a NOT-NULL violation.
+    // (Storing anonymous public scores for the flywheel would need a nullable
+    // org_id/pitch_text migration — a deliberate product decision, not done here.)
+    if (!orgId) {
+      console.log(`[pitch-score] no org resolved (anonymous) — skipping persistence, hash=${pitchHash}`);
+      return;
     }
 
     const areas = result.areas;
@@ -68,9 +82,10 @@ export async function logPitch(
       console.error("[pitch-score] DB insert failed:", error.message);
     } else {
       console.log(`[pitch-score] saved hash=${pitchHash} composite=${result.composite} tier=${result.tier.label}`);
-      // Stage progression: pitch_scored event (only when user is authenticated)
+      // Stage progression: pitch_scored event. Awaited so it isn't dropped when
+      // the function freezes after the response.
       if (clerkUserId) {
-        void recordStageEventFor(clerkUserId, "pitch_scored");
+        await recordStageEventFor(clerkUserId, "pitch_scored");
       }
     }
   } catch (err) {

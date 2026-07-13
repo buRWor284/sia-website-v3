@@ -39,8 +39,10 @@ export async function POST(req: NextRequest) {
   const run = await runScoreRequest(input, { remaining: 999, tier: "email" });
   if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
-  // Always log — platform users always authenticated.
-  void logPitch(input, run.result, userId);
+  // Always log — platform users are always authenticated. MUST be awaited: a
+  // fire-and-forget insert is dropped when the function freezes post-response
+  // (this was why Score History was always empty). logPitch never throws.
+  await logPitch(input, run.result, userId);
 
   return NextResponse.json(run.result);
 }

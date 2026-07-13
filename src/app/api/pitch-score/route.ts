@@ -79,9 +79,12 @@ export async function POST(req: NextRequest) {
   const run = await runScoreRequest(input, { remaining: quota.remaining, tier: usageTier });
   if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
-  // Flywheel (non-blocking) — pass Clerk user ID if session present so score gets org-scoped.
+  // Flywheel — pass the Clerk user ID if a session is present so the score is
+  // org-scoped. MUST be awaited: a fire-and-forget insert is dropped when the
+  // serverless function is frozen right after the response is sent (logPitch is
+  // internally try/caught, so awaiting can never break the response).
   const { userId: clerkUserId } = await auth();
-  void logPitch(input, run.result, clerkUserId ?? undefined);
+  await logPitch(input, run.result, clerkUserId ?? undefined);
 
   return NextResponse.json(run.result);
 }
