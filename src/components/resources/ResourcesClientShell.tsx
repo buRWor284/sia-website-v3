@@ -514,6 +514,17 @@ const GROUP_LABEL: Record<ContentType, string> = {
   "infographic":  "Infographics · Research made visible",
 };
 
+// Deep-link anchors — e.g. /resources#videos jumps to that section.
+const GROUP_ANCHOR: Record<ContentType, string> = {
+  "video":        "videos",
+  "kit":          "kits",
+  "tool":         "tools",
+  "quiz":         "quizzes",
+  "playbook":     "playbooks",
+  "guide":        "guides",
+  "infographic":  "infographics",
+};
+
 const TYPE_ACCENT: Record<ContentType, string> = {
   "video":        "#C0392B",
   "kit":          "#f5b81f",
@@ -811,7 +822,7 @@ function ResourceLedger({
         return (
           <div key={group.type}>
             {/* Category header */}
-            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "28px 0 12px", borderBottom: `1px solid ${INK}` }}>
+            <div id={GROUP_ANCHOR[group.type]} style={{ scrollMarginTop: 120, display: "flex", alignItems: "center", gap: 16, padding: "28px 0 12px", borderBottom: `1px solid ${INK}` }}>
               <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.22em", textTransform: "uppercase", color: INK, borderLeft: `3px solid ${TYPE_ACCENT[group.type]}`, paddingLeft: 10 }}>
                 {GROUP_LABEL[group.type]}
               </span>
@@ -826,6 +837,38 @@ function ResourceLedger({
           </div>
         );
       })}
+
+      {/* Infographics Desk link — the full gallery of all six lives at /infographics */}
+      <div
+        id="infographics"
+        style={{
+          scrollMarginTop: 120,
+          marginTop: 44,
+          padding: "22px 24px",
+          border: `1px solid ${INK}`,
+          background: PAPER2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 16,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase", color: INK55 }}>
+            The Infographics Desk
+          </div>
+          <div style={{ fontFamily: SERIF, fontSize: 17, color: INK, marginTop: 4 }}>
+            All six infographics in one place: interactive editions and restored originals.
+          </div>
+        </div>
+        <a
+          href="/infographics"
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none", flexShrink: 0 }}
+        >
+          View all 6 infographics →
+        </a>
+      </div>
 
       {/* Being Updated section */}
       {updatingItems.length > 0 && (

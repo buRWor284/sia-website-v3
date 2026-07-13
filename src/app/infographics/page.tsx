@@ -158,21 +158,9 @@ const Hero = () => (
 // =========================================================================
 const InfographicCard = ({ card }: { card: InfographicCard }) => {
   const isExternal = card.href.startsWith("http");
-  return (
-    <a
-      href={card.href}
-      {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        border: `1px solid ${INK}`,
-        background: card.status === "live" ? INK : PAPER,
-        color: card.status === "live" ? PAPER : INK,
-        textDecoration: "none",
-        padding: "28px 28px 24px",
-        transition: "opacity .2s",
-      }}
-    >
+  const isLive = card.status === "live";
+  const inner = (
+    <>
       {/* Top row */}
       <div
         style={{
@@ -267,12 +255,49 @@ const InfographicCard = ({ card }: { card: InfographicCard }) => {
             fontSize: 11,
             letterSpacing: "0.14em",
             textTransform: "uppercase",
-            color: card.status === "live" ? YEL : INK,
+            color: isLive ? YEL : INK,
           }}
         >
-          {card.status === "live" ? "View →" : "View original →"}
+          {isLive ? "View →" : "In production"}
         </span>
       </div>
+    </>
+  );
+
+  if (!isLive) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          border: `1px solid ${INK}`,
+          background: PAPER,
+          color: INK,
+          padding: "28px 28px 24px",
+          cursor: "default",
+        }}
+      >
+        {inner}
+      </div>
+    );
+  }
+
+  return (
+    <a
+      href={card.href}
+      {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        border: `1px solid ${INK}`,
+        background: INK,
+        color: PAPER,
+        textDecoration: "none",
+        padding: "28px 28px 24px",
+        transition: "opacity .2s",
+      }}
+    >
+      {inner}
     </a>
   );
 };
@@ -298,7 +323,7 @@ const Grid = () => (
     </div>
     <div style={{ marginTop: 20 }}>
       <SCaps size={10.5} ls="0.16em" color={INK55}>
-        Infographics marked &ldquo;Redesign coming&rdquo; link to the original WordPress edition while the new interactive version is in production.
+        Infographics marked &ldquo;Redesign coming&rdquo; are being rebuilt as new interactive editions, and will return here once ready.
       </SCaps>
     </div>
   </section>
