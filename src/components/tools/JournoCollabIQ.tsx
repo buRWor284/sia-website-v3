@@ -856,9 +856,10 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
 }
 
 // ── Progress Bar ───────────────────────────────────────────────────────────────
-function WizardProgress({ step, onLogoClick, topOffset = 0 }: {
+function WizardProgress({ step, onLogoClick, onStepClick, topOffset = 0 }: {
   step: number;
   onLogoClick: () => void;
+  onStepClick: (step: number) => void;
   topOffset?: number;
 }) {
   const t = LIGHT_T;
@@ -872,7 +873,8 @@ function WizardProgress({ step, onLogoClick, topOffset = 0 }: {
         {STEPS.map((s,i)=>{
           const done=i<step, active=i===step;
           return (
-            <button key={i} disabled={!done}
+            <button key={i} disabled={!done} onClick={done ? () => onStepClick(i + 1) : undefined}
+              title={done ? `Go to ${s}` : undefined}
               style={{ display:"flex", alignItems:"center", gap:8, background:"transparent", border:"none", cursor:done?"pointer":"default", padding:0 }}>
               <span style={{ width:24, height:24, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:MF, fontSize:10, fontWeight:700,
                 background:active?ACC:done?SUCC:"transparent", color:active||done?"#fff":t.TX3,
@@ -1561,7 +1563,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     <>
       <style dangerouslySetInnerHTML={{ __html: GLOBAL_CSS }} />
       <div className="v2-collabiq" style={{ background:t.BG1, color:t.TX, minHeight:"100vh" }}>
-        {step>0 && <WizardProgress step={step===5 && !!aiBrief ? step : step-1} onLogoClick={()=>dispatch({type:"GO",step:1})} topOffset={toolHeaderHeight} />}
+        {step>0 && <WizardProgress step={step===5 && !!aiBrief ? step : step-1} onLogoClick={()=>dispatch({type:"GO",step:1})} onStepClick={(s)=>dispatch({type:"GO",step:s})} topOffset={toolHeaderHeight} />}
 
         <div key={`stage-${step}`}>
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
