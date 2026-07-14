@@ -254,14 +254,18 @@ export default async function EmosDashboardPage() {
             const stats     = toolStats[stage];
 
             return (
-              <div
+              <a
                 key={stage}
+                href={meta.path}
                 style={{
                   background: isActive ? INK : PAPER,
                   display: "grid",
-                  gridTemplateColumns: "48px 1fr auto auto",
+                  gridTemplateColumns: "48px minmax(0,1fr) auto auto",
                   alignItems: "center",
                   gap: 0,
+                  textDecoration: "none",
+                  color: "inherit",
+                  cursor: "pointer",
                 }}
               >
                 {/* Step number */}
@@ -270,8 +274,8 @@ export default async function EmosDashboardPage() {
                 </div>
 
                 {/* Tool info */}
-                <div style={{ padding: "20px 20px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                <div style={{ padding: "20px 20px", minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
                     <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: isActive ? PAPER : isDone ? "rgba(26,20,16,.45)" : INK }}>
                       {meta.label}
                     </span>
@@ -317,23 +321,22 @@ export default async function EmosDashboardPage() {
                 )}
                 {stats.count === 0 && <div style={{ padding: "20px 20px" }} />}
 
-                {/* CTA */}
+                {/* CTA (whole card is the link; this stays as a visual affordance) */}
                 <div style={{ padding: "20px 20px 20px 0" }}>
-                  <a
-                    href={meta.path}
+                  <span
                     style={{
                       display: "inline-block",
                       padding: "8px 18px",
                       background: isActive ? YEL : "transparent",
                       color: isActive ? INK : INK55,
                       border: isActive ? "none" : `1px solid ${INK15}`,
-                      fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none",
+                      fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", whiteSpace: "nowrap",
                     }}
                   >
                     Open →
-                  </a>
+                  </span>
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>
