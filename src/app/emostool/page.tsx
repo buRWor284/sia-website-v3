@@ -89,13 +89,22 @@ export default async function EmostoolLandingPage() {
           login, with your pipeline saved as you go.
         </p>
         <div style={{ marginTop: "clamp(24px,3vw,34px)", display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
-          <Link href="/sign-in" style={{ padding: "14px 34px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-            Sign in to EMOS
+          {/* P4: the purchase path. Self-serve checkout is the primary CTA — sign-up
+              is Restricted in Clerk, so paying first (then getting invited) is the
+              only way in for a new customer. */}
+          <Link href="/emos/subscribe" style={{ padding: "14px 34px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
+            Get EMOS · $50/month
           </Link>
-          <Link href="/emostool/not-invited" style={{ padding: "14px 30px", background: "transparent", color: INK, border: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
+          <Link href="/sign-in" style={{ padding: "14px 30px", background: "transparent", color: INK, border: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
+            Sign in
+          </Link>
+          <Link href="/emostool/not-invited" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, textDecoration: "underline", textDecorationColor: INK15 }}>
             Request access →
           </Link>
         </div>
+        <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+          $50/month · cancel any time · secure payment via Stripe
+        </p>
       </section>
 
       {/* ── The connected pipeline ───────────────────────────────────────── */}
@@ -155,11 +164,11 @@ export default async function EmostoolLandingPage() {
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 220 }}>
-            <Link href="/sign-in" style={{ textAlign: "center", padding: "15px 30px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-              Sign in to EMOS
+            <Link href="/emos/subscribe" style={{ textAlign: "center", padding: "15px 30px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
+              Get EMOS · $50/month
             </Link>
-            <Link href="/emostool/not-invited" style={{ textAlign: "center", padding: "14px 30px", background: "transparent", color: CREAM, border: `1px solid ${CREAM70}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-              Request access →
+            <Link href="/sign-in" style={{ textAlign: "center", padding: "14px 30px", background: "transparent", color: CREAM, border: `1px solid ${CREAM70}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
+              Sign in
             </Link>
             <Link href="/tools" style={{ textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: CREAM70, textDecoration: "underline", textDecorationColor: "rgba(250,250,250,.25)", marginTop: 2 }}>
               Try the free tools first
