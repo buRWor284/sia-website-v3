@@ -19,7 +19,7 @@
 
 import React, { useState, useTransition } from "react";
 import Script from "next/script";
-import { createPitch } from "@/app/emostool/actions/coverageiq";
+import { createPitch } from "@/app/emos-platform/actions/coverageiq";
 import { getJsPDF } from "@/lib/pdf/house-style";
 import { buildPressIqReport } from "@/lib/pdf/pressiq-report";
 import PressIQToolCore from "@/components/pressiq/PressIQToolCore";
@@ -90,7 +90,7 @@ function TrackCTA({ result, pitchSubject }: { result: ScoreResponse; pitchSubjec
     <div style={{ marginTop: 20, border: `1px solid ${INK}`, padding: "14px 24px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
       {tracked ? (
         <a
-          href="/emostool/dashboard/coverageiq"
+          href="/emos-platform/dashboard/coverageiq"
           style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: GREEN, textDecoration: "none", borderBottom: `1px solid ${GREEN}` }}
         >
           ✓ Pitch created in CoverageIQ →

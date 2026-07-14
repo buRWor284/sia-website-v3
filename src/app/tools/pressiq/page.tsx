@@ -300,7 +300,7 @@ export default function PressIQPage() {
           </>
         }
         pitch="PressIQ runs on the EMOS framework: Personal Branding × Storytelling × Neuromarketing. The full Earned Media Operating System hands your team the playbooks, journalist contacts, and pitch system to earn coverage in-house, permanently."
-        applyHref="/emostool"
+        applyHref="/emos-platform"
         applyLabel={r.composite >= 65 ? "Apply to EMOS" : "Explore EMOS"}
         hideExplore
         extraAction={

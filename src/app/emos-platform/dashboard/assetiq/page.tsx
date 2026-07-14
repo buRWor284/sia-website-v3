@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getAssets } from "@/app/emostool/actions/assetiq";
-import { getSignals } from "@/app/emostool/actions/signaliq";
+import { getAssets } from "@/app/emos-platform/actions/assetiq";
+import { getSignals } from "@/app/emos-platform/actions/signaliq";
 import AssetIQClient from "@/components/emostool/AssetIQClient";
 import PipelineNav from "@/components/emostool/PipelineNav";
 import type { Metadata } from "next";
@@ -56,7 +56,7 @@ export default async function AssetIQPage({
       {/* Header */}
       <div style={{ background: INK, color: PAPER, padding: "0 clamp(20px,4vw,56px)" }}>
         <div style={{ maxWidth: 1200, marginInline: "auto", display: "flex", alignItems: "center", height: 52 }}>
-          <a href="/emostool/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
+          <a href="/emos-platform/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
           <span style={{ color: "rgba(241,235,222,.2)", margin: "0 12px" }}>|</span>
           <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>Asset<span style={{ color: YEL }}>IQ</span></span>
           <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", marginLeft: 10 }}>Linkable Asset Builder</span>
@@ -70,7 +70,7 @@ export default async function AssetIQPage({
           <div style={{ background: "rgba(245,184,31,.12)", border: `1px solid ${YEL}`, padding: "12px 18px", marginBottom: 28, display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 8px" }}>From SignalIQ</span>
             <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>{signalHeadline}</span>
-            <a href="/emostool/dashboard/signaliq" style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: "1px solid rgba(26,20,16,.2)" }}>
+            <a href="/emos-platform/dashboard/signaliq" style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: "1px solid rgba(26,20,16,.2)" }}>
               ← Back to SignalIQ
             </a>
           </div>

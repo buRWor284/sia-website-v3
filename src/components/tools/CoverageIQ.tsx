@@ -242,7 +242,7 @@ export default function CoverageIQ() {
         <EmosCTAStrip
           toolName="CoverageIQ"
           pitch="CoverageIQ is the last step of the pipeline: it tracks what your pitches earn. The full Earned Media Operating System gives your team the story signals, journalist matching, and pitch scoring that fill this pipeline in the first place."
-          applyHref="/emostool"
+          applyHref="/emos-platform"
           applyLabel="Explore EMOS"
           hideExplore
         />

@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getSignals } from "@/app/emostool/actions/signaliq";
+import { getSignals } from "@/app/emos-platform/actions/signaliq";
 import SignalIQPlatformClient from "@/components/emostool/SignalIQPlatformClient";
 import PipelineNav from "@/components/emostool/PipelineNav";
 import type { Metadata } from "next";
@@ -29,8 +29,8 @@ export default async function SignalIQPlatformPage() {
   // Build next-tool href: point to AssetIQ with most recent saved signal
   const latestSignal = signals.find(s => s.status === "saved") ?? signals[0];
   const assetIQHref = latestSignal
-    ? `/emostool/dashboard/assetiq?signal=${latestSignal.id}&headline=${encodeURIComponent(latestSignal.headline)}`
-    : "/emostool/dashboard/assetiq";
+    ? `/emos-platform/dashboard/assetiq?signal=${latestSignal.id}&headline=${encodeURIComponent(latestSignal.headline)}`
+    : "/emos-platform/dashboard/assetiq";
 
   const counts = {
     new:      signals.filter(s => s.status === "new").length,
@@ -46,7 +46,7 @@ export default async function SignalIQPlatformPage() {
       <div style={{ background: INK, color: PAPER, padding: "0 clamp(20px,4vw,56px)" }}>
         <div style={{ maxWidth: 1200, marginInline: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 52 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <a href="/emostool/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
+            <a href="/emos-platform/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
             <span style={{ color: "rgba(241,235,222,.2)" }}>|</span>
             <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>Signal<span style={{ color: YEL }}>IQ</span></span>
             <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)" }}>Story Detection</span>

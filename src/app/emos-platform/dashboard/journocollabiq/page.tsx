@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getJournalists } from "@/app/emostool/actions/coverageiq";
+import { getJournalists } from "@/app/emos-platform/actions/coverageiq";
 import JournoCollabIQClient from "@/components/emostool/JournoCollabIQClient";
 import PipelineNav from "@/components/emostool/PipelineNav";
 import type { Metadata } from "next";
@@ -54,12 +54,12 @@ export default async function JournoCollabIQPage({
       <div style={{ background: INK, color: PAPER, padding: "0 clamp(20px,4vw,56px)" }}>
         <div style={{ maxWidth: 1200, marginInline: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 52 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <a href="/emostool/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
+            <a href="/emos-platform/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
             <span style={{ color: "rgba(241,235,222,.2)" }}>|</span>
             <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>JournoCollab<span style={{ color: YEL }}>IQ</span></span>
             <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)" }}>Journalist Discovery</span>
           </div>
-          <a href="/emostool/dashboard/pressiq"
+          <a href="/emos-platform/dashboard/pressiq"
             style={{ padding: "6px 14px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}>
             Score a pitch →
           </a>

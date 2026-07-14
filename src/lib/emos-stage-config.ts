@@ -63,7 +63,7 @@ export const STAGE_META: Record<EmosStage, {
   signal:   {
     label:       "SignalIQ",
     tool:        "Story Detection",
-    path:        "/emostool/dashboard/signaliq",
+    path:        "/emos-platform/dashboard/signaliq",
     description: "Scan open data for newsworthy signals. Save top opportunities.",
     threshold:   "Save 3 signals to advance to AssetIQ",
     nextLabel:   "AssetIQ",
@@ -71,7 +71,7 @@ export const STAGE_META: Record<EmosStage, {
   asset:    {
     label:       "AssetIQ",
     tool:        "Linkable Asset Builder",
-    path:        "/emostool/dashboard/assetiq",
+    path:        "/emos-platform/dashboard/assetiq",
     description: "Turn a signal into a linkable asset — report, calculator, quiz.",
     threshold:   "Create 1 asset to advance to JournoCollabIQ",
     nextLabel:   "JournoCollabIQ",
@@ -79,7 +79,7 @@ export const STAGE_META: Record<EmosStage, {
   collab:   {
     label:       "JournoCollabIQ",
     tool:        "Journalist CRM",
-    path:        "/emostool/dashboard/journocollabiq",
+    path:        "/emos-platform/dashboard/journocollabiq",
     description: "Build and manage journalist relationships. Track every touchpoint.",
     threshold:   "Save 3 journalists to advance to PressIQ",
     nextLabel:   "PressIQ",
@@ -87,7 +87,7 @@ export const STAGE_META: Record<EmosStage, {
   press:    {
     label:       "PressIQ",
     tool:        "Pitch Scoring",
-    path:        "/emostool/dashboard/pressiq",
+    path:        "/emos-platform/dashboard/pressiq",
     description: "Score and refine your pitches against 32-point journalist criteria.",
     threshold:   "Score 5 pitches to advance to CoverageIQ",
     nextLabel:   "CoverageIQ",
@@ -95,7 +95,7 @@ export const STAGE_META: Record<EmosStage, {
   coverage: {
     label:       "CoverageIQ",
     tool:        "Pitch Tracking",
-    path:        "/emostool/dashboard/coverageiq",
+    path:        "/emos-platform/dashboard/coverageiq",
     description: "Track your full pitch pipeline from drafted to amplified.",
     threshold:   "Log 10 pitches to reach Full EMOS",
     nextLabel:   "Full EMOS",
@@ -103,7 +103,7 @@ export const STAGE_META: Record<EmosStage, {
   full:     {
     label:       "EMOS Full",
     tool:        "Full Platform",
-    path:        "/emostool/dashboard",
+    path:        "/emos-platform/dashboard",
     description: "Complete earned media operating system unlocked.",
     threshold:   "All stages complete",
     nextLabel:   "",

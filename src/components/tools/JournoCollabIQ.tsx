@@ -856,7 +856,7 @@ function Stage5({ state, onGated, aiBrief, aiBriefLoading, pdfLoading, pdfDone }
             </>
           }
           pitch="JournoCollabIQ builds the target list, the outreach sequence, and the per-journalist angles. The full Earned Media Operating System hands your team the story signals and pitch system that feed this list, and can run the whole outreach for you if you'd rather not do it in-house."
-          applyHref="/emostool"
+          applyHref="/emos-platform"
           applyLabel="Explore EMOS"
           hideExplore
         />
@@ -1490,7 +1490,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     cy+=inclBoxH+14;
     doc.setFillColor(...GOLD); doc.rect(W/2-54,cy,108,14,"F");
     doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...INK);
-    doc.text("Learn more at syedirfanajmal.com/emostool",W/2,cy+9,{align:"center"});
+    doc.text("Learn more at syedirfanajmal.com/emos-platform",W/2,cy+9,{align:"center"});
     // Attribution well above footer zone — no overlap
     doc.setFontSize(7); doc.setTextColor(55,46,36);
     doc.text(`Generated via JournoCollabIQ  ·  ${date}`,W/2,H-24,{align:"center"});
@@ -1582,7 +1582,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         <div key={`stage-${step}`}>
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
-          {step===3 && <Stage3 partners={partners} hiddenCount={hiddenCount} onUnlock={()=>{setGatedAction("unlock-preview");setShowGate(true);}} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} upgradeHref={upgradeNudge ? "/emostool" : null} />}
+          {step===3 && <Stage3 partners={partners} hiddenCount={hiddenCount} onUnlock={()=>{setGatedAction("unlock-preview");setShowGate(true);}} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} upgradeHref={upgradeNudge ? "/emos-platform" : null} />}
           {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
           {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} pdfLoading={pdfLoading} pdfDone={pdfDone} />}
         </div>

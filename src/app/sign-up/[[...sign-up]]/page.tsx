@@ -30,7 +30,7 @@ export default function SignUpPage() {
       </p>
 
       <SignUp
-        forceRedirectUrl="/emostool/dashboard"
+        forceRedirectUrl="/emos-platform/dashboard"
         appearance={{
           variables: {
             colorPrimary: INK,

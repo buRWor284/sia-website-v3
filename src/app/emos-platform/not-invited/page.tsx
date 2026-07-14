@@ -18,7 +18,7 @@ export default async function NotInvitedPage() {
       const client = await clerkClient();
       const user = await client.users.getUser(userId);
       if (user.publicMetadata?.emos_access) {
-        redirect("/emostool/dashboard");
+        redirect("/emos-platform/dashboard");
       }
     } catch {
       // If Clerk API fails, fall through to show the form

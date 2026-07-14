@@ -1,11 +1,11 @@
 import { clerkMiddleware, clerkClient, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 
-// /emostool and everything under it requires auth.
+// /emos-platform and everything under it requires auth.
 // /emos (course landing page) stays completely public and untouched.
-const isProtectedRoute = createRouteMatcher(["/emostool(.*)"]);
+const isProtectedRoute = createRouteMatcher(["/emos-platform(.*)"]);
 
-// C2 (2026-07-02 review): "/emostool(.*)" does NOT match /api/emostool/* —
+// C2 (2026-07-02 review): "/emos-platform(.*)" does NOT match /api/emostool/* —
 // the platform API routes were reachable by ANY signed-in Clerk account with
 // no emos_access check. Gate them here too (belt) in addition to the
 // requireEmosAccess() guard inside each handler (suspenders). APIs get JSON
@@ -64,13 +64,13 @@ const isClerkClientRoute = createRouteMatcher(["/clients/:slug", "/clients/:slug
 // Public escape hatch — shown when a logged-in user tries the wrong workspace.
 const isClientUnauthorizedPage = createRouteMatcher(["/clients/unauthorized"]);
 
-// /emostool/not-invited is public (no redirect loop)
-const isNotInvitedRoute = createRouteMatcher(["/emostool/not-invited"]);
+// /emos-platform/not-invited is public (no redirect loop)
+const isNotInvitedRoute = createRouteMatcher(["/emos-platform/not-invited"]);
 
-// /emostool (exact root) is the PUBLIC platform landing + sign-out destination.
-// Only the root is public; everything BELOW it (/emostool/dashboard, tools, invite)
+// /emos-platform (exact root) is the PUBLIC platform landing + sign-out destination.
+// Only the root is public; everything BELOW it (/emos-platform/dashboard, tools, invite)
 // stays protected. The page itself forwards signed-in users to the dashboard.
-const isEmostoolLanding = createRouteMatcher(["/emostool", "/emostool/"]);
+const isEmostoolLanding = createRouteMatcher(["/emos-platform", "/emos-platform/"]);
 
 export default clerkMiddleware(async (auth, req) => {
   // ── Legacy: PT (Basic Auth) ──────────────────────────────────────────────
@@ -155,12 +155,12 @@ export default clerkMiddleware(async (auth, req) => {
         const client = await clerkClient();
         const user = await client.users.getUser(userId!);
         if (!user.publicMetadata?.emos_access) {
-          return NextResponse.redirect(new URL("/emostool/not-invited", req.url));
+          return NextResponse.redirect(new URL("/emos-platform/not-invited", req.url));
         }
         // Live metadata has it — let them through (JWT will catch up on next refresh)
       } catch {
         // If Clerk API is unreachable, fail closed
-        return NextResponse.redirect(new URL("/emostool/not-invited", req.url));
+        return NextResponse.redirect(new URL("/emos-platform/not-invited", req.url));
       }
     }
   }

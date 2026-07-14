@@ -4,10 +4,10 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 /**
- * /emostool — EMOS PLATFORM landing (public).
+ * /emos-platform — EMOS PLATFORM landing (public).
  *
  * Doubles as the sign-out destination for the dashboard (see
- * app/emostool/dashboard/page.tsx SignOutButton). Behaviour:
+ * app/emos-platform/dashboard/page.tsx SignOutButton). Behaviour:
  *   - signed OUT  → this marketing landing for the paid EMOS platform
  *   - signed IN   → forwarded to the dashboard (this is the app root)
  * The emostool layout only enforces the subscription gate when a user is
@@ -50,7 +50,7 @@ const PIPELINE: Array<{ n: string; label: string; tool: string; desc: string }> 
 export default async function EmostoolLandingPage() {
   // Members skip the pitch — send them straight to the product.
   const { userId } = await auth();
-  if (userId) redirect("/emostool/dashboard");
+  if (userId) redirect("/emos-platform/dashboard");
 
   return (
     <div style={{ background: PAPER, color: INK, fontFamily: SERIF, minHeight: "100vh" }}>
@@ -92,13 +92,13 @@ export default async function EmostoolLandingPage() {
           {/* P4: the purchase path. Self-serve checkout is the primary CTA — sign-up
               is Restricted in Clerk, so paying first (then getting invited) is the
               only way in for a new customer. */}
-          <Link href="/emos/subscribe" style={{ padding: "14px 34px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
+          <Link href="/emos-platform/subscribe" style={{ padding: "14px 34px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
             Get EMOS · $50/month
           </Link>
           <Link href="/sign-in" style={{ padding: "14px 30px", background: "transparent", color: INK, border: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
             Sign in
           </Link>
-          <Link href="/emostool/not-invited" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, textDecoration: "underline", textDecorationColor: INK15 }}>
+          <Link href="/emos-platform/not-invited" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, textDecoration: "underline", textDecorationColor: INK15 }}>
             Request access →
           </Link>
         </div>
@@ -164,7 +164,7 @@ export default async function EmostoolLandingPage() {
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 220 }}>
-            <Link href="/emos/subscribe" style={{ textAlign: "center", padding: "15px 30px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
+            <Link href="/emos-platform/subscribe" style={{ textAlign: "center", padding: "15px 30px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
               Get EMOS · $50/month
             </Link>
             <Link href="/sign-in" style={{ textAlign: "center", padding: "14px 30px", background: "transparent", color: CREAM, border: `1px solid ${CREAM70}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>

@@ -96,6 +96,15 @@ const nextConfig: NextConfig = {
       { source: "/emos/pay",    destination: "/emos-academy/pay",    permanent: p },
       { source: "/emos/pay/",   destination: "/emos-academy/pay",    permanent: p },
 
+      // EMOS Platform prefix rename (2026-07-14, commit 2): /emostool/* -> /emos-platform/*.
+      // /api/emostool/* is deliberately NOT redirected here (it renames in the API commit).
+      { source: "/emostool",        destination: "/emos-platform",        permanent: p },
+      { source: "/emostool/",       destination: "/emos-platform",        permanent: p },
+      { source: "/emostool/:path*", destination: "/emos-platform/:path*", permanent: p },
+      // Platform checkout moved out from under the cohort prefix.
+      { source: "/emos/subscribe",        destination: "/emos-platform/subscribe",        permanent: p },
+      { source: "/emos/subscribe/:path*", destination: "/emos-platform/subscribe/:path*", permanent: p },
+
       // Legacy WordPress cleanup (added 2026-06-17)
       // Deleted author archives (e.g. /author/joceylnbrown) -> home
       { source: "/author",        destination: "/", permanent: p },

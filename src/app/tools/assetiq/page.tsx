@@ -8,7 +8,7 @@
  * (design_handoff_assetiq_framework). This is a MARKETING EXPLAINER for a
  * platform-only tool, not a working version of AssetIQ: no API routes, no
  * email gates, no live form submission. AssetIQ itself ships inside the
- * authenticated EMOS Platform at /emostool/dashboard/assetiq.
+ * authenticated EMOS Platform at /emos-platform/dashboard/assetiq.
  *
  * Three acts, following the v3 "Fairground" sample scenario (fictional B2B
  * marketplace SaaS, illustrative only):
@@ -553,7 +553,7 @@ export default function AssetIQPage() {
                   </p>
                 </div>
                 <Link
-                  href="/emostool"
+                  href="/emos-platform"
                   style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "15px 26px", whiteSpace: "nowrap", textDecoration: "none" }}
                 >
                   Explore the EMOS Platform {"→"}

@@ -711,7 +711,7 @@ export default function SignalIQToolCore({
               <div style={{ maxWidth: 620, margin: "20px auto 0", padding: "12px 14px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
                 {scanError}
                 {scanUpgrade && (
-                  <a href="/emostool" style={{ display: "inline-block", marginLeft: 8, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: INK, textDecoration: "underline" }}>
+                  <a href="/emos-platform" style={{ display: "inline-block", marginLeft: 8, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: INK, textDecoration: "underline" }}>
                     Explore the EMOS platform →
                   </a>
                 )}
@@ -825,7 +825,7 @@ export default function SignalIQToolCore({
                   <div style={{ padding: "16px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
                     {packError}{" "}
                     {packUpgrade && (
-                      <a href="/emostool" style={{ display: "inline-block", marginRight: 8, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: INK, textDecoration: "underline" }}>
+                      <a href="/emos-platform" style={{ display: "inline-block", marginRight: 8, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: INK, textDecoration: "underline" }}>
                         Explore the EMOS platform →
                       </a>
                     )}

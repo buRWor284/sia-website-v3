@@ -23,7 +23,7 @@ const SERIF  = "var(--font-serif)";
 
 interface PipelineNavProps {
   current: EmosStage;
-  nextHref?: string; // override href for next tool (e.g. /emostool/dashboard/assetiq?signal=xxx)
+  nextHref?: string; // override href for next tool (e.g. /emos-platform/dashboard/assetiq?signal=xxx)
 }
 
 export default function PipelineNav({ current, nextHref }: PipelineNavProps) {

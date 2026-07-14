@@ -12,7 +12,7 @@ import "server-only";
  * It now lives in this `server-only` module (NOT a server action, cannot be
  * invoked from the client). API routes and server libs call
  * recordStageEventFor() with a user ID they have verified themselves; the
- * auth()-based server action in src/app/emostool/actions/stage.ts wraps it.
+ * auth()-based server action in src/app/emos-platform/actions/stage.ts wraps it.
  *
  * Pipeline: signal → asset → collab → press → coverage → full
  */

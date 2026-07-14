@@ -445,13 +445,13 @@ export function EmosCTAStrip({
   pitch,
   eyebrow = "Where this fits",
   heading,
-  // P4: defaults point at the PLATFORM (/emostool), not the training program.
+  // P4: defaults point at the PLATFORM (/emos-platform), not the training program.
   // Every current EMOS tool passes applyHref explicitly; these defaults are the
   // safety net for the next tool page.
-  applyHref = "/emostool",
+  applyHref = "/emos-platform",
   applyLabel = "Explore EMOS",
   applyTarget,
-  exploreHref = "/emostool",
+  exploreHref = "/emos-platform",
   exploreLabel = "Explore EMOS",
   exploreTarget,
   hideExplore = false,

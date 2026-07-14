@@ -34,7 +34,7 @@ import { INK, INK15, INK35, INK55, INK70, MONO, PAPER, SERIF, GROT, YEL } from "
 import { BEATS, EMAIL_SCANS, FREE_SCANS, PRODUCT } from "@/lib/signaliq/config";
 import type { BeatId } from "@/lib/signaliq/types";
 
-const EMOS_URL = "/emostool";
+const EMOS_URL = "/emos-platform";
 
 // Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered
 // and scanning works exactly as before. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY (+ the

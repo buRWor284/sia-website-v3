@@ -62,9 +62,9 @@ export async function POST(req: NextRequest) {
   params.append("line_items[0][quantity]", "1");
   params.append(
     "success_url",
-    `${BASE_URL}/emos/subscribe/success?session_id={CHECKOUT_SESSION_ID}`
+    `${BASE_URL}/emos-platform/subscribe/success?session_id={CHECKOUT_SESSION_ID}`
   );
-  params.append("cancel_url", `${BASE_URL}/emos/subscribe`);
+  params.append("cancel_url", `${BASE_URL}/emos-platform/subscribe`);
   params.append("metadata[source]", "emos_platform");
   if (subscriberId) params.append("metadata[subscriber_id]", subscriberId);
   if (email) params.append("customer_email", email);

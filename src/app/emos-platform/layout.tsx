@@ -33,7 +33,7 @@ export default async function EmostoolLayout({
     if (email && !EMOS_ADMIN_EMAILS.includes(email)) {
       const status = await getSubscriptionStatus(email);
       if (status !== "active" && status !== "none") {
-        redirect("/emos/subscribe");
+        redirect("/emos-platform/subscribe");
       }
     }
   }

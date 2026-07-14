@@ -105,7 +105,7 @@ export async function createAsset(input: CreateAssetInput): Promise<{ id: string
   if (error) { console.error("createAsset error:", error.message); return null; }
 
   void recordStageEvent("asset_created");
-  revalidatePath("/emostool/dashboard/assetiq");
+  revalidatePath("/emos-platform/dashboard/assetiq");
   return data as { id: string };
 }
 
@@ -125,7 +125,7 @@ export async function updateAsset(
     .update({ ...input, updated_at: new Date().toISOString() })
     .eq("id", assetId);
   if (error) { console.error("updateAsset error:", error.message); return false; }
-  revalidatePath("/emostool/dashboard/assetiq");
+  revalidatePath("/emos-platform/dashboard/assetiq");
   return true;
 }
 
@@ -136,6 +136,6 @@ export async function deleteAsset(assetId: string): Promise<boolean> {
     .delete()
     .eq("id", assetId);
   if (error) { console.error("deleteAsset error:", error.message); return false; }
-  revalidatePath("/emostool/dashboard/assetiq");
+  revalidatePath("/emos-platform/dashboard/assetiq");
   return true;
 }

@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getPitches, getJournalists, getAlerts } from "@/app/emostool/actions/coverageiq";
+import { getPitches, getJournalists, getAlerts } from "@/app/emos-platform/actions/coverageiq";
 import CoverageIQPlatform from "@/components/tools/CoverageIQPlatform";
 import PipelineNav from "@/components/emostool/PipelineNav";
 import type { Metadata } from "next";

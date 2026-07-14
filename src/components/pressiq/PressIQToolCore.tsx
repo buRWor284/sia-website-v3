@@ -603,7 +603,7 @@ export default function PressIQToolCore({
                   <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>
                     {error}
                     {errorUpgrade && (
-                      <a href="/emostool" style={{ display: "inline-block", marginLeft: 8, fontFamily: GROT, fontStyle: "normal", fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: YEL, textDecoration: "underline" }}>
+                      <a href="/emos-platform" style={{ display: "inline-block", marginLeft: 8, fontFamily: GROT, fontStyle: "normal", fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: YEL, textDecoration: "underline" }}>
                         Explore the EMOS platform →
                       </a>
                     )}

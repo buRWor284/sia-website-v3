@@ -11,7 +11,7 @@ import "server-only";
  *
  * Callers must have verified the user ID themselves (e.g. via auth()).
  * For Server Action use, see saveSignalFromScan in
- * src/app/emostool/actions/signaliq.ts (auth() + RLS-scoped client).
+ * src/app/emos-platform/actions/signaliq.ts (auth() + RLS-scoped client).
  */
 
 import { createSupabaseServiceClient } from "@/lib/supabase";

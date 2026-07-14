@@ -54,7 +54,7 @@ const PIPELINE: PipelineCard[] = [
   { step: "02", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
   { step: "03", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
   { step: "04", tool: "CoverageIQ",      href: "/tools/coverageiq",      toolId: "coverageiq",      role: "Track the placement" },
-  { step: "05", tool: "EMOS",            href: "/emostool",              toolId: "emos",            role: "Run the full system" },
+  { step: "05", tool: "EMOS",            href: "/emos-platform",              toolId: "emos",            role: "Run the full system" },
 ];
 
 const ORDER: (ToolId | "emos")[] = ["signaliq", "assetiq", "factcheckiq", "journocollabiq", "pressiq", "coverageiq", "emos"];

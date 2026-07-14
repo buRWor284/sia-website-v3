@@ -142,7 +142,7 @@ export async function createPitch(input: CreatePitchInput): Promise<{ id: string
     return null;
   }
 
-  revalidatePath("/emostool/dashboard/coverageiq");
+  revalidatePath("/emos-platform/dashboard/coverageiq");
   // Stage progression: pitch_logged event. MUST be awaited — a fire-and-forget
   // call is dropped when the serverless function freezes after the response
   // (same bug class as the PressIQ "Score History always empty" fix, see
@@ -164,7 +164,7 @@ export async function updatePitchStage(pitchId: string, stage: Stage): Promise<b
     return false;
   }
 
-  revalidatePath("/emostool/dashboard/coverageiq");
+  revalidatePath("/emos-platform/dashboard/coverageiq");
   return true;
 }
 
@@ -172,7 +172,7 @@ export async function updateAlertStatus(alertId: string, status: AlertStatus): P
   const db = await getAuthenticatedClient();
   const { error } = await db.from("coverageiq_alerts").update({ status }).eq("id", alertId);
   if (error) { console.error("updateAlertStatus error:", error.message); return false; }
-  revalidatePath("/emostool/dashboard/coverageiq");
+  revalidatePath("/emos-platform/dashboard/coverageiq");
   return true;
 }
 
@@ -203,8 +203,8 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
 
   if (error) { console.error("createJournalist error:", error.message); return null; }
 
-  revalidatePath("/emostool/dashboard/coverageiq");
-  revalidatePath("/emostool/dashboard/journocollabiq");
+  revalidatePath("/emos-platform/dashboard/coverageiq");
+  revalidatePath("/emos-platform/dashboard/journocollabiq");
   // Awaited for the same fire-and-forget reason as pitch_logged above.
   await recordStageEvent("journalist_saved");
   return data as { id: string };
@@ -220,8 +220,8 @@ export async function updateJournalist(
     .update({ ...input, updated_at: new Date().toISOString() })
     .eq("id", journalistId);
   if (error) { console.error("updateJournalist error:", error.message); return false; }
-  revalidatePath("/emostool/dashboard/coverageiq");
-  revalidatePath("/emostool/dashboard/journocollabiq");
+  revalidatePath("/emos-platform/dashboard/coverageiq");
+  revalidatePath("/emos-platform/dashboard/journocollabiq");
   return true;
 }
 
@@ -229,7 +229,7 @@ export async function deleteJournalist(journalistId: string): Promise<boolean> {
   const db = await getAuthenticatedClient();
   const { error } = await db.from("journalists").delete().eq("id", journalistId);
   if (error) { console.error("deleteJournalist error:", error.message); return false; }
-  revalidatePath("/emostool/dashboard/coverageiq");
-  revalidatePath("/emostool/dashboard/journocollabiq");
+  revalidatePath("/emos-platform/dashboard/coverageiq");
+  revalidatePath("/emos-platform/dashboard/journocollabiq");
   return true;
 }

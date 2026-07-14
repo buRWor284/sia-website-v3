@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * /emos/subscribe
+ * /emos-platform/subscribe
  *
  * Public subscribe page — shown BEFORE sign-up (user pays first, then gets invited).
- * Lives under /emos (not /emostool) so Clerk middleware doesn't protect it.
+ * Lives under /emos (not /emos-platform) so Clerk middleware doesn't protect it.
  *
  * Flow: user clicks "Subscribe" → POST /api/emos-checkout → redirect to Stripe →
- *       payment complete → Stripe webhook fires → Clerk invite sent → /emos/subscribe/success
+ *       payment complete → Stripe webhook fires → Clerk invite sent → /emos-platform/subscribe/success
  */
 
 import { useState } from "react";

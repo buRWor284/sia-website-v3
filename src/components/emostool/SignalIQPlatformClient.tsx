@@ -29,9 +29,9 @@ import { buildSignalIqReport } from "@/lib/pdf/signaliq-report";
 import { BEATS } from "@/lib/signaliq/config";
 import SignalIQToolCore, { type SiqPdfContext } from "@/components/signaliq/SignalIQToolCore";
 import { SIQ_CSS } from "@/components/signaliq/core-css";
-import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emostool/actions/signaliq";
+import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emos-platform/actions/signaliq";
 import type { BeatId, Opportunity, AssetPack } from "@/lib/signaliq/types";
-import type { DbSignal } from "@/app/emostool/actions/signaliq";
+import type { DbSignal } from "@/app/emos-platform/actions/signaliq";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER   = "#f1ebde";
@@ -243,7 +243,7 @@ function SignalLibrary({
                 </span>
                 <div style={{ display: "flex", gap: 9, flexWrap: "wrap", alignItems: "center" }}>
                   <a
-                    href={`/emostool/dashboard/assetiq?signal=${sig.id}&headline=${encodeURIComponent(sig.headline)}`}
+                    href={`/emos-platform/dashboard/assetiq?signal=${sig.id}&headline=${encodeURIComponent(sig.headline)}`}
                     style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: `1px solid ${INK35}`, lineHeight: 1 }}
                   >
                     Build →
@@ -354,9 +354,9 @@ export default function SignalIQPlatformClient({
         onSaveOpportunity={handleSaveOpportunity}
         packActions={{
           onDownloadPDF: handleDownloadPDF,
-          pressIqHref: "/emostool/dashboard/pressiq",
+          pressIqHref: "/emos-platform/dashboard/pressiq",
           buildAssetHref: (opp: Opportunity, pack: AssetPack) =>
-            `/emostool/dashboard/assetiq?headline=${encodeURIComponent(opp.headline)}&assetIdea=${encodeURIComponent(pack.linkableAssetIdea ?? "")}&dataBrief=${encodeURIComponent((pack.brief ?? "").slice(0, 400))}&pitchAngle=${encodeURIComponent((pack.angle ?? "").slice(0, 300))}`,
+            `/emos-platform/dashboard/assetiq?headline=${encodeURIComponent(opp.headline)}&assetIdea=${encodeURIComponent(pack.linkableAssetIdea ?? "")}&dataBrief=${encodeURIComponent((pack.brief ?? "").slice(0, 400))}&pitchAngle=${encodeURIComponent((pack.angle ?? "").slice(0, 300))}`,
         }}
         // No onExit: the dashboard has no landing screen, so the stage-1 back
         // button is hidden. The dashboard header's "← EMOS" covers leaving.

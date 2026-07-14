@@ -9,7 +9,7 @@
  * Per-surface differences are props:
  *  - onDownloadPDF   → download bars render only when the wrapper wires a PDF
  *  - downloadNote    → the public wrapper's "first download asks for your email" hint
- *  - pressIqHref     → public: /tools/pressiq · dashboard: /emostool/dashboard/pressiq
+ *  - pressIqHref     → public: /tools/pressiq · dashboard: /emos-platform/dashboard/pressiq
  *  - buildAssetHref  → dashboard-only "Build asset from this pack →" AssetIQ handoff
  */
 

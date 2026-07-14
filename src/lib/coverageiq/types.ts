@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // CoverageIQ — canonical types + view-model + mappers
 // Shared by the public tool (/tools/coverageiq), the EMOS dashboard
-// (/emostool/dashboard/coverageiq), and the server actions.
+// (/emos-platform/dashboard/coverageiq), and the server actions.
 //
 // Domain unions are DB-shaped (the superset). The two surfaces map their own
 // data (public: seeded mock objects; dashboard: Supabase rows) into the

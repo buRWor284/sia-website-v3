@@ -1,5 +1,5 @@
 /**
- * /emos/subscribe/success
+ * /emos-platform/subscribe/success
  *
  * Shown after a successful Stripe checkout. Stripe redirects here with
  * ?session_id=... The webhook (which fires asynchronously) handles the

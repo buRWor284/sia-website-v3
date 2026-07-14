@@ -2,7 +2,7 @@
 
 /**
  * CoverageIQPlatform — Authenticated EMOS Pitch Tracking CRM (dashboard surface)
- * Route: /emostool/dashboard/coverageiq
+ * Route: /emos-platform/dashboard/coverageiq
  *
  * Thin shell over the shared CoverageIQ core (src/components/coverageiq/*):
  * maps Supabase rows into the view-model and wires the shared tabs to server
@@ -22,7 +22,7 @@ import {
   createJournalist,
   updateJournalist,
   deleteJournalist,
-} from "@/app/emostool/actions/coverageiq";
+} from "@/app/emos-platform/actions/coverageiq";
 import { SectionMast } from "@/components/coverageiq/primitives";
 import { CIQ_CSS } from "@/components/coverageiq/core-css";
 import {
@@ -199,7 +199,7 @@ export default function CoverageIQPlatform({
 
       {/* Back to dashboard link */}
       <div style={{ maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)", paddingTop: 12 }}>
-        <a href="/emostool/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}>
+        <a href="/emos-platform/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}>
           ← EMOS Dashboard
         </a>
       </div>

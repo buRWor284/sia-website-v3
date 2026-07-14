@@ -155,7 +155,7 @@ export async function saveSignalFromScan(
     }
 
     void recordStageEvent("signal_saved");
-    revalidatePath("/emostool/dashboard/signaliq");
+    revalidatePath("/emos-platform/dashboard/signaliq");
     return { ok: true, id: signal?.id ?? null };
   } catch (err) {
     console.error("saveSignalFromScan error:", err);
@@ -175,7 +175,7 @@ export async function updateSignalStatus(
     .update({ status })
     .eq("id", signalId);
   if (error) { console.error("updateSignalStatus error:", error.message); return false; }
-  revalidatePath("/emostool/dashboard/signaliq");
+  revalidatePath("/emos-platform/dashboard/signaliq");
   return true;
 }
 
@@ -185,6 +185,6 @@ export async function deleteSignal(signalId: string): Promise<boolean> {
   const db = await getAuthenticatedClient();
   const { error } = await db.from("signaliq_signals").delete().eq("id", signalId);
   if (error) { console.error("deleteSignal error:", error.message); return false; }
-  revalidatePath("/emostool/dashboard/signaliq");
+  revalidatePath("/emos-platform/dashboard/signaliq");
   return true;
 }

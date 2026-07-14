@@ -80,7 +80,7 @@ export default async function PressIQPlatformPage({
       <div style={{ background: INK, color: PAPER, padding: "0 clamp(20px,4vw,56px)" }}>
         <div style={{ maxWidth: 1200, marginInline: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 52 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <a href="/emostool/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
+            <a href="/emos-platform/dashboard" style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", textDecoration: "none" }}>← EMOS</a>
             <span style={{ color: "rgba(241,235,222,.2)" }}>|</span>
             <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" }}>Press<span style={{ color: YEL }}>IQ</span></span>
             <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)" }}>Pitch Scorer</span>
@@ -99,7 +99,7 @@ export default async function PressIQPlatformPage({
               {assetType && <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, marginTop: 2 }}>{assetType.replace(/_/g, " ")}</div>}
               {assetIdea && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, marginTop: 4, lineHeight: 1.45 }}>{assetIdea}</div>}
             </div>
-            <a href="/emostool/dashboard/assetiq" style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: "1px solid rgba(26,20,16,.2)", flexShrink: 0 }}>
+            <a href="/emos-platform/dashboard/assetiq" style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: "1px solid rgba(26,20,16,.2)", flexShrink: 0 }}>
               ← Back to AssetIQ
             </a>
           </div>
@@ -126,7 +126,7 @@ export default async function PressIQPlatformPage({
           current="press"
           nextHref={
             rows[0]?.journalist_query
-              ? `/emostool/dashboard/coverageiq?pitch=${encodeURIComponent(rows[0].journalist_query.slice(0, 200))}`
+              ? `/emos-platform/dashboard/coverageiq?pitch=${encodeURIComponent(rows[0].journalist_query.slice(0, 200))}`
               : undefined
           }
         />
