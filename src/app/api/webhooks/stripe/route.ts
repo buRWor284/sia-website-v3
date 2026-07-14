@@ -85,17 +85,23 @@ function verifyStripeWebhook(
 // flipped the DB status, but middleware gates on the Clerk flag. Revoke it here
 // so cancellation locks the platform everywhere, immediately.
 
+type ClerkAccessResult = {
+  status: "updated" | "not_found" | "error";
+  /** Set when status === "updated" — used for conversion attribution (P4). */
+  clerkUserId?: string;
+};
+
 /**
  * Set emos_access on the Clerk user with this email.
- * Returns "updated" | "not_found" | "error".
+ * Returns { status: "updated" | "not_found" | "error", clerkUserId? }.
  * Also used on checkout for RE-subscribers (whose Clerk account already
  * exists, so a fresh invitation would fail) to restore access.
  */
-async function setClerkAccess(email: string, access: boolean): Promise<"updated" | "not_found" | "error"> {
+async function setClerkAccess(email: string, access: boolean): Promise<ClerkAccessResult> {
   const secretKey = process.env.CLERK_SECRET_KEY;
   if (!secretKey) {
     console.error("[stripe-webhook] CLERK_SECRET_KEY not set — cannot update emos_access");
-    return "error";
+    return { status: "error" };
   }
 
   try {
@@ -105,11 +111,11 @@ async function setClerkAccess(email: string, access: boolean): Promise<"updated"
     );
     if (!lookup.ok) {
       console.error("[stripe-webhook] Clerk user lookup failed:", lookup.status, await lookup.text());
-      return "error";
+      return { status: "error" };
     }
     const users = (await lookup.json()) as Array<{ id: string }>;
     const clerkUserId = users?.[0]?.id;
-    if (!clerkUserId) return "not_found";
+    if (!clerkUserId) return { status: "not_found" };
 
     // PATCH /users/{id}/metadata does a shallow MERGE (unlike PATCH /users/{id},
     // which replaces) — so client_slug or other metadata keys survive.
@@ -124,14 +130,31 @@ async function setClerkAccess(email: string, access: boolean): Promise<"updated"
 
     if (!res.ok) {
       console.error("[stripe-webhook] emos_access update failed:", res.status, await res.text());
-      return "error";
+      return { status: "error" };
     }
     console.log(`[stripe-webhook] emos_access=${access} set for ${email} (${clerkUserId})`);
-    return "updated";
+    return { status: "updated", clerkUserId };
   } catch (err) {
     console.error("[stripe-webhook] setClerkAccess error:", err);
-    return "error";
+    return { status: "error" };
   }
+}
+
+// ─── Invoice → subscription id (P4 hardening) ────────────────────────────────
+// Newer Stripe API versions removed `invoice.subscription` and nest the id at
+// `invoice.parent.subscription_details.subscription`. Which shape this endpoint
+// receives depends on the API version pinned when the webhook was registered in
+// the Stripe dashboard — so read both, and tolerate an expanded object too.
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function invoiceSubscriptionId(invoice: any): string | null {
+  const direct = invoice?.subscription;
+  if (typeof direct === "string" && direct) return direct;
+  if (typeof direct?.id === "string") return direct.id;
+  const nested = invoice?.parent?.subscription_details?.subscription;
+  if (typeof nested === "string" && nested) return nested;
+  if (typeof nested?.id === "string") return nested.id;
+  return null;
 }
 
 // ─── Clerk invite ─────────────────────────────────────────────────────────────
@@ -314,7 +337,7 @@ export async function POST(req: NextRequest) {
       // Existing Clerk account (re-subscriber or invited beta user who now
       // pays): a fresh invitation would fail — restore access directly instead.
       const restored = await setClerkAccess(email, true);
-      if (restored === "not_found") {
+      if (restored.status === "not_found") {
         // New customer — send Clerk invite + welcome email as before.
         const inviteUrl = await sendClerkInvite(email);
         if (inviteUrl) {
@@ -322,8 +345,21 @@ export async function POST(req: NextRequest) {
         } else {
           console.error("[stripe-webhook] Clerk invite failed for", email, "— subscription recorded but invite NOT sent");
         }
-      } else if (restored === "error") {
+      } else if (restored.status === "error") {
         console.error("[stripe-webhook] could not verify/restore Clerk access for", email);
+      }
+
+      // P4: conversion attribution. If this email belongs to a public-tools
+      // subscriber (the free email rung), stamp the upgrade on their row.
+      // Best-effort only — must never affect the billing flow.
+      if (restored.status === "updated" && restored.clerkUserId) {
+        const { error: convErr } = await db
+          .from("tool_subscribers")
+          .update({ upgraded_clerk_id: restored.clerkUserId })
+          .eq("email", email.toLowerCase().trim());
+        if (convErr) {
+          console.warn("[stripe-webhook] upgraded_clerk_id stamp failed:", convErr.message);
+        }
       }
 
       console.log("[stripe-webhook] checkout.session.completed processed for", email);
@@ -344,15 +380,21 @@ export async function POST(req: NextRequest) {
         console.log("[stripe-webhook] subscription canceled:", sub.id);
         // H3: revoke platform access in Clerk, not just the DB flag.
         const email = rows?.[0]?.email as string | undefined;
-        if (email) await setClerkAccess(email, false);
-        else console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
+        if (email) {
+          const revoked = await setClerkAccess(email, false);
+          if (revoked.status === "error") {
+            console.error("[stripe-webhook] Clerk revocation failed for", email);
+          }
+        } else {
+          console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
+        }
       }
       break;
     }
 
     case "invoice.payment_failed": {
       const invoice = event.data.object;
-      const subId   = invoice.subscription as string;
+      const subId   = invoiceSubscriptionId(invoice);
       if (subId) {
         const { error } = await db
           .from("stripe_subscriptions")
@@ -367,7 +409,7 @@ export async function POST(req: NextRequest) {
 
     case "invoice.payment_succeeded": {
       const invoice = event.data.object;
-      const subId   = invoice.subscription as string;
+      const subId   = invoiceSubscriptionId(invoice);
       // Restore active if it was past_due
       if (subId) {
         await db

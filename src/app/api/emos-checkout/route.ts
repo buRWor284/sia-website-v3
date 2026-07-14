@@ -13,6 +13,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { verifySubscriber } from "@/lib/gate/subscriber-cookie";
+import { SUB_COOKIE } from "@/lib/gate/config";
+import { createSupabaseServiceClient } from "@/lib/supabase";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.syedirfanajmal.com";
 
@@ -33,6 +36,25 @@ export async function POST(req: NextRequest) {
     // email is optional — Stripe collects it at checkout
   }
 
+  // P4: recognize the public-tools subscriber wristband (sia_sub). A verified
+  // free-tier subscriber lands on Stripe with their email prefilled, and the
+  // session carries their subscriber id so the conversion from the free email
+  // rung to the paid rung is attributable. Failure here must never block checkout.
+  const subscriberId = verifySubscriber(req.cookies.get(SUB_COOKIE)?.value);
+  if (subscriberId && !email) {
+    try {
+      const db = createSupabaseServiceClient();
+      const { data } = await db
+        .from("tool_subscribers")
+        .select("email")
+        .eq("id", subscriberId)
+        .maybeSingle();
+      if (typeof data?.email === "string") email = data.email;
+    } catch (e) {
+      console.warn("[emos-checkout] wristband email lookup failed:", e);
+    }
+  }
+
   const params = new URLSearchParams();
   params.append("mode", "subscription");
   params.append("payment_method_types[]", "card");
@@ -44,6 +66,7 @@ export async function POST(req: NextRequest) {
   );
   params.append("cancel_url", `${BASE_URL}/emos/subscribe`);
   params.append("metadata[source]", "emos_platform");
+  if (subscriberId) params.append("metadata[subscriber_id]", subscriberId);
   if (email) params.append("customer_email", email);
 
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
