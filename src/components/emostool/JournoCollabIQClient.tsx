@@ -16,9 +16,8 @@ import {
   createJournalist,
   updateJournalist,
   deleteJournalist,
-  type DbJournalist,
-  type CreateJournalistInput,
 } from "@/app/emostool/actions/coverageiq";
+import type { DbJournalist, CreateJournalistInput } from "@/lib/coverageiq/types";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";

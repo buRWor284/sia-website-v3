@@ -5,18 +5,16 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { recordStageEvent } from "./stage";
+// Types live canonically in src/lib/coverageiq/types.ts and are imported for
+// internal use only. Do NOT re-export them from this file: it is a "use server"
+// module, and Turbopack's server-action manifest treats every export name as a
+// runtime action binding — a re-exported type has no runtime value and breaks
+// the production build (tsc passes; `next build` does not). External consumers
+// import these types directly from "@/lib/coverageiq/types".
 import type {
-  Stage, PesoType, LinkType, ContentType, DataSource, AlertStatus, AlertType,
+  Stage, PesoType, LinkType, ContentType, DataSource, AlertStatus,
   DbPitch, DbJournalist, DbAlert, CreatePitchInput, CreateJournalistInput,
 } from "@/lib/coverageiq/types";
-
-// Types are defined canonically in src/lib/coverageiq/types.ts. Re-exported here
-// so existing importers (JournoCollabIQClient, dashboard pages) keep working
-// against "@/app/emostool/actions/coverageiq".
-export type {
-  Stage, PesoType, LinkType, ContentType, DataSource, AlertStatus, AlertType,
-  DbPitch, DbJournalist, DbAlert, CreatePitchInput, CreateJournalistInput,
-};
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
 
