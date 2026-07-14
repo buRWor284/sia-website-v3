@@ -85,6 +85,17 @@ const nextConfig: NextConfig = {
       { source: "/signup",        destination: "/sign-up",        permanent: false },
       { source: "/signup/:path*", destination: "/sign-up/:path*", permanent: false },
 
+      // EMOS Academy rename (2026-07-14): /emos/* -> /emos-academy/*.
+      // Exact sources only (NOT /emos/:path*) so /emos/subscribe still resolves
+      // until it moves in the platform-prefix commit. Trailing-slash variants
+      // are explicit to avoid a 2-hop normalise-then-redirect chain.
+      { source: "/emos",        destination: "/emos-academy",        permanent: p },
+      { source: "/emos/",       destination: "/emos-academy",        permanent: p },
+      { source: "/emos/apply",  destination: "/emos-academy/apply",  permanent: p },
+      { source: "/emos/apply/", destination: "/emos-academy/apply",  permanent: p },
+      { source: "/emos/pay",    destination: "/emos-academy/pay",    permanent: p },
+      { source: "/emos/pay/",   destination: "/emos-academy/pay",    permanent: p },
+
       // Legacy WordPress cleanup (added 2026-06-17)
       // Deleted author archives (e.g. /author/joceylnbrown) -> home
       { source: "/author",        destination: "/", permanent: p },

@@ -56,7 +56,7 @@ const emosJsonLd = {
       serviceType: "Earned media implementation program",
       provider: { "@id": "https://www.syedirfanajmal.com/#person" },
       areaServed: "Worldwide",
-      url: "https://www.syedirfanajmal.com/emos",
+      url: "https://www.syedirfanajmal.com/emos-academy",
       description:
         "A guided implementation program that helps founders build the media presence investors check before the first meeting, through top-tier earned media and a repeatable system.",
     },

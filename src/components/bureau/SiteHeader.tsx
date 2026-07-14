@@ -15,7 +15,7 @@ const NAV: ReadonlyArray<{ label: string; href: string; matchPrefix?: string }> 
   { label: "Home",           href: "/"              },
   { label: "About",         href: "/about"          },
   { label: "Speaking",      href: "/speaking"       },
-  { label: "EMOS Academy",  href: "/emos"           },
+  { label: "EMOS Academy",  href: "/emos-academy"           },
   { label: "Fractional CMO",href: "/fractional-cmo" },
   { label: "Tools",         href: "/tools"          },
   { label: "Resources",     href: "/resources"      },

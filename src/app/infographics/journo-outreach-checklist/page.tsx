@@ -25,7 +25,7 @@ import {
 // =========================================================================
 // CONSTANTS
 // =========================================================================
-const EMOS_URL  = "/emos";
+const EMOS_URL  = "/emos-academy";
 const STORE_KEY = "sia.reactivepr.checklist.v1";
 
 const PLATFORMS = ["HARO", "Qwoted", "Source of Sources", "Featured", "Help a B2B Writer"];
@@ -627,7 +627,7 @@ const EmosCTA = ({
           <span style={{ fontFamily: SERIF, fontSize: 20 }}>↗</span>
         </a>
         <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
-          syedirfanajmal.com/emos
+          syedirfanajmal.com/emos-academy
         </SCaps>
       </div>
     </div>

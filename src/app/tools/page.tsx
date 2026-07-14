@@ -122,11 +122,11 @@ export default function ToolsIndexPage() {
         </h1>
 
         <p style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.5, color: INK70, margin: 0, maxWidth: 340, flex: "1 1 260px" }}>
-          Six free tools, in the order they&rsquo;re meant to be used. <Link href="/emos" style={{ color: INK }}>EMOS Academy</Link> sequences all six for you, guided.
+          Six free tools, in the order they&rsquo;re meant to be used. <Link href="/emos-academy" style={{ color: INK }}>EMOS Academy</Link> sequences all six for you, guided.
         </p>
 
         <a
-          href="/emos"
+          href="/emos-academy"
           style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none", flexShrink: 0, marginLeft: "auto" }}
         >
           Explore EMOS Academy →

@@ -45,7 +45,7 @@ export default function EmosPayPage() {
       {/* ── Nav ───────────────────────────────────────────────────────── */}
       <nav className="emos-nav">
         <div className="emos-nav-inner">
-          <a href="/emos" className="emos-nav-logo">
+          <a href="/emos-academy" className="emos-nav-logo">
             <span
               style={{
                 background: YEL,
@@ -59,7 +59,7 @@ export default function EmosPayPage() {
             &nbsp; by Syed Irfan Ajmal
           </a>
           <a
-            href="/emos"
+            href="/emos-academy"
             style={{
               fontFamily: GROT,
               fontWeight: 700,

@@ -12,8 +12,8 @@ export const PITCH_MODEL = process.env.PITCH_SCORE_MODEL || "claude-sonnet-4-6";
 
 /** D-12: launch name + EMOS links (mirrors other tools in this repo). */
 export const PRODUCT_NAME = "PressIQ";
-export const EMOS_URL = "/emos";
-export const EMOS_APPLY = "/emos/apply";
+export const EMOS_URL = "/emos-academy";
+export const EMOS_APPLY = "/emos-academy/apply";
 
 // Freemium caps — single source of truth is lib/gate/quota-limits.ts (Phase P2).
 // Re-exported here so PressIQ UI copy and the score route read the same numbers.

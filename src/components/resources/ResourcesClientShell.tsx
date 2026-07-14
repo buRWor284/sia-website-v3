@@ -1174,7 +1174,7 @@ const PHASE2: PipeStep[] = [
   { n: "6", label: "Build the linkable asset", tool: "AssetIQ", cap: "Turns a SignalIQ opportunity into a linkable asset — report, calculator, or quiz — with a 6-step builder engine.", status: "soon", href: "/tools/assetiq", week: "EMOS Wk 5" },
   { n: "7", label: "Verify before you pitch", tool: "FactCheckIQ", cap: "Runs every claim and stat in the asset through a 10-step verification pipeline before a journalist can poke a hole in it.", status: "soon", href: "/tools/factcheckiq", week: "EMOS Wk 6" },
   { n: "8", label: "Target named journalists", tool: "JournoCollabIQ", cap: "Journalist Beat Matcher — who covers your topic and is most likely to bite.", status: "free", contentId: "tool-journocollabiq", week: "EMOS Wk 7" },
-  { n: "9", label: "Launch & compound", tool: "Publish + pitch Tier 1", cap: "Dedicated page, Tier-1 exclusive then Tier-2 release — scored again with PressIQ, tracked again with CoverageIQ, then folded back into the loop.", status: "method", href: "/emos", week: "EMOS Wk 8" },
+  { n: "9", label: "Launch & compound", tool: "Publish + pitch Tier 1", cap: "Dedicated page, Tier-1 exclusive then Tier-2 release — scored again with PressIQ, tracked again with CoverageIQ, then folded back into the loop.", status: "method", href: "/emos-academy", week: "EMOS Wk 8" },
 ];
 
 const FOUNDATION_SCIENCE = [
@@ -1398,7 +1398,7 @@ function GuidedPipeline() {
           </div>
         )}
 
-        <a className="gp-cta" href="/emos">
+        <a className="gp-cta" href="/emos-academy">
           <span className="gp-cta-txt">Try the pieces free. <em>Want the whole sequence, done with you?</em></span>
           <span className="gp-cta-btn">Explore EMOS Academy →</span>
         </a>

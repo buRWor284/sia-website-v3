@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "Apply for EMOS · 5 Seats · Rolling Applications",
   description:
     "One short application. We review every submission personally within 48 hours. If it's a fit, we'll send a Calendly link to talk through the details.",
-  alternates: { canonical: "/emos/apply" },
+  alternates: { canonical: "/emos-academy/apply" },
 };
 
 /* =========================================================================
@@ -36,7 +36,7 @@ export default function EmosApplyPage() {
       {/* ── Nav ───────────────────────────────────────────────────────── */}
       <nav className="emos-nav">
         <div className="emos-nav-inner">
-          <a href="/emos" className="emos-nav-logo">
+          <a href="/emos-academy" className="emos-nav-logo">
             <span
               style={{
                 background: YEL,
@@ -50,7 +50,7 @@ export default function EmosApplyPage() {
             &nbsp; by Syed Irfan Ajmal
           </a>
           <a
-            href="/emos"
+            href="/emos-academy"
             style={{
               fontFamily: GROT,
               fontWeight: 700,

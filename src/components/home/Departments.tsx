@@ -44,7 +44,7 @@ const SERVICES: ReadonlyArray<Service> = [
       "repeatable press wins, without the agency retainer.",
     foot: "For in-house marketing teams",
     cta: "Tour EMOS",
-    href: "/emos",
+    href: "/emos-academy",
     feature: true,
   },
   {

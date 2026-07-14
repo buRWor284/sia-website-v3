@@ -699,7 +699,7 @@ export default function NeuromarketingGuidePage() {
               title: "Get press coverage",
               body:  "The EMOS programme applies these principles to earned media — landing you in Forbes, HBR, and your category&apos;s key publications.",
               cta:   "Learn about EMOS",
-              href:  "/emos",
+              href:  "/emos-academy",
             },
             {
               title: "Work with Syed",

@@ -1332,7 +1332,7 @@ const BookCall = () => (
       <div style={{ flex: "1 1 340px", borderLeft: `1px solid ${INK}`, paddingLeft: 40 }}>
         <SCaps size={10} ls="0.18em" color={INK55}>Not ready for a full retainer?</SCaps>
         <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.6, fontStyle: "italic" }}>
-          <a href="/emos" style={{ color: INK, textDecoration: "underline" }}>EMOS</a>
+          <a href="/emos-academy" style={{ color: INK, textDecoration: "underline" }}>EMOS</a>
           {" "}gives you the same system and playbooks to run earned media in-house, at a fraction of the cost. Most clients use it as a stepping stone.
         </p>
       </div>

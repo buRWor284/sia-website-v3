@@ -313,7 +313,7 @@ export function buildPressIqReport(doc: any, { result, pitch, subject }: PressIq
 
   doc.setFillColor(...iGOLD); doc.rect(W / 2 - 56, y, 112, 14, "F");
   doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...iINK);
-  doc.text("syedirfanajmal.com/emos", W / 2, y + 9.5, { align: "center" });
+  doc.text("syedirfanajmal.com/emos-academy", W / 2, y + 9.5, { align: "center" });
 
   doc.setFont("helvetica","normal"); doc.setFontSize(6); doc.setTextColor(60, 52, 40);
   doc.text(`Generated via PressIQ  ·  ${date}`, W / 2, H - 12, { align: "center" });

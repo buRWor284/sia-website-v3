@@ -257,7 +257,7 @@ export default function AuthorityCalculator() {
 
           {/* CTA */}
           <div>
-            <a href="/emos/apply" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: C.YEL, color: C.INK, fontFamily: C.GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", padding: "16px 28px", textDecoration: "none" }}>
+            <a href="/emos-academy/apply" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: C.YEL, color: C.INK, fontFamily: C.GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", padding: "16px 28px", textDecoration: "none" }}>
               Submit Your Application →
             </a>
             <p style={{ margin: "8px 0 0", fontFamily: C.SERIF, fontStyle: "italic", fontSize: 13, color: C.INK55, textAlign: "center" }}>5 minutes · Decision within 48 hours</p>

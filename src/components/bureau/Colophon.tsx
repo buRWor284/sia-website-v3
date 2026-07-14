@@ -18,7 +18,7 @@ const COLS: ReadonlyArray<FooterCol> = [
     items: [
       { label: "Fractional CMO", href: "/fractional-cmo" },
       { label: "Speaking",       href: "/speaking" },
-      { label: "EMOS Academy",   href: "/emos" },
+      { label: "EMOS Academy",   href: "/emos-academy" },
       { label: "DMR.agency ↗",   href: "https://dmr.agency", external: true },
       { label: "Case Studies",   href: "/case-studies" },
       { label: "Tools",          href: "/tools" },
@@ -196,7 +196,7 @@ export const Colophon = () => (
       <div className="colophon-bottom-group" style={S.monoFlex}>
         <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
         <a href="/fractional-cmo" style={S.open}>● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
-        <a href="/emos" style={S.open}>● EMOS FOUNDING CLASS · APPLY NOW</a>
+        <a href="/emos-academy" style={S.open}>● EMOS FOUNDING CLASS · APPLY NOW</a>
       </div>
 
       <div className="colophon-legal" style={{ ...S.monoFlex, gap: 20 }}>

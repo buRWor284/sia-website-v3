@@ -573,7 +573,7 @@ const EditorsNote = () => (
             Book a discovery call →
           </a>
           <a
-            href="/emos"
+            href="/emos-academy"
             style={{
               padding: "12px 18px",
               background: "transparent",

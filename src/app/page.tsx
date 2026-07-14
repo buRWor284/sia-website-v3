@@ -1054,7 +1054,7 @@ export default function HomePage() {
             <div className="service-card__num">01</div>
             <h3 className="service-card__title">EMOS · Earned Media OS</h3>
             <p className="service-card__body">A productized system for landing editorial coverage — trainings, templates, journalist playbooks. For in-house teams who want the press wins without the agency retainer.</p>
-            <a href="/emos" className="service-card__cta">Tour EMOS →</a>
+            <a href="/emos-academy" className="service-card__cta">Tour EMOS →</a>
           </div>
           <div className="service-card">
             <div className="service-card__num">02</div>

@@ -657,7 +657,7 @@ export default function PersonalBrandingGuidePage() {
               title: "Get press coverage",
               body: "The EMOS programme applies these personal branding principles to earned media — getting you featured in Forbes, HBR, and your category's key publications.",
               cta: "Learn about EMOS",
-              href: "/emos",
+              href: "/emos-academy",
             },
             {
               title: "Work with Syed",

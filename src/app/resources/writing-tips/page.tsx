@@ -357,7 +357,7 @@ export default function WritingTipsGuidePage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 32, marginTop: 40 }}>
           {[
             { title: "Continue reading", body: "Explore the other guides — Personal Branding, Neuromarketing, and Storytelling — to build out your full marketing toolkit.", cta: "Back to Resources", href: "/resources" },
-            { title: "Get press coverage", body: "The EMOS programme applies these content and writing skills to earned media — landing you in Forbes, HBR, and your category's key publications.", cta: "Learn about EMOS", href: "/emos" },
+            { title: "Get press coverage", body: "The EMOS programme applies these content and writing skills to earned media — landing you in Forbes, HBR, and your category's key publications.", cta: "Learn about EMOS", href: "/emos-academy" },
             { title: "Work with Syed", body: "For a fractional CMO arrangement or a done-for-you earned media programme, book a discovery call.", cta: "Book a call", href: CALENDLY },
           ].map(({ title, body, cta, href }) => (
             <div key={title} style={{ borderTop: `2px solid ${INK}`, paddingTop: 20 }}>

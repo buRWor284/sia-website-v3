@@ -579,7 +579,7 @@ export default function BingSeoGuidePage() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 32, marginTop: 8 }}>
           {[
             { title: "Read the 2015 original", body: "This guide replaced a faithfully restored 2015 article. The original, with its illustrated infographic, is preserved.", cta: "View the 2015 archive", href: "/infographics/bing-seo-2015" },
-            { title: "Get cited by AI", body: "The EMOS programme turns earned media into AI visibility: brand mentions and coverage in the outlets the answer engines trust.", cta: "Learn about EMOS", href: "/emos" },
+            { title: "Get cited by AI", body: "The EMOS programme turns earned media into AI visibility: brand mentions and coverage in the outlets the answer engines trust.", cta: "Learn about EMOS", href: "/emos-academy" },
             { title: "Work with Syed", body: "For a fractional CMO arrangement or a done-for-you earned media programme, book a discovery call.", cta: "Book a call", href: CALENDLY },
           ].map(({ title, body, cta, href }) => (
             <div key={title} style={{ borderTop: `2px solid ${INK}`, paddingTop: 20 }}>

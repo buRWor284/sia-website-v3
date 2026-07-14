@@ -24,7 +24,7 @@ const STATS: ReadonlyArray<[string, string, string]> = [
 // ── Right-panel dispatch items ───────────────────────────────────────────────
 // [name, sub-label, anchor]
 const DISPATCH: ReadonlyArray<[string, string, string]> = [
-  ["Press",      "Earned Media OS · The Method",        "/emos"],
+  ["Press",      "Earned Media OS · The Method",        "/emos-academy"],
   ["Speaking",   "Stages & Workshops · 4 Countries",    "/speaking"],
   ["Resources",  "Playbooks, Kits & Podcast",           "/resources"],
   ["Casework",   "What the numbers did",                "#casework"],
@@ -133,7 +133,7 @@ export const Hero = () => (
               Book a discovery call →
             </a>
             <a
-              href="/emos"
+              href="/emos-academy"
               style={{
                 padding: "12px 20px",
                 background: YEL,
@@ -244,7 +244,7 @@ export const Hero = () => (
         {/* Pills */}
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           {([
-            ["Earned Media OS",  "/emos"],
+            ["Earned Media OS",  "/emos-academy"],
             ["Speaking",         "/speaking"],
             ["Resources",        "/resources"],
           ] as const).map(([label, href]) => (

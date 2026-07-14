@@ -189,7 +189,7 @@ export default function NotFound() {
               <a href="/resources" style={{ ...btnBase, border: `2px solid ${INK}`, color: INK, background: "transparent" }}>
                 Resources &rarr;
               </a>
-              <a href="/emos" style={{ ...btnBase, border: `2px solid ${INK}`, color: INK, background: "transparent" }}>
+              <a href="/emos-academy" style={{ ...btnBase, border: `2px solid ${INK}`, color: INK, background: "transparent" }}>
                 EMOS &rarr;
               </a>
               <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ ...btnBase, border: `2px solid ${INK}`, color: INK, background: "transparent" }}>

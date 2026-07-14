@@ -813,7 +813,7 @@ const Outro = () => (
           Free resources →
         </a>
         <a
-          href="/emos"
+          href="/emos-academy"
           style={{ padding: "16px 26px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
           EMOS →

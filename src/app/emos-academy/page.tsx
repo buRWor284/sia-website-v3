@@ -37,11 +37,11 @@ export const metadata: Metadata = {
   title: "EMOS Academy · Earned Media OS for Founders",
   description:
     "EMOS Academy is a guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.",
-  alternates: { canonical: "/emos" },
+  alternates: { canonical: "/emos-academy" },
   openGraph: {
     type: "website",
     siteName: "Syed Irfan Ajmal",
-    url: "https://www.syedirfanajmal.com/emos",
+    url: "https://www.syedirfanajmal.com/emos-academy",
     title: OG_TITLE,
     description: OG_DESC,
   },
@@ -658,7 +658,7 @@ export default function EmosPage() {
                       <div className="emos-apply-step" key={n}><div className="emos-apply-n">{n}</div><div className="emos-apply-text"><strong>{text}</strong>{sub && <>&nbsp;&nbsp;·&nbsp;&nbsp;{sub}</>}</div></div>
                     ))}
                     <div style={{ marginTop: 24, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
-                      <a href="/emos/apply" className="emos-cta-yellow">Submit Your Application →</a>
+                      <a href="/emos-academy/apply" className="emos-cta-yellow">Submit Your Application →</a>
                       <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(250,250,250,.45)" }}>5 minutes. Decision within 48 hours.</span>
                     </div>
                   </div>
@@ -728,7 +728,7 @@ export default function EmosPage() {
                 Rolling applications — next cohort forming now &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
               </p>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-                <a href="/emos/apply" className="emos-cta-yellow" style={{ fontSize: 13, padding: "18px 36px" }}>Submit Your Application →</a>
+                <a href="/emos-academy/apply" className="emos-cta-yellow" style={{ fontSize: 13, padding: "18px 36px" }}>Submit Your Application →</a>
                 <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "rgba(250,250,250,.40)" }}>5 minutes. Decision within 48 hours.</span>
               </div>
             </div>
@@ -754,7 +754,7 @@ export default function EmosPage() {
       {/* CHANGE 3: sticky mobile apply bar (the desktop rail is hidden < 1200px) */}
       <div className="emos-mobile-bar">
         <div className="mmb-price">$2K · $3.5K<span>one-time · Cohort 1 · 5 seats</span></div>
-        <a href="/emos/apply" className="mmb-btn">Apply →</a>
+        <a href="/emos-academy/apply" className="mmb-btn">Apply →</a>
       </div>
     </>
   );
