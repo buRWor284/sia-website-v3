@@ -7,7 +7,7 @@ import { STAGE_META, STAGE_ORDER, STAGE_THRESHOLDS, computeEarnedStage, type Emo
 import type { Metadata } from "next";
 
 // Admin emails bypass the subscription gate (Irfan + ops aliases)
-const ADMIN_EMAILS = ["syedirfanajmal@gmail.com", "sia@syedirfanajmal.com", "irfan@dmr.agency"];
+const ADMIN_EMAILS = ["syedirfanajmal@gmail.com", "sia@syedirfanajmal.com"];
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
