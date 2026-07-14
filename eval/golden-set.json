@@ -1,0 +1,197 @@
+[
+  {
+    "id": "wb-01",
+    "source": "writing-benefits-infographic",
+    "claimText": "Klein & Boals 2001: expressive writing improves working memory, Study 1 n=35 vs 36 freshmen, Study 2 n=34/33/34, WM gains at 7 weeks, J Exp Psychol Gen",
+    "claimType": "citation",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://pubmed.ncbi.nlm.nih.gov/11561925/"]
+  },
+  {
+    "id": "wb-02",
+    "source": "writing-benefits-infographic",
+    "claimText": "Bangert-Drowns et al. 2004 meta-analysis found writing 'sharpens communication' and produces 'verbal-articulation gains' that 'transfer into spoken explanation'",
+    "claimType": "fact",
+    "expectedVerdict": "misleading",
+    "note": "Meta-analysis measured academic achievement (d=0.17), not communication/verbal articulation; the transfer claim is an untested inference."
+  },
+  {
+    "id": "wb-03",
+    "source": "writing-benefits-infographic",
+    "claimText": "Smyth et al. 2018 JMIR Mental Health: n=70 RCT, 15 min x 3 days/week x 12 weeks, reduced distress/anxiety, increased resilience",
+    "claimType": "citation",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://pmc.ncbi.nlm.nih.gov/articles/PMC6305886/"]
+  },
+  {
+    "id": "wb-04",
+    "source": "writing-benefits-infographic",
+    "claimText": "Pennebaker & Beall 1986: n=46 undergraduates, 15 min x 4 consecutive nights, fewer health-center visits over the following 6 months",
+    "claimType": "citation",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://pubmed.ncbi.nlm.nih.gov/3745650/"]
+  },
+  {
+    "id": "wb-05",
+    "source": "writing-benefits-infographic",
+    "claimText": "Scullin et al. 2018: writing a to-do list before bed causes people to fall asleep approximately 9 minutes faster",
+    "claimType": "statistic",
+    "expectedVerdict": "misleading",
+    "note": "The 9-minute figure appears in secondary coverage (Psychology Today) only; absent from both the paper and the Baylor press release the report attributed it to."
+  },
+  {
+    "id": "wb-06",
+    "source": "writing-benefits-infographic",
+    "claimText": "Matthews goals study: writing goals down leads to 76% goal achievement vs 43% for those who don't",
+    "claimType": "statistic",
+    "expectedVerdict": "unverifiable",
+    "note": "Dominican's own sub-metric is 70% vs 35%; mean achievement scores 4.28-7.6; the 76/43 pair is untraceable to any Dominican primary document."
+  },
+  {
+    "id": "wb-07",
+    "source": "writing-benefits-infographic",
+    "claimText": "Page header claims '10 Peer-reviewed sources'",
+    "claimType": "fact",
+    "expectedVerdict": "misleading",
+    "note": "Only 9 of the 12 named sources are peer-reviewed journal articles; Matthews (conference), Cameron (trade book), Franklin (almanac) are not."
+  },
+  {
+    "id": "wb-08",
+    "source": "writing-benefits-infographic",
+    "claimText": "Header stat: '20 min, the Pennebaker dose'",
+    "claimType": "statistic",
+    "expectedVerdict": "unverifiable",
+    "note": "Foundational 1986 Pennebaker & Beall protocol used 15 minutes per session; contradicts the page's own dose calculator row, which correctly says 15 min."
+  },
+  {
+    "id": "wb-09",
+    "source": "writing-benefits-infographic",
+    "claimText": "Franklin quote: 'either write things worth reading, or do things worth the writing,' 1738, Poor Richard's Almanack",
+    "claimType": "quote",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://quoteinvestigator.com/2016/04/27/worth/"]
+  },
+  {
+    "id": "seo-01",
+    "source": "bing-seo-guide",
+    "claimText": "Semrush: the lowest tiers earned 0-4 citations while the top tier earned 79-plus",
+    "claimType": "statistic",
+    "expectedVerdict": "unverifiable",
+    "note": "The strings '0-4' and '79' appear nowhere in the cited Semrush study's text; may exist only in an unread chart."
+  },
+  {
+    "id": "seo-02",
+    "source": "bing-seo-guide",
+    "claimText": "Wikipedia is consistently ChatGPT's most-cited domain",
+    "claimType": "fact",
+    "expectedVerdict": "misleading",
+    "note": "Ahrefs' own cited data ranks Reddit #1, Wikipedia #2, both in the US and globally."
+  },
+  {
+    "id": "seo-03",
+    "source": "bing-seo-guide",
+    "claimText": "The Feb 2023 Bing API price hike ($7 to $25 per 1,000) was explicitly tied to 'the addition of OpenAI's ChatGPT engine to Bing'",
+    "claimType": "quote",
+    "expectedVerdict": "misleading",
+    "note": "The $7-to-$25 figures are Verified; the ChatGPT attribution is Computerworld's own hedged editorial line, not a Microsoft statement."
+  },
+  {
+    "id": "seo-04",
+    "source": "bing-seo-guide",
+    "claimText": "Bing is one of only two named ChatGPT search providers (Shopify was added in May 2025)",
+    "claimType": "fact",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://help.openai.com/en/articles/9237897-chatgpt-search"],
+    "note": "OpenAI's help doc names exactly Bing and Shopify; note Shopify's role is shopping data, not general web search."
+  },
+  {
+    "id": "seo-05",
+    "source": "bing-seo-guide",
+    "claimText": "Bing's US all-device search share is around 7-8%, Europe roughly 3.4%",
+    "claimType": "statistic",
+    "expectedVerdict": "misleading",
+    "note": "Reference-frame error: figures are ~2024-era. As of the guide's publication (mid-2026), StatCounter shows US ~9-10%, Europe ~5.6%. Live/volatile data requires an as_of pin."
+  },
+  {
+    "id": "seo-06",
+    "source": "bing-seo-guide",
+    "claimText": "Bing Copilot overlapped Google's AI Overviews only 9.81% (Perplexity 11.97%, ChatGPT 13.95%)",
+    "claimType": "statistic",
+    "expectedVerdict": "misleading",
+    "note": "All three figures are Bing's own overlaps with the other engines in the SE Ranking study, not the guide's implied cross-engine comparison matrix."
+  },
+  {
+    "id": "seo-07",
+    "source": "bing-seo-guide",
+    "claimText": "SE Ranking study of about 2,000 queries per engine",
+    "claimType": "statistic",
+    "expectedVerdict": "inaccurate",
+    "note": "2,000 total queries across 20 niches, not per engine; Bing Copilot answered 1,452 of them."
+  },
+  {
+    "id": "seo-08",
+    "source": "bing-seo-guide",
+    "claimText": "76% of AI Overview citations were in the top 10 organic results in July 2025, falling to 38% about 8 months later",
+    "claimType": "statistic",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://ahrefs.com/blog/ai-overview-citations-top-10/"],
+    "note": "Verified with caveat: some of the change may reflect Gemini 3 parsing differences noted in the same post."
+  },
+  {
+    "id": "seo-09",
+    "source": "bing-seo-guide",
+    "claimText": "Semrush is owned by Adobe",
+    "claimType": "fact",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://news.adobe.com/news/2026/04/adobe-completes-semrush-acquisition"]
+  },
+  {
+    "id": "seo-10",
+    "source": "bing-seo-guide",
+    "claimText": "62% of AI citations are ghost citations (citations to pages that don't actually support the claim)",
+    "claimType": "statistic",
+    "expectedVerdict": "verified",
+    "expectedSources": ["https://www.semrush.com/blog/the-ghost-citations-study/"],
+    "note": "Precise figure is 61.7%, rounds to 62%."
+  },
+  {
+    "id": "seo-11",
+    "source": "bing-seo-guide",
+    "claimText": "'Windows, Edge, and Microsoft 365 funnel people into Bing on work machines' cites a Nov 2025 Microsoft statement",
+    "claimType": "fact",
+    "expectedVerdict": "misleading",
+    "note": "Citation mismatch: the cited Nov 7, 2025 Copilot blog post is about AI search in Copilot and never makes this defaults claim; the claim itself is credible analyst consensus but shouldn't carry a Microsoft citation."
+  },
+  {
+    "id": "planted-01",
+    "source": "planted-error-drafts",
+    "claimText": "A 2024 study published in the Journal of Applied Cognitive Neuroscience (DOI: 10.1038/s41599-024-99999-x) found that reading fiction for 20 minutes daily increases empathy scores by 34%.",
+    "claimType": "citation",
+    "expectedVerdict": "fabricated",
+    "note": "Planted fake-DOI test case: DOI does not resolve in Crossref/OpenAlex; journal name is not a known real title. Should be caught by the citation gate alone (mode: citation), zero paid search."
+  },
+  {
+    "id": "planted-02",
+    "source": "planted-error-drafts",
+    "claimText": "As Pennebaker & Beall (1986, DOI: 10.1037/0021-843X.95.3.274) showed, expressive writing increases IQ scores by an average of 8 points within a month.",
+    "claimType": "citation",
+    "expectedVerdict": "fabricated",
+    "note": "Planted real-DOI-wrong-paper test case: the DOI resolves to the actual 1986 Pennebaker & Beall paper, which makes no IQ claim at all. Citation gate confirms the DOI exists but the claim attached to it is fabricated."
+  },
+  {
+    "id": "planted-03",
+    "source": "planted-error-drafts",
+    "claimText": "\"Writing is nature's way of showing you how sloppy your thinking is,\" said Richard Guindon.",
+    "claimType": "quote",
+    "expectedVerdict": "inaccurate",
+    "note": "Planted misquote test case: real quote, wrong/underspecified attribution nuance depending on which secondary source is checked; use to test source corroboration and quote-matching, not the citation gate."
+  },
+  {
+    "id": "planted-04",
+    "source": "planted-error-drafts",
+    "claimText": "Bing currently holds roughly 15% of the US desktop search market.",
+    "claimType": "statistic",
+    "expectedVerdict": "fabricated",
+    "note": "Planted stale/wrong market-share test case: current StatCounter figures put Bing US desktop share far below 15%; use to test the recency/as_of check in the per-claim verify+grade step."
+  }
+]
