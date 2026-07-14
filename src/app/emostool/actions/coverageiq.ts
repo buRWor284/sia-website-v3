@@ -5,6 +5,18 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { recordStageEvent } from "./stage";
+import type {
+  Stage, PesoType, LinkType, ContentType, DataSource, AlertStatus, AlertType,
+  DbPitch, DbJournalist, DbAlert, CreatePitchInput, CreateJournalistInput,
+} from "@/lib/coverageiq/types";
+
+// Types are defined canonically in src/lib/coverageiq/types.ts. Re-exported here
+// so existing importers (JournoCollabIQClient, dashboard pages) keep working
+// against "@/app/emostool/actions/coverageiq".
+export type {
+  Stage, PesoType, LinkType, ContentType, DataSource, AlertStatus, AlertType,
+  DbPitch, DbJournalist, DbAlert, CreatePitchInput, CreateJournalistInput,
+};
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
 
@@ -13,67 +25,6 @@ async function getAuthenticatedClient() {
   if (!userId) redirect("/sign-in");
   const token = await getToken();
   return createSupabaseServerClient(token ?? "");
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export type Stage = "drafted" | "sent" | "opened" | "replied" | "placed" | "amplified";
-export type PesoType = "Earned" | "Shared" | "Owned" | "Paid";
-export type LinkType = "Do Follow" | "No Follow" | "N/A";
-export type ContentType = "Original" | "Republished";
-export type DataSource = "manual" | "PressIQ" | "SignalIQ" | "JournoCollabIQ" | "Google Alerts";
-export type AlertStatus = "new" | "reviewed" | "archived";
-export type AlertType = "syndication" | "mention" | "pickup";
-
-export interface DbPitch {
-  id: string;
-  subject: string;
-  client: string | null;
-  team: string | null;
-  stage: Stage;
-  peso_type: PesoType;
-  data_source: DataSource;
-  notes: string | null;
-  sent_date: string | null;
-  placed_date: string | null;
-  follow_up_due: string | null;
-  placement_url: string | null;
-  anchor_text: string | null;
-  domain_rating: number | null;
-  link_type: LinkType | null;
-  content_type: ContentType | null;
-  points: number | null;
-  journalist_id: string | null;
-  // joined
-  journalist_name: string | null;
-  journalist_outlet: string | null;
-  journalist_dr: number | null;
-}
-
-export interface DbJournalist {
-  id: string;
-  name: string;
-  outlet: string | null;
-  beat: string | null;
-  email: string | null;
-  twitter_handle: string | null;
-  domain_rating: number | null;
-  last_contact: string | null;
-  pitches_sent: number;
-  placements: number;
-  notes: string | null;
-  tags: string[];
-}
-
-export interface DbAlert {
-  id: string;
-  alert_type: AlertType;
-  title: string;
-  url: string | null;
-  source: string | null;
-  status: AlertStatus;
-  detected_at: string;
-  pitch_id: string | null;
 }
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -87,7 +38,7 @@ export async function getPitches(): Promise<DbPitch[]> {
       id, subject, client, team, stage, peso_type, data_source, notes,
       sent_date, placed_date, follow_up_due, placement_url, anchor_text,
       domain_rating, link_type, content_type, points, journalist_id,
-      journalists ( name, outlet, domain_rating )
+      journalists ( name, outlet, domain_rating, email )
     `)
     .order("created_at", { ascending: false });
 
@@ -119,6 +70,7 @@ export async function getPitches(): Promise<DbPitch[]> {
     journalist_name: row.journalists?.name ?? null,
     journalist_outlet: row.journalists?.outlet ?? null,
     journalist_dr: row.journalists?.domain_rating ?? null,
+    journalist_email: row.journalists?.email ?? null,
   }));
 }
 
@@ -156,17 +108,6 @@ export async function getAlerts(): Promise<DbAlert[]> {
 }
 
 // ─── Mutations ────────────────────────────────────────────────────────────────
-
-export interface CreatePitchInput {
-  subject: string;
-  journalist_id?: string | null;
-  client?: string | null;
-  team?: string | null;
-  peso_type?: PesoType;
-  stage?: Stage;
-  data_source?: DataSource;
-  notes?: string | null;
-}
 
 export async function createPitch(input: CreatePitchInput): Promise<{ id: string } | null> {
   const db = await getAuthenticatedClient();
@@ -238,19 +179,6 @@ export async function updateAlertStatus(alertId: string, status: AlertStatus): P
 }
 
 // ─── Journalist management (Phase 4) ─────────────────────────────────────────
-
-export interface CreateJournalistInput {
-  name: string;
-  outlet?: string | null;
-  beat?: string | null;
-  email?: string | null;
-  twitter_handle?: string | null;
-  domain_rating?: number | null;
-  notes?: string | null;
-  tags?: string[];
-  /** Where this journalist came from (e.g. "JournoCollabIQ" AI saves). Default "manual". */
-  data_source?: DataSource;
-}
 
 export async function createJournalist(input: CreateJournalistInput): Promise<{ id: string } | null> {
   const db = await getAuthenticatedClient();
