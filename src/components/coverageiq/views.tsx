@@ -374,19 +374,25 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
               <div style={{ padding: "14px 16px", borderLeft: `1px solid ${INK15}` }}>
                 <button
                   onClick={e => {
+                    // Capture the button node synchronously: e.currentTarget is
+                    // reset to null once the handler returns, so reading it inside
+                    // the async clipboard .then() would throw and silently swallow
+                    // the "Copied!" feedback.
+                    const btn = e.currentTarget;
+                    const flash = (msg: string) => {
+                      btn.textContent = msg;
+                      setTimeout(() => { btn.textContent = actionLabel; }, 1500);
+                    };
                     if (urgency === "amplify") {
                       if (pitch.url) window.open(pitch.url, "_blank", "noopener,noreferrer");
-                    } else {
-                      const email = pitch.journalistEmail;
-                      if (email) {
-                        navigator.clipboard.writeText(email).then(() => {
-                          const btn = e.currentTarget as HTMLButtonElement;
-                          const orig = btn.textContent ?? "";
-                          btn.textContent = "Copied!";
-                          setTimeout(() => { btn.textContent = orig; }, 1500);
-                        });
-                      }
+                      else flash("No link");
+                      return;
                     }
+                    const email = pitch.journalistEmail;
+                    if (!email) { flash("No email"); return; }
+                    navigator.clipboard.writeText(email)
+                      .then(() => flash("Copied!"))
+                      .catch(() => flash("Copy failed"));
                   }}
                   style={{ padding: "7px 14px", background: btnBg, color: btnFg, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", border: "none", cursor: "pointer" }}>
                   {actionLabel}
