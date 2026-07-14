@@ -53,3 +53,12 @@ export const PREVIEW_REVEAL: Record<"pciq-preview" | "jciq-preview", QuotaTier> 
 
 /** Rolling quota window, in milliseconds (30 days). */
 export const QUOTA_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+/**
+ * EMOS platform (paid) tier — P4 decision record (2026-07-14, Irfan):
+ * ONE plan, $50/month, UNMETERED tool usage. Platform routes are therefore not
+ * in QUOTA_LIMITS at all; their only limiter is the per-user 30/hr abuse brake
+ * in requireEmosAccess() (src/lib/emos-guard.ts). If a metered entry-level plan
+ * is ever added (§8.4 option B, deliberately NOT chosen at launch), its caps
+ * belong here as a third tier so all limits stay in one file.
+ */
