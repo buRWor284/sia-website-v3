@@ -52,12 +52,17 @@ export async function POST(req: NextRequest) {
   const quota = await consumeQuota(req, "signaliq-scan");
   const tier: UsageTier = quota.tier;
   if (!quota.ok) {
+    // P4: an email subscriber out of quota is the strongest upgrade signal —
+    // point them at the paid rung instead of a 30-day dead end. `upgrade: true`
+    // tells the shared core to render the EMOS platform CTA (public shell only;
+    // the dashboard route never sets it).
     return NextResponse.json(
       {
         error: tier === "email"
-          ? "You've used all your scans this month."
+          ? "You've used all your scans this month. EMOS platform members scan without limits."
           : "You've used your free scans this month. Add your email for more.",
         usage: { remaining: 0, tier },
+        ...(tier === "email" ? { upgrade: true } : {}),
       },
       { status: 429 },
     );

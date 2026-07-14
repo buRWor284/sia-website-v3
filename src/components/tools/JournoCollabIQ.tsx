@@ -433,7 +433,7 @@ function UnlockOverlay({ hidden, kind, onUnlock }: { hidden: number; kind: "part
   );
 }
 
-function Stage3({ partners, hiddenCount, onUnlock, loading, loadingIdx, industry, strategy, biz, selNiches, onToggle, onScore, onGatedCsv, error, onRetry }: {
+function Stage3({ partners, hiddenCount, onUnlock, loading, loadingIdx, industry, strategy, biz, selNiches, onToggle, onScore, onGatedCsv, error, onRetry, upgradeHref }: {
   partners: AiPartner[]; hiddenCount: number; onUnlock: () => void;
   loading: boolean; loadingIdx: number;
   industry: string; strategy: string; biz: string;
@@ -443,6 +443,8 @@ function Stage3({ partners, hiddenCount, onUnlock, loading, loadingIdx, industry
   onGatedCsv: () => void;
   error: string | null;
   onRetry: () => void;
+  /** P4: set when the error is an email-tier quota 429 — renders the EMOS platform CTA. */
+  upgradeHref?: string | null;
 }) {
   if (loading) {
     const msg = V2_LOADING[loadingIdx % V2_LOADING.length];
@@ -483,7 +485,15 @@ function Stage3({ partners, hiddenCount, onUnlock, loading, loadingIdx, industry
       <StageWrapper title="The research didn't come back." subtitle="No sample journalists have been substituted — retry to get live matches personalised to your story.">
         <div style={{ border: `1px solid ${ERR}`, background: "rgba(192,57,43,0.06)", padding: "22px 24px", textAlign: "center" }}>
           <p style={{ fontFamily: GF, fontSize: 14, color: TX, margin: "0 0 16px", lineHeight: 1.6 }}>{error}</p>
-          <button onClick={onRetry} style={{ ...primaryBtn(), justifyContent: "center" }}>↻ Try again</button>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            {upgradeHref ? (
+              <a href={upgradeHref} style={{ ...primaryBtn(), justifyContent: "center", textDecoration: "none" }}>
+                Explore the EMOS platform →
+              </a>
+            ) : (
+              <button onClick={onRetry} style={{ ...primaryBtn(), justifyContent: "center" }}>↻ Try again</button>
+            )}
+          </div>
         </div>
       </StageWrapper>
     );
@@ -934,6 +944,9 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
   const [aiEmailLoading, setAiEmailLoading] = useState(false);
   const [aiBriefLoading, setAiBriefLoading] = useState(false);
   const [partnersError, setPartnersError]   = useState<string|null>(null);
+  // P4: true when the search 429'd at the email tier — Stage3 swaps retry for
+  // the EMOS platform CTA (retrying an exhausted monthly quota is pointless).
+  const [upgradeNudge, setUpgradeNudge] = useState(false);
   const [showGate, setShowGate]     = useState(false);
   const [gatedAction, setGatedAction] = useState<string|null>(null);
   const [isSub, setIsSub]   = useState(false);
@@ -1058,19 +1071,20 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
     // contained REAL named reporters (several no longer at those outlets)
     // presented as live AI matches — users could pitch stale people believing
     // they were matched live. Show a real error + retry instead.
-    setLoading(true); setPartners([]); setHiddenCount(0); setLoadingIdx(0); setPartnersError(null);
+    setLoading(true); setPartners([]); setHiddenCount(0); setLoadingIdx(0); setPartnersError(null); setUpgradeNudge(false);
     try {
       const token = await waitForToken();
       const res = await fetch("/api/journo-ai", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ type:"partner-suggestions", data:{ biz:state.biz, domain:state.domain, desc:state.desc, industry:ind, audType:state.audType, audDesc:state.audDesc, geo:state.geo, strategy:state.strategy }, turnstileToken: token || undefined }),
       });
-      const json = await res.json().catch(() => ({})) as { result?: string; error?: string; hidden?: number };
+      const json = await res.json().catch(() => ({})) as { result?: string; error?: string; hidden?: number; upgrade?: boolean };
       // P3: monthly search quota exhausted. For an anonymous caller, surface the
       // shared gate so they can convert on the spot; a subscriber has hit the hard
-      // 30/mo cap, so just show the message.
+      // 30/mo cap — P4: show the message with the EMOS platform CTA.
       if (res.status === 429) {
         setPartnersError(json.error || "You've reached this month's search limit.");
+        setUpgradeNudge(Boolean(json.upgrade));
         if (!isSub) { setGatedAction("unlock-preview"); setShowGate(true); }
         return;
       }
@@ -1568,7 +1582,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         <div key={`stage-${step}`}>
           {step===1 && <Stage1 state={state} dispatch={dispatch} />}
           {step===2 && <Stage2 state={state} dispatch={dispatch} />}
-          {step===3 && <Stage3 partners={partners} hiddenCount={hiddenCount} onUnlock={()=>{setGatedAction("unlock-preview");setShowGate(true);}} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} />}
+          {step===3 && <Stage3 partners={partners} hiddenCount={hiddenCount} onUnlock={()=>{setGatedAction("unlock-preview");setShowGate(true);}} loading={loading} loadingIdx={loadingIdx} industry={ind} strategy={state.strategy} biz={state.biz} selNiches={state.selNiches} onToggle={n=>dispatch({type:"TOGGLE_NICHE",val:n})} onScore={(n,c)=>dispatch({type:"SCORE_PARTNER",name:n,cat:c})} onGatedCsv={handleGatedCsv} error={partnersError} onRetry={generatePartners} upgradeHref={upgradeNudge ? "/emostool" : null} />}
           {step===4 && <Stage4 state={state} dispatch={dispatch} partners={partners} onGated={handleGated} aiEmail={aiEmail} aiEmailLoading={aiEmailLoading} />}
           {step===5 && <Stage5 state={state} onGated={handleGated} aiBrief={aiBrief} aiBriefLoading={aiBriefLoading} pdfLoading={pdfLoading} pdfDone={pdfDone} />}
         </div>

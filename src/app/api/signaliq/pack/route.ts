@@ -49,12 +49,14 @@ export async function POST(req: NextRequest) {
   const quota = await consumeQuota(req, "signaliq-pack");
   const tier: UsageTier = quota.tier;
   if (!quota.ok) {
+    // P4: out-of-quota subscribers get the paid-rung pointer (see scan route).
     return NextResponse.json(
       {
         error: tier === "email"
-          ? "You've used all your asset packs this month."
+          ? "You've used all your asset packs this month. EMOS platform members build packs without limits."
           : "You've used your free asset pack this month. Add your email for more.",
         usage: { remaining: 0, tier },
+        ...(tier === "email" ? { upgrade: true } : {}),
       },
       { status: 429 },
     );

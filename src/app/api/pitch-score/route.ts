@@ -65,12 +65,16 @@ export async function POST(req: NextRequest) {
   const quota = await consumeQuota(req, "pressiq-score");
   const usageTier = quota.tier;
   if (!quota.ok) {
+    // P4: an email subscriber out of quota is the strongest upgrade signal —
+    // `upgrade: true` makes the shared core render the EMOS platform CTA
+    // (public shell only; the dashboard route never sets it).
     return NextResponse.json(
       {
         error: usageTier === "email"
-          ? "You've used all your scores this month. They reset on a rolling 30-day window."
+          ? "You've used all your scores this month. EMOS platform members score without limits."
           : `You've used your ${quota.limit} free scores this month. Add your email for ${EMAIL_LIMIT}/month.`,
         usage: { remaining: 0, tier: usageTier },
+        ...(usageTier === "email" ? { upgrade: true } : {}),
       },
       { status: 429 },
     );

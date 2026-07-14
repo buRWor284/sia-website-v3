@@ -79,12 +79,15 @@ export async function POST(request: NextRequest) {
     previewTier = quota.tier;
     previewRemaining = quota.remaining;
     if (!quota.ok) {
+      // P4: `upgrade: true` tells the public shell to render the EMOS platform
+      // CTA next to the retry button (email tier only).
       return NextResponse.json(
         {
           error: quota.tier === "email"
             ? "You've used all 30 journalist searches this month. Unlimited runs live in the EMOS platform."
             : "You've used your 3 free journalist searches this month. Add your email for 30 a month, free.",
           usage: { remaining: 0, tier: quota.tier },
+          ...(quota.tier === "email" ? { upgrade: true } : {}),
         },
         { status: 429 },
       );

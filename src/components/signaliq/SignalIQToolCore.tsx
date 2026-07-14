@@ -455,6 +455,12 @@ export default function SignalIQToolCore({
   const [packError, setPackError] = useState<string | null>(null);
   const [pack, setPack] = useState<AssetPack | null>(null);
 
+  // P4: the server sets `upgrade: true` on an email-tier 429 (public routes
+  // only) — render the EMOS platform CTA next to the error. Always false on
+  // the dashboard, whose routes never send the flag.
+  const [scanUpgrade, setScanUpgrade] = useState(false);
+  const [packUpgrade, setPackUpgrade] = useState(false);
+
   // Save-to-EMOS state (only used when onSaveOpportunity is provided)
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -498,6 +504,7 @@ export default function SignalIQToolCore({
   }
   function startOver() {
     setSelected(null); setPack(null); setPackError(null); setScan(null); setScanError(null);
+    setScanUpgrade(false); setPackUpgrade(false);
     setStage(1); scrollTop();
   }
   // Radar card actions: inspect → Angle (stage 4); Generate → straight to Pack (stage 5).
@@ -514,10 +521,13 @@ export default function SignalIQToolCore({
     setScan(null);
     setSelected(null);
     setPack(null);
+    setScanUpgrade(false);
     try {
       const { ok, data } = await api.scan({ beats, companyContext: ctx || undefined });
-      if (!ok) setScanError((data as { error?: string })?.error || "Scan failed.");
-      else setScan(data as ScanResponse);
+      if (!ok) {
+        setScanError((data as { error?: string })?.error || "Scan failed.");
+        setScanUpgrade(Boolean((data as { upgrade?: boolean })?.upgrade));
+      } else setScan(data as ScanResponse);
     } catch {
       setScanError("Network error. Please try again.");
     } finally {
@@ -531,10 +541,13 @@ export default function SignalIQToolCore({
     setPackError(null);
     setPacking(true);
     scrollTop();
+    setPackUpgrade(false);
     try {
       const { ok, data } = await api.pack({ opportunity: opp, companyContext: companyContext.trim() || undefined });
-      if (!ok) setPackError((data as { error?: string })?.error || "Could not generate the pack.");
-      else setPack(data as AssetPack);
+      if (!ok) {
+        setPackError((data as { error?: string })?.error || "Could not generate the pack.");
+        setPackUpgrade(Boolean((data as { upgrade?: boolean })?.upgrade));
+      } else setPack(data as AssetPack);
     } catch {
       setPackError("Network error. Please try again.");
     } finally {
@@ -697,6 +710,11 @@ export default function SignalIQToolCore({
             {scanError && !scanning && (
               <div style={{ maxWidth: 620, margin: "20px auto 0", padding: "12px 14px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
                 {scanError}
+                {scanUpgrade && (
+                  <a href="/emostool" style={{ display: "inline-block", marginLeft: 8, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: INK, textDecoration: "underline" }}>
+                    Explore the EMOS platform →
+                  </a>
+                )}
               </div>
             )}
 
@@ -806,6 +824,11 @@ export default function SignalIQToolCore({
                 {packError && !packing && (
                   <div style={{ padding: "16px", border: `1px solid ${RED}`, background: hexA(RED, 0.06), fontFamily: SERIF, fontSize: 14, color: INK, textAlign: "center" }}>
                     {packError}{" "}
+                    {packUpgrade && (
+                      <a href="/emostool" style={{ display: "inline-block", marginRight: 8, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".06em", textTransform: "uppercase", color: INK, textDecoration: "underline" }}>
+                        Explore the EMOS platform →
+                      </a>
+                    )}
                     <button onClick={() => generatePack(selected)} className="siq-back" style={{ marginLeft: 8 }}>
                       Retry →
                     </button>

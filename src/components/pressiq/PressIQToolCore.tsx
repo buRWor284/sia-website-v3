@@ -370,6 +370,9 @@ export default function PressIQToolCore({
   const [formStep, setFormStep] = useState<1 | 2>(1);
   const [result,   setResult]   = useState<ScoreResponse | null>(null);
   const [error,    setError]    = useState<string | null>(null);
+  // P4: the server sets `upgrade: true` on an email-tier 429 (public route only)
+  // — render the EMOS platform CTA next to the error. Never set on the dashboard.
+  const [errorUpgrade, setErrorUpgrade] = useState(false);
   const [tab,      setTab]      = useState<Tab>("score");
 
   // localStorage prefs (platform/pitchMode/store) — wrapper opts in via persistKey.
@@ -429,7 +432,7 @@ export default function PressIQToolCore({
 
   async function analyze() {
     if (!canAnalyze) return;
-    setError(null); setView("loading"); setResult(null); setTab("score");
+    setError(null); setErrorUpgrade(false); setView("loading"); setResult(null); setTab("score");
     const effectiveQuery = pitchMode === "standalone" ? journalistBeat : query;
     try {
       const { ok, data } = await api.score({
@@ -437,6 +440,7 @@ export default function PressIQToolCore({
       });
       if (!ok) {
         setError((data as { error?: string })?.error || "Something went wrong scoring your pitch.");
+        setErrorUpgrade(Boolean((data as { upgrade?: boolean })?.upgrade));
         setView("pre");
       } else {
         const scored = data as ScoreResponse;
@@ -453,7 +457,7 @@ export default function PressIQToolCore({
 
   // "Score another pitch" — return to the pitch step; KEEP the last result so the
   // Results view stays reachable (no forced re-score just to see it again).
-  function reset() { setView("pre"); setError(null); setFormStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  function reset() { setView("pre"); setError(null); setErrorUpgrade(false); setFormStep(2); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
   // Free navigation between Pitch context / Your pitch / Results — never drops the
   // typed input OR the last result.
@@ -596,7 +600,14 @@ export default function PressIQToolCore({
                 )}
                 {turnstileSlot}
                 {error && (
-                  <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>{error}</div>
+                  <div style={{ marginBottom: 12, padding: "10px 12px", border: `1px solid ${ra(AMBER, 0.5)}`, background: ra(AMBER, 0.08), fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: PAPER, lineHeight: 1.4 }}>
+                    {error}
+                    {errorUpgrade && (
+                      <a href="/emostool" style={{ display: "inline-block", marginLeft: 8, fontFamily: GROT, fontStyle: "normal", fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: YEL, textDecoration: "underline" }}>
+                        Explore the EMOS platform →
+                      </a>
+                    )}
+                  </div>
                 )}
                 <div style={{ display: "flex", gap: 8 }}>
                   <button onClick={() => setFormStep(1)} style={{ padding: "14px 18px", border: `1px solid ${ra(PAPER, 0.3)}`, background: "transparent", color: ra(PAPER, 0.75), fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase", cursor: "pointer" }}>
