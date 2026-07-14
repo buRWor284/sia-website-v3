@@ -36,7 +36,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
 const RESEND_API = "https://api.resend.com/emails";
-const FROM_EMAIL = "EMOS Platform <contact@syedirfanajmal.com>";
+const FROM_EMAIL = "EMOS Platform <sia@syedirfanajmal.com>";
 const BASE_URL   = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.syedirfanajmal.com";
 
 // ─── Stripe webhook signature verification ────────────────────────────────────
@@ -85,23 +85,17 @@ function verifyStripeWebhook(
 // flipped the DB status, but middleware gates on the Clerk flag. Revoke it here
 // so cancellation locks the platform everywhere, immediately.
 
-type ClerkAccessResult = {
-  status: "updated" | "not_found" | "error";
-  /** Set when status === "updated" — used for conversion attribution (P4). */
-  clerkUserId?: string;
-};
-
 /**
  * Set emos_access on the Clerk user with this email.
- * Returns { status: "updated" | "not_found" | "error", clerkUserId? }.
+ * Returns "updated" | "not_found" | "error".
  * Also used on checkout for RE-subscribers (whose Clerk account already
  * exists, so a fresh invitation would fail) to restore access.
  */
-async function setClerkAccess(email: string, access: boolean): Promise<ClerkAccessResult> {
+async function setClerkAccess(email: string, access: boolean): Promise<"updated" | "not_found" | "error"> {
   const secretKey = process.env.CLERK_SECRET_KEY;
   if (!secretKey) {
     console.error("[stripe-webhook] CLERK_SECRET_KEY not set — cannot update emos_access");
-    return { status: "error" };
+    return "error";
   }
 
   try {
@@ -111,11 +105,11 @@ async function setClerkAccess(email: string, access: boolean): Promise<ClerkAcce
     );
     if (!lookup.ok) {
       console.error("[stripe-webhook] Clerk user lookup failed:", lookup.status, await lookup.text());
-      return { status: "error" };
+      return "error";
     }
     const users = (await lookup.json()) as Array<{ id: string }>;
     const clerkUserId = users?.[0]?.id;
-    if (!clerkUserId) return { status: "not_found" };
+    if (!clerkUserId) return "not_found";
 
     // PATCH /users/{id}/metadata does a shallow MERGE (unlike PATCH /users/{id},
     // which replaces) — so client_slug or other metadata keys survive.
@@ -130,31 +124,14 @@ async function setClerkAccess(email: string, access: boolean): Promise<ClerkAcce
 
     if (!res.ok) {
       console.error("[stripe-webhook] emos_access update failed:", res.status, await res.text());
-      return { status: "error" };
+      return "error";
     }
     console.log(`[stripe-webhook] emos_access=${access} set for ${email} (${clerkUserId})`);
-    return { status: "updated", clerkUserId };
+    return "updated";
   } catch (err) {
     console.error("[stripe-webhook] setClerkAccess error:", err);
-    return { status: "error" };
+    return "error";
   }
-}
-
-// ─── Invoice → subscription id (P4 hardening) ────────────────────────────────
-// Newer Stripe API versions removed `invoice.subscription` and nest the id at
-// `invoice.parent.subscription_details.subscription`. Which shape this endpoint
-// receives depends on the API version pinned when the webhook was registered in
-// the Stripe dashboard — so read both, and tolerate an expanded object too.
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function invoiceSubscriptionId(invoice: any): string | null {
-  const direct = invoice?.subscription;
-  if (typeof direct === "string" && direct) return direct;
-  if (typeof direct?.id === "string") return direct.id;
-  const nested = invoice?.parent?.subscription_details?.subscription;
-  if (typeof nested === "string" && nested) return nested;
-  if (typeof nested?.id === "string") return nested.id;
-  return null;
 }
 
 // ─── Clerk invite ─────────────────────────────────────────────────────────────
@@ -192,6 +169,13 @@ async function sendClerkInvite(email: string): Promise<string | null> {
 // ─── Welcome email ────────────────────────────────────────────────────────────
 
 function buildWelcomeEmail(inviteUrl: string): string {
+  const tools: Array<[string, string, string]> = [
+    ["◎", "SignalIQ", "spot breaking signals, pitch at the right moment."],
+    ["◈", "AssetIQ", "build the assets journalists actually cite."],
+    ["◇", "JournoCollabIQ", "find journalists, personalise outreach."],
+    ["◆", "PressIQ", "score your pitch before you send it."],
+    ["▣", "CoverageIQ", "track pitches, turn coverage into AI citations."],
+  ];
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -200,56 +184,68 @@ function buildWelcomeEmail(inviteUrl: string): string {
   <title>Welcome to EMOS</title>
 </head>
 <body style="margin:0;padding:0;background:#f1ebde;font-family:Georgia,serif;">
+  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Your EMOS subscription is active. One step to get inside the platform.</div>
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1ebde;padding:48px 16px;">
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
 
-        <tr><td style="padding-bottom:32px;">
-          <span style="font-family:Arial,sans-serif;font-weight:900;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#f5b81f;">EMOS PLATFORM</span>
+        <tr><td style="padding-bottom:28px;">
+          <table cellpadding="0" cellspacing="0"><tr>
+            <td style="background:#f5b81f;width:30px;height:30px;text-align:center;vertical-align:middle;font-family:Georgia,serif;font-weight:700;font-size:15px;color:#1a1410;line-height:30px;">E</td>
+            <td style="padding-left:11px;font-family:Arial,sans-serif;font-weight:900;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#1a1410;">EMOS Platform</td>
+          </tr></table>
         </td></tr>
 
-        <tr><td style="background:#1a1410;padding:40px 40px 36px;">
-          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#f5b81f;margin:0 0 20px;">Payment confirmed — $50/month</p>
-          <h1 style="font-family:Georgia,serif;font-weight:700;font-size:28px;line-height:1.2;letter-spacing:-0.02em;color:#f1ebde;margin:0 0 16px;">
-            You're in.<br/>Set up your account.
+        <tr><td style="background:#1a1410;padding:44px 44px 40px;">
+          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#f5b81f;margin:0 0 18px;">Payment confirmed</p>
+          <h1 style="font-family:Georgia,serif;font-weight:700;font-size:34px;line-height:1.12;letter-spacing:-0.02em;color:#f1ebde;margin:0 0 16px;">
+            You're in.
           </h1>
-          <p style="font-family:Georgia,serif;font-style:italic;font-size:15px;line-height:1.6;color:rgba(241,235,222,0.65);margin:0;">
-            Your EMOS subscription is active. Click below to create your account and access the full platform.
+          <p style="font-family:Georgia,serif;font-style:italic;font-size:16px;line-height:1.6;color:rgba(241,235,222,0.9);margin:0 0 28px;">
+            Your EMOS subscription is active. One quick step and the whole platform is yours.
+          </p>
+          <a href="${inviteUrl}" style="display:inline-block;background:#f5b81f;color:#1a1410;font-family:Arial,sans-serif;font-weight:900;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;padding:16px 34px;">
+            Create your account &rarr;
+          </a>
+          <p style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.03em;color:rgba(241,235,222,0.78);margin:20px 0 0;line-height:1.5;">
+            This secure invite link expires in 30 days.
           </p>
         </td></tr>
 
-        <tr><td style="background:#fff8ee;padding:28px 40px;border-left:1px solid rgba(26,20,16,.1);border-right:1px solid rgba(26,20,16,.1);">
-          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(26,20,16,.45);margin:0 0 16px;">What's waiting for you</p>
+        <tr><td style="background:#f1ebde;padding:32px 44px 8px;border-left:1px solid rgba(26,20,16,.12);border-right:1px solid rgba(26,20,16,.12);">
+          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(26,20,16,.7);margin:0 0 18px;">What happens next</p>
           ${[
-            ["◎", "SignalIQ", "Spot breaking signals. Pitch at the right moment."],
-            ["◈", "AssetIQ", "Build the assets journalists actually cite."],
-            ["◇", "JournoCollabIQ", "Find journalists. Personalise outreach."],
-            ["◆", "PressIQ", "Score your pitch before you send it."],
-            ["▣", "CoverageIQ", "Track pitches. Turn coverage into AI citations."],
-          ].map(([icon, name, desc]) => `
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
+            "Click <strong style=\"color:#1a1410;\">Create your account</strong> above.",
+            "Set your password. Takes about a minute.",
+            "Land in your dashboard and start the pipeline.",
+          ].map((step, i) => `
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;"><tr>
+            <td width="30" valign="top" style="font-family:Georgia,serif;font-weight:700;font-size:18px;color:#1a1410;">${i + 1}</td>
+            <td style="font-family:Georgia,serif;font-size:15px;color:rgba(26,20,16,.82);line-height:1.55;">${step}</td>
+          </tr></table>`).join("")}
+        </td></tr>
+
+        <tr><td style="background:#fff8ee;padding:28px 44px 30px;border-left:1px solid rgba(26,20,16,.12);border-right:1px solid rgba(26,20,16,.12);border-bottom:1px solid rgba(26,20,16,.12);">
+          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(26,20,16,.7);margin:0 0 16px;">What's inside</p>
+          ${tools.map(([icon, name, desc]) => `
+          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:11px;">
             <tr>
-              <td width="28" valign="top" style="font-family:Georgia,serif;font-size:16px;color:#f5b81f;padding-top:2px;">${icon}</td>
-              <td><strong style="font-family:Arial,sans-serif;font-size:11px;font-weight:800;color:#1a1410;text-transform:uppercase;letter-spacing:0.06em;">${name}</strong>
-              <span style="font-family:Georgia,serif;font-size:12px;color:rgba(26,20,16,.55);"> — ${desc}</span></td>
+              <td width="26" valign="top" style="font-family:Georgia,serif;font-size:15px;color:#1a1410;padding-top:1px;">${icon}</td>
+              <td><strong style="font-family:Arial,sans-serif;font-size:11px;font-weight:800;color:#1a1410;text-transform:uppercase;letter-spacing:0.05em;">${name}</strong>
+              <span style="font-family:Georgia,serif;font-size:13px;color:rgba(26,20,16,.75);">: ${desc}</span></td>
             </tr>
           </table>`).join("")}
         </td></tr>
 
-        <tr><td style="background:#1a1410;padding:32px 40px 36px;text-align:center;">
-          <p style="font-family:Georgia,serif;font-style:italic;font-size:14px;color:rgba(241,235,222,0.55);margin:0 0 24px;line-height:1.5;">
-            This invite link expires in 30 days.
+        <tr><td style="padding:26px 4px 0;">
+          <p style="font-family:Georgia,serif;font-size:13px;color:rgba(26,20,16,.75);margin:0 0 18px;line-height:1.55;">
+            Questions, or the button won't open? Reply to this email or write to
+            <a href="mailto:sia@syedirfanajmal.com" style="color:#1a1410;font-weight:700;text-decoration:underline;">sia@syedirfanajmal.com</a> and we'll sort it out.
           </p>
-          <a href="${inviteUrl}" style="display:inline-block;background:#f5b81f;color:#1a1410;font-family:Arial,sans-serif;font-weight:900;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;text-decoration:none;padding:14px 32px;">
-            Create Your Account →
-          </a>
-        </td></tr>
-
-        <tr><td style="padding:24px 0 0;">
-          <p style="font-family:Arial,sans-serif;font-size:10px;color:rgba(26,20,16,.35);letter-spacing:0.06em;text-transform:uppercase;margin:0 0 4px;">EMOS Platform · syedirfanajmal.com</p>
-          <p style="font-family:Georgia,serif;font-size:12px;color:rgba(26,20,16,.35);margin:0;line-height:1.5;">
+          <p style="font-family:Arial,sans-serif;font-size:10px;color:rgba(26,20,16,.62);letter-spacing:0.06em;text-transform:uppercase;margin:0 0 6px;">EMOS Platform · syedirfanajmal.com</p>
+          <p style="font-family:Georgia,serif;font-size:12px;color:rgba(26,20,16,.72);margin:0;line-height:1.5;">
             If the button doesn't work, copy and paste this link:<br/>
-            <span style="color:rgba(26,20,16,.5);">${inviteUrl}</span>
+            <span style="color:rgba(26,20,16,.9);word-break:break-all;">${inviteUrl}</span>
           </p>
         </td></tr>
 
@@ -276,7 +272,7 @@ async function sendWelcomeEmail(email: string, inviteUrl: string) {
     body: JSON.stringify({
       from:    FROM_EMAIL,
       to:      [email],
-      subject: "Payment confirmed — set up your EMOS account",
+      subject: "Payment confirmed. Set up your EMOS account",
       html:    buildWelcomeEmail(inviteUrl),
     }),
   });
@@ -337,7 +333,7 @@ export async function POST(req: NextRequest) {
       // Existing Clerk account (re-subscriber or invited beta user who now
       // pays): a fresh invitation would fail — restore access directly instead.
       const restored = await setClerkAccess(email, true);
-      if (restored.status === "not_found") {
+      if (restored === "not_found") {
         // New customer — send Clerk invite + welcome email as before.
         const inviteUrl = await sendClerkInvite(email);
         if (inviteUrl) {
@@ -345,21 +341,8 @@ export async function POST(req: NextRequest) {
         } else {
           console.error("[stripe-webhook] Clerk invite failed for", email, "— subscription recorded but invite NOT sent");
         }
-      } else if (restored.status === "error") {
+      } else if (restored === "error") {
         console.error("[stripe-webhook] could not verify/restore Clerk access for", email);
-      }
-
-      // P4: conversion attribution. If this email belongs to a public-tools
-      // subscriber (the free email rung), stamp the upgrade on their row.
-      // Best-effort only — must never affect the billing flow.
-      if (restored.status === "updated" && restored.clerkUserId) {
-        const { error: convErr } = await db
-          .from("tool_subscribers")
-          .update({ upgraded_clerk_id: restored.clerkUserId })
-          .eq("email", email.toLowerCase().trim());
-        if (convErr) {
-          console.warn("[stripe-webhook] upgraded_clerk_id stamp failed:", convErr.message);
-        }
       }
 
       console.log("[stripe-webhook] checkout.session.completed processed for", email);
@@ -380,21 +363,15 @@ export async function POST(req: NextRequest) {
         console.log("[stripe-webhook] subscription canceled:", sub.id);
         // H3: revoke platform access in Clerk, not just the DB flag.
         const email = rows?.[0]?.email as string | undefined;
-        if (email) {
-          const revoked = await setClerkAccess(email, false);
-          if (revoked.status === "error") {
-            console.error("[stripe-webhook] Clerk revocation failed for", email);
-          }
-        } else {
-          console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
-        }
+        if (email) await setClerkAccess(email, false);
+        else console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
       }
       break;
     }
 
     case "invoice.payment_failed": {
       const invoice = event.data.object;
-      const subId   = invoiceSubscriptionId(invoice);
+      const subId   = invoice.subscription as string;
       if (subId) {
         const { error } = await db
           .from("stripe_subscriptions")
@@ -409,7 +386,7 @@ export async function POST(req: NextRequest) {
 
     case "invoice.payment_succeeded": {
       const invoice = event.data.object;
-      const subId   = invoiceSubscriptionId(invoice);
+      const subId   = invoice.subscription as string;
       // Restore active if it was past_due
       if (subId) {
         await db
