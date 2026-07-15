@@ -25,7 +25,7 @@ export default async function JournoCollabIQPage({
   searchParams: Promise<{ asset?: string; topic?: string; beat?: string; story?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
 }) {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
 

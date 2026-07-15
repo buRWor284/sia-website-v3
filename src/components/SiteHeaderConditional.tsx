@@ -2,7 +2,7 @@
 
 /**
  * SiteHeaderConditional — renders SiteHeader + CredibilityTicker only on
- * public site pages. Hidden on /emos-platform/*, /sign-in/*, and every page under
+ * public site pages. Hidden on /emos-platform/* (now includes the moved sign-in / sign-up) and every page under
  * /clients/resourcex (private client workspace — has its own compact
  * masthead, doesn't need the main-site nav/personal branding).
  *
@@ -15,7 +15,7 @@
 import { usePathname } from "next/navigation";
 import { SiteHeader, CredibilityTicker } from "@/components/bureau";
 
-const HIDDEN_PREFIXES = ["/emos-platform", "/sign-in", "/sign-up", "/clients/resourcex", "/emos-academy/apply", "/emos-academy/pay"];
+const HIDDEN_PREFIXES = ["/emos-platform", "/clients/resourcex", "/emos-academy/apply", "/emos-academy/pay"];
 
 export function SiteHeaderConditional() {
   const pathname = usePathname();

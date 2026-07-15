@@ -39,7 +39,7 @@ const TOOL_ICONS: Record<EmosStage, string> = {
 
 export default async function EmosDashboardPage() {
   const { userId, getToken } = await auth();
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/emos-platform/signin");
 
   // ── Subscription gate ─────────────────────────────────────────────────────
   // Non-admin users must have an active Stripe subscription to access the platform.

@@ -59,9 +59,14 @@ export default function SubscribePage() {
     <div style={{ minHeight: "100vh", background: PAPER, fontFamily: SERIF, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px" }}>
       <div style={{ width: "100%", maxWidth: 560 }}>
 
-        {/* Wordmark */}
-        <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase" as const, color: YEL, marginBottom: 32 }}>
-          EMOS Platform
+        {/* Wordmark: amber square E + ink text (accessible on paper, matches /success) */}
+        <div style={{ marginBottom: 32 }}>
+          <span style={{ display: "inline-block", background: YEL, color: INK, fontFamily: SERIF, fontWeight: 700, fontSize: 14, width: 28, height: 28, lineHeight: "28px", textAlign: "center" as const, verticalAlign: "middle" }}>
+            E
+          </span>
+          <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 12, letterSpacing: ".18em", textTransform: "uppercase" as const, color: INK, verticalAlign: "middle", marginLeft: 9 }}>
+            EMOS Platform
+          </span>
         </div>
 
         {/* Card */}
@@ -151,7 +156,7 @@ export default function SubscribePage() {
 
         {/* Already have an account? */}
         <p style={{ textAlign: "center" as const, marginTop: 8 }}>
-          <a href="/sign-in" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(26,20,16,.4)", textDecoration: "none" }}>
+          <a href="/emos-platform/signin" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(26,20,16,.4)", textDecoration: "none" }}>
             Already have an account? Sign in →
           </a>
         </p>

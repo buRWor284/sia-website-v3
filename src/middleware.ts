@@ -77,6 +77,11 @@ const isEmostoolLanding = createRouteMatcher(["/emos-platform", "/emos-platform/
 // must be explicitly exempted or Clerk would force sign-in before payment (money path).
 const isSubscribeRoute = createRouteMatcher(["/emos-platform/subscribe", "/emos-platform/subscribe/(.*)"]);
 
+// C3 (2026-07-15): sign-in/sign-up moved UNDER the protected /emos-platform prefix.
+// They MUST be exempted here or Clerk would force sign-in in order to REACH sign-in
+// (redirect loop / lockout). There is no admin bypass; recovery = revert + redeploy.
+const isAuthRoute = createRouteMatcher(["/emos-platform/signin(.*)", "/emos-platform/signup(.*)"]);
+
 export default clerkMiddleware(async (auth, req) => {
   // ── Legacy: PT (Basic Auth) ──────────────────────────────────────────────
   if (isClientPtRoute(req)) {
@@ -101,7 +106,7 @@ export default clerkMiddleware(async (auth, req) => {
 
     // Belt-and-suspenders: skip if this slug is on Basic Auth (already returned above).
     if (slug && !BASIC_AUTH_CLIENT_SLUGS.has(slug)) {
-      await auth.protect(); // redirects unauthenticated users to /sign-in
+      await auth.protect(); // redirects unauthenticated users to the Clerk sign-in URL (/emos-platform/signin)
 
       const { sessionClaims, userId } = await auth();
       const meta = (sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
@@ -145,7 +150,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // ── EMOS tool: Clerk auth + emos_access metadata ─────────────────────────
-  if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req) && !isSubscribeRoute(req)) {
+  if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req) && !isSubscribeRoute(req) && !isAuthRoute(req)) {
     await auth.protect();
     // Invite-only: require emos_access = true in Clerk publicMetadata.
     // Fast path: read from JWT session claims (already in token).

@@ -110,7 +110,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider signInUrl="/sign-in" signUpUrl="/sign-in">
+    <ClerkProvider signInUrl="/emos-platform/signin" signUpUrl="/emos-platform/signin">
     <html
       lang="en"
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}

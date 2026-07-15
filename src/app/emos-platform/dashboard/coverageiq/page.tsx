@@ -16,7 +16,7 @@ export default async function CoverageIQPlatformPage({
   searchParams: Promise<{ pitch?: string }>;
 }) {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
   const prefillSubject = params.pitch ? decodeURIComponent(params.pitch) : undefined;

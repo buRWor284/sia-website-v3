@@ -32,7 +32,7 @@ export interface DbSignal {
 
 async function getAuthenticatedClient() {
   const { userId, getToken } = await auth();
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/emos-platform/signin");
   const token = await getToken();
   return createSupabaseServerClient(token ?? "");
 }

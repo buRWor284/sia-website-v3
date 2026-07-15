@@ -152,7 +152,7 @@ async function sendClerkInvite(email: string): Promise<string | null> {
     body: JSON.stringify({
       email_address:   email,
       public_metadata: { emos_access: true },
-      redirect_url:    `${BASE_URL}/sign-up`,
+      redirect_url:    `${BASE_URL}/emos-platform/signup`,
     }),
   });
 

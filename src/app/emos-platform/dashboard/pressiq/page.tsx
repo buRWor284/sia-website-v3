@@ -41,7 +41,7 @@ export default async function PressIQPlatformPage({
   searchParams: Promise<{ beat?: string; journalist?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
 }) {
   const { userId, getToken } = await auth();
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
   const assetTitle = params.assetTitle ? decodeURIComponent(params.assetTitle) : null;

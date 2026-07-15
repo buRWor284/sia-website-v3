@@ -81,9 +81,16 @@ const nextConfig: NextConfig = {
       { source: "/resources/collab-link-building",  destination: "/tools/partnercollabiq", permanent: p },
       { source: "/resources/collab-link-building/", destination: "/tools/partnercollabiq", permanent: p },
 
-      // Clerk invite links use /signup (no hyphen) → canonical /sign-up
-      { source: "/signup",        destination: "/sign-up",        permanent: false },
-      { source: "/signup/:path*", destination: "/sign-up/:path*", permanent: false },
+      // Clerk invite links use /signup (no hyphen) → canonical sign-up path
+      { source: "/signup",        destination: "/emos-platform/signup",        permanent: false },
+      { source: "/signup/:path*", destination: "/emos-platform/signup/:path*", permanent: false },
+
+      // C3 (2026-07-15): auth pages moved under the platform prefix. 301 from root.
+      // Preserve :path* because Clerk uses sub-paths for SSO / factor / verification callbacks.
+      { source: "/sign-in",        destination: "/emos-platform/signin",        permanent: p },
+      { source: "/sign-in/:path*", destination: "/emos-platform/signin/:path*", permanent: p },
+      { source: "/sign-up",        destination: "/emos-platform/signup",        permanent: p },
+      { source: "/sign-up/:path*", destination: "/emos-platform/signup/:path*", permanent: p },
 
       // EMOS Academy rename (2026-07-14): /emos/* -> /emos-academy/*.
       // Exact sources only (NOT /emos/:path*) so /emos/subscribe still resolves

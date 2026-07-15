@@ -22,7 +22,7 @@ const SERIF  = "var(--font-serif)";
 
 export default async function SignalIQPlatformPage() {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/emos-platform/signin");
 
   const signals = await getSignals();
 

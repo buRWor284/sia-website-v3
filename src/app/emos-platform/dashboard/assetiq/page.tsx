@@ -24,7 +24,7 @@ export default async function AssetIQPage({
   searchParams: Promise<{ signal?: string; headline?: string; assetIdea?: string; dataBrief?: string; pitchAngle?: string }>;
 }) {
   const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+  if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
   const signalId    = params.signal ?? null;
