@@ -49,6 +49,14 @@ export const VERIFY_AND_GRADE_INSTRUCTIONS = `
 For each claim, in one pass: search the live web for independent sources, fetch
 the most promising ones, and grade the claim against what you actually read.
 
+Record EACH independent source as its OWN separate entry in the sources array,
+with its own url. Never merge several sources into one entry, and never describe
+your sources only in the evidence prose: the corroboration counter reads the
+sources array, not your sentences, so a source you mention but do not list as a
+sources entry does not count and can cause a true claim to be downgraded. If two
+independent sources confirm a load-bearing claim, the sources array must contain
+two entries with two different domains.
+
 Record, per source: the URL, a trust tier, the EXACT matched sentence or data
 point from that source (never a bare "this appears to confirm it" assertion),
 the publisher, and an as-of date when the source reports a value that changes

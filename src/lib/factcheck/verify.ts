@@ -39,11 +39,21 @@ const VALID_VERDICTS: readonly Verdict[] = [
   "fabricated",
 ];
 
-/** Max web_fetch calls the model may make per claim (a little above the search cap, since one search can surface several worth-fetching URLs). */
-const MAX_FETCHES_PER_CLAIM = 5;
+/**
+ * Max web_fetch calls the model may make per claim. Kept tight on purpose: each
+ * fetch pulls a full page into Opus context at input-token cost, and fetches are
+ * the dominant cost driver of a full audit. 3 is enough to corroborate one claim
+ * (the two-source rule needs 2 independent sources, +1 for slack).
+ */
+const MAX_FETCHES_PER_CLAIM = 3;
 
-/** Hard ceiling on model turns per claim. Server tools resolve inside one turn; this only guards the "nudge to record verdict" fallback. */
-const MAX_TURNS_PER_CLAIM = 4;
+/**
+ * Hard ceiling on model turns per claim. Server tools resolve inside one turn, so
+ * turn 0 normally does all the search/fetch/verdict work; turn 1 is only the
+ * forced "record your verdict" fallback. Keeping this at 2 stops the context from
+ * being re-sent (and re-billed) across many turns.
+ */
+const MAX_TURNS_PER_CLAIM = 2;
 
 export interface ClaimToVerify {
   claimText: string;
@@ -106,8 +116,15 @@ export async function verifyClaim(claim: ClaimToVerify, ctx: VerifyContext): Pro
       const message = await anthropic.messages.create(
         {
           model: FACTCHECK_GRADE_MODEL,
-          max_tokens: 4000,
-          system,
+          // The verdict payload (verdict + a few sources + a short evidence line) is
+          // small; 2000 is ample and caps runaway output cost.
+          max_tokens: 2000,
+          // Cache the static system prompt + tool definitions. Every claim in a run
+          // shares this exact prefix, so after the first claim the big playbook is a
+          // cache hit (~90% cheaper on those input tokens) instead of re-billed each
+          // time. This is the plan's top cost lever (§9); the cache_control breakpoint
+          // on the system block covers the tools+system prefix.
+          system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
           tools,
           // On the final fallback turn, force the verdict so we never end without one.
           tool_choice: lastTurn ? { type: "tool", name: "record_verdict" } : { type: "auto" },
