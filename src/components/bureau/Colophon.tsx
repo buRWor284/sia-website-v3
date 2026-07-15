@@ -14,15 +14,22 @@ type FooterCol = {
 
 const COLS: ReadonlyArray<FooterCol> = [
   {
+    head: "EMOS",
+    items: [
+      { label: "EMOS Platform", href: "/emos-platform" },
+      { label: "EMOS Academy",  href: "/emos-academy" },
+      { label: "Free Tools",    href: "/tools" },
+      { label: "Subscribe",     href: "/emos-platform/subscribe" },
+    ],
+  },
+  {
     head: "The Work",
     items: [
       { label: "Fractional CMO", href: "/fractional-cmo" },
       { label: "Speaking",       href: "/speaking" },
-      { label: "EMOS Academy",   href: "/emos-academy" },
-      { label: "DMR.agency ↗",   href: "https://dmr.agency", external: true },
       { label: "Case Studies",   href: "/case-studies" },
-      { label: "Tools",          href: "/tools" },
       { label: "Resources",      href: "/resources" },
+      { label: "DMR.agency ↗",   href: "https://dmr.agency", external: true },
     ],
   },
   {

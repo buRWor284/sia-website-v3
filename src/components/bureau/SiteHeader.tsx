@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CALENDLY, GROT, INK, SERIF, YEL, YEL2 } from "@/lib/tokens";
@@ -10,17 +10,52 @@ const CREAM   = "#FAFAFA";
 const CREAM50 = "rgba(250,250,250,.50)";
 const CREAM45 = "rgba(250,250,250,.45)";
 const CREAM12 = "rgba(250,250,250,.12)";
+const CREAM70 = "rgba(250,250,250,.70)";
 
-const NAV: ReadonlyArray<{ label: string; href: string; matchPrefix?: string }> = [
+type NavLeaf = { label: string; href: string; tag?: "Platform" | "Coming Soon" };
+type NavNode =
+  | { label: string; href: string }
+  | { label: string; children: ReadonlyArray<NavLeaf> };
+
+const NAV: ReadonlyArray<NavNode> = [
   { label: "Home",           href: "/"              },
-  { label: "About",         href: "/about"          },
-  { label: "Speaking",      href: "/speaking"       },
-  { label: "EMOS Academy",  href: "/emos-academy"           },
-  { label: "Fractional CMO",href: "/fractional-cmo" },
-  { label: "Tools",         href: "/tools"          },
-  { label: "Resources",     href: "/resources"      },
-  { label: "Press Kit",     href: "/press-kit"      },
-  { label: "Contact",       href: "/contact"        },
+  { label: "About",          href: "/about"         },
+  { label: "Speaking",       href: "/speaking"      },
+  {
+    label: "EMOS",
+    children: [
+      { label: "EMOS Platform", href: "/emos-platform" },
+      { label: "EMOS Academy",  href: "/emos-academy"  },
+    ],
+  },
+  { label: "Fractional CMO", href: "/fractional-cmo" },
+  {
+    label: "Tools",
+    children: [
+      { label: "PressIQ",              href: "/tools/pressiq"              },
+      { label: "SignalIQ",             href: "/tools/signaliq"             },
+      { label: "CoverageIQ",           href: "/tools/coverageiq"           },
+      { label: "JournoCollabIQ",       href: "/tools/journocollabiq"       },
+      { label: "PartnerCollabIQ",      href: "/tools/partnercollabiq"      },
+      { label: "Authority Calculator", href: "/tools/authority-calculator" },
+      { label: "AssetIQ",              href: "/tools/assetiq",     tag: "Platform"     },
+      { label: "FactCheckIQ",          href: "/tools/factcheckiq", tag: "Coming Soon"  },
+      { label: "All tools →",          href: "/tools"                      },
+    ],
+  },
+  {
+    label: "Resources",
+    children: [
+      { label: "Personal Branding", href: "/resources/personal-branding" },
+      { label: "Neuromarketing",    href: "/resources/neuromarketing"    },
+      { label: "Storytelling",      href: "/resources/storytelling"      },
+      { label: "Writing Tips",      href: "/resources/writing-tips"      },
+      { label: "Infographics",      href: "/infographics"                },
+      { label: "EMOS Curriculum",   href: "/resources/emoscurriculum"    },
+      { label: "All resources →",   href: "/resources"                   },
+    ],
+  },
+  { label: "Contact",        href: "/contact"       },
 ];
 
 function isActive(href: string, pathname: string): boolean {
@@ -28,8 +63,42 @@ function isActive(href: string, pathname: string): boolean {
   return pathname === href || pathname.startsWith(href + "/");
 }
 
+function isNodeActive(node: NavNode, pathname: string): boolean {
+  return "href" in node
+    ? isActive(node.href, pathname)
+    : node.children.some((c) => isActive(c.href, pathname));
+}
+
+const navItemStyle = (active: boolean): CSSProperties => ({
+  fontFamily: GROT, fontSize: 10, fontWeight: 700,
+  letterSpacing: ".16em", textTransform: "uppercase",
+  color: active ? CREAM : CREAM50,
+  textDecoration: "none",
+  transition: "color .12s",
+});
+
+function NavTag({ kind }: { kind: "Platform" | "Coming Soon" }) {
+  const platform = kind === "Platform";
+  return (
+    <span style={{
+      marginLeft: 8, flexShrink: 0,
+      fontFamily: GROT, fontWeight: 800, fontSize: 7.5,
+      letterSpacing: ".10em", textTransform: "uppercase",
+      padding: "2px 5px",
+      background: platform ? YEL : "transparent",
+      color: platform ? INK : CREAM50,
+      border: platform ? "none" : `1px solid ${CREAM12}`,
+      whiteSpace: "nowrap",
+    }}>
+      {kind}
+    </span>
+  );
+}
+
 export const SiteHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const pathname = usePathname();
 
   // Tools get their own chrome — suppress site header
@@ -92,23 +161,83 @@ export const SiteHeader = () => {
         display: "flex", justifyContent: "space-between", alignItems: "center",
         padding: "11px 56px",
       }}>
-        <nav style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}>
-          {NAV.map(({ label, href }) => {
-            const active = isActive(href, pathname);
+        <nav
+          style={{ display: "flex", alignItems: "center", gap: 22, flexWrap: "wrap" }}
+          onKeyDown={(e) => { if (e.key === "Escape") setOpenMenu(null); }}
+        >
+          {NAV.map((node) => {
+            const active = isNodeActive(node, pathname);
+            if ("href" in node) {
+              return (
+                <Link key={node.label} href={node.href} style={navItemStyle(active)}>
+                  {node.label}
+                </Link>
+              );
+            }
+            const open = openMenu === node.label;
             return (
-              <Link
-                key={href}
-                href={href}
-                style={{
-                  fontFamily: GROT, fontSize: 10, fontWeight: 700,
-                  letterSpacing: ".16em", textTransform: "uppercase",
-                  color: active ? CREAM : CREAM50,
-                  textDecoration: "none",
-                  transition: "color .12s",
+              <div
+                key={node.label}
+                style={{ position: "relative" }}
+                onMouseEnter={() => setOpenMenu(node.label)}
+                onMouseLeave={() => setOpenMenu(null)}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenMenu(null);
                 }}
               >
-                {label}
-              </Link>
+                <button
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded={open}
+                  onClick={() => setOpenMenu(open ? null : node.label)}
+                  style={{
+                    ...navItemStyle(active),
+                    background: "none", border: "none", cursor: "pointer",
+                    display: "inline-flex", alignItems: "center", gap: 5, padding: 0,
+                  }}
+                >
+                  {node.label}
+                  <span style={{
+                    fontSize: 7, lineHeight: 1,
+                    transform: open ? "rotate(180deg)" : "none",
+                    transition: "transform .12s",
+                  }}>▾</span>
+                </button>
+                {open && (
+                  <div style={{ position: "absolute", top: "100%", left: 0, paddingTop: 12, zIndex: 200 }}>
+                    <div style={{
+                      minWidth: 208,
+                      background: INK,
+                      border: `1px solid ${CREAM12}`,
+                      boxShadow: "0 14px 34px rgba(0,0,0,.4)",
+                      padding: "6px 0",
+                      display: "flex", flexDirection: "column",
+                    }}>
+                      {node.children.map((c) => {
+                        const cActive = isActive(c.href, pathname);
+                        return (
+                          <Link
+                            key={c.href}
+                            href={c.href}
+                            onClick={() => setOpenMenu(null)}
+                            style={{
+                              display: "flex", alignItems: "center", justifyContent: "space-between",
+                              padding: "9px 16px",
+                              fontFamily: GROT, fontSize: 10.5, fontWeight: 700,
+                              letterSpacing: ".10em", textTransform: "uppercase",
+                              color: cActive ? CREAM : CREAM70, textDecoration: "none",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            <span>{c.label}</span>
+                            {c.tag && <NavTag kind={c.tag} />}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
@@ -152,22 +281,70 @@ export const SiteHeader = () => {
           padding: "8px 20px 16px",
         }}
       >
-        {NAV.map(({ label, href }) => (
-          <Link
-            key={href}
-            href={href}
-            onClick={() => setMenuOpen(false)}
-            style={{
-              padding: "12px 0",
-              borderBottom: `1px solid rgba(250,250,250,.10)`,
-              fontFamily: GROT, fontSize: 15, fontWeight: 600,
-              color: "rgba(250,250,250,.8)",
-              textDecoration: "none",
-            }}
-          >
-            {label}
-          </Link>
-        ))}
+        {NAV.map((node) => {
+          if ("href" in node) {
+            return (
+              <Link
+                key={node.label}
+                href={node.href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  padding: "12px 0",
+                  borderBottom: `1px solid rgba(250,250,250,.10)`,
+                  fontFamily: GROT, fontSize: 15, fontWeight: 600,
+                  color: "rgba(250,250,250,.8)",
+                  textDecoration: "none",
+                }}
+              >
+                {node.label}
+              </Link>
+            );
+          }
+          const expanded = mobileExpanded === node.label;
+          return (
+            <div key={node.label}>
+              <button
+                type="button"
+                aria-expanded={expanded}
+                onClick={() => setMobileExpanded(expanded ? null : node.label)}
+                style={{
+                  width: "100%", textAlign: "left", cursor: "pointer",
+                  background: "none", border: "none",
+                  borderBottom: `1px solid rgba(250,250,250,.10)`,
+                  padding: "12px 0",
+                  fontFamily: GROT, fontSize: 15, fontWeight: 600,
+                  color: "rgba(250,250,250,.8)",
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                }}
+              >
+                {node.label}
+                <span style={{ fontSize: 18, lineHeight: 1, opacity: 0.6 }}>{expanded ? "–" : "+"}</span>
+              </button>
+              {expanded && (
+                <div style={{ display: "flex", flexDirection: "column", paddingLeft: 14 }}>
+                  {node.children.map((c) => (
+                    <Link
+                      key={c.href}
+                      href={c.href}
+                      onClick={() => setMenuOpen(false)}
+                      style={{
+                        padding: "11px 0",
+                        borderBottom: `1px solid rgba(250,250,250,.07)`,
+                        fontFamily: GROT, fontSize: 13.5, fontWeight: 600,
+                        color: "rgba(250,250,250,.65)",
+                        textDecoration: "none",
+                        display: "flex", alignItems: "center",
+                      }}
+                    >
+                      {c.label}
+                      {c.tag && <NavTag kind={c.tag} />}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
         <a
           href="/strategy-call"
           onClick={() => setMenuOpen(false)}
