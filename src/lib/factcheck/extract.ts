@@ -63,8 +63,13 @@ export async function extractClaims(documentText: string, runDate: Date = new Da
   };
 }
 
-/** Converts extracted claims into the `status: 'skipped'` rows the plan requires for honesty (§3 "Honesty mechanics"). */
-export function buildSkippedClaimPlaceholder(overCapCount: number): Pick<Claim, "claimText" | "claimType" | "section" | "risk" | "status">[] {
+/**
+ * Converts over-cap claims into the `status: 'skipped'` rows the plan requires
+ * for honesty (§3 "Honesty mechanics"). Returns the full stored-claim shape (with
+ * the graded fields null) so it composes homogeneously with graded claims into a
+ * single `Claim[]`-shaped array in run.ts — no union that would need casting.
+ */
+export function buildSkippedClaimPlaceholder(overCapCount: number): Omit<Claim, "id" | "runId" | "orgId" | "createdAt">[] {
   if (overCapCount <= 0) return [];
   return [
     {
@@ -73,6 +78,12 @@ export function buildSkippedClaimPlaceholder(overCapCount: number): Pick<Claim, 
       section: null,
       risk: "low",
       status: "skipped",
+      verdict: null,
+      sources: null,
+      sourceUrl: null,
+      sourceTier: null,
+      evidence: null,
+      note: null,
     },
   ];
 }

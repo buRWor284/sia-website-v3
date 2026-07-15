@@ -1,16 +1,17 @@
 // src/lib/factcheck/run.ts
 // FactcheckIQ | orchestrator, per Build-Plan-v2.md §3
 //
-// Citation & link check mode is fully implemented here (Phase 2). Full-audit
-// mode's verify+grade step (Phase 3, verify.ts) does not exist yet — calling
-// run() with mode "full" throws a clear NotImplemented error rather than
-// silently doing a partial job.
+// Both modes are implemented. Citation & link check (Phase 2) runs the free
+// deterministic gate only. Full audit (Phase 3) runs that gate as stage one, then
+// sends every not-yet-fabricated claim through verify.ts for paid per-claim web
+// verification, parallel and concurrency-capped, before the shared clamp + report.
 
 import { extractClaims, buildSkippedClaimPlaceholder } from "./extract";
 import { normalizeInput } from "./intake";
 import { checkCitation } from "./citations";
 import { checkLinks, extractDoi } from "./links";
 import { clampVerdict, findNumericContradictions } from "./grade";
+import { verifyClaims } from "./verify";
 import { buildReportMarkdown, countVerdicts, computeReadiness } from "./report";
 import { createRun, insertClaims, updateRunStatus } from "./store";
 import type { Claim, ClaimType, FactCheckMode, InputType, Risk, RunFlags, Verdict } from "./types";
@@ -57,36 +58,76 @@ export async function processRun(runId: string, params: RunParams): Promise<void
 
     const flags: RunFlags = { skippedClaims: extraction.overCapCount };
     const gradedClaims: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">[] = [];
+    let searchesUsed = 0;
 
+    // Stage one of every run (both modes): the free, deterministic citation & link
+    // gate. In full mode it also cheaply kills fabricated citations before any paid
+    // web search runs (plan §9: "free citation gate first").
+    type ExtractedClaim = (typeof extraction.claims)[number];
+    const gated: { extracted: ExtractedClaim; graded: Omit<Claim, "id" | "runId" | "orgId" | "createdAt"> }[] = [];
     for (const [i, claim] of extraction.claims.entries()) {
       const graded = await runCitationGate(claim.claimText, claim.claimType, claim.section, claim.risk, params.mode);
-      gradedClaims.push(graded);
+      gated.push({ extracted: claim, graded });
       await updateRunStatus(runId, {
         progress: { phase: "citation_gate", claimsDone: i + 1, claimsTotal: extraction.claims.length },
       });
     }
 
-    if (params.mode === "full") {
-      // Phase 3 (verify.ts) doesn't exist yet. Fail loudly and specifically,
-      // rather than silently returning citation-only results labeled "full audit" —
-      // that would be exactly the overclaiming the clamp exists to prevent.
-      throw new Error(
-        "Full audit mode requires verify.ts (Phase 3), which has not been built yet. " +
-          "Only 'citation' mode is available in this build.",
+    if (params.mode === "citation") {
+      for (const g of gated) gradedClaims.push(g.graded);
+    } else {
+      // Full audit (Phase 3, verify.ts): every claim the gate did not already prove
+      // fabricated goes through the paid per-claim web verify+grade step, run in
+      // parallel with a concurrency cap of VERIFY_CONCURRENCY. Deterministically
+      // fabricated claims (fake DOI, wrong paper, retracted) keep their gate verdict
+      // and skip paid search.
+      const preFabricated = gated.filter((g) => g.graded.verdict === "fabricated");
+      const toVerify = gated.filter((g) => g.graded.verdict !== "fabricated");
+      for (const g of preFabricated) gradedClaims.push(g.graded);
+
+      await updateRunStatus(runId, {
+        progress: { phase: "verify", claimsDone: 0, claimsTotal: toVerify.length },
+      });
+
+      const verified = await verifyClaims(
+        toVerify.map((g) => ({
+          claimText: g.extracted.claimText,
+          claimType: g.extracted.claimType,
+          section: g.extracted.section,
+          risk: g.extracted.risk,
+          citationEvidence: g.graded.evidence ?? undefined,
+        })),
+        { documentText: intake.text, runDate },
+        (done) => {
+          void updateRunStatus(runId, {
+            progress: { phase: "verify", claimsDone: done, claimsTotal: toVerify.length },
+          }).catch(() => {});
+        },
       );
+
+      const fetchFailures: string[] = [];
+      const injectionAttempts: string[] = [];
+      for (const v of verified) {
+        gradedClaims.push(v.claim);
+        searchesUsed += v.searchesUsed;
+        if (v.verifyFailed) fetchFailures.push(v.claim.claimText.slice(0, 140));
+        if (v.injectionDetected) injectionAttempts.push(v.claim.claimText.slice(0, 140));
+      }
+      if (fetchFailures.length) flags.fetchFailures = fetchFailures;
+      if (injectionAttempts.length) flags.injectionAttempts = injectionAttempts;
     }
 
     const skipped = buildSkippedClaimPlaceholder(extraction.overCapCount);
     const allClaims = [...gradedClaims, ...skipped];
 
+    // Doc-level consistency pass (§3 step 6): now a first-class report input via
+    // flags.consistencyFindings (a typed RunFlags field), not the previous
+    // `(flags as any)` stopgap.
     const consistency = findNumericContradictions(
       allClaims.map((c, i) => ({ ...c, id: `tmp-${i}`, runId, orgId: params.orgId, createdAt: runDate.toISOString() })),
     );
     if (consistency.length > 0) {
-      flags.injectionAttempts = flags.injectionAttempts ?? [];
-      // Consistency findings are stored in flags for now (no dedicated column);
-      // Phase 3 promotes this into its own doc-level pass output.
-      (flags as any).consistencyFindings = consistency;
+      flags.consistencyFindings = consistency;
     }
 
     await insertClaims(runId, params.orgId, allClaims);
@@ -110,6 +151,7 @@ export async function processRun(runId: string, params: RunParams): Promise<void
       readiness,
       flags,
       reportMd,
+      searchesUsed,
     });
   } catch (err) {
     await updateRunStatus(runId, {

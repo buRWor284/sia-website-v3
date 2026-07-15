@@ -13,17 +13,22 @@ export const FACTCHECK_GRADE_MODEL =
  * Web search / web fetch tool versions and beta header.
  *
  * Phase 0 finding (4 Jul 2026): the plan's original assumption (web_fetch_20250910,
- * beta header "web-fetch-2025-09-10") is superseded. As of the Claude 4.6 launch
- * (Feb 2026), Anthropic ships web_search_20260209 / web_fetch_20260209 with dynamic
- * filtering (Claude runs code to strip irrelevant content before it hits context):
- * ~11% accuracy improvement on BrowseComp/DeepsearchQA, ~24% fewer input tokens,
- * no extra charge beyond standard token cost. Beta header changed accordingly.
- * Re-verify against https://docs.claude.com/en/api/beta-headers before Phase 3 if
- * this file is touched more than a few weeks after this note.
+ * beta header "web-fetch-2025-09-10") was superseded by the _20260209 tools with a
+ * "code-execution-web-tools-2026-02-09" beta header.
+ *
+ * Phase 3 re-verification (14 Jul 2026, against
+ * https://platform.claude.com/docs/en/agents-and-tools/tool-use/web-search-tool
+ * and .../web-fetch-tool): both tools advanced again and are now GA. The current
+ * latest is web_search_20260318 / web_fetch_20260318 (adds response-inclusion
+ * control on top of the _20260209 dynamic filtering), and the docs no longer
+ * require any beta header for either tool. WEB_TOOLS_BETA_HEADER is therefore null;
+ * verify.ts only sends an anthropic-beta header when this is non-null, so a future
+ * reintroduction is a one-line change. Re-verify against the docs above if this
+ * file is touched more than a few weeks after this note.
  */
-export const WEB_SEARCH_TOOL_VERSION = "web_search_20260209";
-export const WEB_FETCH_TOOL_VERSION = "web_fetch_20260209";
-export const WEB_TOOLS_BETA_HEADER = "code-execution-web-tools-2026-02-09";
+export const WEB_SEARCH_TOOL_VERSION = "web_search_20260318";
+export const WEB_FETCH_TOOL_VERSION = "web_fetch_20260318";
+export const WEB_TOOLS_BETA_HEADER: string | null = null;
 
 /** Claims beyond this cap are stored with status "skipped" and reported, never silently dropped. */
 export const MAX_CLAIMS_PER_RUN = 40;

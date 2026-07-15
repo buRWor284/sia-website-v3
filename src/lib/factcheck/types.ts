@@ -72,10 +72,22 @@ export interface RunProgress {
   claimsTotal: number;
 }
 
+/**
+ * A doc-level contradiction between two claims in the same document (e.g. a
+ * header stat and a body stat that disagree). Produced by
+ * findNumericContradictions() in grade.ts and surfaced as its own report section.
+ */
+export interface ConsistencyFinding {
+  claimIds: [string, string];
+  note: string;
+}
+
 export interface RunFlags {
   injectionAttempts?: string[];
   skippedClaims?: number;
   fetchFailures?: string[];
+  /** Doc-level consistency pass output (§3 step 6), promoted from the prior `(flags as any)` stopgap. */
+  consistencyFindings?: ConsistencyFinding[];
 }
 
 export interface RunInput {

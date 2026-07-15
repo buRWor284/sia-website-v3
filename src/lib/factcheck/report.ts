@@ -81,6 +81,16 @@ export function buildReportMarkdown(params: {
     lines.push("");
     lines.push(`_${skipped.length} claim(s) beyond the ${skipped.length + checked.length > 40 ? "40-claim" : ""} cap were not checked in this run._`);
   }
+  if (flags?.consistencyFindings?.length) {
+    lines.push("");
+    lines.push("## Consistency findings");
+    lines.push("");
+    lines.push("Claims within this document that disagree with each other. Reconcile these before publishing, even where each figure is individually defensible.");
+    lines.push("");
+    for (const f of flags.consistencyFindings) {
+      lines.push(`- ${escapeCell(f.note)}`);
+    }
+  }
   lines.push("");
   lines.push("_AI-assisted verification. Review before publishing._");
 

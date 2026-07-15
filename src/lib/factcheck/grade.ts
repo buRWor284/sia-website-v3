@@ -6,8 +6,12 @@
 // clampVerdict is a pure function, unit-testable, called on every claim before
 // it is written to fact_check_claims or shown in a report.
 
-import type { Claim, FactCheckMode, Source, Verdict } from "./types";
+import type { Claim, ConsistencyFinding, FactCheckMode, Source, Verdict } from "./types";
 import { CITATION_MODE_VERDICTS } from "./types";
+
+// ConsistencyFinding is defined in types.ts (so RunFlags can carry it without a
+// circular import); re-exported here for callers that import it from grade.ts.
+export type { ConsistencyFinding } from "./types";
 
 export interface ClampInput {
   /** The verdict the grading model proposed. */
@@ -103,11 +107,6 @@ export function countIndependentSources(sources: Source[]): number {
  * this function's job is to surface pairs for that call to reconcile and to
  * record any contradiction it reports here, in `flags`.
  */
-export interface ConsistencyFinding {
-  claimIds: [string, string];
-  note: string;
-}
-
 export function findNumericContradictions(claims: Claim[]): ConsistencyFinding[] {
   const findings: ConsistencyFinding[] = [];
   const numeric = claims.filter((c) => c.claimType === "statistic" && c.status === "checked");

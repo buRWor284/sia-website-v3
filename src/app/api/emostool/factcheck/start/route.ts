@@ -43,15 +43,6 @@ export async function POST(req: NextRequest) {
   if (body.inputType !== "url" && !body.text) {
     return NextResponse.json({ error: "text is required for paste/markdown input." }, { status: 400 });
   }
-  if (body.mode === "full") {
-    // Phase 3 (verify.ts) isn't built yet — reject clearly at the API boundary
-    // instead of creating a run that will always error mid-flight.
-    return NextResponse.json(
-      { error: "Full audit mode is not available yet in this build. Use 'citation' mode for now." },
-      { status: 501 },
-    );
-  }
-
   let orgId: string;
   try {
     orgId = await getOrgIdForUser(guard.userId);
