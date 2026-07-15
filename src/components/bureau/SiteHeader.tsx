@@ -12,7 +12,7 @@ const CREAM45 = "rgba(250,250,250,.45)";
 const CREAM12 = "rgba(250,250,250,.12)";
 const CREAM70 = "rgba(250,250,250,.70)";
 
-type NavLeaf = { label: string; href: string; tag?: "Platform" | "Coming Soon" };
+type NavLeaf = { label: string; href: string; tag?: string; tagOutline?: boolean; external?: boolean };
 type NavNode =
   | { label: string; href: string }
   | { label: string; children: ReadonlyArray<NavLeaf> };
@@ -22,10 +22,11 @@ const NAV: ReadonlyArray<NavNode> = [
   { label: "About",          href: "/about"         },
   { label: "Speaking",       href: "/speaking"      },
   {
-    label: "EMOS",
+    label: "Earned Media",
     children: [
-      { label: "EMOS Platform", href: "/emos-platform" },
-      { label: "EMOS Academy",  href: "/emos-academy"  },
+      { label: "EMOS Platform", href: "/emos-platform",     tag: "Do-it-yourself" },
+      { label: "EMOS Academy",  href: "/emos-academy",      tag: "Done-with-you"  },
+      { label: "DMR.agency",    href: "https://dmr.agency", tag: "Done-for-you", external: true },
     ],
   },
   { label: "Fractional CMO", href: "/fractional-cmo" },
@@ -38,8 +39,8 @@ const NAV: ReadonlyArray<NavNode> = [
       { label: "JournoCollabIQ",       href: "/tools/journocollabiq"       },
       { label: "PartnerCollabIQ",      href: "/tools/partnercollabiq"      },
       { label: "Authority Calculator", href: "/tools/authority-calculator" },
-      { label: "AssetIQ",              href: "/tools/assetiq",     tag: "Platform"     },
-      { label: "FactCheckIQ",          href: "/tools/factcheckiq", tag: "Coming Soon"  },
+      { label: "AssetIQ",              href: "/tools/assetiq",     tag: "Platform" },
+      { label: "FactCheckIQ",          href: "/tools/factcheckiq", tag: "Coming Soon", tagOutline: true },
       { label: "All tools →",          href: "/tools"                      },
     ],
   },
@@ -59,6 +60,7 @@ const NAV: ReadonlyArray<NavNode> = [
 ];
 
 function isActive(href: string, pathname: string): boolean {
+  if (!href.startsWith("/")) return false; // external
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(href + "/");
 }
@@ -77,21 +79,55 @@ const navItemStyle = (active: boolean): CSSProperties => ({
   transition: "color .12s",
 });
 
-function NavTag({ kind }: { kind: "Platform" | "Coming Soon" }) {
-  const platform = kind === "Platform";
+function NavTag({ label, outline }: { label: string; outline?: boolean }) {
   return (
     <span style={{
       marginLeft: 8, flexShrink: 0,
       fontFamily: GROT, fontWeight: 800, fontSize: 7.5,
       letterSpacing: ".10em", textTransform: "uppercase",
       padding: "2px 5px",
-      background: platform ? YEL : "transparent",
-      color: platform ? INK : CREAM50,
-      border: platform ? "none" : `1px solid ${CREAM12}`,
+      background: outline ? "transparent" : YEL,
+      color: outline ? CREAM50 : INK,
+      border: outline ? `1px solid ${CREAM12}` : "none",
       whiteSpace: "nowrap",
     }}>
-      {kind}
+      {label}
     </span>
+  );
+}
+
+function DropdownLink({ c, variant, active, onNavigate }: {
+  c: NavLeaf; variant: "desktop" | "mobile"; active: boolean; onNavigate: () => void;
+}) {
+  const style: CSSProperties = variant === "desktop"
+    ? {
+        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+        padding: "9px 16px",
+        fontFamily: GROT, fontSize: 10.5, fontWeight: 700,
+        letterSpacing: ".10em", textTransform: "uppercase",
+        color: active ? CREAM : CREAM70, textDecoration: "none", whiteSpace: "nowrap",
+      }
+    : {
+        display: "flex", alignItems: "center", gap: 8,
+        padding: "11px 0",
+        borderBottom: `1px solid rgba(250,250,250,.07)`,
+        fontFamily: GROT, fontSize: 13.5, fontWeight: 600,
+        color: "rgba(250,250,250,.65)", textDecoration: "none",
+      };
+  const inner = (
+    <>
+      <span>{c.label}{c.external ? " ↗" : ""}</span>
+      {c.tag && <NavTag label={c.tag} outline={c.tagOutline} />}
+    </>
+  );
+  return c.external ? (
+    <a href={c.href} target="_blank" rel="noopener noreferrer" onClick={onNavigate} style={style}>
+      {inner}
+    </a>
+  ) : (
+    <Link href={c.href} onClick={onNavigate} style={style}>
+      {inner}
+    </Link>
   );
 }
 
@@ -178,7 +214,7 @@ export const SiteHeader = () => {
             return (
               <div
                 key={node.label}
-                style={{ position: "relative" }}
+                style={{ position: "relative", display: "flex", alignItems: "center" }}
                 onMouseEnter={() => setOpenMenu(node.label)}
                 onMouseLeave={() => setOpenMenu(null)}
                 onBlur={(e) => {
@@ -213,27 +249,15 @@ export const SiteHeader = () => {
                       padding: "6px 0",
                       display: "flex", flexDirection: "column",
                     }}>
-                      {node.children.map((c) => {
-                        const cActive = isActive(c.href, pathname);
-                        return (
-                          <Link
-                            key={c.href}
-                            href={c.href}
-                            onClick={() => setOpenMenu(null)}
-                            style={{
-                              display: "flex", alignItems: "center", justifyContent: "space-between",
-                              padding: "9px 16px",
-                              fontFamily: GROT, fontSize: 10.5, fontWeight: 700,
-                              letterSpacing: ".10em", textTransform: "uppercase",
-                              color: cActive ? CREAM : CREAM70, textDecoration: "none",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            <span>{c.label}</span>
-                            {c.tag && <NavTag kind={c.tag} />}
-                          </Link>
-                        );
-                      })}
+                      {node.children.map((c) => (
+                        <DropdownLink
+                          key={c.href}
+                          c={c}
+                          variant="desktop"
+                          active={isActive(c.href, pathname)}
+                          onNavigate={() => setOpenMenu(null)}
+                        />
+                      ))}
                     </div>
                   </div>
                 )}
@@ -323,22 +347,13 @@ export const SiteHeader = () => {
               {expanded && (
                 <div style={{ display: "flex", flexDirection: "column", paddingLeft: 14 }}>
                   {node.children.map((c) => (
-                    <Link
+                    <DropdownLink
                       key={c.href}
-                      href={c.href}
-                      onClick={() => setMenuOpen(false)}
-                      style={{
-                        padding: "11px 0",
-                        borderBottom: `1px solid rgba(250,250,250,.07)`,
-                        fontFamily: GROT, fontSize: 13.5, fontWeight: 600,
-                        color: "rgba(250,250,250,.65)",
-                        textDecoration: "none",
-                        display: "flex", alignItems: "center",
-                      }}
-                    >
-                      {c.label}
-                      {c.tag && <NavTag kind={c.tag} />}
-                    </Link>
+                      c={c}
+                      variant="mobile"
+                      active={isActive(c.href, pathname)}
+                      onNavigate={() => setMenuOpen(false)}
+                    />
                   ))}
                 </div>
               )}
