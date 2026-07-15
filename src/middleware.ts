@@ -82,6 +82,10 @@ const isSubscribeRoute = createRouteMatcher(["/emos-platform/subscribe", "/emos-
 // (redirect loop / lockout). There is no admin bypass; recovery = revert + redeploy.
 const isAuthRoute = createRouteMatcher(["/emos-platform/signin(.*)", "/emos-platform/signup(.*)"]);
 
+// C3 (2026-07-15): /emos-platform/signedout is the PUBLIC post-sign-out landing. It sits
+// under the protected prefix, so exempt it too or a signed-out visitor is bounced to sign-in.
+const isSignedOutRoute = createRouteMatcher(["/emos-platform/signedout"]);
+
 export default clerkMiddleware(async (auth, req) => {
   // ── Legacy: PT (Basic Auth) ──────────────────────────────────────────────
   if (isClientPtRoute(req)) {
@@ -150,7 +154,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // ── EMOS tool: Clerk auth + emos_access metadata ─────────────────────────
-  if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req) && !isSubscribeRoute(req) && !isAuthRoute(req)) {
+  if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req) && !isSubscribeRoute(req) && !isAuthRoute(req) && !isSignedOutRoute(req)) {
     await auth.protect();
     // Invite-only: require emos_access = true in Clerk publicMetadata.
     // Fast path: read from JWT session claims (already in token).
