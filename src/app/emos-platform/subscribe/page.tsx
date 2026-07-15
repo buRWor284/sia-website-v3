@@ -4,7 +4,8 @@
  * /emos-platform/subscribe
  *
  * Public subscribe page — shown BEFORE sign-up (user pays first, then gets invited).
- * Lives under /emos (not /emos-platform) so Clerk middleware doesn't protect it.
+ * Lives under /emos-platform/subscribe but is EXEMPTED in middleware (isSubscribeRoute),
+ * so Clerk does not gate it: new buyers reach checkout before they have an account.
  *
  * Flow: user clicks "Subscribe" → POST /api/emos-checkout → redirect to Stripe →
  *       payment complete → Stripe webhook fires → Clerk invite sent → /emos-platform/subscribe/success

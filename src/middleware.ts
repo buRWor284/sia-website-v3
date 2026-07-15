@@ -72,6 +72,11 @@ const isNotInvitedRoute = createRouteMatcher(["/emos-platform/not-invited"]);
 // stays protected. The page itself forwards signed-in users to the dashboard.
 const isEmostoolLanding = createRouteMatcher(["/emos-platform", "/emos-platform/"]);
 
+// /emos-platform/subscribe (+ /success) is the PUBLIC checkout path: new buyers hit it
+// BEFORE they have an account. It moved UNDER the protected prefix in the rename, so it
+// must be explicitly exempted or Clerk would force sign-in before payment (money path).
+const isSubscribeRoute = createRouteMatcher(["/emos-platform/subscribe", "/emos-platform/subscribe/(.*)"]);
+
 export default clerkMiddleware(async (auth, req) => {
   // ── Legacy: PT (Basic Auth) ──────────────────────────────────────────────
   if (isClientPtRoute(req)) {
@@ -140,7 +145,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   // ── EMOS tool: Clerk auth + emos_access metadata ─────────────────────────
-  if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req)) {
+  if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req) && !isSubscribeRoute(req)) {
     await auth.protect();
     // Invite-only: require emos_access = true in Clerk publicMetadata.
     // Fast path: read from JWT session claims (already in token).
