@@ -13,14 +13,26 @@ const CREAM12 = "rgba(250,250,250,.12)";
 const CREAM70 = "rgba(250,250,250,.70)";
 
 type NavLeaf = { label: string; href: string; tag?: string; tagOutline?: boolean; external?: boolean };
-type NavNode =
-  | { label: string; href: string }
-  | { label: string; children: ReadonlyArray<NavLeaf> };
+type NavNode = {
+  label: string;
+  href?: string; // dropdown parents with an href are clickable (navigate to their hub page)
+  children?: ReadonlyArray<NavLeaf>;
+};
 
 const NAV: ReadonlyArray<NavNode> = [
   { label: "Home",           href: "/"              },
   { label: "About",          href: "/about"         },
-  { label: "Speaking",       href: "/speaking"      },
+  {
+    label: "Speaking",
+    href: "/speaking",
+    children: [
+      { label: "Speaking Overview",  href: "/speaking"  },
+      { label: "Press Kit",          href: "/press-kit" },
+      { label: "Media Kit",          href: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-Media-Kit-Jun-2026.pdf",  external: true, tag: "PDF", tagOutline: true },
+      { label: "Speaker One-Sheet",  href: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf", external: true, tag: "PDF", tagOutline: true },
+      { label: "Gallery",            href: "/gallery"   },
+    ],
+  },
   {
     label: "Earned Media",
     children: [
@@ -32,20 +44,19 @@ const NAV: ReadonlyArray<NavNode> = [
   { label: "Fractional CMO", href: "/fractional-cmo" },
   {
     label: "Tools",
+    href: "/tools",
     children: [
       { label: "PressIQ",              href: "/tools/pressiq"              },
       { label: "SignalIQ",             href: "/tools/signaliq"             },
       { label: "CoverageIQ",           href: "/tools/coverageiq"           },
       { label: "JournoCollabIQ",       href: "/tools/journocollabiq"       },
       { label: "PartnerCollabIQ",      href: "/tools/partnercollabiq"      },
-      { label: "Authority Calculator", href: "/tools/authority-calculator" },
-      { label: "AssetIQ",              href: "/tools/assetiq",     tag: "Platform" },
-      { label: "FactCheckIQ",          href: "/tools/factcheckiq", tag: "Coming Soon", tagOutline: true },
       { label: "All tools →",          href: "/tools"                      },
     ],
   },
   {
     label: "Resources",
+    href: "/resources",
     children: [
       { label: "Personal Branding", href: "/resources/personal-branding" },
       { label: "Neuromarketing",    href: "/resources/neuromarketing"    },
@@ -66,9 +77,8 @@ function isActive(href: string, pathname: string): boolean {
 }
 
 function isNodeActive(node: NavNode, pathname: string): boolean {
-  return "href" in node
-    ? isActive(node.href, pathname)
-    : node.children.some((c) => isActive(c.href, pathname));
+  if (node.children?.some((c) => isActive(c.href, pathname))) return true;
+  return node.href ? isActive(node.href, pathname) : false;
 }
 
 const navItemStyle = (active: boolean): CSSProperties => ({
@@ -116,7 +126,7 @@ function DropdownLink({ c, variant, active, onNavigate }: {
       };
   const inner = (
     <>
-      <span>{c.label}{c.external ? " ↗" : ""}</span>
+      <span>{c.label}{c.external ? (c.href.endsWith(".pdf") ? " ↓" : " ↗") : ""}</span>
       {c.tag && <NavTag label={c.tag} outline={c.tagOutline} />}
     </>
   );
@@ -203,42 +213,59 @@ export const SiteHeader = () => {
         >
           {NAV.map((node) => {
             const active = isNodeActive(node, pathname);
-            if ("href" in node) {
-              return (
+            if (!node.children) {
+              return node.href ? (
                 <Link key={node.label} href={node.href} style={navItemStyle(active)}>
                   {node.label}
                 </Link>
-              );
+              ) : null;
             }
             const open = openMenu === node.label;
+            const caret = (
+              <span style={{
+                fontSize: 7, lineHeight: 1,
+                transform: open ? "rotate(180deg)" : "none",
+                transition: "transform .12s",
+              }}>▾</span>
+            );
+            const triggerStyle: CSSProperties = {
+              ...navItemStyle(active),
+              display: "inline-flex", alignItems: "center", gap: 5, padding: 0,
+            };
             return (
               <div
                 key={node.label}
                 style={{ position: "relative", display: "flex", alignItems: "center" }}
                 onMouseEnter={() => setOpenMenu(node.label)}
                 onMouseLeave={() => setOpenMenu(null)}
+                onFocus={() => setOpenMenu(node.label)}
                 onBlur={(e) => {
                   if (!e.currentTarget.contains(e.relatedTarget as Node)) setOpenMenu(null);
                 }}
               >
-                <button
-                  type="button"
-                  aria-haspopup="true"
-                  aria-expanded={open}
-                  onClick={() => setOpenMenu(open ? null : node.label)}
-                  style={{
-                    ...navItemStyle(active),
-                    background: "none", border: "none", cursor: "pointer",
-                    display: "inline-flex", alignItems: "center", gap: 5, padding: 0,
-                  }}
-                >
-                  {node.label}
-                  <span style={{
-                    fontSize: 7, lineHeight: 1,
-                    transform: open ? "rotate(180deg)" : "none",
-                    transition: "transform .12s",
-                  }}>▾</span>
-                </button>
+                {node.href ? (
+                  <Link
+                    href={node.href}
+                    aria-haspopup="true"
+                    aria-expanded={open}
+                    onClick={() => setOpenMenu(null)}
+                    style={triggerStyle}
+                  >
+                    {node.label}
+                    {caret}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    aria-haspopup="true"
+                    aria-expanded={open}
+                    onClick={() => setOpenMenu(open ? null : node.label)}
+                    style={{ ...triggerStyle, background: "none", border: "none", cursor: "pointer" }}
+                  >
+                    {node.label}
+                    {caret}
+                  </button>
+                )}
                 {open && (
                   <div style={{ position: "absolute", top: "100%", left: 0, paddingTop: 12, zIndex: 200 }}>
                     <div style={{
@@ -306,7 +333,8 @@ export const SiteHeader = () => {
         }}
       >
         {NAV.map((node) => {
-          if ("href" in node) {
+          if (!node.children) {
+            if (!node.href) return null;
             return (
               <Link
                 key={node.label}
