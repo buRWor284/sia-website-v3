@@ -19,6 +19,8 @@ export function EmosUserButton() {
       }}
     >
       <UserButton
+        userProfileMode="navigation"
+        userProfileUrl="/emos-platform/dashboard/settings"
         appearance={{
           elements: {
             avatarBox: {

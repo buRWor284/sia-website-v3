@@ -136,6 +136,50 @@ async function setClerkAccess(email: string, access: boolean): Promise<"updated"
 
 // ─── Clerk invite ─────────────────────────────────────────────────────────────
 
+/**
+ * Revoke any PENDING Clerk invitation for this email. On cancellation the
+ * subscriber's user access is flipped off (setClerkAccess), but a still-pending
+ * invitation carries public_metadata.emos_access: true and would grant access if
+ * accepted later, so a cancelled sub must also kill the outstanding invite.
+ * Returns "revoked" | "none" | "error".
+ */
+async function revokeClerkInvitations(email: string): Promise<"revoked" | "none" | "error"> {
+  const secretKey = process.env.CLERK_SECRET_KEY;
+  if (!secretKey) {
+    console.error("[stripe-webhook] CLERK_SECRET_KEY not set - cannot revoke invitations");
+    return "error";
+  }
+  try {
+    const res = await fetch(
+      "https://api.clerk.com/v1/invitations?status=pending&limit=100",
+      { headers: { Authorization: `Bearer ${secretKey}` } },
+    );
+    if (!res.ok) {
+      console.error("[stripe-webhook] invitation lookup failed:", res.status, await res.text());
+      return "error";
+    }
+    const json = await res.json();
+    const list = (Array.isArray(json) ? json : json?.data ?? []) as Array<{ id: string; email_address: string }>;
+    const target = email.toLowerCase();
+    const matches = list.filter((i) => (i.email_address ?? "").toLowerCase() === target);
+    if (matches.length === 0) return "none";
+    let revoked = 0;
+    for (const inv of matches) {
+      const rev = await fetch(`https://api.clerk.com/v1/invitations/${inv.id}/revoke`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${secretKey}`, "Content-Type": "application/json" },
+      });
+      if (rev.ok) revoked++;
+      else console.error("[stripe-webhook] invitation revoke failed:", inv.id, rev.status, await rev.text());
+    }
+    console.log(`[stripe-webhook] revoked ${revoked}/${matches.length} pending invite(s) for ${email}`);
+    return revoked > 0 ? "revoked" : "error";
+  } catch (err) {
+    console.error("[stripe-webhook] revokeClerkInvitations error:", err);
+    return "error";
+  }
+}
+
 async function sendClerkInvite(email: string): Promise<string | null> {
   const secretKey = process.env.CLERK_SECRET_KEY;
   if (!secretKey) {
@@ -363,7 +407,10 @@ export async function POST(req: NextRequest) {
         console.log("[stripe-webhook] subscription canceled:", sub.id);
         // H3: revoke platform access in Clerk, not just the DB flag.
         const email = rows?.[0]?.email as string | undefined;
-        if (email) await setClerkAccess(email, false);
+        if (email) {
+          await setClerkAccess(email, false);
+          await revokeClerkInvitations(email); // also kill any still-pending invite (cancelled sub must not leave a live invite)
+        }
         else console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
       }
       break;
