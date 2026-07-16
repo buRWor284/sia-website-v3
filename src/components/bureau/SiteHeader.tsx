@@ -21,7 +21,16 @@ type NavNode = {
 
 const NAV: ReadonlyArray<NavNode> = [
   { label: "Home",           href: "/"              },
-  { label: "About",          href: "/about"         },
+  {
+    label: "About",
+    href: "/about",
+    children: [
+      { label: "About Overview", href: "/about"      },
+      { label: "Podcast",        href: "/podcast"    },
+      { label: "Ventures",       href: "/ventures"   },
+      { label: "Newsletter",     href: "/newsletter" },
+    ],
+  },
   {
     label: "Speaking",
     href: "/speaking",
@@ -39,6 +48,7 @@ const NAV: ReadonlyArray<NavNode> = [
       { label: "EMOS Platform", href: "/emos-platform",     tag: "Do-it-yourself" },
       { label: "EMOS Academy",  href: "/emos-academy",      tag: "Done-with-you"  },
       { label: "DMR.agency",    href: "https://dmr.agency", tag: "Done-for-you", external: true },
+      { label: "Case Studies",  href: "/case-studies" },
     ],
   },
   { label: "Fractional CMO", href: "/fractional-cmo" },
