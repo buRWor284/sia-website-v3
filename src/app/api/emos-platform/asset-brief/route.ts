@@ -1,5 +1,5 @@
 /**
- * /api/emostool/asset-brief
+ * /api/emos-platform/asset-brief
  *
  * Generates a detailed linkable asset creation plan using the signal data,
  * asset pack idea, and asset type. Clerk auth only.

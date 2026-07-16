@@ -1,5 +1,5 @@
 /**
- * /api/emostool/signaliq/scan
+ * /api/emos-platform/signaliq/scan
  *
  * Authenticated version of the SignalIQ scan — no public quota, no Turnstile.
  * Requires a valid Clerk session (platform users only).

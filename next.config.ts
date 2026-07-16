@@ -104,7 +104,7 @@ const nextConfig: NextConfig = {
       { source: "/emos/pay/",   destination: "/emos-academy/pay",    permanent: p },
 
       // EMOS Platform prefix rename (2026-07-14, commit 2): /emostool/* -> /emos-platform/*.
-      // /api/emostool/* is deliberately NOT redirected here (it renames in the API commit).
+      // /api/emostool/* was renamed to /api/emos-platform/* in the API commit (2026-07-16); internal-only, deliberately NOT redirected.
       { source: "/emostool",        destination: "/emos-platform",        permanent: p },
       { source: "/emostool/",       destination: "/emos-platform",        permanent: p },
       { source: "/emostool/:path*", destination: "/emos-platform/:path*", permanent: p },

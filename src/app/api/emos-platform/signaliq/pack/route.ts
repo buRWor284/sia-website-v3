@@ -1,5 +1,5 @@
 /**
- * /api/emostool/signaliq/pack
+ * /api/emos-platform/signaliq/pack
  *
  * Authenticated version of the SignalIQ asset pack generator.
  * Gated by the shared EMOS guard (access + subscription + rate limit).

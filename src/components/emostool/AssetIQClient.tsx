@@ -231,7 +231,7 @@ function AssetRow({
     setBrief(null);
     setBriefLoading(true);
     try {
-      const res = await fetch("/api/emostool/asset-brief", {
+      const res = await fetch("/api/emos-platform/asset-brief", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -435,7 +435,7 @@ export default function AssetIQClient({
     setCreationPlan(null);
     setPlanLoading(true);
     try {
-      const res = await fetch("/api/emostool/asset-brief", {
+      const res = await fetch("/api/emos-platform/asset-brief", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -3,7 +3,7 @@
  *
  * ONE copy of the request-handling logic behind BOTH route sets:
  *   /api/signaliq/{scan,pack}           (public: Turnstile + unified quota)
- *   /api/emostool/signaliq/{scan,pack}  (platform: Clerk EMOS guard)
+ *   /api/emos-platform/signaliq/{scan,pack}  (platform: Clerk EMOS guard)
  *
  * The routes stay separate URLs with separate guards (public stays login-free —
  * RFP §4.5/§9); everything after the guard lives here so fixes land once.

@@ -1,5 +1,5 @@
 /**
- * /api/emostool/pitch-score
+ * /api/emos-platform/pitch-score
  *
  * PressIQ scoring — DASHBOARD surface. Authenticated (Clerk EMOS guard), no rate
  * limit, no Turnstile, always stores. The scoring logic lives in the shared

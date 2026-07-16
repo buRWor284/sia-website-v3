@@ -1,7 +1,7 @@
 /**
  * JournoCollabIQ — shared server core (Phase P6).
  *
- * The public (/api/journo-ai) and dashboard (/api/emostool/journo-ai) routes
+ * The public (/api/journo-ai) and dashboard (/api/emos-platform/journo-ai) routes
  * both call into this module so the prompt builders, the Anthropic call and the
  * preview clamp can never drift — they had already begun to (the dashboard's
  * copies had quietly diverged: a dropped "do not over-polish" line, an abridged

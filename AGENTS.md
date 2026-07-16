@@ -79,9 +79,9 @@ Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → Coverage
 - `src/lib/emos-stage-config.ts` — STAGE_META, STAGE_ORDER, EmosStage type (plain file, safe to import anywhere)
 
 ### Authenticated API routes (platform-only, no rate limit)
-- `src/app/api/emostool/signaliq/scan/route.ts` — Clerk auth, no Turnstile, same scanBeat() as public
-- `src/app/api/emostool/pitch-score/route.ts` — Clerk auth, no rate limit, always stores, same scoring logic as public
-- `src/app/api/emostool/asset-brief/route.ts` — Clerk auth, generates AI asset brief from signal context
+- `src/app/api/emos-platform/signaliq/scan/route.ts` — Clerk auth, no Turnstile, same scanBeat() as public
+- `src/app/api/emos-platform/pitch-score/route.ts` — Clerk auth, no rate limit, always stores, same scoring logic as public
+- `src/app/api/emos-platform/asset-brief/route.ts` — Clerk auth, generates AI asset brief from signal context
 
 ### Key files
 - `src/lib/supabase.ts` — createSupabaseServerClient (Clerk JWT), createSupabaseServiceClient (service role)

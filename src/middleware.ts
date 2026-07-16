@@ -5,12 +5,12 @@ import { NextResponse, type NextRequest } from "next/server";
 // /emos (course landing page) stays completely public and untouched.
 const isProtectedRoute = createRouteMatcher(["/emos-platform(.*)"]);
 
-// C2 (2026-07-02 review): "/emos-platform(.*)" does NOT match /api/emostool/* —
+// C2 (2026-07-02 review): "/emos-platform(.*)" does NOT match /api/emos-platform/* —
 // the platform API routes were reachable by ANY signed-in Clerk account with
 // no emos_access check. Gate them here too (belt) in addition to the
 // requireEmosAccess() guard inside each handler (suspenders). APIs get JSON
 // errors, not redirects.
-const isProtectedApiRoute = createRouteMatcher(["/api/emostool(.*)"]);
+const isProtectedApiRoute = createRouteMatcher(["/api/emos-platform(.*)"]);
 
 // ─── Legacy Basic Auth clients ────────────────────────────────────────────────
 // PT and Resourcex stay on HTTP Basic Auth (shared username/password via Vercel

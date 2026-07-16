@@ -10,7 +10,7 @@
  * no loader, no angle view, and sat on a 30s pack timeout).
  *
  * This wrapper owns ONLY the platform-surface concerns:
- *   - transport to the Clerk-guarded /api/emostool/signaliq/* routes
+ *   - transport to the Clerk-guarded /api/emos-platform/signaliq/* routes
  *     (no Turnstile, no quota — platform scans are unmetered)
  *   - company name + context persistence across the EMOS pipeline
  *     (useCompanyName / useCompanyContext localStorage hooks)
@@ -284,7 +284,7 @@ export default function SignalIQPlatformClient({
   // ── transport: Clerk-guarded platform routes (no Turnstile, no quota) ──────
   const api = {
     scan: async (body: { beats: BeatId[]; companyContext?: string }) => {
-      const res = await fetch("/api/emostool/signaliq/scan", {
+      const res = await fetch("/api/emos-platform/signaliq/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -293,7 +293,7 @@ export default function SignalIQPlatformClient({
       return { ok: res.ok, data };
     },
     pack: async (body: { opportunity: Opportunity; companyContext?: string }) => {
-      const res = await fetch("/api/emostool/signaliq/pack", {
+      const res = await fetch("/api/emos-platform/signaliq/pack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

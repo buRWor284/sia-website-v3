@@ -2,7 +2,7 @@
  * /api/signaliq/pack
  *
  * Generates a newsjacking asset pack for one opportunity. The Anthropic call
- * and pack assembly are shared with /api/emostool/signaliq/pack via
+ * and pack assembly are shared with /api/emos-platform/signaliq/pack via
  * lib/signaliq/route-core.ts (P6) — this file is only the public guard
  * (Turnstile + unified quota) around it.
  *

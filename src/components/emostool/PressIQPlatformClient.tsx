@@ -10,7 +10,7 @@
  * gauge, breakdown, evidence, live mechanics or PDF).
  *
  * This wrapper owns ONLY the platform-surface concerns:
- *   - transport to the Clerk-guarded /api/emostool/pitch-score route
+ *   - transport to the Clerk-guarded /api/emos-platform/pitch-score route
  *     (no Turnstile, no quota — platform scores are unmetered + auto-stored)
  *   - "Track this pitch in CoverageIQ" (createPitch) — the PressIQ→CoverageIQ handoff
  *   - the saved Score History table below the tool
@@ -210,7 +210,7 @@ export default function PressIQPlatformClient({
   // ── transport: Clerk-guarded platform route (no Turnstile, no quota) ────────
   const api = {
     score: async (body: Record<string, unknown>) => {
-      const res = await fetch("/api/emostool/pitch-score", {
+      const res = await fetch("/api/emos-platform/pitch-score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

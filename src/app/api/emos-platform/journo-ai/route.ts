@@ -1,5 +1,5 @@
 /**
- * /api/emostool/journo-ai  —  JournoCollabIQ AI endpoint, DASHBOARD surface.
+ * /api/emos-platform/journo-ai  —  JournoCollabIQ AI endpoint, DASHBOARD surface.
  *
  * Clerk EMOS guard only — no Turnstile, no quota, no preview clamp. The prompt
  * builders and the Anthropic call live in the shared `lib/journo/route-core`

@@ -7,7 +7,7 @@
  * caller supplies `companyContext`, one LLM call tailors the seeds + relevance
  * scoring to that company (optional here; always on in the EMOS platform).
  *
- * P6: request handling shared with /api/emostool/signaliq/scan via
+ * P6: request handling shared with /api/emos-platform/signaliq/scan via
  * lib/signaliq/route-core.ts — this file is only the public guard (Turnstile +
  * quota) around it.
  *

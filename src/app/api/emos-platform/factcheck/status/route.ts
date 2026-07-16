@@ -1,4 +1,4 @@
-// src/app/api/emostool/factcheck/status/route.ts
+// src/app/api/emos-platform/factcheck/status/route.ts
 // FactcheckIQ | poll a run's progress/result. Per Build-Plan-v2.md §3, §6.
 
 import { NextRequest, NextResponse } from "next/server";

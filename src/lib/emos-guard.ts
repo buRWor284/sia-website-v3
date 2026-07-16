@@ -1,8 +1,8 @@
 /**
  * Shared access guard for the paid EMOS platform (C2/H3/H6, 2026-07-02 review).
  *
- * Every /api/emostool/* handler must call requireEmosAccess() — middleware's
- * page matcher ("/emos-platform(.*)") does NOT cover /api/emostool/*, so before
+ * Every /api/emos-platform/* handler must call requireEmosAccess() — middleware's
+ * page matcher ("/emos-platform(.*)") does NOT cover /api/emos-platform/*, so before
  * this guard existed any signed-in Clerk account (including client-workspace
  * users) could script unlimited Opus calls.
  *

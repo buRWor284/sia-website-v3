@@ -198,7 +198,7 @@ function JournalistCard({
     setAngleError(null);
     setLoadingAngle(true);
     try {
-      const res = await fetch("/api/emostool/journo-ai", {
+      const res = await fetch("/api/emos-platform/journo-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -542,7 +542,7 @@ export default function JournoCollabIQClient({
     setSearching(true);
     setLastForm(form);
     try {
-      const res = await fetch("/api/emostool/journo-ai", {
+      const res = await fetch("/api/emos-platform/journo-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -577,7 +577,7 @@ export default function JournoCollabIQClient({
     if (!lastForm) return;
     setLoadingBrief(true);
     try {
-      const res = await fetch("/api/emostool/journo-ai", {
+      const res = await fetch("/api/emos-platform/journo-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

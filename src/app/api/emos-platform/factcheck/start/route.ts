@@ -1,4 +1,4 @@
-// src/app/api/emostool/factcheck/start/route.ts
+// src/app/api/emos-platform/factcheck/start/route.ts
 // FactcheckIQ | Clerk auth -> create run row -> waitUntil(process) -> runId
 // Per Build-Plan-v2.md §3, §6, Appendix A.
 

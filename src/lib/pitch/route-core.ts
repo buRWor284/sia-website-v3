@@ -3,7 +3,7 @@
  *
  * ONE copy of the request-handling logic behind BOTH pitch-score routes:
  *   /api/pitch-score           (public: Turnstile + unified quota)
- *   /api/emostool/pitch-score  (platform: Clerk EMOS guard)
+ *   /api/emos-platform/pitch-score  (platform: Clerk EMOS guard)
  *
  * The routes stay separate URLs with separate guards (public stays login-free —
  * RFP §4.5/§9); everything after the guard lives here so fixes land once. The
