@@ -8,7 +8,11 @@ export type InputType = "paste" | "markdown" | "url";
 
 export type RunStatus = "queued" | "running" | "done" | "error";
 
-export type ClaimStatus = "checked" | "skipped";
+// "check_failed" = the web verification could not run for this claim (search rate
+// limited, timeout, or API error). It is deliberately NOT a verdict: the claim was
+// never actually assessed, so it must never be shown as "Unverifiable" (which means
+// "assessed, evidence inconclusive"). Surfaced to the user as "Check incomplete".
+export type ClaimStatus = "checked" | "skipped" | "check_failed";
 
 export type ClaimType = "statistic" | "citation" | "quote" | "fact" | "logic";
 
@@ -86,6 +90,8 @@ export interface RunFlags {
   injectionAttempts?: string[];
   skippedClaims?: number;
   fetchFailures?: string[];
+  /** Count of claims whose web verification could not run (rate limit / timeout / error); shown as "Check incomplete", retryable. */
+  checkIncomplete?: number;
   /** Doc-level consistency pass output (§3 step 6), promoted from the prior `(flags as any)` stopgap. */
   consistencyFindings?: ConsistencyFinding[];
 }

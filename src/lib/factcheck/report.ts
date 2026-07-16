@@ -42,6 +42,7 @@ export function buildReportMarkdown(params: {
   const readiness = computeReadiness(counts, mode);
   const checked = claims.filter((c) => c.status === "checked");
   const skipped = claims.filter((c) => c.status === "skipped");
+  const incomplete = claims.filter((c) => c.status === "check_failed");
 
   const lines: string[] = [];
   lines.push(`# Fact-check report${title ? `: ${title}` : ""}`);
@@ -62,6 +63,9 @@ export function buildReportMarkdown(params: {
   if (skipped.length > 0) {
     lines.push(`**Not checked (over cap):** ${skipped.length} claim(s).`);
   }
+  if (incomplete.length > 0) {
+    lines.push(`**Check incomplete (system busy):** ${incomplete.length} claim(s) could not be verified because live web search was temporarily unavailable. These are not verdicts, retry them.`);
+  }
   if (flags?.injectionAttempts?.length) {
     lines.push(`**Prompt injection attempts detected in fetched content:** ${flags.injectionAttempts.length}.`);
   }
@@ -80,6 +84,14 @@ export function buildReportMarkdown(params: {
   if (skipped.length > 0) {
     lines.push("");
     lines.push(`_${skipped.length} claim(s) beyond the ${skipped.length + checked.length > 40 ? "40-claim" : ""} cap were not checked in this run._`);
+  }
+  if (incomplete.length > 0) {
+    lines.push("");
+    lines.push("## Check incomplete (retry)");
+    lines.push("");
+    lines.push("Live web search was temporarily unavailable for these claims (rate limited or timed out), so they were not assessed. This is a system state, not a verdict on the claim. Re-run to check them.");
+    lines.push("");
+    incomplete.forEach((c) => lines.push(`- ${escapeCell(c.claimText)}`));
   }
   if (flags?.consistencyFindings?.length) {
     lines.push("");

@@ -87,12 +87,29 @@ function webFetchTool() {
   return { type: WEB_FETCH_TOOL_VERSION, name: "web_fetch", max_uses: MAX_FETCHES_PER_CLAIM } as unknown as Anthropic.Tool;
 }
 
+/** Wait after a rate-limit failure before the single retry, to let the search budget recover. */
+const RATE_LIMIT_BACKOFF_MS = 15000;
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
 /**
- * Verify and grade a single claim. Never throws: any failure resolves to an
- * Unverifiable result with the failure recorded, so one bad claim cannot abort
- * the whole run.
+ * Verify and grade a single claim. Never throws. If web verification cannot run
+ * (search rate-limited, timeout, API error) the claim comes back with
+ * status "check_failed" (NOT a verdict), and we retry once after a backoff in case
+ * the rate limit clears. A genuine content result (any real verdict) short-circuits
+ * the retry.
  */
 export async function verifyClaim(claim: ClaimToVerify, ctx: VerifyContext): Promise<VerifiedClaim> {
+  const first = await attemptVerify(claim, ctx);
+  if (first.claim.status !== "check_failed") return first;
+
+  await sleep(RATE_LIMIT_BACKOFF_MS);
+  const second = await attemptVerify(claim, ctx);
+  second.searchesUsed += first.searchesUsed; // meter both attempts
+  return second;
+}
+
+async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<VerifiedClaim> {
   const system = buildSystemPrompt("full", ctx.runDate);
 
   const userText =
@@ -109,6 +126,8 @@ export async function verifyClaim(claim: ClaimToVerify, ctx: VerifyContext): Pro
   const tools = [webSearchTool(), webFetchTool(), GRADE_TOOL as unknown as Anthropic.Tool];
 
   let searchesUsed = 0;
+  let searchOk = 0; // web_search_tool_result blocks that returned results
+  let searchErr = 0; // web_search_tool_result blocks that returned an error (rate limit etc.)
 
   try {
     for (let turn = 0; turn < MAX_TURNS_PER_CLAIM; turn++) {
@@ -134,13 +153,19 @@ export async function verifyClaim(claim: ClaimToVerify, ctx: VerifyContext): Pro
       );
 
       searchesUsed += countSearches(message);
+      const scan = scanSearchResults(message);
+      searchOk += scan.ok;
+      searchErr += scan.err;
+      // Web search attempted but every result errored (rate limit / unavailable):
+      // this claim cannot be honestly graded, no matter what verdict the model states.
+      const toolUnavailable = searchErr > 0 && searchOk === 0;
 
       const verdictBlock = message.content.find(
         (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "record_verdict",
       );
 
       if (verdictBlock) {
-        return finalizeVerdict(claim, verdictBlock.input as GradeToolInput, searchesUsed);
+        return finalizeVerdict(claim, verdictBlock.input as GradeToolInput, searchesUsed, toolUnavailable);
       }
 
       // No verdict yet. If the model stopped to use server tools, the API has
@@ -153,11 +178,17 @@ export async function verifyClaim(claim: ClaimToVerify, ctx: VerifyContext): Pro
       });
     }
 
-    // Ran out of turns without a verdict — honesty rule: Unverifiable, not a guess.
+    // Ran out of turns without a verdict. If the tools were unavailable, that is a
+    // system failure (check_failed); otherwise it is an honest Unverifiable.
+    if (searchErr > 0 && searchOk === 0) {
+      return checkFailed(claim, "Live web search was unavailable (rate limited); this claim was not checked. Retry.", searchesUsed);
+    }
     return unverifiable(claim, "Verification did not converge on a verdict within the turn budget.", searchesUsed, true);
   } catch (err) {
     const reason = err instanceof Error ? err.message : "Unknown error during web verification.";
-    return unverifiable(claim, `Web verification failed (${reason}).`, searchesUsed, true);
+    // An exception mid-verification (timeout, API error) means the claim was never
+    // assessed: check_failed, not a verdict.
+    return checkFailed(claim, `Web verification could not complete (${reason}). Retry.`, searchesUsed);
   }
 }
 
@@ -196,7 +227,7 @@ interface GradeToolInput {
   injectionAttemptDetected?: boolean;
 }
 
-function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUsed: number): VerifiedClaim {
+function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUsed: number, toolUnavailable: boolean): VerifiedClaim {
   const sources: Source[] = (input.sources ?? [])
     .filter((s) => typeof s.url === "string" && s.url.length > 0)
     .map((s) => ({
@@ -206,6 +237,13 @@ function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUs
       publisher: s.publisher,
       as_of: s.as_of,
     }));
+
+  // If web search was unavailable and the model gathered no real sources, the claim
+  // was not actually assessed, whatever verdict the model typed. Report it honestly
+  // as check_failed (retryable), never as a content verdict like Unverifiable.
+  if (toolUnavailable && sources.length === 0) {
+    return checkFailed(claim, "Live web search was unavailable (rate limited); this claim was not checked. Retry.", searchesUsed);
+  }
 
   const proposedVerdict: Verdict = VALID_VERDICTS.includes(input.verdict as Verdict)
     ? (input.verdict as Verdict)
@@ -247,6 +285,28 @@ function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUs
   };
 }
 
+/** The claim could not be assessed because verification tooling failed. Not a verdict. */
+function checkFailed(claim: ClaimToVerify, reason: string, searchesUsed: number): VerifiedClaim {
+  return {
+    claim: {
+      claimText: claim.claimText,
+      claimType: claim.claimType,
+      section: claim.section,
+      risk: claim.risk,
+      status: "check_failed",
+      verdict: null,
+      sources: [],
+      sourceUrl: null,
+      sourceTier: null,
+      evidence: reason,
+      note: claim.citationEvidence ?? null,
+    },
+    searchesUsed,
+    injectionDetected: false,
+    verifyFailed: true,
+  };
+}
+
 function unverifiable(claim: ClaimToVerify, reason: string, searchesUsed: number, failed: boolean): VerifiedClaim {
   return {
     claim: {
@@ -277,4 +337,25 @@ function countSearches(message: Anthropic.Message): number {
     }
   }
   return n;
+}
+
+/**
+ * Distinguishes successful web searches from errored ones (rate limit / unavailable).
+ * A web_search_tool_result whose content is an array = results returned (ok); one whose
+ * content is a web_search_tool_result_error object = the search failed (err).
+ */
+function scanSearchResults(message: Anthropic.Message): { ok: number; err: number } {
+  let ok = 0;
+  let err = 0;
+  for (const block of message.content) {
+    const b = block as { type?: string; content?: unknown };
+    if (b.type !== "web_search_tool_result") continue;
+    const c = b.content;
+    if (Array.isArray(c)) {
+      ok++;
+    } else if (c && typeof c === "object" && (c as { type?: string }).type === "web_search_tool_result_error") {
+      err++;
+    }
+  }
+  return { ok, err };
 }

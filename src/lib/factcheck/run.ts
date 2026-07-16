@@ -107,14 +107,19 @@ export async function processRun(runId: string, params: RunParams): Promise<void
 
       const fetchFailures: string[] = [];
       const injectionAttempts: string[] = [];
+      let checkIncomplete = 0;
       for (const v of verified) {
         gradedClaims.push(v.claim);
         searchesUsed += v.searchesUsed;
-        if (v.verifyFailed) fetchFailures.push(v.claim.claimText.slice(0, 140));
+        // "check_failed" = verification tooling failed (rate limit / timeout). Counted
+        // separately as "check incomplete" (retryable), NOT lumped into a verdict.
+        if (v.claim.status === "check_failed") checkIncomplete++;
+        else if (v.verifyFailed) fetchFailures.push(v.claim.claimText.slice(0, 140));
         if (v.injectionDetected) injectionAttempts.push(v.claim.claimText.slice(0, 140));
       }
       if (fetchFailures.length) flags.fetchFailures = fetchFailures;
       if (injectionAttempts.length) flags.injectionAttempts = injectionAttempts;
+      if (checkIncomplete) flags.checkIncomplete = checkIncomplete;
     }
 
     const skipped = buildSkippedClaimPlaceholder(extraction.overCapCount);
