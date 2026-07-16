@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { EmosUserButton } from "@/components/emostool/EmosUserButton";
+import { EmosUserButton } from "@/components/emos-platform/EmosUserButton";
 import { EMOS_ADMIN_EMAILS, getSubscriptionStatus } from "@/lib/emos-guard";
 
 export const metadata: Metadata = {

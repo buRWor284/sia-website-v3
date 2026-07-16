@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import PressIQPlatformClient from "@/components/emostool/PressIQPlatformClient";
-import PipelineNav from "@/components/emostool/PipelineNav";
+import PressIQPlatformClient from "@/components/emos-platform/PressIQPlatformClient";
+import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

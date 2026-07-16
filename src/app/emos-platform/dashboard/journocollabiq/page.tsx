@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getJournalists } from "@/app/emos-platform/actions/coverageiq";
-import JournoCollabIQClient from "@/components/emostool/JournoCollabIQClient";
-import PipelineNav from "@/components/emostool/PipelineNav";
+import JournoCollabIQClient from "@/components/emos-platform/JournoCollabIQClient";
+import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

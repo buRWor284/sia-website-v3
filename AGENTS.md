@@ -86,7 +86,7 @@ Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → Coverage
 ### Key files
 - `src/lib/supabase.ts` — createSupabaseServerClient (Clerk JWT), createSupabaseServiceClient (service role)
 - `src/lib/pitch/log.ts` — saves PressIQ scores to Supabase on every analysis
-- `src/components/emostool/` — platform client components (SignalIQPlatformClient, PressIQPlatformClient, JournoCollabIQClient)
+- `src/components/emos-platform/` — platform client components (SignalIQPlatformClient, PressIQPlatformClient, JournoCollabIQClient)
 - `supabase/fix-rls-function.sql` — run this in Supabase if RLS isn't resolving
 - `supabase/seed-coverageiq.sql` — seed data for SIA org
 

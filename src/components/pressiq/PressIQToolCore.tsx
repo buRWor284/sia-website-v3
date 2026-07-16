@@ -6,7 +6,7 @@
  *
  * ONE core, two thin wrappers:
  *   - app/tools/pressiq/page.tsx                     (public: intro + Turnstile + gate + PDF)
- *   - components/emostool/PressIQPlatformClient.tsx  (dashboard: Clerk chrome + Track + Score History)
+ *   - components/emos-platform/PressIQPlatformClient.tsx  (dashboard: Clerk chrome + Track + Score History)
  *
  * The step bar, the 2-step input form, live mechanics, the loading state and the
  * 4 result views (Score / Fixes / Breakdown / Evidence) all live here — moved

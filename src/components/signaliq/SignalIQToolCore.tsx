@@ -6,7 +6,7 @@
  *
  * ONE core, two thin wrappers:
  *   - app/tools/signaliq/page.tsx        (public: landing + Turnstile + gates/quota + PDF)
- *   - components/emostool/SignalIQPlatformClient.tsx (dashboard: Clerk chrome + Save-to-EMOS + library)
+ *   - components/emos-platform/SignalIQPlatformClient.tsx (dashboard: Clerk chrome + Save-to-EMOS + library)
  *
  * The 5-step wizard (Beat → Context → Radar → Angle → Pack), cards, angle view
  * and pack stage all live here — moved verbatim from the public page — so

@@ -1,8 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getSignals } from "@/app/emos-platform/actions/signaliq";
-import SignalIQPlatformClient from "@/components/emostool/SignalIQPlatformClient";
-import PipelineNav from "@/components/emostool/PipelineNav";
+import SignalIQPlatformClient from "@/components/emos-platform/SignalIQPlatformClient";
+import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {

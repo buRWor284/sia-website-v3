@@ -2,8 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getAssets } from "@/app/emos-platform/actions/assetiq";
 import { getSignals } from "@/app/emos-platform/actions/signaliq";
-import AssetIQClient from "@/components/emostool/AssetIQClient";
-import PipelineNav from "@/components/emostool/PipelineNav";
+import AssetIQClient from "@/components/emos-platform/AssetIQClient";
+import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
