@@ -11,7 +11,7 @@
  *       payment complete → Stripe webhook fires → Clerk invite sent → /emos-platform/subscribe/success
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const PAPER = "#f1ebde";
 const INK   = "#1a1410";
@@ -32,6 +32,16 @@ const TOOLS = [
 export default function SubscribePage() {
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState<string | null>(null);
+
+  const [returning, setReturning] = useState(false);
+
+  useEffect(() => {
+    try {
+      setReturning(new URLSearchParams(window.location.search).get("returning") === "1");
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   async function handleSubscribe() {
     setLoading(true);
@@ -68,6 +78,15 @@ export default function SubscribePage() {
             EMOS Platform
           </span>
         </div>
+
+        {returning && (
+          <div style={{ marginBottom: 20, padding: "14px 18px", background: "#e8e0cc", borderLeft: `3px solid ${GREEN}`, fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: INK }}>
+            <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 5 }}>
+              Welcome back
+            </span>
+            Your EMOS subscription has ended. Re-subscribe below to pick up right where you left off. Your account and saved work are still here.
+          </div>
+        )}
 
         {/* Card */}
         <div style={{ background: INK, color: PAPER }}>
