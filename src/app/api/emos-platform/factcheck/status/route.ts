@@ -1,10 +1,9 @@
 // src/app/api/emos-platform/factcheck/status/route.ts
-// FactcheckIQ | poll a run's progress/result. Per Build-Plan-v2.md §3, §6.
-
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { getRunWithClaims, listRuns } from "@/lib/factcheck/store";
+import { getFullAuditUsage } from "@/lib/factcheck/quota";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -30,9 +29,10 @@ export async function GET(req: NextRequest) {
   const runId = req.nextUrl.searchParams.get("runId");
 
   if (!runId) {
-    // No runId: return the plain history list for the dashboard.
-    const runs = await listRuns(orgId);
-    return NextResponse.json({ runs });
+    // History list for the dashboard + the org's current Full-audit quota
+    // snapshot (so the client can render "N of M full audits left this month").
+    const [runs, quota] = await Promise.all([listRuns(orgId), getFullAuditUsage(orgId)]);
+    return NextResponse.json({ runs, quota });
   }
 
   const result = await getRunWithClaims(runId, orgId);

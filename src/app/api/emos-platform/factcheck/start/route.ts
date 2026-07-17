@@ -1,17 +1,15 @@
 // src/app/api/emos-platform/factcheck/start/route.ts
-// FactcheckIQ | Clerk auth -> create run row -> waitUntil(process) -> runId
-// Per Build-Plan-v2.md §3, §6, Appendix A.
-
 import { NextRequest, NextResponse } from "next/server";
 import { waitUntil } from "@vercel/functions";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { startRun, processRun } from "@/lib/factcheck/run";
+import { checkFullAuditQuota } from "@/lib/factcheck/quota";
 import type { FactCheckMode, InputType } from "@/lib/factcheck/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300; // Phase 0 finding: fluid-compute default; full audits fit comfortably inside this
+export const maxDuration = 300; // fluid-compute; full audits fit inside this
 
 async function getOrgIdForUser(userId: string): Promise<string> {
   const db = createSupabaseServiceClient();
@@ -26,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   let body: { mode?: FactCheckMode; inputType?: InputType; title?: string; text?: string; url?: string };
   try {
-    body = await req.json();
+    body = (await req.json()) as typeof body;
   } catch {
     return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
   }
@@ -43,11 +41,26 @@ export async function POST(req: NextRequest) {
   if (body.inputType !== "url" && !body.text) {
     return NextResponse.json({ error: "text is required for paste/markdown input." }, { status: 400 });
   }
+
   let orgId: string;
   try {
     orgId = await getOrgIdForUser(guard.userId);
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Organization lookup failed." }, { status: 403 });
+  }
+
+  // Per-org monthly Full-audit cap (Phase 4). Citation mode is never blocked
+  // here. A Full audit that would exceed the org's monthly allowance is rejected
+  // BEFORE any run row is created or any Anthropic spend happens. See
+  // src/lib/factcheck/quota.ts for why this counts fact_check_runs directly.
+  const quota = await checkFullAuditQuota(orgId, body.mode);
+  if (!quota.ok) {
+    console.info(`[factcheckiq] full-audit quota block org=${orgId} used=${quota.usage.used}/${quota.usage.cap}`);
+    return NextResponse.json({ error: quota.message, quota: quota.usage }, { status: 429 });
+  }
+  if (body.mode === "citation") {
+    // Citation runs are uncapped and near free; log for observability only.
+    console.info(`[factcheckiq] citation run (uncapped) org=${orgId}`);
   }
 
   const runParams = {
@@ -62,13 +75,15 @@ export async function POST(req: NextRequest) {
 
   const runId = await startRun(runParams);
 
-  // Fire the worker without blocking the response; Vercel's fluid compute keeps
-  // this alive past the response via waitUntil (no cron path, per plan §3).
+  // Fire the worker without blocking the response; fluid compute keeps this
+  // alive past the response via waitUntil (no cron path).
   waitUntil(
     processRun(runId, runParams).catch((err) => {
       console.error(`[factcheckiq] run ${runId} failed:`, err);
     }),
   );
 
-  return NextResponse.json({ runId });
+  // quota.usage reflects the count BEFORE this run row was created; the client
+  // re-reads history (which includes fresh quota) once the run completes.
+  return NextResponse.json({ runId, quota: quota.usage });
 }

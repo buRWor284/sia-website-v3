@@ -1,0 +1,1069 @@
+"use client";
+
+// src/components/emos-platform/FactcheckIQClient.tsx
+// FactcheckIQ | Phase 4 dashboard client.
+// Talks to the existing async backend: POST /api/emos-platform/factcheck/start
+// then polls GET /api/emos-platform/factcheck/status?runId=... about every 2s.
+// The status route returns RAW Supabase rows (snake_case columns; camelCase only
+// inside the jsonb blobs progress/flags/verdict_counts/sources), so the wire
+// interfaces below mirror the DB columns exactly.
+//
+// Client copy contains NO em-dashes (repo convention: use , : or |).
+
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
+import { ToolHeader } from "@/components/tools/ToolHeader";
+import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import { SCaps, DoubleRule } from "@/components/bureau/primitives";
+import {
+  PAPER,
+  PAPER2,
+  INK,
+  INK70,
+  INK55,
+  INK35,
+  INK15,
+  YEL,
+  YEL2,
+  GROT,
+  SERIF,
+  MONO,
+} from "@/lib/tokens";
+
+// success / caution / danger accents (match the FactcheckIQ teaser page;
+// GREEN is not in tokens.ts, it is an inline success color used across the site)
+const GREEN = "#3e6b45";
+const AMBER = "#9c7414";
+const RED = "#9b2c2c";
+
+/* -------------------------------------------------------------------------- */
+/* wire types (raw rows from the status route)                                 */
+/* -------------------------------------------------------------------------- */
+
+type Verdict =
+  | "verified"
+  | "partly_accurate"
+  | "misleading"
+  | "unverifiable"
+  | "inaccurate"
+  | "fabricated";
+type ClaimWireStatus = "checked" | "skipped" | "check_failed";
+type Mode = "citation" | "full";
+type InputKind = "paste" | "markdown" | "url";
+type RunWireStatus = "queued" | "running" | "done" | "error";
+
+interface WireSource {
+  url: string;
+  tier: number;
+  quote: string;
+  publisher?: string;
+  as_of?: string;
+}
+interface WireClaim {
+  id: string;
+  claim_text: string;
+  claim_type: string | null;
+  section: string | null;
+  risk: string | null;
+  status: ClaimWireStatus;
+  verdict: Verdict | null;
+  sources: WireSource[] | null;
+  source_url: string | null;
+  source_tier: number | null;
+  evidence: string | null;
+  note: string | null;
+}
+interface WireProgress {
+  phase: string;
+  claimsDone: number;
+  claimsTotal: number;
+}
+interface WireVerdictCounts {
+  verified: number;
+  partly_accurate: number;
+  misleading: number;
+  unverifiable: number;
+  inaccurate: number;
+  fabricated: number;
+}
+interface WireConsistencyFinding {
+  claimIds: [string, string];
+  note: string;
+}
+interface WireFlags {
+  injectionAttempts?: string[];
+  skippedClaims?: number;
+  fetchFailures?: string[];
+  checkIncomplete?: number;
+  consistencyFindings?: WireConsistencyFinding[];
+}
+interface WireRun {
+  id: string;
+  title: string | null;
+  mode: Mode;
+  input_type: string;
+  status: RunWireStatus;
+  progress: WireProgress | null;
+  verdict_counts: WireVerdictCounts | null;
+  readiness: string | null;
+  flags: WireFlags | null;
+  report_md: string | null;
+  cost_cents: number | null;
+  searches_used: number | null;
+  error: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+interface WireHistoryRow {
+  id: string;
+  title: string | null;
+  mode: Mode;
+  status: string;
+  readiness: string | null;
+  created_at: string;
+  completed_at: string | null;
+}
+interface WireQuota {
+  cap: number;
+  used: number;
+  remaining: number;
+  periodStart: string;
+  periodResetsOn: string;
+  blocked: boolean;
+}
+
+/* -------------------------------------------------------------------------- */
+/* constants                                                                   */
+/* -------------------------------------------------------------------------- */
+
+const START_URL = "/api/emos-platform/factcheck/start";
+const STATUS_URL = "/api/emos-platform/factcheck/status";
+const POLL_MS = 2000;
+
+const VERDICT_ORDER: Verdict[] = [
+  "verified",
+  "partly_accurate",
+  "misleading",
+  "unverifiable",
+  "inaccurate",
+  "fabricated",
+];
+
+const VERDICT_META: Record<Verdict, { label: string; bg: string; fg: string }> = {
+  verified: { label: "Verified", bg: GREEN, fg: PAPER },
+  partly_accurate: { label: "Partly accurate", bg: "#e0a21a", fg: INK },
+  misleading: { label: "Misleading", bg: AMBER, fg: PAPER },
+  unverifiable: { label: "Unverifiable", bg: "rgba(26,20,16,.45)", fg: PAPER },
+  inaccurate: { label: "Inaccurate", bg: RED, fg: PAPER },
+  fabricated: { label: "Fabricated", bg: "#7a1f1f", fg: PAPER },
+};
+
+const PHASE_LABEL: Record<string, string> = {
+  queued: "Queued",
+  intake: "Reading input",
+  extract: "Finding claims",
+  citation_gate: "Checking citations and links",
+  verify: "Verifying claims against live sources",
+  done: "Finishing",
+};
+
+const MODE_COPY: Record<Mode, { title: string; does: string; doesNot: string }> = {
+  citation: {
+    title: "Citation and link check",
+    does: "Checks that links resolve and citations are real: DOIs exist and match the cited paper, journals are legitimate, and papers are not retracted.",
+    doesNot: "Does not check whether any statistic, quote, or fact is actually true. Near free.",
+  },
+  full: {
+    title: "Full audit",
+    does: "Verifies citations, statistics, quotes, and facts against independent live sources.",
+    doesNot: "Slower, and spends from your organization's monthly full-audit allowance.",
+  },
+};
+
+const CHECKED_LINE: Record<Mode, { checked: string; notChecked?: string }> = {
+  citation: {
+    checked:
+      "Links resolve, DOIs exist and match the cited paper, journals are legitimate, and papers are not retracted.",
+    notChecked:
+      "Whether any statistic, quote, or fact is actually true. Run a full audit before publishing.",
+  },
+  full: {
+    checked:
+      "Citations, statistics, quotes, and facts, verified against independent live sources.",
+  },
+};
+
+/* -------------------------------------------------------------------------- */
+/* small helpers                                                               */
+/* -------------------------------------------------------------------------- */
+
+function hostOf(u: string): string {
+  try {
+    return new URL(u).hostname.replace(/^www\./, "");
+  } catch {
+    return u.length > 42 ? u.slice(0, 42) + "..." : u;
+  }
+}
+
+function fmtDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  } catch {
+    return iso.slice(0, 10);
+  }
+}
+
+function chip(bg: string, fg: string, border?: string): CSSProperties {
+  return {
+    display: "inline-block",
+    padding: "3px 8px 4px",
+    background: bg,
+    color: fg,
+    border: border ? `1px solid ${border}` : undefined,
+    fontFamily: GROT,
+    fontWeight: 800,
+    fontSize: 9.5,
+    letterSpacing: ".1em",
+    textTransform: "uppercase",
+    whiteSpace: "nowrap",
+  };
+}
+
+function readinessAccent(readiness: string | null): string {
+  if (!readiness) return INK35;
+  const r = readiness.toLowerCase();
+  if (r.startsWith("not publishable") || r.startsWith("not publish-ready")) return RED;
+  if (r.startsWith("publish-ready") || r.includes("passed with no issues")) return GREEN;
+  return AMBER;
+}
+
+/* -------------------------------------------------------------------------- */
+/* presentational bits                                                         */
+/* -------------------------------------------------------------------------- */
+
+function ClaimBadge({ claim }: { claim: WireClaim }) {
+  if (claim.status === "check_failed") {
+    return (
+      <span style={chip(INK15, INK70, INK35)} title="Live web search was unavailable, so this claim was not assessed. Retry to check it.">
+        Check incomplete
+      </span>
+    );
+  }
+  if (claim.status === "skipped") {
+    return <span style={chip("transparent", INK55, INK35)}>Not checked (over cap)</span>;
+  }
+  if (claim.verdict) {
+    const m = VERDICT_META[claim.verdict];
+    return <span style={chip(m.bg, m.fg)}>{m.label}</span>;
+  }
+  return <span style={chip("transparent", INK55, INK35)}>Pending</span>;
+}
+
+function labelBtnStyle(active: boolean): CSSProperties {
+  return {
+    padding: "7px 14px",
+    background: active ? INK : "transparent",
+    color: active ? PAPER : INK55,
+    border: `1px solid ${active ? INK : INK35}`,
+    fontFamily: GROT,
+    fontWeight: 700,
+    fontSize: 10,
+    letterSpacing: ".14em",
+    textTransform: "uppercase",
+    cursor: "pointer",
+  };
+}
+
+/* -------------------------------------------------------------------------- */
+/* main component                                                              */
+/* -------------------------------------------------------------------------- */
+
+export default function FactcheckIQClient() {
+  const [inputKind, setInputKind] = useState<InputKind>("paste");
+  const [mode, setMode] = useState<Mode>("citation");
+  const [title, setTitle] = useState("");
+  const [text, setText] = useState("");
+  const [url, setUrl] = useState("");
+
+  const [view, setView] = useState<"form" | "running" | "report">("form");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [run, setRun] = useState<WireRun | null>(null);
+  const [claims, setClaims] = useState<WireClaim[]>([]);
+
+  const [history, setHistory] = useState<WireHistoryRow[]>([]);
+  const [quota, setQuota] = useState<WireQuota | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [showRaw, setShowRaw] = useState(false);
+
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeRunId = useRef<string | null>(null);
+
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) {
+      clearTimeout(pollRef.current);
+      pollRef.current = null;
+    }
+    activeRunId.current = null;
+  }, []);
+
+  const loadHistory = useCallback(async () => {
+    try {
+      const res = await fetch(STATUS_URL, { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      if (Array.isArray(data?.runs)) setHistory(data.runs as WireHistoryRow[]);
+      if (data?.quota) setQuota(data.quota as WireQuota);
+    } catch {
+      /* history is best-effort */
+    }
+  }, []);
+
+  useEffect(() => {
+    loadHistory();
+    return () => stopPolling();
+  }, [loadHistory, stopPolling]);
+
+  const pollOnce = useCallback(
+    async (runId: string) => {
+      try {
+        const res = await fetch(`${STATUS_URL}?runId=${encodeURIComponent(runId)}`, { cache: "no-store" });
+        if (res.status === 404) {
+          if (activeRunId.current === runId) {
+            setError("That run could not be found.");
+            setView("form");
+          }
+          stopPolling();
+          return;
+        }
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        const data = (await res.json()) as { run: WireRun; claims: WireClaim[] };
+        if (activeRunId.current !== runId) return; // superseded by a newer run
+        setRun(data.run);
+        setClaims(Array.isArray(data.claims) ? data.claims : []);
+        if (data.run.status === "done") {
+          setView("report");
+          stopPolling();
+          loadHistory();
+          return;
+        }
+        if (data.run.status === "error") {
+          setError(data.run.error || "The run failed.");
+          setView("report");
+          stopPolling();
+          loadHistory();
+          return;
+        }
+        pollRef.current = setTimeout(() => pollOnce(runId), POLL_MS);
+      } catch {
+        if (activeRunId.current !== runId) return;
+        pollRef.current = setTimeout(() => pollOnce(runId), POLL_MS);
+      }
+    },
+    [loadHistory, stopPolling],
+  );
+
+  const fullBlocked = mode === "full" && !!quota && quota.blocked;
+
+  const submit = useCallback(async () => {
+    setError(null);
+    const hasInput = inputKind === "url" ? url.trim().length > 0 : text.trim().length > 0;
+    if (!hasInput) {
+      setError(inputKind === "url" ? "Enter a URL to check." : "Paste some text to check.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const body: Record<string, unknown> = {
+        mode,
+        inputType: inputKind,
+        title: title.trim() || undefined,
+      };
+      if (inputKind === "url") body.url = url.trim();
+      else body.text = text;
+
+      const res = await fetch(START_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (data?.quota) setQuota(data.quota as WireQuota);
+        setError((data && data.error) || `Could not start the check (status ${res.status}).`);
+        setSubmitting(false);
+        return;
+      }
+      const runId = data.runId as string;
+      if (data?.quota) setQuota(data.quota as WireQuota);
+      activeRunId.current = runId;
+      setRun({
+        id: runId,
+        title: title.trim() || null,
+        mode,
+        input_type: inputKind,
+        status: "queued",
+        progress: { phase: "queued", claimsDone: 0, claimsTotal: 0 },
+        verdict_counts: null,
+        readiness: null,
+        flags: null,
+        report_md: null,
+        cost_cents: null,
+        searches_used: null,
+        error: null,
+        created_at: new Date().toISOString(),
+        completed_at: null,
+      });
+      setClaims([]);
+      setView("running");
+      setSubmitting(false);
+      pollRef.current = setTimeout(() => pollOnce(runId), POLL_MS);
+    } catch {
+      setError("Network error starting the check. Please try again.");
+      setSubmitting(false);
+    }
+  }, [inputKind, url, text, mode, title, pollOnce]);
+
+  const reopen = useCallback(
+    async (row: WireHistoryRow) => {
+      setError(null);
+      stopPolling();
+      setShowRaw(false);
+      setView("running");
+      try {
+        const res = await fetch(`${STATUS_URL}?runId=${encodeURIComponent(row.id)}`, { cache: "no-store" });
+        const data = await res.json();
+        if (!res.ok) {
+          setError((data && data.error) || "Could not open that run.");
+          setView("form");
+          return;
+        }
+        const r = data.run as WireRun;
+        setRun(r);
+        setClaims(Array.isArray(data.claims) ? data.claims : []);
+        if (r.status === "queued" || r.status === "running") {
+          activeRunId.current = r.id;
+          pollRef.current = setTimeout(() => pollOnce(r.id), POLL_MS);
+          setView("running");
+        } else {
+          setView("report");
+        }
+      } catch {
+        setError("Could not open that run.");
+        setView("form");
+      }
+    },
+    [pollOnce, stopPolling],
+  );
+
+  const newRun = useCallback(() => {
+    stopPolling();
+    setRun(null);
+    setClaims([]);
+    setError(null);
+    setShowRaw(false);
+    setView("form");
+  }, [stopPolling]);
+
+  const copyMarkdown = useCallback(async () => {
+    if (!run?.report_md) return;
+    try {
+      await navigator.clipboard.writeText(run.report_md);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setError("Could not copy to clipboard. Open the raw view and copy manually.");
+    }
+  }, [run]);
+
+  /* ---------------------------------------------------------------------- */
+  /* render helpers                                                          */
+  /* ---------------------------------------------------------------------- */
+
+  const sectionLabel = (t: string) => (
+    <div style={{ marginBottom: 12 }}>
+      <DoubleRule />
+      <div style={{ paddingTop: 8 }}>
+        <SCaps size={11} ls="0.2em">{t}</SCaps>
+      </div>
+    </div>
+  );
+
+  const quotaLine = () => {
+    if (!quota) return null;
+    const out = quota.remaining <= 0;
+    return (
+      <span
+        style={{
+          fontFamily: MONO,
+          fontSize: 9,
+          letterSpacing: ".12em",
+          textTransform: "uppercase",
+          color: out ? YEL2 : "rgba(241,235,222,.72)",
+        }}
+      >
+        {quota.remaining} / {quota.cap} full audits left
+      </span>
+    );
+  };
+
+  const renderForm = () => (
+    <div>
+      <div style={{ marginBottom: 22 }}>
+        <div style={{ fontFamily: SERIF, fontSize: "clamp(24px,3vw,34px)", fontWeight: 700, lineHeight: 1.1, marginBottom: 8 }}>
+          Verify before you publish
+        </div>
+        <p style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.55, color: INK70, maxWidth: 640, margin: 0 }}>
+          Paste a draft or point at a URL. FactcheckIQ traces every statistic, quote, and citation to a live source and
+          grades it, so you can catch fabricated references and unsourced numbers before they ship.
+        </p>
+      </div>
+
+      {sectionLabel("Input")}
+
+      <input
+        value={title}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+        placeholder="Title (optional)"
+        style={{
+          width: "100%",
+          padding: "10px 12px",
+          marginBottom: 12,
+          background: PAPER2,
+          border: `1px solid ${INK15}`,
+          fontFamily: SERIF,
+          fontSize: 15,
+          color: INK,
+          boxSizing: "border-box",
+        }}
+      />
+
+      <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        {(["paste", "markdown", "url"] as InputKind[]).map((k) => (
+          <button key={k} onClick={() => setInputKind(k)} style={labelBtnStyle(inputKind === k)}>
+            {k === "url" ? "URL" : k}
+          </button>
+        ))}
+      </div>
+
+      {inputKind === "url" ? (
+        <input
+          value={url}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)}
+          placeholder="https://example.com/article"
+          style={{
+            width: "100%",
+            padding: "12px",
+            background: PAPER2,
+            border: `1px solid ${INK15}`,
+            fontFamily: MONO,
+            fontSize: 13,
+            color: INK,
+            boxSizing: "border-box",
+          }}
+        />
+      ) : (
+        <textarea
+          value={text}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value)}
+          placeholder={inputKind === "markdown" ? "Paste Markdown here..." : "Paste the text to check here..."}
+          rows={12}
+          style={{
+            width: "100%",
+            padding: "14px",
+            background: PAPER2,
+            border: `1px solid ${INK15}`,
+            fontFamily: inputKind === "markdown" ? MONO : SERIF,
+            fontSize: 14,
+            lineHeight: 1.55,
+            color: INK,
+            boxSizing: "border-box",
+            resize: "vertical",
+          }}
+        />
+      )}
+
+      <div style={{ height: 24 }} />
+      {sectionLabel("Mode")}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+        {(["citation", "full"] as Mode[]).map((m) => {
+          const active = mode === m;
+          const blockedCard = m === "full" && !!quota && quota.blocked;
+          return (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              style={{
+                textAlign: "left",
+                padding: 16,
+                background: active ? INK : PAPER2,
+                color: active ? PAPER : INK,
+                border: `1px solid ${active ? INK : INK15}`,
+                cursor: "pointer",
+                opacity: blockedCard && !active ? 0.7 : 1,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 12, letterSpacing: ".08em", textTransform: "uppercase" }}>
+                  {MODE_COPY[m].title}
+                </span>
+                {m === "citation" && (
+                  <span style={{ fontFamily: MONO, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", color: active ? YEL : INK55 }}>
+                    Default
+                  </span>
+                )}
+              </div>
+              <div style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.5, color: active ? "rgba(241,235,222,.82)" : INK70, marginBottom: 8 }}>
+                {MODE_COPY[m].does}
+              </div>
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, lineHeight: 1.45, color: active ? "rgba(241,235,222,.6)" : INK55 }}>
+                {MODE_COPY[m].doesNot}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {mode === "full" && quota && (
+        <div style={{ marginTop: 12, fontFamily: MONO, fontSize: 11, letterSpacing: ".04em", color: fullBlocked ? RED : INK55 }}>
+          {fullBlocked
+            ? `Full-audit limit reached this month (${quota.used} of ${quota.cap} used). Citation and link checks are still available. Resets ${fmtDate(quota.periodResetsOn)}.`
+            : `${quota.remaining} of ${quota.cap} full audits left this month.`}
+        </div>
+      )}
+
+      {error && (
+        <div style={{ marginTop: 16, padding: "10px 14px", background: "#faf3e3", border: `1px solid ${RED}`, fontFamily: SERIF, fontSize: 14, color: RED }}>
+          {error}
+        </div>
+      )}
+
+      <div style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 14 }}>
+        <button
+          onClick={submit}
+          disabled={submitting || fullBlocked}
+          style={{
+            padding: "12px 26px",
+            background: submitting || fullBlocked ? INK35 : YEL,
+            color: INK,
+            border: "none",
+            fontFamily: GROT,
+            fontWeight: 900,
+            fontSize: 12,
+            letterSpacing: ".12em",
+            textTransform: "uppercase",
+            cursor: submitting || fullBlocked ? "not-allowed" : "pointer",
+          }}
+        >
+          {submitting ? "Starting..." : mode === "citation" ? "Run citation check" : "Run full audit"}
+        </button>
+        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+          AI-assisted verification. Review before publishing.
+        </span>
+      </div>
+    </div>
+  );
+
+  const renderRunning = (r: WireRun) => {
+    const p = r.progress;
+    const phase = p?.phase ?? "queued";
+    const total = p?.claimsTotal ?? 0;
+    const done = p?.claimsDone ?? 0;
+    const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : null;
+    return (
+      <div style={{ padding: "24px 0" }}>
+        {sectionLabel("Checking")}
+        <div style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, marginBottom: 6 }}>
+          {r.title || "Your document"}
+        </div>
+        <div style={{ fontFamily: MONO, fontSize: 12, letterSpacing: ".08em", color: INK55, marginBottom: 20 }}>
+          {(r.mode === "citation" ? "Citation and link check" : "Full audit").toUpperCase()}
+        </div>
+
+        <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: INK, marginBottom: 10 }}>
+          {PHASE_LABEL[phase] ?? phase}
+          {total > 0 ? ` : ${done} of ${total} claims` : ""}
+        </div>
+
+        <div style={{ height: 10, background: PAPER2, border: `1px solid ${INK15}`, overflow: "hidden" }}>
+          <div
+            style={{
+              height: "100%",
+              width: pct === null ? "40%" : `${pct}%`,
+              background: YEL,
+              transition: "width .4s ease",
+            }}
+          />
+        </div>
+
+        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, marginTop: 16 }}>
+          This can take a minute or two for a full audit. You can leave this open, it updates automatically.
+        </p>
+
+        <button onClick={newRun} style={{ ...labelBtnStyle(false), marginTop: 12 }}>
+          Cancel
+        </button>
+      </div>
+    );
+  };
+
+  const renderVerdictCounts = (counts: WireVerdictCounts | null) => {
+    if (!counts) return null;
+    return (
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+        {VERDICT_ORDER.map((v) => {
+          const n = counts[v] ?? 0;
+          const m = VERDICT_META[v];
+          return (
+            <span key={v} style={{ ...chip(m.bg, m.fg), opacity: n === 0 ? 0.4 : 1 }}>
+              {m.label}: {n}
+            </span>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderFlags = (r: WireRun) => {
+    const f = r.flags;
+    if (!f) return null;
+    const rows: string[] = [];
+    if (f.skippedClaims && f.skippedClaims > 0)
+      rows.push(`${f.skippedClaims} claim(s) beyond the 40-claim cap were not checked in this run.`);
+    if (f.checkIncomplete && f.checkIncomplete > 0)
+      rows.push(`${f.checkIncomplete} claim(s) could not be verified because live web search was temporarily unavailable. Retry to check them.`);
+    if (f.injectionAttempts && f.injectionAttempts.length > 0)
+      rows.push(`${f.injectionAttempts.length} prompt-injection attempt(s) detected in fetched content and ignored.`);
+    if (f.fetchFailures && f.fetchFailures.length > 0)
+      rows.push(`${f.fetchFailures.length} source(s) could not be fetched during verification (affected claims marked Unverifiable).`);
+    if (rows.length === 0) return null;
+    return (
+      <div style={{ marginBottom: 18, padding: "12px 16px", background: "#faf3e3", border: `1px solid ${INK15}` }}>
+        <SCaps size={9.5} ls="0.16em" color={INK70}>Flags</SCaps>
+        <ul style={{ margin: "8px 0 0", paddingLeft: 18 }}>
+          {rows.map((t, i) => (
+            <li key={i} style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.5, color: INK70, marginBottom: 4 }}>
+              {t}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const renderConsistency = (r: WireRun) => {
+    const findings = r.flags?.consistencyFindings;
+    if (!findings || findings.length === 0) return null;
+    return (
+      <div style={{ marginBottom: 20 }}>
+        {sectionLabel("Consistency findings")}
+        <p style={{ fontFamily: SERIF, fontSize: 13, fontStyle: "italic", color: INK55, marginTop: 0, marginBottom: 10 }}>
+          Claims within this document that disagree with each other. Reconcile these before publishing, even where each
+          figure is individually defensible.
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 18 }}>
+          {findings.map((f, i) => (
+            <li key={i} style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.5, color: INK, marginBottom: 6 }}>
+              {f.note}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+  const renderSources = (claim: WireClaim) => {
+    const list = claim.sources ?? [];
+    if (list.length === 0) {
+      if (claim.source_url) {
+        return (
+          <a href={claim.source_url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: MONO, fontSize: 11, color: "#2a5db0" }}>
+            {hostOf(claim.source_url)}
+          </a>
+        );
+      }
+      return <span style={{ fontFamily: MONO, fontSize: 11, color: INK35 }}>None</span>;
+    }
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        {list.map((s, i) => (
+          <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: MONO, fontSize: 11, color: "#2a5db0", lineHeight: 1.4 }}>
+            {hostOf(s.url)}
+            {s.as_of ? ` (as of ${s.as_of})` : ""}
+          </a>
+        ))}
+      </div>
+    );
+  };
+
+  const renderReport = (r: WireRun) => {
+    const isError = r.status === "error";
+    const mode2 = r.mode;
+    const searches = r.searches_used;
+    const costCents = r.cost_cents;
+
+    return (
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
+          <div>
+            <div style={{ fontFamily: SERIF, fontSize: "clamp(22px,3vw,30px)", fontWeight: 700, lineHeight: 1.1 }}>
+              {r.title || "Fact-check report"}
+            </div>
+            <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".08em", color: INK55, marginTop: 6 }}>
+              {(mode2 === "citation" ? "Citation and link check" : "Full audit").toUpperCase()}
+              {"  |  "}
+              {fmtDate(r.completed_at || r.created_at)}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={copyMarkdown} style={labelBtnStyle(false)} disabled={!r.report_md}>
+              {copied ? "Copied" : "Copy Markdown"}
+            </button>
+            <button onClick={newRun} style={labelBtnStyle(true)}>
+              New check
+            </button>
+          </div>
+        </div>
+
+        {isError && (
+          <div style={{ marginBottom: 18, padding: "12px 16px", background: "#faf3e3", border: `1px solid ${RED}`, fontFamily: SERIF, fontSize: 14, color: RED }}>
+            This run did not finish: {r.error || "unknown error"}. Nothing was charged for an incomplete run beyond any
+            searches already spent. You can start it again.
+          </div>
+        )}
+
+        {r.readiness && (
+          <div style={{ marginBottom: 18, padding: "12px 16px", background: PAPER2, borderLeft: `4px solid ${readinessAccent(r.readiness)}` }}>
+            <SCaps size={9.5} ls="0.16em" color={INK55}>Readiness</SCaps>
+            <div style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.5, color: INK, marginTop: 4 }}>{r.readiness}</div>
+          </div>
+        )}
+
+        {renderVerdictCounts(r.verdict_counts)}
+
+        <div style={{ marginBottom: 18, fontFamily: SERIF, fontSize: 13, lineHeight: 1.55, color: INK70 }}>
+          <strong style={{ fontWeight: 700 }}>What was checked:</strong> {CHECKED_LINE[mode2].checked}
+          {CHECKED_LINE[mode2].notChecked ? (
+            <>
+              {" "}
+              <strong style={{ fontWeight: 700 }}>What was not checked:</strong> {CHECKED_LINE[mode2].notChecked}
+            </>
+          ) : null}
+        </div>
+
+        {(searches != null || costCents != null) && (
+          <div style={{ marginBottom: 18, fontFamily: MONO, fontSize: 11, letterSpacing: ".06em", color: INK55 }}>
+            THIS RUN:{" "}
+            {searches != null ? `${searches} web search${searches === 1 ? "" : "es"}` : "searches not recorded"}
+            {costCents != null ? `  |  ~$${(costCents / 100).toFixed(2)}` : ""}
+          </div>
+        )}
+
+        {renderFlags(r)}
+        {renderConsistency(r)}
+
+        {sectionLabel(`Claims (${claims.length})`)}
+        <div style={{ border: `1px solid ${INK15}`, overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
+            <thead>
+              <tr style={{ background: INK }}>
+                {["#", "Claim", "Verdict", "Evidence", "Sources"].map((h) => (
+                  <th
+                    key={h}
+                    style={{
+                      textAlign: "left",
+                      padding: "9px 12px",
+                      fontFamily: GROT,
+                      fontWeight: 800,
+                      fontSize: 9,
+                      letterSpacing: ".12em",
+                      textTransform: "uppercase",
+                      color: PAPER,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {claims.length === 0 && (
+                <tr>
+                  <td colSpan={5} style={{ padding: "20px 12px", fontFamily: SERIF, fontStyle: "italic", color: INK55 }}>
+                    No claims were extracted from this input.
+                  </td>
+                </tr>
+              )}
+              {claims.map((c, i) => (
+                <tr key={c.id || i} style={{ borderTop: `1px solid rgba(26,20,16,.14)`, verticalAlign: "top" }}>
+                  <td style={{ padding: "10px 12px", fontFamily: MONO, fontSize: 12, color: INK55 }}>{i + 1}</td>
+                  <td style={{ padding: "10px 12px", fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.45, color: INK, minWidth: 220 }}>
+                    {c.claim_text}
+                    {c.note ? (
+                      <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55, marginTop: 3 }}>{c.note}</div>
+                    ) : null}
+                  </td>
+                  <td style={{ padding: "10px 12px" }}>
+                    <ClaimBadge claim={c} />
+                  </td>
+                  <td style={{ padding: "10px 12px", fontFamily: SERIF, fontSize: 12.5, lineHeight: 1.45, color: INK70, minWidth: 200 }}>
+                    {c.evidence || <span style={{ color: INK35 }}>None</span>}
+                  </td>
+                  <td style={{ padding: "10px 12px", minWidth: 140 }}>{renderSources(c)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {r.report_md && (
+          <div style={{ marginTop: 18 }}>
+            <button onClick={() => setShowRaw((s) => !s)} style={labelBtnStyle(false)}>
+              {showRaw ? "Hide raw Markdown" : "Show raw Markdown"}
+            </button>
+            {showRaw && (
+              <pre
+                style={{
+                  marginTop: 10,
+                  padding: 16,
+                  background: PAPER2,
+                  border: `1px solid ${INK15}`,
+                  fontFamily: MONO,
+                  fontSize: 12,
+                  lineHeight: 1.5,
+                  color: INK,
+                  whiteSpace: "pre-wrap",
+                  wordBreak: "break-word",
+                  overflowX: "auto",
+                }}
+              >
+                {r.report_md}
+              </pre>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderHistory = () => {
+    if (history.length === 0) return null;
+    return (
+      <div style={{ marginTop: 40 }}>
+        {sectionLabel("Recent runs")}
+        <div style={{ border: `1px solid ${INK15}` }}>
+          {history.map((row, i) => (
+            <button
+              key={row.id}
+              onClick={() => reopen(row)}
+              style={{
+                display: "flex",
+                width: "100%",
+                textAlign: "left",
+                alignItems: "center",
+                gap: 12,
+                padding: "10px 14px",
+                background: i % 2 === 0 ? PAPER : PAPER2,
+                border: "none",
+                borderTop: i === 0 ? "none" : `1px solid ${INK15}`,
+                cursor: "pointer",
+              }}
+            >
+              <span style={{ flex: 1, fontFamily: SERIF, fontSize: 14, color: INK, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {row.title || "Untitled document"}
+              </span>
+              <span style={{ ...chip(row.mode === "full" ? INK : "transparent", row.mode === "full" ? PAPER : INK55, INK35) }}>
+                {row.mode === "full" ? "Full" : "Citation"}
+              </span>
+              <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: ".06em", color: statusColor(row.status), width: 84, textTransform: "uppercase" }}>
+                {statusLabel(row.status)}
+              </span>
+              <span style={{ fontFamily: MONO, fontSize: 10, color: INK55, width: 92, textAlign: "right" }}>
+                {fmtDate(row.created_at)}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  /* ---------------------------------------------------------------------- */
+
+  return (
+    <div style={{ minHeight: "100vh", background: PAPER2, color: INK, fontFamily: SERIF }}>
+      <ToolHeader
+        toolPrefix="Factcheck"
+        subtitle="AI-ASSISTED VERIFICATION | EMOS TOOL SUITE"
+        rightContent={
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            {quotaLine()}
+            <a
+              href="/emos-platform/dashboard"
+              style={{ fontFamily: MONO, fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(241,235,222,.6)", textDecoration: "none" }}
+            >
+              ← Dashboard
+            </a>
+          </div>
+        }
+      />
+
+      <main
+        style={{
+          maxWidth: 1240,
+          margin: "0 auto",
+          background: PAPER,
+          borderLeft: `1px solid ${INK15}`,
+          borderRight: `1px solid ${INK15}`,
+          minHeight: "calc(100vh - 52px)",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <div style={{ padding: "clamp(20px,4vw,40px)", flex: 1 }}>
+          {view === "form" && renderForm()}
+          {view === "running" && run && renderRunning(run)}
+          {view === "report" && run && renderReport(run)}
+          {view === "form" && renderHistory()}
+        </div>
+
+        <ToolPipelineFooter currentTool="factcheckiq" />
+
+        <div style={{ padding: "0 clamp(20px,4vw,40px) 28px" }}>
+          <div style={{ borderTop: `1px solid ${INK15}`, paddingTop: 14 }}>
+            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, lineHeight: 1.5, color: INK55, margin: 0, maxWidth: 760 }}>
+              AI-assisted verification, review before publishing. Verdicts are evidence-based judgments, not legal
+              guarantees. &quot;Unverifiable&quot; means the available evidence was inconclusive, not that a claim is
+              false, and &quot;Check incomplete&quot; means the system could not run the check, not a verdict at all.
+            </p>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function statusLabel(s: string): string {
+  if (s === "done") return "Done";
+  if (s === "error") return "Failed";
+  if (s === "running") return "Running";
+  if (s === "queued") return "Queued";
+  return s;
+}
+function statusColor(s: string): string {
+  if (s === "done") return GREEN;
+  if (s === "error") return RED;
+  return INK55;
+}
