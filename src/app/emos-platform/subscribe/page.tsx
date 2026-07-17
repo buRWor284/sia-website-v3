@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { useUser, SignOutButton } from "@clerk/nextjs";
 
 const PAPER = "#f1ebde";
 const INK   = "#1a1410";
@@ -34,6 +35,8 @@ export default function SubscribePage() {
   const [error,   setError]   = useState<string | null>(null);
 
   const [returning, setReturning] = useState(false);
+  const { isSignedIn, user } = useUser();
+  const signedInEmail = user?.primaryEmailAddress?.emailAddress ?? "";
 
   useEffect(() => {
     try {
@@ -123,11 +126,18 @@ export default function SubscribePage() {
             <p style={{ fontFamily: GROT, fontWeight: 900, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase" as const, color: "rgba(241,235,222,.35)", margin: "0 0 12px" }}>
               What happens next
             </p>
-            {[
-              "Pay via Stripe (card). Takes 30 seconds.",
-              "Check your inbox — you'll receive an invite link to create your account.",
-              "Sign in and start building your earned media system.",
-            ].map((step, i) => (
+            {(returning
+              ? [
+                  "Pay via Stripe (card). Takes 30 seconds.",
+                  "Your access switches back on right away. No new account or invite needed.",
+                  "Head straight back to your dashboard and pick up where you left off.",
+                ]
+              : [
+                  "Pay via Stripe (card). Takes 30 seconds.",
+                  "Check your inbox for an invite link to create your account.",
+                  "Sign in and start building your earned media system.",
+                ]
+            ).map((step, i) => (
               <div key={i} style={{ display: "flex", gap: 12, marginBottom: 8 }}>
                 <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, color: YEL, flexShrink: 0, minWidth: 16 }}>{i + 1}.</span>
                 <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.6)", lineHeight: 1.5 }}>{step}</span>
@@ -173,12 +183,24 @@ export default function SubscribePage() {
           EMOS Platform · syedirfanajmal.com
         </p>
 
-        {/* Already have an account? */}
-        <p style={{ textAlign: "center" as const, marginTop: 8 }}>
-          <a href="/emos-platform/signin" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(26,20,16,.4)", textDecoration: "none" }}>
-            Already have an account? Sign in →
-          </a>
-        </p>
+        {/* Account affordance: sign-in for new visitors, sign-out context for a signed-in (returning) user */}
+        {isSignedIn ? (
+          <p style={{ textAlign: "center" as const, marginTop: 8, fontFamily: SERIF, fontSize: 13, color: INK55 }}>
+            Signed in as {signedInEmail || "your account"}.{" "}
+            <SignOutButton>
+              <button style={{ background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK, textDecoration: "underline" }}>
+                Not you? Sign out
+              </button>
+            </SignOutButton>
+          </p>
+        ) : (
+          <p style={{ textAlign: "center" as const, marginTop: 8, fontFamily: SERIF, fontSize: 13 }}>
+            <span style={{ color: INK55 }}>Already have an account? </span>
+            <a href="/emos-platform/signin" style={{ fontFamily: SERIF, fontStyle: "italic", color: INK, textDecoration: "underline" }}>
+              Sign in &rarr;
+            </a>
+          </p>
+        )}
 
       </div>
     </div>
