@@ -361,7 +361,7 @@ const CF_CSS = `
 .cf-stage{position:relative;width:100%;aspect-ratio:820/640;margin:0 auto;}
 .cf-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
 .cf-shadow{fill:rgba(26,20,16,.12);}
-.cf-ring{fill:none;stroke:var(--cf-yel);stroke-width:2;opacity:.45;stroke-dasharray:1;stroke-dashoffset:1;}
+.cf-ring{fill:none;stroke:var(--cf-ink);stroke-width:2;opacity:.45;stroke-dasharray:1;stroke-dashoffset:1;}
 .cf-wheelw.cf-inview .cf-ring{animation:cfRingIn 1.1s cubic-bezier(.65,0,.35,1) .1s both;}
 .cf-rotor{opacity:0;transform:rotate(-9deg) scale(.93);transform-box:view-box;transform-origin:410px 310px;}
 .cf-wheelw.cf-inview .cf-rotor{animation:cfRotorIn .9s cubic-bezier(.16,1,.3,1) both;}
