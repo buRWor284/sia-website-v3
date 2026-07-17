@@ -65,6 +65,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { route: "resources/storytelling",          changeFrequency: "yearly"  as const, priority: 0.7 },
     { route: "resources/neuromarketing",        changeFrequency: "yearly"  as const, priority: 0.7 },
     { route: "resources/writing-tips",          changeFrequency: "yearly"  as const, priority: 0.7 },
+    { route: "resources/authority-flywheel",    changeFrequency: "yearly"  as const, priority: 0.7 },
     // Infographics
     { route: "infographics",                    changeFrequency: "monthly" as const, priority: 0.6 },
     { route: "infographics/writing-benefits",   changeFrequency: "yearly"  as const, priority: 0.6 },

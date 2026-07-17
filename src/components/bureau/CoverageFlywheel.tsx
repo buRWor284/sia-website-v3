@@ -98,11 +98,17 @@ type Align = "left" | "right" | "center";
 interface CoverageFlywheelProps {
   ctaHref?: string;
   ctaLabel?: string;
+  hubEyebrow?: string;
+  hubTitle?: string;
+  hubSub?: string;
 }
 
 export default function CoverageFlywheel({
   ctaHref = "#how-it-works-detail",
   ctaLabel = "See how EMOS builds all six →",
+  hubEyebrow = "EMOS",
+  hubTitle = "Coverage Flywheel",
+  hubSub = "Six compounding benefits",
 }: CoverageFlywheelProps) {
   const wheelwRef = useRef<HTMLDivElement | null>(null);
   const rotorRef = useRef<SVGGElement | null>(null);
@@ -299,9 +305,9 @@ export default function CoverageFlywheel({
           <div className="cf-hub" ref={hubRef}>
             <div className="cf-hub-pulse" />
             <div className="cf-hub-default">
-              <div className="cf-hub-eyebrow">EMOS</div>
-              <div className="cf-hub-title">Coverage Flywheel</div>
-              <div className="cf-hub-sub">Six compounding benefits</div>
+              <div className="cf-hub-eyebrow">{hubEyebrow}</div>
+              <div className="cf-hub-title">{hubTitle}</div>
+              <div className="cf-hub-sub">{hubSub}</div>
             </div>
             <div className="cf-hub-detail" aria-hidden="true">
               <div className="cf-hub-det-num" ref={hubDetNumRef} />

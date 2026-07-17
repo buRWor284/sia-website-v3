@@ -424,6 +424,20 @@ const CONTENT: ContentItem[] = [
 
   // ── INFOGRAPHICS ─────────────────────────────────────────────────────────
   {
+    id: "ig-authority-flywheel",
+    type: "infographic",
+    badge: "Interactive Infographic",
+    topics: ["pr", "strategy", "personal-branding"],
+    title: "The Authority Flywheel",
+    blurb:
+      "Six compounding returns of earned media in one interactive model: reputation, visibility, conversions, brand equity, magnetism, and liberty, and why each turn of the wheel makes the next one easier.",
+    href: "/resources/authority-flywheel",
+    y: "2026",
+    newsHeadline: "The Compounding Machine",
+    newsDeck: "Why earned media keeps paying long after the story runs",
+    hook: "Press begets press. Here is the mechanism",
+  },
+  {
     id: "ve-hubstaff",
     type: "infographic",
     badge: "Infographic",
