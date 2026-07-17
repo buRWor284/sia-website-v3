@@ -275,7 +275,7 @@ export default function CoverageFlywheel({
       <div className="cf-wheelw" ref={wheelwRef}>
         <div className="cf-stage">
           <svg className="cf-svg" viewBox="0 0 820 640" aria-hidden="true" focusable="false">
-            <circle className="cf-shadow" cx={CX} cy={CY + 8} r={R + 6} />
+            <circle className="cf-shadow" cx={CX} cy={CY + 10} r={R - 6} />
             <circle className="cf-ring" cx={CX} cy={CY} r={R + 10} pathLength={1} />
             <g className="cf-rotor" ref={rotorRef}>
               {geom.map((g) => (
