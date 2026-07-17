@@ -47,14 +47,14 @@ function sectorPath(a0: number, a1: number): string {
   return `M${o0[0]},${o0[1]} A${R},${R} 0 0 1 ${o1[0]},${o1[1]} L${i1[0]},${i1[1]} A${RI},${RI} 0 0 0 ${i0[0]},${i0[1]} Z`;
 }
 
-// [segFill, iconInk, badgeFill] — 3-colour alternating pairs
+// [segFill, iconInk, badgeFill] — icon colour must CONTRAST with badge fill
 const PALETTE: ReadonlyArray<[string, string, string]> = [
-  ["#1a1410", "#f5b81f", "#f5b81f"], // 01 Reputation   INK + YEL
-  ["#f5b81f", "#1a1410", "#1a1410"], // 02 Visibility   YEL + INK
-  ["#f1ebde", "#1a1410", "#1a1410"], // 03 Conversions  PAPER + INK
-  ["#1a1410", "#f5b81f", "#f5b81f"], // 04 Brand Equity INK + YEL
-  ["#f5b81f", "#1a1410", "#1a1410"], // 05 Magnetism    YEL + INK
-  ["#f1ebde", "#1a1410", "#1a1410"], // 06 Liberty      PAPER + INK
+  ["#1a1410", "#1a1410", "#f5b81f"], // 01 Reputation   INK seg, YEL badge, ink icon
+  ["#f5b81f", "#f5b81f", "#1a1410"], // 02 Visibility   YEL seg, INK badge, yel icon
+  ["#f1ebde", "#f5b81f", "#1a1410"], // 03 Conversions  PAPER seg, INK badge, yel icon
+  ["#1a1410", "#1a1410", "#f5b81f"], // 04 Brand Equity INK seg, YEL badge, ink icon
+  ["#f5b81f", "#f5b81f", "#1a1410"], // 05 Magnetism    YEL seg, INK badge, yel icon
+  ["#f1ebde", "#f5b81f", "#1a1410"], // 06 Liberty      PAPER seg, INK badge, yel icon
 ];
 
 const SEGS: ReadonlyArray<Seg> = [
@@ -129,7 +129,7 @@ export default function CoverageFlywheel({
     const pal = PALETTE[i];
     const ltx: string = cos > 0.2 ? "0%" : cos < -0.2 ? "-100%" : "-50%";
     const lalign: Align = cos > 0.2 ? "left" : cos < -0.2 ? "right" : "center";
-    return { i, s, path: sectorPath(a0, a1), fill: pal[0], ink: pal[1], badge: pal[2], ix: ic[0], iy: ic[1], lx: lc[0], ly: lc[1], ltx, lalign };
+    return { i, s, path: sectorPath(a0, a1), fill: pal[0], ink: pal[1], badge: pal[2], outline: pal[0] === "#f1ebde", ix: ic[0], iy: ic[1], lx: lc[0], ly: lc[1], ltx, lalign };
   });
 
   function applyState() {
@@ -284,7 +284,7 @@ export default function CoverageFlywheel({
                   onMouseLeave={onLeave}
                   onClick={() => onToggle(g.i)}
                 >
-                  <path className="cf-seg-fill" d={g.path} fill={g.fill} />
+                  <path className={g.outline ? "cf-seg-fill cf-seg-fill--outline" : "cf-seg-fill"} d={g.path} fill={g.fill} />
                   <g className="cf-seg-mark">
                     <circle className="cf-badge" cx={g.ix} cy={g.iy} r={R_BADGE} fill={g.badge} />
                     <g transform={`translate(${g.ix - 19},${g.iy - 19})`} style={{ color: g.ink }}>
@@ -361,17 +361,18 @@ const CF_CSS = `
 .cf-stage{position:relative;width:100%;aspect-ratio:820/640;margin:0 auto;}
 .cf-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
 .cf-shadow{fill:rgba(26,20,16,.12);}
-.cf-ring{fill:none;stroke:var(--cf-ink);stroke-width:2;opacity:.45;stroke-dasharray:1;stroke-dashoffset:1;}
+.cf-ring{fill:none;stroke:var(--cf-yel);stroke-width:2;opacity:.45;stroke-dasharray:1;stroke-dashoffset:1;}
 .cf-wheelw.cf-inview .cf-ring{animation:cfRingIn 1.1s cubic-bezier(.65,0,.35,1) .1s both;}
-.cf-rotor{opacity:0;transform:rotate(-9deg) scale(.93);transform-box:view-box;transform-origin:410px 310px;}
+.cf-rotor{opacity:0;transform:rotate(-9deg) scale(.93);transform-box:view-box;transform-origin:410px 310px;will-change:transform;}
 .cf-wheelw.cf-inview .cf-rotor{animation:cfRotorIn .9s cubic-bezier(.16,1,.3,1) both;}
 .cf-seg{transform-box:view-box;transform-origin:410px 310px;cursor:pointer;}
 .cf-seg-fill{stroke:var(--cf-paper);stroke-width:4;stroke-linejoin:round;opacity:0;transition:filter .25s ease;}
+.cf-seg-fill--outline{stroke:rgba(26,20,16,.55);stroke-width:1.5;}
 .cf-wheelw.cf-inview .cf-seg-fill{animation:cfFadeIn .55s ease both;animation-delay:calc(var(--i) * .09s + .2s);}
 .cf-seg.cf-hover .cf-seg-fill{filter:brightness(1.07);}
 .cf-seg-mark{transform-box:fill-box;transform-origin:center;opacity:0;transform:scale(0);}
 .cf-wheelw.cf-inview .cf-seg-mark{animation:cfPopIn .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .09s + .5s);}
-.cf-badge{stroke:rgba(26,20,16,.12);stroke-width:1;filter:drop-shadow(0 3px 8px rgba(26,20,16,.2));}
+.cf-badge{stroke:rgba(26,20,16,.12);stroke-width:1;}
 .cf-label{position:absolute;font-family:var(--font-grot),"Archivo",sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--cf-ink);white-space:nowrap;line-height:1.18;opacity:0;transition:color .2s ease;cursor:pointer;background:none;border:0;padding:0;margin:0;}
 .cf-wheelw.cf-inview .cf-label{animation:cfFadeIn .5s ease both;animation-delay:calc(var(--i) * .09s + .45s);}
 .cf-label.cf-hover{color:var(--cf-blue);}
