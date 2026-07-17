@@ -3,9 +3,10 @@
 /**
  * EmosUserButton: floating Clerk account button for all EMOS platform pages.
  * Near-black chip with the signed-in user's name/email beside the avatar and a
- * dropdown caret, so it clearly reads as a clickable account menu (Manage
- * account / Sign out). Renders nothing when signed out.
- * "Manage account" -> /emos-platform/dashboard/settings.
+ * dropdown caret, so it clearly reads as a clickable account menu. "Manage
+ * account" opens in-place (modal), so ANY signed-in user (including a lapsed
+ * subscriber who no longer has dashboard access) can still manage their
+ * profile / password / sign out. Renders nothing when signed out.
  */
 
 import { UserButton } from "@clerk/nextjs";
@@ -28,8 +29,6 @@ export function EmosUserButton() {
     >
       <UserButton
         showName
-        userProfileMode="navigation"
-        userProfileUrl="/emos-platform/dashboard/settings"
         appearance={{
           elements: {
             userButtonBox: { backgroundColor: "transparent" },
