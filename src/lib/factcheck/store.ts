@@ -2,7 +2,7 @@
 // FactcheckIQ | Supabase reads/writes, mirrors src/lib/supabase.ts + src/lib/pitch conventions
 
 import { createSupabaseServiceClient } from "../supabase";
-import type { Claim, FactCheckRun, RunInput } from "./types";
+import type { Claim, ClaimType, FactCheckRun, Risk, RunInput } from "./types";
 
 /** Always fetch org_id from `organizations` before insert, per repo convention. */
 export async function getOrgId(clerkOrgSlugOrId: string): Promise<string> {
@@ -98,10 +98,78 @@ export async function failStaleRuns(orgId: string, staleAfterMs: number): Promis
   return data?.length ?? 0;
 }
 
-export async function insertClaims(runId: string, orgId: string, claims: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">[]): Promise<void> {
+/**
+ * Phase 4.5: insert every extracted claim immediately with status 'pending', so
+ * the dashboard shows the full claim list (and its count-based time estimate)
+ * while verification is still running. Returns the new row ids IN INPUT ORDER;
+ * run.ts uses them to update each row in place as its verdict lands. idx is the
+ * stable display order (batch inserts share one created_at, which made
+ * created_at ordering unstable).
+ */
+export async function insertPendingClaims(
+  runId: string,
+  orgId: string,
+  claims: { claimText: string; claimType: ClaimType; section: string | null; risk: Risk }[],
+): Promise<string[]> {
+  if (claims.length === 0) return [];
+  const supabase = createSupabaseServiceClient();
+  const rows = claims.map((c, i) => ({
+    run_id: runId,
+    org_id: orgId,
+    claim_text: c.claimText,
+    claim_type: c.claimType,
+    section: c.section,
+    risk: c.risk,
+    status: "pending",
+    verdict: null,
+    sources: null,
+    source_url: null,
+    source_tier: null,
+    evidence: null,
+    note: null,
+    idx: i,
+  }));
+  const { data, error } = await supabase.from("fact_check_claims").insert(rows).select("id, idx");
+  if (error || !data) throw new Error(`Failed to insert pending fact_check_claims for run ${runId}: ${error?.message}`);
+  // Re-order by idx defensively: PostgREST does not guarantee returned row order.
+  const byIdx = [...data].sort((a, b) => (a.idx as number) - (b.idx as number));
+  return byIdx.map((r) => r.id as string);
+}
+
+/** Phase 4.5: resolve one pending claim row in place as its check completes. */
+export async function updateClaimRow(
+  claimId: string,
+  patch: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">,
+): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+  const { error } = await supabase
+    .from("fact_check_claims")
+    .update({
+      status: patch.status,
+      verdict: patch.verdict,
+      sources: patch.sources,
+      source_url: patch.sourceUrl,
+      source_tier: patch.sourceTier,
+      evidence: patch.evidence,
+      note: patch.note,
+    })
+    .eq("id", claimId);
+  if (error) throw new Error(`Failed to update fact_check_claims ${claimId}: ${error.message}`);
+}
+
+/**
+ * Insert claims that were never pending (today: the over-cap skipped
+ * placeholder). startIdx continues the display order after the pending batch.
+ */
+export async function insertClaims(
+  runId: string,
+  orgId: string,
+  claims: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">[],
+  startIdx = 0,
+): Promise<void> {
   if (claims.length === 0) return;
   const supabase = createSupabaseServiceClient();
-  const rows = claims.map((c) => ({
+  const rows = claims.map((c, i) => ({
     run_id: runId,
     org_id: orgId,
     claim_text: c.claimText,
@@ -115,6 +183,7 @@ export async function insertClaims(runId: string, orgId: string, claims: Omit<Cl
     source_tier: c.sourceTier,
     evidence: c.evidence,
     note: c.note,
+    idx: startIdx + i,
   }));
   const { error } = await supabase.from("fact_check_claims").insert(rows);
   if (error) throw new Error(`Failed to insert fact_check_claims for run ${runId}: ${error.message}`);
@@ -124,7 +193,12 @@ export async function getRunWithClaims(runId: string, orgId: string): Promise<{ 
   const supabase = createSupabaseServiceClient();
   const { data: run, error: runErr } = await supabase.from("fact_check_runs").select("*").eq("id", runId).eq("org_id", orgId).single();
   if (runErr || !run) return null;
-  const { data: claims } = await supabase.from("fact_check_claims").select("*").eq("run_id", runId).order("created_at", { ascending: true });
+  const { data: claims } = await supabase
+    .from("fact_check_claims")
+    .select("*")
+    .eq("run_id", runId)
+    .order("idx", { ascending: true, nullsFirst: false })
+    .order("created_at", { ascending: true });
   return { run, claims: claims ?? [] };
 }
 

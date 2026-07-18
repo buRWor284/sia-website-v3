@@ -5,6 +5,13 @@
 // deterministic gate only. Full audit (Phase 3) runs that gate as stage one, then
 // sends every not-yet-fabricated claim through verify.ts for paid per-claim web
 // verification, parallel and concurrency-capped, before the shared clamp + report.
+//
+// Phase 4.5 (18 Jul 2026): claims are inserted as 'pending' rows right after
+// extraction and resolved in place as each check lands, so the dashboard shows
+// the live claim list (and a count-based time estimate) during the run. Full
+// audits verify highest-risk claims first, and the per-org monthly CLAIM
+// allowance (quota.ts) can partially limit a large document: unverified
+// remainder is stored as 'skipped' with an explanatory note, never dropped.
 
 import { extractClaims, buildSkippedClaimPlaceholder } from "./extract";
 import { normalizeInput } from "./intake";
@@ -13,8 +20,9 @@ import { checkLinks, extractDoi } from "./links";
 import { clampVerdict, findNumericContradictions } from "./grade";
 import { verifyClaims } from "./verify";
 import { buildReportMarkdown, countVerdicts, computeReadiness } from "./report";
-import { createRun, insertClaims, updateRunStatus } from "./store";
+import { createRun, insertClaims, insertPendingClaims, updateClaimRow, updateRunStatus } from "./store";
 import { PROCESS_ROUTE_MAX_DURATION_SECONDS, VERIFY_DEADLINE_SAFETY_MS } from "./config";
+import { getClaimQuotaUsage } from "./quota";
 import type { Claim, ClaimType, FactCheckMode, InputType, Risk, RunFlags, Verdict } from "./types";
 
 export interface RunParams {
@@ -26,6 +34,9 @@ export interface RunParams {
   text?: string;
   url?: string;
 }
+
+/** Verification priority: the claims the argument leans on get checked first. */
+const RISK_PRIORITY: Record<Risk, number> = { high: 0, medium: 1, low: 2 };
 
 export async function startRun(params: RunParams): Promise<string> {
   const runId = await createRun({
@@ -63,6 +74,12 @@ export async function processRun(runId: string, params: RunParams): Promise<void
     await updateRunStatus(runId, { progress: { phase: "extract", claimsDone: 0, claimsTotal: 0 } });
     const extraction = await extractClaims(intake.text, runDate);
 
+    // Phase 4.5: store every extracted claim NOW as a pending row. The dashboard
+    // polls the same claims the report will use, so the user sees exactly what
+    // will be checked (and how many claims there are) within seconds of
+    // submitting, not only at the end. Ids come back in input order.
+    const claimIds = await insertPendingClaims(runId, params.orgId, extraction.claims);
+
     await updateRunStatus(runId, {
       progress: { phase: "citation_gate", claimsDone: 0, claimsTotal: extraction.claims.length },
     });
@@ -75,10 +92,23 @@ export async function processRun(runId: string, params: RunParams): Promise<void
     // gate. In full mode it also cheaply kills fabricated citations before any paid
     // web search runs (plan §9: "free citation gate first").
     type ExtractedClaim = (typeof extraction.claims)[number];
-    const gated: { extracted: ExtractedClaim; graded: Omit<Claim, "id" | "runId" | "orgId" | "createdAt"> }[] = [];
+    type GatedClaim = {
+      extracted: ExtractedClaim;
+      graded: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">;
+      claimId: string;
+    };
+    const gated: GatedClaim[] = [];
     for (const [i, claim] of extraction.claims.entries()) {
       const graded = await runCitationGate(claim.claimText, claim.claimType, claim.section, claim.risk, params.mode);
-      gated.push({ extracted: claim, graded });
+      gated.push({ extracted: claim, graded, claimId: claimIds[i] });
+      // Resolve the pending row live when this gate result is final: always in
+      // citation mode, and for deterministically fabricated claims in full mode.
+      // Full-mode claims heading to web verification stay 'pending' until their
+      // verdict lands. Live row updates are best-effort: a failed update must
+      // not kill the run (the final report still carries the result).
+      if (params.mode === "citation" || graded.verdict === "fabricated") {
+        await updateClaimRow(claimIds[i], graded).catch(() => {});
+      }
       await updateRunStatus(runId, {
         progress: { phase: "citation_gate", claimsDone: i + 1, claimsTotal: extraction.claims.length },
       });
@@ -96,12 +126,42 @@ export async function processRun(runId: string, params: RunParams): Promise<void
       const toVerify = gated.filter((g) => g.graded.verdict !== "fabricated");
       for (const g of preFabricated) gradedClaims.push(g.graded);
 
+      // Highest risk first: when the wall-clock deadline or the claim allowance
+      // cuts a run short, the load-bearing claims are the ones already done.
+      toVerify.sort((a, b) => RISK_PRIORITY[a.extracted.risk] - RISK_PRIORITY[b.extracted.risk]);
+
+      // Phase 4.5 claim allowance: if this document holds more claims than the
+      // org's monthly pool has left, verify up to the remainder and store the
+      // rest as 'skipped' with the reason. The start route already blocked runs
+      // with a fully exhausted pool, so allowed is normally everything.
+      const usage = await getClaimQuotaUsage(params.orgId);
+      const allowed = toVerify.slice(0, usage.remaining);
+      const quotaSkipped = toVerify.slice(usage.remaining);
+      if (quotaSkipped.length > 0) {
+        flags.quotaLimited = quotaSkipped.length;
+        const resetDate = usage.periodResetsOn.slice(0, 10);
+        for (const g of quotaSkipped) {
+          const skippedClaim: Omit<Claim, "id" | "runId" | "orgId" | "createdAt"> = {
+            ...g.graded,
+            status: "skipped",
+            verdict: null,
+            sources: null,
+            sourceUrl: null,
+            sourceTier: null,
+            evidence: null,
+            note: `Not checked: the monthly claim allowance ran out before this claim. Allowance resets on ${resetDate}.`,
+          };
+          gradedClaims.push(skippedClaim);
+          await updateClaimRow(g.claimId, skippedClaim).catch(() => {});
+        }
+      }
+
       await updateRunStatus(runId, {
-        progress: { phase: "verify", claimsDone: 0, claimsTotal: toVerify.length },
+        progress: { phase: "verify", claimsDone: 0, claimsTotal: allowed.length },
       });
 
       const verified = await verifyClaims(
-        toVerify.map((g) => ({
+        allowed.map((g) => ({
           claimText: g.extracted.claimText,
           claimType: g.extracted.claimType,
           section: g.extracted.section,
@@ -111,8 +171,13 @@ export async function processRun(runId: string, params: RunParams): Promise<void
         { documentText: intake.text, runDate, deadlineMs },
         (done) => {
           void updateRunStatus(runId, {
-            progress: { phase: "verify", claimsDone: done, claimsTotal: toVerify.length },
+            progress: { phase: "verify", claimsDone: done, claimsTotal: allowed.length },
           }).catch(() => {});
+        },
+        // Live per-claim resolution: the pending row flips to its verdict the
+        // moment this claim finishes, while its siblings are still verifying.
+        (index, result) => {
+          void updateClaimRow(allowed[index].claimId, result.claim).catch(() => {});
         },
       );
 
@@ -147,7 +212,9 @@ export async function processRun(runId: string, params: RunParams): Promise<void
       flags.consistencyFindings = consistency;
     }
 
-    await insertClaims(runId, params.orgId, allClaims);
+    // Pending rows were already inserted and resolved in place; only the over-cap
+    // placeholder (never pending) still needs a row, continuing the idx order.
+    await insertClaims(runId, params.orgId, skipped, extraction.claims.length);
 
     const counts = countVerdicts(
       allClaims.map((c, i) => ({ ...c, id: `tmp-${i}`, runId, orgId: params.orgId, createdAt: runDate.toISOString() })),

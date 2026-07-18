@@ -1,54 +1,63 @@
 // src/lib/factcheck/quota.ts
-// FactcheckIQ | Phase 4 : per-organization monthly cap on Full audits.
+// FactcheckIQ | Phase 4.5: per-organization monthly CLAIM allowance.
 //
-// WHY THIS EXISTS
-// Every Full audit spends from the shared ANTHROPIC_API_KEY (one key across all
-// EMOS AI tools). A 40-claim Full audit tops out near $5; Citation checks are
-// near free. Before opening FactcheckIQ to real users we cap how many Full
-// audits one paying organization can run per calendar month, so a single org
-// cannot drain the shared balance.
+// WHY CLAIMS, NOT AUDITS (design change 18 Jul 2026, replaces the Phase 4
+// "10 Full audits per month" cap)
+// A "document" is a broken metering unit: one doc can be a paragraph with 2
+// claims and another 500 pages with thousands, yet both counted as "1 audit".
+// The true cost unit is the VERIFIED CLAIM: every claim a full audit verifies is
+// exactly one FACTCHECK_GRADE_MODEL call plus up to MAX_SEARCHES_PER_CLAIM web
+// searches and MAX_FETCHES_PER_CLAIM fetches, so cost per claim is nearly
+// constant (~4 to 8 cents). The allowance is therefore a monthly pool of
+// verified claims per org. Citation & link checks stay uncapped: they cost
+// close to nothing and keep the 20-starts/hour abuse brake.
 //
-// WHY IT COUNTS fact_check_runs ROWS (not a new table, not QUOTA_LIMITS)
-// The EMOS platform is deliberately unmetered (see src/lib/gate/quota-limits.ts,
-// "single-plan platform-tier decision"), so there is no per-org product-quota
-// mechanism to reuse. Rather than stand up a parallel metering table, we count
-// the runs already logged in fact_check_runs (each stamped with org_id, mode,
-// created_at). That row set is the single source of truth for "how many Full
-// audits did this org run this month", and it stays correct even if this file
-// is bypassed. A small race (two Full audits starting in the same instant can
-// both pass the check) is acceptable: the overspend is at most one audit and
-// the hourly abuse brake in requireEmosAccess() still applies.
+// HOW IT IS COUNTED
+// We count fact_check_claims rows with status 'checked' belonging to full-mode
+// runs created in the current UTC month. That row set already exists (claims are
+// stored per run), so no new metering table. Notes on precision, all accepted:
+// - Claims resolved by the free citation gate inside a full audit (deterministic
+//   fabricated) count although they cost no model call: slight overcount, keeps
+//   the query simple.
+// - 'check_failed' claims (rate limit, timeout, deadline) do NOT count: the user
+//   got no answer, so they keep their allowance for the retry.
+// - Two runs starting in the same instant can both pass the gate: overspend is
+//   bounded by one document and the hourly brake still applies.
 //
-// THE NUMBER IS A BUSINESS DECISION (labeled default below). Change the one
-// constant once confirmed; nothing else needs to move.
+// ENFORCEMENT LIVES IN TWO PLACES
+// 1. start route: blocks a new full audit only when the pool is exhausted.
+// 2. run.ts: after extraction, if the document holds more claims than the pool
+//    has left, the highest-risk claims are verified up to the remaining
+//    allowance and the rest are stored as 'skipped' with an explanatory note
+//    (never silently dropped), flagged via flags.quotaLimited.
+//
+// THE NUMBER IS A BUSINESS DECISION. Default 200/month; override without a
+// deploy via the FACTCHECK_MONTHLY_CLAIM_ALLOWANCE env var.
 
 import { createSupabaseServiceClient } from "../supabase";
 import type { FactCheckMode } from "./types";
 
-/**
- * DEFAULT (confirm before public launch): 10 Full audits per organization per
- * UTC calendar month. Rough cost ceiling: 10 x ~$5 = ~$50 of Anthropic spend in
- * a heavy month, usually far less (most audits are well under 40 claims and
- * Citation checks do not count).
- */
-export const FULL_AUDIT_MONTHLY_CAP = 10;
+/** Default monthly pool of verified claims per organization (UTC calendar month). */
+const DEFAULT_MONTHLY_CLAIM_ALLOWANCE = 200;
 
-/**
- * Citation & link check is near free, so it carries NO monthly cap here: only
- * the existing 20-starts/hour abuse brake in requireEmosAccess() applies. Set a
- * number here if a citation cap is ever wanted.
- */
-export const CITATION_MONTHLY_CAP: number | null = null;
+/** Resolved allowance: env override first, labeled default otherwise. */
+export function monthlyClaimAllowance(): number {
+  const raw = process.env.FACTCHECK_MONTHLY_CLAIM_ALLOWANCE;
+  const n = raw ? parseInt(raw, 10) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : DEFAULT_MONTHLY_CLAIM_ALLOWANCE;
+}
 
-export interface FullAuditUsage {
+export interface ClaimQuotaUsage {
+  /** Monthly claim allowance for this org. */
   cap: number;
+  /** Verified claims consumed so far this month. */
   used: number;
   remaining: number;
   /** First instant of the current cap window (UTC ISO). */
   periodStart: string;
   /** When the count resets: first instant of next month (UTC ISO). */
   periodResetsOn: string;
-  /** True when the org is at or over the cap and further Full audits must block. */
+  /** True when the pool is exhausted and new full audits must block. */
   blocked: boolean;
 }
 
@@ -60,58 +69,60 @@ function currentMonthWindow(now: Date): { start: Date; nextReset: Date } {
 }
 
 /**
- * How many Full audits this org has run in the current calendar month, and how
- * many remain. Counts every full-mode run created in the window regardless of
- * final status: an audit that errored partway may still have spent search
- * budget, so it consumes quota (drain-safe). Fails OPEN (does not block) if the
- * count query itself errors, since the hourly abuse brake still applies.
+ * How many verified claims this org has consumed in the current calendar month
+ * and how many remain. Fails OPEN (does not block) if the count query itself
+ * errors, since the hourly abuse brake still applies.
  */
-export async function getFullAuditUsage(orgId: string, now: Date = new Date()): Promise<FullAuditUsage> {
+export async function getClaimQuotaUsage(orgId: string, now: Date = new Date()): Promise<ClaimQuotaUsage> {
   const { start, nextReset } = currentMonthWindow(now);
+  const cap = monthlyClaimAllowance();
   const db = createSupabaseServiceClient();
   const { count, error } = await db
-    .from("fact_check_runs")
-    .select("id", { count: "exact", head: true })
+    .from("fact_check_claims")
+    .select("id, fact_check_runs!inner(mode)", { count: "exact", head: true })
     .eq("org_id", orgId)
-    .eq("mode", "full")
+    .eq("status", "checked")
+    .eq("fact_check_runs.mode", "full")
     .gte("created_at", start.toISOString());
 
   const used: number = error ? 0 : (count ?? 0);
-  const remaining = Math.max(0, FULL_AUDIT_MONTHLY_CAP - used);
+  const remaining = Math.max(0, cap - used);
   return {
-    cap: FULL_AUDIT_MONTHLY_CAP,
+    cap,
     used,
     remaining,
     periodStart: start.toISOString(),
     periodResetsOn: nextReset.toISOString(),
-    blocked: !error && used >= FULL_AUDIT_MONTHLY_CAP,
+    blocked: !error && used >= cap,
   };
 }
 
 type QuotaCheck =
-  | { ok: true; usage: FullAuditUsage | null }
-  | { ok: false; usage: FullAuditUsage; message: string };
+  | { ok: true; usage: ClaimQuotaUsage | null }
+  | { ok: false; usage: ClaimQuotaUsage; message: string };
 
 /**
  * Gate a run BEFORE it is created. Citation mode is never blocked here (returns
- * ok with usage: null). Full mode is blocked when the org is at/over its monthly
- * cap.
+ * ok with usage: null). Full mode is blocked only when the monthly claim pool is
+ * fully exhausted; a document larger than the remaining pool is allowed to start
+ * and is partially verified by run.ts (highest risk first), which is more useful
+ * than refusing outright.
  */
-export async function checkFullAuditQuota(
+export async function checkClaimQuota(
   orgId: string,
   mode: FactCheckMode,
   now: Date = new Date(),
 ): Promise<QuotaCheck> {
   if (mode !== "full") return { ok: true, usage: null };
-  const usage = await getFullAuditUsage(orgId, now);
+  const usage = await getClaimQuotaUsage(orgId, now);
   if (usage.blocked) {
     const resetDate = usage.periodResetsOn.slice(0, 10);
     return {
       ok: false,
       usage,
       message:
-        `Full-audit limit reached for this month: ${usage.used} of ${usage.cap} used. ` +
-        `Citation & link checks are still available, or your Full-audit allowance resets on ${resetDate}.`,
+        `Monthly claim allowance reached: ${usage.used} of ${usage.cap} claims used. ` +
+        `Citation & link checks are still available, or your allowance resets on ${resetDate}.`,
     };
   }
   return { ok: true, usage };

@@ -20,6 +20,13 @@
  *
  * Pass `currentTool` to highlight "You are here".
  * Pass `compact` when inside a fixed-height shell (removes top margin, reduces padding).
+ *
+ * 18 Jul 2026: FactcheckIQ is in private testing. Its card is intentionally
+ * NOT clickable (testing: true → href null, "In testing" badge, dimmed) until
+ * the tool passes testing. Flip testing back off and restore
+ * href: "/tools/factcheckiq" to relaunch it in the strip. The real gate is the
+ * FACTCHECKIQ_ALLOWED_ORG_IDS allowlist in src/lib/factcheck/access.ts; this
+ * card is just the honest signpost.
  */
 
 import Link from "next/link";
@@ -39,10 +46,12 @@ export type ToolId =
 interface PipelineCard {
   step: string;
   tool: string;
-  href: string | null;       // null = coming soon, not clickable
+  href: string | null;       // null = not clickable (coming soon or in testing)
   toolId: ToolId | "emos";
   role: string;
   comingSoon?: boolean;
+  /** In private testing: card shows an "In testing" badge and is not clickable. */
+  testing?: boolean;
   /** Platform-only tool (ships inside the paid EMOS Platform, not a free lead magnet). */
   platform?: boolean;
 }
@@ -50,7 +59,7 @@ interface PipelineCard {
 const PIPELINE: PipelineCard[] = [
   { step: "01", tool: "SignalIQ",        href: "/tools/signaliq",        toolId: "signaliq",        role: "Find the story" },
   { step: "PLATFORM", tool: "AssetIQ",       href: "/tools/assetiq",       toolId: "assetiq",       role: "Build the asset",   platform: true },
-  { step: "PLATFORM", tool: "FactcheckIQ",   href: "/tools/factcheckiq",   toolId: "factcheckiq",   role: "Verify the claims", platform: true },
+  { step: "PLATFORM", tool: "FactcheckIQ",   href: null,                   toolId: "factcheckiq",   role: "Verify the claims", platform: true, testing: true },
   { step: "02", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
   { step: "03", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
   { step: "04", tool: "CoverageIQ",      href: "/tools/coverageiq",      toolId: "coverageiq",      role: "Track the placement" },
@@ -61,6 +70,7 @@ const ORDER: (ToolId | "emos")[] = ["signaliq", "assetiq", "factcheckiq", "journ
 
 function getBadge(card: PipelineCard, currentTool: ToolId | undefined): string {
   if (card.comingSoon) return "Coming soon";
+  if (card.testing && card.toolId !== currentTool) return "In testing";
   if (card.toolId === currentTool) return "You are here";
 
   if (currentTool) {
@@ -111,7 +121,9 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
     .tpf-card:hover:not(.tpf-soon) { background: ${PAPER2}; }
     .tpf-card.active { background: ${PAPER2}; }
     .tpf-card.tpf-soon { cursor: default; opacity: 0.5; }
+    .tpf-card.tpf-soon:hover { background: ${PAPER}; }
     .tpf-card.tpf-platform { background: #faf3df; }
+    .tpf-card.tpf-platform.tpf-soon:hover { background: #faf3df; }
     .tpf-card.tpf-platform:hover:not(.tpf-soon) { background: ${PAPER2}; }
     .tpf-card.tpf-platform.active { background: ${INK}; }
     .tpf-arrow {
@@ -162,7 +174,8 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
         {PIPELINE.map((card, idx) => {
           const isActive = card.toolId === currentTool;
           const badge    = getBadge(card, currentTool);
-          const cardStyle = `tpf-card${card.platform ? " tpf-platform" : ""}${isActive ? " active" : ""}${card.comingSoon ? " tpf-soon" : ""}`;
+          const notClickable = card.comingSoon || (card.testing && !isActive);
+          const cardStyle = `tpf-card${card.platform ? " tpf-platform" : ""}${isActive ? " active" : ""}${notClickable ? " tpf-soon" : ""}`;
           const onDark = card.platform && isActive; // platform card flips to ink when active
 
           const inner = (
@@ -201,7 +214,7 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
             </>
           );
 
-          return card.href ? (
+          return card.href && !notClickable ? (
             <Link key={card.tool} href={card.href} className={cardStyle}>
               {inner}
             </Link>

@@ -1,14 +1,21 @@
 "use client";
 
 // src/components/emos-platform/FactcheckIQClient.tsx
-// FactcheckIQ | Phase 4 dashboard client.
+// FactcheckIQ | Phase 4.5 dashboard client.
 // Talks to the existing async backend: POST /api/emos-platform/factcheck/start
 // then polls GET /api/emos-platform/factcheck/status?runId=... about every 2s.
 // The status route returns RAW Supabase rows (snake_case columns; camelCase only
 // inside the jsonb blobs progress/flags/verdict_counts/sources), so the wire
 // interfaces below mirror the DB columns exactly.
 //
-// Client copy contains NO em-dashes (repo convention: use , : or |).
+// Phase 4.5 additions:
+// - Claims are stored as 'pending' rows at extraction time, so the running view
+//   shows the real claim list within seconds and flips each card to its verdict
+//   live as verification lands.
+// - Count-based time estimate: the wait is framed by how many claims were found.
+// - Claim-based quota copy (monthly claim allowance replaces the audit cap).
+//
+// Client copy contains NO em-dashes and NO en-dashes (repo convention: use , : or |).
 
 import {
   useCallback,
@@ -52,7 +59,7 @@ type Verdict =
   | "unverifiable"
   | "inaccurate"
   | "fabricated";
-type ClaimWireStatus = "checked" | "skipped" | "check_failed";
+type ClaimWireStatus = "pending" | "checked" | "skipped" | "check_failed";
 type Mode = "citation" | "full";
 type InputKind = "paste" | "markdown" | "url";
 type RunWireStatus = "queued" | "running" | "done" | "error";
@@ -100,6 +107,7 @@ interface WireFlags {
   skippedClaims?: number;
   fetchFailures?: string[];
   checkIncomplete?: number;
+  quotaLimited?: number;
   consistencyFindings?: WireConsistencyFinding[];
 }
 interface WireRun {
@@ -145,6 +153,9 @@ const START_URL = "/api/emos-platform/factcheck/start";
 const STATUS_URL = "/api/emos-platform/factcheck/status";
 const POLL_MS = 2000;
 
+/** Claims verified in parallel server-side (mirrors config.VERIFY_CONCURRENCY). */
+const VERIFY_LANES = 4;
+
 const VERDICT_ORDER: Verdict[] = [
   "verified",
   "partly_accurate",
@@ -172,6 +183,16 @@ const PHASE_LABEL: Record<string, string> = {
   done: "Finishing",
 };
 
+/** The verification stack shown while a run works. Mirrors the public teaser. */
+const METHOD_STACK = [
+  "Crossref",
+  "OpenAlex",
+  "DOAJ",
+  "Retraction Watch",
+  "Live web search",
+  "Two-source rule",
+];
+
 const MODE_COPY: Record<Mode, { title: string; does: string; doesNot: string }> = {
   citation: {
     title: "Citation and link check",
@@ -180,8 +201,8 @@ const MODE_COPY: Record<Mode, { title: string; does: string; doesNot: string }> 
   },
   full: {
     title: "Full audit",
-    does: "Verifies citations, statistics, quotes, and facts against independent live sources.",
-    doesNot: "Slower, and spends from your organization's monthly full-audit allowance.",
+    does: "Verifies citations, statistics, quotes, and facts against independent live sources, one live search per claim.",
+    doesNot: "Takes minutes, not seconds, and spends from your organization's monthly claim allowance.",
   },
 };
 
@@ -222,6 +243,16 @@ function fmtDate(iso: string): string {
   }
 }
 
+/**
+ * Count-based wait estimate for a full audit. Claims verify VERIFY_LANES at a
+ * time at roughly one minute each, plus intake and reporting overhead. Shown as
+ * a range on purpose: honest, and it frames the wait as depth, not slowness.
+ */
+function estimateMinutes(claimCount: number): { low: number; high: number } {
+  const waves = Math.max(1, Math.ceil(claimCount / VERIFY_LANES));
+  return { low: waves, high: Math.ceil(waves * 1.5) + 1 };
+}
+
 function chip(bg: string, fg: string, border?: string): CSSProperties {
   return {
     display: "inline-block",
@@ -250,16 +281,27 @@ function readinessAccent(readiness: string | null): string {
 /* presentational bits                                                         */
 /* -------------------------------------------------------------------------- */
 
-function ClaimBadge({ claim }: { claim: WireClaim }) {
+function ClaimBadge({ claim, live }: { claim: WireClaim; live?: boolean }) {
+  if (claim.status === "pending") {
+    return (
+      <span className={live ? "fciq-pulse" : undefined} style={chip("transparent", INK55, INK35)}>
+        {live ? "Checking" : "Pending"}
+      </span>
+    );
+  }
   if (claim.status === "check_failed") {
     return (
-      <span style={chip(INK15, INK70, INK35)} title="Live web search was unavailable, so this claim was not assessed. Retry to check it.">
+      <span style={chip(INK15, INK70, INK35)} title="This claim was not assessed. Retry to check it.">
         Check incomplete
       </span>
     );
   }
   if (claim.status === "skipped") {
-    return <span style={chip("transparent", INK55, INK35)}>Not checked (over cap)</span>;
+    return (
+      <span style={chip("transparent", INK55, INK35)} title={claim.note ?? "Not checked in this run."}>
+        Not checked
+      </span>
+    );
   }
   if (claim.verdict) {
     const m = VERDICT_META[claim.verdict];
@@ -512,7 +554,7 @@ export default function FactcheckIQClient() {
           color: out ? YEL2 : "rgba(241,235,222,.72)",
         }}
       >
-        {quota.remaining} / {quota.cap} full audits left
+        {quota.remaining} / {quota.cap} claims left
       </span>
     );
   };
@@ -524,8 +566,13 @@ export default function FactcheckIQClient() {
           Verify before you publish
         </div>
         <p style={{ fontFamily: SERIF, fontSize: 15, lineHeight: 1.55, color: INK70, maxWidth: 640, margin: 0 }}>
-          Paste a draft or point at a URL. FactcheckIQ traces every statistic, quote, and citation to a live source and
-          grades it, so you can catch fabricated references and unsourced numbers before they ship.
+          Paste a draft or point at a URL. FactcheckIQ splits it into individually checkable claims, traces every
+          statistic, quote, and citation to a live source, and grades each one, so you can catch fabricated references
+          and unsourced numbers before they ship.
+        </p>
+        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.5, color: INK55, maxWidth: 640, margin: "10px 0 0" }}>
+          Anyone can glance at a claim and say it looks fine. Reading the actual source takes longer. That is the
+          difference a full audit buys you: expect minutes, not seconds, and more claims means more minutes.
         </p>
       </div>
 
@@ -638,8 +685,15 @@ export default function FactcheckIQClient() {
       {mode === "full" && quota && (
         <div style={{ marginTop: 12, fontFamily: MONO, fontSize: 11, letterSpacing: ".04em", color: fullBlocked ? RED : INK55 }}>
           {fullBlocked
-            ? `Full-audit limit reached this month (${quota.used} of ${quota.cap} used). Citation and link checks are still available. Resets ${fmtDate(quota.periodResetsOn)}.`
-            : `${quota.remaining} of ${quota.cap} full audits left this month.`}
+            ? `Monthly claim allowance reached (${quota.used} of ${quota.cap} claims used). Citation and link checks are still available. Resets ${fmtDate(quota.periodResetsOn)}.`
+            : `${quota.remaining} of ${quota.cap} claims left this month. Every verified claim spends one.`}
+        </div>
+      )}
+      {mode === "full" && (
+        <div style={{ marginTop: 8, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, lineHeight: 1.5, color: INK55, maxWidth: 640 }}>
+          Rough guide: a short passage with 2 or 3 claims takes 1 to 3 minutes, a dense paragraph with 9 claims takes 3
+          to 6, a long article with 30 or more can take 10 or more. You will see the exact claim count and estimate as
+          soon as extraction finishes.
         </div>
       )}
 
@@ -678,11 +732,19 @@ export default function FactcheckIQClient() {
   const renderRunning = (r: WireRun) => {
     const p = r.progress;
     const phase = p?.phase ?? "queued";
-    const total = p?.claimsTotal ?? 0;
-    const done = p?.claimsDone ?? 0;
-    const pct = total > 0 ? Math.min(100, Math.round((done / total) * 100)) : null;
+    const totalClaims = claims.length;
+    const resolved = claims.filter((c) => c.status !== "pending").length;
+    const pct = totalClaims > 0 ? Math.min(100, Math.round((resolved / totalClaims) * 100)) : null;
+    const est = r.mode === "full" && totalClaims > 0 ? estimateMinutes(totalClaims) : null;
+
     return (
       <div style={{ padding: "24px 0" }}>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `@keyframes fciqPulse { 0%,100% { opacity: 1; } 50% { opacity: .35; } }
+.fciq-pulse { animation: fciqPulse 1.6s ease-in-out infinite; }`,
+          }}
+        />
         {sectionLabel("Checking")}
         <div style={{ fontFamily: SERIF, fontSize: 22, fontWeight: 700, marginBottom: 6 }}>
           {r.title || "Your document"}
@@ -691,27 +753,81 @@ export default function FactcheckIQClient() {
           {(r.mode === "citation" ? "Citation and link check" : "Full audit").toUpperCase()}
         </div>
 
-        <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: INK, marginBottom: 10 }}>
-          {PHASE_LABEL[phase] ?? phase}
-          {total > 0 ? ` : ${done} of ${total} claims` : ""}
-        </div>
+        {totalClaims === 0 ? (
+          <>
+            <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: INK, marginBottom: 10 }}>
+              {PHASE_LABEL[phase] ?? phase}
+            </div>
+            <div style={{ height: 10, background: PAPER2, border: `1px solid ${INK15}`, overflow: "hidden" }}>
+              <div className="fciq-pulse" style={{ height: "100%", width: "40%", background: YEL }} />
+            </div>
+            <p style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.55, color: INK70, marginTop: 16, maxWidth: 640 }}>
+              Reading your document and splitting it into individually checkable claims. One paragraph often holds far
+              more claims than it seems: every statistic, citation, quote, and factual statement gets its own line.
+            </p>
+          </>
+        ) : (
+          <>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap", marginBottom: 10 }}>
+              <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: INK }}>
+                {totalClaims} checkable claim{totalClaims === 1 ? "" : "s"} found : {resolved} of {totalClaims} resolved
+              </span>
+              {est && (
+                <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".06em", color: INK55 }}>
+                  ESTIMATED {est.low} TO {est.high} MINUTES
+                </span>
+              )}
+            </div>
 
-        <div style={{ height: 10, background: PAPER2, border: `1px solid ${INK15}`, overflow: "hidden" }}>
-          <div
-            style={{
-              height: "100%",
-              width: pct === null ? "40%" : `${pct}%`,
-              background: YEL,
-              transition: "width .4s ease",
-            }}
-          />
-        </div>
+            <div style={{ height: 10, background: PAPER2, border: `1px solid ${INK15}`, overflow: "hidden", marginBottom: 16 }}>
+              <div
+                style={{
+                  height: "100%",
+                  width: pct === null ? "40%" : `${Math.max(4, pct)}%`,
+                  background: YEL,
+                  transition: "width .4s ease",
+                }}
+              />
+            </div>
 
-        <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, marginTop: 16 }}>
-          This can take a minute or two for a full audit. You can leave this open, it updates automatically.
-        </p>
+            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.5, color: INK55, margin: "0 0 6px", maxWidth: 640 }}>
+              Fast fact checking is an oxymoron. Every claim below gets its own live search, its own sources, its own
+              receipts. High-risk claims are checked first. You can leave this open, it updates automatically.
+            </p>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", margin: "0 0 18px" }}>
+              <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
+                Checked against:
+              </span>
+              {METHOD_STACK.map((m2) => (
+                <span key={m2} style={chip("transparent", INK55, INK15)}>{m2}</span>
+              ))}
+            </div>
 
-        <button onClick={newRun} style={{ ...labelBtnStyle(false), marginTop: 12 }}>
+            <div style={{ border: `1px solid ${INK15}` }}>
+              {claims.map((c, i) => (
+                <div
+                  key={c.id || i}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 12,
+                    padding: "10px 14px",
+                    background: i % 2 === 0 ? PAPER : PAPER2,
+                    borderTop: i === 0 ? "none" : `1px solid ${INK15}`,
+                  }}
+                >
+                  <span style={{ fontFamily: MONO, fontSize: 11, color: INK35, minWidth: 20, paddingTop: 2 }}>{i + 1}</span>
+                  <span style={{ flex: 1, fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.45, color: c.status === "pending" ? INK70 : INK }}>
+                    {c.claim_text.length > 220 ? c.claim_text.slice(0, 220) + "..." : c.claim_text}
+                  </span>
+                  <ClaimBadge claim={c} live />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        <button onClick={newRun} style={{ ...labelBtnStyle(false), marginTop: 16 }}>
           Cancel
         </button>
       </div>
@@ -740,9 +856,11 @@ export default function FactcheckIQClient() {
     if (!f) return null;
     const rows: string[] = [];
     if (f.skippedClaims && f.skippedClaims > 0)
-      rows.push(`${f.skippedClaims} claim(s) beyond the 40-claim cap were not checked in this run.`);
+      rows.push(`${f.skippedClaims} claim(s) beyond the 40-claim per-run cap were not checked in this run.`);
+    if (f.quotaLimited && f.quotaLimited > 0)
+      rows.push(`${f.quotaLimited} claim(s) were not checked because your monthly claim allowance ran out mid-document. They are listed below as Not checked and can be re-run after the allowance resets.`);
     if (f.checkIncomplete && f.checkIncomplete > 0)
-      rows.push(`${f.checkIncomplete} claim(s) could not be verified because live web search was temporarily unavailable. Retry to check them.`);
+      rows.push(`${f.checkIncomplete} claim(s) could not be verified in the available time or search capacity. Re-run to check them.`);
     if (f.injectionAttempts && f.injectionAttempts.length > 0)
       rows.push(`${f.injectionAttempts.length} prompt-injection attempt(s) detected in fetched content and ignored.`);
     if (f.fetchFailures && f.fetchFailures.length > 0)

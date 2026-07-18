@@ -4,7 +4,8 @@ import { waitUntil } from "@vercel/functions";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { startRun, processRun } from "@/lib/factcheck/run";
-import { checkFullAuditQuota } from "@/lib/factcheck/quota";
+import { checkClaimQuota } from "@/lib/factcheck/quota";
+import { isFactcheckOrgAllowed } from "@/lib/factcheck/access";
 import type { FactCheckMode, InputType } from "@/lib/factcheck/types";
 
 export const runtime = "nodejs";
@@ -54,13 +55,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Organization lookup failed." }, { status: 403 });
   }
 
-  // Per-org monthly Full-audit cap (Phase 4). Citation mode is never blocked
-  // here. A Full audit that would exceed the org's monthly allowance is rejected
-  // BEFORE any run row is created or any Anthropic spend happens. See
-  // src/lib/factcheck/quota.ts for why this counts fact_check_runs directly.
-  const quota = await checkFullAuditQuota(orgId, body.mode);
+  // Private-testing gate (18 Jul 2026): while FACTCHECKIQ_ALLOWED_ORG_IDS is
+  // set, only allowlisted orgs may run checks. See src/lib/factcheck/access.ts.
+  if (!isFactcheckOrgAllowed(orgId)) {
+    return NextResponse.json({ error: "FactcheckIQ is in private testing and not yet available to your organization." }, { status: 403 });
+  }
+
+  // Per-org monthly CLAIM allowance (Phase 4.5, replaces the per-document cap).
+  // Citation mode is never blocked here. A full audit is refused only when the
+  // pool is fully exhausted; a document larger than the remaining pool starts
+  // normally and run.ts partially verifies it, highest risk first. See
+  // src/lib/factcheck/quota.ts for the counting rules.
+  const quota = await checkClaimQuota(orgId, body.mode);
   if (!quota.ok) {
-    console.info(`[factcheckiq] full-audit quota block org=${orgId} used=${quota.usage.used}/${quota.usage.cap}`);
+    console.info(`[factcheckiq] claim-quota block org=${orgId} used=${quota.usage.used}/${quota.usage.cap}`);
     return NextResponse.json({ error: quota.message, quota: quota.usage }, { status: 429 });
   }
   if (body.mode === "citation") {
@@ -88,7 +96,7 @@ export async function POST(req: NextRequest) {
     }),
   );
 
-  // quota.usage reflects the count BEFORE this run row was created; the client
+  // quota.usage reflects the count BEFORE this run consumed anything; the client
   // re-reads history (which includes fresh quota) once the run completes.
   return NextResponse.json({ runId, quota: quota.usage });
 }

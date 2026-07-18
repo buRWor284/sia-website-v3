@@ -223,8 +223,15 @@ async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<
  * returned in the same order as the input. Individual failures are contained.
  * verifyClaim gates on ctx.deadlineMs itself, so a claim that spends the whole
  * budget queued behind slow siblings is caught the moment its worker picks it up.
+ * onClaim (Phase 4.5) fires per finished claim with its input index, so run.ts
+ * can flip the matching pending DB row live while later claims are still running.
  */
-export async function verifyClaims(claims: ClaimToVerify[], ctx: VerifyContext, onProgress?: (done: number) => void): Promise<VerifiedClaim[]> {
+export async function verifyClaims(
+  claims: ClaimToVerify[],
+  ctx: VerifyContext,
+  onProgress?: (done: number) => void,
+  onClaim?: (index: number, result: VerifiedClaim) => void,
+): Promise<VerifiedClaim[]> {
   const results = new Array<VerifiedClaim>(claims.length);
   let nextIndex = 0;
   let doneCount = 0;
@@ -235,6 +242,7 @@ export async function verifyClaims(claims: ClaimToVerify[], ctx: VerifyContext, 
       if (i >= claims.length) return;
       results[i] = await verifyClaim(claims[i], ctx);
       doneCount++;
+      onClaim?.(i, results[i]);
       onProgress?.(doneCount);
     }
   }
