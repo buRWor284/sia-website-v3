@@ -61,6 +61,43 @@ export async function updateRunStatus(
   if (error) throw new Error(`Failed to update fact_check_runs ${runId}: ${error.message}`);
 }
 
+/**
+ * Stale-run sweeper (17 Jul 2026). When the worker is hard-killed at the
+ * function-duration cap, no catch block runs and the run row stays "running"
+ * forever — the client then polls forever. There is no cron in this design, so
+ * the status route calls this on every read: any of THIS org's runs still
+ * queued/running past `staleAfterMs` (config.STALE_RUN_AFTER_MS: the cap plus
+ * slack — a live run can never legitimately be that old, the platform would
+ * already have killed it) is flipped to a terminal error the UI can show.
+ * Best-effort by design: a sweep failure must never break a status read, so
+ * errors are swallowed and 0 is returned. Returns the number of runs swept.
+ * NOTE: keys off created_at — fact_check_runs has no updated_at column.
+ */
+export async function failStaleRuns(orgId: string, staleAfterMs: number): Promise<number> {
+  const supabase = createSupabaseServiceClient();
+  const cutoffIso = new Date(Date.now() - staleAfterMs).toISOString();
+  const { data, error } = await supabase
+    .from("fact_check_runs")
+    .update({
+      status: "error",
+      error:
+        "This run was stopped by the platform's time limit before it could finish and has been marked failed. Re-run it; if it happens again, try citation mode or a shorter document.",
+      completed_at: new Date().toISOString(),
+    })
+    .eq("org_id", orgId)
+    .in("status", ["queued", "running"])
+    .lt("created_at", cutoffIso)
+    .select("id");
+  if (error) {
+    console.error(`[factcheckiq] stale-run sweep failed for org ${orgId}: ${error.message}`);
+    return 0;
+  }
+  if (data && data.length > 0) {
+    console.info(`[factcheckiq] stale-run sweep: marked ${data.length} zombied run(s) as error for org ${orgId}`);
+  }
+  return data?.length ?? 0;
+}
+
 export async function insertClaims(runId: string, orgId: string, claims: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">[]): Promise<void> {
   if (claims.length === 0) return;
   const supabase = createSupabaseServiceClient();

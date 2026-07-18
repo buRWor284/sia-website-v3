@@ -14,6 +14,7 @@ import { clampVerdict, findNumericContradictions } from "./grade";
 import { verifyClaims } from "./verify";
 import { buildReportMarkdown, countVerdicts, computeReadiness } from "./report";
 import { createRun, insertClaims, updateRunStatus } from "./store";
+import { PROCESS_ROUTE_MAX_DURATION_SECONDS, VERIFY_DEADLINE_SAFETY_MS } from "./config";
 import type { Claim, ClaimType, FactCheckMode, InputType, Risk, RunFlags, Verdict } from "./types";
 
 export interface RunParams {
@@ -44,6 +45,16 @@ export async function startRun(params: RunParams): Promise<string> {
 /** The actual worker. Called from the process route via waitUntil, or directly for a retry. */
 export async function processRun(runId: string, params: RunParams): Promise<void> {
   const runDate = new Date();
+  // Wall-clock deadline for the paid verify stage (full mode). This worker lives
+  // inside the start route's single function invocation; at maxDuration Vercel
+  // hard-kills it and NO catch block runs, so without this guard a long run
+  // zombies at status "running" forever (observed live 17 Jul 2026: 9-claim full
+  // audit killed at exactly 300s mid-claim-5). processRun starts via waitUntil
+  // essentially at request start, so Date.now() here ~= the invocation clock.
+  // Claims not STARTED by the deadline come back status "check_failed" ("Check
+  // incomplete" in the UI, counted in flags.checkIncomplete) and the run still
+  // finishes with a partial report instead of dying with nothing.
+  const deadlineMs = Date.now() + PROCESS_ROUTE_MAX_DURATION_SECONDS * 1000 - VERIFY_DEADLINE_SAFETY_MS;
   try {
     await updateRunStatus(runId, { status: "running", progress: { phase: "intake", claimsDone: 0, claimsTotal: 0 } });
 
@@ -97,7 +108,7 @@ export async function processRun(runId: string, params: RunParams): Promise<void
           risk: g.extracted.risk,
           citationEvidence: g.graded.evidence ?? undefined,
         })),
-        { documentText: intake.text, runDate },
+        { documentText: intake.text, runDate, deadlineMs },
         (done) => {
           void updateRunStatus(runId, {
             progress: { phase: "verify", claimsDone: done, claimsTotal: toVerify.length },
@@ -111,7 +122,8 @@ export async function processRun(runId: string, params: RunParams): Promise<void
       for (const v of verified) {
         gradedClaims.push(v.claim);
         searchesUsed += v.searchesUsed;
-        // "check_failed" = verification tooling failed (rate limit / timeout). Counted
+        // "check_failed" = verification tooling failed (rate limit / timeout) OR the
+        // run's wall-clock budget ran out before this claim started. Counted
         // separately as "check incomplete" (retryable), NOT lumped into a verdict.
         if (v.claim.status === "check_failed") checkIncomplete++;
         else if (v.verifyFailed) fetchFailures.push(v.claim.claimText.slice(0, 140));

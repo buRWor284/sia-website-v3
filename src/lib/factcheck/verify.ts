@@ -68,6 +68,17 @@ export interface VerifyContext {
   /** The full document under audit, for lateral-reading and doc-level reference-frame context. */
   documentText: string;
   runDate: Date;
+  /**
+   * Optional wall-clock deadline (epoch ms) for STARTING claim verifications.
+   * The whole run lives inside one Vercel function invocation (the start route's
+   * maxDuration); at the cap the platform hard-kills the worker and no catch
+   * block runs, zombie-ing the run at "running" (observed live 17 Jul 2026).
+   * When set: a claim whose verification has not started by this time returns
+   * status "check_failed" with zero API calls, and the mid-flight rate-limit
+   * retry is skipped when its backoff would cross the deadline. run.ts sizes
+   * this so in-flight claims can land and the partial report still gets written.
+   */
+  deadlineMs?: number;
 }
 
 export interface VerifiedClaim {
@@ -92,16 +103,31 @@ const RATE_LIMIT_BACKOFF_MS = 15000;
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+/** Evidence line for claims never started because the run's wall-clock budget ran out. */
+const TIME_BUDGET_MESSAGE =
+  "Run time budget was exhausted before this claim could be checked; it was not assessed. Re-run to check it.";
+
 /**
  * Verify and grade a single claim. Never throws. If web verification cannot run
  * (search rate-limited, timeout, API error) the claim comes back with
  * status "check_failed" (NOT a verdict), and we retry once after a backoff in case
  * the rate limit clears. A genuine content result (any real verdict) short-circuits
- * the retry.
+ * the retry. Past ctx.deadlineMs, no API call is made at all: the claim comes
+ * back check_failed immediately (see VerifyContext.deadlineMs).
  */
 export async function verifyClaim(claim: ClaimToVerify, ctx: VerifyContext): Promise<VerifiedClaim> {
+  if (ctx.deadlineMs !== undefined && Date.now() >= ctx.deadlineMs) {
+    return checkFailed(claim, TIME_BUDGET_MESSAGE, 0);
+  }
+
   const first = await attemptVerify(claim, ctx);
   if (first.claim.status !== "check_failed") return first;
+
+  // Skip the backoff+retry when it cannot finish before the deadline: one honest
+  // check_failed beats a retry the platform kills mid-flight.
+  if (ctx.deadlineMs !== undefined && Date.now() + RATE_LIMIT_BACKOFF_MS >= ctx.deadlineMs) {
+    return first;
+  }
 
   await sleep(RATE_LIMIT_BACKOFF_MS);
   const second = await attemptVerify(claim, ctx);
@@ -195,6 +221,8 @@ async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<
 /**
  * Verify a batch of claims in parallel, capped at VERIFY_CONCURRENCY. Results are
  * returned in the same order as the input. Individual failures are contained.
+ * verifyClaim gates on ctx.deadlineMs itself, so a claim that spends the whole
+ * budget queued behind slow siblings is caught the moment its worker picks it up.
  */
 export async function verifyClaims(claims: ClaimToVerify[], ctx: VerifyContext, onProgress?: (done: number) => void): Promise<VerifiedClaim[]> {
   const results = new Array<VerifiedClaim>(claims.length);

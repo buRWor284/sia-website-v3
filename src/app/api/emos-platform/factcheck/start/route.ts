@@ -9,7 +9,12 @@ import type { FactCheckMode, InputType } from "@/lib/factcheck/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 300; // fluid-compute; full audits fit inside this
+// Next.js requires a literal here (segment config is statically analyzed), so this
+// CANNOT import config.PROCESS_ROUTE_MAX_DURATION_SECONDS — keep the two equal by
+// hand. Full audits do NOT always fit inside this (a 9-claim audit was hard-killed
+// at exactly 300s on 17 Jul 2026); run.ts's verify deadline guard derives from the
+// config constant and finishes the run with a partial report before the cap hits.
+export const maxDuration = 300;
 
 async function getOrgIdForUser(userId: string): Promise<string> {
   const db = createSupabaseServiceClient();

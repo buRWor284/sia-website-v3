@@ -2,8 +2,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
-import { getRunWithClaims, listRuns } from "@/lib/factcheck/store";
+import { failStaleRuns, getRunWithClaims, listRuns } from "@/lib/factcheck/store";
 import { getFullAuditUsage } from "@/lib/factcheck/quota";
+import { STALE_RUN_AFTER_MS } from "@/lib/factcheck/config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,6 +26,14 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     return NextResponse.json({ error: e instanceof Error ? e.message : "Organization lookup failed." }, { status: 403 });
   }
+
+  // Zombie-run sweep (17 Jul 2026): a worker hard-killed at the function-duration
+  // cap leaves its run at "running" forever (no catch runs on a platform kill),
+  // and the client would poll forever. There is no cron in this design, and the
+  // polling client calls this route every ~2s while a run is live, so sweeping
+  // here guarantees a stuck run resolves to a visible error within one poll of
+  // going stale. failStaleRuns is best-effort and never throws.
+  await failStaleRuns(orgId, STALE_RUN_AFTER_MS);
 
   const runId = req.nextUrl.searchParams.get("runId");
 

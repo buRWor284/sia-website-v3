@@ -55,11 +55,41 @@ export const SOURCE_TIERS = {
  * Vercel fluid-compute duration (Phase 0 finding, 4 Jul 2026):
  * default maxDuration across plans is now 300s; Pro/Enterprise fluid compute
  * supports up to 800s generally available (30 min extended max is beta-only).
- * A typical full audit (~1-4 min per plan §2) fits well inside the 300s default;
- * set an explicit maxDuration on the process route regardless, per Vercel docs
- * (https://vercel.com/docs/functions/configuring-functions/duration).
+ *
+ * REVISED 17 Jul 2026 after the first live full audit was hard-killed at exactly
+ * 300s ("Vercel Runtime Timeout Error: Task timed out after 300 seconds"): the
+ * Phase 0 assumption that "a typical full audit fits well inside the 300s
+ * default" is FALSE for a ~9-claim document with Opus + web search + the
+ * rate-limit retry path. The whole worker (waitUntil) lives inside the start
+ * route's single invocation, and a hard kill skips every catch block, leaving
+ * the run row at status "running" forever. Two guards now depend on this value:
+ * the verify-stage wall-clock deadline in run.ts (stops STARTING new claim
+ * verifications VERIFY_DEADLINE_SAFETY_MS before the cap so in-flight claims can
+ * land and a partial report still gets written) and the stale-run sweeper in the
+ * status route (flips zombied runs to error after STALE_RUN_AFTER_MS).
+ *
+ * NOTE: the start route's `export const maxDuration = 300` must stay a literal
+ * (Next.js statically analyzes segment config) and MUST be kept equal to this.
  */
 export const PROCESS_ROUTE_MAX_DURATION_SECONDS = 300;
+
+/**
+ * How long before the function-duration cap the full-audit verify stage stops
+ * starting new per-claim verifications. Sized to let one worst-case in-flight
+ * claim (up to 2 Opus turns with searches) finish AND leave room for the report
+ * build + final status write. Claims not started by the deadline come back as
+ * status "check_failed" ("Check incomplete" in the UI) — honest and retryable,
+ * never silently dropped.
+ */
+export const VERIFY_DEADLINE_SAFETY_MS = 90_000;
+
+/**
+ * A run still queued/running this long after creation is presumed hard-killed
+ * (the platform kill skips all catch blocks, so the row can never fix itself).
+ * The status route sweeps such rows to status "error" so clients stop polling.
+ * Cap + 2 minutes of slack for clock drift and slow final writes.
+ */
+export const STALE_RUN_AFTER_MS = (PROCESS_ROUTE_MAX_DURATION_SECONDS + 120) * 1000;
 
 export const CITATION_APIS = {
   CROSSREF: "https://api.crossref.org",
