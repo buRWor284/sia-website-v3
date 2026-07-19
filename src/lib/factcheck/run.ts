@@ -357,7 +357,7 @@ async function maybeFinalize(runId: string): Promise<void> {
   const counts = countVerdicts(claims);
   const readiness = computeReadiness(counts, run.mode as FactCheckMode);
   const reportMd = buildReportMarkdown({
-    title: (run.title as string | null) ?? undefined,
+    title: (run.title as string | null),
     mode: run.mode as FactCheckMode,
     claims,
     flags,
