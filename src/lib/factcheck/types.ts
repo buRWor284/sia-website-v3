@@ -78,6 +78,8 @@ export interface RunProgress {
   phase: string;
   claimsDone: number;
   claimsTotal: number;
+  /** Phase 5a: how many continuation invocations have picked this run up (loop guard, see MAX_CONTINUATIONS). */
+  attempts?: number;
 }
 
 /**

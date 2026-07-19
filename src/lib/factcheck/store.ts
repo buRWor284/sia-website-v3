@@ -62,40 +62,115 @@ export async function updateRunStatus(
 }
 
 /**
- * Stale-run sweeper (17 Jul 2026). When the worker is hard-killed at the
- * function-duration cap, no catch block runs and the run row stays "running"
- * forever — the client then polls forever. There is no cron in this design, so
- * the status route calls this on every read: any of THIS org's runs still
- * queued/running past `staleAfterMs` (config.STALE_RUN_AFTER_MS: the cap plus
- * slack — a live run can never legitimately be that old, the platform would
- * already have killed it) is flipped to a terminal error the UI can show.
- * Best-effort by design: a sweep failure must never break a status read, so
- * errors are swallowed and 0 is returned. Returns the number of runs swept.
- * NOTE: keys off created_at — fact_check_runs has no updated_at column.
+ * Stale-run sweeper, Phase 5a semantics (19 Jul 2026). With continuation in
+ * place, "old and still running" is NORMAL for a large document, so age alone
+ * no longer means dead. A run is failed only when it cannot possibly continue:
+ * - it died before any claims were stored (nothing for a continuation to pick
+ *   up): older than `staleAfterMs` with zero claim rows; or
+ * - it blew the absolute backstop (`absoluteMaxMs`), whatever its state.
+ * Everything else that stalls is revived by the status route's continuation
+ * trigger instead of being killed here. Best-effort by design: a sweep failure
+ * must never break a status read. Returns the number of runs swept.
  */
-export async function failStaleRuns(orgId: string, staleAfterMs: number): Promise<number> {
+export async function failStaleRuns(orgId: string, staleAfterMs: number, absoluteMaxMs: number): Promise<number> {
   const supabase = createSupabaseServiceClient();
-  const cutoffIso = new Date(Date.now() - staleAfterMs).toISOString();
+  const now = Date.now();
+  const staleCutoff = new Date(now - staleAfterMs).toISOString();
+  const absoluteCutoff = new Date(now - absoluteMaxMs).toISOString();
+
+  const { data: candidates, error: candErr } = await supabase
+    .from("fact_check_runs")
+    .select("id, created_at, fact_check_claims(count)")
+    .eq("org_id", orgId)
+    .in("status", ["queued", "running"])
+    .lt("created_at", staleCutoff);
+  if (candErr || !candidates || candidates.length === 0) {
+    if (candErr) console.error(`[factcheckiq] stale-run sweep query failed for org ${orgId}: ${candErr.message}`);
+    return 0;
+  }
+
+  const toFail = candidates
+    .filter((r: { id: string; created_at: string; fact_check_claims?: { count: number }[] }) => {
+      const claimCount = r.fact_check_claims?.[0]?.count ?? 0;
+      return claimCount === 0 || r.created_at < absoluteCutoff;
+    })
+    .map((r: { id: string }) => r.id);
+  if (toFail.length === 0) return 0;
+
   const { data, error } = await supabase
     .from("fact_check_runs")
     .update({
       status: "error",
       error:
-        "This run was stopped by the platform's time limit before it could finish and has been marked failed. Re-run it; if it happens again, try citation mode or a shorter document.",
+        "This run could not be completed and has been marked failed. Re-run it; if it happens again, try citation mode or a shorter document.",
       completed_at: new Date().toISOString(),
     })
-    .eq("org_id", orgId)
+    .in("id", toFail)
     .in("status", ["queued", "running"])
-    .lt("created_at", cutoffIso)
     .select("id");
   if (error) {
     console.error(`[factcheckiq] stale-run sweep failed for org ${orgId}: ${error.message}`);
     return 0;
   }
   if (data && data.length > 0) {
-    console.info(`[factcheckiq] stale-run sweep: marked ${data.length} zombied run(s) as error for org ${orgId}`);
+    console.info(`[factcheckiq] stale-run sweep: marked ${data.length} unrecoverable run(s) as error for org ${orgId}`);
   }
   return data?.length ?? 0;
+}
+
+/**
+ * Phase 5a: atomically take the run's work lease if it is free or expired.
+ * Exactly one caller wins; everyone else sees false and leaves the run alone.
+ * The winner must renew via renewRunLease as it makes progress.
+ */
+export async function acquireRunLease(runId: string, leaseSeconds: number): Promise<boolean> {
+  const supabase = createSupabaseServiceClient();
+  const nowIso = new Date().toISOString();
+  const untilIso = new Date(Date.now() + leaseSeconds * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("fact_check_runs")
+    .update({ lease_until: untilIso })
+    .eq("id", runId)
+    .or(`lease_until.is.null,lease_until.lt.${nowIso}`)
+    .select("id");
+  if (error) {
+    console.error(`[factcheckiq] lease acquire failed for run ${runId}: ${error.message}`);
+    return false;
+  }
+  return (data?.length ?? 0) > 0;
+}
+
+/** Phase 5a: unconditional lease refresh by the worker that already owns the run. Best-effort. */
+export async function renewRunLease(runId: string, leaseSeconds: number): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+  const untilIso = new Date(Date.now() + leaseSeconds * 1000).toISOString();
+  await supabase.from("fact_check_runs").update({ lease_until: untilIso }).eq("id", runId);
+}
+
+/** Phase 5a: store the normalized document text so continuation invocations keep full verify context. */
+export async function setRunInputText(runId: string, text: string): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+  const { error } = await supabase.from("fact_check_runs").update({ input_text: text }).eq("id", runId);
+  if (error) throw new Error(`Failed to store input_text for run ${runId}: ${error.message}`);
+}
+
+/** Phase 5a: full run row (snake_case, as stored) for continuation and finalize. */
+export async function getRunRow(runId: string): Promise<any | null> {
+  const supabase = createSupabaseServiceClient();
+  const { data } = await supabase.from("fact_check_runs").select("*").eq("id", runId).single();
+  return data ?? null;
+}
+
+/** Phase 5a: this run's still-pending claim rows (snake_case), display order. */
+export async function getPendingClaims(runId: string): Promise<any[]> {
+  const supabase = createSupabaseServiceClient();
+  const { data } = await supabase
+    .from("fact_check_claims")
+    .select("*")
+    .eq("run_id", runId)
+    .eq("status", "pending")
+    .order("idx", { ascending: true, nullsFirst: false });
+  return data ?? [];
 }
 
 /**

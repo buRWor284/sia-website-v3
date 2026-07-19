@@ -231,6 +231,12 @@ function hostOf(u: string): string {
   }
 }
 
+function fmtElapsed(ms: number): string {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const m = Math.floor(s / 60);
+  return `${m}:${String(s % 60).padStart(2, "0")}`;
+}
+
 function fmtDate(iso: string): string {
   try {
     return new Date(iso).toLocaleDateString(undefined, {
@@ -350,6 +356,14 @@ export default function FactcheckIQClient() {
 
   const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const activeRunId = useRef<string | null>(null);
+
+  // Elapsed-time ticker for the running view (1s resolution, only while running).
+  const [nowTick, setNowTick] = useState<number>(Date.now());
+  useEffect(() => {
+    if (view !== "running") return;
+    const t = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [view]);
 
   const stopPolling = useCallback(() => {
     if (pollRef.current) {
@@ -736,6 +750,7 @@ export default function FactcheckIQClient() {
     const resolved = claims.filter((c) => c.status !== "pending").length;
     const pct = totalClaims > 0 ? Math.min(100, Math.round((resolved / totalClaims) * 100)) : null;
     const est = r.mode === "full" && totalClaims > 0 ? estimateMinutes(totalClaims) : null;
+    const elapsedMs = nowTick - new Date(r.created_at).getTime();
 
     return (
       <div style={{ padding: "24px 0" }}>
@@ -755,8 +770,13 @@ export default function FactcheckIQClient() {
 
         {totalClaims === 0 ? (
           <>
-            <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: INK, marginBottom: 10 }}>
-              {PHASE_LABEL[phase] ?? phase}
+            <div style={{ display: "flex", alignItems: "baseline", gap: 14, flexWrap: "wrap", marginBottom: 10 }}>
+              <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", color: INK }}>
+                {PHASE_LABEL[phase] ?? phase}
+              </span>
+              <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".06em", color: INK55 }}>
+                ELAPSED {fmtElapsed(elapsedMs)}
+              </span>
             </div>
             <div style={{ height: 10, background: PAPER2, border: `1px solid ${INK15}`, overflow: "hidden" }}>
               <div className="fciq-pulse" style={{ height: "100%", width: "40%", background: YEL }} />
@@ -777,6 +797,9 @@ export default function FactcheckIQClient() {
                   ESTIMATED {est.low} TO {est.high} MINUTES
                 </span>
               )}
+              <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: ".06em", color: INK55 }}>
+                ELAPSED {fmtElapsed(elapsedMs)}
+              </span>
             </div>
 
             <div style={{ height: 10, background: PAPER2, border: `1px solid ${INK15}`, overflow: "hidden", marginBottom: 16 }}>
@@ -792,7 +815,8 @@ export default function FactcheckIQClient() {
 
             <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.5, color: INK55, margin: "0 0 6px", maxWidth: 640 }}>
               Fast fact checking is an oxymoron. Every claim below gets its own live search, its own sources, its own
-              receipts. High-risk claims are checked first. You can leave this open, it updates automatically.
+              receipts. High-risk claims are checked first, and long documents continue automatically in extra passes.
+              You can leave this open, it updates automatically.
             </p>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", margin: "0 0 18px" }}>
               <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>

@@ -18,6 +18,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import {
   FACTCHECK_GRADE_MODEL,
   MAX_SEARCHES_PER_CLAIM,
+  PER_CLAIM_TIMEOUT_MS,
   VERIFY_CONCURRENCY,
   WEB_SEARCH_TOOL_VERSION,
   WEB_FETCH_TOOL_VERSION,
@@ -103,23 +104,17 @@ const RATE_LIMIT_BACKOFF_MS = 15000;
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-/** Evidence line for claims never started because the run's wall-clock budget ran out. */
-const TIME_BUDGET_MESSAGE =
-  "Run time budget was exhausted before this claim could be checked; it was not assessed. Re-run to check it.";
-
 /**
  * Verify and grade a single claim. Never throws. If web verification cannot run
  * (search rate-limited, timeout, API error) the claim comes back with
  * status "check_failed" (NOT a verdict), and we retry once after a backoff in case
  * the rate limit clears. A genuine content result (any real verdict) short-circuits
- * the retry. Past ctx.deadlineMs, no API call is made at all: the claim comes
- * back check_failed immediately (see VerifyContext.deadlineMs).
+ * the retry. Each model call carries PER_CLAIM_TIMEOUT_MS, so no single claim can
+ * quietly hold a worker for minutes (observed live 19 Jul 2026). The deadline
+ * gate for NOT STARTING claims lives in verifyClaims, not here: unstarted claims
+ * must stay pending so a continuation invocation can pick them up.
  */
 export async function verifyClaim(claim: ClaimToVerify, ctx: VerifyContext): Promise<VerifiedClaim> {
-  if (ctx.deadlineMs !== undefined && Date.now() >= ctx.deadlineMs) {
-    return checkFailed(claim, TIME_BUDGET_MESSAGE, 0);
-  }
-
   const first = await attemptVerify(claim, ctx);
   if (first.claim.status !== "check_failed") return first;
 
@@ -175,7 +170,12 @@ async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<
           tool_choice: lastTurn ? { type: "tool", name: "record_verdict" } : { type: "auto" },
           messages,
         },
-        WEB_TOOLS_BETA_HEADER ? { headers: { "anthropic-beta": WEB_TOOLS_BETA_HEADER } } : undefined,
+        {
+          // Hard per-call ceiling: a hung search/fetch turn fails fast as
+          // check_failed instead of silently eating the invocation window.
+          timeout: PER_CLAIM_TIMEOUT_MS,
+          ...(WEB_TOOLS_BETA_HEADER ? { headers: { "anthropic-beta": WEB_TOOLS_BETA_HEADER } } : {}),
+        },
       );
 
       searchesUsed += countSearches(message);
@@ -220,19 +220,20 @@ async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<
 
 /**
  * Verify a batch of claims in parallel, capped at VERIFY_CONCURRENCY. Results are
- * returned in the same order as the input. Individual failures are contained.
- * verifyClaim gates on ctx.deadlineMs itself, so a claim that spends the whole
- * budget queued behind slow siblings is caught the moment its worker picks it up.
- * onClaim (Phase 4.5) fires per finished claim with its input index, so run.ts
- * can flip the matching pending DB row live while later claims are still running.
+ * returned in the same order as the input; entries are null for claims that were
+ * NEVER STARTED because ctx.deadlineMs passed first. Null claims stay 'pending'
+ * in the DB, which is exactly what lets a continuation invocation (Phase 5a)
+ * resume them on a fresh clock. Individual failures are contained. onClaim
+ * (Phase 4.5) fires per finished claim with its input index, so run.ts can flip
+ * the matching pending DB row live while later claims are still running.
  */
 export async function verifyClaims(
   claims: ClaimToVerify[],
   ctx: VerifyContext,
   onProgress?: (done: number) => void,
   onClaim?: (index: number, result: VerifiedClaim) => void,
-): Promise<VerifiedClaim[]> {
-  const results = new Array<VerifiedClaim>(claims.length);
+): Promise<(VerifiedClaim | null)[]> {
+  const results = new Array<VerifiedClaim | null>(claims.length).fill(null);
   let nextIndex = 0;
   let doneCount = 0;
 
@@ -240,9 +241,13 @@ export async function verifyClaims(
     for (;;) {
       const i = nextIndex++;
       if (i >= claims.length) return;
-      results[i] = await verifyClaim(claims[i], ctx);
+      // Deadline gate: never START a claim past the deadline; leave it null
+      // (still pending in the DB) for the next invocation.
+      if (ctx.deadlineMs !== undefined && Date.now() >= ctx.deadlineMs) return;
+      const result = await verifyClaim(claims[i], ctx);
+      results[i] = result;
       doneCount++;
-      onClaim?.(i, results[i]);
+      onClaim?.(i, result);
       onProgress?.(doneCount);
     }
   }

@@ -8,22 +8,47 @@
 //
 // Phase 4.5 (18 Jul 2026): claims are inserted as 'pending' rows right after
 // extraction and resolved in place as each check lands, so the dashboard shows
-// the live claim list (and a count-based time estimate) during the run. Full
-// audits verify highest-risk claims first, and the per-org monthly CLAIM
-// allowance (quota.ts) can partially limit a large document: unverified
-// remainder is stored as 'skipped' with an explanatory note, never dropped.
+// the live claim list (and a count-based time estimate) during the run.
+//
+// Phase 5a (19 Jul 2026): CHECKPOINT AND CONTINUE. One Vercel invocation cannot
+// exceed maxDuration (300s on the current plan), and a full audit often can.
+// So the work is resumable: all state lives in the DB (pending claim rows +
+// input_text + flags), each invocation verifies as many claims as fit before
+// its wall-clock deadline and simply stops STARTING new ones; claims never
+// started stay 'pending'. The status route (polled every ~2s by the client)
+// notices a running run whose work lease has expired, atomically takes the
+// lease, and starts a continuation worker on a fresh 300s clock via waitUntil.
+// When no pending claims remain, whichever invocation gets there finalizes the
+// report. MAX_CONTINUATIONS bounds the loop; the sweeper only kills runs that
+// cannot continue (no claims stored) or blow the absolute backstop.
 
 import { extractClaims, buildSkippedClaimPlaceholder } from "./extract";
 import { normalizeInput } from "./intake";
 import { checkCitation } from "./citations";
 import { checkLinks, extractDoi } from "./links";
 import { clampVerdict, findNumericContradictions } from "./grade";
-import { verifyClaims } from "./verify";
+import { verifyClaims, type ClaimToVerify } from "./verify";
 import { buildReportMarkdown, countVerdicts, computeReadiness } from "./report";
-import { createRun, insertClaims, insertPendingClaims, updateClaimRow, updateRunStatus } from "./store";
-import { PROCESS_ROUTE_MAX_DURATION_SECONDS, VERIFY_DEADLINE_SAFETY_MS } from "./config";
+import {
+  createRun,
+  getPendingClaims,
+  getRunRow,
+  getRunWithClaims,
+  insertClaims,
+  insertPendingClaims,
+  renewRunLease,
+  setRunInputText,
+  updateClaimRow,
+  updateRunStatus,
+} from "./store";
+import {
+  MAX_CONTINUATIONS,
+  PROCESS_ROUTE_MAX_DURATION_SECONDS,
+  RUN_LEASE_SECONDS,
+  VERIFY_DEADLINE_SAFETY_MS,
+} from "./config";
 import { getClaimQuotaUsage } from "./quota";
-import type { Claim, ClaimType, FactCheckMode, InputType, Risk, RunFlags, Verdict } from "./types";
+import type { Claim, ClaimStatus, ClaimType, FactCheckMode, InputType, Risk, RunFlags, Verdict } from "./types";
 
 export interface RunParams {
   orgId: string;
@@ -37,6 +62,17 @@ export interface RunParams {
 
 /** Verification priority: the claims the argument leans on get checked first. */
 const RISK_PRIORITY: Record<Risk, number> = { high: 0, medium: 1, low: 2 };
+
+/**
+ * Wall-clock deadline for STARTING claim verifications in this invocation.
+ * Vercel hard-kills at maxDuration and no catch runs, so we stop early enough
+ * that in-flight claims (bounded by PER_CLAIM_TIMEOUT_MS) can land and progress
+ * writes can flush. Called at invocation start (waitUntil fires essentially at
+ * request start, so Date.now() ~= the invocation clock).
+ */
+function invocationDeadline(): number {
+  return Date.now() + PROCESS_ROUTE_MAX_DURATION_SECONDS * 1000 - VERIFY_DEADLINE_SAFETY_MS;
+}
 
 export async function startRun(params: RunParams): Promise<string> {
   const runId = await createRun({
@@ -53,96 +89,76 @@ export async function startRun(params: RunParams): Promise<string> {
   return runId;
 }
 
-/** The actual worker. Called from the process route via waitUntil, or directly for a retry. */
+/** The initial worker. Called from the start route via waitUntil. */
 export async function processRun(runId: string, params: RunParams): Promise<void> {
   const runDate = new Date();
-  // Wall-clock deadline for the paid verify stage (full mode). This worker lives
-  // inside the start route's single function invocation; at maxDuration Vercel
-  // hard-kills it and NO catch block runs, so without this guard a long run
-  // zombies at status "running" forever (observed live 17 Jul 2026: 9-claim full
-  // audit killed at exactly 300s mid-claim-5). processRun starts via waitUntil
-  // essentially at request start, so Date.now() here ~= the invocation clock.
-  // Claims not STARTED by the deadline come back status "check_failed" ("Check
-  // incomplete" in the UI, counted in flags.checkIncomplete) and the run still
-  // finishes with a partial report instead of dying with nothing.
-  const deadlineMs = Date.now() + PROCESS_ROUTE_MAX_DURATION_SECONDS * 1000 - VERIFY_DEADLINE_SAFETY_MS;
+  const deadlineMs = invocationDeadline();
   try {
+    // Take the work lease immediately: the run is brand new, so nobody else can
+    // legitimately hold it, and holding it stops the status route from spawning
+    // a continuation while this worker is alive.
+    await renewRunLease(runId, RUN_LEASE_SECONDS);
     await updateRunStatus(runId, { status: "running", progress: { phase: "intake", claimsDone: 0, claimsTotal: 0 } });
 
     const intake = await normalizeInput(params.inputType, { text: params.text, url: params.url });
+    // Persist the normalized document: continuation invocations never see the
+    // original request body, and per-claim verification needs the full text for
+    // lateral reading.
+    await setRunInputText(runId, intake.text);
 
     await updateRunStatus(runId, { progress: { phase: "extract", claimsDone: 0, claimsTotal: 0 } });
     const extraction = await extractClaims(intake.text, runDate);
 
-    // Phase 4.5: store every extracted claim NOW as a pending row. The dashboard
-    // polls the same claims the report will use, so the user sees exactly what
-    // will be checked (and how many claims there are) within seconds of
-    // submitting, not only at the end. Ids come back in input order.
+    // Phase 4.5: store every extracted claim NOW as a pending row (plus the
+    // over-cap placeholder, already terminal). The dashboard polls the same
+    // rows the report will use, and continuation invocations resume from them.
     const claimIds = await insertPendingClaims(runId, params.orgId, extraction.claims);
+    const overCapPlaceholder = buildSkippedClaimPlaceholder(extraction.overCapCount);
+    await insertClaims(runId, params.orgId, overCapPlaceholder, extraction.claims.length);
+    if (extraction.overCapCount > 0) {
+      await mergeRunFlags(runId, { skippedClaims: extraction.overCapCount });
+    } else {
+      await mergeRunFlags(runId, { skippedClaims: 0 });
+    }
 
     await updateRunStatus(runId, {
       progress: { phase: "citation_gate", claimsDone: 0, claimsTotal: extraction.claims.length },
     });
 
-    const flags: RunFlags = { skippedClaims: extraction.overCapCount };
-    const gradedClaims: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">[] = [];
-    let searchesUsed = 0;
-
     // Stage one of every run (both modes): the free, deterministic citation & link
     // gate. In full mode it also cheaply kills fabricated citations before any paid
     // web search runs (plan §9: "free citation gate first").
-    type ExtractedClaim = (typeof extraction.claims)[number];
-    type GatedClaim = {
-      extracted: ExtractedClaim;
-      graded: Omit<Claim, "id" | "runId" | "orgId" | "createdAt">;
-      claimId: string;
-    };
-    const gated: GatedClaim[] = [];
     for (const [i, claim] of extraction.claims.entries()) {
       const graded = await runCitationGate(claim.claimText, claim.claimType, claim.section, claim.risk, params.mode);
-      gated.push({ extracted: claim, graded, claimId: claimIds[i] });
-      // Resolve the pending row live when this gate result is final: always in
-      // citation mode, and for deterministically fabricated claims in full mode.
-      // Full-mode claims heading to web verification stay 'pending' until their
-      // verdict lands. Live row updates are best-effort: a failed update must
-      // not kill the run (the final report still carries the result).
       if (params.mode === "citation" || graded.verdict === "fabricated") {
+        // Final result for this claim: resolve the pending row now.
         await updateClaimRow(claimIds[i], graded).catch(() => {});
+      } else {
+        // Full mode, heading to web verification: stay pending, but persist the
+        // gate's deterministic evidence on the row. Continuation invocations
+        // read it back as citationEvidence (in-memory state does not survive).
+        await updateClaimRow(claimIds[i], { ...graded, status: "pending", verdict: null, sources: null, sourceUrl: null, sourceTier: null, note: null }).catch(() => {});
       }
+      await renewRunLease(runId, RUN_LEASE_SECONDS);
       await updateRunStatus(runId, {
         progress: { phase: "citation_gate", claimsDone: i + 1, claimsTotal: extraction.claims.length },
       });
     }
 
-    if (params.mode === "citation") {
-      for (const g of gated) gradedClaims.push(g.graded);
-    } else {
-      // Full audit (Phase 3, verify.ts): every claim the gate did not already prove
-      // fabricated goes through the paid per-claim web verify+grade step, run in
-      // parallel with a concurrency cap of VERIFY_CONCURRENCY. Deterministically
-      // fabricated claims (fake DOI, wrong paper, retracted) keep their gate verdict
-      // and skip paid search.
-      const preFabricated = gated.filter((g) => g.graded.verdict === "fabricated");
-      const toVerify = gated.filter((g) => g.graded.verdict !== "fabricated");
-      for (const g of preFabricated) gradedClaims.push(g.graded);
-
-      // Highest risk first: when the wall-clock deadline or the claim allowance
-      // cuts a run short, the load-bearing claims are the ones already done.
-      toVerify.sort((a, b) => RISK_PRIORITY[a.extracted.risk] - RISK_PRIORITY[b.extracted.risk]);
-
+    if (params.mode === "full") {
       // Phase 4.5 claim allowance: if this document holds more claims than the
-      // org's monthly pool has left, verify up to the remainder and store the
-      // rest as 'skipped' with the reason. The start route already blocked runs
-      // with a fully exhausted pool, so allowed is normally everything.
+      // org's monthly pool has left, verify the highest-risk claims up to the
+      // remainder and mark the rest skipped with the reason. Done ONCE, here:
+      // continuations only ever see the already-sliced pending set.
+      const pending = await getPendingClaims(runId);
       const usage = await getClaimQuotaUsage(params.orgId);
-      const allowed = toVerify.slice(0, usage.remaining);
-      const quotaSkipped = toVerify.slice(usage.remaining);
-      if (quotaSkipped.length > 0) {
-        flags.quotaLimited = quotaSkipped.length;
+      if (pending.length > usage.remaining) {
+        const sorted = sortByRiskThenIdx(pending);
+        const overBudget = sorted.slice(usage.remaining);
         const resetDate = usage.periodResetsOn.slice(0, 10);
-        for (const g of quotaSkipped) {
-          const skippedClaim: Omit<Claim, "id" | "runId" | "orgId" | "createdAt"> = {
-            ...g.graded,
+        for (const row of overBudget) {
+          await updateClaimRow(row.id, {
+            ...rowToClaimPatch(row),
             status: "skipped",
             verdict: null,
             sources: null,
@@ -150,93 +166,15 @@ export async function processRun(runId: string, params: RunParams): Promise<void
             sourceTier: null,
             evidence: null,
             note: `Not checked: the monthly claim allowance ran out before this claim. Allowance resets on ${resetDate}.`,
-          };
-          gradedClaims.push(skippedClaim);
-          await updateClaimRow(g.claimId, skippedClaim).catch(() => {});
-        }
-      }
-
-      await updateRunStatus(runId, {
-        progress: { phase: "verify", claimsDone: 0, claimsTotal: allowed.length },
-      });
-
-      const verified = await verifyClaims(
-        allowed.map((g) => ({
-          claimText: g.extracted.claimText,
-          claimType: g.extracted.claimType,
-          section: g.extracted.section,
-          risk: g.extracted.risk,
-          citationEvidence: g.graded.evidence ?? undefined,
-        })),
-        { documentText: intake.text, runDate, deadlineMs },
-        (done) => {
-          void updateRunStatus(runId, {
-            progress: { phase: "verify", claimsDone: done, claimsTotal: allowed.length },
           }).catch(() => {});
-        },
-        // Live per-claim resolution: the pending row flips to its verdict the
-        // moment this claim finishes, while its siblings are still verifying.
-        (index, result) => {
-          void updateClaimRow(allowed[index].claimId, result.claim).catch(() => {});
-        },
-      );
-
-      const fetchFailures: string[] = [];
-      const injectionAttempts: string[] = [];
-      let checkIncomplete = 0;
-      for (const v of verified) {
-        gradedClaims.push(v.claim);
-        searchesUsed += v.searchesUsed;
-        // "check_failed" = verification tooling failed (rate limit / timeout) OR the
-        // run's wall-clock budget ran out before this claim started. Counted
-        // separately as "check incomplete" (retryable), NOT lumped into a verdict.
-        if (v.claim.status === "check_failed") checkIncomplete++;
-        else if (v.verifyFailed) fetchFailures.push(v.claim.claimText.slice(0, 140));
-        if (v.injectionDetected) injectionAttempts.push(v.claim.claimText.slice(0, 140));
+        }
+        if (overBudget.length > 0) await mergeRunFlags(runId, { quotaLimited: overBudget.length });
       }
-      if (fetchFailures.length) flags.fetchFailures = fetchFailures;
-      if (injectionAttempts.length) flags.injectionAttempts = injectionAttempts;
-      if (checkIncomplete) flags.checkIncomplete = checkIncomplete;
+
+      await verifyPendingBatch(runId, params.orgId, intake.text, runDate, deadlineMs);
     }
 
-    const skipped = buildSkippedClaimPlaceholder(extraction.overCapCount);
-    const allClaims = [...gradedClaims, ...skipped];
-
-    // Doc-level consistency pass (§3 step 6): now a first-class report input via
-    // flags.consistencyFindings (a typed RunFlags field), not the previous
-    // `(flags as any)` stopgap.
-    const consistency = findNumericContradictions(
-      allClaims.map((c, i) => ({ ...c, id: `tmp-${i}`, runId, orgId: params.orgId, createdAt: runDate.toISOString() })),
-    );
-    if (consistency.length > 0) {
-      flags.consistencyFindings = consistency;
-    }
-
-    // Pending rows were already inserted and resolved in place; only the over-cap
-    // placeholder (never pending) still needs a row, continuing the idx order.
-    await insertClaims(runId, params.orgId, skipped, extraction.claims.length);
-
-    const counts = countVerdicts(
-      allClaims.map((c, i) => ({ ...c, id: `tmp-${i}`, runId, orgId: params.orgId, createdAt: runDate.toISOString() })),
-    );
-    const readiness = computeReadiness(counts, params.mode);
-    const reportMd = buildReportMarkdown({
-      title: params.title ?? intake.title,
-      mode: params.mode,
-      claims: allClaims.map((c, i) => ({ ...c, id: `tmp-${i}`, runId, orgId: params.orgId, createdAt: runDate.toISOString() })),
-      flags,
-      runDate,
-    });
-
-    await updateRunStatus(runId, {
-      status: "done",
-      progress: { phase: "done", claimsDone: allClaims.length, claimsTotal: allClaims.length },
-      verdictCounts: counts,
-      readiness,
-      flags,
-      reportMd,
-      searchesUsed,
-    });
+    await maybeFinalize(runId);
   } catch (err) {
     await updateRunStatus(runId, {
       status: "error",
@@ -244,6 +182,249 @@ export async function processRun(runId: string, params: RunParams): Promise<void
     });
     throw err;
   }
+}
+
+/**
+ * Phase 5a continuation worker. Called from the status route via waitUntil
+ * AFTER the caller atomically acquired the run's expired lease. Loads all state
+ * from the DB, verifies what fits in this invocation's window, finalizes when
+ * done. Never marks the run failed on its own crash: the lease simply expires
+ * and the next poll retries, bounded by MAX_CONTINUATIONS.
+ */
+export async function continueRun(runId: string): Promise<void> {
+  const deadlineMs = invocationDeadline();
+  const run = await getRunRow(runId);
+  if (!run || run.status !== "running") return;
+
+  const attempts = ((run.progress?.attempts as number | undefined) ?? 0) + 1;
+  console.info(`[factcheckiq] continuation ${attempts} for run ${runId}`);
+  await updateRunStatus(runId, {
+    progress: { ...(run.progress ?? { phase: "verify", claimsDone: 0, claimsTotal: 0 }), attempts },
+  });
+
+  if (attempts > MAX_CONTINUATIONS) {
+    // Loop guard: stop spending, resolve what is left as honestly incomplete,
+    // and ship the partial report. A partial report always beats an error.
+    const stillPending = await getPendingClaims(runId);
+    for (const row of stillPending) {
+      await updateClaimRow(row.id, {
+        ...rowToClaimPatch(row),
+        status: "check_failed",
+        verdict: null,
+        sources: null,
+        sourceUrl: null,
+        sourceTier: null,
+        evidence: "This claim could not be checked within the allowed number of passes; it was not assessed. Re-run to check it.",
+        note: null,
+      }).catch(() => {});
+    }
+    if (stillPending.length > 0) await mergeRunFlags(runId, { checkIncomplete: stillPending.length, additive: true });
+    await maybeFinalize(runId);
+    return;
+  }
+
+  const docText: string = run.input_text ?? "";
+  const runDate = new Date(run.created_at);
+  if (run.mode === "full" && docText) {
+    await verifyPendingBatch(runId, run.org_id, docText, runDate, deadlineMs);
+  }
+  await maybeFinalize(runId);
+}
+
+/**
+ * Verify as many of this run's pending claims as fit before deadlineMs,
+ * highest risk first, resolving each DB row live and renewing the work lease as
+ * results land. Used identically by the initial worker and continuations: the
+ * DB pending set IS the work queue.
+ */
+async function verifyPendingBatch(
+  runId: string,
+  orgId: string,
+  documentText: string,
+  runDate: Date,
+  deadlineMs: number,
+): Promise<void> {
+  const pendingRows = sortByRiskThenIdx(await getPendingClaims(runId));
+  if (pendingRows.length === 0) return;
+
+  const { claims: allRows } = (await getRunWithClaims(runId, orgId)) ?? { claims: [] };
+  const totalClaims = allRows.length;
+  const resolvedBefore = totalClaims - pendingRows.length;
+
+  await updateRunStatus(runId, {
+    progress: { phase: "verify", claimsDone: resolvedBefore, claimsTotal: totalClaims },
+  });
+
+  const toVerify: ClaimToVerify[] = pendingRows.map((row) => ({
+    claimText: row.claim_text as string,
+    claimType: (row.claim_type ?? "fact") as ClaimType,
+    section: (row.section ?? null) as string | null,
+    risk: (row.risk ?? "medium") as Risk,
+    citationEvidence: (row.evidence as string | null) ?? undefined,
+  }));
+
+  let batchSearches = 0;
+  const fetchFailures: string[] = [];
+  const injectionAttempts: string[] = [];
+
+  const results = await verifyClaims(
+    toVerify,
+    { documentText, runDate, deadlineMs },
+    (done) => {
+      void updateRunStatus(runId, {
+        progress: { phase: "verify", claimsDone: resolvedBefore + done, claimsTotal: totalClaims },
+      }).catch(() => {});
+    },
+    (index, result) => {
+      // Live per-claim resolution + lease renewal (proof of life for the
+      // status route, which only spawns a continuation on an expired lease).
+      // COMPLETENESS RULE (19 Jul 2026): a claim that came back check_failed was
+      // never actually assessed (per-claim timeout, rate limit, transient API
+      // error). We do NOT write that terminal status now; we leave the row
+      // pending so a LATER continuation window retries it on a fresh clock, when
+      // the slow source or rate limit may have cleared. Only a real verdict
+      // (including an honest "unverifiable") is written and terminal. Claims that
+      // still cannot be assessed after every window are finalized as check_failed
+      // once, by continueRun at the MAX_CONTINUATIONS cap. Net effect: you only
+      // ever see "Check incomplete" for a claim that failed every retry across
+      // all windows, never for one that simply ran out of time in one window.
+      if (result.claim.status !== "check_failed") {
+        void updateClaimRow(pendingRows[index].id, result.claim).catch(() => {});
+      }
+      void renewRunLease(runId, RUN_LEASE_SECONDS);
+    },
+  );
+
+  for (const v of results) {
+    if (!v) continue; // never started: still pending, next invocation's work
+    batchSearches += v.searchesUsed;
+    // check_failed claims stay pending for a later window (see onClaim), so they
+    // are not flagged here. fetchFailures is informational on a REAL verdict
+    // whose corroboration hit a snag, and is only meaningful for a resolved row.
+    if (v.claim.status === "checked" && v.verifyFailed) fetchFailures.push(v.claim.claimText.slice(0, 140));
+    if (v.injectionDetected) injectionAttempts.push(v.claim.claimText.slice(0, 140));
+  }
+
+  const flagPatch: FlagMerge = { additive: true };
+  if (fetchFailures.length) flagPatch.fetchFailures = fetchFailures;
+  if (injectionAttempts.length) flagPatch.injectionAttempts = injectionAttempts;
+  if (flagPatch.fetchFailures || flagPatch.injectionAttempts) {
+    await mergeRunFlags(runId, flagPatch);
+  }
+  if (batchSearches > 0) {
+    const run = await getRunRow(runId);
+    await updateRunStatus(runId, { searchesUsed: ((run?.searches_used as number | null) ?? 0) + batchSearches });
+  }
+}
+
+/**
+ * Finalize the run IF no pending claims remain: verdict counts, readiness,
+ * doc-level consistency pass, report markdown, status done. Safe to call from
+ * any invocation; a run with pending work or a non-running status is left alone.
+ */
+async function maybeFinalize(runId: string): Promise<void> {
+  const run = await getRunRow(runId);
+  if (!run || run.status !== "running") return;
+  const result = await getRunWithClaims(runId, run.org_id);
+  if (!result) return;
+  const rows = result.claims;
+  if (rows.some((r: { status: string }) => r.status === "pending")) return;
+
+  const runDate = new Date(run.created_at);
+  const claims: Claim[] = rows.map((r: any) => ({
+    id: r.id as string,
+    runId,
+    orgId: run.org_id as string,
+    claimText: r.claim_text as string,
+    claimType: (r.claim_type ?? null) as ClaimType | null,
+    section: (r.section ?? null) as string | null,
+    risk: (r.risk ?? null) as Risk | null,
+    status: r.status as ClaimStatus,
+    verdict: (r.verdict ?? null) as Verdict | null,
+    sources: r.sources ?? null,
+    sourceUrl: (r.source_url ?? null) as string | null,
+    sourceTier: (r.source_tier ?? null) as number | null,
+    evidence: (r.evidence ?? null) as string | null,
+    note: (r.note ?? null) as string | null,
+    createdAt: r.created_at as string,
+  }));
+
+  const flags: RunFlags = { ...((run.flags as RunFlags | null) ?? {}) };
+  // Doc-level consistency pass (§3 step 6), computed over the final claim set.
+  const consistency = findNumericContradictions(claims);
+  if (consistency.length > 0) flags.consistencyFindings = consistency;
+
+  const counts = countVerdicts(claims);
+  const readiness = computeReadiness(counts, run.mode as FactCheckMode);
+  const reportMd = buildReportMarkdown({
+    title: (run.title as string | null) ?? undefined,
+    mode: run.mode as FactCheckMode,
+    claims,
+    flags,
+    runDate,
+  });
+
+  await updateRunStatus(runId, {
+    status: "done",
+    progress: { phase: "done", claimsDone: claims.length, claimsTotal: claims.length },
+    verdictCounts: counts,
+    readiness,
+    flags,
+    reportMd,
+  });
+}
+
+/* ------------------------------- helpers -------------------------------- */
+
+interface FlagMerge extends Partial<RunFlags> {
+  /** When true, numeric counters and string lists ADD to stored values instead of replacing them. */
+  additive?: boolean;
+}
+
+/** Read-merge-write on run.flags. Single-writer safe: only the lease holder calls this. */
+async function mergeRunFlags(runId: string, patch: FlagMerge): Promise<void> {
+  const run = await getRunRow(runId);
+  const current: RunFlags = { ...((run?.flags as RunFlags | null) ?? {}) };
+  const { additive, ...rest } = patch;
+  const next: RunFlags = { ...current };
+  if (rest.skippedClaims !== undefined) next.skippedClaims = rest.skippedClaims;
+  if (rest.quotaLimited !== undefined) next.quotaLimited = rest.quotaLimited;
+  if (rest.checkIncomplete !== undefined) {
+    next.checkIncomplete = additive ? (current.checkIncomplete ?? 0) + rest.checkIncomplete : rest.checkIncomplete;
+  }
+  if (rest.fetchFailures !== undefined) {
+    next.fetchFailures = additive ? [...(current.fetchFailures ?? []), ...rest.fetchFailures] : rest.fetchFailures;
+  }
+  if (rest.injectionAttempts !== undefined) {
+    next.injectionAttempts = additive ? [...(current.injectionAttempts ?? []), ...rest.injectionAttempts] : rest.injectionAttempts;
+  }
+  await updateRunStatus(runId, { flags: next });
+}
+
+function sortByRiskThenIdx(rows: any[]): any[] {
+  return [...rows].sort((a, b) => {
+    const ra = RISK_PRIORITY[(a.risk ?? "medium") as Risk] ?? 1;
+    const rb = RISK_PRIORITY[(b.risk ?? "medium") as Risk] ?? 1;
+    if (ra !== rb) return ra - rb;
+    return ((a.idx as number | null) ?? 0) - ((b.idx as number | null) ?? 0);
+  });
+}
+
+/** Base claim-shaped patch from a stored row (identity fields preserved). */
+function rowToClaimPatch(row: any): Omit<Claim, "id" | "runId" | "orgId" | "createdAt"> {
+  return {
+    claimText: row.claim_text as string,
+    claimType: (row.claim_type ?? null) as ClaimType | null,
+    section: (row.section ?? null) as string | null,
+    risk: (row.risk ?? null) as Risk | null,
+    status: row.status as ClaimStatus,
+    verdict: (row.verdict ?? null) as Verdict | null,
+    sources: row.sources ?? null,
+    sourceUrl: (row.source_url ?? null) as string | null,
+    sourceTier: (row.source_tier ?? null) as number | null,
+    evidence: (row.evidence ?? null) as string | null,
+    note: (row.note ?? null) as string | null,
+  };
 }
 
 /**
