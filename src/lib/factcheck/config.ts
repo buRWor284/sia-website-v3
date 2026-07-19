@@ -91,6 +91,31 @@ export const VERIFY_DEADLINE_SAFETY_MS = 90_000;
  */
 export const STALE_RUN_AFTER_MS = (PROCESS_ROUTE_MAX_DURATION_SECONDS + 120) * 1000;
 
+/**
+ * Phase 5a (19 Jul 2026): per-request timeout on each verify+grade model call.
+ * Observed live: one claim finished in ~1 minute while three sat in flight for
+ * 4+ minutes each, eating the whole 300s window. The deadline guard cannot
+ * abort an in-flight call; this can. A claim that exceeds it comes back
+ * check_failed fast and the worker moves to the next claim; unfinished claims
+ * are picked up by a continuation invocation on a fresh clock.
+ */
+export const PER_CLAIM_TIMEOUT_MS = 75_000;
+
+/**
+ * Cooperative work lease on a run (fact_check_runs.lease_until). The live
+ * worker renews it as claims resolve; a status poll may start a continuation
+ * worker only by atomically taking an EXPIRED lease, so at most one worker
+ * verifies a run at a time. Must exceed the worst per-claim quiet period
+ * (PER_CLAIM_TIMEOUT_MS + backoff + retry ~ 165s) with slack.
+ */
+export const RUN_LEASE_SECONDS = 240;
+
+/** Continuation attempts cap: after this many, remaining pending claims are marked check_failed and the run finalizes with a partial report (never an endless loop). */
+export const MAX_CONTINUATIONS = 6;
+
+/** Absolute backstop: a run older than this is failed by the sweeper regardless of state. Far above any legitimate multi-window audit. */
+export const RUN_ABSOLUTE_MAX_MS = 45 * 60 * 1000;
+
 export const CITATION_APIS = {
   CROSSREF: "https://api.crossref.org",
   OPENALEX: "https://api.openalex.org",
