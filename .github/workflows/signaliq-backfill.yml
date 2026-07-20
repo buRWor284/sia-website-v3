@@ -1,0 +1,30 @@
+name: SignalIQ Coverage Backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'First day (YYYY-MM-DD)'
+        required: true
+        default: '2026-05-19'
+      end:
+        description: 'Last day (YYYY-MM-DD)'
+        required: true
+        default: '2026-07-17'
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Backfill coverage in 3-day chunks
+        run: |
+          URL="https://www.syedirfanajmal.com/api/signaliq/refresh-coverage?mode=backfill&start=${{ github.event.inputs.start }}&end=${{ github.event.inputs.end }}"
+          for i in $(seq 1 30); do
+            RESP=$(curl -s -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "$URL")
+            REM=$(echo "$RESP" | jq -r '.remaining // "?"' 2>/dev/null || echo "?")
+            SC=$(echo "$RESP" | jq -c '.scanned // []' 2>/dev/null || echo "[]")
+            echo "call $i -> scanned=$SC remaining=$REM"
+            if [ "$REM" = "0" ]; then echo "== BACKFILL COMPLETE =="; break; fi
+            sleep 3
+          done
