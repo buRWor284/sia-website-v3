@@ -56,9 +56,11 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // seconds (Vercel Hobby cap)
 
-const MATCHER = "webngrams_v1";
+// v2 = COUNT(DISTINCT url) article counting (2026-07-20 parity probe: occurrence
+// counting inflated low-volume topics; see signaliq-parity-probe memory / WORKLOG).
+const MATCHER = "webngrams_v2";
 const RECENT_WINDOW_DAYS = 3; // steady state scans within [today-3, yesterday]
-const MAX_DAYS_PER_RUN = 2; // ≤2 BigQuery scans per invocation (~30 GB worst case)
+const MAX_DAYS_PER_RUN = 2; // ≤2 BigQuery scans per invocation (~80 GB worst case at v2 bytes)
 const MAX_BACKFILL_DAYS_PER_RUN = 3; // backfill: a few more, still inside 60s + the daily quota
 const DERIVE_WINDOW_DAYS = 60;
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;

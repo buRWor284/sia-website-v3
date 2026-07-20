@@ -8,7 +8,7 @@
  * Cost guardrails (all mandatory — a careless GDELT/BigQuery query has produced
  * real >$500 bills by scanning an unpartitioned multi-TB table):
  *   - `maximumBytesBilled` = 100 GB on every query → an over-cap query FAILS
- *     instead of billing. (Real usage ≈ 15 GB/day.)
+ *     instead of billing. (Real usage ≈ 40 GB/day with the url column.)
  *   - The partition date is injected as a validated DATE LITERAL, never a bind
  *     parameter — BigQuery only prunes to the single daily partition when the
  *     predicate is a constant literal (Phase 0 GATE C2). `day` comes from the
@@ -17,8 +17,12 @@
  *     injection-free path for customer-defined topics in the SaaS version).
  *   - `location: 'US'` is required — webngrams lives in the US multi-region, and
  *     the job errors "dataset not found in location" without it.
- *   - `COUNT(1)` occurrences (not COUNT(DISTINCT url)): Phase 0 showed occurrences
- *     ≈ articles and dropping the url column halves the bytes scanned.
+ *   - `COUNT(DISTINCT n.url)` distinct articles (webngrams_v2, since 2026-07-20).
+ *     v1 used COUNT(1) occurrences to halve the bytes, but the 2026-07-20 parity
+ *     probe showed occurrence counting inflates low-volume topics erratically
+ *     (open-banking spike days collapsed 47→12 articles, matching the DOC API's
+ *     13/12 almost exactly) and sank parity Spearman to 0.35. Distinct articles
+ *     ≈ ground truth; the extra ~20 GB/day is ~$0.15/mo worst case.
  *   - English only (`lang = 'en'`).
  *
  * Auth: JSON.parse(process.env.GCP_SA_KEY) — the raw service-account JSON stored
@@ -58,7 +62,7 @@ function client(): BigQuery {
 function buildSql(day: string): string {
   return `
     WITH topics AS (SELECT * FROM UNNEST(@topics))
-    SELECT t.topic AS topic, COUNT(1) AS article_count
+    SELECT t.topic AS topic, COUNT(DISTINCT n.url) AS article_count
     FROM ${WEBNGRAMS} n
     JOIN topics t ON (
          (t.nwords = 1 AND LOWER(n.ngram) = t.w1)
@@ -73,7 +77,7 @@ function buildSql(day: string): string {
 }
 
 export interface DayScanResult {
-  /** canonical topic → occurrence count for this day (matched topics only). */
+  /** canonical topic → distinct-article count for this day (matched topics only). */
   counts: Map<string, number>;
   /** number of topics with at least one match. */
   topicsMatched: number;
