@@ -74,7 +74,7 @@ const STEPS: Step[] = [
     note: "Follows SIFT: Stop → Investigate the source → Find better coverage → Trace to the original." },
   { icon: "▣", name: "Citation gate", desc: "Every citation is tested for real existence, a matching DOI, and a source that actually supports the claim.", chips: ["DEAD LINK CHECK", "DOI GATE", "SUPPORTS CLAIM", "JOURNAL VETTING"],
     quote: "A DOI that merely loads proves nothing.",
-    plain: "The skill clicks through and confirms it is really the cited paper, and vets the venue: indexing (Scopus, Web of Science, PubMed, DOAJ), retractions (Retraction Watch), and predatory or hijacked journals.",
+    plain: "The skill clicks through and confirms it is really the cited paper, checking the DOI and title against Crossref and OpenAlex (two free, open scholarly registries), then vetting the venue against DOAJ (legitimate open-access journals, not predatory or hijacked ones) and Retraction Watch (retracted papers). These are free, authoritative, independent databases, so a citation is confirmed against real records rather than a guess about whether it sounds plausible.",
     note: "A “predatory” journal prints anything for a fee; a “hijacked” one is a counterfeit of a real journal." },
   { icon: "✦", name: "Numeric accuracy", desc: "Each figure is matched to its source for value, units, and scale, with any stripped context restored.", chips: ["EXACT MATCH", "UNIT & SCALE", "CONTEXT RESTORED", "RE DERIVE MATH"],
     quote: "A zombie statistic is a real number that wandered off from its context.",
