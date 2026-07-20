@@ -99,21 +99,67 @@ describe("findNumericContradictions", () => {
     note: null,
     createdAt: "2026-07-14T00:00:00Z",
   };
+  const stat = (id: string, claimText: string): Claim => ({ ...base, id, claimText, claimType: "statistic" });
 
-  it("flags the Pennebaker 20-min vs 15-min case", () => {
+  // --- genuine same-subject conflicts: must still flag ---
+
+  it("flags the Pennebaker 20-min vs 15-min case (same subject, same unit)", () => {
     const claims: Claim[] = [
-      { ...base, id: "c1", claimText: "Header stat: 20 min, the Pennebaker dose.", claimType: "statistic" },
-      { ...base, id: "c2", claimText: "Dose calculator: Pennebaker, at least 15 min per session.", claimType: "statistic" },
+      stat("c1", "The Pennebaker writing dose is 20 minutes per session."),
+      stat("c2", "The recommended Pennebaker writing dose is at least 15 minutes per session."),
     ];
     const findings = findNumericContradictions(claims);
     expect(findings.length).toBe(1);
     expect(findings[0].claimIds).toEqual(["c1", "c2"]);
   });
 
+  it("flags a same-subject count that disagrees (35 vs 36 participants)", () => {
+    const claims: Claim[] = [
+      stat("c1", "The experiment enrolled 35 participants."),
+      stat("c2", "The experiment enrolled 36 participants."),
+    ];
+    expect(findNumericContradictions(claims).length).toBe(1);
+  });
+
+  // --- precision guards: patterns that must NOT be flagged (regressions from 20 Jul 2026) ---
+
   it("does not flag unrelated statistics", () => {
     const claims: Claim[] = [
-      { ...base, id: "c1", claimText: "Bing US desktop share is about 9-10%.", claimType: "statistic" },
-      { ...base, id: "c2", claimText: "Ghost citations make up 62% of AI citations.", claimType: "statistic" },
+      stat("c1", "Bing US desktop share is about 9-10%."),
+      stat("c2", "Ghost citations make up 62% of AI citations."),
+    ];
+    expect(findNumericContradictions(claims).length).toBe(0);
+  });
+
+  it("does not flag different search engines in an enumeration (Google vs Bing share)", () => {
+    const claims: Claim[] = [
+      stat("c1", "As of May 2026, StatCounter put Google at 90.39% of worldwide search across all devices"),
+      stat("c2", "As of May 2026, StatCounter put Bing at 5.03% of worldwide search across all devices"),
+    ];
+    expect(findNumericContradictions(claims).length).toBe(0);
+  });
+
+  it("does not flag correlations reported for different AI systems", () => {
+    const claims: Claim[] = [
+      stat("c1", "In Ahrefs's study, Domain Rating correlation with AI citations landed at just 0.266 for ChatGPT"),
+      stat("c2", "In Ahrefs's study, Domain Rating correlation with AI citations landed at 0.285 for AI Mode"),
+      stat("c3", "In Ahrefs's study, Domain Rating correlation with AI citations landed at 0.326 for AI Overviews"),
+    ];
+    expect(findNumericContradictions(claims).length).toBe(0);
+  });
+
+  it("does not flag a level against a growth rate (share vs YoY growth)", () => {
+    const claims: Claim[] = [
+      stat("c1", "AI engines sent under 1% of referral traffic in 2025"),
+      stat("c2", "AI referral traffic grew about 357% year over year in 2025"),
+    ];
+    expect(findNumericContradictions(claims).length).toBe(0);
+  });
+
+  it("does not flag a percentage against a count (a year is never the compared number)", () => {
+    const claims: Claim[] = [
+      stat("c1", "As of May 2026, StatCounter put Google at 90.39% of worldwide search across all devices"),
+      stat("c2", "There were 191 billion referrals from Google Search as of June 2025"),
     ];
     expect(findNumericContradictions(claims).length).toBe(0);
   });

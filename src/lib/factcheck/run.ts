@@ -28,7 +28,7 @@ import { checkCitation } from "./citations";
 import { checkLinks, extractDoi } from "./links";
 import { clampVerdict, findNumericContradictions } from "./grade";
 import { verifyClaims, type ClaimToVerify } from "./verify";
-import { buildReportMarkdown, countVerdicts, computeReadiness } from "./report";
+import { buildReportMarkdown, countVerdicts, computeReadiness, hasCheckableReferences } from "./report";
 import {
   createRun,
   getPendingClaims,
@@ -354,11 +354,15 @@ async function maybeFinalize(runId: string): Promise<void> {
   const consistency = findNumericContradictions(claims);
   if (consistency.length > 0) flags.consistencyFindings = consistency;
 
+  const mode = run.mode as FactCheckMode;
   const counts = countVerdicts(claims);
-  const readiness = computeReadiness(counts, run.mode as FactCheckMode);
+  // Citation mode with no links/DOIs anywhere had nothing to check: say so in the
+  // stored readiness too, so the dashboard's readiness box matches the report body.
+  const citationHadReferences = mode === "citation" ? hasCheckableReferences(claims) : true;
+  const readiness = computeReadiness(counts, mode, citationHadReferences);
   const reportMd = buildReportMarkdown({
     title: (run.title as string | null),
-    mode: run.mode as FactCheckMode,
+    mode,
     claims,
     flags,
     runDate,
@@ -444,7 +448,7 @@ async function runCitationGate(
   const urlMatch = claimText.match(/https?:\/\/[^\s"'<>)]+/);
 
   let proposedVerdict: Verdict = "unverifiable";
-  let evidence = "No DOI or link found in this claim to check deterministically.";
+  let evidence = "No link or DOI in this claim, so the citation and link check has nothing to verify here. Run a full audit to check the statistic itself.";
   const sources: Claim["sources"] = [];
 
   if (doi) {

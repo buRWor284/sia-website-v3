@@ -969,8 +969,25 @@ export default function FactcheckIQClient() {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={copyMarkdown} style={labelBtnStyle(false)} disabled={!r.report_md}>
-              {copied ? "Copied" : "Copy Markdown"}
+            <button
+              onClick={copyMarkdown}
+              disabled={!r.report_md}
+              title="Copy the full report as Markdown to your clipboard"
+              style={{
+                padding: "7px 16px",
+                background: copied ? GREEN : YEL,
+                color: copied ? PAPER : INK,
+                border: `1px solid ${copied ? GREEN : YEL}`,
+                fontFamily: GROT,
+                fontWeight: 800,
+                fontSize: 10,
+                letterSpacing: ".12em",
+                textTransform: "uppercase",
+                cursor: r.report_md ? "pointer" : "not-allowed",
+                opacity: r.report_md ? 1 : 0.5,
+              }}
+            >
+              {copied ? "Copied" : "Copy report"}
             </button>
             <button onClick={newRun} style={labelBtnStyle(true)}>
               New check
@@ -1072,9 +1089,14 @@ export default function FactcheckIQClient() {
 
         {r.report_md && (
           <div style={{ marginTop: 18 }}>
-            <button onClick={() => setShowRaw((s) => !s)} style={labelBtnStyle(false)}>
-              {showRaw ? "Hide raw Markdown" : "Show raw Markdown"}
-            </button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button onClick={() => setShowRaw((s) => !s)} style={labelBtnStyle(false)}>
+                {showRaw ? "Hide raw Markdown" : "Show raw Markdown"}
+              </button>
+              <button onClick={copyMarkdown} style={labelBtnStyle(false)} disabled={!r.report_md}>
+                {copied ? "Copied" : "Copy Markdown"}
+              </button>
+            </div>
             {showRaw && (
               <pre
                 style={{
