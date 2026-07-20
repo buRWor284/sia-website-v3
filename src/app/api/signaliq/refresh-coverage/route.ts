@@ -1,159 +1,204 @@
 /**
- * /api/signaliq/refresh-coverage
+ * /api/signaliq/refresh-coverage — SignalIQ coverage refresher (BigQuery edition).
  *
- * Background worker — triggered by Vercel Cron (daily, Hobby-plan limit) +
- * GitHub Actions (scheduled ~every 30 min; GitHub may throttle to ~1-2/hour).
- * Fetches GDELT coverage for the next seeds in a rotating cursor over the
- * 120 preset seeds, saves results to Supabase, then advances the cursor.
+ * Replaces the old GDELT DOC-API rotating-cursor worker. GDELT IP-blocks Vercel
+ * egress, so the DOC path could only refresh ~4 topics/day. This job queries
+ * GDELT Web News NGrams 3.0 directly in BigQuery: ONE scan covers every topic at
+ * once, so the cursor rotates over DAYS, not topics. Adding topics costs zero
+ * extra query bytes — only array size.
  *
- * This is the ONLY place that calls GDELT. By serialising all GDELT calls here
- * (1 call / 5.2s), we fully own the pace and never trip the rate limit.
+ * Per invocation (Vercel Cron daily + GitHub Actions ~every 30 min):
+ *   1. auth — CRON_SECRET bearer check (unchanged).
+ *   2. day cursor — the recent [today-3, yesterday] days not yet in
+ *      signaliq_scan_log, take up to MAX_DAYS_PER_RUN (nothing pending →
+ *      cheap no-op; the frequent invocations make the schedule self-healing).
+ *   3. per pending day — one batched BigQuery query (scanDay) → upsert counts +
+ *      explicit zeros into signaliq_daily_counts → log the run (day, bytes,
+ *      duration) in signaliq_scan_log. A day is logged ONLY after a successful
+ *      scan+upsert, so a failed/timed-out day is simply retried next run
+ *      (advance-on-success, like the old topic cursor).
+ *   4. derive — recompute volume/trend/article_count per topic over the trailing
+ *      60 days. Written to the coverage cache ONLY at cutover (see CUTOVER).
  *
- * Batching is TIME-BUDGETED, not fixed-size: we keep pulling seeds until
- * ~40s have elapsed (maxDuration is 60s; the tail is headroom for a slow
- * fetch + Supabase writes). Failures are cheap (~0.3s connection resets), so
- * a run full of failures still attempts many seeds.
+ * SAFETY — the live scorer is untouched until cutover. `coverage.volume` is a
+ * 0..1 value in the DOC-API (v1) world; BigQuery counts are raw units. The derive
+ * step writes the cache only when the code's ACTIVE coverage version already
+ * equals the BigQuery version (the cutover commit, which also re-baselines the
+ * scorer). Before that, this job writes ONLY the two new tables and never touches
+ * signaliq_coverage_cache — so raw counts can never reach scoring, and the parity
+ * week compares signaliq_daily_counts against the DOC API directly.
  *
- * RETRIES: GDELT aggressively rate-limits shared datacenter IPs (Vercel's
- * egress), so "fetch failed" connection errors are common and transient.
- * Each seed gets up to MAX_ATTEMPTS tries (still 5.2s apart) before we give
- * up on it for this run.
+ * Backfill (Phase 4) — the GCP key lives only in Vercel env, so backfill runs
+ * here, not in a local script:
+ *   GET /api/signaliq/refresh-coverage?mode=backfill&start=YYYY-MM-DD&end=YYYY-MM-DD
+ * walks the range in up to MAX_BACKFILL_DAYS_PER_RUN unscanned days per call
+ * (call repeatedly until `remaining` is 0). Same 100 GB/query + 0.15 TiB/day caps.
  *
- * CURSOR RULES (subtle — do not "simplify"):
- *  - ok/empty seeds advance the cursor.
- *  - throttled seeds (429 / rate-limit text) do NOT advance — retried next run.
- *  - seeds that still error after retries DO advance (recorded as failed, not
- *    "successful") — they get fresh attempts on the next cursor cycle. Holding
- *    the cursor for them would stall the whole rotation behind one bad seed.
- *
- * Auth: Vercel automatically sends Authorization: Bearer <CRON_SECRET>.
- * Set CRON_SECRET in the Vercel project environment to lock this endpoint down.
+ * Auth: Vercel Cron sends Authorization: Bearer <CRON_SECRET> automatically.
  */
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { BEATS } from "@/lib/signaliq/config";
-import { parseTimeline } from "@/lib/signaliq/sources/gdelt";
-import { getText } from "@/lib/signaliq/sources/http";
-import { getCursor, setCursor, setStoredCoverage } from "@/lib/signaliq/coverage-store";
+import { buildTopicMatchers } from "@/lib/signaliq/coverage/tokenize";
+import { scanDay } from "@/lib/signaliq/coverage/bigquery";
+import { deriveTopicCoverage, type DailyCount } from "@/lib/signaliq/coverage/derive";
+import {
+  ACTIVE_COVERAGE_VERSION,
+  BIGQUERY_COVERAGE_VERSION,
+  getScannedDays,
+  upsertDailyCounts,
+  logScan,
+  getRecentDailyCounts,
+  setStoredCoverageBulk,
+} from "@/lib/signaliq/coverage-store";
 
-export const maxDuration = 60; // seconds
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const maxDuration = 60; // seconds (Vercel Hobby cap)
 
-const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
-const TIME_BUDGET_MS = 40_000; // stop starting new work after this much elapsed
-const MAX_SEEDS_PER_RUN = 12; // hard cap so a burst of instant failures can't sweep the whole list
-const MAX_ATTEMPTS = 3; // per-seed tries within one run (connection failures are transient)
-const DELAY_MS = 5200; // just over 5s — respects GDELT's ~1 req/5s limit
-const FETCH_TIMEOUT_MS = 12_000; // per-request cap; keeps worst case inside the budget
+const MATCHER = "webngrams_v1";
+const RECENT_WINDOW_DAYS = 3; // steady state scans within [today-3, yesterday]
+const MAX_DAYS_PER_RUN = 2; // ≤2 BigQuery scans per invocation (~30 GB worst case)
+const MAX_BACKFILL_DAYS_PER_RUN = 3; // backfill: a few more, still inside 60s + the daily quota
+const DERIVE_WINDOW_DAYS = 60;
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 
-/** All 120 preset seeds in a stable flat order (6 beats × 20 seeds). */
-const ALL_SEEDS: string[] = BEATS.flatMap((b) => b.seeds);
+/** Canonical, de-duped matchers built once from every beat's seeds. */
+const TOPIC_MATCHERS = buildTopicMatchers(BEATS.flatMap((b) => b.seeds));
+const ALL_TOPICS = TOPIC_MATCHERS.map((m) => m.topic);
 
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms));
+/** Cache-write switch: true only once ACTIVE has been flipped to the BigQuery
+ *  version (the cutover commit). Until then the cache is never touched here. */
+const CUTOVER = ACTIVE_COVERAGE_VERSION === BIGQUERY_COVERAGE_VERSION;
+
+function ymd(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+function addDaysUTC(base: Date, delta: number): Date {
+  return new Date(base.getTime() + delta * 86_400_000);
 }
 
-function isThrottle(text: string): boolean {
-  return /limit requests|too many requests/i.test(text);
+/** Scan + persist a list of days in order. Each day is logged only on success. */
+async function runDays(days: string[]): Promise<Array<Record<string, unknown>>> {
+  const scanned: Array<Record<string, unknown>> = [];
+  for (const day of days) {
+    const res = await scanDay(day, TOPIC_MATCHERS);
+    await upsertDailyCounts(day, res.counts, ALL_TOPICS, MATCHER);
+    await logScan({
+      day,
+      topicsMatched: res.topicsMatched,
+      bytesBilled: res.bytesBilled,
+      durationMs: res.durationMs,
+    });
+    scanned.push({
+      day,
+      topicsMatched: res.topicsMatched,
+      bytesBilledMB: Math.round(res.bytesBilled / 1e6),
+      durationMs: res.durationMs,
+    });
+  }
+  return scanned;
 }
 
-type SeedOutcome = "ok" | "empty" | "throttled" | "failed";
+/** Recompute per-topic coverage from signaliq_daily_counts; write to the cache
+ *  only at cutover. Returns a compact summary for the response. */
+async function deriveAndMaybeWrite(today: Date): Promise<Record<string, unknown>> {
+  const since = ymd(addDaysUTC(today, -DERIVE_WINDOW_DAYS));
+  const rows = await getRecentDailyCounts(since);
+
+  const byTopic = new Map<string, DailyCount[]>();
+  for (const r of rows) {
+    const arr = byTopic.get(r.topic) ?? [];
+    arr.push({ day: String(r.day), article_count: Number(r.article_count) || 0 });
+    byTopic.set(r.topic, arr);
+  }
+
+  const derived = [...byTopic.entries()].map(([topic, series]) => {
+    const d = deriveTopicCoverage(series, today);
+    return { topic, volume: d.volume, trend: d.trend, articleCount: d.articleCount };
+  });
+
+  if (CUTOVER && derived.length) {
+    await setStoredCoverageBulk(derived, BIGQUERY_COVERAGE_VERSION);
+  }
+
+  return {
+    topicsDerived: derived.length,
+    written: CUTOVER,
+    version: CUTOVER ? BIGQUERY_COVERAGE_VERSION : null,
+  };
+}
 
 export async function GET(req: NextRequest) {
-  // Vercel Cron sends Authorization: Bearer <CRON_SECRET> automatically.
   const secret = process.env.CRON_SECRET;
   if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const started = Date.now();
+  const today = new Date();
   const elapsed = () => Date.now() - started;
 
-  const cursor = await getCursor();
-
-  const results: string[] = [];
-  const counts: Record<SeedOutcome, number> = { ok: 0, empty: 0, throttled: 0, failed: 0 };
-  let advance = 0; // how many seeds the cursor moves past (ok + empty + failed; NOT throttled)
-  let processed = 0;
-  let firstCall = true;
-
-  for (let s = 0; s < MAX_SEEDS_PER_RUN; s++) {
-    const idx = cursor + s;
-    if (idx >= ALL_SEEDS.length) break; // end of list — wrap happens via modulo below on next run
-    if (elapsed() > TIME_BUDGET_MS) break;
-
-    const topic = ALL_SEEDS[idx];
-    processed++;
-    let outcome: SeedOutcome = "failed";
-    let lastError = "";
-
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-      // Uniform spacing between ALL GDELT calls (retries included), except the very first.
-      if (!firstCall) await sleep(DELAY_MS);
-      firstCall = false;
-      // Don't start an attempt we may not have time to finish.
-      if (elapsed() > TIME_BUDGET_MS) break;
-
-      try {
-        const url =
-          `${GDELT_BASE}?query=${encodeURIComponent(`"${topic}"`)}&mode=timelinevol&format=json&timespan=2m`;
-        const text = await getText(url, FETCH_TIMEOUT_MS);
-        if (isThrottle(text)) {
-          outcome = "throttled";
-          continue; // retry after the standard delay
-        }
-        const cov = parseTimeline(topic, text);
-        if (cov) {
-          await setStoredCoverage(cov);
-          outcome = "ok";
-        } else {
-          outcome = "empty";
-        }
-        break; // got a definitive answer — stop retrying this seed
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        lastError = msg;
-        // GDELT returns 429 when rate-limited — treat as throttled, not a hard error.
-        outcome = msg.includes("429") ? "throttled" : "failed";
-        // loop → retry (both throttled and failed are worth another try this run)
-      }
-    }
-
-    counts[outcome]++;
-    if (outcome === "ok" || outcome === "empty") {
-      results.push(`${outcome}:${topic}`);
-      advance++;
-    } else if (outcome === "throttled") {
-      // Do NOT advance — cursor stays here, seed is retried next run.
-      results.push(`throttled:${topic}`);
-      break; // we're rate-limited: stop hammering GDELT for the rest of this run
-    } else {
-      // Persistent non-throttle failure: advance past it (fresh chance next cycle),
-      // but record it honestly — this is NOT a success.
-      results.push(`failed:${topic}:${lastError}`);
-      advance++;
-    }
-  }
-
-  const nextCursor = (cursor + advance) % ALL_SEEDS.length;
-
-  let cursorError: string | null = null;
   try {
-    if (advance > 0) await setCursor(nextCursor);
-  } catch (err) {
-    cursorError = err instanceof Error ? err.message : String(err);
-  }
+    const mode = new URL(req.url).searchParams.get("mode");
 
-  return NextResponse.json({
-    processed,
-    ok: counts.ok,
-    empty: counts.empty,
-    failed: counts.failed,
-    throttled: counts.throttled,
-    cursor,
-    nextCursor,
-    totalSeeds: ALL_SEEDS.length,
-    elapsedMs: elapsed(),
-    results,
-    cursorError,
-  });
+    // ── Backfill mode (Phase 4) ──────────────────────────────────────────────
+    if (mode === "backfill") {
+      const params = new URL(req.url).searchParams;
+      const start = params.get("start") ?? "";
+      const end = params.get("end") ?? "";
+      if (!ISO_DAY.test(start) || !ISO_DAY.test(end) || start > end) {
+        return NextResponse.json(
+          { error: "backfill needs ?start=YYYY-MM-DD&end=YYYY-MM-DD (start ≤ end)" },
+          { status: 400 },
+        );
+      }
+      const candidates: string[] = [];
+      for (let d = new Date(`${start}T00:00:00Z`); ymd(d) <= end; d = addDaysUTC(d, 1)) {
+        candidates.push(ymd(d));
+      }
+      const already = await getScannedDays(start);
+      const outstanding = candidates.filter((d) => !already.has(d));
+      const pending = outstanding.slice(0, MAX_BACKFILL_DAYS_PER_RUN);
+      const scanned = await runDays(pending);
+      const derive = scanned.length ? await deriveAndMaybeWrite(today) : { skipped: true };
+
+      return NextResponse.json({
+        mode: "backfill",
+        start,
+        end,
+        scanned,
+        remaining: outstanding.length - pending.length,
+        derive,
+        totalTopics: ALL_TOPICS.length,
+        cutover: CUTOVER,
+        elapsedMs: elapsed(),
+      });
+    }
+
+    // ── Steady state: recent day cursor ──────────────────────────────────────
+    const candidates: string[] = [];
+    for (let age = 1; age <= RECENT_WINDOW_DAYS; age++) candidates.push(ymd(addDaysUTC(today, -age)));
+    const oldest = candidates[candidates.length - 1];
+    const already = await getScannedDays(oldest);
+    const pending = candidates.filter((d) => !already.has(d)).slice(0, MAX_DAYS_PER_RUN);
+    const scanned = await runDays(pending);
+    const derive = scanned.length || CUTOVER ? await deriveAndMaybeWrite(today) : { skipped: true };
+
+    return NextResponse.json({
+      mode: "daily",
+      pendingDays: pending,
+      scanned,
+      derive,
+      totalTopics: ALL_TOPICS.length,
+      cutover: CUTOVER,
+      elapsedMs: elapsed(),
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      { error: "refresh-coverage failed", message, elapsedMs: elapsed() },
+      { status: 500 },
+    );
+  }
 }

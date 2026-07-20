@@ -11,6 +11,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.111.0",
     "@clerk/nextjs": "^7.4.3",
+    "@google-cloud/bigquery": "^7.9.0",
     "@next/third-parties": "^16.2.6",
     "@supabase/supabase-js": "^2.107.0",
     "@vercel/functions": "^3.7.5",
@@ -30,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.1",
     "typescript": "^5"
   }
 }
