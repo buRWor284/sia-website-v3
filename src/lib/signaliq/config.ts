@@ -151,6 +151,7 @@ export const BEATS: Beat[] = [
       "oncology", "cardiovascular disease",
       "healthy aging", "anti-aging", "skincare", "skin rejuvenation",
       "dietary supplements", "strength training", "intermittent fasting", "nutrition",
+      "peptides", "botox", "age reversal", "creatine", "hormone therapy", "sunscreen",
     ],
     blurb: "Care delivery, digital health, and consumer-health stories.",
   },
