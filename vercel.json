@@ -3,6 +3,10 @@
     {
       "path": "/api/signaliq/refresh-coverage",
       "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/emos-platform/factcheck/cron",
+      "schedule": "* * * * *"
     }
   ]
 }

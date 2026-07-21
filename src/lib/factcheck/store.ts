@@ -68,24 +68,31 @@ export async function updateRunStatus(
  * - it died before any claims were stored (nothing for a continuation to pick
  *   up): older than `staleAfterMs` with zero claim rows; or
  * - it blew the absolute backstop (`absoluteMaxMs`), whatever its state.
- * Everything else that stalls is revived by the status route's continuation
- * trigger instead of being killed here. Best-effort by design: a sweep failure
- * must never break a status read. Returns the number of runs swept.
+ * Everything else that stalls is revived by the continuation trigger (the status
+ * route on a live poll, OR the tabless cron) instead of being killed here.
+ * Best-effort by design: a sweep failure must never break a status read. Returns
+ * the number of runs swept.
+ *
+ * Scope: pass an orgId to sweep one org (the status route's per-org read); pass
+ * null to sweep every org (the tabless cron's global tick). The logic is
+ * identical; only the org filter differs.
  */
-export async function failStaleRuns(orgId: string, staleAfterMs: number, absoluteMaxMs: number): Promise<number> {
+async function failStaleRunsImpl(orgId: string | null, staleAfterMs: number, absoluteMaxMs: number): Promise<number> {
   const supabase = createSupabaseServiceClient();
   const now = Date.now();
   const staleCutoff = new Date(now - staleAfterMs).toISOString();
   const absoluteCutoff = new Date(now - absoluteMaxMs).toISOString();
+  const scope = orgId ? `org ${orgId}` : "all orgs";
 
-  const { data: candidates, error: candErr } = await supabase
+  let query = supabase
     .from("fact_check_runs")
     .select("id, created_at, fact_check_claims(count)")
-    .eq("org_id", orgId)
     .in("status", ["queued", "running"])
     .lt("created_at", staleCutoff);
+  if (orgId) query = query.eq("org_id", orgId);
+  const { data: candidates, error: candErr } = await query;
   if (candErr || !candidates || candidates.length === 0) {
-    if (candErr) console.error(`[factcheckiq] stale-run sweep query failed for org ${orgId}: ${candErr.message}`);
+    if (candErr) console.error(`[factcheckiq] stale-run sweep query failed for ${scope}: ${candErr.message}`);
     return 0;
   }
 
@@ -109,13 +116,70 @@ export async function failStaleRuns(orgId: string, staleAfterMs: number, absolut
     .in("status", ["queued", "running"])
     .select("id");
   if (error) {
-    console.error(`[factcheckiq] stale-run sweep failed for org ${orgId}: ${error.message}`);
+    console.error(`[factcheckiq] stale-run sweep failed for ${scope}: ${error.message}`);
     return 0;
   }
   if (data && data.length > 0) {
-    console.info(`[factcheckiq] stale-run sweep: marked ${data.length} unrecoverable run(s) as error for org ${orgId}`);
+    console.info(`[factcheckiq] stale-run sweep: marked ${data.length} unrecoverable run(s) as error for ${scope}`);
   }
   return data?.length ?? 0;
+}
+
+/** Per-org stale-run sweep (used by the status route on each poll). Behavior unchanged from the pre-cron single-arg version. */
+export async function failStaleRuns(orgId: string, staleAfterMs: number, absoluteMaxMs: number): Promise<number> {
+  return failStaleRunsImpl(orgId, staleAfterMs, absoluteMaxMs);
+}
+
+/**
+ * Global stale-run sweep across every org, for the tabless continuation cron:
+ * the cron runs with no user/org context, so it cannot sweep per-org the way the
+ * status route does. Same unrecoverable-only criteria as failStaleRuns.
+ */
+export async function failStaleRunsGlobal(staleAfterMs: number, absoluteMaxMs: number): Promise<number> {
+  return failStaleRunsImpl(null, staleAfterMs, absoluteMaxMs);
+}
+
+/**
+ * Tabless continuation (21 Jul 2026): the runs the cron should drive this tick.
+ * Returns up to `limit` runs, across ALL orgs, that are:
+ *   - status 'running', and
+ *   - free to be picked up: lease_until is null or already expired (no live
+ *     worker is renewing it), and
+ *   - actually resumable: at least one claim row exists.
+ *
+ * Why the claim-row guard: for a running run, report_md is always null (it is
+ * written only at finalize, in the same update that flips status to 'done'), so
+ * "still needs work" is implied by status='running' alone — we do NOT need to
+ * inspect report_md or pending counts. What we must exclude is a run that died
+ * before extraction stored any claims (the sweeper's job, not continueRun's —
+ * continueRun on a claim-less run would finalize an empty report) and a slow
+ * intake that still holds a live lease but has not inserted claims yet (its lease
+ * is not expired, so the lease filter already excludes it; the claim guard is
+ * belt-and-suspenders).
+ *
+ * The embedded fact_check_claims(count) cannot be a WHERE clause in PostgREST, so
+ * we over-fetch (oldest first, for fairness) and filter by count in code, then
+ * slice to `limit`. Single-writer safety is enforced at pickup by acquireRunLease,
+ * not here; this is only a candidate list.
+ */
+export async function getRunsNeedingContinuation(limit: number): Promise<{ id: string; org_id: string }[]> {
+  const supabase = createSupabaseServiceClient();
+  const nowIso = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("fact_check_runs")
+    .select("id, org_id, fact_check_claims(count)")
+    .eq("status", "running")
+    .or(`lease_until.is.null,lease_until.lt.${nowIso}`)
+    .order("created_at", { ascending: true })
+    .limit(Math.max(limit * 4, limit));
+  if (error) {
+    console.error(`[factcheckiq] getRunsNeedingContinuation query failed: ${error.message}`);
+    return [];
+  }
+  return (data ?? [])
+    .filter((r: { fact_check_claims?: { count: number }[] }) => (r.fact_check_claims?.[0]?.count ?? 0) > 0)
+    .slice(0, limit)
+    .map((r: { id: string; org_id: string }) => ({ id: r.id, org_id: r.org_id }));
 }
 
 /**

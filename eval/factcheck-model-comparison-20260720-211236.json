@@ -1,0 +1,81 @@
+{
+  "generatedAt": "2026-07-20T16:12:36.761Z",
+  "note": "FactcheckIQ two-model grade-model comparison. Measurement only; pipeline and clampVerdict unchanged. Cost reflects the verify/grade step (the ~95% cost driver); the free citation/link gate and extract step are not billed here.",
+  "models": {
+    "a": "claude-opus-4-8",
+    "b": "claude-sonnet-5"
+  },
+  "selection": [
+    "planted-01"
+  ],
+  "totals": {
+    "a": {
+      "model": "claude-opus-4-8",
+      "label": "Opus 4.8",
+      "scored": 1,
+      "passed": 1,
+      "incomplete": 0,
+      "searches": 0,
+      "cost": {
+        "total": 0,
+        "input": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "output": 0,
+        "webSearch": 0
+      },
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "cacheRead": 0,
+        "cacheCreation": 0,
+        "webSearchRequests": 0,
+        "capturedResponses": 0
+      }
+    },
+    "b": {
+      "model": "claude-sonnet-5",
+      "label": "Sonnet 5",
+      "scored": 1,
+      "passed": 1,
+      "incomplete": 0,
+      "searches": 0,
+      "cost": {
+        "total": 0,
+        "input": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "output": 0,
+        "webSearch": 0
+      },
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "cacheRead": 0,
+        "cacheCreation": 0,
+        "webSearchRequests": 0,
+        "capturedResponses": 0
+      }
+    }
+  },
+  "perClaim": [
+    {
+      "id": "planted-01",
+      "golden": "fabricated",
+      "a": {
+        "verdict": "fabricated",
+        "match": true,
+        "scored": true,
+        "via": "gate"
+      },
+      "b": {
+        "verdict": "fabricated",
+        "match": true,
+        "scored": true,
+        "via": "gate"
+      },
+      "diverged": false
+    }
+  ],
+  "diverged": []
+}

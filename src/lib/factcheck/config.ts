@@ -102,19 +102,61 @@ export const STALE_RUN_AFTER_MS = (PROCESS_ROUTE_MAX_DURATION_SECONDS + 120) * 1
 export const PER_CLAIM_TIMEOUT_MS = 75_000;
 
 /**
- * Cooperative work lease on a run (fact_check_runs.lease_until). The live
- * worker renews it as claims resolve; a status poll may start a continuation
- * worker only by atomically taking an EXPIRED lease, so at most one worker
- * verifies a run at a time. Must exceed the worst per-claim quiet period
- * (PER_CLAIM_TIMEOUT_MS + backoff + retry ~ 165s) with slack.
+ * Cooperative work lease on a run (fact_check_runs.lease_until). The live worker
+ * renews it as claims resolve; another worker (a status poll OR the tabless cron)
+ * may start a continuation ONLY by atomically taking an EXPIRED lease, so at most
+ * one worker verifies a run at a time.
+ *
+ * SIZED TO OUTLIVE ONE INVOCATION (revised 21 Jul 2026). The lease is renewed only
+ * when a claim RESOLVES (run.ts onClaim) — there is no mid-claim heartbeat — and a
+ * single stubborn claim can run with no resolution for far longer than the old
+ * "~165s" estimate assumed: up to MAX_TURNS_PER_CLAIM (2) * PER_CLAIM_TIMEOUT_MS
+ * (75s) + RATE_LIMIT_BACKOFF_MS (15s) + a second 2*75s attempt ~= 315s. If the
+ * lease were shorter than the invocation, it could expire UNDER a still-alive
+ * worker grinding one slow claim, and the every-minute cron would pounce on that
+ * expired lease and double-drive the run (double paid verify). The fix does not
+ * depend on estimating the worst claim: a worker cannot outlive its function
+ * invocation (PROCESS_ROUTE_MAX_DURATION_SECONDS hard kill), so a lease longer
+ * than one invocation can NEVER expire while its worker is alive. The only cost is
+ * that a genuinely dead run waits marginally longer for revival — a non-issue next
+ * to double-spending. Keep this strictly greater than PROCESS_ROUTE_MAX_DURATION_SECONDS.
  */
-export const RUN_LEASE_SECONDS = 240;
+export const RUN_LEASE_SECONDS = PROCESS_ROUTE_MAX_DURATION_SECONDS + 60;
 
-/** Continuation attempts cap: after this many, remaining pending claims are marked check_failed and the run finalizes with a partial report (never an endless loop). */
+/**
+ * Continuation attempts cap: after this many continueRun passes, remaining
+ * pending claims are marked check_failed and the run finalizes with a partial
+ * report (never an endless loop).
+ *
+ * Tabless-cron cadence check (21 Jul 2026): under the every-minute cron each
+ * window ends with the lease renewed to now + RUN_LEASE_SECONDS (240s), so the
+ * next window can only start ~4 min after the previous one's last claim landed —
+ * i.e. windows are naturally spaced, not back-to-back. A realistic worst case (a
+ * 40-claim doc; the initial start-route window plus ~14 claims per continuation
+ * window) finishes in 2-3 continuations and well under RUN_ABSOLUTE_MAX_MS, so 6
+ * keeps ample headroom. Only a run doing very few claims per window (heavy rate
+ * limiting) would reach the cap; that finalizes an honest partial report, which
+ * beats spending unboundedly. If real cron traffic shows long docs hitting the
+ * cap, raise this AND RUN_ABSOLUTE_MAX_MS together (raising this alone just lets
+ * the 45-min sweeper preempt the clean partial with an error) — and weigh the
+ * added per-run cost, since each extra window re-attempts every stuck claim.
+ */
 export const MAX_CONTINUATIONS = 6;
 
 /** Absolute backstop: a run older than this is failed by the sweeper regardless of state. Far above any legitimate multi-window audit. */
 export const RUN_ABSOLUTE_MAX_MS = 45 * 60 * 1000;
+
+/**
+ * Tabless continuation cron (21 Jul 2026): the max number of DISTINCT runs the
+ * every-minute cron will drive in a single tick. The single-writer lease
+ * (acquireRunLease) already stops any one run being driven twice, so this only
+ * bounds how many separate stalled runs advance concurrently inside one cron
+ * invocation — a cost/throughput guard, not a correctness one. Small on purpose:
+ * FactcheckIQ is in private testing with low concurrency, and the per-minute
+ * schedule means anything not picked up this tick is picked up moments later.
+ * Raise it only if many long audits legitimately run at the same time.
+ */
+export const MAX_RUNS_PER_CRON_TICK = 5;
 
 export const CITATION_APIS = {
   CROSSREF: "https://api.crossref.org",
