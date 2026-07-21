@@ -295,6 +295,18 @@ async function verifyPendingBatch(
     },
   );
 
+  // Terminal failure (auth rejected / usage limit / refused request): retrying
+  // across windows cannot fix it, so stop now and surface the reason instead of
+  // leaving claims pending to spin until the backstop (the 20 Jul 2026 silent hang).
+  const fatal = results.find((v) => v && v.terminal === true);
+  if (fatal) {
+    await updateRunStatus(runId, {
+      status: "error",
+      error: fatal.claim.evidence ?? "Verification is unavailable; re-run after resolving it.",
+    });
+    return;
+  }
+
   for (const v of results) {
     if (!v) continue; // never started: still pending, next invocation's work
     batchSearches += v.searchesUsed;

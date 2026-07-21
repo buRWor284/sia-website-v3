@@ -92,6 +92,13 @@ export interface VerifiedClaim {
   injectionDetected: boolean;
   /** True when web verification could not complete for this claim (API/search failure); claim is marked Unverifiable. */
   verifyFailed: boolean;
+  /**
+   * True when the failure is TERMINAL (auth rejected, usage/credit limit, or a
+   * refused request): retrying across windows cannot fix it, so run.ts fails the
+   * whole run fast with the reason instead of leaving the claim pending to spin
+   * until the backstop (the 20 Jul 2026 silent "Checking" hang).
+   */
+  terminal?: boolean;
 }
 
 // --- server-tool definitions (cast: these versions are newer than the SDK's typed union) ---
@@ -215,11 +222,61 @@ async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<
     }
     return unverifiable(claim, "Verification did not converge on a verdict within the turn budget.", searchesUsed, true);
   } catch (err) {
-    const reason = err instanceof Error ? err.message : "Unknown error during web verification.";
-    // An exception mid-verification (timeout, API error) means the claim was never
-    // assessed: check_failed, not a verdict.
-    return checkFailed(claim, `Web verification could not complete (${reason}). Retry.`, searchesUsed);
+    const cls = classifyVerifyError(err);
+    // Always surface the real error to the server logs. A swallowed verify error
+    // used to leave the run spinning at "Checking" with no visible reason.
+    console.error(`[factcheckiq] verify call failed (status=${cls.status ?? "n/a"}, terminal=${cls.terminal}): ${cls.raw}`);
+    // Terminal (auth / usage limit / refused request): do not retry, run.ts fails
+    // the run fast with this reason. Transient (rate limit, timeout, 5xx): retry.
+    return checkFailed(
+      claim,
+      cls.terminal ? cls.message : `Web verification could not complete (${cls.raw}). Retry.`,
+      searchesUsed,
+      cls.terminal,
+    );
   }
+}
+
+/**
+ * Split a verify failure into TERMINAL (retrying cannot help: auth rejected,
+ * usage/credit limit reached, or a request the API refuses) vs transient (rate
+ * limit, timeout, network, provider 5xx). run.ts stops a run on a terminal error
+ * and shows the reason, instead of retrying every window until the backstop kills
+ * it (the 20 Jul 2026 Anthropic spend-limit silent hang).
+ */
+function classifyVerifyError(err: unknown): { terminal: boolean; message: string; raw: string; status?: number } {
+  const raw = err instanceof Error ? err.message : String(err);
+  const status = typeof (err as { status?: unknown })?.status === "number" ? (err as { status: number }).status : undefined;
+  const low = raw.toLowerCase();
+  if (/usage limit|regain access|credit balance|billing|quota|insufficient|out of credit|payment/.test(low)) {
+    return {
+      terminal: true,
+      status,
+      raw,
+      message:
+        "Verification is unavailable: the verification service's usage limit or credit has been reached. Raise the limit or add credit in the provider account, then re-run.",
+    };
+  }
+  if (status === 401 || status === 403 || /invalid x-api-key|authentication_error|unauthorized|permission/.test(low)) {
+    return {
+      terminal: true,
+      status,
+      raw,
+      message:
+        "Verification is unavailable: the verification service rejected the API key. Check the key in the deployment settings, then re-run.",
+    };
+  }
+  // Other 4xx (not 429 rate limit, not 408 timeout) are refused/malformed requests
+  // that a retry will not fix; 429 / 408 / 5xx / network / timeouts are transient.
+  if (status !== undefined && status >= 400 && status < 500 && status !== 429 && status !== 408) {
+    return {
+      terminal: true,
+      status,
+      raw,
+      message: `Verification is unavailable: the request was rejected by the verification service (${raw}). This will not clear on its own; re-run after resolving it.`,
+    };
+  }
+  return { terminal: false, status, raw, message: raw };
 }
 
 /**
@@ -331,7 +388,7 @@ function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUs
 }
 
 /** The claim could not be assessed because verification tooling failed. Not a verdict. */
-function checkFailed(claim: ClaimToVerify, reason: string, searchesUsed: number): VerifiedClaim {
+function checkFailed(claim: ClaimToVerify, reason: string, searchesUsed: number, terminal = false): VerifiedClaim {
   return {
     claim: {
       claimText: claim.claimText,
@@ -349,6 +406,7 @@ function checkFailed(claim: ClaimToVerify, reason: string, searchesUsed: number)
     searchesUsed,
     injectionDetected: false,
     verifyFailed: true,
+    terminal,
   };
 }
 
