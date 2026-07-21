@@ -43,10 +43,14 @@ const VALID_VERDICTS: readonly Verdict[] = [
 /**
  * Max web_fetch calls the model may make per claim. Kept tight on purpose: each
  * fetch pulls a full page into Opus context at input-token cost, and fetches are
- * the dominant cost driver of a full audit. 3 is enough to corroborate one claim
- * (the two-source rule needs 2 independent sources, +1 for slack).
+ * the dominant cost driver of a full audit. Raised 3 -> 5 (20 Jul 2026): 3 left
+ * no room to read the PRIMARY cited source on top of the two independent
+ * corroborators the two-source rule needs, so attributed statistics were graded
+ * on a secondary site's rounding instead of the source itself (the StatCounter
+ * 90.39% case). 5 = primary + 2 independent + slack. A ceiling, not a target;
+ * most claims use fewer.
  */
-const MAX_FETCHES_PER_CLAIM = 3;
+const MAX_FETCHES_PER_CLAIM = 5;
 
 /**
  * Hard ceiling on model turns per claim. Server tools resolve inside one turn, so

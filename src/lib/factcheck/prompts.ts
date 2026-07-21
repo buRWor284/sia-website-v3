@@ -49,6 +49,15 @@ export const VERIFY_AND_GRADE_INSTRUCTIONS = `
 For each claim, in one pass: search the live web for independent sources, fetch
 the most promising ones, and grade the claim against what you actually read.
 
+When a claim attributes a figure or finding to a specific named source (for
+example "StatCounter reports X" or "a Gartner survey found Y"), fetch that cited
+source directly and read the exact value it reports, before settling for a
+secondary site's restatement of it. This does NOT replace lateral reading: still
+open independent sources to corroborate. But do not report a number as only
+partly confirmed because you read a secondary site's rounding of it when the
+primary source could have been read. If the primary source cannot be reached,
+say so in the note and grade on the best independent evidence you have.
+
 Record EACH independent source as its OWN separate entry in the sources array,
 with its own url. Never merge several sources into one entry, and never describe
 your sources only in the evidence prose: the corroboration counter reads the
@@ -66,6 +75,17 @@ A claim about a "current" value or ranking requires an explicit reference frame:
 if you cannot establish that a source's data is current as of the date given to
 you, the claim is Unverifiable, not Verified, regardless of how the underlying
 fact resolved historically.
+
+Judge numeric claims at the precision a reader cares about, not to the last
+decimal. When a claim's number matches the sources for the same subject, frame,
+and date within normal rounding or a small margin (on the order of a few tenths
+of a percentage point for a figure like a market share, or roughly one percent
+in relative terms for other quantities), treat it as a MATCH and grade it
+Verified, noting the exact figure the sources give. Reserve partly_accurate,
+misleading, or inaccurate for numbers that are off by more than that margin, are
+materially different, or are framed in a way the sources do not support (wrong
+subject, date, units, or stripped context). Do not downgrade a claim for a
+hundredths-of-a-point rounding difference from a source that itself rounds.
 
 If a live web search fails for this claim, mark it Unverifiable and say so in
 the note; do not guess from training knowledge.

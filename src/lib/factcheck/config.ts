@@ -33,8 +33,8 @@ export const WEB_TOOLS_BETA_HEADER: string | null = null;
 /** Claims beyond this cap are stored with status "skipped" and reported, never silently dropped. */
 export const MAX_CLAIMS_PER_RUN = 40;
 
-/** Per-claim search budget inside the verify+grade step. */
-export const MAX_SEARCHES_PER_CLAIM = 3;
+/** Per-claim search budget inside the verify+grade step. Raised 3 -> 4 (20 Jul 2026) so the verifier has a search to spare for locating the primary cited source (e.g. StatCounter's own page) before corroborating with independent ones. */
+export const MAX_SEARCHES_PER_CLAIM = 4;
 
 /** Concurrency cap for parallel per-claim verify+grade calls in full-audit mode. */
 export const VERIFY_CONCURRENCY = 4;
