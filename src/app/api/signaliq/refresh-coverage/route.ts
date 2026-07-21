@@ -60,8 +60,8 @@ export const maxDuration = 60; // seconds (Vercel Hobby cap)
 // counting inflated low-volume topics; see signaliq-parity-probe memory / WORKLOG).
 const MATCHER = "webngrams_v2";
 const RECENT_WINDOW_DAYS = 3; // steady state scans within [today-3, yesterday]
-const MAX_DAYS_PER_RUN = 2; // ≤2 BigQuery scans per invocation (~80 GB worst case at v2 bytes)
-const MAX_BACKFILL_DAYS_PER_RUN = 3; // backfill: a few more, still inside 60s + the daily quota
+const MAX_DAYS_PER_RUN = 1; // 1 BigQuery scan per invocation - 2 v2 days (~66s+) breach the 60s route cap; frequent invocations still self-heal
+const MAX_BACKFILL_DAYS_PER_RUN = 1; // backfill: ONE day per call - 3-day v2 batches exceeded the 60s cap and left billed-but-discarded BigQuery jobs (2026-07-21)
 const DERIVE_WINDOW_DAYS = 60;
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 

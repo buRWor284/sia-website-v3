@@ -111,6 +111,8 @@ export const BEATS: Beat[] = [
       "usage-based pricing", "remote work software", "product analytics", "customer success", "sales automation",
       "marketing automation", "workflow automation", "AI copilot", "app store fees", "SOC 2 compliance",
       "venture capital", "seed funding", "micro SaaS", "integration platform", "low-code development", "tech IPO",
+      // - widened 2026-07-21 (Irfan: client-work + geography coverage) -
+      "staff augmentation", "IT outsourcing", "Pakistan startups",
     ],
     blurb: "Software, product, and go-to-market stories.",
   },
@@ -207,6 +209,13 @@ export const BEATS: Beat[] = [
       "conversion rate optimization", "customer acquisition cost", "marketing attribution", "first-party data", "cookie deprecation",
       "ad fraud", "brand safety", "connected TV advertising", "web development", "app development",
       "app store optimization", "headless CMS", "web design", "user generated content", "video marketing", "email marketing",
+      // - widened 2026-07-21 (Irfan: own-positioning seeds - fractional CMO offer, EMB/EME
+      //   earned-media climate, FactCheckIQ credibility beat, SEO/link-building craft) -
+      "fractional CMO", "fractional executive", "thought leadership", "B2B marketing", "marketing budget",
+      "press release", "newsroom layoffs", "data journalism", "podcast advertising",
+      "fact checking", "misinformation", "AI generated content",
+      "SEO", "LLM visibility", "link building", "backlinking", "editorial backlinks", "SEO PR",
+      "media pitching", "media outreach", "cold email", "cold email outreach", "brand mentions",
     ],
     blurb: "Marketing, SEO/GEO, digital PR, content, and web/app agency stories.",
   },

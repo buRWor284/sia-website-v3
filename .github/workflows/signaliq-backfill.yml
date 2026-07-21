@@ -20,7 +20,7 @@ jobs:
       - name: Backfill coverage in 3-day chunks
         run: |
           URL="https://www.syedirfanajmal.com/api/signaliq/refresh-coverage?mode=backfill&start=${{ github.event.inputs.start }}&end=${{ github.event.inputs.end }}"
-          for i in $(seq 1 30); do
+          for i in $(seq 1 70); do
             RESP=$(curl -s -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "$URL")
             REM=$(echo "$RESP" | jq -r '.remaining // "?"' 2>/dev/null || echo "?")
             SC=$(echo "$RESP" | jq -c '.scanned // []' 2>/dev/null || echo "[]")
