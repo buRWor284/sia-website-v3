@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "The Authority Flywheel: Six Compounding Returns of Earned Media",
+  title: "The Earned Media Authority Flywheel",
   description:
-    "An interactive model of how earned media compounds: reputation, visibility, conversions, brand equity, magnetism, and liberty, and why each turn of the wheel makes the next one easier.",
+    "An interactive model of how earned media compounds: reputation, visibility, conversions, brand equity, magnetism, and liberty, each turn making the next easier.",
   openGraph: {
     title: "The Authority Flywheel: Six Compounding Returns of Earned Media",
     description:
