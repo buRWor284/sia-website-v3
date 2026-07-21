@@ -128,6 +128,8 @@ export const BEATS: Beat[] = [
       "digital wallet", "real-time payments", "cross-border payments", "mortgage technology", "robo-advisor",
       "small business lending", "invoice financing", "expense management", "financial compliance", "KYC verification",
       "anti-money laundering", "interchange fees", "crypto custody", "tokenized assets", "financial literacy", "credit builder",
+      // - widened 2026-07-21 (royalty/private-markets angle for the BioPalace conversation) -
+      "private credit", "alternative assets",
     ],
     blurb: "Payments, lending, crypto-adjacent, and consumer-finance stories.",
   },
@@ -144,6 +146,11 @@ export const BEATS: Beat[] = [
       "women's health", "sleep health", "medical devices", "vaccine development", "rare disease",
       "cancer screening", "immunotherapy", "microbiome", "eldercare", "home health care",
       "medical imaging", "hospital staffing shortage", "addiction treatment",
+      // - widened 2026-07-21 (BioPalace biotech-royalty conversation + wellness/longevity cluster) -
+      "biotech royalties", "royalty financing", "biotech funding", "drug licensing",
+      "oncology", "cardiovascular disease",
+      "healthy aging", "anti-aging", "skincare", "skin rejuvenation",
+      "dietary supplements", "strength training", "intermittent fasting", "nutrition",
     ],
     blurb: "Care delivery, digital health, and consumer-health stories.",
   },
@@ -191,6 +198,8 @@ export const BEATS: Beat[] = [
       "ransomware", "phishing", "supply chain attack", "passkey adoption", "API security",
       "IoT security", "children's online privacy", "age verification", "facial recognition", "spyware",
       "encrypted messaging", "post-quantum encryption", "bug bounty", "insider threat", "critical infrastructure security", "cloud security",
+      // - widened 2026-07-21 (Efani conversation) -
+      "mobile security", "phone scam", "digital identity",
     ],
     blurb: "Mobile security, identity fraud, privacy, and the policy fight around them.",
   },
