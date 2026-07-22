@@ -33,9 +33,9 @@ const LINKS = {
   emosAcademy: "/emos-academy",
   emosAcademyApply: "/emos-academy/apply",
   fractionalCmo: "/fractional-cmo",
-  // External (dmr.agency). Booster slug to confirm; falls back to the agency home.
-  eme: "https://dmr.agency/earned-media-engine",
-  emb: "https://dmr.agency",
+  // External (dmr.agency)
+  eme: "https://www.dmr.agency/earned-media-engine/",
+  emb: "https://www.dmr.agency/earned-media-booster/",
 };
 
 export default async function RadarPage() {
