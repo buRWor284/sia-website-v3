@@ -12,6 +12,17 @@ const isProtectedRoute = createRouteMatcher(["/emos-platform(.*)"]);
 // errors, not redirects.
 const isProtectedApiRoute = createRouteMatcher(["/api/emos-platform(.*)"]);
 
+// C4 (2026-07-22, tabless-cron live-verify): cron-triggered routes under
+// /api/emos-platform authenticate via their own CRON_SECRET bearer check
+// (see factcheck/cron/route.ts), not a Clerk session — Vercel Cron never
+// carries one. Left ungated, isProtectedApiRoute's `if (!userId) return 401`
+// fired before the route handler ever ran, so every scheduled tick 401'd at
+// the middleware layer and the route's CRON_SECRET check was never reached.
+// Caught via Vercel runtime logs: 100% 401 on every per-minute invocation
+// since the route shipped. Exempt by exact path, not prefix, so any future
+// /api/emos-platform/** route defaults back to the Clerk gate.
+const isEmosCronRoute = createRouteMatcher(["/api/emos-platform/factcheck/cron"]);
+
 // ─── Legacy Basic Auth clients ────────────────────────────────────────────────
 // PT and Resourcex stay on HTTP Basic Auth (shared username/password via Vercel
 // env vars). All new clients should use the Clerk-based system below instead.
@@ -130,6 +141,9 @@ export default clerkMiddleware(async (auth, req) => {
       }
     }
   }
+
+  // ── EMOS cron routes: own CRON_SECRET check, no Clerk session available ──
+  if (isEmosCronRoute(req)) return NextResponse.next();
 
   // ── EMOS platform API routes: Clerk auth + emos_access, JSON errors ──────
   if (isProtectedApiRoute(req)) {
