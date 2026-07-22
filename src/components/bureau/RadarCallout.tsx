@@ -5,14 +5,14 @@ const CREAM = "#FAFAFA";
 
 /**
  * RadarCallout — a small, self-contained teaser that links to the live Earned
- * Media Radar (/radar). Paper card with an ink border so it reads on both light
+ * Media Radar (/earned-media-radar). Paper card with an ink border so it reads on both light
  * and dark sections. Server-compatible (no client hooks). Drop it into any page.
  */
 export function RadarCallout({ maxWidth = 1000 }: { maxWidth?: number }) {
   return (
     <div style={{ padding: "0 24px", boxSizing: "border-box", width: "100%" }}>
       <Link
-        href="/radar"
+        href="/earned-media-radar"
         style={{
           display: "flex",
           alignItems: "center",

@@ -11,11 +11,11 @@ export const metadata: Metadata = {
   title: "Earned Media Radar",
   description:
     "A live map of what the press is covering across PR, earned media, SEO, and AI search. Powered by SignalIQ. See why earned media wins now, and how to put it to work.",
-  alternates: { canonical: "/radar" },
+  alternates: { canonical: "/earned-media-radar" },
   openGraph: {
     title: "Earned Media Radar · Syed Irfan Ajmal",
     description: "A live map of what the press is covering across PR, earned media, SEO, and AI search. Powered by SignalIQ.",
-    url: "/radar",
+    url: "/earned-media-radar",
   },
 };
 
@@ -56,7 +56,7 @@ export default async function RadarPage() {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: "Earned Media Radar",
-    url: "https://www.syedirfanajmal.com/radar",
+    url: "https://www.syedirfanajmal.com/earned-media-radar",
     description:
       "A live map of what the press is covering across PR, earned media, SEO, and AI search, powered by SignalIQ.",
     isPartOf: { "@id": "https://www.syedirfanajmal.com/#website" },

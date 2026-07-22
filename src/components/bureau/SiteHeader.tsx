@@ -44,9 +44,9 @@ const NAV: ReadonlyArray<NavNode> = [
   },
   {
     label: "Earned Media",
-    href: "/radar",
+    href: "/earned-media-radar",
     children: [
-      { label: "Earned Media Radar", href: "/radar",             tag: "Live"           },
+      { label: "Earned Media Radar", href: "/earned-media-radar",             tag: "Live"           },
       { label: "EMOS Platform",      href: "/emos-platform",     tag: "Do-it-yourself" },
       { label: "EMOS Academy",       href: "/emos-academy",      tag: "Done-with-you"  },
       { label: "DMR.agency",         href: "https://dmr.agency", tag: "Done-for-you", external: true },
