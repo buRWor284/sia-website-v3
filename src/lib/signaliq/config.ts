@@ -247,6 +247,33 @@ export const BEATS: Beat[] = [
     ],
     blurb: "Marketing, SEO/GEO, digital PR, content, and web/app agency stories.",
   },
+  {
+    id: "founders",
+    label: "Founders / Series-A",
+    // New beat 2026-07-22 (Irfan): the EMOS Academy ICP — pre-Series-A / Series-A
+    // founders. Two kinds of seed: (1) topics ALREADY scanned by other beats
+    // (venture capital, AI agents, …) re-grouped here so a founder can pick ONE
+    // coherent beat — buildTopicMatchers de-dupes on the canonical phrase, so this
+    // adds ZERO extra scan cost; (2) net-new founder/funding/AI-wave terms below
+    // (probe-scan pending — drop any that GDELT doesn't actually return). This beat
+    // deliberately EXCLUDES the dead startup-ops terms still in the `saas` beat
+    // (product-led growth, SaaS churn, micro SaaS, B2B software pricing, …) that
+    // return ~0 GDELT volume and would flat-line a movers/brief view.
+    seeds: [
+      // — already live (full history, shared with other beats; de-duped in cron) —
+      "venture capital", "seed funding", "startup funding", "tech IPO", "private credit", "alternative assets",
+      "AI agents", "foundation model", "AI governance", "AI safety", "AI regulation", "AI search",
+      "enterprise AI adoption", "humanoid robot", "edge AI", "AI coding assistant", "multimodal AI",
+      "developer tools", "workflow automation", "customer success", "customer acquisition cost", "usage-based pricing",
+      "stablecoin", "embedded finance", "cross-border payments",
+      "creator economy", "thought leadership", "content marketing",
+      // — net-new 2026-07-22 (probe-scan pending) —
+      "generative AI", "large language model", "AI infrastructure", "AI bubble", "tech layoffs",
+      "agentic AI", "AI startup", "venture debt", "robotaxi", "sovereign AI",
+      "Series A funding", "down round", "enterprise AI", "AI chatbot", "startup accelerator",
+    ],
+    blurb: "Funding climate, the AI wave, and go-to-market — the stories a pre-Series-A / Series-A founder builds authority around.",
+  },
 ];
 
 export function beatById(id: BeatId): Beat {
