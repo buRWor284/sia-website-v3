@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMoversData } from "@/lib/movers/data";
 import { pctInt, fmtK, sparkline, type MoverTopic } from "@/lib/movers/types";
-import "../radar/radar.css";
 import "./movers.css";
 
 export const revalidate = 43200; // 12h; the coverage scan runs daily
