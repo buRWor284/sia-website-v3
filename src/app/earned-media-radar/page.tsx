@@ -4,6 +4,8 @@ import { getRadarData } from "@/lib/radar/data";
 import { delta7 } from "@/lib/radar/types";
 import RadarModule from "./RadarModule";
 import "./radar.css";
+import { Colophon } from "@/components/bureau";
+import { ScrollButtons } from "@/components/ScrollButtons";
 
 export const revalidate = 43200; // 12h; the coverage scan runs daily
 
@@ -64,6 +66,7 @@ export default async function RadarPage() {
   };
 
   return (
+    <>
     <main className="emr-wrap">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
@@ -329,7 +332,9 @@ export default async function RadarPage() {
           ))}
         </div>
       </div>
-      <p className="emr-copyright">© MMXXVI Syed Irfan Ajmal · SIA Enterprises Inc</p>
     </main>
+    <Colophon />
+    <ScrollButtons />
+    </>
   );
 }
