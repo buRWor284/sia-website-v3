@@ -82,6 +82,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Platform teaser pages (marketing explainers for EMOS-Platform-only tools)
     { route: "tools/assetiq",                   changeFrequency: "monthly" as const, priority: 0.6 },
     { route: "tools/factcheckiq",               changeFrequency: "monthly" as const, priority: 0.6 },
+    // Earned-media data pages (live SignalIQ coverage; refreshed daily)
+    { route: "earned-media-radar",              changeFrequency: "daily"   as const, priority: 0.8 },
+    { route: "founder-movers",                  changeFrequency: "daily"   as const, priority: 0.8 },
   ];
 
   const staticEntries = pages.map(({ route, changeFrequency, priority }) => ({

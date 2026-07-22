@@ -39,29 +39,30 @@ function Spark({ series }: { series: number[] }) {
   );
 }
 
-function MoverRow({ t, i, rising, max }: { t: MoverTopic; i: number; rising: boolean; max: number }) {
-  const width = max > 0 ? Math.max(6, (Math.abs(t.wow) / max) * 100) : 6;
+/** One row of the diverging (tornado) movers chart: bar grows right in amber for
+ *  rising topics, left in ink for cooling ones, from a shared center 0% line. */
+function TornadoRow({ t, maxAbs }: { t: MoverTopic; maxAbs: number }) {
+  const up = t.wow >= 0;
+  const half = maxAbs > 0 ? Math.min(48, (Math.abs(t.wow) / maxAbs) * 48) : 0;
   return (
-    <div className="emr-list-row">
-      <span className="emr-rank">{i + 1}</span>
-      <div className="emr-row-main">
-        <div className="emr-row-name">{displayTopic(t.topic)}</div>
-        <div className="emr-bar">
-          <i className={rising ? "emr-bar-y" : ""} style={{ width: width + "%" }} />
-        </div>
+    <div className="mvr-trow">
+      <div className="mvr-tlabel">{displayTopic(t.topic)}</div>
+      <div className="mvr-ttrack">
+        <span className={"mvr-tbar " + (up ? "up" : "down")} style={{ width: half + "%" }} />
       </div>
-      <span className="mvr-rowcount">{fmtK(t.last7)}</span>
-      <span className="emr-mom">
-        {rising ? "▲" : "▼"} {pctInt(t.wow)}
-      </span>
+      <div className="mvr-tcount">{fmtK(t.last7)}</div>
+      <div className="mvr-tval">
+        {up ? "▲" : "▼"} {pctInt(t.wow)}
+      </div>
     </div>
   );
 }
 
 export default async function MoversPage() {
   const data = await getMoversData();
-  const maxRise = data.risers.length ? Math.max(...data.risers.map((t) => t.wow)) : 1;
-  const maxFall = data.coolers.length ? Math.max(...data.coolers.map((t) => Math.abs(t.wow))) : 1;
+  // One ranked column, most-rising at the top to most-cooling at the bottom.
+  const movers = [...data.risers, ...data.coolers].sort((a, b) => b.wow - a.wow);
+  const maxAbs = movers.length ? Math.max(...movers.map((m) => Math.abs(m.wow))) : 1;
   const live = data.covered > 0;
 
   const jsonLd = {
@@ -81,11 +82,6 @@ export default async function MoversPage() {
     { n: String(data.coolingCount), l: "Cooling down" },
     { n: fmtK(data.totalLast7), l: "Articles · last 7 days" },
   ];
-
-  const risersHint =
-    data.heatingCount > data.risers.length ? `top ${data.risers.length} of ${data.heatingCount}` : "week over week";
-  const coolersHint =
-    data.coolingCount > data.coolers.length ? `top ${data.coolers.length} of ${data.coolingCount}` : "quiet lanes";
 
   return (
     <main className="emr-wrap">
@@ -129,40 +125,28 @@ export default async function MoversPage() {
         ))}
       </div>
 
-      {/* BOARD: risers + coolers */}
-      <div className="mvr-board">
-        <div className="emr-panel">
-          <div className="emr-panel-head">
-            <span className="emr-scaps">Heating up this week</span>
+      {/* MOVERS — diverging centerpiece */}
+      {movers.length ? (
+        <div className="mvr-tornado">
+          <div className="mvr-tornado-head">
+            <span className="emr-scaps">Heating up &harr; cooling down</span>
             <span className="emr-mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--color-ink-55)" }}>
-              {risersHint}
+              {data.heatingCount} up · {data.coolingCount} down · this week
             </span>
           </div>
-          <div className="emr-panel-body">
-            {data.risers.length ? (
-              data.risers.map((t, i) => <MoverRow key={t.topic} t={t} i={i} rising max={maxRise} />)
-            ) : (
-              <p className="mvr-note">Nothing clearly rising yet — check back after the next daily scan.</p>
-            )}
+          <div className="mvr-tornado-mid" aria-hidden="true">
+            <span>← cooling</span>
+            <span>heating →</span>
           </div>
+          {movers.map((t) => (
+            <TornadoRow key={t.topic} t={t} maxAbs={maxAbs} />
+          ))}
         </div>
-
-        <div className="emr-panel">
-          <div className="emr-panel-head">
-            <span className="emr-scaps">Cooling down</span>
-            <span className="emr-mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--color-ink-55)" }}>
-              {coolersHint}
-            </span>
-          </div>
-          <div className="emr-panel-body">
-            {data.coolers.length ? (
-              data.coolers.map((t, i) => <MoverRow key={t.topic} t={t} i={i} rising={false} max={maxFall} />)
-            ) : (
-              <p className="mvr-note">No clear cool-offs this week.</p>
-            )}
-          </div>
-        </div>
-      </div>
+      ) : (
+        <p className="mvr-note" style={{ padding: "8px 0 20px" }}>
+          Nothing clearly moving yet — check back after the next daily scan.
+        </p>
+      )}
 
       {/* BREAKING NOW: spikes */}
       <div className="emr-panel">

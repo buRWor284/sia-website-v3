@@ -296,6 +296,9 @@ export default async function RadarPage() {
         </Link>
         <p className="emr-micro">Thirty minutes, no pitch deck. The easiest first step is a Marketing Leadership Audit, and if you go further it pays for itself.</p>
         <div className="emr-secondary-links">
+          <Link href="/founder-movers" className="emr-tlink">
+            See this week&apos;s Founder Movers
+          </Link>
           <Link href={LINKS.signaliq} className="emr-tlink">
             Try SignalIQ free
           </Link>
