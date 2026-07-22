@@ -30,6 +30,7 @@ import SignalIQToolCore, { type SiqPdfContext } from "@/components/signaliq/Sign
 import { SIQ_CSS } from "@/components/signaliq/core-css";
 import { CountUp, SOURCES_DATA } from "@/components/signaliq/cards";
 import { DoubleRule, Mark, SCaps } from "@/components/bureau/primitives";
+import { RadarCallout } from "@/components/bureau/RadarCallout";
 import { INK, INK15, INK35, INK55, INK70, MONO, PAPER, SERIF, GROT, YEL } from "@/lib/tokens";
 import { BEATS, EMAIL_SCANS, FREE_SCANS, PRODUCT } from "@/lib/signaliq/config";
 import type { BeatId } from "@/lib/signaliq/types";
@@ -477,6 +478,7 @@ export default function SignalIQPage() {
               </Link>
             </p>
           </div>
+          <RadarCallout />
           <ToolPipelineFooter currentTool="signaliq" />
         </div>
       )}

@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { RadarCallout } from "@/components/bureau/RadarCallout";
 
 /**
  * /emos-platform — EMOS PLATFORM landing (public).
@@ -106,6 +107,8 @@ export default async function EmostoolLandingPage() {
           $50/month · cancel any time · secure payment via Stripe
         </p>
       </section>
+
+      <RadarCallout />
 
       {/* ── The connected pipeline ───────────────────────────────────────── */}
       <section style={{ maxWidth: 1120, marginInline: "auto", padding: "clamp(20px,3vw,32px) clamp(20px,4vw,56px) clamp(48px,7vw,88px)" }}>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Subscriptions, CTATicker, Colophon } from '@/components/bureau';
 import { Reveal } from '@/components/motion/Reveal';
+import { RadarCallout } from '@/components/bureau/RadarCallout';
 
 /**
  * Homepage v4 Cream edition (SIA-homepage-v3 design)
@@ -781,6 +782,8 @@ export default function HomePage() {
       </header>
 
       {/* ══ § 01 KITS / FREE RESOURCES ══ */}
+      <RadarCallout />
+
       <section className="kits">
         <div className="sec-idx">
           <span className="sec-idx__n">§ 01</span>

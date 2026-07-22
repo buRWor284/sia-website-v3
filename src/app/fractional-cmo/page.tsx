@@ -4,6 +4,7 @@ import { Fragment, useCallback, useState } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import Script from "next/script";
 import { Colophon, Subscriptions } from "@/components/bureau";
+import { RadarCallout } from "@/components/bureau/RadarCallout";
 import { Turnstile } from "@/components/Turnstile";
 import {
   DoubleRule,
@@ -1410,6 +1411,7 @@ export default function FractionalCMOPage() {
       <Scope />
       <CMOTestimonials />
       <CaseFiles />
+      <RadarCallout />
       <Timeline />
       <FAQ />
       <AuditSection />

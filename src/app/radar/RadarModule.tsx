@@ -194,7 +194,7 @@ export default function RadarModule({ data }: { data: RadarData }) {
     let cx = 150;
     let cy = 150;
     let R = 130;
-    function sizeRadar() {
+    const sizeRadar = () => {
       const w = cv.parentElement ? cv.parentElement.clientWidth : 380;
       size = w;
       cx = w / 2;
@@ -209,7 +209,7 @@ export default function RadarModule({ data }: { data: RadarData }) {
 
     let sweep = 0;
     let raf = 0;
-    function draw() {
+    const draw = () => {
       ctx.clearRect(0, 0, size, size);
       ctx.strokeStyle = "rgba(26,20,16,.15)";
       ctx.lineWidth = 1;
@@ -273,7 +273,7 @@ export default function RadarModule({ data }: { data: RadarData }) {
       ctx.fillStyle = "#f5b81f";
       ctx.fill();
     }
-    function loop() {
+    const loop = () => {
       sweep += RM ? 0.006 : 0.014;
       if (sweep > Math.PI * 2) sweep -= Math.PI * 2;
       draw();

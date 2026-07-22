@@ -11,6 +11,7 @@ import {
 import { Figure } from "@/components/bureau/EmosFigures";
 import { EmosTOC } from "@/components/bureau/EmosTOC";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
+import { RadarCallout } from "@/components/bureau/RadarCallout";
 import {
   GROT,
   INK,
@@ -260,6 +261,7 @@ export default function EmosPage() {
           </section>
 
           {/* ── § 2: REAL PROBLEM ──────────────────────────────────────── */}
+          <RadarCallout />
           <section id="how-it-works" className="sy bg-p2 sx">
             <div className="max">
               <SectionMast noVol n="2" label="The Real Problem · Why Most Founders Fail at PR" />
