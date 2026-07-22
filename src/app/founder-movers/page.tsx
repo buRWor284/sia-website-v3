@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMoversData } from "@/lib/movers/data";
 import { pctInt, fmtK, sparkline, type MoverTopic } from "@/lib/movers/types";
+import { displayTopic } from "@/lib/topics/display";
 import "./movers.css";
 
 export const revalidate = 43200; // 12h; the coverage scan runs daily
@@ -9,21 +10,21 @@ export const revalidate = 43200; // 12h; the coverage scan runs daily
 export const metadata: Metadata = {
   title: "Founder Movers",
   description:
-    "A live weekly read of which founder and Series-A topics the press is covering more — and less — this week. Powered by SignalIQ. Ride the wave while it's rising; own the quiet lanes.",
-  alternates: { canonical: "/movers" },
+    "This week's biggest movers in press coverage across founder and Series-A topics — what's heating up, and what's cooling. Powered by SignalIQ.",
+  alternates: { canonical: "/founder-movers" },
   openGraph: {
     title: "Founder Movers · Syed Irfan Ajmal",
     description:
-      "Which founder / Series-A topics are heating up in the press this week, and which are cooling. Powered by SignalIQ.",
-    url: "/movers",
+      "This week's biggest movers in press coverage across founder / Series-A topics. Powered by SignalIQ.",
+    url: "/founder-movers",
   },
 };
 
-// Internal link targets — real routes used by the /radar page.
+// Internal link targets — real routes on the site.
 const LINKS = {
   book: "/strategy-call",
   signaliq: "/tools/signaliq",
-  radar: "/radar",
+  radar: "/earned-media-radar",
   emosAcademy: "/emos-academy",
   emosAcademyApply: "/emos-academy/apply",
 };
@@ -44,11 +45,12 @@ function MoverRow({ t, i, rising, max }: { t: MoverTopic; i: number; rising: boo
     <div className="emr-list-row">
       <span className="emr-rank">{i + 1}</span>
       <div className="emr-row-main">
-        <div className="emr-row-name">{t.topic}</div>
+        <div className="emr-row-name">{displayTopic(t.topic)}</div>
         <div className="emr-bar">
           <i className={rising ? "emr-bar-y" : ""} style={{ width: width + "%" }} />
         </div>
       </div>
+      <span className="mvr-rowcount">{fmtK(t.last7)}</span>
       <span className="emr-mom">
         {rising ? "▲" : "▼"} {pctInt(t.wow)}
       </span>
@@ -66,9 +68,9 @@ export default async function MoversPage() {
     "@context": "https://schema.org",
     "@type": "WebPage",
     name: "Founder Movers",
-    url: "https://www.syedirfanajmal.com/movers",
+    url: "https://www.syedirfanajmal.com/founder-movers",
     description:
-      "A live weekly read of which founder / Series-A topics the press is covering more and less, powered by SignalIQ.",
+      "This week's biggest movers in press coverage across founder / Series-A topics, powered by SignalIQ.",
     isPartOf: { "@id": "https://www.syedirfanajmal.com/#website" },
     about: { "@id": "https://www.syedirfanajmal.com/#person" },
   };
@@ -80,6 +82,11 @@ export default async function MoversPage() {
     { n: fmtK(data.totalLast7), l: "Articles · last 7 days" },
   ];
 
+  const risersHint =
+    data.heatingCount > data.risers.length ? `top ${data.risers.length} of ${data.heatingCount}` : "week over week";
+  const coolersHint =
+    data.coolingCount > data.coolers.length ? `top ${data.coolers.length} of ${data.coolingCount}` : "quiet lanes";
+
   return (
     <main className="emr-wrap">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -87,11 +94,11 @@ export default async function MoversPage() {
       {/* HERO */}
       <section className="emr-hero">
         <div className="emr-scaps">Live · Founder Movers</div>
-        <h1 className="emr-h1">What the press is writing more — and less — about in your category this week.</h1>
+        <h1 className="emr-h1">This week&apos;s biggest movers in press coverage.</h1>
         <p className="emr-body-lg" style={{ margin: "0 0 24px" }}>
           Every day, SignalIQ counts how much the press covers the topics a pre-Series-A and Series-A founder builds
-          authority around. This turns that into one weekly read: what is heating up, so you ride the wave while it is
-          rising, and what has gone quiet, an open lane you can still own.
+          authority around. This is the weekly read: what is heating up, so you ride the wave while it is rising, and what
+          has gone quiet — an open lane you can still own.
         </p>
         <div className="emr-cta-row">
           <Link href={LINKS.signaliq} className="emr-btn-yellow">
@@ -128,7 +135,7 @@ export default async function MoversPage() {
           <div className="emr-panel-head">
             <span className="emr-scaps">Heating up this week</span>
             <span className="emr-mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--color-ink-55)" }}>
-              week over week
+              {risersHint}
             </span>
           </div>
           <div className="emr-panel-body">
@@ -144,7 +151,7 @@ export default async function MoversPage() {
           <div className="emr-panel-head">
             <span className="emr-scaps">Cooling down</span>
             <span className="emr-mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--color-ink-55)" }}>
-              quiet lanes
+              {coolersHint}
             </span>
           </div>
           <div className="emr-panel-body">
@@ -162,19 +169,19 @@ export default async function MoversPage() {
         <div className="emr-panel-head">
           <span className="emr-scaps">Breaking now</span>
           <span className="emr-mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--color-ink-55)" }}>
-            latest day vs baseline
+            vs a normal day
           </span>
         </div>
         <div className="emr-panel-body">
           {data.spikes.length ? (
             data.spikes.map((t) => (
               <div className="mvr-spikerow" key={t.topic}>
-                <span className="mvr-name">{t.topic}</span>
+                <span className="mvr-name">{displayTopic(t.topic)}</span>
                 <Spark series={t.series} />
                 <span className="mvr-meta">
                   {Math.round(t.lastDay)} today · {t.avgDay.toFixed(0)}/day avg
                 </span>
-                <span className="mvr-z">{t.z.toFixed(1)}σ</span>
+                <span className="mvr-z">{(t.avgDay > 0 ? t.lastDay / t.avgDay : 0).toFixed(1)}×</span>
               </div>
             ))
           ) : (
@@ -194,12 +201,12 @@ export default async function MoversPage() {
             {
               n: "01",
               h: "Ride what is heating up.",
-              b: "When a topic in your world is climbing, reporters are already looking for sources and takes. That is the week to publish your view, share your data, and pitch, while the story is cresting and you are not the two-hundredth email.",
+              b: "When a topic in your world is climbing, reporters are already looking for sources and takes. That is the week to publish your view, share your data, and pitch — while the story is cresting and you are not the two-hundredth email.",
             },
             {
               n: "02",
               h: "Own what has gone quiet.",
-              b: "A cooling topic is not a dead one. It is an open lane, less crowded, easier to become the name attached to it. Founders build durable authority on the beats nobody else is fighting over yet.",
+              b: "A cooling topic is not a dead one. It is an open lane: less crowded, easier to become the name attached to it. Founders build durable authority on the beats nobody else is fighting over yet.",
             },
             {
               n: "03",
@@ -225,7 +232,7 @@ export default async function MoversPage() {
         </div>
         <p className="emr-body-lg emr-italic" style={{ marginTop: 22, maxWidth: 760 }}>
           Momentum is a 7-day-versus-prior-7-day change in press coverage, measured from real article counts and refreshed
-          daily. Early signals, not predictions — and every one traces back to the source.
+          daily. Early signals, not predictions — and every one traces back to its source.
         </p>
       </section>
 

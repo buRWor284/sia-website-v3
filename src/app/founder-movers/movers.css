@@ -66,15 +66,17 @@
 .mvr-name { flex: 1; min-width: 0; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mvr-meta { font-family: var(--font-mono); font-size: 10.5px; color: var(--color-ink-55); white-space: nowrap; }
 .mvr-z { font-family: var(--font-mono); font-size: 12px; width: 46px; text-align: right; }
+.mvr-rowcount { font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-55); width: 54px; text-align: right; }
 .mvr-spark { width: 92px; height: 26px; flex: 0 0 auto; }
 .mvr-spark polyline { fill: none; stroke: var(--color-ink); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
 
-/* ---- responsive ---- */
+/* ---- responsive (harmonized: stats reflow before they cramp; board holds
+   side-by-side down to 820, then stacks) ---- */
 @media (max-width: 1080px) { .emr-four { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 880px) { .mvr-board { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .mvr-stats { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 820px) { .mvr-board { grid-template-columns: 1fr; } }
 @media (max-width: 640px) {
   .emr-wrap { padding: 0 18px 56px; }
   .emr-four { grid-template-columns: 1fr; }
-  .mvr-stats { grid-template-columns: 1fr 1fr; }
   .mvr-spark { display: none; }
 }

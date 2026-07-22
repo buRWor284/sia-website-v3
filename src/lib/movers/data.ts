@@ -18,6 +18,7 @@ import type { MoversData, MoverTopic } from "./types";
 
 const MATCHER = "webngrams_v2";
 const WINDOW_DAYS = 28;
+const MIN_SCANNED_DAYS = 14; // need ~2 weeks of REAL scanned days before a topic can rank — kills half-backfilled artifacts
 const MIN_PRIOR7 = 30; // WoW noise floor — need a real base the prior week
 const MIN_LAST7 = 15; // …and real coverage this week, so tiny topics can't post +900%
 const MIN_AVG_SPIKE = 8; // spikes only for topics with a real daily baseline
@@ -93,36 +94,40 @@ export async function getMoversData(): Promise<MoversData> {
     const rows = await fetchDaily(FOUNDER_TOPICS, isoDaysAgo(WINDOW_DAYS - 1));
     if (rows.length === 0) return empty;
 
-    // All founder topics share the same scanned days; align each topic on that grid.
-    const days = Array.from(new Set(rows.map((r) => String(r.day)))).sort();
-    const dayIndex = new Map(days.map((d, i) => [d, i] as const));
-
-    const byTopic = new Map<string, number[]>();
+    // Group each topic's counts by the days it was ACTUALLY scanned (present rows
+    // only). A missing day means "not scanned for this topic yet", never a real 0 —
+    // this matches derive.ts and stops a half-backfilled topic (one recent day, the
+    // rest absent) from faking a huge spike.
+    const byTopic = new Map<string, { day: string; c: number }[]>();
     for (const r of rows) {
-      let arr = byTopic.get(r.topic);
-      if (!arr) {
-        arr = new Array<number>(days.length).fill(0);
-        byTopic.set(r.topic, arr);
-      }
-      const i = dayIndex.get(String(r.day));
-      if (i !== undefined) arr[i] = Number(r.article_count) || 0;
+      const arr = byTopic.get(r.topic) ?? [];
+      arr.push({ day: String(r.day), c: Number(r.article_count) || 0 });
+      byTopic.set(r.topic, arr);
     }
 
-    const all: MoverTopic[] = [...byTopic.entries()].map(([topic, series]) => statsFor(topic, series));
+    const allDays = new Set<string>();
+    const ranked: MoverTopic[] = [];
+    for (const [topic, arr] of byTopic) {
+      arr.sort((a, b) => (a.day < b.day ? -1 : a.day > b.day ? 1 : 0));
+      for (const x of arr) allDays.add(x.day);
+      if (arr.length < MIN_SCANNED_DAYS) continue; // sample-size floor
+      ranked.push(statsFor(topic, arr.map((x) => x.c)));
+    }
 
-    const eligible = all.filter((t) => t.prior7 >= MIN_PRIOR7 && t.last7 >= MIN_LAST7);
+    const sortedDays = [...allDays].sort();
+    const eligible = ranked.filter((t) => t.prior7 >= MIN_PRIOR7 && t.last7 >= MIN_LAST7);
     const rising = eligible.filter((t) => t.wow > 0).sort((a, b) => b.wow - a.wow);
     const cooling = eligible.filter((t) => t.wow < 0).sort((a, b) => a.wow - b.wow);
-    const spikes = all
+    const spikes = ranked
       .filter((t) => t.avgDay >= MIN_AVG_SPIKE && t.z > 0)
       .sort((a, b) => b.z - a.z)
       .slice(0, MAX_SPIKES);
 
     return {
-      asOf: days[days.length - 1],
+      asOf: sortedDays.length ? sortedDays[sortedDays.length - 1] : isoDaysAgo(1),
       windowDays: WINDOW_DAYS,
-      covered: all.length,
-      totalLast7: sum(all.map((t) => t.last7)),
+      covered: byTopic.size,
+      totalLast7: sum(ranked.map((t) => t.last7)),
       heatingCount: rising.length,
       coolingCount: cooling.length,
       risers: rising.slice(0, MAX_ROWS),

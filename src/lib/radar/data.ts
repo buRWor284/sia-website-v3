@@ -13,6 +13,7 @@ import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { ACTIVE_COVERAGE_VERSION } from "@/lib/signaliq/coverage-store";
 import { LENSES, type Lens, type RadarData, type RadarTopic } from "./types";
+import { displayTopic } from "@/lib/topics/display";
 
 /**
  * The curated, marketing-safe focus set (no client-specific beats). Edit here to
@@ -108,7 +109,7 @@ export async function getRadarData(): Promise<RadarData> {
     const daily = (dailyRes.data ?? []) as DailyRow[];
 
     const radarTopics: RadarTopic[] = cov.map((r) => ({
-      topic: r.topic,
+      topic: displayTopic(r.topic),
       lens: lensOf.get(r.topic) ?? "pr",
       vol: Number(r.volume) || 0,
       tr: Number(r.trend) || 0,
