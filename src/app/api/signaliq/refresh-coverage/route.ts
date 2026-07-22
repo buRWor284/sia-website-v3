@@ -38,7 +38,7 @@
  */
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { BEATS } from "@/lib/signaliq/config";
+import { BEATS, normalizeVolume } from "@/lib/signaliq/config";
 import { buildTopicMatchers } from "@/lib/signaliq/coverage/tokenize";
 import { scanDay } from "@/lib/signaliq/coverage/bigquery";
 import { deriveTopicCoverage, type DailyCount } from "@/lib/signaliq/coverage/derive";
@@ -117,7 +117,7 @@ async function deriveAndMaybeWrite(today: Date): Promise<Record<string, unknown>
 
   const derived = [...byTopic.entries()].map(([topic, series]) => {
     const d = deriveTopicCoverage(series, today);
-    return { topic, volume: d.volume, trend: d.trend, articleCount: d.articleCount };
+    return { topic, volume: normalizeVolume(d.volume), trend: d.trend, articleCount: d.articleCount };
   });
 
   if (CUTOVER && derived.length) {

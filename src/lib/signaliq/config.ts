@@ -81,6 +81,24 @@ export function bandFor(score: number): { min: number; band: OppBand; label: str
 }
 
 /**
+ * Volume normalisation reference — SignalIQ BigQuery cutover (2026-07-22).
+ * Scorer reads coverage.volume as 0..1 (score.ts: 1 - coverage.volume). BigQuery
+ * volume (derive.ts) is a RAW 14-day avg distinct-article count, 0..~2500 across
+ * topics (live 07-08..07-21: p50 5, p90 82, p99 440, max 2544), so compress to
+ * 0..1 before scoring. ~500x spread rules out a linear cap; log keeps spread:
+ *   vol01 = clamp01( log10(1 + v14) / log10(1 + VOLUME_LOG_REF) )
+ * REF=500 (~p99) reproduces the old DOC-era median gap (0.71), so BANDS carry over.
+ */
+export const VOLUME_LOG_REF = 500;
+
+/** Compress a raw occurrence average to the 0..1 saturation the scorer expects. */
+export function normalizeVolume(rawVolume: number, ref: number = VOLUME_LOG_REF): number {
+  const v = Number.isFinite(rawVolume) && rawVolume > 0 ? rawVolume : 0;
+  const denom = Math.log10(1 + Math.max(ref, 2));
+  return Math.max(0, Math.min(1, Math.log10(1 + v) / denom));
+}
+
+/**
  * Tasteful-newsjacking guardrail (RFP §11.4, D-13): never frame human tragedy
  * as an "opportunity." Matched items are flagged `sensitive` and demoted below
  * all non-sensitive opportunities in the ranking.

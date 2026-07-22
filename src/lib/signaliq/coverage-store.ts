@@ -25,8 +25,8 @@ const CURSOR_KEY = "coverage_refresh_cursor";
 
 /**
  * Coverage semantics currently trusted by the scorer:
- *   1 = DOC-API-derived (0..1 normalised volume)   ← ACTIVE today
- *   2 = BigQuery-derived (raw occurrence units)     ← written by the BQ pipeline
+ *   1 = DOC-API-derived (0..1 normalised volume)   ← legacy (pre-cutover)
+ *   2 = BigQuery-derived (0..1 log-normalised vol)  ← ACTIVE (cutover 2026-07-22)
  * The BigQuery pipeline writes v2 rows and the scorer only ever reads the ACTIVE
  * version, so raw-unit values can never reach 0..1 scoring. Bump ACTIVE to the
  * BigQuery version at cutover (after the parity week + scoring re-baseline).
@@ -35,7 +35,7 @@ const CURSOR_KEY = "coverage_refresh_cursor";
 // commit flips ACTIVE to the BigQuery version, and `ACTIVE === BIGQUERY` must
 // stay a legal runtime comparison rather than a "these literals never overlap"
 // type error.
-export const ACTIVE_COVERAGE_VERSION: number = 1;
+export const ACTIVE_COVERAGE_VERSION: number = 2; // was 1 — BigQuery cutover 2026-07-22
 export const BIGQUERY_COVERAGE_VERSION: number = 2;
 
 /** Read cached coverage for a topic (ACTIVE version only). Null if not present. */
