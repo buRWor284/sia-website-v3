@@ -193,16 +193,14 @@ async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<
       const scan = scanSearchResults(message);
       searchOk += scan.ok;
       searchErr += scan.err;
-      // Web search attempted but every result errored (rate limit / unavailable):
-      // this claim cannot be honestly graded, no matter what verdict the model states.
-      const toolUnavailable = searchErr > 0 && searchOk === 0;
-
       const verdictBlock = message.content.find(
         (b): b is Anthropic.ToolUseBlock => b.type === "tool_use" && b.name === "record_verdict",
       );
 
       if (verdictBlock) {
-        return finalizeVerdict(claim, verdictBlock.input as GradeToolInput, searchesUsed, toolUnavailable);
+        // Pass the raw search tallies; finalizeVerdict decides whether the web
+        // check actually happened (searchOk) before trusting any content verdict.
+        return finalizeVerdict(claim, verdictBlock.input as GradeToolInput, searchesUsed, searchOk, searchErr);
       }
 
       // No verdict yet. If the model stopped to use server tools, the API has
@@ -215,12 +213,13 @@ async function attemptVerify(claim: ClaimToVerify, ctx: VerifyContext): Promise<
       });
     }
 
-    // Ran out of turns without a verdict. If the tools were unavailable, that is a
-    // system failure (check_failed); otherwise it is an honest Unverifiable.
-    if (searchErr > 0 && searchOk === 0) {
-      return checkFailed(claim, "Live web search was unavailable (rate limited); this claim was not checked. Retry.", searchesUsed);
+    // Ran out of turns without a verdict. If no search succeeded, the web check
+    // never really happened, so this is a technical "couldn't check", not an
+    // honest Unverifiable (which must mean "we looked and could not confirm").
+    if (searchOk === 0) {
+      return checkFailed(claim, technicalReason(searchErr), searchesUsed);
     }
-    return unverifiable(claim, "Verification did not converge on a verdict within the turn budget.", searchesUsed, true);
+    return unverifiable(claim, "Searched the live web but could not gather enough to reach a verdict within the step budget.", searchesUsed, true);
   } catch (err) {
     const cls = classifyVerifyError(err);
     // Always surface the real error to the server logs. A swallowed verify error
@@ -329,7 +328,21 @@ interface GradeToolInput {
   injectionAttemptDetected?: boolean;
 }
 
-function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUsed: number, toolUnavailable: boolean): VerifiedClaim {
+/**
+ * A clear, user-facing reason for a claim that could not be web-checked because
+ * the research tooling did not deliver — a TECHNICAL failure, not a judgment on
+ * the claim. Distinguishes "search ran but errored / was rate-limited" from
+ * "search never ran (tool unavailable)" so the report can say which, instead of
+ * the overloaded "Unverifiable" (which should mean "we looked and could not
+ * confirm"). No em/en dashes: this text is shown to users.
+ */
+function technicalReason(searchErr: number): string {
+  return searchErr > 0
+    ? "Couldn't verify: live web search was rate-limited or errored, so no sources could be read. This is a temporary tool issue, not a judgment on the claim. Re-run to check it."
+    : "Couldn't verify: the web research tool was unavailable, so no sources could be read. This is a temporary tool issue, not a judgment on the claim. Re-run to check it.";
+}
+
+function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUsed: number, searchOk: number, searchErr: number): VerifiedClaim {
   const sources: Source[] = (input.sources ?? [])
     .filter((s) => typeof s.url === "string" && s.url.length > 0)
     .map((s) => ({
@@ -340,11 +353,16 @@ function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUs
       as_of: s.as_of,
     }));
 
-  // If web search was unavailable and the model gathered no real sources, the claim
-  // was not actually assessed, whatever verdict the model typed. Report it honestly
-  // as check_failed (retryable), never as a content verdict like Unverifiable.
-  if (toolUnavailable && sources.length === 0) {
-    return checkFailed(claim, "Live web search was unavailable (rate limited); this claim was not checked. Retry.", searchesUsed);
+  // A full-audit verdict is only real if the live web check actually happened. If
+  // NO search succeeded (searchOk === 0) and nothing was fetched, the claim was not
+  // assessed, whatever verdict the model typed — surface it as an honest technical
+  // "couldn't check" (retryable), never a content verdict like Unverifiable. This is
+  // the Kilimanjaro case (21 Jul 2026): the model returned "unverifiable" with zero
+  // sources because the web tool was down, and it was wrongly shown as a real
+  // verdict. Broadened from the old `searchErr > 0` test so the "search never even
+  // ran" variant (searchErr === 0 && searchOk === 0) is caught too.
+  if (searchOk === 0 && sources.length === 0) {
+    return checkFailed(claim, technicalReason(searchErr), searchesUsed);
   }
 
   const proposedVerdict: Verdict = VALID_VERDICTS.includes(input.verdict as Verdict)

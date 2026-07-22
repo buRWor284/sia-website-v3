@@ -75,13 +75,19 @@ export const PROCESS_ROUTE_MAX_DURATION_SECONDS = 300;
 
 /**
  * How long before the function-duration cap the full-audit verify stage stops
- * starting new per-claim verifications. Sized to let one worst-case in-flight
- * claim (up to 2 Opus turns with searches) finish AND leave room for the report
- * build + final status write. Claims not started by the deadline come back as
- * status "check_failed" ("Check incomplete" in the UI) — honest and retryable,
- * never silently dropped.
+ * STARTING new per-claim verifications, so a claim already in flight can finish
+ * and the partial report still gets written before the platform hard-kill.
+ *
+ * INVARIANT (revised 21 Jul 2026): must be >= PER_CLAIM_TIMEOUT_MS. A claim may
+ * be started right at the deadline and then run for up to a full per-claim
+ * timeout; if this safety margin were smaller than that timeout, the platform
+ * would hard-kill the claim mid-flight (wasted paid work). Sized here at
+ * PER_CLAIM_TIMEOUT_MS + 15s of slack for the final report build + status write.
+ * Raised 90s -> 135s alongside the per-claim timeout raise (75s -> 120s), after
+ * live logs (21 Jul) showed most claims legitimately needed longer than 75s and
+ * were being killed as false "timeouts."
  */
-export const VERIFY_DEADLINE_SAFETY_MS = 90_000;
+export const VERIFY_DEADLINE_SAFETY_MS = 135_000;
 
 /**
  * A run still queued/running this long after creation is presumed hard-killed
@@ -92,14 +98,23 @@ export const VERIFY_DEADLINE_SAFETY_MS = 90_000;
 export const STALE_RUN_AFTER_MS = (PROCESS_ROUTE_MAX_DURATION_SECONDS + 120) * 1000;
 
 /**
- * Phase 5a (19 Jul 2026): per-request timeout on each verify+grade model call.
- * Observed live: one claim finished in ~1 minute while three sat in flight for
- * 4+ minutes each, eating the whole 300s window. The deadline guard cannot
+ * Per-request timeout on each verify+grade model call. The deadline guard cannot
  * abort an in-flight call; this can. A claim that exceeds it comes back
- * check_failed fast and the worker moves to the next claim; unfinished claims
- * are picked up by a continuation invocation on a fresh clock.
+ * check_failed fast and the worker moves on; unfinished claims are retried by a
+ * later continuation window.
+ *
+ * RAISED 75s -> 120s (21 Jul 2026). Live logs showed the 75s cap was the actual
+ * blocker: on a 33-claim run all but the fastest claims tripped it — Opus +
+ * web_search + reading a couple of fetched pages routinely needs 80-110s — so
+ * they came back as false "Request timed out" check_failures, retried, timed out
+ * again, and the run died at the backstop with most claims never really checked.
+ * 120s covers the realistic per-claim cost with headroom. Trade-off: fewer claims
+ * start per 300s window, so long docs need more continuation windows (fine now
+ * that continuations are cron-driven and the attempts counter is fixed). Kept
+ * below VERIFY_DEADLINE_SAFETY_MS so a claim started at the deadline still lands
+ * before the invocation hard-kill.
  */
-export const PER_CLAIM_TIMEOUT_MS = 75_000;
+export const PER_CLAIM_TIMEOUT_MS = 120_000;
 
 /**
  * Cooperative work lease on a run (fact_check_runs.lease_until). The live worker
@@ -111,8 +126,9 @@ export const PER_CLAIM_TIMEOUT_MS = 75_000;
  * when a claim RESOLVES (run.ts onClaim) — there is no mid-claim heartbeat — and a
  * single stubborn claim can run with no resolution for far longer than the old
  * "~165s" estimate assumed: up to MAX_TURNS_PER_CLAIM (2) * PER_CLAIM_TIMEOUT_MS
- * (75s) + RATE_LIMIT_BACKOFF_MS (15s) + a second 2*75s attempt ~= 315s. If the
- * lease were shorter than the invocation, it could expire UNDER a still-alive
+ * + RATE_LIMIT_BACKOFF_MS + a second full attempt — comfortably into the minutes,
+ * and larger still after the 120s per-claim timeout raise. If the lease were
+ * shorter than the invocation, it could expire UNDER a still-alive
  * worker grinding one slow claim, and the every-minute cron would pounce on that
  * expired lease and double-drive the run (double paid verify). The fix does not
  * depend on estimating the worst claim: a worker cannot outlive its function

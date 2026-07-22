@@ -226,7 +226,7 @@ export async function continueRun(runId: string): Promise<void> {
   const docText: string = run.input_text ?? "";
   const runDate = new Date(run.created_at);
   if (run.mode === "full" && docText) {
-    await verifyPendingBatch(runId, run.org_id, docText, runDate, deadlineMs);
+    await verifyPendingBatch(runId, run.org_id, docText, runDate, deadlineMs, attempts);
   }
   await maybeFinalize(runId);
 }
@@ -243,7 +243,17 @@ async function verifyPendingBatch(
   documentText: string,
   runDate: Date,
   deadlineMs: number,
+  // The continuation counter for THIS window, threaded in so the progress writes
+  // below preserve it. Without this, verifyPendingBatch's progress writes replace
+  // the whole progress object and silently drop progress.attempts, so every
+  // continuation re-read it as 0 and MAX_CONTINUATIONS never fired — the run could
+  // only ever stop at the 45-min backstop (diagnosed live 21 Jul 2026: logs showed
+  // "continuation 1" forever, DB attempts stuck null). Undefined on the initial
+  // processRun window, which has no continuation attempts yet.
+  attempts?: number,
 ): Promise<void> {
+  const withAttempts = (p: { phase: string; claimsDone: number; claimsTotal: number }) =>
+    attempts !== undefined ? { ...p, attempts } : p;
   const pendingRows = sortByRiskThenIdx(await getPendingClaims(runId));
   if (pendingRows.length === 0) return;
 
@@ -252,7 +262,7 @@ async function verifyPendingBatch(
   const resolvedBefore = totalClaims - pendingRows.length;
 
   await updateRunStatus(runId, {
-    progress: { phase: "verify", claimsDone: resolvedBefore, claimsTotal: totalClaims },
+    progress: withAttempts({ phase: "verify", claimsDone: resolvedBefore, claimsTotal: totalClaims }),
   });
 
   const toVerify: ClaimToVerify[] = pendingRows.map((row) => ({
@@ -272,7 +282,7 @@ async function verifyPendingBatch(
     { documentText, runDate, deadlineMs },
     (done) => {
       void updateRunStatus(runId, {
-        progress: { phase: "verify", claimsDone: resolvedBefore + done, claimsTotal: totalClaims },
+        progress: withAttempts({ phase: "verify", claimsDone: resolvedBefore + done, claimsTotal: totalClaims }),
       }).catch(() => {});
     },
     (index, result) => {
