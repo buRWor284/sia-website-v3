@@ -12,7 +12,7 @@ const CREAM45 = "rgba(250,250,250,.45)";
 const CREAM12 = "rgba(250,250,250,.12)";
 const CREAM70 = "rgba(250,250,250,.70)";
 
-type NavLeaf = { label: string; href: string; tag?: string; tagOutline?: boolean; external?: boolean };
+type NavLeaf = { label: string; href: string; tag?: string; tagOutline?: boolean; external?: boolean; live?: boolean };
 type NavNode = {
   label: string;
   href?: string; // dropdown parents with an href are clickable (navigate to their hub page)
@@ -47,7 +47,7 @@ const NAV: ReadonlyArray<NavNode> = [
     label: "Earned Media",
     href: "/earned-media-radar",
     children: [
-      { label: "Earned Media Radar", href: "/earned-media-radar",             tag: "Live"           },
+      { label: "Earned Media Radar", href: "/earned-media-radar",             tag: "Live", live: true },
       { label: "Founder Movers",     href: "/founder-movers",                 tag: "New"            },
       { label: "EMOS Platform",      href: "/emos-platform",     tag: "Do-it-yourself" },
       { label: "EMOS Academy",       href: "/emos-academy",      tag: "Done-with-you"  },
@@ -120,6 +120,36 @@ function NavTag({ label, outline }: { label: string; outline?: boolean }) {
   );
 }
 
+/**
+ * LiveIndicator — a small ring-with-dot glyph (plus a soft pulsing halo)
+ * that marks a nav item as a live, always-updating dashboard rather than a
+ * static page. Purely decorative (aria-hidden); the "Live" text tag still
+ * carries the meaning for screen readers.
+ */
+function LiveIndicator() {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center",
+        width: 12, height: 12, marginRight: 8, flexShrink: 0,
+      }}
+    >
+      <span className="site-header__live-ping" style={{
+        position: "absolute", inset: 0, borderRadius: "50%",
+        background: YEL, opacity: 0.55,
+      }} />
+      <span style={{
+        position: "absolute", inset: 0, borderRadius: "50%",
+        border: `1.5px solid ${YEL}`,
+      }} />
+      <span style={{
+        position: "relative", width: 4, height: 4, borderRadius: "50%", background: YEL,
+      }} />
+    </span>
+  );
+}
+
 function DropdownLink({ c, variant, active, onNavigate }: {
   c: NavLeaf; variant: "desktop" | "mobile"; active: boolean; onNavigate: () => void;
 }) {
@@ -140,7 +170,10 @@ function DropdownLink({ c, variant, active, onNavigate }: {
       };
   const inner = (
     <>
-      <span>{c.label}{c.external ? (c.href.endsWith(".pdf") ? " ↓" : " ↗") : ""}</span>
+      <span style={{ display: "flex", alignItems: "center" }}>
+        {c.live && <LiveIndicator />}
+        {c.label}{c.external ? (c.href.endsWith(".pdf") ? " ↓" : " ↗") : ""}
+      </span>
       {c.tag && <NavTag label={c.tag} outline={c.tagOutline} />}
     </>
   );
@@ -165,6 +198,14 @@ export const SiteHeader = () => {
   if (pathname.startsWith("/tools/")) return null;
 
   return (
+    <>
+      <style>{`
+        @keyframes siteHeaderLivePing {
+          0% { transform: scale(0.4); opacity: .7; }
+          100% { transform: scale(1.7); opacity: 0; }
+        }
+        .site-header__live-ping { animation: siteHeaderLivePing 1.8s cubic-bezier(.2,.6,.4,1) infinite; }
+      `}</style>
     <header style={{
       background: INK,
       color: CREAM,
@@ -418,5 +459,6 @@ export const SiteHeader = () => {
         </a>
       </nav>
     </header>
+    </>
   );
 };
