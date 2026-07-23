@@ -802,17 +802,6 @@ export default function HomePage() {
         <div className="kits-grid">
           <Reveal className="kit-card">
             <div className="kit-card__badge">LIVE · WEEKLY RANKINGS</div>
-            <div className="kit-card__paper">
-              <div className="kit-card__paper-header">
-                <span className="kit-card__gazette">IRFAN AJMAL</span>
-                <span className="kit-card__date">MMXXVI</span>
-              </div>
-              <div className="kit-card__paper-title">THE FOUNDER LEADERBOARD</div>
-              <div className="kit-card__paper-cols">
-                <div className="kit-card__paper-col">Founders who compound attention are early, not louder</div>
-                <div className="kit-card__paper-col">syedirfanajmal.com</div>
-              </div>
-            </div>
             <h3 className="kit-card__title">Founder Movers</h3>
             <p className="kit-card__body">Weekly rankings of founder and Series-A topics by press-coverage momentum, powered by SignalIQ. See what's heating up before it saturates.</p>
             <div className="kit-card__footer">
@@ -822,17 +811,6 @@ export default function HomePage() {
           </Reveal>
           <Reveal className="kit-card" delay={120}>
             <div className="kit-card__badge">AI-POWERED TOOL</div>
-            <div className="kit-card__paper">
-              <div className="kit-card__paper-header">
-                <span className="kit-card__gazette">IRFAN AJMAL</span>
-                <span className="kit-card__date">MMXXVI</span>
-              </div>
-              <div className="kit-card__paper-title">COLLAB LINK BUILDER</div>
-              <div className="kit-card__paper-cols">
-                <div className="kit-card__paper-col">AI finds your best link-building partners in minutes, not weeks</div>
-                <div className="kit-card__paper-col">syedirfanajmal.com</div>
-              </div>
-            </div>
             <h3 className="kit-card__title">PartnerCollabIQ</h3>
             <p className="kit-card__body">Go beyond links. Drop in your niche and PartnerCollabIQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
             <div className="kit-card__footer">
