@@ -1,83 +1,127 @@
 import Link from "next/link";
-import { GROT, INK, SERIF, YEL } from "@/lib/tokens";
-
-const CREAM = "#FAFAFA";
+import { GROT, INK, PAPER, SERIF, YEL } from "@/lib/tokens";
 
 /**
  * RadarCallout — a small, self-contained teaser that links to the live Earned
- * Media Radar (/earned-media-radar). Paper card with an ink border so it reads on both light
- * and dark sections. Server-compatible (no client hooks). Drop it into any page.
+ * Media Radar (/earned-media-radar). Built in the Bureau newspaper system —
+ * ink band, yellow rules, a pulsing radar glyph — so it reads as a live
+ * "wire bulletin" rather than a generic card. Server-compatible (no client
+ * hooks; the sweep/pulse are pure CSS). Drop it into any page.
  */
 export function RadarCallout({ maxWidth = 1000 }: { maxWidth?: number }) {
   return (
     <div style={{ padding: "0 24px", boxSizing: "border-box", width: "100%" }}>
+      <style>{`
+        @keyframes radarSweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes radarPulse { 0% { transform: scale(0.35); opacity: .85; } 100% { transform: scale(1); opacity: 0; } }
+        .rc-glyph { position: relative; width: 46px; height: 46px; flex-shrink: 0; border-radius: 50%; border: 1px solid rgba(245,184,31,.35); }
+        .rc-glyph::before, .rc-glyph::after {
+          content: ""; position: absolute; inset: 0; border-radius: 50%;
+          border: 1px solid rgba(245,184,31,.55);
+          animation: radarPulse 2.6s cubic-bezier(.2,.6,.4,1) infinite;
+        }
+        .rc-glyph::after { animation-delay: 1.3s; }
+        .rc-glyph-sweep {
+          position: absolute; inset: 3px; border-radius: 50%;
+          background: conic-gradient(from 0deg, rgba(245,184,31,.9), rgba(245,184,31,0) 55%);
+          animation: radarSweep 3.4s linear infinite;
+        }
+        .rc-glyph-dot { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; margin: -2.5px; border-radius: 50%; background: ${YEL}; }
+        .rc-band { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+        .rc-stats { display: flex; gap: 22px; flex-wrap: wrap; }
+        @media (max-width: 720px) { .rc-cta { margin-left: 0 !important; } }
+      `}</style>
       <Link
         href="/earned-media-radar"
+        className="rc-band"
         style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 18,
-          flexWrap: "wrap",
           maxWidth,
           margin: "40px auto",
-          padding: "22px 26px",
-          background: CREAM,
-          border: `2px solid ${INK}`,
+          padding: "26px 30px",
+          background: INK,
+          borderTop: `3px solid ${YEL}`,
+          borderBottom: `3px solid ${YEL}`,
           textDecoration: "none",
         }}
       >
+        <div className="rc-glyph">
+          <div className="rc-glyph-sweep" />
+          <div className="rc-glyph-dot" />
+        </div>
+
         <span
           style={{
+            display: "inline-block",
+            padding: "4px 8px",
+            background: YEL,
+            color: INK,
             fontFamily: GROT,
             fontWeight: 800,
             fontSize: 8.5,
-            letterSpacing: ".14em",
+            letterSpacing: ".16em",
             textTransform: "uppercase",
-            background: YEL,
-            color: INK,
-            padding: "4px 8px",
-            whiteSpace: "nowrap",
+            flexShrink: 0,
           }}
         >
-          Live
+          Live · Wire
         </span>
-        <span style={{ flex: 1, minWidth: 240 }}>
+
+        <span style={{ flex: "2 1 300px", minWidth: 240 }}>
           <span
             style={{
               display: "block",
               fontFamily: SERIF,
               fontWeight: 700,
-              fontSize: 20,
-              color: INK,
+              fontSize: 22,
+              color: PAPER,
               lineHeight: 1.2,
             }}
           >
-            See the Earned Media Radar
+            The Earned Media Radar<span style={{ color: YEL }}>.</span>
           </span>
           <span
             style={{
               display: "block",
               fontFamily: GROT,
               fontSize: 12.5,
-              color: "rgba(26,20,16,.68)",
-              marginTop: 5,
+              color: "rgba(241,235,222,.62)",
+              marginTop: 6,
+              maxWidth: 480,
+              lineHeight: 1.5,
             }}
           >
-            A live map of what the press is covering across PR, earned media, SEO, and AI search. Powered by SignalIQ.
+            A live map of what the press is covering across PR, earned media, SEO, and AI search — powered by SignalIQ.
           </span>
         </span>
+
+        <span className="rc-stats" style={{ flex: "1 1 220px" }}>
+          <span>
+            <span style={{ display: "block", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: YEL, lineHeight: 1 }}>28</span>
+            <span style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", marginTop: 4 }}>Beats tracked</span>
+          </span>
+          <span>
+            <span style={{ display: "block", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: YEL, lineHeight: 1 }}>4</span>
+            <span style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", marginTop: 4 }}>Lenses · PR / SEO / GEO / Earned</span>
+          </span>
+        </span>
+
         <span
+          className="rc-cta"
           style={{
             fontFamily: GROT,
             fontWeight: 800,
-            fontSize: 12,
-            letterSpacing: ".10em",
+            fontSize: 11.5,
+            letterSpacing: ".12em",
             textTransform: "uppercase",
             color: INK,
+            background: YEL,
+            padding: "11px 18px",
             whiteSpace: "nowrap",
+            marginLeft: "auto",
+            flexShrink: 0,
           }}
         >
-          Open radar &rarr;
+          Open Radar &rarr;
         </span>
       </Link>
     </div>

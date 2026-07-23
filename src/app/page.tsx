@@ -796,27 +796,27 @@ export default function HomePage() {
             <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Kits · Playbooks · Calculators</p>
             <p style={{fontFamily:'var(--sans)',fontWeight:400,fontStyle:'italic',fontSize:'15px',color:'var(--I70)',marginTop:'6px',marginBottom:0}}>Might not stay free for too long.</p>
           </div>
-          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>22 TOTAL IN THE LIBRARY →</a>
+          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>24 TOTAL IN THE LIBRARY →</a>
         </Reveal>
         <div className="kits-grid">
           <Reveal className="kit-card">
-            <div className="kit-card__badge">INTERACTIVE KIT</div>
+            <div className="kit-card__badge">LIVE · WEEKLY RANKINGS</div>
             <div className="kit-card__paper">
               <div className="kit-card__paper-header">
                 <span className="kit-card__gazette">IRFAN AJMAL</span>
                 <span className="kit-card__date">MMXXVI</span>
               </div>
-              <div className="kit-card__paper-title">PITCH PERFECT</div>
+              <div className="kit-card__paper-title">THE FOUNDER LEADERBOARD</div>
               <div className="kit-card__paper-cols">
-                <div className="kit-card__paper-col">The seven-step system that gets reporters to say yes</div>
+                <div className="kit-card__paper-col">Founders who compound attention are early, not louder</div>
                 <div className="kit-card__paper-col">syedirfanajmal.com</div>
               </div>
             </div>
-            <h3 className="kit-card__title">The Journo Outreach<br/>Checklist</h3>
-            <p className="kit-card__body">Seven steps to a pitch reporters actually use.</p>
+            <h3 className="kit-card__title">Founder Movers</h3>
+            <p className="kit-card__body">Weekly rankings of founder and Series-A topics by press-coverage momentum, powered by SignalIQ. See what's heating up before it saturates.</p>
             <div className="kit-card__footer">
               <span className="kit-card__year">2026</span>
-              <a href="/infographics/journo-outreach-checklist" className="kit-card__cta">OPEN THE KIT ↗</a>
+              <a href="/founder-movers" className="kit-card__cta">SEE THIS WEEK'S MOVERS ↗</a>
             </div>
           </Reveal>
           <Reveal className="kit-card" delay={120}>
