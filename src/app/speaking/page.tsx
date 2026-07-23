@@ -53,6 +53,7 @@ type PrimaryTopic = {
   blurb: string;
   bullets: string[];
   casestudy: { v: string; l: string };
+  moreHref?: string;
 };
 
 const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
@@ -85,6 +86,22 @@ const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
       "A repeatable system for organic, durable growth",
     ],
     casestudy: { v: "6×", l: "daily signups · Centriq case" },
+  },
+  {
+    no: "03",
+    label: "Primary topic · flagship for 2026",
+    title: "Earned Media in the Age of AI",
+    blurb:
+      "How AI is remaking earned media from both sides at once: agents that can now run a six stage PR pipeline, and the LLMs and AI search that decide which brands get seen. Built from real data inside the earned media OS I run, with three live activities the room works through together.",
+    bullets: [
+      "The six stage AI pipeline: Signal, Authority Content, Verify, Match, Pitch, Attribute",
+      "Three live activities: an idea sprint, spot the slop, and a pitch clinic on real work",
+      "Why LLMs and AI search now decide which brands get seen, and what they reward",
+      "The Coverage Flywheel: how one placement compounds into six returns",
+      "Honest failures: exactly where AI still cannot do the job of a PR team",
+    ],
+    casestudy: { v: "06", l: "stage AI pipeline · run live in the room" },
+    moreHref: "/speaking/earned-media-in-the-age-of-ai",
   },
 ];
 
@@ -428,7 +445,7 @@ const WatchTheWork = () => {
 
 const Topics = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="02" label="Signature Topics · The five talks" />
+    <SectionMast n="02" label="Signature Topics · The six talks" />
 
     <div className="grid-intro">
       <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
@@ -436,7 +453,7 @@ const Topics = () => (
         <span style={{ fontStyle: "italic" }}><Mark>in my sleep.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 19, color: INK70, lineHeight: 1.55, maxWidth: 560 }}>
-        Twenty-two years of work has settled into two flagship talks and a handful of close cousins. Each is built around real case studies, the numbers behind them, and a take-home playbook the audience can apply on Monday morning.
+        Twenty-two years of work has settled into two flagship talks and a handful of close cousins, each built around real case studies and a take-home playbook. The newest one is built from live data inside the earned media OS I run, and maps how AI is remaking earned media from both sides.
       </p>
     </div>
 
@@ -447,6 +464,7 @@ const Topics = () => (
           padding: "36px 28px 30px",
           background: i === 0 ? PAPER : PAPER2,
           display: "flex", flexDirection: "column",
+          gridColumn: tp.moreHref ? "1 / -1" : undefined,
         }}>
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
             <Pill size={10.5} ls="0.20em">Topic {tp.no}</Pill>
@@ -472,9 +490,16 @@ const Topics = () => (
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px, 4vw, 38px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em", marginTop: 4 }}>{tp.casestudy.v}</div>
               <div style={{ marginTop: 4 }}><SCaps size={10} ls="0.12em" color={INK70}>{tp.casestudy.l}</SCaps></div>
             </div>
-            <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK, textDecoration: "none", fontWeight: 600 }}>
-              <Mark>Book this talk →</Mark>
-            </a>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
+              {tp.moreHref && (
+                <a href={tp.moreHref} style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK}`, paddingBottom: 2 }}>
+                  See the full session →
+                </a>
+              )}
+              <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK, textDecoration: "none", fontWeight: 600 }}>
+                <Mark>Book this talk →</Mark>
+              </a>
+            </div>
           </div>
         </div>
       ))}
@@ -487,7 +512,7 @@ const Topics = () => (
     <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
       {SUPPORTING_TOPICS.map((s, i) => (
         <div key={s.title} className="card-border" style={{ padding: "26px 24px", background: PAPER, display: "flex", flexDirection: "column", minHeight: 200 }}>
-          <SCaps size={10} ls="0.18em" color={INK55}>Topic 0{i + 3}</SCaps>
+          <SCaps size={10} ls="0.18em" color={INK55}>Topic 0{i + 4}</SCaps>
           <h4 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{s.title}</h4>
           <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.55, fontStyle: "italic", flex: 1 }}>{s.blurb}</p>
         </div>

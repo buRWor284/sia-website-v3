@@ -1006,6 +1006,10 @@ export default function HomePage() {
               <div className="speaking-photo__caption">MPS2016 · DUBAI, UAE</div>
             </div>
             <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>
+            <a href="/speaking/earned-media-in-the-age-of-ai" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6, marginBottom: 20, textDecoration: "none" }}>
+              <span style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", background: "var(--Y)", color: "var(--INK)", padding: "3px 7px", flexShrink: 0 }}>New</span>
+              <span style={{ fontFamily: "var(--sans)", fontWeight: 700, fontSize: 13, letterSpacing: ".01em", color: "var(--BG)" }}>Earned Media in the Age of AI: my new flagship session →</span>
+            </a>
             <a href="/speaking" className="speaking__cta">Speaker sheet &amp; topics <span className="mono-arrow">→</span></a>
           </div>
           <div>
