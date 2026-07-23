@@ -786,11 +786,40 @@ const CalendlySection = () => (
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+const FeaturedSession = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 8 }}>
+    <a
+      href="/speaking/earned-media-in-the-age-of-ai"
+      style={{
+        display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
+        maxWidth: 1000, margin: "0 auto", padding: "24px 28px",
+        background: PAPER2, border: `2px solid ${INK}`, textDecoration: "none",
+      }}
+    >
+      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", background: YEL, color: INK, padding: "5px 9px", whiteSpace: "nowrap" }}>
+        New · Flagship
+      </span>
+      <span style={{ flex: 1, minWidth: 260 }}>
+        <span style={{ display: "block", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px, 3vw, 26px)", color: INK, lineHeight: 1.15, letterSpacing: "-0.015em" }}>
+          Earned Media in the Age of AI
+        </span>
+        <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.5, marginTop: 5 }}>
+          My new interactive keynote and workshop on how AI is remaking earned media from both sides. Six stage AI pipeline, live activities, and the Coverage Flywheel.
+        </span>
+      </span>
+      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, whiteSpace: "nowrap" }}>
+        See the session →
+      </span>
+    </a>
+  </section>
+);
+
 export default function SpeakingPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
       <Hero />
+      <FeaturedSession />
       <WatchTheWork />
       <SpeakingLead />
       <DMSSStrip />
