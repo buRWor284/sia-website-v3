@@ -1005,7 +1005,7 @@ export default function HomePage() {
               <img src="/assets/speaking/mps2016.jpg" alt="Syed Irfan Ajmal speaking at MPS2016 Dubai" width={1200} height={390} loading="lazy" decoding="async" />
               <div className="speaking-photo__caption">MPS2016 · DUBAI, UAE</div>
             </div>
-            <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>
+            <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Guest spots on US podcasts.</p>
             <a href="/speaking/earned-media-in-the-age-of-ai" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6, marginBottom: 20, textDecoration: "none" }}>
               <span style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", background: "var(--Y)", color: "var(--INK)", padding: "3px 7px", flexShrink: 0 }}>New</span>
               <span style={{ fontFamily: "var(--sans)", fontWeight: 700, fontSize: 13, letterSpacing: ".01em", color: "var(--BG)" }}>Earned Media in the Age of AI: my new flagship session →</span>
@@ -1014,34 +1014,39 @@ export default function HomePage() {
           </div>
           <div>
             <div className="stage-row">
-              <div className="stage__n">01</div><div className="stage__city">KUALA LUMPUR</div>
+              <div className="stage__n">01</div><div className="stage__city">DUBAI ATM</div>
+              <div className="stage__ctry">UAE</div>
+              <div className="stage__tag">ARABIAN TRAVEL SUMMIT · 40,000 AUDIENCE</div>
+            </div>
+            <div className="stage-row">
+              <div className="stage__n">02</div><div className="stage__city">KUALA LUMPUR</div>
               <div className="stage__ctry">Malaysia</div>
               <div className="stage__tag">WEBINARS · WORKSHOPS</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">02</div><div className="stage__city">BALI</div>
+              <div className="stage__n">03</div><div className="stage__city">BALI</div>
               <div className="stage__ctry">Indonesia</div>
               <div className="stage__tag">DMSS · 200+ AUDIENCE</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">03</div><div className="stage__city">PESHAWAR</div>
+              <div className="stage__n">04</div><div className="stage__city">PESHAWAR</div>
               <div className="stage__ctry">Pakistan</div>
               <div className="stage__tag">G-DAY X · DURSHAL</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">04</div><div className="stage__city">DUBAI</div>
+              <div className="stage__n">05</div><div className="stage__city">DUBAI</div>
               <div className="stage__ctry">UAE</div>
-              <div className="stage__tag">ATM · IN5 · MPS2016</div>
+              <div className="stage__tag">Astrolabs · IN5 · MPS2016</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">05</div><div className="stage__city">WEBINARS</div>
+              <div className="stage__n">06</div><div className="stage__city">WEBINARS</div>
               <div className="stage__ctry">US / UK</div>
               <div className="stage__tag">12+ SESSIONS</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">06</div><div className="stage__city">US PODCASTS</div>
+              <div className="stage__n">07</div><div className="stage__city">US PODCASTS</div>
               <div className="stage__ctry">Remote</div>
-              <div className="stage__tag">15+ GUEST SPOTS</div>
+              <div className="stage__tag">GUEST SPOTS</div>
             </div>
           </div>
         </div>

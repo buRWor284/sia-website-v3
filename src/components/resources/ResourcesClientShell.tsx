@@ -171,6 +171,42 @@ const CONTENT: ContentItem[] = [
     hook: "Find the reporter before your rivals do",
   },
 
+  {
+    id: "tool-earned-media-radar",
+    type: "tool",
+    badge: "Interactive Tool",
+    beta: true,
+    topics: ["pr", "seo", "strategy"],
+    title: "Earned Media Radar — Live Coverage Map",
+    sub: "See which PR, earned-media, SEO, and GEO beats are heating up right now.",
+    blurb:
+      "A live radar of press-coverage momentum across the beats that matter, built on the same SignalIQ data that powers the pipeline. Filter by lens to see what's saturated and what's still ownable.",
+    href: "/earned-media-radar",
+    y: "2026",
+    newsHeadline: "The Coverage Radar",
+    newsDeck: "Watch press momentum shift across your beats in real time",
+    cta: "Open the Radar",
+    hook: "See what's heating up before it saturates",
+  },
+
+  {
+    id: "tool-founder-movers",
+    type: "tool",
+    badge: "Interactive Tool",
+    beta: true,
+    topics: ["pr", "strategy", "personal-branding"],
+    title: "Founder Movers — Weekly Topic Rankings",
+    sub: "Which founder and Series-A topics are gaining press momentum this week.",
+    blurb:
+      "Weekly rankings of founder and Series-A topics by press-coverage change, powered by SignalIQ. See what's heating up, what's cooling down, and what's spiking today versus normal, so you pitch into rising attention instead of a saturated narrative.",
+    href: "/founder-movers",
+    y: "2026",
+    newsHeadline: "The Founder Leaderboard",
+    newsDeck: "Founders who compound attention are early, not louder",
+    cta: "See This Week's Movers",
+    hook: "Founders who compound attention are early, not louder",
+  },
+
   // ── CALCULATORS ─────────────────────────────────────────────────────────
   {
     id: "calc-authority",

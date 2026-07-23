@@ -95,6 +95,20 @@ const ADJACENT: AdjacentTool[] = [
       "What agency retainers, bought links, and sponsored placements actually cost over a year, versus owning authority through earned media.",
     href: "/tools/authority-calculator",
   },
+  {
+    name: "Founder Movers",
+    role: "Weekly topic rankings",
+    blurb:
+      "Weekly rankings of founder and Series-A topics by press-coverage momentum, powered by SignalIQ, so you pitch into rising attention before it saturates.",
+    href: "/founder-movers",
+  },
+  {
+    name: "Earned Media Radar",
+    role: "Live coverage map",
+    blurb:
+      "A live radar across PR, earned-media, SEO, and GEO beats, built on the same SignalIQ data, with a lens filter to see what's still ownable.",
+    href: "/earned-media-radar",
+  },
 ];
 
 export default function ToolsIndexPage() {
