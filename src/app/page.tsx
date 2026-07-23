@@ -364,14 +364,15 @@ const css = `
   }
   .kit-card {
     padding: 36px 32px 32px; border-right: 2px solid var(--INK);
+    border-top: 4px solid var(--Y);
     display: flex; flex-direction: column;
   }
   .kit-card:last-child { border-right: none; }
   .kit-card__badge {
     display: inline-block; padding: 6px 12px;
-    background: var(--INK); border: 2px solid var(--INK);
+    background: var(--Y); border: 2px solid var(--Y);
     font-family: var(--mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--BG);
+    letter-spacing: .14em; text-transform: uppercase; color: var(--INK);
     align-self: flex-start; margin-bottom: 24px;
   }
   .kit-card__paper {
@@ -411,7 +412,7 @@ const css = `
   }
   .kit-card__footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 2px solid var(--INK); padding-top: 18px; margin-top: 24px;
+    border-top: 2px solid var(--Y); padding-top: 18px; margin-top: 24px;
   }
   .kit-card__year {
     font-family: var(--mono); font-size: 11px; color: var(--I45); letter-spacing: .06em;
