@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
+import PipelineFlow from "./PipelineFlow";
+import PitchClinicDemo from "./PitchClinicDemo";
 import {
   DoubleRule,
   HRule,
@@ -72,16 +74,6 @@ const SESSION_SPECS: ReadonlyArray<[string, string]> = [
   ["Length", "45 min keynote to a half day workshop"],
   ["Room", "20 to 500+, in person or virtual"],
   ["Built for", "Founders, marketers, PR and comms teams"],
-];
-
-type Stage = { n: string; stage: string; tool: string; job: string };
-const PIPELINE: ReadonlyArray<Stage> = [
-  { n: "01", stage: "Signal", tool: "SignalIQ", job: "Surface the topics about to break that a brand can ride early, before the rest of the market notices." },
-  { n: "02", stage: "Authority Content", tool: "AssetIQ", job: "Turn the signal into the research, surveys, AI apps and data tools that actually earn coverage." },
-  { n: "03", stage: "Verify", tool: "FactCheckIQ", job: "Screen out AI slop and unverified claims before a single word reaches a journalist." },
-  { n: "04", stage: "Match", tool: "JournoIQ", job: "Find the right journalists and the right stories for the asset, not a spray and pray list." },
-  { n: "05", stage: "Pitch", tool: "PressIQ", job: "Draft and send the outreach itself, scored and tuned for the person on the other end." },
-  { n: "06", stage: "Attribute", tool: "CoverageIQ", job: "Track what the coverage actually produced, from placement to pipeline." },
 ];
 
 type Activity = { n: string; title: string; body: string };
@@ -276,19 +268,7 @@ const Pipeline = () => (
         Each stage maps to a tool in EMOS, the earned media OS I built and run, so the talk is backed by live data, not slideware. String the six together and you have a full pipeline, run with AI and no code.
       </p>
     </div>
-    <div className="emai-cards3">
-      {PIPELINE.map((s) => (
-        <div key={s.n} style={{ border: `1px solid ${INK}`, background: PAPER, padding: "24px 22px 22px", display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
-            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", color: BLUE }}>{s.n}</span>
-            <span style={{ display: "inline-block", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", padding: "4px 8px" }}>{s.tool}</span>
-          </div>
-          <h3 style={{ margin: "14px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 24, color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>{s.stage}</h3>
-          <HRule style={{ margin: "14px 0", background: INK35 }} />
-          <p style={{ margin: 0, fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55, flex: 1 }}>{s.job}</p>
-        </div>
-      ))}
-    </div>
+    <PipelineFlow />
     <p style={{ margin: "30px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: INK, lineHeight: 1.5, textAlign: "center" }}>
       In the room, we do not just describe the pipeline. <Mark>We run it live.</Mark>
     </p>
@@ -321,6 +301,9 @@ const Activities = () => (
           <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 16, color: "rgba(241,235,222,.72)", lineHeight: 1.6, flex: 1 }}>{a.body}</p>
         </div>
       ))}
+    </div>
+    <div style={{ marginTop: 48, maxWidth: 760, marginLeft: "auto", marginRight: "auto" }}>
+      <PitchClinicDemo />
     </div>
   </section>
 );
