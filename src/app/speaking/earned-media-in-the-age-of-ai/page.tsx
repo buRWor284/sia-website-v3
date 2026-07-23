@@ -486,6 +486,27 @@ const Speaker = () => (
   </section>
 );
 
+// ─── Speaker Photo ────────────────────────────────────────────────────────────
+
+const SpeakerPhotoStrip = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 20 }}>
+    <figure style={{ margin: "0 auto", padding: 10, background: "#0e0d0a", border: `1px solid ${INK}`, maxWidth: 900 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/assets/speaking/dmss-irfan-large-audience.jpg"
+        alt="Syed Irfan Ajmal speaking to a large live audience at DMSS Conference, Bali"
+        style={{ width: "100%", height: "auto", display: "block", border: "1px solid rgba(250,250,250,.25)", maxHeight: 380, objectFit: "cover", objectPosition: "center 30%" }}
+      />
+      <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
+        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#FAFAFA", lineHeight: 1.4 }}>
+          DMSS Conference, Bali · Same live-room energy this session is built for, 500+ attendees.
+        </div>
+        <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo by dmss.io</SCaps>
+      </figcaption>
+    </figure>
+  </section>
+);
+
 // ─── Bottom CTA ───────────────────────────────────────────────────────────────
 
 const BottomCTA = () => (
@@ -523,6 +544,7 @@ export default function EarnedMediaInTheAgeOfAIPage() {
       <LeaveWith />
       <QandA />
       <Speaker />
+      <SpeakerPhotoStrip />
       <BottomCTA />
       <CTATicker />
       <Subscriptions sectionNumber="09" />
