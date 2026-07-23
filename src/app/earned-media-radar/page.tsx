@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getRadarData } from "@/lib/radar/data";
 import { delta7 } from "@/lib/radar/types";
 import RadarModule from "./RadarModule";
+import { Colophon } from "@/components/bureau";
 import "./radar.css";
 
 export const revalidate = 43200; // 12h; the coverage scan runs daily
@@ -334,7 +335,7 @@ export default async function RadarPage() {
       </div>
 
       {/* FINAL */}
-      <main className="emr-wrap">
+      <main className="emr-wrap" style={{ paddingBottom: 64 }}>
         <section className="emr-final">
           <h2 className="emr-h2">Stop renting attention. Start earning it.</h2>
           <p className="emr-body-lg" style={{ margin: "16px 0 24px" }}>
@@ -375,8 +376,9 @@ export default async function RadarPage() {
             ))}
           </div>
         </div>
-        <p className="emr-copyright">© MMXXVI Syed Irfan Ajmal · SIA Enterprises Inc</p>
       </main>
+
+      <Colophon />
     </>
   );
 }
