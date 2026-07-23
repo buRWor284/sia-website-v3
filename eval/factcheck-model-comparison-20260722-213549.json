@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-07-22T16:35:49.131Z",
+  "note": "FactcheckIQ two-model grade-model comparison. Measurement only; pipeline and clampVerdict unchanged. Cost reflects the verify/grade step (the ~95% cost driver); the free citation/link gate and extract step are not billed here.",
+  "models": {
+    "a": "claude-opus-4-8",
+    "b": "claude-sonnet-5"
+  },
+  "thinkingDisabledOnB": true,
+  "selection": [
+    "seo-09"
+  ],
+  "totals": {
+    "a": {
+      "model": "claude-opus-4-8",
+      "label": "Opus 4.8",
+      "scored": 1,
+      "passed": 1,
+      "incomplete": 0,
+      "searches": 4,
+      "cost": {
+        "total": 0.223812,
+        "input": 0.00351,
+        "cacheRead": 0.0403895,
+        "cacheWrite": 0.0836375,
+        "output": 0.056275,
+        "webSearch": 0.04
+      },
+      "usage": {
+        "inputTokens": 702,
+        "outputTokens": 2251,
+        "cacheRead": 80779,
+        "cacheCreation": 13382,
+        "webSearchRequests": 4,
+        "capturedResponses": 1
+      }
+    },
+    "b": {
+      "model": "claude-sonnet-5",
+      "label": "Sonnet 5",
+      "scored": 1,
+      "passed": 0,
+      "incomplete": 0,
+      "searches": 16,
+      "cost": {
+        "total": 0.4626871,
+        "input": 0.206422,
+        "cacheRead": 0.0593676,
+        "cacheWrite": 0.0502275,
+        "output": 0.06667000000000001,
+        "webSearch": 0.08
+      },
+      "usage": {
+        "inputTokens": 103211,
+        "outputTokens": 6667,
+        "cacheRead": 296838,
+        "cacheCreation": 20091,
+        "webSearchRequests": 8,
+        "capturedResponses": 2
+      }
+    }
+  },
+  "perClaim": [
+    {
+      "id": "seo-09",
+      "golden": "verified",
+      "a": {
+        "verdict": "verified",
+        "match": true,
+        "scored": true,
+        "via": "verify"
+      },
+      "b": {
+        "verdict": "misleading",
+        "match": false,
+        "scored": true,
+        "via": "verify"
+      },
+      "diverged": true
+    }
+  ],
+  "diverged": [
+    "seo-09"
+  ]
+}

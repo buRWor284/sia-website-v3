@@ -1,0 +1,84 @@
+{
+  "generatedAt": "2026-07-22T17:16:09.419Z",
+  "note": "FactcheckIQ two-model grade-model comparison. Measurement only; pipeline and clampVerdict unchanged. Cost reflects the verify/grade step (the ~95% cost driver); the free citation/link gate and extract step are not billed here.",
+  "models": {
+    "a": "claude-opus-4-8",
+    "b": "claude-sonnet-5"
+  },
+  "thinkingDisabledOnB": true,
+  "selection": [
+    "seo-09"
+  ],
+  "totals": {
+    "a": {
+      "model": "claude-opus-4-8",
+      "label": "Opus 4.8",
+      "scored": 1,
+      "passed": 0,
+      "incomplete": 0,
+      "searches": 4,
+      "cost": {
+        "total": 0.17680725,
+        "input": 0.0035,
+        "cacheRead": 0.0383635,
+        "cacheWrite": 0.02506875,
+        "output": 0.069875,
+        "webSearch": 0.04
+      },
+      "usage": {
+        "inputTokens": 700,
+        "outputTokens": 2795,
+        "cacheRead": 76727,
+        "cacheCreation": 4011,
+        "webSearchRequests": 4,
+        "capturedResponses": 1
+      }
+    },
+    "b": {
+      "model": "claude-sonnet-5",
+      "label": "Sonnet 5",
+      "scored": 0,
+      "passed": 0,
+      "incomplete": 1,
+      "searches": 0,
+      "cost": {
+        "total": 0,
+        "input": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "output": 0,
+        "webSearch": 0
+      },
+      "usage": {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "cacheRead": 0,
+        "cacheCreation": 0,
+        "webSearchRequests": 0,
+        "capturedResponses": 0
+      }
+    }
+  },
+  "perClaim": [
+    {
+      "id": "seo-09",
+      "golden": "verified",
+      "a": {
+        "verdict": "misleading",
+        "match": false,
+        "scored": true,
+        "via": "verify"
+      },
+      "b": {
+        "verdict": "check_failed",
+        "match": false,
+        "scored": false,
+        "via": "incomplete"
+      },
+      "diverged": true
+    }
+  ],
+  "diverged": [
+    "seo-09"
+  ]
+}

@@ -48,6 +48,9 @@
  *        --models=a,b       override the two model ids (default claude-opus-4-8,claude-sonnet-5)
  *        --gap=SECONDS      wait between the two models (default 60) so the second model does
  *                           not trip the per-minute API rate limit the first one just used
+ *        --no-think         run the CANDIDATE model (B) with extended thinking disabled
+ *                           (thinking:{type:"disabled"} injected in-flight; verify.ts untouched) --
+ *                           use to test Sonnet 5 without its default thinking overhead
  *        --out=path/prefix  override the results file prefix (default eval/factcheck-model-comparison-<ts>)
  *        --only=id1,id2     run just those fixture ids
  *        --all              run the full 24 (default is the 5-claim watchable set)
@@ -96,6 +99,7 @@ const isCompare = args.includes("--compare");
 const modelsArg = args.find((a) => a.startsWith("--models="))?.split("=")[1];
 const outArg = args.find((a) => a.startsWith("--out="))?.split("=")[1];
 const gapArg = args.find((a) => a.startsWith("--gap="))?.split("=")[1];
+const noThink = args.includes("--no-think");
 
 const DEFAULT_MODEL = "claude-opus-4-8";
 const DEFAULT_MODELS: [string, string] = ["claude-opus-4-8", "claude-sonnet-5"];
@@ -212,16 +216,54 @@ export function estimateCost(model: string, u: Usage): CostBreakdown | null {
 interface UsageMeter {
   usage: Usage;
   flush: () => Promise<void>;
+  thinkingInjected: () => number;
 }
 
-export function installUsageMeter(): UsageMeter {
+export function installUsageMeter(disableThinking = false): UsageMeter {
   const usage = emptyUsage();
   const pending: Promise<void>[] = [];
+  let thinkingInjected = 0;
   const orig = globalThis.fetch;
+
+  const urlOf = (input: Parameters<typeof fetch>[0]): string =>
+    typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
 
   if (typeof orig === "function") {
     const wrapped: typeof fetch = async (input, init) => {
-      const res = await orig(input, init);
+      let reqInput = input;
+      let reqInit = init;
+
+      // Measurement-only request rewrite: strip extended thinking from outgoing
+      // /v1/messages calls so we can test the model with thinking OFF without
+      // editing verify.ts. Sonnet 5 has adaptive thinking ON by default; the
+      // documented off switch is thinking:{type:"disabled"} (confirmed 22 Jul 2026
+      // against platform.claude.com whats-new-sonnet-5). If the body cannot be
+      // rewritten, the original request is sent unchanged rather than broken.
+      if (disableThinking) {
+        try {
+          const url = urlOf(input);
+          if (url.includes("/v1/messages") && init && typeof init.body === "string") {
+            const body = JSON.parse(init.body) as Record<string, unknown>;
+            body.thinking = { type: "disabled" };
+            const headers = new Headers(init.headers ?? {});
+            headers.delete("content-length");
+            reqInit = { ...init, body: JSON.stringify(body), headers };
+            thinkingInjected++;
+          } else if (url.includes("/v1/messages") && input instanceof Request) {
+            const original = input;
+            const body = JSON.parse(await original.clone().text()) as Record<string, unknown>;
+            body.thinking = { type: "disabled" };
+            const headers = new Headers(original.headers);
+            headers.delete("content-length");
+            reqInput = new Request(original, { body: JSON.stringify(body), headers });
+            thinkingInjected++;
+          }
+        } catch {
+          /* leave the request unchanged if we cannot parse/rewrite it */
+        }
+      }
+
+      const res = await orig(reqInput, reqInit);
       try {
         const url =
           typeof input === "string" ? input : input instanceof URL ? input.href : (input as Request).url;
@@ -261,6 +303,7 @@ export function installUsageMeter(): UsageMeter {
     flush: async () => {
       await Promise.all(pending);
     },
+    thinkingInjected: () => thinkingInjected,
   };
 }
 
@@ -492,6 +535,7 @@ interface WorkerPayload {
   usage: Usage;
   totalSearches: number;
   ids: string[];
+  thinkingDisabled?: boolean;
 }
 
 function buildComparison(a: WorkerPayload, b: WorkerPayload) {
@@ -523,6 +567,7 @@ function writeResultFiles(a: WorkerPayload, b: WorkerPayload): { json: string; m
     generatedAt,
     note: "FactcheckIQ two-model grade-model comparison. Measurement only; pipeline and clampVerdict unchanged. Cost reflects the verify/grade step (the ~95% cost driver); the free citation/link gate and extract step are not billed here.",
     models: { a: a.model, b: b.model },
+    thinkingDisabledOnB: b.thinkingDisabled ?? false,
     selection: cmp.ids,
     totals: {
       a: { ...ta, cost: ta.cost },
@@ -547,7 +592,7 @@ function writeResultFiles(a: WorkerPayload, b: WorkerPayload): { json: string; m
   lines.push(`Generated: ${generatedAt}`);
   lines.push("");
   lines.push(`- Model A: \`${a.model}\` (${la})`);
-  lines.push(`- Model B: \`${b.model}\` (${lb})`);
+  lines.push(`- Model B: \`${b.model}\` (${lb})${b.thinkingDisabled ? " — extended thinking DISABLED" : ""}`);
   lines.push(`- Claim set: ${cmp.ids.length} claim(s): ${cmp.ids.join(", ")}`);
   lines.push("");
   lines.push(`Measurement only. Pipeline behavior and clampVerdict are unchanged. Cost reflects the per-claim verify/grade step (the dominant cost driver); the free citation/link gate and the extract step are not billed here.`);
@@ -620,13 +665,14 @@ async function runWorkerMode(): Promise<void> {
   // the sentinel-wrapped JSON result the parent parses.
   console.error(`[worker ${model}] verifying ${selected.length} claim(s): ${selected.map((f) => f.id).join(", ")}`);
 
-  const meter = installUsageMeter();
+  const meter = installUsageMeter(noThink);
   const pipeline = await loadPipeline();
   const { rows, usage, totalSearches } = await runEvalCore(pipeline, fixtures, selected, meter, (row) => {
     console.error(`[worker ${model}] ${rowMark(row).padEnd(4)} ${row.id.padEnd(12)} -> ${row.actual ?? "ERROR"} (via ${row.via}, searches ${row.searches})`);
   });
 
-  const payload: WorkerPayload = { model, rows, usage, totalSearches, ids: selected.map((f) => f.id) };
+  if (noThink) console.error(`[worker ${model}] extended thinking DISABLED; injected into ${meter.thinkingInjected()} model request(s)`);
+  const payload: WorkerPayload = { model, rows, usage, totalSearches, ids: selected.map((f) => f.id), thinkingDisabled: noThink };
   process.stdout.write(`${RESULT_BEGIN}${JSON.stringify(payload)}${RESULT_END}\n`);
 }
 
@@ -682,10 +728,13 @@ async function runCompareMode(): Promise<void> {
   const [modelA, modelB] = models;
   const scope = onlyArg ? `--only=${onlyArg}` : runAll ? "ALL 24 (paid)" : "default 5-claim set";
   const forwarded = args.filter((a) => a === "--all" || a.startsWith("--only=") || a.startsWith("--limit="));
+  // --no-think disables extended thinking on the CANDIDATE (model B) only, so the
+  // comparison is Opus-as-is vs Sonnet-with-thinking-off (today's prod vs proposed).
+  const forwardedB = noThink ? [...forwarded, "--no-think"] : forwarded;
 
   console.log(`FactcheckIQ two-model grade comparison`);
   console.log(`Set: ${scope}`);
-  console.log(`A = ${modelA} (${labelFor(modelA)})   B = ${modelB} (${labelFor(modelB)})`);
+  console.log(`A = ${modelA} (${labelFor(modelA)})   B = ${modelB} (${labelFor(modelB)})${noThink ? " [thinking OFF]" : ""}`);
   console.log(`Each model runs in its own process (sequential, to bound spend + rate limits). Measurement only; pipeline unchanged.`);
 
   const a = await runWorker(modelA, forwarded, "Model A");
@@ -701,7 +750,7 @@ async function runCompareMode(): Promise<void> {
     await new Promise<void>((resolve) => setTimeout(resolve, gapSeconds * 1000));
   }
 
-  const b = await runWorker(modelB, forwarded, "Model B");
+  const b = await runWorker(modelB, forwardedB, noThink ? "Model B (thinking OFF)" : "Model B");
 
   const ta = totalsFor(modelA, a.rows, a.usage, a.totalSearches);
   const tb = totalsFor(modelB, b.rows, b.usage, b.totalSearches);
@@ -747,6 +796,10 @@ async function runCompareMode(): Promise<void> {
     console.log(`- Token usage was not captured on this run, so no dollar figure. (Searches: ${la} ${ta.searches}, ${lb} ${tb.searches}.)`);
   }
 
+  if (b.thinkingDisabled) {
+    console.log(`- NOTE: ${lb} ran with extended thinking DISABLED (candidate config); ${la} ran normally.`);
+  }
+
   const written = writeResultFiles(a, b);
   console.log(`\nWrote:\n  ${written.json}\n  ${written.md}`);
 }
@@ -761,7 +814,7 @@ async function runSingleMode(): Promise<void> {
   console.log(`Running ${selected.length} fixture(s) [${scope}] through ${model} sequentially...`);
   console.log(`Ids: ${selected.map((f) => f.id).join(", ")}\n`);
 
-  const meter = installUsageMeter();
+  const meter = installUsageMeter(noThink);
   const pipeline = await loadPipeline();
   const { rows, usage, totalSearches } = await runEvalCore(pipeline, fixtures, selected, meter, (row) => {
     const mark = !row.scored ? "SKIP" : row.match ? "PASS" : "FAIL";

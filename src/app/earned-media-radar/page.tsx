@@ -4,8 +4,6 @@ import { getRadarData } from "@/lib/radar/data";
 import { delta7 } from "@/lib/radar/types";
 import RadarModule from "./RadarModule";
 import "./radar.css";
-import { Colophon } from "@/components/bureau";
-import { ScrollButtons } from "@/components/ScrollButtons";
 
 export const revalidate = 43200; // 12h; the coverage scan runs daily
 
@@ -48,10 +46,10 @@ export default async function RadarPage() {
 
   const ticker: string[] = [
     top ? `“${top.topic}” coverage ${pctInt(top.tr)} in 30 days` : "Earned coverage compounds while paid stops the moment you stop paying",
-    quiet ? `“${quiet.topic}” coverage ${pctInt(quiet.tr)}, an open lane` : "Quiet in the press is yours to own",
+    quiet ? `“${quiet.topic}” coverage ${pctInt(quiet.tr)}, a wide-open lane` : "Quiet in the press is yours to own",
     `GEO / AI-search coverage ${pctInt(geoWoW)} week over week`,
     "If you are not in the coverage, you are not in the AI answer",
-    "The window that pays is before the story breaks",
+    "The window that pays opens before the story breaks",
   ];
 
   const jsonLd = {
@@ -59,215 +57,263 @@ export default async function RadarPage() {
     "@type": "WebPage",
     name: "Earned Media Radar",
     url: "https://www.syedirfanajmal.com/earned-media-radar",
-    description:
-      "A live map of what the press is covering across PR, earned media, SEO, and AI search, powered by SignalIQ.",
+    description: "A live map of what the press is covering across PR, earned media, SEO, and AI search, powered by SignalIQ.",
     isPartOf: { "@id": "https://www.syedirfanajmal.com/#website" },
     about: { "@id": "https://www.syedirfanajmal.com/#person" },
   };
 
   return (
     <>
-    <main className="emr-wrap">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      {/* HERO */}
-      <section className="emr-hero">
-        <div className="emr-scaps">Live Earned Media Radar</div>
-        <h1 className="emr-h1">Everyone else is buying attention. This is a live map of how to earn it.</h1>
-        <p className="emr-body-lg" style={{ margin: "0 0 28px" }}>
-          Right now, in real time, this radar reads what the press is actually covering across PR, earned media, SEO, and AI search. It runs
-          on SignalIQ, the same engine behind the campaigns that have put founders in Forbes, Harvard Business Review, and Business Insider.
-          Scroll down and watch it work.
-        </p>
-        <div className="emr-cta-row">
-          <Link href={LINKS.book} className="emr-btn-yellow">
-            Book a discovery call
-          </Link>
-          <Link href={LINKS.signaliq} className="emr-tlink">
-            or start with SignalIQ, free
+      {/* HERO + RADAR */}
+      <main className="emr-wrap">
+        <section className="emr-hero">
+          <div className="emr-scaps">Live Earned Media Radar</div>
+          <h1 className="emr-h1">Everyone else is buying attention. This is a live map of how to earn it.</h1>
+          <p className="emr-body-lg" style={{ margin: "0 0 26px" }}>
+            Ask ChatGPT or Google&rsquo;s AI Overviews about your market and the answer is built from what the press has published &mdash; not from your ad
+            budget. This radar reads that coverage in real time across PR, earned media, SEO, and AI search. It runs on SignalIQ, the same engine behind
+            founder placements in Forbes, Harvard Business Review, and Business Insider.
+          </p>
+          <div className="emr-cta-row">
+            <Link href={LINKS.book} className="emr-btn-yellow">
+              Book a discovery call
+            </Link>
+            <Link href={LINKS.signaliq} className="emr-tlink">
+              or start with SignalIQ, free
+            </Link>
+          </div>
+          <p className="emr-micro">Not a mockup. Every mark is a real topic, every number is live coverage data, refreshed daily. Click a lens to filter it.</p>
+        </section>
+
+        <div className="emr-double" />
+        <div className="emr-mast">
+          <span className="emr-pill">§ 03</span>
+          <h2 className="emr-h3">The live radar</h2>
+        </div>
+
+        <RadarModule data={data} />
+
+        <div style={{ textAlign: "center", padding: "30px 0 6px" }}>
+          <Link href={LINKS.signaliq} className="emr-btn">
+            Start with SignalIQ, free
           </Link>
         </div>
-        <p className="emr-micro">
-          This is not a mockup. Every dot is a topic. Every number is real coverage data from SignalIQ, refreshed daily. Hover anything to see it.
-        </p>
-      </section>
 
-      {/* LIVE RADAR */}
-      <div className="emr-double" />
-      <div className="emr-mast">
-        <span className="emr-pill">§ 03</span>
-        <h2 className="emr-h3">The live radar</h2>
-      </div>
-      <RadarModule data={data} />
-      <div style={{ textAlign: "center", padding: "28px 0 8px" }}>
-        <Link href={LINKS.signaliq} className="emr-btn">
-          Start with SignalIQ, free
-        </Link>
-      </div>
+        {/* pull line: radar -> hire */}
+        <div style={{ textAlign: "center", maxWidth: 840, margin: "52px auto 6px" }}>
+          <p className="emr-h2" style={{ fontStyle: "italic" }}>
+            &ldquo;I built this radar. Now imagine it pointed at <span className="emr-hl">your</span> company.&rdquo;
+          </p>
+          <p className="emr-scaps" style={{ marginTop: 16, display: "block" }}>
+            &mdash; Syed Irfan Ajmal
+          </p>
+        </div>
+      </main>
 
-      {/* WHY EARNED WHY NOW */}
-      <section className="emr-section">
-        <div className="emr-scaps">§ 04 · Why earned, why now</div>
-        <h2 className="emr-h2" style={{ margin: "10px 0 24px", maxWidth: 760 }}>
-          Ads stop the second you stop paying. Earned media compounds while you sleep.
-        </h2>
-        <div className="emr-four">
-          {[
-            {
-              n: "01",
-              h: "A journalist quoting you beats an ad you wrote about yourself.",
-              b: "Nobody trusts the brand that says it is the best. They trust the reporter, the study, the third party. Earned coverage borrows that credibility, and it is the only kind of visibility your competitor cannot simply outbid you for.",
-            },
-            {
-              n: "02",
-              h: "AI now answers your buyer with earned coverage, not your ad.",
-              b: "Ask ChatGPT, Perplexity, or Google's AI Overviews about your category and the answer is stitched from what the open web has published about you. The radar shows this shift live: answer engine optimization is one of the fastest-rising topics on the board. If you are not in the coverage, you are not in the answer.",
-            },
-            {
-              n: "03",
-              h: "The window that pays is before the story breaks.",
-              b: "Once a topic is hot, every comms person can see it and you are the two-hundredth pitch. The money is in the one to two weeks before a story crests, when the signal is in the data but not yet in the headlines. That gap is exactly what the radar measures.",
-            },
-            {
-              n: "04",
-              h: "Earned assets keep working. Paid stops dead.",
-              b: "A research report reporters cite, a tool they link to, a quote that gets syndicated: those keep sending you traffic, links, and authority for years. Pause an ad budget and the traffic is gone. One is an asset. The other is a meter running.",
-            },
-          ].map((c) => (
-            <div className="emr-card" key={c.n}>
-              <span className="emr-num">{c.n}</span>
+      {/* § 04 — WHY (paper-2 band) */}
+      <div className="emr-band-p2">
+        <div className="emr-band-inner">
+          <div className="emr-mast">
+            <span className="emr-pill">§ 04</span>
+            <span className="emr-scaps">Why earned, why now</span>
+          </div>
+          <h2 className="emr-h2" style={{ maxWidth: 820 }}>
+            Ads stop the second you stop paying. Earned media compounds while you sleep.
+          </h2>
+          <div className="emr-why-grid">
+            <div className="emr-why-card feature">
+              <span className="emr-why-num">01</span>
               <h3 className="emr-h3" style={{ marginBottom: 10 }}>
-                {c.h}
+                AI now answers your buyer with earned coverage &mdash; not your ad.
               </h3>
-              <p className="emr-body" style={{ fontSize: 14.5 }}>
-                {c.b}
+              <p className="emr-body">
+                Ask ChatGPT, Perplexity, or Google&rsquo;s AI Overviews about your category and the answer is assembled from what the open web has published
+                about you. The radar shows it live:{" "}
+                <span className="emr-hl">&ldquo;answer engine optimization&rdquo; is one of the fastest-rising beats on the board</span>. If you&rsquo;re not in
+                the coverage, you&rsquo;re not in the answer &mdash; and that answer is quietly replacing the search result.
               </p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* THE SYSTEM */}
-      <section className="emr-section">
-        <div className="emr-scaps">§ 05 · How it actually works</div>
-        <h2 className="emr-h2" style={{ margin: "10px 0 24px", maxWidth: 760 }}>
-          Getting quoted is not a lottery. It is four repeatable moves.
-        </h2>
-        <div className="emr-four">
-          {[
-            { s: "01 · Detect · SignalIQ", h: "Find the signal early.", b: "Watch open, primary sources and find the stories rising fastest before the press catches up. This is SignalIQ, the engine you are watching above." },
-            { s: "02 · Build · AssetIQ", h: "Build the thing reporters cite.", b: "Turn the signal into a linkable asset: a sourced data brief, a chart or map, a survey, a small tool. Not a press release. Something with a reason to exist." },
-            { s: "03 · Pitch · PressIQ + JournoCollabIQ", h: "Pitch it early, to the right desk.", b: "Score the pitch before you send it, and match it to the journalist most likely to bite. Early plus relevant beats late plus generic every time." },
-            { s: "04 · Track · CoverageIQ", h: "Track it and compound.", b: "Follow the placement, the links, and the citations, then feed what worked back into the next cycle." },
-          ].map((c) => (
-            <div className="emr-step" key={c.s}>
-              <div className="emr-scaps" style={{ display: "block", marginBottom: 8 }}>
-                {c.s}
-              </div>
-              <h3 className="emr-h3" style={{ marginBottom: 8 }}>
-                {c.h}
+            <div className="emr-why-card">
+              <span className="emr-why-num">02</span>
+              <h3 className="emr-h3" style={{ marginBottom: 10 }}>
+                A reporter quoting you beats an ad you wrote about yourself.
               </h3>
-              <p className="emr-body" style={{ fontSize: 14 }}>
-                {c.b}
+              <p className="emr-body">
+                Nobody trusts the brand that says it&rsquo;s the best. They trust the journalist, the study, the third party. Earned coverage borrows that
+                credibility &mdash; and it&rsquo;s the one kind of visibility a competitor can&rsquo;t simply outbid you for.
               </p>
             </div>
-          ))}
+            <div className="emr-why-card">
+              <span className="emr-why-num">03</span>
+              <h3 className="emr-h3" style={{ marginBottom: 10 }}>
+                The window that pays opens before the story breaks.
+              </h3>
+              <p className="emr-body">
+                Once a topic is hot, you&rsquo;re the two-hundredth pitch. The money is in the one-to-two weeks before a story crests &mdash; visible in the
+                data, not yet in the headlines. That gap is exactly what this radar measures.
+              </p>
+            </div>
+            <div className="emr-why-card">
+              <span className="emr-why-num">04</span>
+              <h3 className="emr-h3" style={{ marginBottom: 10 }}>
+                Earned assets compound. Paid stops dead.
+              </h3>
+              <p className="emr-body">
+                A cited study, a linked tool, a syndicated quote keep sending you traffic, links, and authority for years. Pause an ad and the traffic vanishes
+                that afternoon. One is an asset. The other is a meter running.
+              </p>
+            </div>
+          </div>
         </div>
-        <p className="emr-body-lg emr-italic" style={{ marginTop: 22, maxWidth: 760 }}>
-          That loop is EMOS, the Earned Media Operating System. You can run it yourself, learn it with me, or hand it over.
-        </p>
-      </section>
+      </div>
 
-      {/* THE LADDER */}
-      <section className="emr-section">
-        <div className="emr-scaps">§ 06 · Where do you want to start</div>
-        <h2 className="emr-h2" style={{ margin: "10px 0 24px", maxWidth: 760 }}>
+      {/* § 05 — SYSTEM (ink band, 5 steps) */}
+      <div className="emr-band-ink">
+        <div className="emr-band-inner">
+          <div className="emr-mast">
+            <span className="emr-pill">§ 05</span>
+            <span className="emr-scaps" style={{ color: "var(--color-paper-55)" }}>
+              How it actually works
+            </span>
+          </div>
+          <h2 className="emr-h2" style={{ color: "var(--color-paper)", maxWidth: 820 }}>
+            Getting quoted is not a lottery. It is five repeatable moves.
+          </h2>
+          <div className="emr-steps">
+            <div className="emr-step">
+              <div className="emr-step-num">01 &middot; Detect</div>
+              <div className="emr-step-tool">SignalIQ</div>
+              <h4>Find the signal early.</h4>
+              <p>Watch open, primary sources and surface the stories rising fastest, before the press catches up. It&rsquo;s the engine behind this radar.</p>
+            </div>
+            <div className="emr-step">
+              <div className="emr-step-num">02 &middot; Build</div>
+              <div className="emr-step-tool">AssetIQ</div>
+              <h4>Build what reporters cite.</h4>
+              <p>Turn the signal into something worth citing: a sourced data brief, a chart, a survey, a small tool. Not a press release.</p>
+            </div>
+            <div className="emr-step">
+              <div className="emr-step-num">03 &middot; Verify</div>
+              <div className="emr-step-tool">FactCheckIQ</div>
+              <h4>Make every claim airtight.</h4>
+              <p>Pressure-test every stat and citation before you send. A reporter stakes their name on your numbers &mdash; earned, not faked, is the whole brand.</p>
+            </div>
+            <div className="emr-step">
+              <div className="emr-step-num">04 &middot; Pitch</div>
+              <div className="emr-step-tool">PressIQ + JournoCollabIQ</div>
+              <h4>Pitch it right.</h4>
+              <p>Score the pitch before it goes out, and match it to the journalist most likely to bite. Early and relevant beats late and generic.</p>
+            </div>
+            <div className="emr-step">
+              <div className="emr-step-num">05 &middot; Track</div>
+              <div className="emr-step-tool">CoverageIQ</div>
+              <h4>Track and compound.</h4>
+              <p>Follow the placement, the links, and the citations &mdash; then feed what worked back into the next cycle.</p>
+            </div>
+          </div>
+          <p className="emr-throughline">
+            That loop is <span className="emr-hl">EMOS</span>, the Earned Media Operating System. Run it yourself, learn it with me, or hand it over &mdash;
+            that&rsquo;s the rest of this page.
+          </p>
+        </div>
+      </div>
+
+      {/* § 06 — LADDER */}
+      <main className="emr-wrap">
+        <div className="emr-mast" style={{ marginTop: 56 }}>
+          <span className="emr-pill">§ 06</span>
+          <span className="emr-scaps">Where do you want to start</span>
+        </div>
+        <h2 className="emr-h2" style={{ maxWidth: 820 }}>
           From &ldquo;let me try it myself&rdquo; to &ldquo;please just run this for me.&rdquo;
         </h2>
         <div className="emr-ladder">
-          <div className="emr-lcard emr-first">
-            <span className="emr-scaps">Do it yourself · free</span>
+          <div className="emr-lcard first">
+            <span className="tier">Free &middot; DIY</span>
             <h3 className="emr-h3">The public tools</h3>
-            <p className="emr-body" style={{ fontSize: 14 }}>
-              Open, no card, no signup wall. Start with SignalIQ and watch the same radar find opportunities in your category.
+            <p className="emr-body" style={{ fontSize: 14.5 }}>
+              Point SignalIQ at your own category and watch it surface opportunities in minutes. No card, no signup wall.
             </p>
-            <Link href={LINKS.signaliq} className="emr-tlink emr-lcard-cta">
-              Start with SignalIQ, free →
+            <Link href={LINKS.signaliq} className="emr-tlink cta">
+              Start with SignalIQ, free &rarr;
             </Link>
           </div>
-
           <div className="emr-lcard">
-            <span className="emr-scaps">Run it as software</span>
+            <span className="tier">Software</span>
             <h3 className="emr-h3">EMOS platform</h3>
-            <p className="emr-body" style={{ fontSize: 14 }}>
-              The operating system behind everything here: find the story, build the asset, score the pitch, find the journalist, track the placement.
+            <p className="emr-body" style={{ fontSize: 14.5 }}>
+              Run the whole play under one login: find the story, build and verify the asset, pitch the journalist, track the coverage.
             </p>
-            <Link href={LINKS.emosPlatform} className="emr-tlink emr-lcard-cta">
-              See the EMOS platform →
+            <Link href={LINKS.emosPlatform} className="emr-tlink cta">
+              See the EMOS platform &rarr;
             </Link>
           </div>
-
           <div className="emr-lcard">
-            <span className="emr-scaps">Learn it, with guidance</span>
+            <span className="tier">Learn &middot; DWY</span>
             <h3 className="emr-h3">EMOS Academy</h3>
-            <p className="emr-body" style={{ fontSize: 14 }}>
-              The guided version. Build a real media presence over the cohort, and keep the capability forever. Built for founders near a raise.
+            <p className="emr-body" style={{ fontSize: 14.5 }}>
+              Build a real media presence over a guided cohort &mdash; and keep the capability for good. For founders three-to-twelve months from a raise.
             </p>
-            <Link href={LINKS.emosAcademy} className="emr-tlink emr-lcard-cta">
-              Apply to the Academy →
+            <Link href={LINKS.emosAcademyApply} className="emr-tlink cta">
+              Apply to the Academy &rarr;
             </Link>
           </div>
-
           <div className="emr-lcard">
-            <span className="emr-scaps">Done for you · reactive</span>
+            <span className="tier">Done-for-you</span>
             <h3 className="emr-h3">Earned Media Booster</h3>
-            <p className="emr-body" style={{ fontSize: 14 }}>
-              We catch the journalist requests worth answering and get you quoted, so you get the coverage without living in the queries.
+            <p className="emr-body" style={{ fontSize: 14.5 }}>
+              We catch the journalist requests worth answering and get you quoted &mdash; coverage, without you living in the queries.
             </p>
-            <a href={LINKS.emb} className="emr-tlink emr-lcard-cta" target="_blank" rel="noopener">
-              See Earned Media Booster →
+            <a href={LINKS.emb} className="emr-tlink cta" target="_blank" rel="noopener">
+              See Earned Media Booster &rarr;
             </a>
           </div>
-
           <div className="emr-lcard">
-            <span className="emr-scaps">Done for you · proactive</span>
+            <span className="tier">Done-for-you</span>
             <h3 className="emr-h3">Earned Media Engine</h3>
-            <p className="emr-body" style={{ fontSize: 14 }}>
-              Original research, surveys, and mini-tools, taken to the press for Tier-1 coverage and AI citations. Manufacture the signal instead of waiting for it.
+            <p className="emr-body" style={{ fontSize: 14.5 }}>
+              Original research, surveys, and tools taken to the press for Tier-1 coverage and AI citations. We manufacture the signal instead of waiting.
             </p>
-            <a href={LINKS.eme} className="emr-tlink emr-lcard-cta" target="_blank" rel="noopener">
-              See the Earned Media Engine →
+            <a href={LINKS.eme} className="emr-tlink cta" target="_blank" rel="noopener">
+              See the Earned Media Engine &rarr;
             </a>
           </div>
-
-          <div className="emr-lcard emr-primary">
-            <span className="emr-scaps">Marketing leadership</span>
+          <div className="emr-lcard primary">
+            <span className="tier">Leadership</span>
             <h3 className="emr-h3">Fractional CMO + audit</h3>
-            <p className="emr-body" style={{ fontSize: 14, color: "var(--color-paper-72)" }}>
-              Hand marketing leadership to an operator who has shipped the campaigns. The lowest-risk way in is a Marketing Leadership Audit: two weeks, a full read, a written plan. Move into the retainer and the fee credits back in full.
+            <p className="emr-body" style={{ fontSize: 14.5 }}>
+              Hand marketing leadership to the operator who built this radar. Start with a two-week Marketing Leadership Audit; move to the retainer and it
+              credits back in full.
             </p>
-            <Link href={LINKS.book} className="emr-btn-yellow emr-lcard-cta">
+            <Link href={LINKS.book} className="emr-btn-yellow cta">
               Book a discovery call
             </Link>
           </div>
         </div>
-      </section>
+      </main>
 
-      {/* PROOF */}
-      <section className="emr-proof">
-        <div className="emr-proof-inner">
-          <div className="emr-scaps">§ 07 · This is not theory</div>
-          <h2 className="emr-h2" style={{ margin: "10px 0 20px", color: "var(--color-paper)", maxWidth: 760 }}>
-            I have spent over a decade on both sides of the journalist&apos;s inbox.
+      {/* § 07 — PROOF (ink band) */}
+      <div className="emr-band-ink" style={{ marginTop: 60 }}>
+        <div className="emr-band-inner">
+          <div className="emr-mast">
+            <span className="emr-pill">§ 07</span>
+            <span className="emr-scaps" style={{ color: "var(--color-paper-55)" }}>
+              This is not theory
+            </span>
+          </div>
+          <h2 className="emr-h2" style={{ color: "var(--color-paper)", maxWidth: 800 }}>
+            I&rsquo;ve spent over a decade on both sides of the journalist&rsquo;s inbox.
           </h2>
-          <div className="emr-logos">
-            Forbes &nbsp;·&nbsp; Harvard Business Review &nbsp;·&nbsp; Business Insider &nbsp;·&nbsp; Entrepreneur &nbsp;·&nbsp; Yahoo &nbsp;·&nbsp;
-            MarketWatch &nbsp;·&nbsp; MSN &nbsp;·&nbsp; World Bank &nbsp;·&nbsp; SEMrush &nbsp;·&nbsp; Ahrefs
+          <div className="emr-logos" style={{ marginTop: 18 }}>
+            Forbes &nbsp;&middot;&nbsp; Harvard Business Review &nbsp;&middot;&nbsp; Business Insider &nbsp;&middot;&nbsp; Entrepreneur &nbsp;&middot;&nbsp; Yahoo
+            &nbsp;&middot;&nbsp; MarketWatch &nbsp;&middot;&nbsp; MSN &nbsp;&middot;&nbsp; World Bank &nbsp;&middot;&nbsp; SEMrush &nbsp;&middot;&nbsp; Ahrefs
           </div>
           <div className="emr-stats">
             {[
               { n: "0 → 1.5M", c: "Monthly visitors · Ridester" },
-              { n: "160K → 1.2M", c: "Monthly revenue · National Tyres & Autocare" },
+              { n: "160K → 1.2M", c: "Monthly revenue · National Tyres" },
               { n: "6×", c: "Daily signups · Centriq" },
               { n: "+140%", c: "Traffic in 3 months · DinarStandard" },
             ].map((s) => (
@@ -278,63 +324,59 @@ export default async function RadarPage() {
             ))}
           </div>
           <p className="emr-proof-body">
-            Not a titled ex-CMO, and I would rather say that plainly than let three letters imply something they have not earned. An operator:
-            22 years building companies since 2004, 13 of them running DMR.agency, and the campaigns above are ones I actually shipped.
+            Not a titled ex-CMO, and I&rsquo;d rather say that plainly than let three letters imply something they haven&rsquo;t earned. An operator: 22 years
+            building companies since 2004, 13 of them running DMR.agency &mdash; the same team behind every result here.
           </p>
-          <p style={{ marginTop: 18 }}>
-            <span className="emr-pill">2 CMO spots open · Q3 2026</span>
+          <p style={{ marginTop: 20 }}>
+            <span className="emr-pill">2 CMO spots open &middot; Q3 2026</span>
           </p>
-        </div>
-      </section>
-
-      {/* FINAL CTA */}
-      <section className="emr-final">
-        <h2 className="emr-h2">Stop renting attention. Start earning it.</h2>
-        <p className="emr-body-lg" style={{ margin: "16px 0 24px" }}>
-          The reporters and the AI engines your buyers trust are writing tomorrow&apos;s answers from today&apos;s data. This radar reads the
-          same data. The only question is whether you want to watch it yourself, learn to work it, or hand it to someone who does this for a living.
-        </p>
-        <Link href={LINKS.book} className="emr-btn-yellow">
-          Book a discovery call
-        </Link>
-        <p className="emr-micro">Thirty minutes, no pitch deck. The easiest first step is a Marketing Leadership Audit, and if you go further it pays for itself.</p>
-        <div className="emr-secondary-links">
-          <Link href="/founder-movers" className="emr-tlink">
-            See this week&apos;s Founder Movers
-          </Link>
-          <Link href={LINKS.signaliq} className="emr-tlink">
-            Try SignalIQ free
-          </Link>
-          <a href={LINKS.eme} className="emr-tlink" target="_blank" rel="noopener">
-            See the Earned Media Engine
-          </a>
-          <Link href={LINKS.emosAcademyApply} className="emr-tlink">
-            Apply to the Academy
-          </Link>
-        </div>
-        <div className="emr-honesty">
-          I built all of this on one rule: earned media is earned, not faked. The radar shows real signals in real data and links every one back
-          to its source. It will never hand you a prediction dressed up as a fact, and I will never sell you a tool that spends the credibility you
-          are trying to build. That is the whole point.
-          <span className="emr-sign">Syed Irfan Ajmal</span>
-        </div>
-      </section>
-
-      {/* TICKER */}
-      <div className="emr-ticker" aria-hidden="true">
-        <div className="emr-ticker-lbl">Headline insights</div>
-        <div className="emr-ticker-track">
-          {ticker.concat(ticker).map((t, i) => (
-            <span key={i}>
-              <span className="emr-diamond">&#9670;</span>
-              {t}
-            </span>
-          ))}
         </div>
       </div>
-    </main>
-    <Colophon />
-    <ScrollButtons />
+
+      {/* FINAL */}
+      <main className="emr-wrap">
+        <section className="emr-final">
+          <h2 className="emr-h2">Stop renting attention. Start earning it.</h2>
+          <p className="emr-body-lg" style={{ margin: "16px 0 24px" }}>
+            The reporters and the AI engines your buyers trust are writing tomorrow&rsquo;s answers from today&rsquo;s data. This radar reads the same data. The
+            only question is whether you watch it yourself, learn to work it, or hand it to someone who does this for a living.
+          </p>
+          <Link href={LINKS.book} className="emr-btn-yellow">
+            Book a discovery call
+          </Link>
+          <p className="emr-micro">Thirty minutes, no pitch deck. The easiest first step is a Marketing Leadership Audit, and if you go further it pays for itself.</p>
+          <div className="emr-secondary-links">
+            <Link href={LINKS.signaliq} className="emr-tlink">
+              Try SignalIQ free
+            </Link>
+            <a href={LINKS.eme} className="emr-tlink" target="_blank" rel="noopener">
+              See the Earned Media Engine
+            </a>
+            <Link href={LINKS.emosAcademyApply} className="emr-tlink">
+              Apply to the Academy
+            </Link>
+          </div>
+          <div className="emr-honesty">
+            I built all of this on one rule: earned media is earned, not faked. The radar shows real signals in real data and links every one back to its source.
+            It will never hand you a prediction dressed up as a fact, and I&rsquo;ll never sell you a tool that spends the credibility you&rsquo;re trying to
+            build. That is the whole point.
+            <span className="sign">Syed Irfan Ajmal</span>
+          </div>
+        </section>
+
+        <div className="emr-ticker" aria-hidden="true">
+          <div className="emr-ticker-lbl">Headline insights</div>
+          <div className="emr-ticker-track">
+            {ticker.concat(ticker).map((t, i) => (
+              <span key={i}>
+                <span className="d">&#9670;</span>
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+        <p className="emr-copyright">© MMXXVI Syed Irfan Ajmal · SIA Enterprises Inc</p>
+      </main>
     </>
   );
 }

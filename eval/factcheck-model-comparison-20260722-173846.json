@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-07-22T12:38:46.373Z",
+  "note": "FactcheckIQ two-model grade-model comparison. Measurement only; pipeline and clampVerdict unchanged. Cost reflects the verify/grade step (the ~95% cost driver); the free citation/link gate and extract step are not billed here.",
+  "models": {
+    "a": "claude-opus-4-8",
+    "b": "claude-sonnet-5"
+  },
+  "selection": [
+    "wb-08",
+    "wb-09",
+    "seo-04",
+    "seo-09",
+    "planted-01"
+  ],
+  "totals": {
+    "a": {
+      "model": "claude-opus-4-8",
+      "label": "Opus 4.8",
+      "scored": 5,
+      "passed": 4,
+      "incomplete": 0,
+      "searches": 16,
+      "cost": {
+        "total": 0.7991484999999999,
+        "input": 0.014859999999999998,
+        "cacheRead": 0.1609135,
+        "cacheWrite": 0.19877499999999998,
+        "output": 0.2646,
+        "webSearch": 0.16
+      },
+      "usage": {
+        "inputTokens": 2972,
+        "outputTokens": 10584,
+        "cacheRead": 321827,
+        "cacheCreation": 31804,
+        "webSearchRequests": 16,
+        "capturedResponses": 4
+      }
+    },
+    "b": {
+      "model": "claude-sonnet-5",
+      "label": "Sonnet 5",
+      "scored": 2,
+      "passed": 2,
+      "incomplete": 3,
+      "searches": 4,
+      "cost": {
+        "total": 0.1326824,
+        "input": 0.001508,
+        "cacheRead": 0.0036444,
+        "cacheWrite": 0.062079999999999996,
+        "output": 0.02545,
+        "webSearch": 0.04
+      },
+      "usage": {
+        "inputTokens": 754,
+        "outputTokens": 2545,
+        "cacheRead": 18222,
+        "cacheCreation": 24832,
+        "webSearchRequests": 4,
+        "capturedResponses": 1
+      }
+    }
+  },
+  "perClaim": [
+    {
+      "id": "wb-08",
+      "golden": "unverifiable",
+      "a": {
+        "verdict": "verified",
+        "match": false,
+        "scored": true,
+        "via": "verify"
+      },
+      "b": {
+        "verdict": "unverifiable",
+        "match": true,
+        "scored": true,
+        "via": "verify"
+      },
+      "diverged": true
+    },
+    {
+      "id": "wb-09",
+      "golden": "verified",
+      "a": {
+        "verdict": "verified",
+        "match": true,
+        "scored": true,
+        "via": "verify"
+      },
+      "b": {
+        "verdict": "check_failed",
+        "match": false,
+        "scored": false,
+        "via": "incomplete"
+      },
+      "diverged": true
+    },
+    {
+      "id": "seo-04",
+      "golden": "verified",
+      "a": {
+        "verdict": "verified",
+        "match": true,
+        "scored": true,
+        "via": "verify"
+      },
+      "b": {
+        "verdict": "check_failed",
+        "match": false,
+        "scored": false,
+        "via": "incomplete"
+      },
+      "diverged": true
+    },
+    {
+      "id": "seo-09",
+      "golden": "verified",
+      "a": {
+        "verdict": "verified",
+        "match": true,
+        "scored": true,
+        "via": "verify"
+      },
+      "b": {
+        "verdict": "check_failed",
+        "match": false,
+        "scored": false,
+        "via": "incomplete"
+      },
+      "diverged": true
+    },
+    {
+      "id": "planted-01",
+      "golden": "fabricated",
+      "a": {
+        "verdict": "fabricated",
+        "match": true,
+        "scored": true,
+        "via": "gate"
+      },
+      "b": {
+        "verdict": "fabricated",
+        "match": true,
+        "scored": true,
+        "via": "gate"
+      },
+      "diverged": false
+    }
+  ],
+  "diverged": [
+    "wb-08",
+    "wb-09",
+    "seo-04",
+    "seo-09"
+  ]
+}
