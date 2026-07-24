@@ -274,6 +274,36 @@ export const BEATS: Beat[] = [
     ],
     blurb: "Funding climate, the AI wave, and go-to-market — the stories a pre-Series-A / Series-A founder builds authority around.",
   },
+  {
+    id: "ksa-tourism",
+    label: "KSA Tourism & Hospitality",
+    // New beat 2026-07-24 (Irfan): powers the /ksa-tourism-radar page + KSA
+    // speaking-circuit positioning (Sep-Nov 2026 events). Destination/brand
+    // names chosen over generic head-terms ("hotel") so totals stay honest.
+    // NOTE: "Saudi tourism" / "Saudi hotels" ARE umbrella head-terms - keep
+    // them for context but never let them headline radar totals (the 224.8K
+    // lesson from /earned-media-radar). Deliberately excluded: "The Line"
+    // (stop-word phrase, matcher noise), bare "Mecca" (metaphor noise:
+    // "a mecca for..."), bare "hotel" (generic head-term).
+    seeds: [
+      // giga-projects & destinations
+      "NEOM", "Red Sea Global", "AlUla", "Diriyah", "Qiddiya",
+      "New Murabba", "Mukaab", "Soudah Peaks",
+      // mega-events & entertainment
+      "Riyadh Season", "Expo 2030", "2034 World Cup", "Saudi Grand Prix",
+      "Esports World Cup", "Soundstorm", "Jeddah Season",
+      // hospitality & aviation
+      "Riyadh Air", "Saudia", "AROYA Cruises", "Cruise Saudi",
+      "Saudi hotels", "King Salman International Airport", "Saudi tourism",
+      // faith & Muslim-friendly travel
+      "Hajj", "Umrah", "Makkah", "Madinah", "halal travel",
+      "Muslim travelers", "Nusuk", "Haramain",
+      // - Arabic probe seeds (verify coverage/tokenize.ts handles non-Latin
+      //   tokens, then uncomment; probe-scan pattern per the founders beat) -
+      // "\u0646\u064a\u0648\u0645", "\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0644\u0627", "\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0645\u0631\u0629",
+    ],
+    blurb: "Saudi giga-projects, mega-events, hospitality, aviation, and faith-travel coverage.",
+  },
 ];
 
 export function beatById(id: BeatId): Beat {
