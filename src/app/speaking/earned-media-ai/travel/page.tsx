@@ -168,6 +168,24 @@ const btnGhostDark = { ...btnBase, background: "transparent", color: INK, border
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
+const SaudiHeroBanner = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 24, paddingBottom: 8 }}>
+    <div style={{ position: "relative", width: "100%", height: "clamp(190px, 34vw, 380px)", overflow: "hidden", border: `1px solid ${INK}`, background: INK }}>
+      <div aria-hidden style={{ position: "absolute", inset: 0, backgroundImage: "url('/assets/speaking/saudi-hero.jpg')", backgroundSize: "cover", backgroundPosition: "center 44%" }} />
+      <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(14,13,10,.22) 0%, rgba(14,13,10,.03) 38%, rgba(14,13,10,.72) 100%)" }} />
+      <div style={{ position: "absolute", left: 18, right: 18, bottom: 16 }}>
+        <SCaps size={11} ls="0.24em" color={YEL}>Earned Media for Saudi Tourism · Vision 2030</SCaps>
+        <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(15px, 2vw, 20px)", color: "#FAFAFA", lineHeight: 1.3, textShadow: "0 1px 12px rgba(0,0,0,.5)" }}>
+          Masmak Fort, Riyadh.
+        </div>
+      </div>
+      <div style={{ position: "absolute", right: 14, top: 12, textShadow: "0 1px 6px rgba(0,0,0,.75)" }}>
+        <SCaps size={8.5} ls="0.12em" color="rgba(250,250,250,.62)">Photo · Abdul7amid Al Fadhly / Pexels</SCaps>
+      </div>
+    </div>
+  </section>
+);
+
 const Hero = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 64, paddingBottom: 70 }}>
     <div style={{ marginBottom: 20 }}>
@@ -644,6 +662,7 @@ export default function EarnedMediaAITravelPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
+      <SaudiHeroBanner />
       <Hero />
       <Flywheel />
       <Shift />
