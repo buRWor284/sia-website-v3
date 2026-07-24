@@ -4,22 +4,21 @@ Reverse-chronological log of substantive changes. Newest entries on top.
 
 ---
 
-## 2026-07-24 · Speaking pages — Saudi/ATM edition surfaced + honest-numbers pass
+## 2026-07-24 · Speaking pages — Saudi/ATM edition + audience numbers
 
-**Why:** prepping the WTM Spotlight Riyadh (8–10 Sep 2026) / ATM Dubai (14–17 Sep 2026) speaker submission. The form blurb links to `/speaking`, so the travel edition had to be visible there.
+**Why:** prepping the WTM Spotlight Riyadh (8–10 Sep 2026) / ATM Dubai (14–17 Sep 2026) speaker submission. The form blurb links to `/speaking`, so the travel edition had to be surfaced there.
 
 **/speaking** (`src/app/speaking/page.tsx`)
-- New "Saudi Tourism edition" featured bar at the top (dark card → `/speaking/earned-media-ai/travel`), rendered above the flagship bar.
-- Biggest-audience stat `500+` → `40,000+ · attendees · ATM Dubai` (event scale per WTM's ATM 2018 figure — not session headcount).
-- Lead paragraph: "Arabian Travel Market (Dubai)" → "Arabian Travel Market Dubai (a 40,000-attendee show)".
-- Past Stages: ATM year `2017` → `2018` (matches the reel title). **Confirm.**
+- New "Saudi Tourism edition" featured bar at the top (dark card → `/speaking/earned-media-ai/travel`), above the flagship bar.
+- Biggest-audience stat: `500+` (his ATM Dubai session). DMSS set to `200+` everywhere; "Biggest" tag moved from DMSS to the ATM stage row.
+- Past Stages: ATM year `2017` → `2018`.
 - Signature Topics intro: "two talks" → "three talks".
 
 **/travel** (`src/app/speaking/earned-media-ai/travel/page.tsx`)
-- Same `40,000+ · attendees · ATM Dubai` stat.
-- Masthead CTA "get bookings" → "get chosen" (removes the clash with the §04 honest-measurement note).
-- Speaker bio: added ATM 40k scale + "hosts a business podcast, running since 2018."
+- Same `500+` biggest-audience stat; DMSS strip `500+` → `200+`.
+- Masthead CTA "get bookings" → "get chosen".
+- Bio: added "hosts a business podcast, running since 2018."
 
-**Verified facts:** WTM Spotlight Riyadh 8–10 Sep 2026 (RFECC); ATM Dubai 14–17 Sep 2026 (DWTC); ATM 2018 ≈ 40,000 attendees (WTM press release).
+**Note:** ATM Dubai's total event size is ~40,000 (WTM press release) — considered as the stat, then reverted to his real room number (500) per Irfan. Kept on file as an event credential if ever wanted.
 
-**Open:** confirm ATM year (set 2018); reconcile DMSS audience number (200+ vs 500+ appears in different spots on the hub).
+**Verified:** WTM Spotlight Riyadh 8–10 Sep 2026 (RFECC); ATM Dubai 14–17 Sep 2026 (DWTC).

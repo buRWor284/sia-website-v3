@@ -132,7 +132,7 @@ const STATS: ReadonlyArray<[string, string]> = [
   ["22", "years in marketing, as an operator"],
   ["1.5M", "organic visitors grown, Ridester"],
   ["04", "countries hosted on stage"],
-  ["40,000+", "attendees · ATM Dubai"],
+  ["500+", "biggest live audience"],
 ];
 
 const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
@@ -526,7 +526,7 @@ const Speaker = () => (
         <span style={{ fontStyle: "italic", color: YEL }}>not a commentator.</span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.75)", lineHeight: 1.6, maxWidth: 560 }}>
-        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, serving 300+ clients, mostly American brands, along with work for a Gulf government through DinarStandard in Dubai. He grew Ridester, a US transport publication, from zero to 1.5M monthly organic visitors, and his stages include Arabian Travel Market Dubai (a 40,000-attendee show), DMSS Bali, and MaGIC Malaysia. He also hosts a business podcast, running since 2018.
+        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, serving 300+ clients, mostly American brands, along with work for a Gulf government through DinarStandard in Dubai. He grew Ridester, a US transport publication, from zero to 1.5M monthly organic visitors, and his stages include Arabian Travel Market Dubai, DMSS Bali, and MaGIC Malaysia. He also hosts a business podcast, running since 2018.
       </p>
     </div>
     <div style={{ marginTop: 6, paddingTop: 18, borderTop: "1px solid rgba(241,235,222,.16)" }}>
@@ -550,20 +550,40 @@ const Speaker = () => (
 
 const SpeakerPhotoStrip = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 20 }}>
-    <figure style={{ margin: "0 auto", padding: 10, background: "#0e0d0a", border: `1px solid ${INK}`, maxWidth: 900 }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/assets/speaking/dmss-irfan-large-audience.jpg"
-        alt="Syed Irfan Ajmal speaking to a large live audience at DMSS Conference, Bali"
-        style={{ width: "100%", height: "auto", display: "block", border: "1px solid rgba(250,250,250,.25)", maxHeight: 380, objectFit: "cover", objectPosition: "center 30%" }}
-      />
-      <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
-        <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#FAFAFA", lineHeight: 1.4 }}>
-          DMSS Conference, Bali · Same live-room energy this session is built for, 500+ attendees.
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 16, maxWidth: 1000, margin: "0 auto" }}>
+      <figure style={{ margin: 0, flex: "1 1 380px", padding: 10, background: "#0e0d0a", border: `1px solid ${INK}` }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/assets/speaking/dmss-irfan-large-audience.jpg"
+          alt="Syed Irfan Ajmal speaking to a large live audience at DMSS Conference, Bali"
+          style={{ width: "100%", aspectRatio: "16 / 9", display: "block", border: "1px solid rgba(250,250,250,.25)", objectFit: "cover", objectPosition: "center 30%" }}
+        />
+        <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "#FAFAFA", lineHeight: 1.4 }}>
+            DMSS Conference, Bali · Same live-room energy this session is built for, 200+ attendees.
+          </div>
+          <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo · dmss.io</SCaps>
+        </figcaption>
+      </figure>
+      <figure style={{ margin: 0, flex: "1 1 380px", padding: 10, background: "#0e0d0a", border: `1px solid ${INK}` }}>
+        <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(250,250,250,.25)", overflow: "hidden" }}>
+          <iframe
+            src="https://www.youtube.com/embed/uSn4s5ZbJcQ?rel=0&start=743"
+            title="Syed Irfan Ajmal on the panel at Arabian Travel Market, Dubai"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ width: "100%", height: "100%", border: 0, display: "block" }}
+          />
         </div>
-        <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo by dmss.io</SCaps>
-      </figcaption>
-    </figure>
+        <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "#FAFAFA", lineHeight: 1.4 }}>
+            Arabian Travel Market, Dubai · On the panel at one of travel&rsquo;s biggest shows, 40,000+ attendees.
+          </div>
+          <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Panel · 2018</SCaps>
+        </figcaption>
+      </figure>
+    </div>
   </section>
 );
 

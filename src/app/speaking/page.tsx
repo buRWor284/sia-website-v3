@@ -43,7 +43,7 @@ const STATS: ReadonlyArray<[string, string]> = [
   ["04",  "countries hosted on stage"],
   ["06",  "speaker formats offered"],
   ["12+", "webinars & guest podcasts"],
-  ["40,000+", "attendees · ATM Dubai"],
+  ["500+", "biggest live audience"],
 ];
 
 type PrimaryTopic = {
@@ -158,8 +158,8 @@ type Stage = {
 const STAGES: ReadonlyArray<Stage> = [
   { yr: "2018",    evt: "IN5 Innovation Hub",           city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Media Hacks · Free Publicity"                          },
   { yr: "2018",    evt: "Durshal",                      city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding"                                     },
-  { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller", flag: "AE"  },
-  { yr: "2016",    evt: "DMSS Conference",              city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (200+ audience)",              tag: "Biggest" },
+  { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller (500+ audience)", flag: "AE", tag: "Biggest"  },
+  { yr: "2016",    evt: "DMSS Conference",              city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (200+ audience)" },
   { yr: "2016",    evt: "MPS2016 · M Powered Summit",   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote"                             },
   { yr: "2016",    evt: "AstroLabs",                    city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success"                  },
   { yr: "2016",    evt: "IK Institute of Business",     city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Co-trainer with Irfan Khairi"                          },
@@ -290,8 +290,8 @@ const SpeakingLead = () => (
         <div style={{ fontFamily: SERIF, fontSize: "clamp(20px, 2.5vw, 26px)", color: INK, lineHeight: 1.45 }}>
           <p style={{ margin: 0 }}>
             On stage since 2013, talking <strong>earned media</strong> and{" "}
-            <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market Dubai (a 40,000-attendee show),
-            DMSS (Bali, 500+ audience), IN5, AstroLabs, and MaGIC (Malaysia) — plus
+            <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
+            DMSS (Bali, 200+ audience), IN5, AstroLabs, and MaGIC (Malaysia) — plus
             webinar &amp; podcast circuits across North America and the UK.
           </p>
           <p style={{ marginTop: "0.6em", fontStyle: "italic", color: INK70 }}>
@@ -759,7 +759,7 @@ const DMSSStrip = () => (
       />
       <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
         <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "#FAFAFA", lineHeight: 1.4 }}>
-          DMSS Conference, Bali · Presenting &ldquo;Media Hacks&rdquo; to 500+ attendees.
+          DMSS Conference, Bali · Presenting &ldquo;Media Hacks&rdquo; to 200+ attendees.
         </div>
         <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo by dmss.io</SCaps>
       </figcaption>
