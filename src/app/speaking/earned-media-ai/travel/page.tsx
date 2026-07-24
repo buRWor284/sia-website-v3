@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
-import PipelineFlow from "./PipelineFlow";
-import PipelineFlowV2 from "./PipelineFlowV2";
-import PitchClinicDemo from "./PitchClinicDemo";
+import PipelineFlowV2 from "../PipelineFlowV2";
+import PitchClinicDemo from "../PitchClinicDemo";
 import {
   DoubleRule,
   HRule,
@@ -32,18 +31,18 @@ import {
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Earned Media in the Age of AI · Keynote & Interactive Session",
+  title: "When Travelers Ask ChatGPT Where to Go · Earned Media for Saudi Tourism",
   description:
-    "A flagship, interactive session on how AI is remaking earned media from both sides: AI agents that now run a six stage PR pipeline, and the LLMs and AI search that decide which brands get seen. Mapped from inside a working earned media OS by Syed Irfan Ajmal. Also presented as 'When AI Agents Pitch Journalists: The New Earned Media Engine.'",
+    "Travelers now plan trips by asking AI assistants, and those answers are built from earned media: the coverage, reviews, and authority content the models trust. The travel edition of the flagship session Earned Media in the Age of AI, tuned for Saudi tourism and Vision 2030, shows destinations, hotels, and travel brands how to win that visibility.",
   openGraph: {
-    title: "Earned Media in the Age of AI · Keynote & Interactive Session",
+    title: "When Travelers Ask ChatGPT Where to Go · Earned Media for Saudi Tourism",
     description:
-      "How AI is changing earned media from both sides, mapped from the inside using real data from the earned media OS Syed Irfan Ajmal built. Keynote, workshop, or panel.",
+      "The travel edition of Earned Media in the Age of AI: how destinations, hotels, and travel brands win visibility in AI travel answers. Keynote, workshop, or panel.",
   },
-  alternates: { canonical: "/speaking/earned-media-ai" },
+  alternates: { canonical: "/speaking/earned-media-ai/travel" },
 };
 
-// ─── Page-scoped layout CSS (self-contained, no globals dependency) ───────────
+// ─── Page-scoped layout CSS (same grid system as the flagship page) ───────────
 
 const PAGE_CSS = `
 .emai-hero{display:grid;grid-template-columns:1.5fr 1fr;gap:46px;align-items:start;}
@@ -71,40 +70,49 @@ const PAGE_CSS = `
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const SESSION_SPECS: ReadonlyArray<[string, string]> = [
-  ["Formats", "Keynote · Interactive workshop · Panel · Webinar"],
+  ["Formats", "Keynote · Interactive workshop · Panel"],
   ["Length", "45 min keynote to a half day workshop"],
   ["Room", "20 to 500+, in person or virtual"],
-  ["Built for", "Founders, marketers, PR and comms teams"],
+  ["Built for", "DMOs, tourism boards, hotels, airlines, DMCs, travel marketers"],
 ];
 
 type Activity = { n: string; title: string; body: string };
 const ACTIVITIES: ReadonlyArray<Activity> = [
-  { n: "01", title: "Idea sprint", body: "The room picks a topic. Together we generate authority asset ideas the press would actually want to cover." },
+  { n: "01", title: "Idea sprint", body: "The room picks a travel topic. Together we generate authority asset ideas the travel press would actually want to cover." },
   { n: "02", title: "Spot the slop", body: "We put an AI draft next to a human one. The room calls which is which, and we pull apart the tells that give AI away." },
   { n: "03", title: "Pitch clinic", body: "We review attendees’ real pitches live, then rebuild the weak ones on the spot." },
 ];
 
 type Audience = { t: string; body: string; want: string };
 const AUDIENCES: ReadonlyArray<Audience> = [
-  { t: "People", body: "Readers, buyers, and the journalists who cover them still trust editorial coverage far more than an ad.", want: "A credible, quotable source with a real point of view." },
-  { t: "Search engines", body: "Google weighs links, mentions and expertise signals to decide who ranks and who stays buried.", want: "Authority signals from independent sites." },
-  { t: "Generative engines", body: "LLMs and AI search stake their reputation on citation quality, so they surface brands with genuine authority.", want: "To cite the most trusted, most mentioned source." },
+  { t: "Travelers", body: "Trip planning now starts with a question to ChatGPT or Gemini, and travelers trust editorial coverage and reviews far more than a destination's own ads.", want: "A place worth going, vouched for by sources they trust." },
+  { t: "Search engines", body: "Google still routes a huge share of travel demand, weighing links, mentions and expertise signals to decide which destinations rank.", want: "Authority signals from independent travel media." },
+  { t: "Generative engines", body: "LLMs and AI search assemble travel answers from the coverage they trust, so they surface destinations and hotels with genuine authority.", want: "To cite the most trusted, most mentioned source." },
 ];
 
 const RETURNS: ReadonlyArray<[string, string, string]> = [
-  ["01", "Reputation", "Media mentions signal authority to prospects, partners and search engines at the same time."],
-  ["02", "Visibility", "Editorial coverage reaches audiences no paid budget can reliably touch."],
-  ["03", "Conversions", "Third party validation turns interest into intent, faster than owned content can."],
-  ["04", "Brand Equity", "Consistent coverage compounds into a brand that commands premium positioning."],
-  ["05", "Magnetism", "Press begets press. Journalists cite sources other journalists have already cited."],
-  ["06", "Liberty", "A media backed brand earns pricing power, category leadership, and freedom from paid ads."],
+  ["01", "Reputation", "Media mentions signal authority to travelers, trade partners and search engines at the same time."],
+  ["02", "Visibility", "Editorial coverage reaches travelers no ad budget can reliably touch."],
+  ["03", "Bookings", "Third party validation turns wish-list interest into booked trips faster than owned content can."],
+  ["04", "Brand Equity", "Consistent coverage compounds into a destination brand that commands premium positioning."],
+  ["05", "Magnetism", "Press begets press. Travel journalists cite sources other journalists have already cited."],
+  ["06", "Liberty", "A media backed travel brand earns pricing power, category leadership, and freedom from paid ads."],
+];
+
+const STAGES_TRAVEL: ReadonlyArray<[string, string, string]> = [
+  ["01", "Signal", "The topics about to break that a destination or travel brand can ride early."],
+  ["02", "Authority Content", "The research, surveys, AI apps and data tools that earn travel coverage."],
+  ["03", "Verify", "Screening out AI slop and unverified claims before they ship."],
+  ["04", "Match", "The right journalists, the right stories, the right beats."],
+  ["05", "Pitch", "The outreach itself, briefed and reviewed by a human."],
+  ["06", "Attribute", "What the coverage actually produced, down to bookings."],
 ];
 
 const TAKEAWAYS: ReadonlyArray<string> = [
+  "Audit what AI assistants currently say about your destination, hotel, or brand.",
+  "Earn the coverage AI models actually cite.",
   "Run a full earned media pipeline with AI and no code.",
-  "Brief an AI agent for each of the six stages, from signal to attribution.",
-  "Catch AI slop and unverified claims before they ship.",
-  "Read the numbers that prove a placement actually worked.",
+  "Measure whether coverage produced bookings, not just clippings.",
 ];
 
 const FAILURES: ReadonlyArray<string> = [
@@ -115,9 +123,9 @@ const FAILURES: ReadonlyArray<string> = [
 ];
 
 const QA: ReadonlyArray<[string, string]> = [
-  ["01", "Which jobs of a PR team can AI agents genuinely run today, and where do they still fail?"],
-  ["02", "How do you pair AI with human judgment so the work earns the trust of journalists, customers, LLMs and AI search?"],
-  ["03", "Why do LLMs and AI search now decide which brands get seen, and what do they reward?"],
+  ["01", "Which jobs of a travel PR team can AI agents genuinely run today, and where do they still fail?"],
+  ["02", "How do you pair AI with human judgment so the work earns the trust of journalists, travelers, LLMs and AI search?"],
+  ["03", "Why do LLMs and AI search now decide which destinations and travel brands get seen, and what do they reward?"],
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
@@ -142,7 +150,6 @@ const btnBase = {
 };
 const btnInk = { ...btnBase, background: INK, color: PAPER };
 const btnYel = { ...btnBase, background: YEL, color: INK };
-const btnGhostLight = { ...btnBase, background: "transparent", color: PAPER, border: `1px solid ${PAPER}` };
 const btnGhostDark = { ...btnBase, background: "transparent", color: INK, border: `1px solid ${INK}` };
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
@@ -152,10 +159,10 @@ const Hero = () => (
     <div style={{ marginBottom: 20 }}>
       <DoubleRule />
       <div style={{ display: "flex", alignItems: "baseline", gap: 14, padding: "10px 0 6px", flexWrap: "wrap" }}>
-        <Pill size={11} ls="0.18em">Flagship Session</Pill>
+        <Pill size={11} ls="0.18em">Travel Edition</Pill>
         <SCaps size={11.5} ls="0.22em" color={INK}>Keynote · Interactive Workshop · Panel</SCaps>
         <div style={{ flex: 1, height: 1, background: INK35, minWidth: 40 }} />
-        <SCaps size={11} ls="0.18em" color={INK55}>Vol. XV · The AI Desk</SCaps>
+        <SCaps size={11} ls="0.18em" color={INK55}>Vol. XV · The AI Desk · Travel</SCaps>
       </div>
       <div style={{ marginTop: -1, borderTop: `1px solid ${INK}` }} />
     </div>
@@ -163,46 +170,35 @@ const Hero = () => (
     <div className="emai-hero">
       {/* Left — the headline */}
       <div>
-        <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(40px, 7vw, 76px)", color: INK, lineHeight: 0.98, letterSpacing: "-0.028em" }}>
-          Earned Media
+        <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(38px, 6.4vw, 70px)", color: INK, lineHeight: 0.98, letterSpacing: "-0.028em" }}>
+          When Travelers Ask <Mark>ChatGPT</Mark>
           <br />
-          <span style={{ fontStyle: "italic" }}>in the Age of <Mark>AI</Mark></span>
+          <span style={{ fontStyle: "italic" }}>Where to Go</span>
         </h1>
         <p style={{ margin: "26px 0 0", fontFamily: SERIF, fontSize: "clamp(18px, 2.4vw, 23px)", color: INK, lineHeight: 1.5, maxWidth: 620 }}>
-          Earned media earns attention instead of buying it. That matters more every quarter, as paid ads get pricier, convert worse, and vanish behind ad blockers.
+          Trip planning now starts with a question to an AI assistant. The answers are built from earned media: the coverage, reviews, and authority content the models trust. A destination or hotel missing from that coverage is missing from the answer.
         </p>
         <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
-          AI is now rewriting earned media from both sides at once. This session maps the whole shift from the inside, using real data from the earned media OS I built and run.
+          The travel edition of the flagship session{" "}
+          <a href="/speaking/earned-media-ai" style={{ color: INK, fontStyle: "italic" }}>Earned Media in the Age of AI</a>, tuned for Saudi tourism and the brands connecting the Kingdom with the world, using real data from the earned media OS I built and run.
         </p>
         <div style={{ marginTop: 26, display: "flex", gap: 12, flexWrap: "wrap" }}>
           <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={btnInk}>Invite me to speak &rarr;</a>
           <a href="/contact" style={btnGhostDark}>Ask about this session &rarr;</a>
         </div>
         <p style={{ margin: "24px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 15.5, color: INK70, lineHeight: 1.5 }}>
-          By Syed Irfan Ajmal · Founder of EMOS · CEO of DMR.agency · Quoted in Harvard Business Review and Forbes.
+          By Syed Irfan Ajmal · Founder of EMOS · Previously on stage at Arabian Travel Market Dubai.
         </p>
-        <div style={{ marginTop: 14, display: "flex", alignItems: "baseline", gap: 9, flexWrap: "wrap" }}>
-          <SCaps size={10} ls="0.16em" color={INK55}>Also presented as</SCaps>
-          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK, lineHeight: 1.4 }}>
-            &ldquo;When AI Agents Pitch Journalists: The New Earned Media Engine&rdquo;
-          </span>
-        </div>
-        <div style={{ marginTop: 8, display: "flex", alignItems: "baseline", gap: 9, flexWrap: "wrap" }}>
-          <SCaps size={10} ls="0.16em" color={INK55}>Travel edition</SCaps>
-          <a href="/speaking/earned-media-ai/travel" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK, lineHeight: 1.4 }}>
-            When Travelers Ask ChatGPT Where to Go &rarr;
-          </a>
-        </div>
       </div>
 
       {/* Right — the session desk */}
       <aside style={{ border: `1px solid ${INK}`, background: PAPER2, padding: "24px 24px 26px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <SCaps size={10.5} ls="0.18em" color={INK55}>Session Desk</SCaps>
-          <Pill size={10} ls="0.18em">Signature</Pill>
+          <Pill size={10} ls="0.18em">KSA Ready</Pill>
         </div>
         <div style={{ marginTop: 12, fontFamily: SERIF, fontSize: 21, lineHeight: 1.2, color: INK, fontWeight: 700 }}>
-          One session, two sides of the shift.
+          Get covered, get found, get bookings.
         </div>
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "auto 1fr", gap: "10px 16px" }}>
           {SESSION_SPECS.map(([k, v]) => (
@@ -220,6 +216,46 @@ const Hero = () => (
   </section>
 );
 
+// ─── §01 · The Coverage Flywheel ──────────────────────────────────────────────
+
+const Flywheel = () => (
+  <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
+    <SectionMast n="01" label="The Payoff · The Coverage Flywheel" />
+    <div style={{ maxWidth: 720, margin: "0 auto 8px", textAlign: "center" }}>
+      <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
+        One asset. One placement. <span style={{ fontStyle: "italic" }}>Six compounding returns.</span>
+      </h2>
+      <p style={{ margin: "16px auto 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
+        A single authority asset and a single piece of travel coverage do not stop at the placement. They compound around a six part flywheel. Spin it long enough and it starts turning on its own, because journalists cite sources other journalists have already cited.
+      </p>
+    </div>
+
+    <div style={{ marginTop: 20 }}>
+      <CoverageFlywheel
+        hubEyebrow="Earned Media"
+        hubTitle="Coverage Flywheel"
+        hubSub="Six compounding returns"
+        ctaHref="#invite"
+        ctaLabel="Bring this session to your stage →"
+      />
+    </div>
+
+    <p style={{ margin: "8px 0 0", fontFamily: GROT, fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: INK55, textAlign: "center" }}>
+      Hover or tap a segment to read each return
+    </p>
+
+    <div className="emai-returns">
+      {RETURNS.map(([n, name, desc]) => (
+        <div key={n}>
+          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE, marginBottom: 4 }}>{n}</span>
+          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, marginBottom: 6 }}>{name}</span>
+          <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55 }}>{desc}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
 // ─── §02 · The Shift ──────────────────────────────────────────────────────────
 
 const Shift = () => (
@@ -227,68 +263,72 @@ const Shift = () => (
     <SectionMast n="02" label="The Shift · Why this, why now" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
-        Paid attention is getting worse.
+        AI changed how trips are planned.
         <br />
-        <span style={{ fontStyle: "italic" }}><Mark>Earned attention compounds.</Mark></span>
+        <span style={{ fontStyle: "italic" }}><Mark>And how coverage is earned.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18.5, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
-        A credible mention in a publication your buyers already trust keeps working long after it goes live, and it makes the next mention easier to get. The moment you stop paying for an ad, the attention stops. And AI has just changed earned media from both sides at once.
+        A credible mention in media travelers already trust keeps selling a destination long after it goes live, and it makes the next mention easier to get. AI has just changed earned media from both sides at once: how travelers find you, and how the coverage gets earned.
       </p>
     </div>
     <div className="emai-split">
       <div style={{ border: `1px solid ${INK}`, background: PAPER, padding: "28px 26px" }}>
-        <SCaps size={10.5} ls="0.18em" color={BLUE}>Supply side</SCaps>
+        <SCaps size={10.5} ls="0.18em" color={BLUE}>Demand side</SCaps>
         <h3 style={{ margin: "12px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
-          AI agents can now do the core jobs of a PR team.
+          LLMs and AI search now decide which destinations get seen.
         </h3>
         <HRule style={{ margin: "16px 0", background: INK35 }} />
         <p style={{ margin: 0, fontFamily: SERIF, fontSize: 16, color: INK70, lineHeight: 1.6 }}>
-          The work of earning coverage breaks into six stages. Each one now has an AI agent doing the heavy lifting, and each maps to a tool in the OS I run.
-        </p>
-      </div>
-      <div style={{ border: `1px solid ${INK}`, background: INK, color: PAPER, padding: "28px 26px" }}>
-        <SCaps size={10.5} ls="0.18em" color={YEL}>Demand side</SCaps>
-        <h3 style={{ margin: "12px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: PAPER, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
-          LLMs and AI search now decide which brands get seen.
-        </h3>
-        <HRule style={{ margin: "16px 0", background: "rgba(241,235,222,.35)" }} />
-        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 16, color: "rgba(241,235,222,.75)", lineHeight: 1.6 }}>
           And they reward exactly what earned media produces: authoritative coverage, citations, and genuine expert content.
         </p>
       </div>
+      <div style={{ border: `1px solid ${INK}`, background: INK, color: PAPER, padding: "28px 26px" }}>
+        <SCaps size={10.5} ls="0.18em" color={YEL}>Supply side</SCaps>
+        <h3 style={{ margin: "12px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: PAPER, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
+          AI agents can now do the core jobs of a PR team.
+        </h3>
+        <HRule style={{ margin: "16px 0", background: "rgba(241,235,222,.35)" }} />
+        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 16, color: "rgba(241,235,222,.75)", lineHeight: 1.6 }}>
+          The work of earning travel coverage breaks into six stages. Each one now has an AI agent doing the heavy lifting, with a human deciding at every gate.
+        </p>
+      </div>
     </div>
   </section>
 );
 
-// ─── §04 · The Earned Media Pipeline ──────────────────────────────────────────
+// ─── §03 · Demand Side ────────────────────────────────────────────────────────
 
-const Pipeline = () => (
-  <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
-    <SectionMast n="04" label="Supply Side · The Earned Media Pipeline" />
+const Demand = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84 }}>
+    <SectionMast n="03" label="Demand Side · Who gets seen now" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
-        Six jobs a PR team does.
+        AI travel answers reward
         <br />
-        <span style={{ fontStyle: "italic" }}>AI can now run every one.</span>
+        <span style={{ fontStyle: "italic" }}><Mark>what earned media produces.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
-        Each stage maps to a tool in EMOS, the earned media OS I built and run, so the talk is backed by live data, not slideware. String the six together and you have a full pipeline, run with AI and no code.
+        Ask an AI assistant to plan a week in the Gulf and it assembles the answer from sources it trusts: travel press, guides, reviews, expert commentary. Earn that coverage once and it pays out to travelers, to search, and to the machines that cite you, at the same time.
       </p>
     </div>
-    <PipelineFlow />
-    <p style={{ margin: "30px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: INK, lineHeight: 1.5, textAlign: "center" }}>
-      In the room, we do not just describe the pipeline. <Mark>We run it live.</Mark>
-    </p>
+    <div className="emai-cards3">
+      {AUDIENCES.map((a) => (
+        <div key={a.t} style={{ border: `1px solid ${INK}`, background: PAPER, padding: "24px 22px", display: "flex", flexDirection: "column" }}>
+          <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.15 }}>{a.t}</h3>
+          <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55, flex: 1 }}>{a.body}</p>
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${INK35}` }}>
+            <SCaps size={9.5} ls="0.14em" color={INK55}>They want</SCaps>
+            <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 14.5, color: INK, lineHeight: 1.5, fontStyle: "italic" }}>{a.want}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   </section>
 );
 
-// ─── §04 · The Earned Media Pipeline · V2 (active) ────────────────
-// V2 of Section 04. Same section shell as Pipeline (V1), with the reframed copy:
-// leverage-led heading, "human decides at every gate" intro, PipelineFlowV2
-// chips, the co-author caption, and the "work of ten" kicker.
-// Rollback: render <Pipeline /> instead of <PipelineV2 /> below. V1 stays intact.
+// ─── §04 · The Earned Media Pipeline (travel terms) ───────────────────────────
 
-const PipelineV2 = () => (
+const Pipeline = () => (
   <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
     <SectionMast n="04" label="Supply Side · The Earned Media Pipeline" />
     <div className="emai-intro">
@@ -298,19 +338,19 @@ const PipelineV2 = () => (
         <span style={{ fontStyle: "italic" }}>AI can now run every one. None of them without a human.</span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
-        Each stage maps to a tool in EMOS, the earned media OS I built and run, so the talk is backed by live data, not slideware. String the six together and you have a full pipeline where AI does the manual work and a human decides at every gate. No code, no autopilot.
+        Each stage maps to a tool in EMOS, the earned media OS I built and run, so the session runs on live data, not slideware. Below the pipeline: the same six stages in travel terms.
       </p>
     </div>
     <PipelineFlowV2 />
-    <div style={{ margin: "34px auto 0", maxWidth: 720, border: `1px solid ${INK}`, borderLeft: `3px solid ${YEL}`, background: PAPER, padding: "22px 26px" }}>
-      <SCaps size={10.5} ls="0.18em" color={BLUE}>On AssetIQ &amp; PressIQ</SCaps>
-      <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.6 }}>
-        Treat the AI as a co-author, not a vending machine. You don&rsquo;t drop a coin and collect a finished pitch. You brief it, push back, rewrite. Your name goes on the final.
-      </p>
+    <div className="emai-returns">
+      {STAGES_TRAVEL.map(([n, name, desc]) => (
+        <div key={n}>
+          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE, marginBottom: 4 }}>{n}</span>
+          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, marginBottom: 6 }}>{name}</span>
+          <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55 }}>{desc}</span>
+        </div>
+      ))}
     </div>
-    <p style={{ margin: "30px auto 0", maxWidth: 780, textAlign: "center", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3.2vw, 30px)", color: INK, lineHeight: 1.25, letterSpacing: "-0.015em" }}>
-      Even with a human deciding at every gate, one operator now does the earned media work of <span style={{ fontStyle: "italic" }}>ten, if not more.</span>
-    </p>
     <p style={{ margin: "30px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: INK, lineHeight: 1.5, textAlign: "center" }}>
       In the room, we do not just describe the pipeline. <Mark>We run it live.</Mark>
     </p>
@@ -350,76 +390,6 @@ const Activities = () => (
   </section>
 );
 
-// ─── §03 · Demand Side ────────────────────────────────────────────────────────
-
-const Demand = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84 }}>
-    <SectionMast n="03" label="Demand Side · Who gets seen now" />
-    <div className="emai-intro">
-      <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
-        AI search rewards exactly
-        <br />
-        <span style={{ fontStyle: "italic" }}><Mark>what earned media produces.</Mark></span>
-      </h2>
-      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
-        Generative engines increasingly decide which brands surface in an answer. They stake their credibility on citation quality, so they reward authoritative coverage, third party citations, and real expert content. Earn it once and it pays out to people, to search, and to the machines that cite you, at the same time.
-      </p>
-    </div>
-    <div className="emai-cards3">
-      {AUDIENCES.map((a) => (
-        <div key={a.t} style={{ border: `1px solid ${INK}`, background: PAPER, padding: "24px 22px", display: "flex", flexDirection: "column" }}>
-          <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.15 }}>{a.t}</h3>
-          <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55, flex: 1 }}>{a.body}</p>
-          <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${INK35}` }}>
-            <SCaps size={9.5} ls="0.14em" color={INK55}>They want</SCaps>
-            <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 14.5, color: INK, lineHeight: 1.5, fontStyle: "italic" }}>{a.want}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </section>
-);
-
-// ─── §01 · The Coverage Flywheel ──────────────────────────────────────────────
-
-const Flywheel = () => (
-  <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
-    <SectionMast n="01" label="The Payoff · The Coverage Flywheel" />
-    <div style={{ maxWidth: 720, margin: "0 auto 8px", textAlign: "center" }}>
-      <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
-        One asset. One placement. <span style={{ fontStyle: "italic" }}>Six compounding returns.</span>
-      </h2>
-      <p style={{ margin: "16px auto 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
-        A single authority asset and a single piece of coverage do not stop at the placement. They compound around a six part flywheel. Spin it long enough and it starts turning on its own, because journalists cite sources other journalists have already cited.
-      </p>
-    </div>
-
-    <div style={{ marginTop: 20 }}>
-      <CoverageFlywheel
-        hubEyebrow="Earned Media"
-        hubTitle="Coverage Flywheel"
-        hubSub="Six compounding returns"
-        ctaHref="#invite"
-        ctaLabel="Bring this session to your stage →"
-      />
-    </div>
-
-    <p style={{ margin: "8px 0 0", fontFamily: GROT, fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: INK55, textAlign: "center" }}>
-      Hover or tap a segment to read each return
-    </p>
-
-    <div className="emai-returns">
-      {RETURNS.map(([n, name, desc]) => (
-        <div key={n}>
-          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE, marginBottom: 4 }}>{n}</span>
-          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, marginBottom: 6 }}>{name}</span>
-          <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55 }}>{desc}</span>
-        </div>
-      ))}
-    </div>
-  </section>
-);
-
 // ─── §06 · What You Leave With + the honest part ──────────────────────────────
 
 const LeaveWith = () => (
@@ -455,10 +425,28 @@ const LeaveWith = () => (
   </section>
 );
 
+// ─── The Saudi Angle · Vision 2030 band ───────────────────────────────────────
+
+const SaudiAngle = () => (
+  <section className="sx" style={{ background: INK, color: PAPER, paddingTop: 64, paddingBottom: 64, borderTop: `1px solid ${INK}` }}>
+    <div style={{ maxWidth: 820, margin: "0 auto", textAlign: "center" }}>
+      <SCaps size={11} ls="0.22em" color={YEL}>The Saudi Angle · Vision 2030</SCaps>
+      <h2 style={{ margin: "16px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(26px, 4.4vw, 44px)", color: PAPER, lineHeight: 1.08, letterSpacing: "-0.025em" }}>
+        Earned media is how the Kingdom&rsquo;s tourism story
+        <br />
+        <span style={{ fontStyle: "italic", color: YEL }}>reaches the world.</span>
+      </h2>
+      <p style={{ margin: "18px auto 0", fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.75)", lineHeight: 1.6, maxWidth: 640 }}>
+        Vision 2030 set the goal. AI search now decides which destinations travelers hear about. The travel brands that earn trusted coverage will be the ones the answers cite.
+      </p>
+    </div>
+  </section>
+);
+
 // ─── §07 · Q&A ────────────────────────────────────────────────────────────────
 
 const QandA = () => (
-  <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}` }}>
+  <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84 }}>
     <SectionMast n="07" label="Q&A · Where the room usually goes" />
     <div style={{ maxWidth: 760, marginBottom: 30 }}>
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(26px, 4.2vw, 42px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
@@ -491,7 +479,7 @@ const Speaker = () => (
         <span style={{ fontStyle: "italic", color: YEL }}>not a commentator.</span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.75)", lineHeight: 1.6, maxWidth: 560 }}>
-        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, delivering SEO-PR and content results like growing Ridester from zero to 1.5M monthly organic visitors. Earlier he cofounded Silk Route Interactive, a spatial intelligence startup, and studied and worked in Scandinavia. He also hosts the SIA Business podcast.
+        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, serving 300+ clients, mostly American brands, along with work for a Gulf government through DinarStandard in Dubai. He grew Ridester, a US transport publication, from zero to 1.5M monthly organic visitors, and his stages include Arabian Travel Market Dubai, DMSS Bali, and MaGIC Malaysia.
       </p>
     </div>
     <div style={{ marginTop: 6, paddingTop: 18, borderTop: "1px solid rgba(241,235,222,.16)" }}>
@@ -539,7 +527,7 @@ const BottomCTA = () => (
     <div style={{ maxWidth: 760, margin: "0 auto", textAlign: "center" }}>
       <SCaps size={11} ls="0.22em" color={INK}>Two ways in</SCaps>
       <h2 style={{ margin: "14px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 5.5vw, 54px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.028em" }}>
-        Bring this session to your stage.
+        Bring this session to your travel stage.
       </h2>
       <p style={{ margin: "16px auto 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 18, color: INK, lineHeight: 1.5, maxWidth: 560, opacity: 0.85 }}>
         Organizers, send the event, audience and the metric you want moved. Curious about the content, ask a question. Response inside a working day, no salesy follow-up.
@@ -556,7 +544,7 @@ const BottomCTA = () => (
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function EarnedMediaInTheAgeOfAIPage() {
+export default function EarnedMediaAITravelPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
@@ -564,9 +552,10 @@ export default function EarnedMediaInTheAgeOfAIPage() {
       <Flywheel />
       <Shift />
       <Demand />
-      <PipelineV2 />
+      <Pipeline />
       <Activities />
       <LeaveWith />
+      <SaudiAngle />
       <QandA />
       <Speaker />
       <SpeakerPhotoStrip />
