@@ -139,7 +139,7 @@ const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
   ["80%", "of travelers now research and plan trips with AI tools"],
   ["262M", "international Muslim travel arrivals projected by 2030, from ~196M in 2025"],
   ["$310B", "projected annual Muslim travel spend by 2030"],
-  ["40%", "of US travelers used AI to plan trips in 2025, up 11 points in a year"],
+  ["~40%", "of US travelers used AI to plan trips in 2025, up 11 points in a year"],
 ];
 
 type Fmt = { t: string; meta: string; body: string };
@@ -361,6 +361,9 @@ const Demand = () => (
         </div>
       ))}
     </div>
+    <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.5, maxWidth: 880 }}>
+      Why AI rewards this: about 83% of AI citations point to third-party sources rather than brand-owned pages (Analyze, 83,670 citations); branded mentions are the strongest correlate of Google AI Overview visibility, roughly 3x backlinks (Ahrefs, 75,000 brands); and adding credible citations lifts generative-engine visibility 30 to 40% (Princeton GEO study).
+    </p>
   </section>
 );
 
