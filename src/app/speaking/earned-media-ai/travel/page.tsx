@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
 import PipelineFlowV2 from "../PipelineFlowV2";
-import PitchClinicDemo from "../PitchClinicDemo";
+import PitchClinicDemoTravel from "./PitchClinicDemoTravel";
 import {
   DoubleRule,
   HRule,
@@ -385,7 +385,7 @@ const Activities = () => (
       ))}
     </div>
     <div style={{ marginTop: 48, maxWidth: 760, marginLeft: "auto", marginRight: "auto" }}>
-      <PitchClinicDemo />
+      <PitchClinicDemoTravel />
     </div>
   </section>
 );
