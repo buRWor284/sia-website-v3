@@ -36,6 +36,7 @@ export const KSA_FOCUS: { topic: string; lens: KsaLens }[] = [
   { topic: "expo 2030", lens: "events" },
   { topic: "2034 world cup", lens: "events" },
   { topic: "saudi grand prix", lens: "events" },
+  { topic: "saudi arabian grand prix", lens: "events" }, // variant seed, accrues from 2026-07-25
   { topic: "esports world cup", lens: "events" },
   { topic: "soundstorm", lens: "events" },
   { topic: "jeddah season", lens: "events" },
@@ -45,6 +46,7 @@ export const KSA_FOCUS: { topic: string; lens: KsaLens }[] = [
   { topic: "aroya cruises", lens: "hosp" },
   { topic: "cruise saudi", lens: "hosp" },
   { topic: "saudi hotels", lens: "hosp" },
+  { topic: "saudi hotel", lens: "hosp" }, // variant seed, accrues from 2026-07-25
   { topic: "king salman international airport", lens: "hosp" },
   { topic: "saudi tourism", lens: "hosp" },
   // faith & Muslim-friendly travel

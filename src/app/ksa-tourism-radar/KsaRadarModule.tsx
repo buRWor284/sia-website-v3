@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { KSA_LENSES, KSA_LENS_LABEL, ksaDelta7, type KsaLens, type KsaLiveTopic, type KsaRadarData } from "@/lib/ksa-radar/types";
-import { RING_LABEL, SIGNALS, STATUS_META, type KsaSignal } from "./content";
+import { RING_LABEL, SIGNALS, SIGNAL_BY_TOPIC, STATUS_META, VERDICT_META, verdictFor, type KsaSignal } from "./content";
 
 type LensFilter = KsaLens | "all";
 type MarkShape = "disc" | "square" | "ring" | "diamond";
@@ -110,8 +110,16 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
     };
   }, [live.hasData, liveMap]);
 
+  const medianN = useMemo(() => {
+    const ns = live.topics.map((t) => t.n).sort((a, b) => a - b);
+    if (ns.length === 0) return 1;
+    const mid = Math.floor(ns.length / 2);
+    return ns.length % 2 ? ns[mid] : (ns[mid - 1] + ns[mid]) / 2;
+  }, [live.topics]);
+
   const selected = SIGNALS.find((s) => s.id === selectedId) ?? SIGNALS[0];
   const selectedLive = liveFor(selected);
+  const selectedVerdict = verdictFor(selectedLive?.n ?? null, selectedLive?.tr ?? null, medianN, selected.demand, selected.catalyst, selected.status);
 
   // ---- radar canvas (all helpers are arrow fns to preserve cv/ctx null-narrowing) ----
   useEffect(() => {
@@ -430,6 +438,13 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
               <span className="src">Live press-volume line lands here once the SignalIQ wire has scanned this topic.</span>
             )}
           </div>
+          <div className="ksr-file-verdict">
+            <span className="row"><b>Press</b>{selectedLive ? `${selectedLive.n.toLocaleString()} articles · ${selectedLive.tr >= 0.1 ? "rising" : selectedLive.tr <= -0.1 ? "falling" : "flat"}` : "wire pending"}</span>
+            <span className="row"><b>Reality</b>{selected.demand}</span>
+            <span className="row"><b>Next</b>{selected.catalyst}</span>
+            <span className={"ksr-verdict v-" + VERDICT_META[selectedVerdict].tone}>{VERDICT_META[selectedVerdict].label}</span>
+            <span className="vnote">{VERDICT_META[selectedVerdict].note}</span>
+          </div>
           <p className="ksr-file-talk">
             <b>Talk angle:</b> {selected.talk}
           </p>
@@ -521,6 +536,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
                 <span className="ksr-scaps">Trending in the Saudi story</span>
                 <span className="ksr-mono">momentum · 30d</span>
               </div>
+              <div className="ksr-panel-explain">Rising and quiet is the early window. Rising and loud means enter fast, with a data angle.</div>
               <div className="ksr-panel-body">
                 {live.risers.slice(0, 8).map((t, i) => (
                   <div className={"ksr-list-row cat-" + t.lens} key={t.topic}>
@@ -540,25 +556,34 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
               </div>
             </div>
             <div className="ksr-panel">
-              <div className="ksr-panel-head">
-                <span className="ksr-scaps">Quiet · ownable</span>
+                <div className="ksr-panel-head">
+                <span className="ksr-scaps">Quiet · check the demand</span>
                 <span className="ksr-mono">fewest articles first</span>
               </div>
-              <div className="ksr-panel-explain">Very little press competition: one good asset can make you the source.</div>
+              <div className="ksr-panel-explain">
+                Quiet means few articles, not no interest. The test: is reality (capital, visitors, a dated catalyst) ahead of the coverage? If yes,
+                whitespace you can own; if no, dormant. Counts are exact-phrase, so variants can undercount.
+              </div>
               <div className="ksr-panel-body">
-                {live.quiet.map((t) => (
-                  <div className={"ksr-list-row cat-" + t.lens} key={t.topic}>
-                    <div className="ksr-row-main">
-                      <div className="ksr-row-name">
-                        <span className={chipClass(t.lens)}>{KSA_LENS_LABEL[t.lens]}</span>
-                        {t.topic}
+                {live.quiet.map((t) => {
+                  const sig = SIGNAL_BY_TOPIC.get(t.topic);
+                  const v = verdictFor(t.n, t.tr, medianN, sig?.demand, sig?.catalyst, sig?.status ?? "steady");
+                  return (
+                    <div className={"ksr-list-row cat-" + t.lens} key={t.topic}>
+                      <div className="ksr-row-main">
+                        <div className="ksr-row-name">
+                          <span className={chipClass(t.lens)}>{KSA_LENS_LABEL[t.lens]}</span>
+                          {t.topic}
+                          <span className={"ksr-verdict sm v-" + VERDICT_META[v].tone}>{VERDICT_META[v].label}</span>
+                        </div>
+                        {sig ? <div className="ksr-quiet-demand">vs {sig.demand}</div> : null}
                       </div>
+                      <span className="ksr-gapval">
+                        {t.n.toLocaleString()} articles · {pct(t.tr)}
+                      </span>
                     </div>
-                    <span className="ksr-gapval">
-                      {t.n.toLocaleString()} arts · {pct(t.tr)}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

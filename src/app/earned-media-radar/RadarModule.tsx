@@ -504,7 +504,7 @@ export default function RadarModule({ data }: { data: RadarData }) {
                   </div>
                 </div>
                 <span className="emr-gapval">
-                  {t.n.toLocaleString()} arts &middot; {pct(t.tr)}
+                  {t.n.toLocaleString()} articles &middot; {pct(t.tr)}
                 </span>
               </div>
             ))}

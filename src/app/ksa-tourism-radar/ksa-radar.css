@@ -135,7 +135,34 @@
 .ksr-bar>i{display:block;height:100%;background:var(--color-ink)}
 .ksr-bar>i.ksr-bar-y{background:var(--color-yellow)}
 .ksr-mom{font-family:var(--font-mono);font-size:13px;width:62px;text-align:right}
-.ksr-gapval{font-family:var(--font-mono);font-size:12px;color:var(--color-ink-55);width:96px;text-align:right}
+.ksr-gapval{font-family:var(--font-mono);font-size:12px;color:var(--color-ink-55);width:128px;text-align:right}
+
+/* verdict vocabulary (shared: quiet list, signal files, The Window) */
+.ksr-verdict{display:inline-block;font-family:var(--font-grot);font-weight:800;font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--color-ink);white-space:nowrap;color:var(--color-ink)}
+.ksr-verdict.sm{font-size:8px;padding:2px 6px}
+.ksr-verdict.v-gold{background:var(--color-yellow);border-color:var(--color-yellow)}
+.ksr-verdict.v-ink{background:var(--color-ink);color:var(--color-paper)}
+.ksr-verdict.v-quiet{color:var(--color-ink-55);border-color:var(--color-ink-55)}
+.ksr-verdict.v-warn{border-style:dashed}
+.ksr-file-verdict{border:1px solid var(--color-ink);background:var(--color-paper-2);padding:12px 14px;margin:0 0 12px;font-family:var(--font-mono);font-size:11.5px;line-height:1.7;color:var(--color-ink-70)}
+.ksr-file-verdict .row{display:block}
+.ksr-file-verdict .row b{font-family:var(--font-grot);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-ink-55);display:inline-block;width:60px}
+.ksr-file-verdict .ksr-verdict{margin:8px 8px 0 0}
+.ksr-file-verdict .vnote{font-size:10.5px;color:var(--color-ink-55)}
+.ksr-quiet-demand{font-family:var(--font-mono);font-size:10.5px;color:var(--color-ink-55);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ksr-row-name .ksr-verdict.sm{margin-left:2px;flex:0 0 auto}
+
+/* The Window quadrant */
+.ksr-window{border:1px solid var(--color-ink);padding:18px;background:var(--color-paper)}
+.ksr-window svg{display:block;width:100%;height:auto}
+.ksr-window .zl{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;fill:rgba(26,20,16,.55)}
+.ksr-window .ax{font-family:var(--font-mono);font-size:10.5px;fill:rgba(26,20,16,.55)}
+.ksr-window .axm{font-family:var(--font-mono);font-size:9.5px;fill:rgba(26,20,16,.45)}
+.ksr-window .dl{font-family:Archivo,sans-serif;font-size:11px;fill:rgba(26,20,16,.8)}
+.ksr-window-rules{font-size:14px;line-height:1.65;color:var(--color-ink-70);max-width:860px;margin:16px 0 12px}
+.ksr-window-rules b{color:var(--color-ink)}
+.ksr-verdict-legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--font-mono);font-size:10.5px;color:var(--color-ink-55)}
+.ksr-verdict-legend>span{display:inline-flex;align-items:center;gap:6px}
 
 /* live-wire pending state */
 .ksr-pending{border:1px dashed var(--color-ink);background:var(--color-paper-2);padding:24px;max-width:860px}
@@ -168,6 +195,16 @@
 /* final + sources */
 .ksr-final{text-align:center;max-width:820px;margin:60px auto 0}
 .ksr-sources{margin-top:60px;border-top:1px solid var(--color-ink);padding-top:26px}
+/* sources: compact expandable colophon (replaces the 4-col grid) */
+.ksr-src-details summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ksr-src-details summary::-webkit-details-marker{display:none}
+.ksr-src-details summary::after{content:"+";font-family:var(--font-mono);color:var(--color-ink-55);font-size:15px;margin-left:2px}
+.ksr-src-details[open] summary::after{content:"\2212"}
+.ksr-srcflow{margin-top:16px;border-top:1px solid var(--color-ink-15);padding-top:14px}
+.ksr-srcflow p{font-size:12.5px;line-height:2.1;color:var(--color-ink-70);margin:0 0 10px}
+.ksr-srcflow p b{font-family:var(--font-grot);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-ink-55);margin-right:12px}
+.ksr-srcflow a{color:var(--color-ink-70);text-decoration:none;border-bottom:1px dotted var(--color-ink-55);margin-right:14px}
+.ksr-srcflow a:hover{color:var(--color-ink)}
 .ksr-srcgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
 .ksr-srcgrid h5{font-family:var(--font-grot);font-weight:700;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-ink-55);margin:0 0 8px}
 .ksr-srcgrid a{display:block;font-size:12.5px;color:var(--color-ink-70);text-decoration:none;padding:3px 0}
