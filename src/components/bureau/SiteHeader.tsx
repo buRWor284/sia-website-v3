@@ -36,7 +36,7 @@ const NAV: ReadonlyArray<NavNode> = [
     href: "/speaking",
     children: [
       { label: "Speaking Overview",  href: "/speaking"  },
-      { label: "Earned Media in the Age of AI", href: "/speaking/earned-media-in-the-age-of-ai", tag: "New" },
+      { label: "Earned Media in the Age of AI", href: "/speaking/earned-media-ai", tag: "New" },
       { label: "Press Kit",          href: "/press-kit" },
       { label: "Media Kit",          href: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-Media-Kit-Jun-2026.pdf",  external: true, tag: "PDF", tagOutline: true },
       { label: "Speaker One-Sheet",  href: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf", external: true, tag: "PDF", tagOutline: true },

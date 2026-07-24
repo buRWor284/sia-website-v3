@@ -101,7 +101,7 @@ const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
       "Honest failures: exactly where AI still cannot do the job of a PR team",
     ],
     casestudy: { v: "06", l: "stage AI pipeline · run live in the room" },
-    moreHref: "/speaking/earned-media-in-the-age-of-ai",
+    moreHref: "/speaking/earned-media-ai",
   },
 ];
 
@@ -814,7 +814,7 @@ const CalendlySection = () => (
 const FeaturedSession = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 8 }}>
     <a
-      href="/speaking/earned-media-in-the-age-of-ai"
+      href="/speaking/earned-media-ai"
       style={{
         display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
         maxWidth: 1000, margin: "0 auto", padding: "24px 28px",

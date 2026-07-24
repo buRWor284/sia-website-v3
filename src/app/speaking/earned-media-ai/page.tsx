@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
 import PipelineFlow from "./PipelineFlow";
+import PipelineFlowV2 from "./PipelineFlowV2";
 import PitchClinicDemo from "./PitchClinicDemo";
 import {
   DoubleRule,
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
     description:
       "How AI is changing earned media from both sides, mapped from the inside using real data from the earned media OS Syed Irfan Ajmal built. Keynote, workshop, or panel.",
   },
-  alternates: { canonical: "/speaking/earned-media-in-the-age-of-ai" },
+  alternates: { canonical: "/speaking/earned-media-ai" },
 };
 
 // ─── Page-scoped layout CSS (self-contained, no globals dependency) ───────────
@@ -213,11 +214,11 @@ const Hero = () => (
   </section>
 );
 
-// ─── §01 · The Shift ──────────────────────────────────────────────────────────
+// ─── §02 · The Shift ──────────────────────────────────────────────────────────
 
 const Shift = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 84 }}>
-    <SectionMast n="01" label="The Shift · Why this, why now" />
+  <section className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84 }}>
+    <SectionMast n="02" label="The Shift · Why this, why now" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         Paid attention is getting worse.
@@ -253,11 +254,11 @@ const Shift = () => (
   </section>
 );
 
-// ─── §02 · The Earned Media Pipeline ──────────────────────────────────────────
+// ─── §04 · The Earned Media Pipeline ──────────────────────────────────────────
 
 const Pipeline = () => (
   <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
-    <SectionMast n="02" label="Supply Side · The Earned Media Pipeline" />
+    <SectionMast n="04" label="Supply Side · The Earned Media Pipeline" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         Six jobs a PR team does.
@@ -275,14 +276,49 @@ const Pipeline = () => (
   </section>
 );
 
-// ─── §03 · In the Room ────────────────────────────────────────────────────────
+// ─── §04 · The Earned Media Pipeline · V2 (active) ────────────────
+// V2 of Section 04. Same section shell as Pipeline (V1), with the reframed copy:
+// leverage-led heading, "human decides at every gate" intro, PipelineFlowV2
+// chips, the co-author caption, and the "work of ten" kicker.
+// Rollback: render <Pipeline /> instead of <PipelineV2 /> below. V1 stays intact.
+
+const PipelineV2 = () => (
+  <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
+    <SectionMast n="04" label="Supply Side · The Earned Media Pipeline" />
+    <div className="emai-intro">
+      <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
+        Six jobs that used to need a team.
+        <br />
+        <span style={{ fontStyle: "italic" }}>AI can now run every one. None of them without a human.</span>
+      </h2>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
+        Each stage maps to a tool in EMOS, the earned media OS I built and run, so the talk is backed by live data, not slideware. String the six together and you have a full pipeline where AI does the manual work and a human decides at every gate. No code, no autopilot.
+      </p>
+    </div>
+    <PipelineFlowV2 />
+    <div style={{ margin: "34px auto 0", maxWidth: 720, border: `1px solid ${INK}`, borderLeft: `3px solid ${YEL}`, background: PAPER, padding: "22px 26px" }}>
+      <SCaps size={10.5} ls="0.18em" color={BLUE}>On AssetIQ &amp; PressIQ</SCaps>
+      <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.6 }}>
+        Treat the AI as a co-author, not a vending machine. You don&rsquo;t drop a coin and collect a finished pitch. You brief it, push back, rewrite. Your name goes on the final.
+      </p>
+    </div>
+    <p style={{ margin: "30px auto 0", maxWidth: 780, textAlign: "center", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3.2vw, 30px)", color: INK, lineHeight: 1.25, letterSpacing: "-0.015em" }}>
+      Even with a human deciding at every gate, one operator now does the earned media work of <span style={{ fontStyle: "italic" }}>ten, if not more.</span>
+    </p>
+    <p style={{ margin: "30px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 17, color: INK, lineHeight: 1.5, textAlign: "center" }}>
+      In the room, we do not just describe the pipeline. <Mark>We run it live.</Mark>
+    </p>
+  </section>
+);
+
+// ─── §05 · In the Room ────────────────────────────────────────────────────────
 
 const Activities = () => (
   <section className="sx" style={{ background: INK, color: PAPER, paddingTop: 80, paddingBottom: 88, position: "relative", overflow: "hidden" }}>
     <div aria-hidden style={{ position: "absolute", top: -40, right: -60, opacity: 0.06, pointerEvents: "none" }}>
       <SiaLogo height={320} />
     </div>
-    <SectionMast n="03" label="In the Room · Three live activities" dark />
+    <SectionMast n="05" label="In the Room · Three live activities" dark />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: PAPER, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         A working session,
@@ -308,11 +344,11 @@ const Activities = () => (
   </section>
 );
 
-// ─── §04 · Demand Side ────────────────────────────────────────────────────────
+// ─── §03 · Demand Side ────────────────────────────────────────────────────────
 
 const Demand = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84 }}>
-    <SectionMast n="04" label="Demand Side · Who gets seen now" />
+    <SectionMast n="03" label="Demand Side · Who gets seen now" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         AI search rewards exactly
@@ -338,11 +374,11 @@ const Demand = () => (
   </section>
 );
 
-// ─── §05 · The Coverage Flywheel ──────────────────────────────────────────────
+// ─── §01 · The Coverage Flywheel ──────────────────────────────────────────────
 
 const Flywheel = () => (
   <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
-    <SectionMast n="05" label="The Payoff · The Coverage Flywheel" />
+    <SectionMast n="01" label="The Payoff · The Coverage Flywheel" />
     <div style={{ maxWidth: 720, margin: "0 auto 8px", textAlign: "center" }}>
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
         One asset. One placement. <span style={{ fontStyle: "italic" }}>Six compounding returns.</span>
@@ -519,11 +555,11 @@ export default function EarnedMediaInTheAgeOfAIPage() {
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
       <Hero />
-      <Shift />
-      <Pipeline />
-      <Activities />
-      <Demand />
       <Flywheel />
+      <Shift />
+      <Demand />
+      <PipelineV2 />
+      <Activities />
       <LeaveWith />
       <QandA />
       <Speaker />

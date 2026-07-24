@@ -37,6 +37,10 @@ const nextConfig: NextConfig = {
       { source: "/videos",                   destination: "/gallery",  permanent: p },
       { source: "/videos/",                  destination: "/gallery",  permanent: p },
 
+      // Flagship session slug shortened (2026-07-24)
+      { source: "/speaking/earned-media-in-the-age-of-ai",  destination: "/speaking/earned-media-ai", permanent: p },
+      { source: "/speaking/earned-media-in-the-age-of-ai/", destination: "/speaking/earned-media-ai", permanent: p },
+
       // Writing guides (playbooks)
       { source: "/brand-yourself-for-success",                            destination: "/resources/personal-branding", permanent: p },
       { source: "/brand-yourself-for-success/",                           destination: "/resources/personal-branding", permanent: p },
