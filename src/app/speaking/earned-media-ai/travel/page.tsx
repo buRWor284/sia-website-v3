@@ -132,7 +132,7 @@ const STATS: ReadonlyArray<[string, string]> = [
   ["22", "years in marketing, as an operator"],
   ["1.5M", "organic visitors grown, Ridester"],
   ["04", "countries hosted on stage"],
-  ["500+", "biggest live audience"],
+  ["40,000+", "attendees · ATM Dubai"],
 ];
 
 const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
@@ -212,7 +212,7 @@ const Hero = () => (
           <Pill size={10} ls="0.18em">KSA Ready</Pill>
         </div>
         <div style={{ marginTop: 12, fontFamily: SERIF, fontSize: 21, lineHeight: 1.2, color: INK, fontWeight: 700 }}>
-          Get covered, get found, get bookings.
+          Get covered, get found, get chosen.
         </div>
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "auto 1fr", gap: "10px 16px" }}>
           {SESSION_SPECS.map(([k, v]) => (
@@ -526,7 +526,7 @@ const Speaker = () => (
         <span style={{ fontStyle: "italic", color: YEL }}>not a commentator.</span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.75)", lineHeight: 1.6, maxWidth: 560 }}>
-        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, serving 300+ clients, mostly American brands, along with work for a Gulf government through DinarStandard in Dubai. He grew Ridester, a US transport publication, from zero to 1.5M monthly organic visitors, and his stages include Arabian Travel Market Dubai, DMSS Bali, and MaGIC Malaysia.
+        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, serving 300+ clients, mostly American brands, along with work for a Gulf government through DinarStandard in Dubai. He grew Ridester, a US transport publication, from zero to 1.5M monthly organic visitors, and his stages include Arabian Travel Market Dubai (a 40,000-attendee show), DMSS Bali, and MaGIC Malaysia. He also hosts a business podcast, running since 2018.
       </p>
     </div>
     <div style={{ marginTop: 6, paddingTop: 18, borderTop: "1px solid rgba(241,235,222,.16)" }}>
