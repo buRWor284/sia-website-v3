@@ -39,21 +39,23 @@ function Spark({ series }: { series: number[] }) {
   );
 }
 
-/** One row of the diverging (tornado) chart: bar grows right in amber for rising
- *  topics, left in ink for cooling ones, from a shared center 0% line, with a
- *  4-week sparkline and the weekly article count + change. */
-function TornadoRow({ t, maxAbs }: { t: MoverTopic; maxAbs: number }) {
-  const up = t.wow >= 0;
-  const half = maxAbs > 0 ? Math.min(48, (Math.abs(t.wow) / maxAbs) * 48) : 0;
+/** One row of the movers board: a horizontal bar-track that fills from the
+ *  left in yellow for a heating topic, or from the right in ink for a
+ *  cooling one — the "Founder Movers Board" design (Bureau system, top-5
+ *  snapshot + full list share this row). */
+function BoardRow({ t, maxAbs, cooling }: { t: MoverTopic; maxAbs: number; cooling?: boolean }) {
+  const w = maxAbs > 0 ? Math.min(100, (Math.abs(t.wow) / maxAbs) * 100) : 0;
   return (
-    <div className="mvr-trow">
-      <div className="mvr-tlabel">{displayTopic(t.topic)}</div>
-      <div className="mvr-ttrack">
-        <span className={"mvr-tbar " + (up ? "up" : "down")} style={{ width: half + "%" }} />
+    <div className="mvr-board-fullrow">
+      <div className="mvr-board-row-head">
+        <span className="mvr-board-row-name">{displayTopic(t.topic)}</span>
+        <Spark series={t.series} />
+        <span className="mvr-board-row-pct" style={cooling ? { color: "var(--color-ink-55)" } : undefined}>
+          {cooling ? "▼" : "▲"} {pctInt(t.wow)}
+        </span>
       </div>
-      <Spark series={t.series} />
-      <div className="mvr-tval">
-        {fmtK(t.last7)} · {up ? "▲" : "▼"} {pctInt(t.wow)}
+      <div className={"mvr-board-track" + (cooling ? " cool" : "")}>
+        <div className="mvr-board-fill" style={{ width: w + "%", background: cooling ? "var(--color-ink)" : "var(--color-yellow)" }} />
       </div>
     </div>
   );
@@ -68,6 +70,13 @@ export default async function MoversPage() {
   const topRise = data.risers[0] ?? null;
   const topCool = data.coolers[0] ?? null;
   const live = data.covered > 0;
+
+  // Top-5/top-5 snapshot for the "board" panel (risers/coolers already come
+  // pre-sorted strongest-first, per topRise/topCool above).
+  const heatingTop5 = data.risers.slice(0, 5);
+  const coolingTop5 = data.coolers.slice(0, 5);
+  const topHeatMax = heatingTop5.length ? heatingTop5[0].wow : 0;
+  const topCoolMax = coolingTop5.length ? Math.abs(coolingTop5[0].wow) : 0;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -157,22 +166,111 @@ export default async function MoversPage() {
           ))}
         </div>
 
-        {/* MOVERS — diverging centerpiece */}
-        {movers.length ? (
-          <div className="mvr-tornado">
-            <div className="mvr-tornado-head">
-              <span className="emr-scaps">This week&apos;s movers</span>
-              <span className="emr-mono" style={{ marginLeft: "auto", fontSize: 10, color: "var(--color-ink-55)" }}>
-                {data.heatingCount} up · {data.coolingCount} down
+        {/* THE BOARD — top-5/top-5 snapshot, pull-quote + CTA footer */}
+        {(heatingTop5.length > 0 || coolingTop5.length > 0) && (
+          <div className="mvr-board-panel">
+            <div className="mvr-board-head">
+              <span className="emr-scaps">The board — heating ▲ · cooling ▼</span>
+              <span className="emr-mono" style={{ fontSize: 11, color: "var(--color-ink-55)" }}>
+                SignalIQ · through {data.asOf}
               </span>
             </div>
-            <div className="mvr-tornado-mid">
-              <span>&larr; cooling</span>
-              <span>heating &rarr;</span>
+            <div className="mvr-board-cols">
+              <div className="mvr-board-col">
+                <div className="mvr-board-col-head">
+                  <span className="mvr-board-col-title">Heating up</span>
+                  <span className="emr-scaps">crowded — pitch fast</span>
+                </div>
+                <p className="mvr-board-col-sub">Reporters are hunting sources right now.</p>
+                <div className="mvr-board-rows">
+                  {heatingTop5.map((t) => {
+                    const w = topHeatMax > 0 ? Math.min(100, (t.wow / topHeatMax) * 100) : 0;
+                    return (
+                      <div key={t.topic}>
+                        <div className="mvr-board-row-head">
+                          <span className="mvr-board-row-name">{displayTopic(t.topic)}</span>
+                          <span className="mvr-board-row-pct">▲ {pctInt(t.wow)}</span>
+                        </div>
+                        <div className="mvr-board-track">
+                          <div className="mvr-board-fill" style={{ width: w + "%", background: "var(--color-yellow)" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="mvr-board-col">
+                <div className="mvr-board-col-head">
+                  <span className="mvr-board-col-title">Cooling down</span>
+                  <span className="emr-scaps">open — go homestead</span>
+                </div>
+                <p className="mvr-board-col-sub">Nobody&apos;s fighting you for the byline.</p>
+                <div className="mvr-board-rows">
+                  {coolingTop5.map((t) => {
+                    const w = topCoolMax > 0 ? Math.min(100, (Math.abs(t.wow) / topCoolMax) * 100) : 0;
+                    return (
+                      <div key={t.topic}>
+                        <div className="mvr-board-row-head">
+                          <span className="mvr-board-row-name">{displayTopic(t.topic)}</span>
+                          <span className="mvr-board-row-pct" style={{ color: "var(--color-ink-55)" }}>▼ {pctInt(t.wow)}</span>
+                        </div>
+                        <div className="mvr-board-track cool">
+                          <div className="mvr-board-fill" style={{ width: w + "%", background: "var(--color-ink)" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-            {movers.map((t) => (
-              <TornadoRow key={t.topic} t={t} maxAbs={maxAbs} />
-            ))}
+            <div className="mvr-board-footer">
+              <p className="mvr-board-quote">
+                &ldquo;The founders who compound attention aren&apos;t louder. They&apos;re <mark>earlier</mark> — and
+                occasionally, gloriously alone in the quiet lane.&rdquo;
+              </p>
+              <div className="mvr-board-ctas">
+                <Link href={LINKS.signaliq} className="emr-btn-yellow">
+                  Scan your category &rarr;
+                </Link>
+                <Link href={LINKS.emosAcademyApply} className="emr-tlink">
+                  Learn the system
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ALL MOVERS — full two-column heating/cooling list, same visual system */}
+        {movers.length ? (
+          <div className="mvr-board-panel mvr-board-full">
+            <div className="mvr-board-head">
+              <span className="emr-scaps">All movers this week</span>
+              <span className="emr-mono" style={{ fontSize: 11, color: "var(--color-ink-55)" }}>
+                {data.heatingCount} up &middot; {data.coolingCount} down
+              </span>
+            </div>
+            <div className="mvr-board-cols">
+              <div className="mvr-board-col">
+                <div className="mvr-board-col-head">
+                  <span className="mvr-board-col-title">Heating up</span>
+                </div>
+                <div className="mvr-board-rows">
+                  {data.risers.map((t) => (
+                    <BoardRow key={t.topic} t={t} maxAbs={maxAbs} />
+                  ))}
+                </div>
+              </div>
+              <div className="mvr-board-col">
+                <div className="mvr-board-col-head">
+                  <span className="mvr-board-col-title">Cooling down</span>
+                </div>
+                <div className="mvr-board-rows">
+                  {data.coolers.map((t) => (
+                    <BoardRow key={t.topic} t={t} maxAbs={maxAbs} cooling />
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         ) : (
           <p className="mvr-note" style={{ padding: "8px 0 20px" }}>
