@@ -79,7 +79,7 @@ function TheWindow({ live }: { live: KsaRadarData }) {
   };
   const vx = X(Math.max(median, 1));
   const hy = Y(0.1);
-  const LABELED = new Set(["hajj", "umrah", "riyadh air", "neom", "alula", "expo 2030", "soudah peaks", "nusuk"]);
+  const LABELED = new Set(["hajj", "umrah", "riyadh air", "neom", "alula", "expo 2030", "soudah peaks", "nusuk", "sharqiah season"]);
   return (
     <div className="ksr-window">
       <svg
@@ -124,7 +124,8 @@ function TheWindow({ live }: { live: KsaRadarData }) {
         Three rules, one read. <b>Volume</b> says how crowded a story is (the boundary is this set&rsquo;s median). <b>Momentum</b> says which way it is
         moving. <b>Demand</b>, the committed capital, real visitors, and dated catalysts in each signal file, says whether quiet means opportunity or
         nothing. Quiet plus demand is whitespace you can own. Loud plus rising is a newsjack you enter fast, with data. Loud plus flat means wait for the
-        next catalyst.
+        next catalyst. Think of a quiet topic with real demand like a stock with strong revenue and no analyst coverage: the silence is a lag you can
+        profit from, not a verdict on the company.
       </p>
       <div className="ksr-verdict-legend">
         {(["early", "whitespace", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
@@ -134,8 +135,10 @@ function TheWindow({ live }: { live: KsaRadarData }) {
         ))}
       </div>
       <p className="ksr-micro" style={{ marginTop: 10 }}>
-        No topic here reads DORMANT: this set was curated because reality is moving in each one. In an open market scan, most quiet topics are dormant. That
-        is the selection working, not the test failing.
+        One topic is tracked deliberately as a calibration control: sharqiah season{" "}
+        <span className="ksr-info" title="Its siblings still run: Riyadh Season and Diriyah Season carry the Saudi Season format forward. A dormant sibling is a sharper control than an obscure topic.">(i)</span>, a 2019 Saudi Season with no announced return. It should read DORMANT,
+        and in an open market scan most quiet topics would look like it. Everything else here was curated because reality is moving in it. Dots under{" "}
+        12 articles: the momentum axis is noise-prone there, and verdicts ignore it.
       </p>
     </div>
   );
@@ -165,9 +168,8 @@ export default async function KsaRadarPage() {
           <div className="ksr-scaps">Signal Radar · KSA Edition · إصدار المملكة العربية السعودية</div>
           <h1 className="ksr-h1">KSA Tourism &amp; Hospitality Radar</h1>
           <p className="ksr-ar-sub" dir="rtl">رادار السياحة والضيافة في المملكة العربية السعودية</p>
-          <p className="ksr-body-lg" style={{ margin: "0 0 26px" }}>
-            Twenty-eight signals across four lenses: what is moving in Saudi tourism right now, what is building toward 2030, and which narratives nobody owns
-            yet. Every number on this page links to its source.
+          <p className="ksr-hero-sub">
+            Twenty-eight Saudi tourism signals, one live instrument: what is moving now, what is building toward 2030, and which stories nobody owns yet.
           </p>
           <div className="ksr-cta-row">
             <Link href={LINKS.book} className="ksr-btn-yellow">
@@ -177,25 +179,29 @@ export default async function KsaRadarPage() {
               see the pitched session
             </Link>
           </div>
-          <p className="ksr-micro">
-            Curated layer as of 24 Jul 2026 · live wire: SignalIQ × GDELT BigQuery{live.hasData ? ` · live data as of ${live.asOf}` : " · pending first scan"}
-          </p>
-          <div className="ksr-target">
-            VISION 2030 TARGET · <b>150M visits/yr</b> (70M international + 80M domestic) ·{" "}
-            <a href="https://www.sta.gov.sa/en/vision2030" target="_blank" rel="noopener noreferrer">
-              Saudi Tourism Authority ↗
-            </a>
-          </div>
         </section>
 
         <div className="ksr-double" />
 
-        {/* § 01 — THE RADAR (lead with the live instrument) */}
+        {/* § 01 — THE RADAR (lead with the live instrument, above the fold) */}
         <div className="ksr-mast">
           <span className="ksr-pill">§ 01</span>
           <h2 className="ksr-h3">The radar · 28 signals, 4 lenses, 3 horizons</h2>
+          <span className="ksr-freshness">{live.hasData ? `live data as of ${live.asOf}` : "curated layer live · wire pending"}</span>
         </div>
         <KsaRadarModule live={live} />
+
+        <div className="ksr-metastrip">
+          <span>
+            Curated layer as of 24 Jul 2026 · SignalIQ × GDELT BigQuery{live.hasData ? ` · data as of ${live.asOf}` : " · wire pending"}
+          </span>
+          <span>
+            VISION 2030 TARGET · <b>150M visits/yr</b> (70M international + 80M domestic) ·{" "}
+            <a href="https://www.sta.gov.sa/en/vision2030" target="_blank" rel="noopener noreferrer">
+              Saudi Tourism Authority ↗
+            </a>
+          </span>
+        </div>
 
         {/* § 02 — THE WINDOW (the methodology, visible) */}
         <div className="ksr-mast" style={{ marginTop: 46 }}>

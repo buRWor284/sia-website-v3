@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { KSA_LENSES, KSA_LENS_LABEL, ksaDelta7, type KsaLens, type KsaLiveTopic, type KsaRadarData } from "@/lib/ksa-radar/types";
-import { RING_LABEL, SIGNALS, SIGNAL_BY_TOPIC, STATUS_META, VERDICT_META, verdictFor, type KsaSignal } from "./content";
+import { LOW_SAMPLE_N, RING_LABEL, SIGNALS, SIGNAL_BY_TOPIC, STATUS_META, VERDICT_META, verdictFor, type KsaSignal } from "./content";
 
 type LensFilter = KsaLens | "all";
 type MarkShape = "disc" | "square" | "ring" | "diamond";
@@ -116,6 +116,8 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
     const mid = Math.floor(ns.length / 2);
     return ns.length % 2 ? ns[mid] : (ns[mid - 1] + ns[mid]) / 2;
   }, [live.topics]);
+
+  const trendRisers = useMemo(() => live.risers.filter((t) => t.n >= LOW_SAMPLE_N).slice(0, 8), [live.risers]);
 
   const selected = SIGNALS.find((s) => s.id === selectedId) ?? SIGNALS[0];
   const selectedLive = liveFor(selected);
@@ -319,7 +321,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
           bb.s.name +
           "</b>" +
           '<span style="font-size:10.5px;opacity:.85">' +
-          (lv ? lv.n.toLocaleString() + " articles / 30d · " + pct(lv.tr) : STATUS_META[bb.s.status].glyph + " " + STATUS_META[bb.s.status].note) +
+          (lv ? lv.n.toLocaleString() + " articles / 60d · " + pct(lv.tr) : STATUS_META[bb.s.status].glyph + " " + STATUS_META[bb.s.status].note) +
           "</span>";
       } else {
         cv.style.cursor = "default";
@@ -386,7 +388,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
             {live.hasData ? (
               <>
                 {" "}
-                · <b>{fmtK(live.grand)}</b> articles of press coverage in the last 30 days · <b>{live.heating}</b> heating
+                · <b>{fmtK(live.grand)}</b> articles of press coverage over the last 60 days · <b>{live.heating}</b> heating
               </>
             ) : (
               <> · curated layer live · SignalIQ wire pending first scan</>
@@ -398,7 +400,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
             {live.hasData ? (
               <>
                 {" "}
-                · <b>{fmtK(live.lensTotal[lens])}</b> articles / 30d · {ksaDelta7(live.series[lens]) >= 0 ? "▲" : "▼"} {pct(ksaDelta7(live.series[lens]))} week
+                · <b>{fmtK(live.lensTotal[lens])}</b> articles / 60d · {ksaDelta7(live.series[lens]) >= 0 ? "▲" : "▼"} {pct(ksaDelta7(live.series[lens]))} week
                 over week
               </>
             ) : null}
@@ -428,22 +430,12 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
             <span className="ksr-file-lbl">Latest signal</span>
             {selected.sig}
           </p>
-          <div className="ksr-file-live">
-            {selectedLive ? (
-              <>
-                <b>{selectedLive.n.toLocaleString()}</b> articles / 30d · <b>{pct(selectedLive.tr)}</b> momentum
-                <span className="src"> · SignalIQ × GDELT, as of {live.asOf}</span>
-              </>
-            ) : (
-              <span className="src">Live press-volume line lands here once the SignalIQ wire has scanned this topic.</span>
-            )}
-          </div>
           <div className="ksr-file-verdict">
-            <span className="row"><b>Press</b>{selectedLive ? `${selectedLive.n.toLocaleString()} articles · ${selectedLive.tr >= 0.1 ? "rising" : selectedLive.tr <= -0.1 ? "falling" : "flat"}` : "wire pending"}</span>
-            <span className="row"><b>Reality</b>{selected.demand}</span>
-            <span className="row"><b>Next</b>{selected.catalyst}</span>
+            <span className="row"><b>Press</b>{selectedLive ? `${selectedLive.n.toLocaleString()} articles · ${selectedLive.n < LOW_SAMPLE_N ? "sample too small for a trend" : selectedLive.tr >= 0.1 ? "rising" : selectedLive.tr <= -0.1 ? "falling" : "flat"}` : "wire pending"}</span>
+            <span className="row"><b>Reality</b>{selected.demand || "none on file"}</span>
+            <span className="row"><b>Next</b>{selected.catalyst || "none scheduled"}</span>
             <span className={"ksr-verdict v-" + VERDICT_META[selectedVerdict].tone}>{VERDICT_META[selectedVerdict].label}</span>
-            <span className="vnote">{VERDICT_META[selectedVerdict].note}</span>
+            <span className="vnote">{VERDICT_META[selectedVerdict].note}{selectedLive ? ` · SignalIQ × GDELT, as of ${live.asOf}` : ""}</span>
           </div>
           <p className="ksr-file-talk">
             <b>Talk angle:</b> {selected.talk}
@@ -506,14 +498,14 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
           <div className="ksr-kpis-band">
             <div className="ksr-kpis">
               <div className="ksr-kpi" data-cat="all">
-                <div className="ksr-kpi-label">Total coverage · 30d</div>
+                <div className="ksr-kpi-label">Total coverage · 60d</div>
                 <div className="ksr-kpi-val">{fmtK(live.grand)}</div>
                 <div className="ksr-kpi-delta">{ksaDelta7(totalSeries) >= 0 ? "▲" : "▼"} {pct(ksaDelta7(totalSeries))} 7d</div>
                 <Spark series={totalSeries} color={INK} />
               </div>
               {KSA_LENSES.map((l) => (
                 <div className="ksr-kpi" data-cat={l} key={l}>
-                  <div className="ksr-kpi-label">{KSA_LENS_LABEL[l]} · 30d</div>
+                  <div className="ksr-kpi-label">{KSA_LENS_LABEL[l]} · 60d</div>
                   <div className="ksr-kpi-val">{fmtK(live.lensTotal[l])}</div>
                   <div className="ksr-kpi-delta">{ksaDelta7(live.series[l]) >= 0 ? "▲" : "▼"} {pct(ksaDelta7(live.series[l]))} 7d</div>
                   <Spark series={live.series[l]} color={l === "faith" ? YEL : INK} />
@@ -538,7 +530,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
               </div>
               <div className="ksr-panel-explain">Rising and quiet is the early window. Rising and loud means enter fast, with a data angle.</div>
               <div className="ksr-panel-body">
-                {live.risers.slice(0, 8).map((t, i) => (
+                {trendRisers.map((t, i) => (
                   <div className={"ksr-list-row cat-" + t.lens} key={t.topic}>
                     <span className="ksr-rank">{i + 1}</span>
                     <div className="ksr-row-main">
@@ -547,7 +539,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
                         {t.topic}
                       </div>
                       <div className="ksr-bar">
-                        <i className={t.lens === "faith" ? "ksr-bar-y" : ""} style={{ width: (t.tr / Math.max(live.risers[0]?.tr || 1, 0.01)) * 100 + "%" }} />
+                        <i className={t.lens === "faith" ? "ksr-bar-y" : ""} style={{ width: (t.tr / Math.max(trendRisers[0]?.tr || 1, 0.01)) * 100 + "%" }} />
                       </div>
                     </div>
                     <span className="ksr-mom">{pct(t.tr)}</span>
@@ -562,7 +554,8 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
               </div>
               <div className="ksr-panel-explain">
                 Quiet means few articles, not no interest. The test: is reality (capital, visitors, a dated catalyst) ahead of the coverage? If yes,
-                whitespace you can own; if no, dormant. Counts are exact-phrase, so variants can undercount.
+                whitespace you can own; if no, dormant. Counts are exact-phrase, so variants can undercount, and under {LOW_SAMPLE_N} articles a trend
+                percentage is noise, so we say low sample instead.
               </div>
               <div className="ksr-panel-body">
                 {live.quiet.map((t) => {
@@ -579,7 +572,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
                         {sig ? <div className="ksr-quiet-demand">vs {sig.demand}</div> : null}
                       </div>
                       <span className="ksr-gapval">
-                        {t.n.toLocaleString()} articles · {pct(t.tr)}
+                        {t.n.toLocaleString()} articles · {t.n < LOW_SAMPLE_N ? "low sample" : pct(t.tr)}
                       </span>
                     </div>
                   );

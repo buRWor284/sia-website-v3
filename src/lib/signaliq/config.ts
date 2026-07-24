@@ -302,6 +302,10 @@ export const BEATS: Beat[] = [
       //   ("Saudi Arabian Grand Prix" vs "saudi grand prix"; "Saudi hotel
       //   market/sector" vs "saudi hotels"). Forward-accruing only - no backfill.
       "Saudi Arabian Grand Prix", "Saudi hotel",
+      // - calibration control 2026-07-24: a 2019 Saudi Season with no announced
+      //   return. Tracked deliberately so the radar's DORMANT verdict is visible
+      //   and the instrument demonstrably can say no. -
+      "Sharqiah Season",
       // - Arabic probe seeds (verify coverage/tokenize.ts handles non-Latin
       //   tokens, then uncomment; probe-scan pattern per the founders beat) -
       // "\u0646\u064a\u0648\u0645", "\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0644\u0627", "\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0645\u0631\u0629",

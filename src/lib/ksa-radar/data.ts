@@ -40,6 +40,7 @@ export const KSA_FOCUS: { topic: string; lens: KsaLens }[] = [
   { topic: "esports world cup", lens: "events" },
   { topic: "soundstorm", lens: "events" },
   { topic: "jeddah season", lens: "events" },
+  { topic: "sharqiah season", lens: "events" }, // calibration control: should read DORMANT
   // hospitality & aviation
   { topic: "riyadh air", lens: "hosp" },
   { topic: "saudia", lens: "hosp" },

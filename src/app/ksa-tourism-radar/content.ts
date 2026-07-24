@@ -566,6 +566,11 @@ export const VERDICT_META: Record<KsaVerdict, { label: string; note: string; ton
   recal: { label: "RECALIBRATING", note: "story in flux: watch, do not call it", tone: "warn" },
 };
 
+/** Below this many articles, a 30v30 percentage is statistical noise (2 vs 4
+ *  articles reads as +100%). Verdicts ignore momentum under this floor and the
+ *  UI says "low sample" instead of a percentage. */
+export const LOW_SAMPLE_N = 12;
+
 export function verdictFor(
   n: number | null,
   tr: number | null,
@@ -577,7 +582,7 @@ export function verdictFor(
   if (status === "watch") return "recal";
   if (n === null || tr === null) return demand || catalyst ? "whitespace" : "dormant";
   const loud = n >= Math.max(medianN, 1);
-  const rising = tr >= 0.1;
+  const rising = tr >= 0.1 && n >= LOW_SAMPLE_N;
   if (loud) return rising ? "newsjack" : "late";
   if (rising) return "early";
   return demand || catalyst ? "whitespace" : "dormant";
