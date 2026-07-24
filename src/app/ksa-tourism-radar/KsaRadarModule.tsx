@@ -366,13 +366,6 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
 
   return (
     <div className="ksr-mod" data-lens={lens}>
-      <div className="ksr-read-help">
-        <p className="ksr-body">
-          Each mark is one Saudi tourism signal. <b>Distance from the centre is time</b>: inner ring is live now, the middle is building, the outer ring is
-          the 2030+ horizon. <b>Mark size is the scale of the bet.</b> Click any mark, or any row below, to open its signal file.
-        </p>
-      </div>
-
       <div className="ksr-lenses" role="tablist" aria-label="Filter by lens">
         {lenses.map((x) => (
           <button key={x.l} type="button" className="ksr-lens" data-active={lens === x.l} aria-pressed={lens === x.l} onClick={() => setLens(x.l)}>
@@ -457,6 +450,13 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
             {KSA_LENS_LABEL[l]}
           </span>
         ))}
+      </div>
+
+      <div className="ksr-read-help ksr-read-below">
+        <p className="ksr-body">
+          Each mark is one Saudi tourism signal. <b>Distance from the centre is time</b>: inner ring is live now, the middle is building, the outer ring is
+          the 2030+ horizon. <b>Mark size is the scale of the bet.</b> Click any mark, or any row below, to open its signal file.
+        </p>
       </div>
 
       {/* signal index: four lens columns */}

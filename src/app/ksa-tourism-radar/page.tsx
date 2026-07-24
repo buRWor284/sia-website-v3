@@ -165,13 +165,14 @@ export default async function KsaRadarPage() {
       <main className="ksr-wrap">
         {/* HERO */}
         <section className="ksr-hero">
-          <div className="ksr-scaps">Signal Radar · KSA Edition · إصدار المملكة العربية السعودية</div>
-          <h1 className="ksr-h1">KSA Tourism &amp; Hospitality Radar</h1>
-          <p className="ksr-ar-sub" dir="rtl">رادار السياحة والضيافة في المملكة العربية السعودية</p>
-          <p className="ksr-hero-sub">
-            Twenty-eight Saudi tourism signals, one live instrument: what is moving now, what is building toward 2030, and which stories nobody owns yet.
-          </p>
-          <div className="ksr-cta-row">
+          <div className="ksr-hero-lead">
+            <div className="ksr-scaps">Signal Radar · KSA Edition · إصدار المملكة العربية السعودية</div>
+            <h1 className="ksr-h1">KSA Tourism &amp; Hospitality Radar</h1>
+            <p className="ksr-hero-sub">
+              Twenty-eight Saudi tourism signals, one live instrument: what is moving now, what is building toward 2030, and which stories nobody owns yet.
+            </p>
+          </div>
+          <div className="ksr-hero-actions">
             <Link href={LINKS.book} className="ksr-btn-yellow">
               Book a speaker call
             </Link>
