@@ -43,7 +43,7 @@ const STATS: ReadonlyArray<[string, string]> = [
   ["04",  "countries hosted on stage"],
   ["06",  "speaker formats offered"],
   ["12+", "webinars & guest podcasts"],
-  ["500+", "biggest live audience"],
+  ["40,000+", "attendees · ATM Dubai"],
 ];
 
 type PrimaryTopic = {
@@ -158,7 +158,7 @@ type Stage = {
 const STAGES: ReadonlyArray<Stage> = [
   { yr: "2018",    evt: "IN5 Innovation Hub",           city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Media Hacks · Free Publicity"                          },
   { yr: "2018",    evt: "Durshal",                      city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding"                                     },
-  { yr: "2017",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller", flag: "AE"  },
+  { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller", flag: "AE"  },
   { yr: "2016",    evt: "DMSS Conference",              city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (200+ audience)",              tag: "Biggest" },
   { yr: "2016",    evt: "MPS2016 · M Powered Summit",   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote"                             },
   { yr: "2016",    evt: "AstroLabs",                    city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success"                  },
@@ -290,7 +290,7 @@ const SpeakingLead = () => (
         <div style={{ fontFamily: SERIF, fontSize: "clamp(20px, 2.5vw, 26px)", color: INK, lineHeight: 1.45 }}>
           <p style={{ margin: 0 }}>
             On stage since 2013, talking <strong>earned media</strong> and{" "}
-            <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
+            <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market Dubai (a 40,000-attendee show),
             DMSS (Bali, 500+ audience), IN5, AstroLabs, and MaGIC (Malaysia) — plus
             webinar &amp; podcast circuits across North America and the UK.
           </p>
@@ -449,11 +449,11 @@ const Topics = () => (
 
     <div className="grid-intro">
       <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
-        Two talks I can give<br />
+        Three talks I can give<br />
         <span style={{ fontStyle: "italic" }}><Mark>in my sleep.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 19, color: INK70, lineHeight: 1.55, maxWidth: 560 }}>
-        Twenty-two years of work has settled into two flagship talks and a handful of close cousins, each built around real case studies and a take-home playbook. The newest one is built from live data inside the earned media OS I run, and maps how AI is remaking earned media from both sides.
+        Twenty-two years of work has settled into three flagship talks and a handful of close cousins, each built around real case studies and a take-home playbook. The newest one is built from live data inside the earned media OS I run, and maps how AI is remaking earned media from both sides.
       </p>
     </div>
 
@@ -811,6 +811,34 @@ const CalendlySection = () => (
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+const FeaturedTravelSession = () => (
+  <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 8 }}>
+    <a
+      href="/speaking/earned-media-ai/travel"
+      style={{
+        display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
+        maxWidth: 1000, margin: "0 auto", padding: "24px 28px",
+        background: INK, border: `2px solid ${INK}`, textDecoration: "none",
+      }}
+    >
+      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", background: YEL, color: INK, padding: "5px 9px", whiteSpace: "nowrap" }}>
+        Saudi Tourism edition
+      </span>
+      <span style={{ flex: 1, minWidth: 260 }}>
+        <span style={{ display: "block", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px, 3vw, 26px)", color: PAPER, lineHeight: 1.15, letterSpacing: "-0.015em" }}>
+          When Travelers Ask ChatGPT Where to Go
+        </span>
+        <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: "rgba(250,250,250,.72)", lineHeight: 1.5, marginTop: 5 }}>
+          The travel edition of my Earned Media in the Age of AI keynote, tuned for Saudi tourism and Vision 2030, for DMOs, tourism boards, hotels, airlines and travel marketers.
+        </span>
+      </span>
+      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: YEL, whiteSpace: "nowrap" }}>
+        See the session →
+      </span>
+    </a>
+  </section>
+);
+
 const FeaturedSession = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 8 }}>
     <a
@@ -844,6 +872,7 @@ export default function SpeakingPage() {
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
       <Hero />
+      <FeaturedTravelSession />
       <FeaturedSession />
       <WatchTheWork />
       <SpeakingLead />
