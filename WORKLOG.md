@@ -19,7 +19,7 @@ Reverse-chronological log of substantive changes. Newest entries on top.
 - Masthead CTA "get bookings" → "get chosen".
 - Bio: added "hosts a business podcast, running since 2018."
 - Speaker strip → two-up: DMSS photo + embedded ATM Dubai talk video (YouTube `uSn4s5ZbJcQ`). ATM's 40,000-attendee event size restored as a credential in the video caption (kept distinct from the 500-person room).
-- New Masmak Fort, Riyadh hero banner above the headline. Image `public/assets/speaking/saudi-hero.jpg` (optimized to ~462 KB from a Pexels original; credit: Abdul7amid Al Fadhly / Pexels). Crop `backgroundPosition: center 44%`.
+- Masmak Fort, Riyadh image as a faded (~20%) backdrop behind the Saudi Angle / Vision 2030 band (not a top banner). Image `public/assets/speaking/saudi-hero.jpg` (optimized to ~462 KB from a Pexels original; credit: Abdul7amid Al Fadhly / Pexels).
 
 **/speaking/earned-media-ai (flagship)** (`src/app/speaking/earned-media-ai/page.tsx`)
 - Speaker strip → two-up: DMSS photo + ATM Dubai video; DMSS corrected to `200+`.

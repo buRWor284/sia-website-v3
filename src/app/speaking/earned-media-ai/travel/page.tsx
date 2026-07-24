@@ -168,24 +168,6 @@ const btnGhostDark = { ...btnBase, background: "transparent", color: INK, border
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
-const SaudiHeroBanner = () => (
-  <section className="sx" style={{ background: PAPER, paddingTop: 24, paddingBottom: 8 }}>
-    <div style={{ position: "relative", width: "100%", height: "clamp(190px, 34vw, 380px)", overflow: "hidden", border: `1px solid ${INK}`, background: INK }}>
-      <div aria-hidden style={{ position: "absolute", inset: 0, backgroundImage: "url('/assets/speaking/saudi-hero.jpg')", backgroundSize: "cover", backgroundPosition: "center 44%" }} />
-      <div aria-hidden style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(14,13,10,.22) 0%, rgba(14,13,10,.03) 38%, rgba(14,13,10,.72) 100%)" }} />
-      <div style={{ position: "absolute", left: 18, right: 18, bottom: 16 }}>
-        <SCaps size={11} ls="0.24em" color={YEL}>Earned Media for Saudi Tourism · Vision 2030</SCaps>
-        <div style={{ marginTop: 6, fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(15px, 2vw, 20px)", color: "#FAFAFA", lineHeight: 1.3, textShadow: "0 1px 12px rgba(0,0,0,.5)" }}>
-          Masmak Fort, Riyadh.
-        </div>
-      </div>
-      <div style={{ position: "absolute", right: 14, top: 12, textShadow: "0 1px 6px rgba(0,0,0,.75)" }}>
-        <SCaps size={8.5} ls="0.12em" color="rgba(250,250,250,.62)">Photo · Abdul7amid Al Fadhly / Pexels</SCaps>
-      </div>
-    </div>
-  </section>
-);
-
 const Hero = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 64, paddingBottom: 70 }}>
     <div style={{ marginBottom: 20 }}>
@@ -493,17 +475,22 @@ const LeaveWith = () => (
 // ─── The Saudi Angle · Vision 2030 band ───────────────────────────────────────
 
 const SaudiAngle = () => (
-  <section className="sx" style={{ background: INK, color: PAPER, paddingTop: 64, paddingBottom: 64, borderTop: `1px solid ${INK}` }}>
-    <div style={{ maxWidth: 820, margin: "0 auto", textAlign: "center" }}>
+  <section className="sx" style={{ position: "relative", overflow: "hidden", background: INK, color: PAPER, paddingTop: 64, paddingBottom: 64, borderTop: `1px solid ${INK}` }}>
+    <div aria-hidden style={{ position: "absolute", inset: 0, backgroundImage: "url('/assets/speaking/saudi-hero.jpg')", backgroundSize: "cover", backgroundPosition: "center 40%", opacity: 0.3 }} />
+    <div aria-hidden style={{ position: "absolute", inset: 0, background: "rgba(14,13,10,.34)" }} />
+    <div style={{ position: "relative", maxWidth: 820, margin: "0 auto", textAlign: "center" }}>
       <SCaps size={11} ls="0.22em" color={YEL}>The Saudi Angle · Vision 2030</SCaps>
       <h2 style={{ margin: "16px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(26px, 4.4vw, 44px)", color: PAPER, lineHeight: 1.08, letterSpacing: "-0.025em" }}>
         Earned media is how the Kingdom&rsquo;s tourism story
         <br />
         <span style={{ fontStyle: "italic", color: YEL }}>reaches the world.</span>
       </h2>
-      <p style={{ margin: "18px auto 0", fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.75)", lineHeight: 1.6, maxWidth: 640 }}>
+      <p style={{ margin: "18px auto 0", fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.85)", lineHeight: 1.6, maxWidth: 640 }}>
         From AlUla and Diriyah to the Red Sea and NEOM, Vision 2030 set the goal. AI search now decides which destinations travelers hear about. The travel brands that earn trusted coverage will be the ones the answers cite.
       </p>
+      <div style={{ marginTop: 18 }}>
+        <SCaps size={8.5} ls="0.12em" color="rgba(241,235,222,.4)">Masmak Fort, Riyadh · Photo Abdul7amid Al Fadhly / Pexels</SCaps>
+      </div>
     </div>
   </section>
 );
@@ -662,7 +649,6 @@ export default function EarnedMediaAITravelPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
-      <SaudiHeroBanner />
       <Hero />
       <Flywheel />
       <Shift />
