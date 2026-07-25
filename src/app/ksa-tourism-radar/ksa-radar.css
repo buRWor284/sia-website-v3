@@ -225,17 +225,17 @@
 .ksr-srcgrid a:hover{color:var(--color-ink);background:var(--color-paper-2)}
 
 @media(max-width:900px){
-  .ksr-kpis{grid-template-columns:repeat(2,1fr)}
+  .ksr-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .ksr-kpi:nth-child(3n){border-right:1px solid var(--color-ink-15)}
   .ksr-kpi:nth-child(2n){border-right:0}
   .ksr-kpi:nth-last-child(-n+3){border-bottom:1px solid var(--color-ink-15)}
-  .ksr-cols{grid-template-columns:1fr 1fr}
+  .ksr-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .ksr-col:nth-child(2n){border-right:0}
   .ksr-col{border-bottom:1px solid var(--color-ink-15)}
   .ksr-col:nth-last-child(-n+2){border-bottom:0}
-  .ksr-panels{grid-template-columns:1fr}
+  .ksr-panels{grid-template-columns:minmax(0,1fr)}
   .ksr-panel:first-child{border-right:0;border-bottom:1px solid var(--color-ink)}
-  .ksr-gapgrid{grid-template-columns:1fr}
-  .ksr-talks{grid-template-columns:1fr}
+  .ksr-gapgrid{grid-template-columns:minmax(0,1fr)}
+  .ksr-talks{grid-template-columns:minmax(0,1fr)}
 }
-@media(max-width:560px){.ksr-kpis{grid-template-columns:1fr}.ksr-cols{grid-template-columns:1fr}.ksr-col{border-right:0}}
+@media(max-width:560px){.ksr-kpis{grid-template-columns:minmax(0,1fr)}.ksr-cols{grid-template-columns:minmax(0,1fr)}.ksr-col{border-right:0}}
