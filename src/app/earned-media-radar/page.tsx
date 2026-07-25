@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description:
     "A live map of what the press is covering across PR, earned media, SEO, and AI search. Powered by SignalIQ. See why earned media wins now, and how to put it to work.",
   alternates: { canonical: "/earned-media-radar" },
+  icons: { icon: "/favicon.png" },
   openGraph: {
     title: "Earned Media Radar · Syed Irfan Ajmal",
     description: "A live map of what the press is covering across PR, earned media, SEO, and AI search. Powered by SignalIQ.",
@@ -358,9 +359,9 @@ export default async function RadarPage() {
             </Link>
           </div>
           <div className="emr-honesty">
-            I built all of this on one rule: earned media is earned, not faked. The radar shows real signals in real data and links every one back to its source.
-            It will never hand you a prediction dressed up as a fact, and I&rsquo;ll never sell you a tool that spends the credibility you&rsquo;re trying to
-            build. That is the whole point.
+            I built all of this on one rule: earned media is earned, not faked. The radar shows real signals in real data &mdash; real article volumes counted
+            daily from open news, never a prediction dressed up as a fact. And I&rsquo;ll never sell you a tool that spends the credibility you&rsquo;re trying
+            to build. That is the whole point.
             <span className="sign">Syed Irfan Ajmal</span>
           </div>
         </section>

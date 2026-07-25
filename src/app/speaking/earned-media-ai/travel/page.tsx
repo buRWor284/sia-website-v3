@@ -488,6 +488,16 @@ const SaudiAngle = () => (
       <p style={{ margin: "18px auto 0", fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.85)", lineHeight: 1.6, maxWidth: 640 }}>
         From AlUla and Diriyah to the Red Sea and NEOM, Vision 2030 set the goal. AI search now decides which destinations travelers hear about. The travel brands that earn trusted coverage will be the ones the answers cite.
       </p>
+      <div style={{ marginTop: 26, maxWidth: 620, marginLeft: "auto", marginRight: "auto", border: "1px solid rgba(241,235,222,.28)", background: "rgba(241,235,222,.05)", padding: "22px 24px", textAlign: "left" }}>
+        <SCaps size={10} ls="0.16em" color={YEL}>Live companion · the data behind the talk</SCaps>
+        <h3 style={{ margin: "10px 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: PAPER, lineHeight: 1.2 }}>
+          KSA Tourism &amp; Hospitality Radar
+        </h3>
+        <p style={{ margin: "0 0 16px", fontFamily: SERIF, fontSize: 15.5, color: "rgba(241,235,222,.78)", lineHeight: 1.55 }}>
+          28 sourced signals across giga-projects, mega-events, hospitality, and faith travel, wired to live press-coverage data. The instrument this session runs on.
+        </p>
+        <a href="/ksa-tourism-radar" style={btnYel}>Open the KSA radar &rarr;</a>
+      </div>
       <div style={{ marginTop: 18 }}>
         <SCaps size={8.5} ls="0.12em" color="rgba(241,235,222,.4)">Masmak Fort, Riyadh · Photo Abdul7amid Al Fadhly / Pexels</SCaps>
       </div>

@@ -25,6 +25,13 @@ const pct = (x: number): string => {
 };
 const chipClass = (l: Lens): string => "emr-chip" + (l === "geo" ? " c-geo" : "");
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const fmtDate = (iso: string): string => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+  if (!m) return iso || "";
+  return `${Number(m[3])} ${MONTHS[Number(m[2]) - 1] ?? m[2]} ${m[1]}`;
+};
+
 function sparkPoints(series: number[]): { line: string; area: string } | null {
   if (!series || series.length < 2) return null;
   const w = 150;
@@ -234,6 +241,35 @@ export default function RadarModule({ data }: { data: RadarData }) {
       }
     };
 
+    // Small paper-backed callout so a marquee mark reads without hovering.
+    const drawLabel = (px: number, py: number, text: string) => {
+      ctx.font = "600 11px Archivo, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      const padX = 6;
+      const bw = ctx.measureText(text).width + padX * 2;
+      const bh = 18;
+      let bx = px + 12;
+      if (bx + bw > size - 4) bx = px - 12 - bw;
+      bx = Math.max(4, Math.min(bx, size - bw - 4));
+      const by = Math.max(2, Math.min(py - bh / 2, size - bh - 2));
+      ctx.strokeStyle = "rgba(26,20,16,0.28)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+      ctx.lineTo(bx < px ? bx + bw : bx, by + bh / 2);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(250,250,250,0.92)";
+      ctx.fillRect(bx, by, bw, bh);
+      ctx.strokeStyle = "rgba(26,20,16,0.9)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(bx + 0.5, by + 0.5, bw - 1, bh - 1);
+      ctx.fillStyle = INK;
+      ctx.fillText(text, bx + padX, by + bh / 2 + 0.5);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "alphabetic";
+    };
+
     let sweep = 0;
     let raf = 0;
     const draw = () => {
@@ -278,6 +314,7 @@ export default function RadarModule({ data }: { data: RadarData }) {
       ctx.lineTo(le.x, le.y);
       ctx.stroke();
       const cur = lensRef.current;
+      const vis: (typeof blips)[number][] = [];
       blips.forEach((b) => {
         if (cur !== "all" && cur !== b.cat) {
           b.sx = undefined;
@@ -293,11 +330,24 @@ export default function RadarModule({ data }: { data: RadarData }) {
         ctx.globalAlpha = 0.72 + b.ping * 0.28;
         drawMark(p.x, p.y, b.cat, base);
         ctx.globalAlpha = 1;
+        vis.push(b);
       });
       ctx.beginPath();
       ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
       ctx.fillStyle = YEL;
       ctx.fill();
+      // Label the two marquee marks so the board reads without hovering:
+      // the fastest riser, and the quietest / most ownable topic.
+      if (vis.length) {
+        let riser = vis[0];
+        let gap = vis[0];
+        for (const b of vis) {
+          if (b.tr > riser.tr) riser = b;
+          if (b.n < gap.n) gap = b;
+        }
+        if (gap !== riser && gap.sx != null && gap.sy != null) drawLabel(gap.sx, gap.sy, gap.label);
+        if (riser.sx != null && riser.sy != null) drawLabel(riser.sx, riser.sy, riser.tr > 0 ? `${riser.label} ${pct(riser.tr)}` : riser.label);
+      }
     };
     const loop = () => {
       sweep += RM ? 0.006 : 0.013;
@@ -311,11 +361,29 @@ export default function RadarModule({ data }: { data: RadarData }) {
 
     const onResize = () => sizeRadar();
     window.addEventListener("resize", onResize);
-    const onMove = (e: MouseEvent) => {
+    const showTip = (b: (typeof blips)[number]) => {
       if (!tip) return;
+      tip.style.left = (b.sx ?? 0) + "px";
+      tip.style.top = (b.sy ?? 0) + "px";
+      tip.style.opacity = "1";
+      tip.innerHTML =
+        '<span style="font-family:var(--font-grot);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-yellow)">' +
+        LENS_LABEL[b.cat] +
+        '</span><b style="display:block">' +
+        b.label +
+        '</b><span style="font-size:10.5px;opacity:.8">' +
+        b.n.toLocaleString() +
+        " articles · " +
+        pct(b.tr) +
+        "</span>";
+    };
+    const hideTip = () => {
+      if (tip) tip.style.opacity = "0";
+    };
+    const nearest = (clientX: number, clientY: number, thresh: number) => {
       const rect = cv.getBoundingClientRect();
-      const mx = e.clientX - rect.left;
-      const my = e.clientY - rect.top;
+      const mx = clientX - rect.left;
+      const my = clientY - rect.top;
       let best: (typeof blips)[number] | null = null;
       let bd = 1e9;
       blips.forEach((b) => {
@@ -328,36 +396,31 @@ export default function RadarModule({ data }: { data: RadarData }) {
           best = b;
         }
       });
-      if (best && bd < 260) {
-        const bb = best as (typeof blips)[number];
-        tip.style.left = (bb.sx ?? 0) + "px";
-        tip.style.top = (bb.sy ?? 0) + "px";
-        tip.style.opacity = "1";
-        tip.innerHTML =
-          '<span style="font-family:var(--font-grot);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-yellow)">' +
-          LENS_LABEL[bb.cat] +
-          '</span><b style="display:block">' +
-          bb.label +
-          '</b><span style="font-size:10.5px;opacity:.8">' +
-          bb.n.toLocaleString() +
-          " articles · " +
-          pct(bb.tr) +
-          "</span>";
-      } else {
-        tip.style.opacity = "0";
-      }
+      return best && bd < thresh ? (best as (typeof blips)[number]) : null;
     };
-    const onLeave = () => {
-      if (tip) tip.style.opacity = "0";
+    const onMove = (e: MouseEvent) => {
+      const b = nearest(e.clientX, e.clientY, 260);
+      if (b) showTip(b);
+      else hideTip();
     };
+    // Tap/click: the radar is interactive on touch devices too (no hover there),
+    // with a more forgiving hit radius for fingers.
+    const onClick = (e: MouseEvent) => {
+      const b = nearest(e.clientX, e.clientY, 1600);
+      if (b) showTip(b);
+      else hideTip();
+    };
+    const onLeave = () => hideTip();
     cv.addEventListener("mousemove", onMove);
     cv.addEventListener("mouseleave", onLeave);
+    cv.addEventListener("click", onClick);
 
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("resize", onResize);
       cv.removeEventListener("mousemove", onMove);
       cv.removeEventListener("mouseleave", onLeave);
+      cv.removeEventListener("click", onClick);
     };
   }, [data]);
 
@@ -404,7 +467,7 @@ export default function RadarModule({ data }: { data: RadarData }) {
         <div ref={tipRef} className="emr-radar-tip" />
       </div>
       <div className="emr-radar-foot">
-        <span>each mark = one tracked topic</span>
+        <span>tap any mark for its numbers</span>
         <span ref={sweepLblRef}>live</span>
       </div>
       <div className="emr-radar-legend">
@@ -416,6 +479,9 @@ export default function RadarModule({ data }: { data: RadarData }) {
         ))}
       </div>
       <p className="emr-help-line">Filter by lens &mdash; the radar, the six numbers, and the lists below all narrow to it.</p>
+      <p className="emr-source-note">
+        Real press-coverage volumes from open global news data, refreshed daily by SignalIQ &middot; data through {fmtDate(data.asOf)}. Signals, not predictions.
+      </p>
 
       {/* BIG KPI BAND */}
       <div className="emr-kpis-band">
@@ -504,7 +570,7 @@ export default function RadarModule({ data }: { data: RadarData }) {
                   </div>
                 </div>
                 <span className="emr-gapval">
-                  {t.n.toLocaleString()} articles &middot; {pct(t.tr)}
+                  {t.n.toLocaleString()} arts &middot; {pct(t.tr)}
                 </span>
               </div>
             ))}

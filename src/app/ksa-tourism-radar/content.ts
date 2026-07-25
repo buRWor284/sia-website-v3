@@ -441,12 +441,7 @@ export const GAPS: KsaGap[] = [
     src: S("The National · inside Saudi sports strategy", "https://www.thenationalnews.com/sport/2026/05/22/inside-saudi-arabias-new-sports-strategy-world-cup-2034-qiddiya-and-esports/"),
   },
   {
-    n: "05", t: "Carrying capacity & regenerative claims, scrutinised", talk: 3,
-    p: "Red Sea Global self-publishes its regenerative model, and 1.7M-pilgrim crowd management is a real operations success, but independent, data-led coverage of capacity limits is nearly absent. Credible scrutiny is a trust asset.",
-    src: S("Arab News · Hajj operations", "https://www.arabnews.com/node/2634480/saudi-arabia"),
-  },
-  {
-    n: "06", t: "Women and solo-traveler narratives, done credibly", talk: 1,
+    n: "05", t: "Women and solo-traveler narratives, done credibly", talk: 1,
     p: "The 'safest G20 country for solo female travelers' claim circulates via SEO blogs, not credible first-person earned media. The perception-vs-reality gap is unclaimed territory for whoever reports it properly.",
     src: S("Gulf Good News · the circulating claim", "https://gulfgoodnews.com/saudi-arabia-safest-g20-solo-female-travellers"),
   },

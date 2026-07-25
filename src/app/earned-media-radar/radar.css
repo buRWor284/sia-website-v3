@@ -60,6 +60,7 @@
 .emr-lg{display:flex;align-items:center;gap:8px;font-family:var(--font-grot);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--color-ink-70)}
 .emr-lg .m{width:14px;height:14px;display:inline-block;flex:0 0 auto}
 .emr-help-line{text-align:center;font-family:var(--font-serif);font-style:italic;font-size:14.5px;color:var(--color-ink-55);max-width:640px;margin:8px auto 0}
+.emr-source-note{text-align:center;font-family:var(--font-mono);font-size:11px;line-height:1.5;color:var(--color-ink-55);max-width:680px;margin:8px auto 0;letter-spacing:.01em}
 
 /* BIG KPI tiles — full-width band below radar */
 .emr-kpis-band{border-top:1px solid var(--color-ink);border-bottom:1px solid var(--color-ink);margin-top:34px;padding:6px 0}
@@ -99,7 +100,7 @@
 .emr-bar>i{display:block;height:100%;background:var(--color-ink)}
 .emr-bar>i.emr-bar-y{background:var(--color-yellow)}
 .emr-mom{font-family:var(--font-mono);font-size:13px;width:62px;text-align:right}
-.emr-gapval{font-family:var(--font-mono);font-size:12px;color:var(--color-ink-55);width:128px;text-align:right}
+.emr-gapval{font-family:var(--font-mono);font-size:12px;color:var(--color-ink-55);width:78px;text-align:right}
 .emr-chip{font-family:var(--font-grot);font-weight:700;font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--color-ink);white-space:nowrap}
 .emr-chip.c-geo{background:var(--color-yellow);border-color:var(--color-yellow)}
 .emr-mod[data-lens]:not([data-lens=all]) .emr-list-row{display:none}
