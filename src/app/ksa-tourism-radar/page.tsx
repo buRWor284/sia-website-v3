@@ -172,14 +172,6 @@ export default async function KsaRadarPage() {
               Twenty-eight Saudi tourism signals, one live instrument: what is moving now, what is building toward 2030, and which stories nobody owns yet.
             </p>
           </div>
-          <div className="ksr-hero-actions">
-            <Link href={LINKS.book} className="ksr-btn-yellow">
-              Book a speaker call
-            </Link>
-            <Link href={LINKS.session} className="ksr-tlink">
-              see the pitched session
-            </Link>
-          </div>
         </section>
 
         <div className="ksr-double" />

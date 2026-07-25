@@ -306,9 +306,13 @@ export const BEATS: Beat[] = [
       //   return. Tracked deliberately so the radar's DORMANT verdict is visible
       //   and the instrument demonstrably can say no. -
       "Sharqiah Season",
-      // - Arabic probe seeds (verify coverage/tokenize.ts handles non-Latin
-      //   tokens, then uncomment; probe-scan pattern per the founders beat) -
-      // "\u0646\u064a\u0648\u0645", "\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0644\u0627", "\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0645\u0631\u0629",
+      // - Arabic probe seeds ENABLED 2026-07-24: tokenize.ts verified script-
+      //   agnostic (lowercase is a no-op on Arabic; split is whitespace-only;
+      //   no ASCII/Latin assumption). \uXXXX source escapes compile to Arabic.
+      //   Forward-accruing probe only - NO backfill; drop any that return zero
+      //   GDELT rows (founders-beat probe pattern). Glosses:
+      //   NEOM / Riyadh Season / AlUla / Diriyah / Riyadh Air / Umrah
+      "\u0646\u064a\u0648\u0645", "\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0644\u0627", "\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0645\u0631\u0629",
     ],
     blurb: "Saudi giga-projects, mega-events, hospitality, aviation, and faith-travel coverage.",
   },
