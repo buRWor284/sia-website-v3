@@ -63,11 +63,11 @@ function TheWindow({ live }: { live: KsaRadarData }) {
     return <p className="ksr-micro">The window plots every tracked topic by press volume and momentum once the live wire has data.</p>;
   }
   const W = 860;
-  const H = 470;
+  const H = 486;
   const L = 64;
   const T = 34;
   const pw = W - L - 24;
-  const ph = H - T - 64;
+  const ph = H - T - 80;
   const maxN = Math.max(...live.topics.map((t) => t.n), 10);
   const ns = live.topics.map((t) => t.n).sort((a, b) => a - b);
   const mid = Math.floor(ns.length / 2);
@@ -95,11 +95,11 @@ function TheWindow({ live }: { live: KsaRadarData }) {
         <line x1={L} y1={hy} x2={L + pw} y2={hy} stroke="rgba(26,20,16,.45)" />
         <text x={L + 10} y={T + 18} className="zl">EARLY WINDOW · OWN IT NOW</text>
         <text x={L + pw - 10} y={T + 18} textAnchor="end" className="zl">NEWSJACK · DATA ANGLE, FAST</text>
-        <text x={L + 10} y={T + ph - 10} className="zl">CHECK THE DEMAND · WHITESPACE OR DORMANT</text>
-        <text x={L + pw - 10} y={T + ph - 10} textAnchor="end" className="zl">LATE · WAIT FOR THE CATALYST</text>
+        <text x={L + 10} y={T + ph + 15} className="zl">CHECK THE DEMAND · WHITESPACE OR DORMANT</text>
+        <text x={L + pw - 10} y={T + ph + 15} textAnchor="end" className="zl">LATE · WAIT FOR THE CATALYST</text>
         <text x={L + pw / 2} y={H - 18} textAnchor="middle" className="ax">press volume · articles, log scale →</text>
         <text x={14} y={T - 12} className="ax">↑ momentum · 30d vs prior 30d</text>
-        <text x={vx} y={T + ph + 16} textAnchor="middle" className="axm">set median</text>
+        <text x={vx} y={T + ph + 34} textAnchor="middle" className="axm">set median</text>
         <text x={L + pw - 6} y={hy - 6} textAnchor="end" className="axm">+10% = rising</text>
         {live.topics.map((t) => {
           const x = X(t.n);
