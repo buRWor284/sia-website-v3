@@ -301,6 +301,19 @@ export default async function KsaRadarPage() {
 
       {/* § 05 — SPEAKER */}
       <main className="ksr-wrap" style={{ paddingBottom: 64 }}>
+        {/* teaser: radar -> the pitched travel session */}
+        <div style={{ border: "1px solid rgba(26,20,16,.18)", borderLeft: "3px solid #f5b81f", padding: "22px 26px", margin: "40px 0 24px", display: "flex", gap: 22, alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ flex: "1 1 340px" }}>
+            <span className="ksr-scaps">The session this radar powers</span>
+            <h3 className="ksr-h3" style={{ margin: "6px 0 8px" }}>When Travelers Ask ChatGPT Where to Go</h3>
+            <p className="ksr-body-sm" style={{ margin: 0 }}>
+              Earned media for Saudi tourism: the keynote, workshop, and panel built on this radar&rsquo;s live data. Tuned for DMOs, hotels, airlines, and travel marketers.
+            </p>
+          </div>
+          <Link href={LINKS.session} className="ksr-btn-yellow">
+            See the travel session
+          </Link>
+        </div>
         <section className="ksr-final">
           <div className="ksr-scaps">Speaker · Syed Irfan Ajmal</div>
           <h2 className="ksr-h2" style={{ margin: "14px 0 16px" }}>
