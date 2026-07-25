@@ -9,7 +9,7 @@
  *
  * Per invocation (Vercel Cron daily + GitHub Actions ~every 30 min):
  *   1. auth — CRON_SECRET bearer check (unchanged).
- *   2. day cursor — the recent [today-3, yesterday] days not yet in
+ *   2. day cursor — the recent [today-7, yesterday] days not yet in
  *      signaliq_scan_log, take up to MAX_DAYS_PER_RUN (nothing pending →
  *      cheap no-op; the frequent invocations make the schedule self-healing).
  *   3. per pending day — one batched BigQuery query (scanDay) → upsert counts +
@@ -18,7 +18,17 @@
  *      scan+upsert, so a failed/timed-out day is simply retried next run
  *      (advance-on-success, like the old topic cursor).
  *   4. derive — recompute volume/trend/article_count per topic over the trailing
- *      60 days. Written to the coverage cache ONLY at cutover (see CUTOVER).
+ *      60 days. Written to the coverage cache ONLY at cutover (see CUTOVER),
+ *      and only when a day was scanned or the cache has gone stale (§ DERIVE).
+ *
+ * QUOTA (2026-07-25) — BigQuery enforces a custom QueryUsagePerDay cap
+ * (0.15 TiB) that resets at midnight PACIFIC, not UTC. A large backfill spends
+ * days of budget in minutes, so every scan for the rest of that Pacific day is
+ * rejected with `usageQuotaExceeded`. That is a budget event, not a fault: the
+ * day stays unlogged and the next run retries it. This route therefore answers
+ * 200 with `quotaBlocked: true` rather than 500, so the Actions schedule does
+ * not go red for hours over an expected, self-clearing condition. Genuine
+ * failures (auth, Supabase, malformed SQL, timeouts) still 500.
  *
  * SAFETY — the live scorer is untouched until cutover. `coverage.volume` is a
  * 0..1 value in the DOC-API (v1) world; BigQuery counts are raw units. The derive
@@ -50,6 +60,7 @@ import {
   logScan,
   getRecentDailyCounts,
   setStoredCoverageBulk,
+  getCoverageFreshness,
 } from "@/lib/signaliq/coverage-store";
 
 export const runtime = "nodejs";
@@ -59,10 +70,23 @@ export const maxDuration = 60; // seconds (Vercel Hobby cap)
 // v2 = COUNT(DISTINCT url) article counting (2026-07-20 parity probe: occurrence
 // counting inflated low-volume topics; see signaliq-parity-probe memory / WORKLOG).
 const MATCHER = "webngrams_v2";
-const RECENT_WINDOW_DAYS = 3; // steady state scans within [today-3, yesterday]
+// A day that never gets scanned inside this window is lost SILENTLY — it just
+// stops being a candidate and leaves a hole in the 60-day derive. 3 days gave
+// almost no slack: one quota-blocked Pacific day plus GitHub's schedule
+// throttling (~3 runs/6h observed, not the nominal 48/day) came within a day of
+// dropping 2026-07-24. 7 costs nothing in steady state (still MAX_DAYS_PER_RUN
+// per run, and only MISSING days are scanned) and survives a full quota outage.
+const RECENT_WINDOW_DAYS = 7; // steady state scans within [today-7, yesterday]
 const MAX_DAYS_PER_RUN = 1; // 1 BigQuery scan per invocation - 2 v2 days (~66s+) breach the 60s route cap; frequent invocations still self-heal
 const MAX_BACKFILL_DAYS_PER_RUN = 1; // backfill: ONE day per call - 3-day v2 batches exceeded the 60s cap and left billed-but-discarded BigQuery jobs (2026-07-21)
 const DERIVE_WINDOW_DAYS = 60;
+// § DERIVE — derive is a pure function of signaliq_daily_counts + today, so on a
+// no-op run it recomputes an identical result. Re-running it on all ~48
+// invocations/day meant ~21k row reads + a 351-row cache rewrite each time, for
+// nothing. Derive when a day was actually scanned, or when the cache is older
+// than this (so the trailing-60-day window still rolls forward on days where no
+// scan lands), or when freshness is unknown.
+const DERIVE_MAX_AGE_MS = 12 * 60 * 60 * 1000;
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Canonical, de-duped matchers built once from every beat's seeds. */
@@ -78,6 +102,37 @@ function ymd(d: Date): string {
 }
 function addDaysUTC(base: Date, delta: number): Date {
   return new Date(base.getTime() + delta * 86_400_000);
+}
+
+/**
+ * True for BigQuery budget rejections (custom QueryUsagePerDay cap, project
+ * quota, rate limit) as opposed to real faults. Checked on the `reason` field
+ * first, which the BigQuery client sets to `usageQuotaExceeded`, with a message
+ * regex as the fallback since `reason` is not always populated on the top-level
+ * error. Deliberately NARROW: anything it does not match still 500s.
+ */
+const QUOTA_REASONS = new Set(["usageQuotaExceeded", "quotaExceeded", "rateLimitExceeded"]);
+
+function isQuotaError(err: unknown): boolean {
+  const e = err as {
+    message?: unknown;
+    reason?: unknown;
+    errors?: Array<{ reason?: unknown }> | null;
+  };
+  const nested = Array.isArray(e?.errors) ? e.errors.map((x) => x?.reason) : [];
+  const reasons = [e?.reason, ...nested].filter((r): r is string => typeof r === "string");
+  if (reasons.some((r) => QUOTA_REASONS.has(r))) return true;
+  const message = typeof e?.message === "string" ? e.message : String(err);
+  return /custom quota exceeded|quota exceeded|exceeded .*quota|rateLimitExceeded/i.test(message);
+}
+
+/** See § DERIVE. Scanned a day → always. Otherwise only if the cache is stale. */
+async function shouldDerive(scannedCount: number): Promise<boolean> {
+  if (scannedCount > 0) return true;
+  if (!CUTOVER) return false; // pre-cutover derive is a dry run; nothing is written
+  const fetchedAt = await getCoverageFreshness();
+  if (!fetchedAt) return true; // empty cache or unknown freshness → rebuild
+  return Date.now() - fetchedAt.getTime() > DERIVE_MAX_AGE_MS;
 }
 
 /** Scan + persist a list of days in order. Each day is logged only on success. */
@@ -140,13 +195,14 @@ export async function GET(req: NextRequest) {
   const started = Date.now();
   const today = new Date();
   const elapsed = () => Date.now() - started;
+  // Hoisted out of the try so the catch can label a quota block with the mode
+  // it happened in (backfill quota blocks are expected and routine).
+  const params = new URL(req.url).searchParams;
+  const mode = params.get("mode") === "backfill" ? "backfill" : "daily";
 
   try {
-    const mode = new URL(req.url).searchParams.get("mode");
-
     // ── Backfill mode (Phase 4) ──────────────────────────────────────────────
     if (mode === "backfill") {
-      const params = new URL(req.url).searchParams;
       const start = params.get("start") ?? "";
       const end = params.get("end") ?? "";
       if (!ISO_DAY.test(start) || !ISO_DAY.test(end) || start > end) {
@@ -163,7 +219,9 @@ export async function GET(req: NextRequest) {
       const outstanding = candidates.filter((d) => !already.has(d));
       const pending = outstanding.slice(0, MAX_BACKFILL_DAYS_PER_RUN);
       const scanned = await runDays(pending);
-      const derive = scanned.length ? await deriveAndMaybeWrite(today) : { skipped: true };
+      const derive = (await shouldDerive(scanned.length))
+        ? await deriveAndMaybeWrite(today)
+        : { skipped: true };
 
       return NextResponse.json({
         mode: "backfill",
@@ -183,23 +241,49 @@ export async function GET(req: NextRequest) {
     for (let age = 1; age <= RECENT_WINDOW_DAYS; age++) candidates.push(ymd(addDaysUTC(today, -age)));
     const oldest = candidates[candidates.length - 1];
     const already = await getScannedDays(oldest);
-    const pending = candidates.filter((d) => !already.has(d)).slice(0, MAX_DAYS_PER_RUN);
+    const missing = candidates.filter((d) => !already.has(d));
+    const pending = missing.slice(0, MAX_DAYS_PER_RUN);
     const scanned = await runDays(pending);
-    const derive = scanned.length || CUTOVER ? await deriveAndMaybeWrite(today) : { skipped: true };
+    const derive = (await shouldDerive(scanned.length))
+      ? await deriveAndMaybeWrite(today)
+      : { skipped: true };
 
     return NextResponse.json({
       mode: "daily",
       pendingDays: pending,
+      // Days still missing after this run — the Actions health check warns when
+      // this stops shrinking, which is what a stuck cursor actually looks like.
+      daysBehind: missing.length - scanned.length,
       scanned,
       derive,
+      quotaBlocked: false,
       totalTopics: ALL_TOPICS.length,
       cutover: CUTOVER,
       elapsedMs: elapsed(),
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
+
+    // Budget exhaustion is expected and self-clearing (see QUOTA above): answer
+    // 200 so the schedule stays green, but say so loudly in the body. The day
+    // was never logged, so the next run after the Pacific-midnight reset picks
+    // it straight back up.
+    if (isQuotaError(err)) {
+      return NextResponse.json({
+        mode,
+        quotaBlocked: true,
+        skipped: "quota",
+        scanned: [],
+        derive: { skipped: true },
+        message,
+        totalTopics: ALL_TOPICS.length,
+        cutover: CUTOVER,
+        elapsedMs: elapsed(),
+      });
+    }
+
     return NextResponse.json(
-      { error: "refresh-coverage failed", message, elapsedMs: elapsed() },
+      { error: "refresh-coverage failed", quotaBlocked: false, message, elapsedMs: elapsed() },
       { status: 500 },
     );
   }

@@ -187,6 +187,29 @@ export async function getRecentDailyCounts(sinceDay: string): Promise<DailyCount
   return out;
 }
 
+/**
+ * `fetched_at` of the freshest ACTIVE-version cache row, or null if the cache is
+ * empty. One row, no scan — used by the refresher to skip the derive step on
+ * no-op invocations instead of rewriting every topic ~48x/day.
+ */
+export async function getCoverageFreshness(): Promise<Date | null> {
+  try {
+    const db = createSupabaseServiceClient();
+    const { data, error } = await db
+      .from(COVERAGE_TABLE)
+      .select("fetched_at")
+      .eq("coverage_version", ACTIVE_COVERAGE_VERSION)
+      .order("fetched_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error || !data?.fetched_at) return null;
+    const d = new Date(data.fetched_at as string);
+    return Number.isNaN(d.getTime()) ? null : d;
+  } catch {
+    return null; // unknown freshness → caller derives (fail safe, not fail stale)
+  }
+}
+
 export interface DerivedCoverageRow {
   topic: string;
   volume: number;
