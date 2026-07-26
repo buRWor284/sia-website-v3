@@ -10,7 +10,6 @@ const PAPER = "#f1ebde";
 const INK   = "#1a1410";
 const INK55 = "rgba(26,20,16,.55)";
 const GROT  = "var(--font-grot)";
-const SERIF = "var(--font-serif)";
 
 export default function SignInPage() {
   return (
@@ -25,10 +24,12 @@ export default function SignInPage() {
         </div>
       </div>
 
-      {/* Invite-only note */}
-      <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, marginBottom: 24, textAlign: "center" }}>
-        Private beta — access by invitation only.
-      </p>
+      {/* 2026-07-26: the "Private beta — access by invitation only" note that
+          used to sit here is gone. Two reasons. It is factually wrong now that
+          EMOS is sold self-serve at $50/month, and it sat OUTSIDE the <SignIn>
+          widget: on submit Clerk unmounts the box while the redirect resolves,
+          leaving this line alone on screen. A customer who had just paid and
+          signed in watched the page tell them they were not invited. */}
 
       <SignIn
         fallbackRedirectUrl="/emos-platform/dashboard"

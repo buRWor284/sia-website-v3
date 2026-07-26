@@ -45,7 +45,7 @@ function buildInviteEmail(inviteUrl: string): string {
           <tr>
             <td style="background:#1a1410;padding:40px 40px 36px;">
               <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#f5b81f;margin:0 0 20px;">
-                Private Beta — Invitation Only
+                Your access is ready
               </p>
               <h1 style="font-family:Georgia,serif;font-weight:700;font-size:28px;line-height:1.2;letter-spacing:-0.02em;color:#f1ebde;margin:0 0 16px;">
                 You're in.<br/>Welcome to EMOS.
