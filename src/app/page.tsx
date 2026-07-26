@@ -995,7 +995,7 @@ export default function HomePage() {
             <div className="stage-row">
               <div className="stage__n">01</div><div className="stage__city">DUBAI ATM</div>
               <div className="stage__ctry">UAE</div>
-              <div className="stage__tag">ARABIAN TRAVEL SUMMIT · 40,000 AUDIENCE</div>
+              <div className="stage__tag">ARABIAN TRAVEL MARKET · PANEL · ~500 AUDIENCE</div>
             </div>
             <div className="stage-row">
               <div className="stage__n">02</div><div className="stage__city">KUALA LUMPUR</div>
@@ -1005,7 +1005,7 @@ export default function HomePage() {
             <div className="stage-row">
               <div className="stage__n">03</div><div className="stage__city">BALI</div>
               <div className="stage__ctry">Indonesia</div>
-              <div className="stage__tag">DMSS · 200+ AUDIENCE</div>
+              <div className="stage__tag">DMSS · ~200 AUDIENCE</div>
             </div>
             <div className="stage-row">
               <div className="stage__n">04</div><div className="stage__city">PESHAWAR</div>

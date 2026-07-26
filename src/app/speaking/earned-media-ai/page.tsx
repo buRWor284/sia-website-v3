@@ -73,7 +73,7 @@ const PAGE_CSS = `
 const SESSION_SPECS: ReadonlyArray<[string, string]> = [
   ["Formats", "Keynote · Interactive workshop · Panel · Webinar"],
   ["Length", "45 min keynote to a half day workshop"],
-  ["Room", "20 to 500+, in person or virtual"],
+  ["Room", "20 to ~500, in person or virtual"],
   ["Built for", "Founders, marketers, PR and comms teams"],
 ];
 
@@ -124,7 +124,7 @@ const STATS: ReadonlyArray<[string, string]> = [
   ["22", "years in marketing, as an operator"],
   ["1.5M", "organic visitors grown, Ridester"],
   ["04", "countries hosted on stage"],
-  ["500+", "biggest live audience"],
+  ["~500", "biggest live audience"],
 ];
 
 // ─── Shared button styles ─────────────────────────────────────────────────────
@@ -525,7 +525,7 @@ const SpeakerPhotoStrip = () => (
         />
         <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "#FAFAFA", lineHeight: 1.4 }}>
-            DMSS Conference, Bali · Same live-room energy this session is built for, 200+ attendees.
+            DMSS Conference, Bali · Same live-room energy this session is built for, ~200 attendees.
           </div>
           <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo · dmss.io</SCaps>
         </figcaption>
@@ -543,7 +543,7 @@ const SpeakerPhotoStrip = () => (
         </div>
         <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "#FAFAFA", lineHeight: 1.4 }}>
-            Arabian Travel Market, Dubai · On the panel at a 40,000-attendee industry show.
+            Arabian Travel Market, Dubai · On the panel at a ~40,000-attendee industry show.
           </div>
           <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Panel · 2018</SCaps>
         </figcaption>
