@@ -35,6 +35,7 @@ const LINKS = {
   emosAcademy: "/emos-academy",
   emosAcademyApply: "/emos-academy/apply",
   fractionalCmo: "/fractional-cmo",
+  ksaRadar: "/ksa-tourism-radar",
   // External (dmr.agency)
   eme: "https://www.dmr.agency/earned-media-engine/",
   emb: "https://www.dmr.agency/earned-media-booster/",
@@ -102,6 +103,36 @@ export default async function RadarPage() {
             Start with SignalIQ, free
           </Link>
         </div>
+
+        {/* Regional edition — sibling instrument pointed at KSA tourism */}
+        <Link
+          href={LINKS.ksaRadar}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 18,
+            flexWrap: "wrap",
+            maxWidth: 1000,
+            margin: "16px auto 0",
+            padding: "20px 24px",
+            background: "var(--color-paper-2)",
+            border: "2px solid var(--color-ink)",
+            textDecoration: "none",
+          }}
+        >
+          <span style={{ flex: 1, minWidth: 240 }}>
+            <span className="emr-scaps" style={{ display: "block", marginBottom: 6 }}>
+              Regional edition
+            </span>
+            <span className="emr-body" style={{ display: "block", fontSize: 15, color: "var(--color-ink)" }}>
+              There&rsquo;s a version of this radar pointed at Saudi Arabia&rsquo;s tourism &amp; hospitality boom &mdash; the giga-projects, mega-events, and
+              faith-travel beats, and the coverage gaps a challenger brand or speaker can still own.
+            </span>
+          </span>
+          <span className="emr-tlink" style={{ whiteSpace: "nowrap" }}>
+            See the KSA Tourism Radar &rarr;
+          </span>
+        </Link>
 
         {/* pull line: radar -> hire */}
         <div style={{ textAlign: "center", maxWidth: 840, margin: "52px auto 6px" }}>

@@ -72,7 +72,7 @@ const PAGE_CSS = `
 const SESSION_SPECS: ReadonlyArray<[string, string]> = [
   ["Formats", "Keynote · Interactive workshop · Panel"],
   ["Length", "45 min keynote to a half day workshop"],
-  ["Room", "20 to 500+, in person or virtual"],
+  ["Room", "20 to ~500, in person or virtual"],
   ["Built for", "DMOs, tourism boards, hotels, airlines, DMCs, travel marketers"],
 ];
 
@@ -132,7 +132,7 @@ const STATS: ReadonlyArray<[string, string]> = [
   ["22", "years in marketing, as an operator"],
   ["1.5M", "organic visitors grown, Ridester"],
   ["04", "countries hosted on stage"],
-  ["500+", "biggest live audience"],
+  ["~500", "biggest live audience"],
 ];
 
 const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
@@ -144,7 +144,7 @@ const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
 
 type Fmt = { t: string; meta: string; body: string };
 const FORMATS: ReadonlyArray<Fmt> = [
-  { t: "Keynote", meta: "30–45 min + Q&A · up to 500+", body: "A fast, story-led mainstage talk with a live “what does AI say about your destination?” moment. Best to open or close a track." },
+  { t: "Keynote", meta: "30–45 min + Q&A · up to ~500", body: "A fast, story-led mainstage talk with a live “what does AI say about your destination?” moment. Best to open or close a track." },
   { t: "Interactive workshop", meta: "90 min to half day · capped ~20–40", body: "The full working session: idea sprint, spot-the-slop, and a live pitch clinic on the room’s real pitches. Best as a hands-on breakout." },
   { t: "Panel or fireside", meta: "30–45 min · any size", body: "I bring the live data and the contrarian takes; you bring the moderator and co-panelists. Best for a debate on AI, PR and destination marketing." },
 ];
@@ -575,7 +575,7 @@ const SpeakerPhotoStrip = () => (
         />
         <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "#FAFAFA", lineHeight: 1.4 }}>
-            DMSS Conference, Bali · Same live-room energy this session is built for, 200+ attendees.
+            DMSS Conference, Bali · Same live-room energy this session is built for, ~200 attendees.
           </div>
           <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Photo · dmss.io</SCaps>
         </figcaption>
@@ -593,7 +593,7 @@ const SpeakerPhotoStrip = () => (
         </div>
         <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "#FAFAFA", lineHeight: 1.4 }}>
-            Arabian Travel Market, Dubai · On the panel at one of travel&rsquo;s biggest shows, 40,000+ attendees.
+            Arabian Travel Market, Dubai · On the panel at one of travel&rsquo;s biggest shows, ~40,000 attendees.
           </div>
           <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Panel · 2018</SCaps>
         </figcaption>
