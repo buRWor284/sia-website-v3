@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -9,10 +9,17 @@ import { RadarCallout } from "@/components/bureau/RadarCallout";
  *
  * Doubles as the sign-out destination for the dashboard (see
  * app/emos-platform/dashboard/page.tsx SignOutButton). Behaviour:
- *   - signed OUT  → this marketing landing for the paid EMOS platform
- *   - signed IN   → forwarded to the dashboard (this is the app root)
+ *   - signed OUT              → this marketing landing for the paid EMOS platform
+ *   - signed IN, has access   → forwarded to the dashboard (this is the app root)
+ *   - signed IN, NO access    → this landing, with a banner pointing at checkout
  * The emostool layout only enforces the subscription gate when a user is
  * present, so a logged-out visitor renders straight through to here.
+ *
+ * 2026-07-26: that third case used to be a bug. The redirect was unconditional,
+ * so ANY signed-in user without emos_access was forwarded to the dashboard,
+ * bounced by middleware, and landed on "Access by invitation only" — a page with
+ * no way to buy on it. A person holding out a credit card could not reach the
+ * checkout from the platform's own front door. Gate the redirect on access.
  *
  * Distinct from /emos, which markets the EMOS Academy. This page is the paid
  * *platform* (the connected tool suite). Copy is a concise first pass — refine
@@ -49,9 +56,20 @@ const PIPELINE: Array<{ n: string; label: string; tool: string; desc: string }> 
 ];
 
 export default async function EmostoolLandingPage() {
-  // Members skip the pitch — send them straight to the product.
+  // Members skip the pitch — send them straight to the product. Everyone else,
+  // signed in or not, sees the pitch and can reach checkout from here.
   const { userId } = await auth();
-  if (userId) redirect("/emos-platform/dashboard");
+  let signedInEmail = "";
+  if (userId) {
+    const user = await currentUser();
+    if (user?.publicMetadata?.emos_access === true) {
+      redirect("/emos-platform/dashboard");
+    }
+    signedInEmail =
+      user?.primaryEmailAddress?.emailAddress ??
+      user?.emailAddresses?.[0]?.emailAddress ??
+      "";
+  }
 
   return (
     <div style={{ background: PAPER, color: INK, fontFamily: SERIF, minHeight: "100vh" }}>
@@ -73,6 +91,21 @@ export default async function EmostoolLandingPage() {
         </div>
       </header>
 
+      {/* ── Signed in, no subscription yet ───────────────────────────────── */}
+      {userId && (
+        <div style={{ background: PAPER2, borderBottom: `1px solid ${INK15}` }}>
+          <div style={{ maxWidth: 1120, marginInline: "auto", padding: "14px clamp(20px,4vw,56px)", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "baseline", justifyContent: "space-between" }}>
+            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.5 }}>
+              You&apos;re signed in{signedInEmail ? ` as ${signedInEmail}` : ""}. Your account doesn&apos;t have an active
+              EMOS subscription yet.
+            </p>
+            <Link href="/emos-platform/subscribe" style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK, textDecoration: "underline", textDecorationColor: INK15 }}>
+              Activate for $50/month →
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section style={{ maxWidth: 1120, marginInline: "auto", padding: "clamp(40px,7vw,88px) clamp(20px,4vw,56px) clamp(28px,4vw,44px)" }}>
         <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: INK55 }}>
@@ -90,17 +123,18 @@ export default async function EmostoolLandingPage() {
           login, with your pipeline saved as you go.
         </p>
         <div style={{ marginTop: "clamp(24px,3vw,34px)", display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
-          {/* P4: the purchase path. Self-serve checkout is the primary CTA — sign-up
-              is Restricted in Clerk, so paying first (then getting invited) is the
-              only way in for a new customer. */}
+          {/* P4: the purchase path. Checkout is the primary CTA — sign-up is
+              Restricted in Clerk (verified 2026-07-26), so paying first and then
+              accepting the emailed invitation is the only way in for a new
+              customer. The old "Request access →" link beside these pointed at
+              /not-invited and was removed with that page: on a page that sells a
+              $50/month product, inviting people to apply instead of buy was the
+              clearest expression of the invite-only/self-serve split. */}
           <Link href="/emos-platform/subscribe" style={{ padding: "14px 34px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
             Get EMOS · $50/month
           </Link>
           <Link href="/emos-platform/signin" style={{ padding: "14px 30px", background: "transparent", color: INK, border: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
             Sign in
-          </Link>
-          <Link href="/emos-platform/not-invited" style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, textDecoration: "underline", textDecorationColor: INK15 }}>
-            Request access →
           </Link>
         </div>
         <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>

@@ -4,7 +4,10 @@
  * Creates a Stripe Checkout Session for the EMOS Platform $50/month subscription.
  * Returns { url } which the client immediately redirects to.
  *
- * Public route — no Clerk auth required (user hasn't signed up yet).
+ * Public route — no Clerk auth required (a new buyer hasn't signed up yet).
+ * It does, however, USE a Clerk session when one happens to be present: since
+ * 2026-07-26 a signed-in visitor without access is routed here instead of to
+ * /not-invited, so the buyer may well already have an account.
  *
  * Required env vars:
  *   STRIPE_SECRET_KEY   — from Stripe Dashboard → Developers → API keys
@@ -13,6 +16,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { verifySubscriber } from "@/lib/gate/subscriber-cookie";
 import { SUB_COOKIE } from "@/lib/gate/config";
 import { createSupabaseServiceClient } from "@/lib/supabase";
@@ -55,6 +59,32 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // A signed-in buyer is the strongest signal we have about WHICH account the
+  // access should land on. Stamping clerk_user_id on the session lets the
+  // webhook (and the success-page fallback) grant emos_access directly to that
+  // account instead of guessing from the payment email — otherwise paying with
+  // a Link/Google Pay/work address silently grants a different account, and the
+  // one they actually use stays locked out. The Clerk email also overrides the
+  // wristband email so Stripe prefills the right address.
+  // Never let this block checkout: a failure here just falls back to the
+  // email-only path, which is what every signed-out buyer uses anyway.
+  let clerkUserId: string | null = null;
+  try {
+    const { userId } = await auth();
+    if (userId) {
+      clerkUserId = userId;
+      const client = await clerkClient();
+      const user = await client.users.getUser(userId);
+      const clerkEmail =
+        user.primaryEmailAddress?.emailAddress ??
+        user.emailAddresses?.[0]?.emailAddress ??
+        "";
+      if (clerkEmail) email = clerkEmail;
+    }
+  } catch (e) {
+    console.warn("[emos-checkout] Clerk session lookup failed:", e);
+  }
+
   const params = new URLSearchParams();
   params.append("mode", "subscription");
   params.append("payment_method_types[]", "card");
@@ -67,6 +97,7 @@ export async function POST(req: NextRequest) {
   params.append("cancel_url", `${BASE_URL}/emos-platform/subscribe`);
   params.append("metadata[source]", "emos_platform");
   if (subscriberId) params.append("metadata[subscriber_id]", subscriberId);
+  if (clerkUserId) params.append("metadata[clerk_user_id]", clerkUserId);
   if (email) params.append("customer_email", email);
 
   const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {

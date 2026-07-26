@@ -75,7 +75,10 @@ const isClerkClientRoute = createRouteMatcher(["/clients/:slug", "/clients/:slug
 // Public escape hatch — shown when a logged-in user tries the wrong workspace.
 const isClientUnauthorizedPage = createRouteMatcher(["/clients/unauthorized"]);
 
-// /emos-platform/not-invited is public (no redirect loop)
+// /emos-platform/not-invited is public (no redirect loop).
+// RETIRED as a destination 2026-07-26 (see the no-access redirect below) but the
+// route itself stays — it is now a redirect stub, and it must remain exempt or
+// the stub would be gated by the very check that used to send people to it.
 const isNotInvitedRoute = createRouteMatcher(["/emos-platform/not-invited"]);
 
 // /emos-platform (exact root) is the PUBLIC platform landing + sign-out destination.
@@ -96,6 +99,16 @@ const isAuthRoute = createRouteMatcher(["/emos-platform/signin(.*)", "/emos-plat
 // C3 (2026-07-15): /emos-platform/signedout is the PUBLIC post-sign-out landing. It sits
 // under the protected prefix, so exempt it too or a signed-out visitor is bounced to sign-in.
 const isSignedOutRoute = createRouteMatcher(["/emos-platform/signedout"]);
+
+// 2026-07-26 (self-serve): where a signed-in user WITHOUT emos_access goes.
+// Was /emos-platform/not-invited — a dead end whose only affordance was a
+// "request access" form, with no way to buy anywhere on the page. Anyone with a
+// Clerk account who wanted to PAY (a client-workspace user, someone whose grant
+// failed, an old beta account) was told they were not invited and left there.
+// /subscribe is the correct destination: it sells, it takes payment, and it is
+// already exempt above so there is no redirect loop. Lapsed subscribers are
+// separately steered to /subscribe?returning=1 by the dashboard layout.
+const NO_ACCESS_DESTINATION = "/emos-platform/subscribe";
 
 export default clerkMiddleware(async (auth, req) => {
   // ── Legacy: PT (Basic Auth) ──────────────────────────────────────────────
@@ -170,7 +183,7 @@ export default clerkMiddleware(async (auth, req) => {
   // ── EMOS tool: Clerk auth + emos_access metadata ─────────────────────────
   if (isProtectedRoute(req) && !isNotInvitedRoute(req) && !isEmostoolLanding(req) && !isSubscribeRoute(req) && !isAuthRoute(req) && !isSignedOutRoute(req)) {
     await auth.protect();
-    // Invite-only: require emos_access = true in Clerk publicMetadata.
+    // Require emos_access = true in Clerk publicMetadata.
     // Fast path: read from JWT session claims (already in token).
     // Fallback: fresh Clerk API call for new sign-ups where the webhook
     // may have set emos_access after the session token was issued.
@@ -183,12 +196,12 @@ export default clerkMiddleware(async (auth, req) => {
         const client = await clerkClient();
         const user = await client.users.getUser(userId!);
         if (!user.publicMetadata?.emos_access) {
-          return NextResponse.redirect(new URL("/emos-platform/not-invited", req.url));
+          return NextResponse.redirect(new URL(NO_ACCESS_DESTINATION, req.url));
         }
         // Live metadata has it — let them through (JWT will catch up on next refresh)
       } catch {
         // If Clerk API is unreachable, fail closed
-        return NextResponse.redirect(new URL("/emos-platform/not-invited", req.url));
+        return NextResponse.redirect(new URL(NO_ACCESS_DESTINATION, req.url));
       }
     }
   }

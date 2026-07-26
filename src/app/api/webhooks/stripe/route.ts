@@ -5,16 +5,23 @@
  *
  * checkout.session.completed
  *   → upsert stripe_subscriptions row with status='active'
- *   → send Clerk invitation + branded welcome email via Resend
+ *   → grant emos_access, or send a Clerk invitation + branded welcome email
  *
  * customer.subscription.deleted
- *   → update status to 'canceled'
+ *   → update status to 'canceled', revoke Clerk access + any pending invite
  *
  * invoice.payment_failed
  *   → update status to 'past_due'
  *
  * invoice.payment_succeeded  (recovers past_due back to active)
  *   → update status to 'active'
+ *
+ * 2026-07-26: the grant/invite logic moved to src/lib/emos-billing.ts so the
+ * success page can run the identical reconciliation as a fallback. This route
+ * is now just signature verification + event dispatch. See that file for why
+ * the fallback exists (short version: this webhook is not a reliable single
+ * point of truth, and under Clerk's restricted sign-up mode a missed invitation
+ * is a hard lockout for someone who has already paid).
  *
  * Required env vars:
  *   STRIPE_SECRET_KEY          — Stripe API key
@@ -34,10 +41,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { createSupabaseServiceClient } from "@/lib/supabase";
-
-const RESEND_API = "https://api.resend.com/emails";
-const FROM_EMAIL = "EMOS Platform <sia@syedirfanajmal.com>";
-const BASE_URL   = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.syedirfanajmal.com";
+import {
+  grantOrInvite,
+  recordSubscription,
+  revokeClerkInvitations,
+  setClerkAccess,
+} from "@/lib/emos-billing";
 
 // ─── Stripe webhook signature verification ────────────────────────────────────
 // Implements https://stripe.com/docs/webhooks/signatures without the Stripe SDK.
@@ -80,253 +89,6 @@ function verifyStripeWebhook(
   });
 }
 
-// ─── Clerk access revocation (H3, 2026-07-02 review) ─────────────────────────
-// Cancelled subscribers previously kept emos_access forever: the webhook only
-// flipped the DB status, but middleware gates on the Clerk flag. Revoke it here
-// so cancellation locks the platform everywhere, immediately.
-
-/**
- * Set emos_access on the Clerk user with this email.
- * Returns "updated" | "not_found" | "error".
- * Also used on checkout for RE-subscribers (whose Clerk account already
- * exists, so a fresh invitation would fail) to restore access.
- */
-async function setClerkAccess(email: string, access: boolean): Promise<"updated" | "not_found" | "error"> {
-  const secretKey = process.env.CLERK_SECRET_KEY;
-  if (!secretKey) {
-    console.error("[stripe-webhook] CLERK_SECRET_KEY not set — cannot update emos_access");
-    return "error";
-  }
-
-  try {
-    const lookup = await fetch(
-      `https://api.clerk.com/v1/users?email_address=${encodeURIComponent(email)}&limit=1`,
-      { headers: { Authorization: `Bearer ${secretKey}` } },
-    );
-    if (!lookup.ok) {
-      console.error("[stripe-webhook] Clerk user lookup failed:", lookup.status, await lookup.text());
-      return "error";
-    }
-    const users = (await lookup.json()) as Array<{ id: string }>;
-    const clerkUserId = users?.[0]?.id;
-    if (!clerkUserId) return "not_found";
-
-    // PATCH /users/{id}/metadata does a shallow MERGE (unlike PATCH /users/{id},
-    // which replaces) — so client_slug or other metadata keys survive.
-    const res = await fetch(`https://api.clerk.com/v1/users/${clerkUserId}/metadata`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${secretKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ public_metadata: { emos_access: access } }),
-    });
-
-    if (!res.ok) {
-      console.error("[stripe-webhook] emos_access update failed:", res.status, await res.text());
-      return "error";
-    }
-    console.log(`[stripe-webhook] emos_access=${access} set for ${email} (${clerkUserId})`);
-    return "updated";
-  } catch (err) {
-    console.error("[stripe-webhook] setClerkAccess error:", err);
-    return "error";
-  }
-}
-
-// ─── Clerk invite ─────────────────────────────────────────────────────────────
-
-/**
- * Revoke any PENDING Clerk invitation for this email. On cancellation the
- * subscriber's user access is flipped off (setClerkAccess), but a still-pending
- * invitation carries public_metadata.emos_access: true and would grant access if
- * accepted later, so a cancelled sub must also kill the outstanding invite.
- * Returns "revoked" | "none" | "error".
- */
-async function revokeClerkInvitations(email: string): Promise<"revoked" | "none" | "error"> {
-  const secretKey = process.env.CLERK_SECRET_KEY;
-  if (!secretKey) {
-    console.error("[stripe-webhook] CLERK_SECRET_KEY not set - cannot revoke invitations");
-    return "error";
-  }
-  try {
-    const res = await fetch(
-      "https://api.clerk.com/v1/invitations?status=pending&limit=100",
-      { headers: { Authorization: `Bearer ${secretKey}` } },
-    );
-    if (!res.ok) {
-      console.error("[stripe-webhook] invitation lookup failed:", res.status, await res.text());
-      return "error";
-    }
-    const json = await res.json();
-    const list = (Array.isArray(json) ? json : json?.data ?? []) as Array<{ id: string; email_address: string }>;
-    const target = email.toLowerCase();
-    const matches = list.filter((i) => (i.email_address ?? "").toLowerCase() === target);
-    if (matches.length === 0) return "none";
-    let revoked = 0;
-    for (const inv of matches) {
-      const rev = await fetch(`https://api.clerk.com/v1/invitations/${inv.id}/revoke`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${secretKey}`, "Content-Type": "application/json" },
-      });
-      if (rev.ok) revoked++;
-      else console.error("[stripe-webhook] invitation revoke failed:", inv.id, rev.status, await rev.text());
-    }
-    console.log(`[stripe-webhook] revoked ${revoked}/${matches.length} pending invite(s) for ${email}`);
-    return revoked > 0 ? "revoked" : "error";
-  } catch (err) {
-    console.error("[stripe-webhook] revokeClerkInvitations error:", err);
-    return "error";
-  }
-}
-
-async function sendClerkInvite(email: string): Promise<string | null> {
-  const secretKey = process.env.CLERK_SECRET_KEY;
-  if (!secretKey) {
-    console.error("[stripe-webhook] CLERK_SECRET_KEY not set");
-    return null;
-  }
-
-  const res = await fetch("https://api.clerk.com/v1/invitations", {
-    method: "POST",
-    headers: {
-      Authorization:  `Bearer ${secretKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email_address:   email,
-      public_metadata: { emos_access: true },
-      redirect_url:    `${BASE_URL}/emos-platform/signup`,
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.text();
-    console.error("[stripe-webhook] Clerk invite failed:", res.status, err);
-    return null;
-  }
-
-  const data = await res.json();
-  return (data.url as string) ?? null;
-}
-
-// ─── Welcome email ────────────────────────────────────────────────────────────
-
-function buildWelcomeEmail(inviteUrl: string): string {
-  const tools: Array<[string, string, string]> = [
-    ["◎", "SignalIQ", "spot breaking signals, pitch at the right moment."],
-    ["◈", "AssetIQ", "build the assets journalists actually cite."],
-    ["◇", "JournoCollabIQ", "find journalists, personalise outreach."],
-    ["◆", "PressIQ", "score your pitch before you send it."],
-    ["▣", "CoverageIQ", "track pitches, turn coverage into AI citations."],
-  ];
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome to EMOS</title>
-</head>
-<body style="margin:0;padding:0;background:#f1ebde;font-family:Georgia,serif;">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;">Your EMOS subscription is active. One step to get inside the platform.</div>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1ebde;padding:48px 16px;">
-    <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
-
-        <tr><td style="padding-bottom:28px;">
-          <table cellpadding="0" cellspacing="0"><tr>
-            <td style="background:#f5b81f;width:30px;height:30px;text-align:center;vertical-align:middle;font-family:Georgia,serif;font-weight:700;font-size:15px;color:#1a1410;line-height:30px;">E</td>
-            <td style="padding-left:11px;font-family:Arial,sans-serif;font-weight:900;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#1a1410;">EMOS Platform</td>
-          </tr></table>
-        </td></tr>
-
-        <tr><td style="background:#1a1410;padding:44px 44px 40px;">
-          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#f5b81f;margin:0 0 18px;">Payment confirmed</p>
-          <h1 style="font-family:Georgia,serif;font-weight:700;font-size:34px;line-height:1.12;letter-spacing:-0.02em;color:#f1ebde;margin:0 0 16px;">
-            You're in.
-          </h1>
-          <p style="font-family:Georgia,serif;font-style:italic;font-size:16px;line-height:1.6;color:rgba(241,235,222,0.9);margin:0 0 28px;">
-            Your EMOS subscription is active. One quick step and the whole platform is yours.
-          </p>
-          <a href="${inviteUrl}" style="display:inline-block;background:#f5b81f;color:#1a1410;font-family:Arial,sans-serif;font-weight:900;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;text-decoration:none;padding:16px 34px;">
-            Create your account &rarr;
-          </a>
-          <p style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:0.03em;color:rgba(241,235,222,0.78);margin:20px 0 0;line-height:1.5;">
-            This secure invite link expires in 30 days.
-          </p>
-        </td></tr>
-
-        <tr><td style="background:#f1ebde;padding:32px 44px 8px;border-left:1px solid rgba(26,20,16,.12);border-right:1px solid rgba(26,20,16,.12);">
-          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(26,20,16,.7);margin:0 0 18px;">What happens next</p>
-          ${[
-            "Click <strong style=\"color:#1a1410;\">Create your account</strong> above.",
-            "Set your password. Takes about a minute.",
-            "Land in your dashboard and start the pipeline.",
-          ].map((step, i) => `
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;"><tr>
-            <td width="30" valign="top" style="font-family:Georgia,serif;font-weight:700;font-size:18px;color:#1a1410;">${i + 1}</td>
-            <td style="font-family:Georgia,serif;font-size:15px;color:rgba(26,20,16,.82);line-height:1.55;">${step}</td>
-          </tr></table>`).join("")}
-        </td></tr>
-
-        <tr><td style="background:#fff8ee;padding:28px 44px 30px;border-left:1px solid rgba(26,20,16,.12);border-right:1px solid rgba(26,20,16,.12);border-bottom:1px solid rgba(26,20,16,.12);">
-          <p style="font-family:Arial,sans-serif;font-weight:900;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(26,20,16,.7);margin:0 0 16px;">What's inside</p>
-          ${tools.map(([icon, name, desc]) => `
-          <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:11px;">
-            <tr>
-              <td width="26" valign="top" style="font-family:Georgia,serif;font-size:15px;color:#1a1410;padding-top:1px;">${icon}</td>
-              <td><strong style="font-family:Arial,sans-serif;font-size:11px;font-weight:800;color:#1a1410;text-transform:uppercase;letter-spacing:0.05em;">${name}</strong>
-              <span style="font-family:Georgia,serif;font-size:13px;color:rgba(26,20,16,.75);">: ${desc}</span></td>
-            </tr>
-          </table>`).join("")}
-        </td></tr>
-
-        <tr><td style="padding:26px 4px 0;">
-          <p style="font-family:Georgia,serif;font-size:13px;color:rgba(26,20,16,.75);margin:0 0 18px;line-height:1.55;">
-            Questions, or the button won't open? Reply to this email or write to
-            <a href="mailto:sia@syedirfanajmal.com" style="color:#1a1410;font-weight:700;text-decoration:underline;">sia@syedirfanajmal.com</a> and we'll sort it out.
-          </p>
-          <p style="font-family:Arial,sans-serif;font-size:10px;color:rgba(26,20,16,.62);letter-spacing:0.06em;text-transform:uppercase;margin:0 0 6px;">EMOS Platform · syedirfanajmal.com</p>
-          <p style="font-family:Georgia,serif;font-size:12px;color:rgba(26,20,16,.72);margin:0;line-height:1.5;">
-            If the button doesn't work, copy and paste this link:<br/>
-            <span style="color:rgba(26,20,16,.9);word-break:break-all;">${inviteUrl}</span>
-          </p>
-        </td></tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-}
-
-async function sendWelcomeEmail(email: string, inviteUrl: string) {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) {
-    console.error("[stripe-webhook] RESEND_API_KEY not set — skipping welcome email");
-    return;
-  }
-
-  const res = await fetch(RESEND_API, {
-    method: "POST",
-    headers: {
-      Authorization:  `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from:    FROM_EMAIL,
-      to:      [email],
-      subject: "Payment confirmed. Set up your EMOS account",
-      html:    buildWelcomeEmail(inviteUrl),
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json();
-    console.error("[stripe-webhook] Resend error:", err);
-  }
-}
-
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
@@ -356,40 +118,28 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      const customerId     = session.customer as string;
-      const subscriptionId = session.subscription as string;
+      await recordSubscription({
+        email,
+        customerId:     session.customer as string,
+        subscriptionId: session.subscription as string,
+        status:         "active",
+      });
 
-      const { error: upsertErr } = await db.from("stripe_subscriptions").upsert(
-        {
-          email,
-          stripe_customer_id:     customerId,
-          stripe_subscription_id: subscriptionId,
-          status:     "active",
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "email" }
-      );
+      // grantOrInvite covers every state: signed-in buyer (clerk_user_id stamped
+      // on the session), existing account, already-pending invitation, brand new
+      // customer. Critically it still attempts an invitation when the Clerk
+      // lookup ERRORS — the old code returned early there, which took the money
+      // and left the customer with no account and no email.
+      const grant = await grantOrInvite({
+        email,
+        clerkUserId: session.metadata?.clerk_user_id ?? null,
+      });
 
-      if (upsertErr) {
-        console.error("[stripe-webhook] Supabase upsert failed:", upsertErr);
+      if (grant.outcome === "failed") {
+        console.error("[stripe-webhook] PROVISIONING FAILED for", email, "— paid but no access; success page will retry");
       }
 
-      // Existing Clerk account (re-subscriber or invited beta user who now
-      // pays): a fresh invitation would fail — restore access directly instead.
-      const restored = await setClerkAccess(email, true);
-      if (restored === "not_found") {
-        // New customer — send Clerk invite + welcome email as before.
-        const inviteUrl = await sendClerkInvite(email);
-        if (inviteUrl) {
-          await sendWelcomeEmail(email, inviteUrl);
-        } else {
-          console.error("[stripe-webhook] Clerk invite failed for", email, "— subscription recorded but invite NOT sent");
-        }
-      } else if (restored === "error") {
-        console.error("[stripe-webhook] could not verify/restore Clerk access for", email);
-      }
-
-      console.log("[stripe-webhook] checkout.session.completed processed for", email);
+      console.log("[stripe-webhook] checkout.session.completed processed for", email, "→", grant.outcome);
       break;
     }
 
