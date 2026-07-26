@@ -431,6 +431,33 @@ export async function grantOrInvite(args: {
   // 4. New customer.
   const inviteUrl = await createClerkInvitation(email);
   if (!inviteUrl) {
+    // Creating the invitation can fail for two RECOVERABLE reasons, and simply
+    // reporting "failed" (the previous behaviour) was wrong for both:
+    //
+    //   a) Lost race. The webhook and a success-page load run the same grant
+    //      concurrently. Clerk refuses a second invitation while one is
+    //      pending, so whichever call arrives second used to report failure
+    //      even though the customer had a perfectly good invite waiting.
+    //   b) The account already exists, so Clerk refuses to invite it at all.
+    //      This is the tail of a step-2 lookup that returned "error" instead
+    //      of "updated" (a Clerk API blip): the user was there the whole time.
+    //
+    // Re-read before giving up: first for an invitation someone else created,
+    // then for the account itself.
+    const raced = await findPendingInvitation(email);
+    if (raced) {
+      if (resend) {
+        const resent = await sendWelcomeEmail(email, raced.url);
+        return { outcome: resent ? "invite_resent" : "failed", email, inviteUrl: raced.url };
+      }
+      return { outcome: "invite_pending", email, inviteUrl: raced.url };
+    }
+
+    if ((await setClerkAccess(email, true)) === "updated") {
+      console.log("[emos-billing] invite refused but account exists — granted directly:", email);
+      return { outcome: "granted", email };
+    }
+
     console.error("[emos-billing] could not grant OR invite", email, "— subscription recorded, access NOT provisioned");
     return { outcome: "failed", email };
   }
