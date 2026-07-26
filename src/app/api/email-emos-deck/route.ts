@@ -8,12 +8,20 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitDb } from "@/lib/rate-limit-db";
+import { clientIp } from "@/lib/public-tool-guard";
 
 const RESEND_API   = "https://api.resend.com/emails";
 const FROM_EMAIL   = "Syed Irfan Ajmal <contact@syedirfanajmal.com>";
 const CC_EMAILS    = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
 const DECK_URL     = "https://www.syedirfanajmal.com/clients/resourcex/emos-deck";
+
+// Generous enough for the real flow (a client emailing themselves the deck,
+// mistyping once, retrying) and far below anything useful as a spam relay.
+const IP_LIMIT            = 5;
+const IP_WINDOW_MS        = 10 * 60_000;   // 5 sends per 10 minutes per IP
+const RECIPIENT_LIMIT     = 3;
+const RECIPIENT_WINDOW_MS = 60 * 60_000;   // 3 sends per hour per address
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -116,15 +124,32 @@ export async function POST(request: NextRequest) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return NextResponse.json({ error: "Server configuration error." }, { status: 500 });
 
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
-  const { ok: withinLimit } = rateLimit(ip);
-  if (!withinLimit) return NextResponse.json({ error: "Too many requests. Please wait a minute." }, { status: 429 });
+  // ── Rate limiting (M1, 2026-07-02 review) ─────────────────────────────────
+  // Unauthenticated route that sends SIA-branded mail to any address the caller
+  // supplies, CC'd to Irfan. Old guard: first x-forwarded-for hop (spoofable) +
+  // the per-instance in-memory limiter. Now: spoof-resistant IP + cross-instance
+  // DB limiter, plus a per-recipient limit so rotating IPs can't email-bomb one
+  // victim. Same pattern as /api/email-cmo-pdf.
+  const ip = clientIp(request);
+  const { ok: withinLimit } = await rateLimitDb(`email-emos-deck:ip:${ip}`, {
+    limit: IP_LIMIT,
+    windowMs: IP_WINDOW_MS,
+  });
+  if (!withinLimit) return NextResponse.json({ error: "Too many requests. Please wait a few minutes." }, { status: 429 });
 
   let body: unknown;
   try { body = await request.json(); } catch { return NextResponse.json({ error: "Invalid JSON." }, { status: 400 }); }
 
   const to = ((body as Record<string, unknown>)?.to as string || "").trim();
   if (!to || !isValidEmail(to)) return NextResponse.json({ error: "A valid recipient email is required." }, { status: 400 });
+
+  const { ok: recipientOk } = await rateLimitDb(`email-emos-deck:to:${to.toLowerCase()}`, {
+    limit: RECIPIENT_LIMIT,
+    windowMs: RECIPIENT_WINDOW_MS,
+  });
+  // Same message as the IP limit on purpose — never confirm to a stranger that
+  // this address has already been mailed.
+  if (!recipientOk) return NextResponse.json({ error: "Too many requests. Please wait a few minutes." }, { status: 429 });
 
   try {
     await sendEmail(apiKey, {

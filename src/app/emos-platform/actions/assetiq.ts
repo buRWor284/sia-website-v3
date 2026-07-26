@@ -120,22 +120,29 @@ export async function updateAsset(
   }>,
 ): Promise<boolean> {
   const db = await getAuthenticatedClient();
-  const { error } = await db
+  // M5: `.select("id")` so a no-op write (stale id, or another org's row, which
+  // RLS silently filters out rather than erroring) reports false, not success.
+  // See the long note in actions/coverageiq.ts.
+  const { data, error } = await db
     .from("linkable_assets")
     .update({ ...input, updated_at: new Date().toISOString() })
-    .eq("id", assetId);
+    .eq("id", assetId)
+    .select("id");
   if (error) { console.error("updateAsset error:", error.message); return false; }
+  if (!data?.length) { console.warn(`updateAsset: no row matched ${assetId}`); return false; }
   revalidatePath("/emos-platform/dashboard/assetiq");
   return true;
 }
 
 export async function deleteAsset(assetId: string): Promise<boolean> {
   const db = await getAuthenticatedClient();
-  const { error } = await db
+  const { data, error } = await db
     .from("linkable_assets")
     .delete()
-    .eq("id", assetId);
+    .eq("id", assetId)
+    .select("id");
   if (error) { console.error("deleteAsset error:", error.message); return false; }
+  if (!data?.length) { console.warn(`deleteAsset: no row matched ${assetId}`); return false; }
   revalidatePath("/emos-platform/dashboard/assetiq");
   return true;
 }

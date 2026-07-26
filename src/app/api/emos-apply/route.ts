@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { escapeHtml } from "@/lib/escape-html";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
@@ -68,8 +69,16 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // M2 (2026-07-02 review): the address is used as Resend's `reply_to`, so an
+  // unvalidated value both fails the send and lands unchecked in the mail body.
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "A valid email address is required." }, { status: 400 });
+  }
+
   const tierLabel = tier === "accelerate" ? "Accelerate – $3,500" : "Foundation – $2,000";
 
+  // M2: every value below is attacker-controlled (public form) and this mail
+  // arrives from Irfan's own domain — escape at each interpolation point.
   const html = `
     <div style="font-family: Georgia, serif; max-width: 640px; color: #1a1410;">
       <h2 style="margin-bottom: 4px;">New EMOS Application</h2>
@@ -78,25 +87,25 @@ export async function POST(req: NextRequest) {
       <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
         <tr>
           <td style="padding: 10px 12px; font-weight: bold; width: 180px; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Name</td>
-          <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${first_name} ${last_name}</td>
+          <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(first_name)} ${escapeHtml(last_name)}</td>
         </tr>
         <tr>
           <td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Email</td>
-          <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;"><a href="mailto:${email}">${email}</a></td>
+          <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td>
         </tr>
-        ${company ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Company</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${company}</td></tr>` : ""}
+        ${company ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Company</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(company)}</td></tr>` : ""}
         <tr>
           <td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Tier</td>
           <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${tierLabel}</td>
         </tr>
-        ${arr_range ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">ARR Range</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${arr_range}</td></tr>` : ""}
-        ${timeline_to_raise ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Timeline to Raise</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${timeline_to_raise}</td></tr>` : ""}
-        ${current_press ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Current Press</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${current_press}</td></tr>` : ""}
-        ${what_tried ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">What They've Tried</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${what_tried}</td></tr>` : ""}
-        ${why_now ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Why Now</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${why_now}</td></tr>` : ""}
-        ${message ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Message</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${message}</td></tr>` : ""}
+        ${arr_range ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">ARR Range</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(arr_range)}</td></tr>` : ""}
+        ${timeline_to_raise ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Timeline to Raise</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(timeline_to_raise)}</td></tr>` : ""}
+        ${current_press ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Current Press</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(current_press)}</td></tr>` : ""}
+        ${what_tried ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">What They've Tried</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(what_tried)}</td></tr>` : ""}
+        ${why_now ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Why Now</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(why_now)}</td></tr>` : ""}
+        ${message ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Message</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(message)}</td></tr>` : ""}
       </table>
-      <p style="margin-top: 24px; font-size: 13px; color: #888;">Reply directly to reach the applicant at ${email}.</p>
+      <p style="margin-top: 24px; font-size: 13px; color: #888;">Reply directly to reach the applicant at ${escapeHtml(email)}.</p>
     </div>
   `;
 

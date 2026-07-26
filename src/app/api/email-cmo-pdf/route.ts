@@ -9,12 +9,20 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimitDb } from "@/lib/rate-limit-db";
+import { clientIp } from "@/lib/public-tool-guard";
 
 const RESEND_API  = "https://api.resend.com/emails";
 const FROM_EMAIL  = "Syed Irfan Ajmal <contact@syedirfanajmal.com>";
 const CC_EMAILS   = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
 const PROPOSAL_URL = "https://www.syedirfanajmal.com/clients/resourcex/cmo-pilot";
+
+// Generous enough for the real flow (a client emailing themselves the proposal,
+// mistyping once, retrying) and far below anything useful as a spam relay.
+const IP_LIMIT            = 5;
+const IP_WINDOW_MS        = 10 * 60_000;   // 5 sends per 10 minutes per IP
+const RECIPIENT_LIMIT     = 3;
+const RECIPIENT_WINDOW_MS = 60 * 60_000;   // 3 sends per hour per address
 
 // ─── Validation ──────────────────────────────────────────────
 
@@ -159,15 +167,22 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // ── Rate limiting ─────────────────────────────────────────
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown";
-  const { ok: withinLimit } = rateLimit(ip);
+  // ── Rate limiting (M1, 2026-07-02 review) ─────────────────
+  // This route sends SIA-branded mail to ANY address the caller names, and CCs
+  // Irfan on every send. The old guard trusted the FIRST x-forwarded-for hop
+  // (client-controlled) and used the in-memory limiter, which resets whenever a
+  // Vercel instance recycles — so it stopped neither an email bomb aimed at one
+  // victim nor a loop from a single attacker. Now: spoof-resistant IP + the
+  // cross-instance DB limiter, and a SECOND limit keyed on the recipient so no
+  // one address can be mailed repeatedly however many IPs the caller rotates.
+  const ip = clientIp(request);
+  const { ok: withinLimit } = await rateLimitDb(`email-cmo-pdf:ip:${ip}`, {
+    limit: IP_LIMIT,
+    windowMs: IP_WINDOW_MS,
+  });
   if (!withinLimit) {
     return NextResponse.json(
-      { error: "Too many requests. Please wait a minute and try again." },
+      { error: "Too many requests. Please wait a few minutes and try again." },
       { status: 429 }
     );
   }
@@ -184,6 +199,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { error: "A valid recipient email is required." },
       { status: 400 }
+    );
+  }
+
+  const { ok: recipientOk } = await rateLimitDb(
+    `email-cmo-pdf:to:${to.toLowerCase()}`,
+    { limit: RECIPIENT_LIMIT, windowMs: RECIPIENT_WINDOW_MS },
+  );
+  if (!recipientOk) {
+    // Deliberately the same wording as the IP limit: do not confirm to a
+    // stranger that this particular address has already been mailed.
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a few minutes and try again." },
+      { status: 429 }
     );
   }
 

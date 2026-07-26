@@ -20,8 +20,17 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { verifySubscriber } from "@/lib/gate/subscriber-cookie";
 import { SUB_COOKIE } from "@/lib/gate/config";
 import { createSupabaseServiceClient } from "@/lib/supabase";
+import { rateLimitDb } from "@/lib/rate-limit-db";
+import { clientIp } from "@/lib/public-tool-guard";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.syedirfanajmal.com";
+
+// Deliberately loose. This is the money path: a real buyer retrying a declined
+// card, or a couple sharing an office IP, must never be turned away. The cap
+// only exists to stop a script minting Stripe sessions in a loop, which costs
+// nothing to run and fills the Stripe dashboard with abandoned sessions.
+const CHECKOUT_LIMIT     = 10;
+const CHECKOUT_WINDOW_MS = 10 * 60_000;
 
 export async function POST(req: NextRequest) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
@@ -30,6 +39,17 @@ export async function POST(req: NextRequest) {
   if (!secretKey || !priceId) {
     console.error("[emos-checkout] Missing STRIPE_SECRET_KEY or STRIPE_PRICE_ID");
     return NextResponse.json({ error: "Payment not configured" }, { status: 500 });
+  }
+
+  const { ok: withinLimit } = await rateLimitDb(`emos-checkout:${clientIp(req)}`, {
+    limit: CHECKOUT_LIMIT,
+    windowMs: CHECKOUT_WINDOW_MS,
+  });
+  if (!withinLimit) {
+    return NextResponse.json(
+      { error: "Too many checkout attempts. Please wait a few minutes, or email sia@syedirfanajmal.com." },
+      { status: 429 }
+    );
   }
 
   let email: string | undefined;

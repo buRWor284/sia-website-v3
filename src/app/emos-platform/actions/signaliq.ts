@@ -170,11 +170,16 @@ export async function updateSignalStatus(
   status: DbSignal["status"],
 ): Promise<boolean> {
   const db = await getAuthenticatedClient();
-  const { error } = await db
+  // M5: `.select("id")` so a no-op write (stale id, or another org's row, which
+  // RLS silently filters out rather than erroring) reports false, not success.
+  // See the long note in actions/coverageiq.ts.
+  const { data, error } = await db
     .from("signaliq_signals")
     .update({ status })
-    .eq("id", signalId);
+    .eq("id", signalId)
+    .select("id");
   if (error) { console.error("updateSignalStatus error:", error.message); return false; }
+  if (!data?.length) { console.warn(`updateSignalStatus: no row matched ${signalId}`); return false; }
   revalidatePath("/emos-platform/dashboard/signaliq");
   return true;
 }
@@ -183,8 +188,9 @@ export async function updateSignalStatus(
 
 export async function deleteSignal(signalId: string): Promise<boolean> {
   const db = await getAuthenticatedClient();
-  const { error } = await db.from("signaliq_signals").delete().eq("id", signalId);
+  const { data, error } = await db.from("signaliq_signals").delete().eq("id", signalId).select("id");
   if (error) { console.error("deleteSignal error:", error.message); return false; }
+  if (!data?.length) { console.warn(`deleteSignal: no row matched ${signalId}`); return false; }
   revalidatePath("/emos-platform/dashboard/signaliq");
   return true;
 }

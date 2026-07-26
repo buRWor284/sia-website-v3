@@ -22,6 +22,18 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { reconcileCheckoutSession, type GrantOutcome } from "@/lib/emos-billing";
+import { rateLimitDb } from "@/lib/rate-limit-db";
+
+// 2026-07-26 follow-up to the self-serve change: ?resend=1 makes this GET send
+// an email, which needs two guards the first version did not have.
+//   1. prefetch={false} on the resend links below. Next prefetches <Link>s in
+//      production, and prefetching an RSC route RUNS the server component — so
+//      a hover over "Send it again" would fire the invite with no click at all.
+//   2. this limiter. A checkout session_id is not a secret (it sits in the URL,
+//      in browser history, in any shared screenshot); with no cap, anyone
+//      holding one could loop the link and mail-bomb that buyer.
+const RESEND_LIMIT     = 3;
+const RESEND_WINDOW_MS = 60 * 60_000; // 3 resends per hour per checkout session
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -83,6 +95,7 @@ function nextStep(outcome: GrantOutcome | "unknown", sessionId: string) {
         cta: sessionId ? (
           <Link
             href={`/emos-platform/subscribe/success?session_id=${encodeURIComponent(sessionId)}&resend=1`}
+            prefetch={false}
             style={linkStyle}
           >
             Send it again &rarr;
@@ -96,6 +109,7 @@ function nextStep(outcome: GrantOutcome | "unknown", sessionId: string) {
         cta: sessionId ? (
           <Link
             href={`/emos-platform/subscribe/success?session_id=${encodeURIComponent(sessionId)}&resend=1`}
+            prefetch={false}
             style={linkStyle}
           >
             Resend my invite &rarr;
@@ -112,7 +126,19 @@ export default async function SubscribeSuccessPage({
 }) {
   const params    = await searchParams;
   const sessionId = params.session_id ?? "";
-  const resend    = params.resend === "1";
+  const requestedResend = params.resend === "1";
+
+  // Over the cap we still reconcile (the grant is idempotent and costs nothing)
+  // but drop the resend flag, so the page keeps working and only the mail stops.
+  const resend =
+    requestedResend && sessionId
+      ? (
+          await rateLimitDb(`emos-invite-resend:${sessionId}`, {
+            limit: RESEND_LIMIT,
+            windowMs: RESEND_WINDOW_MS,
+          })
+        ).ok
+      : false;
 
   // Idempotent: records the subscription and grants access or (re)sends the
   // invitation. Safe on every load; the email only goes out again on ?resend=1.

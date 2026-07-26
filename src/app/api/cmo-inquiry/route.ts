@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { escapeHtml } from "@/lib/escape-html";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
@@ -44,8 +45,10 @@ function validate(body: unknown): InquiryPayload | string {
 // ─── Email HTML builders ─────────────────────────────────────
 
 function buildNotificationHtml(d: InquiryPayload): string {
+  // M2 (2026-07-02 review): public-form fields rendered inside a mail that
+  // arrives from Irfan's own domain — escape before interpolating.
   const companyLine = d.company
-    ? `<p><strong>Company:</strong> ${d.company}</p>`
+    ? `<p><strong>Company:</strong> ${escapeHtml(d.company)}</p>`
     : "";
 
   return `
@@ -53,13 +56,13 @@ function buildNotificationHtml(d: InquiryPayload): string {
   <h2 style="border-bottom: 2px solid #f5b81f; padding-bottom: 12px;">
     New Fractional CMO inquiry — syedirfanajmal.com
   </h2>
-  <p><strong>From:</strong> ${d.name} &lt;${d.email}&gt;</p>
+  <p><strong>From:</strong> ${escapeHtml(d.name)} &lt;${escapeHtml(d.email)}&gt;</p>
   ${companyLine}
   <hr style="border: none; border-top: 1px solid #F0F0EE; margin: 20px 0;" />
-  <div style="white-space: pre-wrap; line-height: 1.6;">${d.message}</div>
+  <div style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(d.message)}</div>
   <hr style="border: none; border-top: 1px solid #F0F0EE; margin: 20px 0;" />
   <p style="font-size: 13px; color: #888;">
-    Reply directly to this email to respond to ${d.name}.
+    Reply directly to this email to respond to ${escapeHtml(d.name)}.
   </p>
 </div>`;
 }
@@ -68,7 +71,7 @@ function buildAutoReplyHtml(name: string): string {
   return `
 <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #1a1410;">
   <h2 style="border-bottom: 2px solid #f5b81f; padding-bottom: 12px;">
-    Thanks for reaching out, ${name}.
+    Thanks for reaching out, ${escapeHtml(name)}.
   </h2>
   <p style="line-height: 1.6;">
     I've received your message and will get back to you within one working day.

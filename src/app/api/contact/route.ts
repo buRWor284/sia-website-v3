@@ -10,6 +10,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { escapeHtml } from "@/lib/escape-html";
 
 const RESEND_API = "https://api.resend.com/emails";
 const TO_EMAILS = ["sia@syedirfanajmal.com", "syedirfanajmal@gmail.com"];
@@ -49,11 +50,14 @@ function validate(body: unknown): ContactPayload | string {
 // ─── Email HTML builders ─────────────────────────────────────
 
 function buildNotificationHtml(d: ContactPayload): string {
+  // M2 (2026-07-02 review): these fields come from a public form and this mail
+  // arrives in Irfan's inbox from his own trusted domain — escape every one of
+  // them or a submitter can render arbitrary markup (e.g. a spoofed link) there.
   const interestLine = d.interests.length
-    ? `<p><strong>Interested in:</strong> ${d.interests.join(", ")}</p>`
+    ? `<p><strong>Interested in:</strong> ${escapeHtml(d.interests.join(", "))}</p>`
     : "";
   const companyLine = d.company
-    ? `<p><strong>Company:</strong> ${d.company}</p>`
+    ? `<p><strong>Company:</strong> ${escapeHtml(d.company)}</p>`
     : "";
 
   return `
@@ -61,14 +65,14 @@ function buildNotificationHtml(d: ContactPayload): string {
   <h2 style="border-bottom: 2px solid #f5b81f; padding-bottom: 12px;">
     New message from syedirfanajmal.com
   </h2>
-  <p><strong>From:</strong> ${d.name} &lt;${d.email}&gt;</p>
+  <p><strong>From:</strong> ${escapeHtml(d.name)} &lt;${escapeHtml(d.email)}&gt;</p>
   ${companyLine}
   ${interestLine}
   <hr style="border: none; border-top: 1px solid #F0F0EE; margin: 20px 0;" />
-  <div style="white-space: pre-wrap; line-height: 1.6;">${d.message}</div>
+  <div style="white-space: pre-wrap; line-height: 1.6;">${escapeHtml(d.message)}</div>
   <hr style="border: none; border-top: 1px solid #F0F0EE; margin: 20px 0;" />
   <p style="font-size: 13px; color: #888;">
-    Reply directly to this email to respond to ${d.name}.
+    Reply directly to this email to respond to ${escapeHtml(d.name)}.
   </p>
 </div>`;
 }
@@ -77,7 +81,7 @@ function buildAutoReplyHtml(name: string): string {
   return `
 <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; color: #1a1410;">
   <h2 style="border-bottom: 2px solid #f5b81f; padding-bottom: 12px;">
-    Thanks for reaching out, ${name}.
+    Thanks for reaching out, ${escapeHtml(name)}.
   </h2>
   <p style="line-height: 1.6;">
     I've received your message and will get back to you within 1–2 business days.

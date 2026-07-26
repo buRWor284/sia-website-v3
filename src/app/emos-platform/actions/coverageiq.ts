@@ -106,6 +106,21 @@ export async function getAlerts(): Promise<DbAlert[]> {
 }
 
 // ─── Mutations ────────────────────────────────────────────────────────────────
+//
+// M5 (2026-07-02 review) — why every update/delete below ends with `.select("id")`:
+//
+// These filter by row id alone (`.eq("id", pitchId)`), so tenancy rests entirely
+// on Supabase RLS. That was verified live on 2026-07-26: every tenant table has
+// RLS enabled with an `org_isolation` policy (`org_id = get_current_org_id()`,
+// FOR ALL, no separate WITH CHECK, so the same expression guards writes), and
+// these actions use createSupabaseServerClient (anon key + Clerk JWT), which RLS
+// applies to. Isolation IS enforced.
+//
+// The gap was in the reporting. An UPDATE or DELETE against another org's row is
+// not an error under RLS — it simply matches zero rows and reports success. So a
+// cross-tenant attempt, a stale id and a genuine edit all returned `true`.
+// Asking for the affected rows back makes the difference visible: no row means
+// no write happened, which is a real false and worth a log line.
 
 export async function createPitch(input: CreatePitchInput): Promise<{ id: string } | null> {
   const db = await getAuthenticatedClient();
@@ -154,13 +169,18 @@ export async function createPitch(input: CreatePitchInput): Promise<{ id: string
 export async function updatePitchStage(pitchId: string, stage: Stage): Promise<boolean> {
   const db = await getAuthenticatedClient();
 
-  const { error } = await db
+  const { data, error } = await db
     .from("coverageiq_pitches")
     .update({ stage, updated_at: new Date().toISOString() })
-    .eq("id", pitchId);
+    .eq("id", pitchId)
+    .select("id");
 
   if (error) {
     console.error("updatePitchStage error:", error.message);
+    return false;
+  }
+  if (!data?.length) {
+    console.warn(`updatePitchStage: no row matched ${pitchId} (deleted, or not this org)`);
     return false;
   }
 
@@ -170,8 +190,9 @@ export async function updatePitchStage(pitchId: string, stage: Stage): Promise<b
 
 export async function updateAlertStatus(alertId: string, status: AlertStatus): Promise<boolean> {
   const db = await getAuthenticatedClient();
-  const { error } = await db.from("coverageiq_alerts").update({ status }).eq("id", alertId);
+  const { data, error } = await db.from("coverageiq_alerts").update({ status }).eq("id", alertId).select("id");
   if (error) { console.error("updateAlertStatus error:", error.message); return false; }
+  if (!data?.length) { console.warn(`updateAlertStatus: no row matched ${alertId}`); return false; }
   revalidatePath("/emos-platform/dashboard/coverageiq");
   return true;
 }
@@ -215,11 +236,13 @@ export async function updateJournalist(
   input: Partial<CreateJournalistInput>,
 ): Promise<boolean> {
   const db = await getAuthenticatedClient();
-  const { error } = await db
+  const { data, error } = await db
     .from("journalists")
     .update({ ...input, updated_at: new Date().toISOString() })
-    .eq("id", journalistId);
+    .eq("id", journalistId)
+    .select("id");
   if (error) { console.error("updateJournalist error:", error.message); return false; }
+  if (!data?.length) { console.warn(`updateJournalist: no row matched ${journalistId}`); return false; }
   revalidatePath("/emos-platform/dashboard/coverageiq");
   revalidatePath("/emos-platform/dashboard/journocollabiq");
   return true;
@@ -227,8 +250,9 @@ export async function updateJournalist(
 
 export async function deleteJournalist(journalistId: string): Promise<boolean> {
   const db = await getAuthenticatedClient();
-  const { error } = await db.from("journalists").delete().eq("id", journalistId);
+  const { data, error } = await db.from("journalists").delete().eq("id", journalistId).select("id");
   if (error) { console.error("deleteJournalist error:", error.message); return false; }
+  if (!data?.length) { console.warn(`deleteJournalist: no row matched ${journalistId}`); return false; }
   revalidatePath("/emos-platform/dashboard/coverageiq");
   revalidatePath("/emos-platform/dashboard/journocollabiq");
   return true;
