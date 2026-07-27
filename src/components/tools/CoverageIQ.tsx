@@ -27,6 +27,18 @@ import {
 } from "@/lib/coverageiq/types";
 
 // ── Mock data ──────────────────────────────────────────────────────────────────
+//
+// ★ EVERYTHING BELOW IS INVENTED. The journalists, outlets, pitches, placement
+// URLs and alerts are all fictional demo content for the public shop-window
+// version of the tool. Several look uncomfortably real — named writers at real
+// outlets, a Yahoo Finance link, a Rand Fishkin tweet — none of which exist.
+//
+// M9 (2026-07-02 security/UX review): a pulsing amber "LIVE" pill used to sit
+// above this in the header, so a first-time visitor had every reason to read
+// fabricated alerts as real monitoring output. For a product whose whole pitch
+// is PR credibility, that is the wrong kind of wrong. The header badge now says
+// SAMPLE DATA. If you add anything here, keep it obviously illustrative and do
+// not invent quotes, links or coverage attributed to real named people.
 
 const JOURNALISTS: MockJournalist[] = [
   { id: "j1",  name: "Jordan Ames",     outlet: "TechCrunch",                beat: "Marketplace Infra",  dr: 93, email: "j.ames@tc.com",              lastContact: "2026-05-28", pitchesSent: 4, placements: 2 },
@@ -180,9 +192,18 @@ export default function CoverageIQ() {
                 {followUpCount} ACTION{followUpCount !== 1 ? "S" : ""} DUE
               </button>
             )}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}>
-              <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%", display: "inline-block" }} />
-              LIVE
+            {/* M9: was a pulsing amber "LIVE" pill, which read as real-time
+                monitoring sitting directly above invented alerts (fake Yahoo
+                Finance syndication, a fake Rand Fishkin tweet). Now labelled for
+                what it is. Square marker, not a dot — Bureau has no rounded
+                corners; amber stays a marker, never the text, per the locked
+                a11y colour rules. */}
+            <div
+              title="Every pitch, contact and alert in this demo is invented."
+              style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase", color: "rgba(241,235,222,.55)" }}
+            >
+              <span style={{ width: 6, height: 6, background: YEL, display: "inline-block" }} />
+              Sample data
             </div>
           </>
         }
