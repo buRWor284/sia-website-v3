@@ -187,8 +187,18 @@ async function deriveAndMaybeWrite(today: Date): Promise<Record<string, unknown>
 }
 
 export async function GET(req: NextRequest) {
+  // CRON_SECRET bearer auth. Vercel Cron sends `Authorization: Bearer <CRON_SECRET>`
+  // automatically when the var is set in the project env.
+  //
+  // 2026-07-26: this was `if (secret && ...)`, which FAILS OPEN — with CRON_SECRET
+  // unset the condition short-circuits and the check is skipped entirely, leaving a
+  // public GET that runs billed BigQuery scans, writes to Supabase, and accepts a
+  // caller-chosen ?mode=backfill&start=&end= range. Nothing else guards it either:
+  // middleware only gates /api/emos-platform/*, not /api/signaliq/*. Now requires the
+  // secret to be set AND matched, matching factcheck/cron, which already documented
+  // this route's laxer check as the deliberate contrast.
   const secret = process.env.CRON_SECRET;
-  if (secret && req.headers.get("authorization") !== `Bearer ${secret}`) {
+  if (!secret || req.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
