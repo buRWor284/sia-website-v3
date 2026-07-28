@@ -245,7 +245,7 @@ export default function FactcheckIQPage() {
                     FACTCHECK<span style={{ color: YEL }}>IQ</span>
                   </div>
                   <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: P55, margin: "8px 0 0" }}>
-                    How a draft becomes a graded, sourced report in a single pass
+                    How a draft becomes a graded report, one sourced verdict per claim
                   </p>
                 </div>
                 <div style={{ textAlign: "right" }}>
