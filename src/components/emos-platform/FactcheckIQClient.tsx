@@ -251,12 +251,25 @@ function fmtDate(iso: string): string {
 
 /**
  * Count-based wait estimate for a full audit. Claims verify VERIFY_LANES at a
- * time at roughly one minute each, plus intake and reporting overhead. Shown as
- * a range on purpose: honest, and it frames the wait as depth, not slowness.
+ * time. Shown as a range on purpose: honest, and it frames the wait as depth,
+ * not slowness.
+ *
+ * RECALIBRATED 29 Jul 2026. The old model (low = waves, high = waves * 1.5 + 1)
+ * was measurably too optimistic, because it priced only the verify calls and
+ * ignored the gaps between server windows: a run that outlives one invocation
+ * waits for the next continuation tick before resuming. Live wall clock:
+ *
+ *   9 claims  (3 waves) -> 234s = 3.9 min
+ *   14 claims (4 waves) -> 724s = 12.1 min
+ *
+ * The old model predicted 3 to 6 and 4 to 7 minutes for those. The 14-claim run
+ * blew straight past its own upper bound. The band below covers both real runs
+ * and is deliberately wide: an estimate a user beats feels fast, one they wait
+ * past feels broken.
  */
 function estimateMinutes(claimCount: number): { low: number; high: number } {
   const waves = Math.max(1, Math.ceil(claimCount / VERIFY_LANES));
-  return { low: waves, high: Math.ceil(waves * 1.5) + 1 };
+  return { low: waves, high: waves * 3 + 2 };
 }
 
 function chip(bg: string, fg: string, border?: string): CSSProperties {
@@ -586,7 +599,9 @@ export default function FactcheckIQClient() {
         </p>
         <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.5, color: INK55, maxWidth: 640, margin: "10px 0 0" }}>
           Anyone can glance at a claim and say it looks fine. Reading the actual source takes longer. That is the
-          difference a full audit buys you: expect minutes, not seconds, and more claims means more minutes.
+          difference a full audit buys you: expect minutes, not seconds, and more claims means more minutes. You can
+          close this tab once an audit starts. It keeps running on our side, and the finished report will be waiting in
+          your history.
         </p>
       </div>
 
@@ -705,9 +720,11 @@ export default function FactcheckIQClient() {
       )}
       {mode === "full" && (
         <div style={{ marginTop: 8, fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, lineHeight: 1.5, color: INK55, maxWidth: 640 }}>
-          Rough guide: a short passage with 2 or 3 claims takes 1 to 3 minutes, a dense paragraph with 9 claims takes 3
-          to 6, a long article with 30 or more can take 10 or more. You will see the exact claim count and estimate as
-          soon as extraction finishes.
+          Rough guide, from real runs: a short passage with 2 or 3 claims takes 1 to 3 minutes, a dense paragraph with 9
+          claims takes about 4, and a full article at the 20 claim ceiling takes 15 to 20. You will see the exact claim
+          count and estimate as soon as extraction finishes. A full audit checks up to 20 claims per run. If your draft
+          has more, the extra claims are listed in the report as unchecked rather than dropped, so you can split the
+          piece and run it again.
         </div>
       )}
 

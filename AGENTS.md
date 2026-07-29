@@ -107,6 +107,22 @@ Pipeline order: SignalIQ → AssetIQ → JournoCollabIQ → PressIQ → Coverage
 - Sandbox environment cannot push (proxy restriction) — always provide exact git commands for user to run locally.
 - Stale `.git/index.lock` / `.git/HEAD.lock` files appear frequently — user deletes manually with `rm`.
 
+## FactcheckIQ (as of 29 Jul 2026)
+
+Authenticated EMOS tool. Engine lives in `src/lib/factcheck/`, routes under `src/app/api/emos-platform/factcheck/`, client is `src/components/emos-platform/FactcheckIQClient.tsx`. Supabase tables `fact_check_runs` / `fact_check_claims`.
+
+**Two engines, selected by the `FACTCHECK_ENGINE` env var.**
+- Unset or `vercel` (CURRENT, and the deliberate fail-safe default): full audits run on Vercel in 300-second windows, checkpointing to Supabase and resuming via the status-route poll and an every-minute cron. Bounded by `MAX_CONTINUATIONS` (6) and `RUN_ABSOLUTE_MAX_MS` (45 min).
+- `worker`: full audits queue for an always-on Railway worker (`worker/index.ts`) that processes each run start to finish with no time limit. **The code is deployed and live but DORMANT.** Nothing runs it until the flag is set on both Vercel and Railway. Turning it on costs about $5/month of hosting and is deferred until FactcheckIQ has paying users.
+
+**`MAX_CLAIMS_PER_RUN` is 20, and that number is load-bearing.** It is sized to what the Vercel engine can finish, not what it can start: measured wall clock is roughly 30 to 60 seconds per claim, so 20 claims is about 17 minutes against a 45-minute backstop. Do not raise it without either moving to the worker engine or re-measuring. Claims beyond the cap are reported as unchecked, never silently dropped.
+
+**Hard guardrails. Do not touch these while reliability work is in flight:**
+- `grade.ts` (especially `clampVerdict`), `prompts.ts`, and `verify.ts` are off limits. They encode verdict calibration and the fabrication guards, which are the product. Reliability and infra changes must not alter what a verdict means.
+- Verify calls cost real money (Anthropic, roughly $0.12 per claim on the current Opus grader). Never double-drive a run: both engines claim work through the same `lease_until` compare-and-swap, and that invariant must hold.
+
+**Known open items:** the finalize write in `run.ts` drops `progress.attempts`, so completed runs cannot be traced back to how many windows they took (correctness is fine, forensics are not). Five of nine claims in the 29 Jul canary rendered "No evidence summary returned by the grader." in the report table, including the fabricated one. Both are logged and deliberately deferred, since fixing the second means touching guardrailed files.
+
 ## Critical rules
 - `"use server"` files may ONLY export async functions. No object exports, no type re-exports. Types live in `src/lib/emos-stage-config.ts`.
 - Always fetch `org_id` from the `organizations` table before any INSERT — never rely on RLS to inject it.

@@ -49,8 +49,24 @@ export const WEB_SEARCH_TOOL_VERSION = "web_search_20260318";
 export const WEB_FETCH_TOOL_VERSION = "web_fetch_20260318";
 export const WEB_TOOLS_BETA_HEADER: string | null = null;
 
-/** Claims beyond this cap are stored with status "skipped" and reported, never silently dropped. */
-export const MAX_CLAIMS_PER_RUN = 40;
+/**
+ * Claims beyond this cap are stored with status "skipped" and reported, never silently dropped.
+ *
+ * Lowered 40 -> 20 on 29 Jul 2026, to size the tool to what the Vercel engine can
+ * ACTUALLY finish rather than what it can start. Measured wall clock on the Fix A
+ * path (VERIFY_CONCURRENCY=4): a 9-claim run took 234s, a 14-claim run took 724s,
+ * i.e. roughly 30 to 60 seconds per claim once cross-window gaps are counted. At
+ * the slow end, 20 claims lands near 17 minutes, comfortably inside both
+ * RUN_ABSOLUTE_MAX_MS (45 min) and MAX_CONTINUATIONS (6 windows), with real margin
+ * for one stubborn tail claim. 40 claims at that same rate is ~35 minutes, which
+ * only fits if nothing goes wrong, and the one 33-claim attempt on record died at
+ * the backstop.
+ *
+ * This cap is a VERCEL-ENGINE constraint, not a product one. Under
+ * FACTCHECK_ENGINE=worker there is no invocation window and no reason for a cap
+ * this tight, so raise it as part of the Fix B cutover, not before.
+ */
+export const MAX_CLAIMS_PER_RUN = 20;
 
 /** Per-claim search budget inside the verify+grade step. Raised 3 -> 4 (20 Jul 2026) so the verifier has a search to spare for locating the primary cited source (e.g. StatCounter's own page) before corroborating with independent ones. */
 export const MAX_SEARCHES_PER_CLAIM = 4;
