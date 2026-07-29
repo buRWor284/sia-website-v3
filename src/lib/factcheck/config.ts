@@ -10,6 +10,25 @@ export const FACTCHECK_GRADE_MODEL =
   process.env.FACTCHECK_GRADE_MODEL ?? "claude-opus-4-8";
 
 /**
+ * Fix B (24 Jul 2026): which engine drives FULL audits.
+ * - "vercel" (the DEFAULT, and the value when the env var is unset or anything
+ *   unrecognized): today's proven path. The start route hosts the initial worker
+ *   via waitUntil and the status route + every-minute cron drive checkpointed
+ *   continuations across 300s windows. A misconfigured env can only ever fall
+ *   back HERE, never to the new path.
+ * - "worker": the start route persists the raw input, leaves the run 'queued',
+ *   and the always-on Railway worker (worker/index.ts) claims it and processes
+ *   it start-to-finish with no invocation time limit. The continuation
+ *   machinery stays in the codebase but dormant.
+ * The worker process itself also requires this to be "worker" on ITS host
+ * before it will poll, so a half-flipped deployment fails safe (worker idles).
+ * Citation-mode runs always use the inline Vercel path regardless of this flag.
+ */
+export type FactcheckEngine = "vercel" | "worker";
+export const FACTCHECK_ENGINE: FactcheckEngine =
+  process.env.FACTCHECK_ENGINE === "worker" ? "worker" : "vercel";
+
+/**
  * Web search / web fetch tool versions and beta header.
  *
  * Phase 0 finding (4 Jul 2026): the plan's original assumption (web_fetch_20250910,
@@ -74,6 +93,31 @@ export const SOURCE_TIERS = {
 export const PROCESS_ROUTE_MAX_DURATION_SECONDS = 300;
 
 /**
+ * Per-request timeout on each verify+grade model call. The deadline guard cannot
+ * abort an in-flight call; this can. A claim that exceeds it comes back
+ * check_failed fast and the worker moves on; unfinished claims are retried by a
+ * later continuation window (Vercel engine) or a later pass (worker engine).
+ *
+ * RAISED 75s -> 120s (21 Jul 2026). Live logs showed the 75s cap was the actual
+ * blocker: on a 33-claim run all but the fastest claims tripped it — Opus +
+ * web_search + reading a couple of fetched pages routinely needs 80-110s — so
+ * they came back as false "Request timed out" check_failures, retried, timed out
+ * again, and the run died at the backstop with most claims never really checked.
+ * 120s covers the realistic per-claim cost with headroom.
+ *
+ * Fix B (24 Jul 2026): ENV-OVERRIDABLE via FACTCHECK_PER_CLAIM_TIMEOUT_MS. This
+ * exists for the ALWAYS-ON WORKER HOST ONLY (Railway sets 240000): with no
+ * invocation window to fit inside, the timeout's sole job is hang protection on
+ * the SDK call, so it can be generous. Do NOT set the env var on Vercel: there
+ * the 120s default is load-bearing (VERIFY_DEADLINE_SAFETY_MS below is derived
+ * from this value so a claim started at the deadline still lands before the
+ * invocation hard-kill).
+ */
+const perClaimTimeoutEnv = parseInt(process.env.FACTCHECK_PER_CLAIM_TIMEOUT_MS ?? "", 10);
+export const PER_CLAIM_TIMEOUT_MS =
+  Number.isFinite(perClaimTimeoutEnv) && perClaimTimeoutEnv > 0 ? perClaimTimeoutEnv : 120_000;
+
+/**
  * How long before the function-duration cap the full-audit verify stage stops
  * STARTING new per-claim verifications, so a claim already in flight can finish
  * and the partial report still gets written before the platform hard-kill.
@@ -81,40 +125,23 @@ export const PROCESS_ROUTE_MAX_DURATION_SECONDS = 300;
  * INVARIANT (revised 21 Jul 2026): must be >= PER_CLAIM_TIMEOUT_MS. A claim may
  * be started right at the deadline and then run for up to a full per-claim
  * timeout; if this safety margin were smaller than that timeout, the platform
- * would hard-kill the claim mid-flight (wasted paid work). Sized here at
+ * would hard-kill the claim mid-flight (wasted paid work). Sized at
  * PER_CLAIM_TIMEOUT_MS + 15s of slack for the final report build + status write.
- * Raised 90s -> 135s alongside the per-claim timeout raise (75s -> 120s), after
- * live logs (21 Jul) showed most claims legitimately needed longer than 75s and
- * were being killed as false "timeouts."
+ * Fix B (24 Jul 2026): now DERIVED from PER_CLAIM_TIMEOUT_MS (same 135_000 value
+ * as before at the 120s default), so the invariant holds by construction even if
+ * someone sets the timeout env var on Vercel against advice.
  */
-export const VERIFY_DEADLINE_SAFETY_MS = 135_000;
+export const VERIFY_DEADLINE_SAFETY_MS = PER_CLAIM_TIMEOUT_MS + 15_000;
 
 /**
  * A run still queued/running this long after creation is presumed hard-killed
  * (the platform kill skips all catch blocks, so the row can never fix itself).
  * The status route sweeps such rows to status "error" so clients stop polling.
  * Cap + 2 minutes of slack for clock drift and slow final writes.
+ * Vercel-engine semantics; the worker engine uses QUEUED_STALL_AFTER_MS and the
+ * absolute backstop instead (a queued run waiting for a busy worker is healthy).
  */
 export const STALE_RUN_AFTER_MS = (PROCESS_ROUTE_MAX_DURATION_SECONDS + 120) * 1000;
-
-/**
- * Per-request timeout on each verify+grade model call. The deadline guard cannot
- * abort an in-flight call; this can. A claim that exceeds it comes back
- * check_failed fast and the worker moves on; unfinished claims are retried by a
- * later continuation window.
- *
- * RAISED 75s -> 120s (21 Jul 2026). Live logs showed the 75s cap was the actual
- * blocker: on a 33-claim run all but the fastest claims tripped it — Opus +
- * web_search + reading a couple of fetched pages routinely needs 80-110s — so
- * they came back as false "Request timed out" check_failures, retried, timed out
- * again, and the run died at the backstop with most claims never really checked.
- * 120s covers the realistic per-claim cost with headroom. Trade-off: fewer claims
- * start per 300s window, so long docs need more continuation windows (fine now
- * that continuations are cron-driven and the attempts counter is fixed). Kept
- * below VERIFY_DEADLINE_SAFETY_MS so a claim started at the deadline still lands
- * before the invocation hard-kill.
- */
-export const PER_CLAIM_TIMEOUT_MS = 120_000;
 
 /**
  * Cooperative work lease on a run (fact_check_runs.lease_until). The live worker
@@ -136,6 +163,8 @@ export const PER_CLAIM_TIMEOUT_MS = 120_000;
  * than one invocation can NEVER expire while its worker is alive. The only cost is
  * that a genuinely dead run waits marginally longer for revival — a non-issue next
  * to double-spending. Keep this strictly greater than PROCESS_ROUTE_MAX_DURATION_SECONDS.
+ * (Vercel-engine lease sizing. The always-on worker claims runs with the shorter
+ * WORKER_LEASE_SECONDS below because it has a real mid-claim heartbeat.)
  */
 export const RUN_LEASE_SECONDS = PROCESS_ROUTE_MAX_DURATION_SECONDS + 60;
 
@@ -156,11 +185,21 @@ export const RUN_LEASE_SECONDS = PROCESS_ROUTE_MAX_DURATION_SECONDS + 60;
  * cap, raise this AND RUN_ABSOLUTE_MAX_MS together (raising this alone just lets
  * the 45-min sweeper preempt the clean partial with an error) — and weigh the
  * added per-run cost, since each extra window re-attempts every stuck claim.
+ * (Vercel engine only; the worker engine bounds retries per claim with
+ * FACTCHECK_MAX_CLAIM_ATTEMPTS instead, since it has no windows.)
  */
 export const MAX_CONTINUATIONS = 6;
 
-/** Absolute backstop: a run older than this is failed by the sweeper regardless of state. Far above any legitimate multi-window audit. */
-export const RUN_ABSOLUTE_MAX_MS = 45 * 60 * 1000;
+/**
+ * Absolute backstop: a run older than this is failed by the sweeper regardless
+ * of state. Far above any legitimate audit. Fix B (24 Jul 2026): under the
+ * worker engine this is 2 hours (runs no longer race a window cadence, and the
+ * worker's pass loop FINALIZES an honest partial at this age rather than
+ * erroring; the sweeper error is the last resort for a dead worker). Under the
+ * Vercel engine it stays 45 minutes, matched to the window cadence math above.
+ */
+export const RUN_ABSOLUTE_MAX_MS =
+  FACTCHECK_ENGINE === "worker" ? 2 * 60 * 60 * 1000 : 45 * 60 * 1000;
 
 /**
  * Tabless continuation cron (21 Jul 2026): the max number of DISTINCT runs the
@@ -173,6 +212,43 @@ export const RUN_ABSOLUTE_MAX_MS = 45 * 60 * 1000;
  * Raise it only if many long audits legitimately run at the same time.
  */
 export const MAX_RUNS_PER_CRON_TICK = 5;
+
+/* ---------------- Fix B: always-on worker engine (24 Jul 2026) ---------------- */
+
+/**
+ * Per-claim retry cap on the worker engine, replacing MAX_CONTINUATIONS' window
+ * math. A pending claim whose verification comes back check_failed (transient
+ * tooling failure, NOT a verdict) has fact_check_claims.verify_attempts
+ * incremented and stays pending for a later pass; once it reaches this cap it is
+ * finalized as an honest check_failed. Strictly cheaper than the old worst case
+ * (a stuck claim could be re-attempted in every one of up to 7 windows).
+ */
+export const FACTCHECK_MAX_CLAIM_ATTEMPTS = 3;
+
+/** How often the idle worker polls Supabase for runnable full-audit runs. */
+export const WORKER_POLL_INTERVAL_MS = 5_000;
+
+/**
+ * Lease duration the always-on worker claims runs with. Deliberately SHORT
+ * (unlike RUN_LEASE_SECONDS): the worker renews on a fixed WORKER_HEARTBEAT_MS
+ * timer while alive, so expiry means roughly three missed heartbeats = the
+ * worker is dead and the run is claimable again (by the restarted worker).
+ */
+export const WORKER_LEASE_SECONDS = 180;
+
+/** Fixed heartbeat interval at which the busy worker renews its run lease. */
+export const WORKER_HEARTBEAT_MS = 60_000;
+
+/** Wait between verify passes over a run's still-pending claims, so transient rate limits / slow sources can clear before the retry. */
+export const RETRY_PASS_BACKOFF_MS = 30_000;
+
+/**
+ * Worker engine: a run still 'queued' this long after creation, while NO run
+ * anywhere holds a live lease (= no worker heartbeat = the worker looks
+ * offline), is failed with an honest "engine offline" message. A queued run
+ * waiting behind a BUSY worker (live lease exists) is healthy and never swept.
+ */
+export const QUEUED_STALL_AFTER_MS = 10 * 60 * 1000;
 
 export const CITATION_APIS = {
   CROSSREF: "https://api.crossref.org",

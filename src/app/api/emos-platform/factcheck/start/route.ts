@@ -6,6 +6,8 @@ import { createSupabaseServiceClient } from "@/lib/supabase";
 import { startRun, processRun } from "@/lib/factcheck/run";
 import { checkClaimQuota } from "@/lib/factcheck/quota";
 import { isFactcheckOrgAllowed } from "@/lib/factcheck/access";
+import { setRunInputText } from "@/lib/factcheck/store";
+import { FACTCHECK_ENGINE } from "@/lib/factcheck/config";
 import type { FactCheckMode, InputType } from "@/lib/factcheck/types";
 
 export const runtime = "nodejs";
@@ -87,6 +89,20 @@ export async function POST(req: NextRequest) {
   };
 
   const runId = await startRun(runParams);
+
+  // Fix B (24 Jul 2026): under the worker engine, FULL audits are processed by
+  // the always-on worker instead of this invocation. Persist the raw input now
+  // (the worker never sees this request body; url-type runs already stored their
+  // source_url at createRun) and leave the run 'queued' for the worker's poll.
+  // Citation runs always take the inline path below: they finish in seconds and
+  // must not depend on worker uptime.
+  if (body.mode === "full" && FACTCHECK_ENGINE === "worker") {
+    if (body.inputType !== "url" && body.text) {
+      await setRunInputText(runId, body.text);
+    }
+    console.info(`[factcheckiq] run ${runId} queued for the worker engine`);
+    return NextResponse.json({ runId, quota: quota.usage });
+  }
 
   // Fire the worker without blocking the response; fluid compute keeps this
   // alive past the response via waitUntil (no cron path).

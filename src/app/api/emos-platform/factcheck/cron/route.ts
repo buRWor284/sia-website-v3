@@ -43,6 +43,7 @@ import { NextResponse } from "next/server";
 import { acquireRunLease, failStaleRunsGlobal, getRunsNeedingContinuation } from "@/lib/factcheck/store";
 import { continueRun } from "@/lib/factcheck/run";
 import {
+  FACTCHECK_ENGINE,
   MAX_RUNS_PER_CRON_TICK,
   RUN_ABSOLUTE_MAX_MS,
   RUN_LEASE_SECONDS,
@@ -69,6 +70,23 @@ export async function GET(req: NextRequest) {
   }
 
   const started = Date.now();
+
+  // Fix B (24 Jul 2026): under the worker engine the always-on worker is the
+  // only driver of full audits, so this cron must NOT lease or continue runs
+  // (it would fight the worker for expired leases). It degrades to a sweep-only
+  // tick: the absolute-backstop last resort, with 10 minutes of margin so the
+  // worker's own in-loop backstop (an honest partial report) always acts first.
+  // This whole route is deleted in cleanup phase B4 after the worker burn-in.
+  if (FACTCHECK_ENGINE === "worker") {
+    const sweepAfterMs = RUN_ABSOLUTE_MAX_MS + 10 * 60 * 1000;
+    let sweptStale = 0;
+    try {
+      sweptStale = await failStaleRunsGlobal(sweepAfterMs, sweepAfterMs);
+    } catch (err) {
+      console.error(`[factcheckiq] cron worker-mode sweep failed:`, err);
+    }
+    return NextResponse.json({ ok: true, mode: "worker-sweep-only", sweptStale, elapsedMs: Date.now() - started });
+  }
 
   // 1) Global stale sweep (all orgs). Fails ONLY truly unrecoverable runs (died
   //    before any claims were stored, or past the absolute backstop) — the same

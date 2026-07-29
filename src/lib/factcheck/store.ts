@@ -351,3 +351,115 @@ export async function listRuns(orgId: string, limit = 20): Promise<any[]> {
     .limit(limit);
   return data ?? [];
 }
+
+/* ---------------- Fix B: always-on worker engine (24 Jul 2026) ---------------- */
+
+/**
+ * Fix B: the full-audit runs the always-on worker should consider this poll
+ * tick, oldest first:
+ *   - status 'queued': created by the start route under FACTCHECK_ENGINE=worker
+ *     (raw input persisted, never picked up yet), or
+ *   - status 'running': an interrupted run to resume (worker crash/restart, or
+ *     a Vercel-era run whose window died) or one that only needs finalizing,
+ * and in either case the lease is free or expired (no live worker heartbeat).
+ * Deliberately NO claim-count guard here (unlike getRunsNeedingContinuation):
+ * the worker's processFullRunToCompletion handles every state itself, including
+ * a 'running' run with zero claims (it restarts the pipeline from the persisted
+ * input, which the queued flow now guarantees exists). Single-writer safety is
+ * enforced at pickup by acquireRunLease, not here; this is only a candidate list.
+ */
+export async function getRunnableWorkerRuns(limit: number): Promise<{ id: string; org_id: string; status: string }[]> {
+  const supabase = createSupabaseServiceClient();
+  const nowIso = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("fact_check_runs")
+    .select("id, org_id, status")
+    .eq("mode", "full")
+    .in("status", ["queued", "running"])
+    .or(`lease_until.is.null,lease_until.lt.${nowIso}`)
+    .order("created_at", { ascending: true })
+    .limit(limit);
+  if (error) {
+    console.error(`[factcheckiq] getRunnableWorkerRuns query failed: ${error.message}`);
+    return [];
+  }
+  return (data ?? []).map((r: { id: string; org_id: string; status: string }) => ({
+    id: r.id,
+    org_id: r.org_id,
+    status: r.status,
+  }));
+}
+
+/**
+ * Fix B: bump a pending claim's verify_attempts after a TRANSIENT check_failed
+ * (the worker engine's per-claim retry meter; see FACTCHECK_MAX_CLAIM_ATTEMPTS).
+ * Read-modify-write is safe here: only the run's lease holder processes its
+ * claims, so there is exactly one writer. The caller passes the row's current
+ * value (it already holds the row) to save a read. Best-effort: a lost increment
+ * only means one extra retry, never a wrong verdict.
+ */
+export async function incrementClaimVerifyAttempts(claimId: string, currentAttempts: number): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+  await supabase
+    .from("fact_check_claims")
+    .update({ verify_attempts: currentAttempts + 1 })
+    .eq("id", claimId);
+}
+
+/**
+ * Fix B: release a run's lease immediately (graceful worker shutdown), so the
+ * replacement worker resumes the run on its next poll instead of waiting out
+ * WORKER_LEASE_SECONDS. Best-effort; harmless on a run that just finished.
+ */
+export async function clearRunLease(runId: string): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+  await supabase.from("fact_check_runs").update({ lease_until: null }).eq("id", runId);
+}
+
+/**
+ * Fix B: worker-engine queue watchdog, called from the status route on user
+ * polls. Fails 'queued' full-audit runs older than stalledAfterMs with an honest
+ * "engine offline" message, but ONLY when no run anywhere holds a live lease.
+ * A live lease means a worker heartbeat landed within WORKER_LEASE_SECONDS, so
+ * the engine is up and the queued run is simply waiting its turn behind a busy
+ * worker, which is healthy at any age. Best-effort, never throws into the route.
+ */
+export async function failStalledQueuedRuns(orgId: string, stalledAfterMs: number): Promise<number> {
+  const supabase = createSupabaseServiceClient();
+  const nowIso = new Date().toISOString();
+
+  // Liveness probe: any unexpired lease anywhere = a worker is alive.
+  const { data: live, error: liveErr } = await supabase
+    .from("fact_check_runs")
+    .select("id")
+    .gt("lease_until", nowIso)
+    .limit(1);
+  if (liveErr) {
+    console.error(`[factcheckiq] queued-stall liveness probe failed: ${liveErr.message}`);
+    return 0;
+  }
+  if (live && live.length > 0) return 0;
+
+  const cutoff = new Date(Date.now() - stalledAfterMs).toISOString();
+  const { data, error } = await supabase
+    .from("fact_check_runs")
+    .update({
+      status: "error",
+      error:
+        "The verification engine did not pick this run up. It may be offline for maintenance. Please re-run in a few minutes; your claim allowance was not used.",
+      completed_at: new Date().toISOString(),
+    })
+    .eq("org_id", orgId)
+    .eq("mode", "full")
+    .eq("status", "queued")
+    .lt("created_at", cutoff)
+    .select("id");
+  if (error) {
+    console.error(`[factcheckiq] queued-stall sweep failed for org ${orgId}: ${error.message}`);
+    return 0;
+  }
+  if (data && data.length > 0) {
+    console.info(`[factcheckiq] queued-stall sweep: failed ${data.length} unclaimed queued run(s) for org ${orgId}`);
+  }
+  return data?.length ?? 0;
+}
