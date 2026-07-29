@@ -5,7 +5,9 @@
     "claimText": "Klein & Boals 2001: expressive writing improves working memory, Study 1 n=35 vs 36 freshmen, Study 2 n=34/33/34, WM gains at 7 weeks, J Exp Psychol Gen",
     "claimType": "citation",
     "expectedVerdict": "verified",
-    "expectedSources": ["https://pubmed.ncbi.nlm.nih.gov/11561925/"]
+    "expectedSources": [
+      "https://pubmed.ncbi.nlm.nih.gov/11561925/"
+    ]
   },
   {
     "id": "wb-02",
@@ -21,7 +23,9 @@
     "claimText": "Smyth et al. 2018 JMIR Mental Health: n=70 RCT, 15 min x 3 days/week x 12 weeks, reduced distress/anxiety, increased resilience",
     "claimType": "citation",
     "expectedVerdict": "verified",
-    "expectedSources": ["https://pmc.ncbi.nlm.nih.gov/articles/PMC6305886/"]
+    "expectedSources": [
+      "https://pmc.ncbi.nlm.nih.gov/articles/PMC6305886/"
+    ]
   },
   {
     "id": "wb-04",
@@ -29,15 +33,18 @@
     "claimText": "Pennebaker & Beall 1986: n=46 undergraduates, 15 min x 4 consecutive nights, fewer health-center visits over the following 6 months",
     "claimType": "citation",
     "expectedVerdict": "verified",
-    "expectedSources": ["https://pubmed.ncbi.nlm.nih.gov/3745650/"]
+    "expectedSources": [
+      "https://pubmed.ncbi.nlm.nih.gov/3745650/"
+    ]
   },
   {
     "id": "wb-05",
     "source": "writing-benefits-infographic",
     "claimText": "Scullin et al. 2018: writing a to-do list before bed causes people to fall asleep approximately 9 minutes faster",
     "claimType": "statistic",
-    "expectedVerdict": "misleading",
-    "note": "The 9-minute figure appears in secondary coverage (Psychology Today) only; absent from both the paper and the Baylor press release the report attributed it to."
+    "expectedVerdict": "verified",
+    "note": "LABEL REPAIRED 29 Jul 2026 (was misleading). The 9-minute figure is reported directly from the study by Forbes (Alice G. Walton, 14 Jan 2018): \"people who wrote to-do lists fell asleep nine minutes sooner than people who wrote about the previous days accomplishments\". The old note claiming it appeared in Psychology Today ONLY was incomplete. The Baylor press release does omit any minutes figure (verified), but multiple independent outlets report it from the paper, so attributing ~9 min to Scullin et al. 2018 is supported. Both Opus 4.8 and Sonnet 5 independently said verified.",
+    "priorExpectedVerdict": "misleading"
   },
   {
     "id": "wb-06",
@@ -69,7 +76,9 @@
     "claimText": "Franklin quote: 'either write things worth reading, or do things worth the writing,' 1738, Poor Richard's Almanack",
     "claimType": "quote",
     "expectedVerdict": "verified",
-    "expectedSources": ["https://quoteinvestigator.com/2016/04/27/worth/"]
+    "expectedSources": [
+      "https://quoteinvestigator.com/2016/04/27/worth/"
+    ]
   },
   {
     "id": "seo-01",
@@ -77,7 +86,7 @@
     "claimText": "Semrush: the lowest tiers earned 0-4 citations while the top tier earned 79-plus",
     "claimType": "statistic",
     "expectedVerdict": "unverifiable",
-    "note": "The strings '0-4' and '79' appear nowhere in the cited Semrush study's text; may exist only in an unread chart."
+    "note": "The strings '0-4' and '79' appear nowhere in the cited Semrush study's text; may exist only in an unread chart. LABEL REVIEWED 29 Jul 2026 and CONFIRMED CORRECT. Opus matched it."
   },
   {
     "id": "seo-02",
@@ -101,7 +110,9 @@
     "claimText": "Bing is one of only two named ChatGPT search providers (Shopify was added in May 2025)",
     "claimType": "fact",
     "expectedVerdict": "verified",
-    "expectedSources": ["https://help.openai.com/en/articles/9237897-chatgpt-search"],
+    "expectedSources": [
+      "https://help.openai.com/en/articles/9237897-chatgpt-search"
+    ],
     "note": "OpenAI's help doc names exactly Bing and Shopify; note Shopify's role is shopping data, not general web search."
   },
   {
@@ -126,7 +137,7 @@
     "claimText": "SE Ranking study of about 2,000 queries per engine",
     "claimType": "statistic",
     "expectedVerdict": "inaccurate",
-    "note": "2,000 total queries across 20 niches, not per engine; Bing Copilot answered 1,452 of them."
+    "note": "2,000 total queries across 20 niches, not per engine; Bing Copilot answered 1,452 of them. LABEL REVIEWED 29 Jul 2026 and CONFIRMED CORRECT. The claim says ~2,000 queries PER ENGINE; the study ran 2,000 TOTAL across 20 niches. Both models got this wrong (Opus partly_accurate, Sonnet verified), so this is a genuine grader weakness, not a label problem. Keep as a regression test."
   },
   {
     "id": "seo-08",
@@ -134,7 +145,9 @@
     "claimText": "76% of AI Overview citations were in the top 10 organic results in July 2025, falling to 38% about 8 months later",
     "claimType": "statistic",
     "expectedVerdict": "verified",
-    "expectedSources": ["https://ahrefs.com/blog/ai-overview-citations-top-10/"],
+    "expectedSources": [
+      "https://ahrefs.com/blog/ai-overview-citations-top-10/"
+    ],
     "note": "Verified with caveat: some of the change may reflect Gemini 3 parsing differences noted in the same post."
   },
   {
@@ -143,16 +156,21 @@
     "claimText": "Semrush is owned by Adobe",
     "claimType": "fact",
     "expectedVerdict": "verified",
-    "expectedSources": ["https://news.adobe.com/news/2026/04/adobe-completes-semrush-acquisition"]
+    "expectedSources": [
+      "https://news.adobe.com/news/2026/04/adobe-completes-semrush-acquisition"
+    ]
   },
   {
     "id": "seo-10",
     "source": "bing-seo-guide",
     "claimText": "62% of AI citations are ghost citations (citations to pages that don't actually support the claim)",
     "claimType": "statistic",
-    "expectedVerdict": "verified",
-    "expectedSources": ["https://www.semrush.com/blog/the-ghost-citations-study/"],
-    "note": "Precise figure is 61.7%, rounds to 62%."
+    "expectedVerdict": "misleading",
+    "expectedSources": [
+      "https://www.semrush.com/blog/the-ghost-citations-study/"
+    ],
+    "note": "LABEL REPAIRED 29 Jul 2026 (was verified). The 62% figure is right (study says 61.7%), but the claim PARENTHETICAL DEFINITION IS WRONG. Semrush defines a ghost citation as an AI citing your site WITHOUT NAMING YOUR BRAND (study title: \"Why 62% of AI citations dont lead to brand mentions\"). It is a brand-attribution problem, NOT \"citations to pages that dont actually support the claim\". Right number, wrong definition = misleading. Opus said misleading on 21 Jul AND 29 Jul, and Sonnet 5 independently agreed; three votes against the old label.",
+    "priorExpectedVerdict": "verified"
   },
   {
     "id": "seo-11",
@@ -183,15 +201,17 @@
     "source": "planted-error-drafts",
     "claimText": "\"Writing is nature's way of showing you how sloppy your thinking is,\" said Richard Guindon.",
     "claimType": "quote",
-    "expectedVerdict": "inaccurate",
-    "note": "Planted misquote test case: real quote, wrong/underspecified attribution nuance depending on which secondary source is checked; use to test source corroboration and quote-matching, not the citation gate."
+    "expectedVerdict": "partly_accurate",
+    "note": "LABEL REPAIRED 29 Jul 2026 (was inaccurate). This fixtures OWN note says \"real quote, wrong/underspecified attribution nuance depending on which secondary source is checked\". A real quote with an under-specified attribution is partly_accurate, not inaccurate. Sonnet 5 traced it to cartoonist Richard \"Dick\" Guindon and his book and returned partly_accurate, which fits the note; Opus returned a flat verified, which under-hedges.",
+    "priorExpectedVerdict": "inaccurate"
   },
   {
     "id": "planted-04",
     "source": "planted-error-drafts",
     "claimText": "Bing currently holds roughly 15% of the US desktop search market.",
     "claimType": "statistic",
-    "expectedVerdict": "fabricated",
-    "note": "Planted stale/wrong market-share test case: current StatCounter figures put Bing US desktop share far below 15%; use to test the recency/as_of check in the per-claim verify+grade step."
+    "expectedVerdict": "inaccurate",
+    "note": "LABEL REPAIRED 29 Jul 2026 (was fabricated). THE OLD LABEL CONTRADICTED THIS FIXTURES OWN NOTE, which describes it as a \"stale/wrong market-share test case\" for the recency/as_of check. Nothing is invented: Bing is a real engine and StatCounter US desktop share was 11.64% in June 2026 vs the claims ~15%. A real statistic overstated is inaccurate. RESERVE \"fabricated\" FOR SOURCES THAT DO NOT EXIST. Sonnet 5 returned inaccurate with the StatCounter figure cited; Opus returned misleading.",
+    "priorExpectedVerdict": "fabricated"
   }
 ]

@@ -343,8 +343,15 @@ function technicalReason(searchErr: number): string {
 }
 
 function finalizeVerdict(claim: ClaimToVerify, input: GradeToolInput, searchesUsed: number, searchOk: number, searchErr: number): VerifiedClaim {
-  const sources: Source[] = (input.sources ?? [])
-    .filter((s) => typeof s.url === "string" && s.url.length > 0)
+  // Defensive (29 Jul 2026): `?? []` only guards null/undefined, NOT a wrong TYPE.
+  // A grader that returns `sources` as an object or string made this throw
+  // "(input.sources ?? []).filter is not a function", which failed the whole verify
+  // call and burned a paid retry (seen live on claude-sonnet-5, eval claim seo-10,
+  // searches 8 instead of 4). Semantically neutral: it only changes the path that
+  // previously crashed. No verdict logic altered.
+  const rawSources = Array.isArray(input.sources) ? input.sources : [];
+  const sources: Source[] = rawSources
+    .filter((s) => s && typeof s.url === "string" && s.url.length > 0)
     .map((s) => ({
       url: s.url as string,
       tier: typeof s.tier === "number" ? s.tier : 4,
