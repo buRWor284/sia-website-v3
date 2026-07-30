@@ -6,7 +6,7 @@ export const contentType = OG_CONTENT_TYPE;
 
 export default async function Image() {
   return ogCard({
-    eyebrow: "FACTCHECK IQ · EMOS PLATFORM",
+    eyebrow: "FACTCHECK IQ · COMING SOON",
     title: "FactcheckIQ\nGraded, sourced fact-checks",
     subtitle: "Catch the made up statistic before your reader does.",
     variant: "dark",

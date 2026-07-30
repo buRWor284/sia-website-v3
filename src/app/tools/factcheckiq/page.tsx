@@ -234,9 +234,16 @@ export default function FactcheckIQPage() {
 
             {/* ── MASTHEAD ─────────────────────────────────────────────────── */}
             <header style={{ background: INK, color: PAPER, padding: "26px 40px" }}>
-              <div style={{ marginBottom: 16 }}>
+              {/* 30 Jul 2026: FactcheckIQ was pulled out of the EMOS launch. This
+                  badge used to read "Inside the EMOS Platform", which told a reader
+                  the tool was theirs to use on signup. It isn't yet. Restore that
+                  copy only when the tool is actually sellable. */}
+              <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 <span style={{ display: "inline-block", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 10.5, letterSpacing: ".18em", textTransform: "uppercase", padding: "5px 10px" }}>
-                  Inside the EMOS Platform
+                  Coming soon
+                </span>
+                <span style={{ display: "inline-block", border: `1px solid ${P25}`, color: P72, fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".16em", textTransform: "uppercase", padding: "4px 9px" }}>
+                  EMOS Platform
                 </span>
               </div>
               <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
@@ -246,6 +253,12 @@ export default function FactcheckIQPage() {
                   </div>
                   <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: P55, margin: "8px 0 0" }}>
                     How a draft becomes a graded report, one sourced verdict per claim
+                  </p>
+                  <p style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.5, color: P72, margin: "10px 0 0", maxWidth: "52ch" }}>
+                    <strong style={{ fontWeight: 700, color: PAPER }}>Not available yet.</strong>{" "}
+                    This is a walkthrough of how FactcheckIQ works, not a tool you can run today.
+                    It is not part of the current EMOS Platform subscription — the five working
+                    tools are. We&rsquo;ll say so here the day it opens.
                   </p>
                 </div>
                 <div style={{ textAlign: "right" }}>
@@ -657,7 +670,7 @@ export default function FactcheckIQPage() {
                   FACTCHECK<span style={{ color: "#b78514" }}>IQ</span>
                 </span>
                 <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
-                  Catch the made up statistic before your reader does.
+                  Catch the made up statistic before your reader does. <strong style={{ fontStyle: "normal", fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK }}>Coming soon</strong>
                 </span>
               </div>
 

@@ -229,9 +229,16 @@ export default async function RadarPage() {
             </div>
             <div className="emr-step">
               <div className="emr-step-num">03 &middot; Verify</div>
-              <div className="emr-step-tool">FactCheckIQ</div>
+              {/* FactCheckIQ is a real step in the method but not a shipped tool
+                  (pulled out of the EMOS launch, 30 Jul 2026). The method stays;
+                  the "coming soon" tag stops this reading as something a new
+                  subscriber gets today. Drop the tag when the tool opens. */}
+              <div className="emr-step-tool">
+                FactCheckIQ{" "}
+                <span style={{ fontWeight: 600, opacity: 0.6, letterSpacing: ".1em" }}>&middot; coming soon</span>
+              </div>
               <h4>Make every claim airtight.</h4>
-              <p>Pressure-test every stat and citation before you send. A reporter stakes their name on your numbers &mdash; earned, not faked, is the whole brand.</p>
+              <p>Pressure-test every stat and citation before you send. A reporter stakes their name on your numbers &mdash; earned, not faked, is the whole brand. This step is the method; the tool that automates it is still in build.</p>
             </div>
             <div className="emr-step">
               <div className="emr-step-num">04 &middot; Pitch</div>

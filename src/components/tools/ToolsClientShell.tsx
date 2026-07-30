@@ -1,9 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { GROT, INK, INK15, INK35, INK55, INK70, PAPER, PAPER2, YEL, SERIF } from "@/lib/tokens";
 
-type Status = "live" | "platform";
+/**
+ * "soon" = announced but not yet buyable. The card renders dimmed, tagged
+ * "Coming soon", and is NOT a link — nothing on /tools should click through to
+ * a page that implies you can use the tool today (FactcheckIQ was pulled out of
+ * the launch on 30 Jul 2026). To relaunch a tool, flip its status back to
+ * "platform" or "live"; nothing else in this file needs to change.
+ */
+type Status = "live" | "platform" | "soon";
 
 export interface PipelineTool {
   step: string;
@@ -31,7 +38,14 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "other", label: "Other Tools" },
 ];
 
+const STATUS_TAG: Record<Status, { label: string; bg: string; fg: string }> = {
+  live:     { label: "Live · Free",          bg: "#3e6b45",     fg: "#fff" },
+  platform: { label: "Teaser · Inside EMOS", bg: INK,           fg: YEL    },
+  soon:     { label: "Coming soon",          bg: "transparent", fg: INK55  },
+};
+
 function StatusTag({ status }: { status: Status }) {
+  const tag = STATUS_TAG[status];
   return (
     <span
       style={{
@@ -41,11 +55,12 @@ function StatusTag({ status }: { status: Status }) {
         letterSpacing: "0.14em",
         textTransform: "uppercase",
         padding: "3px 7px",
-        background: status === "live" ? "#3e6b45" : INK,
-        color: status === "live" ? "#fff" : YEL,
+        background: tag.bg,
+        color: tag.fg,
+        border: status === "soon" ? `1px solid ${INK35}` : "none",
       }}
     >
-      {status === "live" ? "Live · Free" : "Teaser · Inside EMOS"}
+      {tag.label}
     </span>
   );
 }
@@ -112,31 +127,42 @@ export function ToolsClientShell({ pipeline, adjacent }: { pipeline: PipelineToo
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
-            {pipeline.map((tool, i) => (
-              <a
-                key={tool.name}
-                href={isHowItWorks ? tool.howItWorksHref : tool.href}
-                style={{ display: "block", background: PAPER, padding: "22px 22px 24px", textDecoration: "none", color: INK, position: "relative" }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                  <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK35, letterSpacing: "-0.02em" }}>{tool.step}</span>
-                  <StatusTag status={tool.status} />
-                  {isHowItWorks && (
-                    <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
-                      How it works →
-                    </span>
-                  )}
-                </div>
-                <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, marginBottom: 4 }}>{tool.name}</div>
-                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>{tool.role}</div>
-                <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: INK70, margin: 0 }}>{tool.blurb}</p>
-                {!isHowItWorks && i < pipeline.length - 1 && (
-                  <div style={{ position: "absolute", right: -1, top: "50%", transform: "translateY(-50%)", fontFamily: SERIF, fontSize: 14, color: INK35, background: PAPER, border: `1px solid ${INK15}`, width: 22, height: 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
-                    →
+            {pipeline.map((tool, i) => {
+              const soon = tool.status === "soon";
+              // Annotated: hoisting the style out of JSX loses contextual typing,
+              // so without CSSProperties `display` widens to string and fails tsc.
+              const cardStyle: CSSProperties = { display: "block", background: PAPER, padding: "22px 22px 24px", textDecoration: "none", color: INK, position: "relative", opacity: soon ? 0.55 : 1 };
+              const body = (
+                <>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK35, letterSpacing: "-0.02em" }}>{tool.step}</span>
+                    <StatusTag status={tool.status} />
+                    {isHowItWorks && !soon && (
+                      <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
+                        How it works →
+                      </span>
+                    )}
                   </div>
-                )}
-              </a>
-            ))}
+                  <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, marginBottom: 4 }}>{tool.name}</div>
+                  <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>{tool.role}</div>
+                  <p style={{ fontFamily: SERIF, fontSize: 14, lineHeight: 1.55, color: INK70, margin: 0 }}>{tool.blurb}</p>
+                  {!isHowItWorks && i < pipeline.length - 1 && (
+                    <div style={{ position: "absolute", right: -1, top: "50%", transform: "translateY(-50%)", fontFamily: SERIF, fontSize: 14, color: INK35, background: PAPER, border: `1px solid ${INK15}`, width: 22, height: 22, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1 }}>
+                      →
+                    </div>
+                  )}
+                </>
+              );
+
+              // A "soon" tool renders as a plain div, not an anchor: no link, no
+              // hover affordance, dimmed. It stays in the strip so the six-step
+              // pipeline story survives, but it cannot be clicked into.
+              return soon ? (
+                <div key={tool.name} style={cardStyle} aria-disabled="true">{body}</div>
+              ) : (
+                <a key={tool.name} href={isHowItWorks ? tool.howItWorksHref : tool.href} style={cardStyle}>{body}</a>
+              );
+            })}
           </div>
         </section>
       )}

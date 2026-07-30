@@ -519,23 +519,26 @@ export default function AssetIQPage() {
 
                 <div style={{ background: INK, color: PAPER, marginTop: 18, padding: "24px 26px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 20 }}>
                   <div style={{ maxWidth: 560 }}>
+                    {/* 30 Jul 2026: FactcheckIQ is not shipped. This block used to end
+                        in a yellow "Go to FactcheckIQ →" button, which read as a live
+                        handoff to a tool you could open. Kept as a signpost, de-linked
+                        and labelled. Restore the Link when the tool actually opens. */}
                     <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: YEL, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
-                      Next step in the pipeline
+                      Next in the pipeline
                       <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", color: P55 }}>PLATFORM</span>
                     </div>
                     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.2, marginBottom: 8 }}>
                       FactcheckIQ | Verification Pipeline
                     </div>
                     <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, lineHeight: 1.5, color: P72 }}>
-                      Verify every claim in the asset before it goes out to journalists.
+                      Verify every claim in the asset before it goes out to journalists. Not shipped yet.
                     </div>
                   </div>
-                  <Link
-                    href="/tools/factcheckiq"
-                    style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", background: YEL, color: INK, padding: "14px 24px", whiteSpace: "nowrap", textDecoration: "none" }}
+                  <span
+                    style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", border: `1px solid ${P55}`, color: P72, padding: "14px 24px", whiteSpace: "nowrap" }}
                   >
-                    Go to FactcheckIQ {"→"}
-                  </Link>
+                    Coming soon
+                  </span>
                 </div>
               </div>
 

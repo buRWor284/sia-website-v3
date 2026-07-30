@@ -5,12 +5,16 @@ import { ScrollButtons } from "@/components/ScrollButtons";
 import { GROT, INK, PAPER, SERIF, YEL, INK70 } from "@/lib/tokens";
 import { ToolsClientShell, type PipelineTool, type AdjacentTool } from "@/components/tools/ToolsClientShell";
 
-const OG_TITLE = "EMOS Tools · The Earned-Media Pipeline, Free";
+// Copy is deliberately "four free tools", not "six": AssetIQ is a platform
+// teaser and FactcheckIQ is not shipped yet (pulled out of the launch,
+// 30 Jul 2026). Claiming six free tools on a page where two of them can't be
+// used is exactly the credibility leak this page exists to avoid.
+const OG_TITLE = "EMOS Tools · The Earned-Media Pipeline";
 const OG_DESC =
-  "Six free tools, in the order they're meant to be used: find the story, build the asset, verify it, find the journalist, score the pitch, track the placement. Each is a free taste of the EMOS Platform.";
+  "Four free tools, in the order they're meant to be used: find the story, find the journalist, score the pitch, track the placement — plus the platform tools that complete the pipeline. Each free tool is a taste of the EMOS Platform.";
 
 export const metadata: Metadata = {
-  title: "EMOS Tools · The Earned-Media Pipeline, Free",
+  title: "EMOS Tools · The Earned-Media Pipeline",
   description: OG_DESC,
   alternates: { canonical: "/tools" },
   openGraph: { type: "website", title: OG_TITLE, description: OG_DESC, url: "https://www.syedirfanajmal.com/tools" },
@@ -46,7 +50,10 @@ const PIPELINE: PipelineTool[] = [
       "Runs every claim and stat in the asset through a 10-step verification pipeline before a journalist can poke a hole in it.",
     href: "/tools/factcheckiq",
     howItWorksHref: "/tools/factcheckiq",
-    status: "platform",
+    // Not shipped. status "soon" makes the card dimmed + non-clickable in
+    // ToolsClientShell; href/howItWorksHref are kept so relaunching is a
+    // one-word change back to "platform".
+    status: "soon",
   },
   {
     step: "04",
@@ -128,7 +135,7 @@ export default function ToolsIndexPage() {
         }}
       >
         <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", flexShrink: 0 }}>
-          6 Tools · Free
+          4 Free · 2 Platform
         </span>
 
         <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.3vw,28px)", lineHeight: 1.15, letterSpacing: "-0.02em", color: INK, margin: 0, flexShrink: 0 }}>
@@ -136,7 +143,7 @@ export default function ToolsIndexPage() {
         </h1>
 
         <p style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.5, color: INK70, margin: 0, maxWidth: 340, flex: "1 1 260px" }}>
-          Six free tools, in the order they&rsquo;re meant to be used. <Link href="/emos-academy" style={{ color: INK }}>EMOS Academy</Link> sequences all six for you, guided.
+          Four free tools plus the platform tools that complete the pipeline, in the order they&rsquo;re meant to be used. <Link href="/emos-academy" style={{ color: INK }}>EMOS Academy</Link> sequences them for you, guided.
         </p>
 
         <a

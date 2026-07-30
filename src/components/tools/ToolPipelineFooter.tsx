@@ -21,10 +21,12 @@
  * Pass `currentTool` to highlight "You are here".
  * Pass `compact` when inside a fixed-height shell (removes top margin, reduces padding).
  *
- * 18 Jul 2026: FactcheckIQ is in private testing. Its card is intentionally
- * NOT clickable (testing: true → href null, "In testing" badge, dimmed) until
- * the tool passes testing. Flip testing back off and restore
- * href: "/tools/factcheckiq" to relaunch it in the strip. The real gate is the
+ * 30 Jul 2026: FactcheckIQ was pulled OUT of the EMOS launch and is now
+ * "coming soon" — it ships later, after the five working tools. Its card is
+ * intentionally NOT clickable (comingSoon: true → href null, "Coming soon"
+ * badge, dimmed). This replaced the earlier "In testing" state (18 Jul), which
+ * implied a tool about to open; it isn't. To relaunch it in the strip, drop
+ * comingSoon and restore href: "/tools/factcheckiq". The real gate is the
  * FACTCHECKIQ_ALLOWED_ORG_IDS allowlist in src/lib/factcheck/access.ts; this
  * card is just the honest signpost.
  */
@@ -46,12 +48,11 @@ export type ToolId =
 interface PipelineCard {
   step: string;
   tool: string;
-  href: string | null;       // null = not clickable (coming soon or in testing)
+  href: string | null;       // null = not clickable (coming soon)
   toolId: ToolId | "emos";
   role: string;
+  /** Not shipped yet: card shows a "Coming soon" badge, dimmed, not clickable. */
   comingSoon?: boolean;
-  /** In private testing: card shows an "In testing" badge and is not clickable. */
-  testing?: boolean;
   /** Platform-only tool (ships inside the paid EMOS Platform, not a free lead magnet). */
   platform?: boolean;
 }
@@ -59,7 +60,7 @@ interface PipelineCard {
 const PIPELINE: PipelineCard[] = [
   { step: "01", tool: "SignalIQ",        href: "/tools/signaliq",        toolId: "signaliq",        role: "Find the story" },
   { step: "PLATFORM", tool: "AssetIQ",       href: "/tools/assetiq",       toolId: "assetiq",       role: "Build the asset",   platform: true },
-  { step: "PLATFORM", tool: "FactcheckIQ",   href: null,                   toolId: "factcheckiq",   role: "Verify the claims", platform: true, testing: true },
+  { step: "PLATFORM", tool: "FactcheckIQ",   href: null,                   toolId: "factcheckiq",   role: "Verify the claims", platform: true, comingSoon: true },
   { step: "02", tool: "JournoCollabIQ",  href: "/tools/journocollabiq",  toolId: "journocollabiq",  role: "Find the journalist" },
   { step: "03", tool: "PressIQ",         href: "/tools/pressiq",         toolId: "pressiq",         role: "Score the pitch" },
   { step: "04", tool: "CoverageIQ",      href: "/tools/coverageiq",      toolId: "coverageiq",      role: "Track the placement" },
@@ -69,8 +70,10 @@ const PIPELINE: PipelineCard[] = [
 const ORDER: (ToolId | "emos")[] = ["signaliq", "assetiq", "factcheckiq", "journocollabiq", "pressiq", "coverageiq", "emos"];
 
 function getBadge(card: PipelineCard, currentTool: ToolId | undefined): string {
+  // "Coming soon" wins even on the tool's own teaser page — a visitor reading
+  // the FactcheckIQ explainer is exactly the person who must not be told the
+  // tool is available.
   if (card.comingSoon) return "Coming soon";
-  if (card.testing && card.toolId !== currentTool) return "In testing";
   if (card.toolId === currentTool) return "You are here";
 
   if (currentTool) {
@@ -174,7 +177,7 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
         {PIPELINE.map((card, idx) => {
           const isActive = card.toolId === currentTool;
           const badge    = getBadge(card, currentTool);
-          const notClickable = card.comingSoon || (card.testing && !isActive);
+          const notClickable = !!card.comingSoon;
           const cardStyle = `tpf-card${card.platform ? " tpf-platform" : ""}${isActive ? " active" : ""}${notClickable ? " tpf-soon" : ""}`;
           const onDark = card.platform && isActive; // platform card flips to ink when active
 
@@ -208,7 +211,9 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
               <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: onDark ? "rgba(241,235,222,.72)" : isActive ? INK70 : INK35 }}>
                 {card.role}
               </div>
-              {idx < PIPELINE.length - 1 && !card.comingSoon && (
+              {/* Connector arrow is about position in the chain, not status —
+                  FactcheckIQ sits mid-pipeline, so the chain must not break at it. */}
+              {idx < PIPELINE.length - 1 && (
                 <div className="tpf-arrow">→</div>
               )}
             </>
