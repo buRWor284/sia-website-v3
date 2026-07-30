@@ -57,7 +57,7 @@ export default async function NotInvitedPage() {
   if (email && !EMOS_ADMIN_EMAILS.includes(email)) {
     let status = "none";
     try {
-      status = await getSubscriptionStatus(email);
+      status = await getSubscriptionStatus(email, userId); // D4: account first, payment email second
     } catch {
       status = "none";
     }

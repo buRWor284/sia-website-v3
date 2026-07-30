@@ -43,9 +43,11 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import {
   grantOrInvite,
+  normalizeEmail,
   recordSubscription,
+  resolveClerkUserIdByEmail,
+  revokeAccessUnlessStillPaying,
   revokeClerkInvitations,
-  setClerkAccess,
 } from "@/lib/emos-billing";
 
 // ─── Stripe webhook signature verification ────────────────────────────────────
@@ -112,17 +114,21 @@ export async function POST(req: NextRequest) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object;
-      const email   = session.customer_details?.email ?? session.customer_email;
+      const email   = normalizeEmail(session.customer_details?.email ?? session.customer_email);
       if (!email) {
         console.error("[stripe-webhook] checkout.session.completed — no email found");
         break;
       }
 
+      const customerId   = (session.customer as string | null) ?? null;
+      const checkoutUser = (session.metadata?.clerk_user_id as string | undefined) ?? null;
+
       await recordSubscription({
         email,
-        customerId:     session.customer as string,
+        customerId,
         subscriptionId: session.subscription as string,
         status:         "active",
+        clerkUserId:    checkoutUser,
       });
 
       // grantOrInvite covers every state: signed-in buyer (clerk_user_id stamped
@@ -130,11 +136,14 @@ export async function POST(req: NextRequest) {
       // customer. Critically it still attempts an invitation when the Clerk
       // lookup ERRORS — the old code returned early there, which took the money
       // and left the customer with no account and no email.
-      const grant = await grantOrInvite({
-        email,
-        clerkUserId: session.metadata?.clerk_user_id ?? null,
-      });
+      const grant = await grantOrInvite({ email, clerkUserId: checkoutUser });
 
+      // D4: the row is bound to an account ONLY from checkout metadata (done in
+      // recordSubscription above) or from a live session on the success page.
+      // It is deliberately NOT bound to an account grantOrInvite resolved from
+      // the payment email: that is a guess, and since the webhook usually wins
+      // the race against the success page, writing it would burn the one-time
+      // claim before the buyer ever got to use the sign-in-and-attach path.
       if (grant.outcome === "failed") {
         console.error("[stripe-webhook] PROVISIONING FAILED for", email, "— paid but no access; success page will retry");
       }
@@ -149,19 +158,71 @@ export async function POST(req: NextRequest) {
         .from("stripe_subscriptions")
         .update({ status: "canceled", updated_at: new Date().toISOString() })
         .eq("stripe_subscription_id", sub.id as string)
-        .select("email");
+        .select("email, clerk_user_id");
 
       if (error) {
         console.error("[stripe-webhook] cancel update failed:", error);
       } else {
         console.log("[stripe-webhook] subscription canceled:", sub.id);
         // H3: revoke platform access in Clerk, not just the DB flag.
-        const email = rows?.[0]?.email as string | undefined;
-        if (email) {
-          await setClerkAccess(email, false);
-          await revokeClerkInvitations(email); // also kill any still-pending invite (cancelled sub must not leave a live invite)
+        //
+        // D4 (2026-07-30): this used to revoke by the row's EMAIL only, which
+        // was the exact mirror of the grant bug and strictly worse. Once
+        // checkout began stamping clerk_user_id, a signed-in buyer whose
+        // payment email differed got access on account A and, on cancellation,
+        // a revoke aimed at whatever account matched the payment email — so
+        // account A kept full access for free, silently and indefinitely.
+        //
+        // Now: revoke every account this subscription could have provisioned —
+        // the linked one AND the one behind the payment email — because either
+        // may hold access granted off this single payment. Two guards keep that
+        // from hurting anyone:
+        //
+        //   - revokeAccessUnlessStillPaying skips any account that holds
+        //     ANOTHER active subscription. One person can easily own two rows
+        //     (bought once signed out, once signed in); a blind revoke on
+        //     either cancellation would lock out someone who is still paying.
+        //   - the row is only ever linked from real evidence (checkout
+        //     metadata or a live post-checkout session), never from an
+        //     email guess, so `linkedId` is not itself a guess.
+        //
+        // The residual risk is the reverse of a money leak and much cheaper: if
+        // a buyer paid with an address belonging to a colleague who has EMOS on
+        // a comped (no-Stripe-row) account, that colleague loses access and has
+        // to ask for it back. Preferred over an ex-customer keeping the product
+        // for free indefinitely.
+        const row      = rows?.[0] as { email?: string; clerk_user_id?: string | null } | undefined;
+        const email    = row?.email ? normalizeEmail(row.email) : "";
+        const linkedId = row?.clerk_user_id ?? null;
+
+        if (!row) {
+          console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
+        } else {
+          const targets = new Set<string>();
+          if (linkedId) targets.add(linkedId);
+          if (email) {
+            const byEmail = await resolveClerkUserIdByEmail(email);
+            if (byEmail.id) targets.add(byEmail.id);
+            // A Clerk blip here looks exactly like "no such account" if you
+            // only read .id — and the two need very different follow-up. This
+            // one means a cancelled customer may still hold access.
+            else if (byEmail.errored) {
+              console.error("[stripe-webhook] REVOCATION INCOMPLETE: Clerk lookup errored for", email, "— access may still be live for sub", sub.id);
+            }
+          }
+
+          for (const id of targets) {
+            const result = await revokeAccessUnlessStillPaying(id);
+            console.log("[stripe-webhook] revoke", id, "→", result);
+          }
+          if (targets.size === 0) {
+            console.warn("[stripe-webhook] cancellation resolved no Clerk account for", email || "(no email)");
+          }
+
+          // A cancelled sub must not leave a live invitation behind: accepting
+          // it later would carry emos_access straight back in.
+          if (email) await revokeClerkInvitations(email);
         }
-        else console.warn("[stripe-webhook] canceled sub had no matching DB row — no Clerk revocation");
       }
       break;
     }

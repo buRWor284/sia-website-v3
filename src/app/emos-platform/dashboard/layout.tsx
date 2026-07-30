@@ -27,7 +27,9 @@ export default async function EmosDashboardLayout({
       "";
 
     if (email && !EMOS_ADMIN_EMAILS.includes(email)) {
-      const status = await getSubscriptionStatus(email);
+      // D4: pass the Clerk user id so a subscription bought under a different
+      // payment address still resolves to this account.
+      const status = await getSubscriptionStatus(email, userId);
       if (status !== "active" && status !== "none") {
         redirect("/emos-platform/subscribe");
       }

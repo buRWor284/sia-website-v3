@@ -18,8 +18,13 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { rateLimitDb } from "@/lib/rate-limit-db";
+import { normalizeEmail } from "@/lib/emos-billing";
+import { EMOS_ADMIN_EMAILS } from "@/lib/emos-admins";
 
-export const EMOS_ADMIN_EMAILS = ["syedirfanajmal@gmail.com", "sia@syedirfanajmal.com"];
+// Moved to src/lib/emos-admins.ts (D4, 2026-07-30) so emos-billing can read it
+// without importing this file, which imports emos-billing. Re-exported here so
+// every existing caller keeps working unchanged.
+export { EMOS_ADMIN_EMAILS };
 
 const HOUR_MS = 60 * 60 * 1000;
 
@@ -32,25 +37,66 @@ function deny(status: number, error: string): EmosGuardResult {
 }
 
 /**
- * Subscription status for an email. Returns:
+ * Subscription status for a person. Returns:
  *  - "active"  → paying (or recovered) subscriber
- *  - "none"    → no subscription row (admin-invited beta user)
+ *  - "none"    → no subscription row (admin-invited beta user) — ALLOWED
  *  - anything else ("canceled", "past_due", …) → blocked
+ *
+ * ★ "none" means ALLOWED and must stay that way. Admin-invited beta accounts
+ *   and the admin logins have no Stripe row at all; treating a missing row as
+ *   "hasn't paid" would lock every one of them out the moment it deployed.
+ *
+ * D4 (2026-07-30): resolves by `clerk_user_id` FIRST, then by the normalised
+ * email. The email alone was never a reliable key — the row stores the address
+ * Stripe reported, which for a Link / Google Pay / work-card payment is not the
+ * address the person signs in with. It also compared raw case against Clerk's
+ * lowercased address, so a mixed-case payment email silently missed.
+ *
+ * Where the two sources disagree, "active" wins. Being generous here is the
+ * same fail-open posture as the error branches below: the authoritative gate is
+ * the emos_access flag in Clerk, which the webhook revokes on cancellation.
  */
-export async function getSubscriptionStatus(email: string): Promise<string> {
+export async function getSubscriptionStatus(
+  email: string,
+  clerkUserId?: string | null,
+): Promise<string> {
   const db = createSupabaseServiceClient();
+  const normalized = normalizeEmail(email);
+  let linked: string | null = null;
+
+  if (clerkUserId) {
+    // Not unique: one account can accumulate rows across re-subscribes.
+    const { data, error } = await db
+      .from("stripe_subscriptions")
+      .select("status, updated_at")
+      .eq("clerk_user_id", clerkUserId)
+      .order("updated_at", { ascending: false });
+    if (error) {
+      console.warn("[emos-guard] subscription lookup by user failed:", error.message);
+      return "none";
+    }
+    const rows = (data ?? []) as Array<{ status: string }>;
+    if (rows.some((r) => r.status === "active")) return "active";
+    linked = rows[0]?.status ?? null;
+  }
+
+  if (!normalized) return linked ?? "none";
+
   const { data, error } = await db
     .from("stripe_subscriptions")
     .select("status")
-    .eq("email", email)
+    .eq("email", normalized)
     .maybeSingle();
   if (error) {
     // Fail open on DB outage — the emos_access flag is the primary gate and
     // is revoked on cancellation by the Stripe webhook.
     console.warn("[emos-guard] subscription lookup failed:", error.message);
-    return "none";
+    return linked ?? "none";
   }
-  return data?.status ?? "none";
+
+  const byEmail = (data?.status as string | undefined) ?? null;
+  if (byEmail === "active") return "active";
+  return linked ?? byEmail ?? "none";
 }
 
 export async function requireEmosAccess(opts?: {
@@ -91,7 +137,7 @@ export async function requireEmosAccess(opts?: {
 
   // ── Subscription ───────────────────────────────────────────────────────────
   if (email && !EMOS_ADMIN_EMAILS.includes(email)) {
-    const status = await getSubscriptionStatus(email);
+    const status = await getSubscriptionStatus(email, userId);
     if (status !== "active" && status !== "none") {
       return deny(402, "Your EMOS subscription is not active. Renew it to keep using the platform.");
     }

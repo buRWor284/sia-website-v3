@@ -21,6 +21,7 @@
 
 import Link from "next/link";
 import type { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
 import { reconcileCheckoutSession, type GrantOutcome } from "@/lib/emos-billing";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 
@@ -71,6 +72,27 @@ const primaryLinkStyle: React.CSSProperties = {
   fontWeight: 900,
   padding: "13px 28px",
 };
+
+/**
+ * D4: the escape hatch for a buyer who ALREADY has an EMOS account but paid
+ * while signed out, with an address that account does not carry (Link, Google
+ * Pay, a work card). Nothing in the payment tells us who they are, so the
+ * invite goes to the payment address and the account they actually use stays
+ * locked out — the original D4 lockout, and the one case the checkout-metadata
+ * stamp cannot reach because there was no session to stamp.
+ *
+ * Signing in from here and coming straight back lets reconcileCheckoutSession
+ * see a live session and claim the subscription for that account.
+ *
+ * Three things stop that being a way in for anyone else: the claim only ever
+ * fills a NULL, so it cannot move a subscription that already has an owner; it
+ * EXPIRES an hour after checkout, so a session id resurfacing from history or a
+ * screenshot is worthless; and owner/admin accounts are refused outright.
+ */
+function linkExistingAccountHref(sessionId: string) {
+  const back = `/emos-platform/subscribe/success?session_id=${encodeURIComponent(sessionId)}`;
+  return `/emos-platform/signin?redirect_url=${encodeURIComponent(back)}`;
+}
 
 /** Copy for each reconciliation outcome. */
 function nextStep(outcome: GrantOutcome | "unknown", sessionId: string) {
@@ -140,15 +162,45 @@ export default async function SubscribeSuccessPage({
         ).ok
       : false;
 
+  // D4 (2026-07-30): who is standing here matters as much as what they paid.
+  // This route is middleware-exempt, so auth() simply returns null for the
+  // usual signed-out buyer — but when a session IS present it is the best
+  // evidence we will ever get about which account the access belongs on,
+  // better than the payment email that Link / Google Pay / a work card
+  // reports. reconcileCheckoutSession only lets it claim an UNCLAIMED
+  // subscription, so a session id recovered later from history or a shared
+  // screenshot cannot move access to somebody else's account.
+  let sessionClerkUserId: string | null = null;
+  try {
+    sessionClerkUserId = (await auth()).userId;
+  } catch (e) {
+    // Never let an auth hiccup break the post-payment page.
+    console.warn("[subscribe/success] Clerk session lookup failed:", e);
+  }
+
   // Idempotent: records the subscription and grants access or (re)sends the
   // invitation. Safe on every load; the email only goes out again on ?resend=1.
   const result = sessionId
-    ? await reconcileCheckoutSession(sessionId, { resend })
+    ? await reconcileCheckoutSession(sessionId, { resend, sessionClerkUserId })
     : null;
 
   const outcome: GrantOutcome | "unknown" =
     result?.verified ? result.outcome : "unknown";
   const step = nextStep(outcome, sessionId);
+
+  // Offer the "attach to my existing account" path to every signed-out buyer,
+  // including on a "granted" outcome. Granted only means SOME account matched
+  // the payment email — with a work card or a shared address that can be a
+  // colleague's account rather than theirs, and the webhook usually resolves it
+  // before this page ever loads. A signed-in visitor is excluded because their
+  // session was already considered above.
+  //
+  // Past the claim window the link would send them through sign-in and back to
+  // a page that silently does nothing, so it is replaced with a way to reach a
+  // human. `claimExpired` only ever comes back true for a signed-IN visitor, so
+  // this state is reached on the return leg, after they have signed in.
+  const claimExpired = result?.claimExpired === true;
+  const showLinkExisting = Boolean(sessionId) && !sessionClerkUserId && !claimExpired;
 
   return (
     <div
@@ -198,6 +250,27 @@ export default async function SubscribeSuccessPage({
             </p>
             {step.cta && <div style={{ marginTop: 16 }}>{step.cta}</div>}
           </div>
+
+          {/* D4 escape hatch — for a signed-out buyer whose payment address may
+              not be the one they sign in with. See linkExistingAccountHref. */}
+          {claimExpired && (
+            <p style={{ fontFamily: SERIF, fontSize: 13, color: "rgba(241,235,222,.7)", margin: "-14px 0 26px", lineHeight: 1.6 }}>
+              This payment is too old to attach to an account automatically. Email{" "}
+              <a href="mailto:sia@syedirfanajmal.com" style={{ color: YEL, textDecoration: "none", fontWeight: 700 }}>
+                sia@syedirfanajmal.com
+              </a>{" "}
+              and we&rsquo;ll link it by hand.
+            </p>
+          )}
+          {showLinkExisting && (
+            <p style={{ fontFamily: SERIF, fontSize: 13, color: "rgba(241,235,222,.7)", margin: "-14px 0 26px", lineHeight: 1.6 }}>
+              Paid with a different address than you sign in with?{" "}
+              <Link href={linkExistingAccountHref(sessionId)} prefetch={false} style={{ color: YEL, textDecoration: "underline", fontWeight: 700 }}>
+                Sign in to your existing account
+              </Link>{" "}
+              and we&rsquo;ll attach this subscription to it.
+            </p>
+          )}
 
           <div style={{ borderTop: "1px solid rgba(241,235,222,.18)", paddingTop: 24 }}>
             <p style={{ fontFamily: GROT, fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(241,235,222,.72)", margin: "0 0 18px", lineHeight: 1.7 }}>

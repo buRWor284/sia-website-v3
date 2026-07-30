@@ -22,9 +22,27 @@
  * so the invitation email is the ONLY way a paying customer can ever create an
  * account. Every one of the failures above is therefore a hard lockout, not an
  * inconvenience. Everything here is idempotent and safe to run repeatedly.
+ *
+ * ── D4 finished 2026-07-30 ──────────────────────────────────────────────────
+ * Until now access was resolved against the PAYMENT email. That address is not
+ * an identity: Stripe Link, Google Pay and work cards all routinely report one
+ * the buyer never signs in with. Three things changed here.
+ *
+ *   - `clerk_user_id` on stripe_subscriptions is now the authoritative link
+ *     between a payment and an account, written from checkout metadata or
+ *     claimed once from the buyer's live session on the success page.
+ *   - Emails are normalised on every read and write (normalizeEmail), and the
+ *     row is keyed on the Stripe CUSTOMER id in preference to the email.
+ *   - grantOrInvite reports which account it landed on, so callers can bind it.
+ *
+ * ★ What did NOT change, deliberately: a missing subscription row still means
+ *   ALLOWED (see emos-guard). Every admin-invited beta account and Irfan's own
+ *   admin login depends on that. D4 was an identity bug, not a policy bug —
+ *   flipping "no row" to "hasn't paid" would lock all of them out on deploy.
  */
 
 import { createSupabaseServiceClient } from "@/lib/supabase";
+import { isEmosAdminEmail } from "@/lib/emos-admins";
 
 const CLERK_API  = "https://api.clerk.com/v1";
 const STRIPE_API = "https://api.stripe.com/v1";
@@ -32,43 +50,100 @@ const RESEND_API = "https://api.resend.com/emails";
 const FROM_EMAIL = "EMOS Platform <sia@syedirfanajmal.com>";
 const BASE_URL   = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.syedirfanajmal.com";
 
+/**
+ * The single spelling of an email address used for every comparison and every
+ * write (D4, 2026-07-30).
+ *
+ * Stripe reports the address exactly as the buyer typed it; Clerk lowercases.
+ * The read side in emos-guard compares with .eq(), which is case SENSITIVE, so
+ * "Irfan@Dmr.agency" written by the webhook never matched "irfan@dmr.agency"
+ * read back from Clerk. That degraded to "no row" — harmless while "no row"
+ * means allowed, but it also meant a re-subscribe under different casing tried
+ * to INSERT a second row and died on the UNIQUE(stripe_customer_id) constraint,
+ * silently leaving a stale `canceled` row in place. Normalise once, here.
+ */
+export function normalizeEmail(email: string | null | undefined): string {
+  return (email ?? "").trim().toLowerCase();
+}
+
 // ─── Clerk: users ─────────────────────────────────────────────────────────────
 
 /**
- * Set emos_access on the Clerk user with this email.
- * Returns "updated" | "not_found" | "error".
- * Used on checkout for RE-subscribers (whose Clerk account already exists, so a
- * fresh invitation would fail) and on cancellation to revoke.
+ * Find the Clerk user id for an email.
+ *
+ * `errored` distinguishes "Clerk says no such user" from "we could not ask".
+ * The difference matters: on a genuine miss the caller should go on to create an
+ * invitation, but on an API blip it must NOT conclude the account is absent —
+ * that is precisely how a paying customer used to end up with neither a grant
+ * nor an invite.
  */
-export async function setClerkAccess(
+export async function resolveClerkUserIdByEmail(
   email: string,
-  access: boolean,
-): Promise<"updated" | "not_found" | "error"> {
+): Promise<{ id: string | null; errored: boolean }> {
   const secretKey = process.env.CLERK_SECRET_KEY;
   if (!secretKey) {
-    console.error("[emos-billing] CLERK_SECRET_KEY not set — cannot update emos_access");
-    return "error";
+    console.error("[emos-billing] CLERK_SECRET_KEY not set — cannot look up user");
+    return { id: null, errored: true };
   }
 
   try {
     const lookup = await fetch(
-      `${CLERK_API}/users?email_address=${encodeURIComponent(email)}&limit=1`,
+      `${CLERK_API}/users?email_address=${encodeURIComponent(normalizeEmail(email))}&limit=1`,
       { headers: { Authorization: `Bearer ${secretKey}` } },
     );
     if (!lookup.ok) {
       console.error("[emos-billing] Clerk user lookup failed:", lookup.status, await lookup.text());
-      return "error";
+      return { id: null, errored: true };
     }
     const users = (await lookup.json()) as Array<{ id: string }>;
-    const clerkUserId = users?.[0]?.id;
-    if (!clerkUserId) return "not_found";
-
-    return (await setClerkAccessById(clerkUserId, access)) ? "updated" : "error";
+    return { id: users?.[0]?.id ?? null, errored: false };
   } catch (err) {
-    console.error("[emos-billing] setClerkAccess error:", err);
-    return "error";
+    console.error("[emos-billing] resolveClerkUserIdByEmail error:", err);
+    return { id: null, errored: true };
   }
 }
+
+/**
+ * Every email address on a Clerk account, lowercased.
+ *
+ * Needed because one account can hold several addresses, and the subscription
+ * table is keyed on whichever one Stripe happened to report. Used to answer
+ * "is THIS PERSON still paying?" across all their rows, however those rows
+ * happen to be keyed.
+ */
+export async function resolveClerkEmailsById(
+  clerkUserId: string,
+): Promise<{ emails: string[]; errored: boolean }> {
+  const secretKey = process.env.CLERK_SECRET_KEY;
+  if (!secretKey) return { emails: [], errored: true };
+
+  try {
+    const res = await fetch(`${CLERK_API}/users/${clerkUserId}`, {
+      headers: { Authorization: `Bearer ${secretKey}` },
+    });
+    if (!res.ok) {
+      console.error("[emos-billing] Clerk user fetch failed:", res.status, await res.text());
+      return { emails: [], errored: true };
+    }
+    const user = (await res.json()) as {
+      email_addresses?: Array<{ email_address?: string }>;
+    };
+    const emails = (user.email_addresses ?? [])
+      .map((e) => normalizeEmail(e.email_address))
+      .filter(Boolean);
+    return { emails, errored: false };
+  } catch (err) {
+    console.error("[emos-billing] resolveClerkEmailsById error:", err);
+    return { emails: [], errored: true };
+  }
+}
+
+// setClerkAccess(email, access) used to live here. Removed 2026-07-30: every
+// caller now resolves the account id explicitly (resolveClerkUserIdByEmail +
+// setClerkAccessById) because D4 needs to KNOW which account it touched — to
+// record it, and on revocation to check whether that account is still paying
+// before switching anything off. A helper that hid the id behind an email was
+// exactly the abstraction that let the payment address stand in for identity.
 
 /**
  * Set emos_access directly on a known Clerk user id. Preferred over the
@@ -337,30 +412,171 @@ export async function sendWelcomeEmail(email: string, inviteUrl: string): Promis
 // ─── Subscription record ──────────────────────────────────────────────────────
 
 /**
- * Upsert the stripe_subscriptions row. Email casing is written exactly as
- * Stripe supplies it — the table's conflict target is `email`, and rewriting
- * the case here would create a SECOND row alongside any existing mixed-case
- * one rather than updating it. (The read side in emos-guard is fail-open on a
- * miss, so a case mismatch degrades to "none" = allowed, never a lockout.)
+ * Write the stripe_subscriptions row for this customer.
+ *
+ * Rewritten for D4 (2026-07-30). The old version was a single
+ * `upsert(..., { onConflict: "email" })` with the email in whatever case Stripe
+ * supplied, which broke in two ways:
+ *
+ *   1. `stripe_customer_id` is ALSO UNIQUE. A returning customer who
+ *      re-subscribed under a different address (Link, a work card, or just a
+ *      different capitalisation) did not match on email, so the upsert tried to
+ *      INSERT — and died on the customer-id constraint. The error was logged and
+ *      swallowed, leaving the previous `canceled` row untouched. That is a
+ *      lockout that fails CLOSED: they had just paid, and the guard read
+ *      "canceled" and blocked them.
+ *   2. The row was the only link between a payment and an account, and it was
+ *      keyed on an address that may be nobody's login.
+ *
+ * So: prefer the Stripe customer id as the conflict target (it is the stable
+ * identity of the payer across email changes) and fall back to email only when
+ * there is no customer id or no row for it yet. `clerk_user_id` is written
+ * whenever we know it and never cleared — see linkSubscriptionToClerkUser.
  */
 export async function recordSubscription(args: {
   email: string;
   customerId?: string | null;
   subscriptionId?: string | null;
   status: string;
+  clerkUserId?: string | null;
 }): Promise<void> {
   const db = createSupabaseServiceClient();
-  const { error } = await db.from("stripe_subscriptions").upsert(
-    {
-      email:                  args.email,
-      stripe_customer_id:     args.customerId ?? null,
-      stripe_subscription_id: args.subscriptionId ?? null,
-      status:                 args.status,
-      updated_at:             new Date().toISOString(),
-    },
-    { onConflict: "email" },
-  );
+
+  // Null customer/subscription ids are omitted rather than written: blanking an
+  // id we already hold would break the next lookup that depends on it.
+  const row: Record<string, string> = {
+    email:      normalizeEmail(args.email),
+    status:     args.status,
+    updated_at: new Date().toISOString(),
+  };
+  if (args.customerId)     row.stripe_customer_id     = args.customerId;
+  if (args.subscriptionId) row.stripe_subscription_id = args.subscriptionId;
+  if (args.clerkUserId)    row.clerk_user_id          = args.clerkUserId;
+
+  if (args.customerId) {
+    const { data, error } = await db
+      .from("stripe_subscriptions")
+      .update(row)
+      .eq("stripe_customer_id", args.customerId)
+      .select("id");
+    // Do NOT return on error: falling through to the upsert is the whole point
+    // of having two paths. An early return here would re-create the very bug
+    // this function was rewritten to kill — a paid customer whose `active`
+    // write is dropped while a stale `canceled` row keeps them blocked.
+    if (error) console.error("[emos-billing] update by customer failed, trying upsert:", error);
+    else if (data && data.length > 0) return;
+  }
+
+  const { error } = await db
+    .from("stripe_subscriptions")
+    .upsert(row, { onConflict: "email" });
   if (error) console.error("[emos-billing] Supabase upsert failed:", error);
+}
+
+/**
+ * Does this account still have a paid subscription other than the one being
+ * cancelled?
+ *
+ * Guards every revocation. One account can hold more than one row — someone who
+ * bought once signed out and again signed in has two Stripe customers and two
+ * rows — and cancelling either one used to strip emos_access outright, locking
+ * out a customer who was still paying on the other.
+ */
+export async function hasActiveSubscription(clerkUserId: string): Promise<boolean> {
+  const db = createSupabaseServiceClient();
+
+  // 1. Rows explicitly bound to this account.
+  const byId = await db
+    .from("stripe_subscriptions")
+    .select("id")
+    .eq("clerk_user_id", clerkUserId)
+    .eq("status", "active")
+    .limit(1);
+  if (byId.error) {
+    // Fail SAFE for the customer: if we cannot tell, do not revoke. A missed
+    // revocation costs a subscription; a wrong one locks out someone who is
+    // paying, which is the failure a launch cannot afford.
+    console.error("[emos-billing] active-subscription check failed:", byId.error);
+    return true;
+  }
+  if ((byId.data?.length ?? 0) > 0) return true;
+
+  // 2. Rows keyed on any address this account owns. This second pass is what
+  //    actually protects people: most rows carry NO clerk_user_id (a signed-out
+  //    buyer invited by email is never bound to an account), so an id-only
+  //    check would report "not paying" for almost every real subscriber and
+  //    revoke them the moment somebody else's payment address happened to
+  //    resolve to their account.
+  const { emails, errored } = await resolveClerkEmailsById(clerkUserId);
+  if (errored) return true; // same fail-safe direction
+  if (emails.length === 0) return false;
+
+  const byEmail = await db
+    .from("stripe_subscriptions")
+    .select("id")
+    .in("email", emails)
+    .eq("status", "active")
+    .limit(1);
+  if (byEmail.error) {
+    console.error("[emos-billing] active-subscription check by email failed:", byEmail.error);
+    return true;
+  }
+  return (byEmail.data?.length ?? 0) > 0;
+}
+
+/**
+ * Turn off emos_access for one account unless it still holds another live
+ * subscription. Returns what happened, for the log.
+ */
+export async function revokeAccessUnlessStillPaying(
+  clerkUserId: string,
+): Promise<"revoked" | "kept" | "error"> {
+  if (await hasActiveSubscription(clerkUserId)) return "kept";
+  return (await setClerkAccessById(clerkUserId, false)) ? "revoked" : "error";
+}
+
+/**
+ * Attach a Clerk account to a subscription row, but only if it is unclaimed.
+ *
+ * This is the sticky half of the D4 fix. The first load of the success page
+ * after checkout is the buyer's own browser, so a Clerk session there is strong
+ * evidence of which account the access belongs on. A checkout session id is NOT
+ * a secret, though — it sits in the URL, in browser history, in any screenshot —
+ * so the claim has to be one-time. Once a row carries a clerk_user_id, a later
+ * visitor holding the same link cannot move it.
+ *
+ * Returns the account the row is bound to after the call.
+ */
+export async function linkSubscriptionToClerkUser(args: {
+  email: string;
+  customerId?: string | null;
+  clerkUserId: string;
+}): Promise<string | null> {
+  const db = createSupabaseServiceClient();
+
+  let query = db
+    .from("stripe_subscriptions")
+    .update({ clerk_user_id: args.clerkUserId, updated_at: new Date().toISOString() })
+    .is("clerk_user_id", null);
+
+  query = args.customerId
+    ? query.eq("stripe_customer_id", args.customerId)
+    : query.eq("email", normalizeEmail(args.email));
+
+  const { data, error } = await query.select("clerk_user_id");
+  if (error) {
+    console.error("[emos-billing] clerk_user_id link failed:", error);
+    return null;
+  }
+  if (data && data.length > 0) return args.clerkUserId;
+
+  // Nothing updated: either there is no row yet, or it is already claimed.
+  // Read back so the caller can tell the difference.
+  const existing = args.customerId
+    ? await db.from("stripe_subscriptions").select("clerk_user_id").eq("stripe_customer_id", args.customerId).maybeSingle()
+    : await db.from("stripe_subscriptions").select("clerk_user_id").eq("email", normalizeEmail(args.email)).maybeSingle();
+
+  return (existing.data?.clerk_user_id as string | null) ?? null;
 }
 
 // ─── The grant ────────────────────────────────────────────────────────────────
@@ -382,13 +598,20 @@ export interface GrantResult {
   email: string;
   /** Present whenever an invitation exists, so a caller can surface it. */
   inviteUrl?: string;
+  /**
+   * The Clerk account the grant actually landed on, when one was resolved.
+   * Callers persist this so enforcement and REVOCATION can follow the account
+   * rather than the payment email (D4).
+   */
+  clerkUserId?: string | null;
 }
 
 /**
  * Give this customer a way in, whatever state they are in. Idempotent.
  *
  * Order:
- *   1. known Clerk user id (buyer was signed in at checkout) → grant directly
+ *   1. known Clerk user id (buyer was signed in at checkout, or claimed the
+ *      purchase from a live session on the success page) → grant directly
  *   2. Clerk user with this email → grant
  *   3. pending invitation for this email → reuse it (re-send only if asked)
  *   4. otherwise → create an invitation and send the welcome email
@@ -403,20 +626,25 @@ export async function grantOrInvite(args: {
   /** Re-send the welcome email even if an invitation is already pending. */
   resend?: boolean;
 }): Promise<GrantResult> {
-  const { email, clerkUserId, resend } = args;
+  const email = normalizeEmail(args.email);
+  const { clerkUserId, resend } = args;
 
   // 1. Direct grant against a known account.
   if (clerkUserId) {
     if (await setClerkAccessById(clerkUserId, true)) {
-      return { outcome: "granted", email };
+      return { outcome: "granted", email, clerkUserId };
     }
     console.error("[emos-billing] direct grant failed for", clerkUserId, "— falling back to email path");
   }
 
   // 2. Existing account with this email (re-subscriber, or an admin-invited
-  //    beta user who has now paid).
-  const byEmail = await setClerkAccess(email, true);
-  if (byEmail === "updated") return { outcome: "granted", email };
+  //    beta user who has now paid). Resolve the id first rather than calling
+  //    setClerkAccess blind, so a successful grant can be reported back with
+  //    the account it landed on.
+  const byEmail = await resolveClerkUserIdByEmail(email);
+  if (byEmail.id && (await setClerkAccessById(byEmail.id, true))) {
+    return { outcome: "granted", email, clerkUserId: byEmail.id };
+  }
 
   // 3. Invitation already outstanding — reuse rather than fail.
   const pending = await findPendingInvitation(email);
@@ -453,9 +681,10 @@ export async function grantOrInvite(args: {
       return { outcome: "invite_pending", email, inviteUrl: raced.url };
     }
 
-    if ((await setClerkAccess(email, true)) === "updated") {
+    const retry = await resolveClerkUserIdByEmail(email);
+    if (retry.id && (await setClerkAccessById(retry.id, true))) {
       console.log("[emos-billing] invite refused but account exists — granted directly:", email);
-      return { outcome: "granted", email };
+      return { outcome: "granted", email, clerkUserId: retry.id };
     }
 
     console.error("[emos-billing] could not grant OR invite", email, "— subscription recorded, access NOT provisioned");
@@ -470,6 +699,14 @@ export async function grantOrInvite(args: {
 export interface ReconcileResult extends GrantResult {
   /** false when the session id was unusable / unpaid — caller shows generic copy. */
   verified: boolean;
+  /**
+   * True when a live session tried to claim this subscription but the claim
+   * window had closed. The success page uses it to stop offering the
+   * sign-in-and-attach link, which would otherwise send the one customer this
+   * feature exists for through sign-in and back to a page that quietly does
+   * nothing.
+   */
+  claimExpired?: boolean;
 }
 
 /**
@@ -481,10 +718,42 @@ export interface ReconcileResult extends GrantResult {
  * Trust model matches the webhook's: we act only on a session Stripe itself
  * reports as paid. A session id is a 66-character unguessable token, so this is
  * no weaker than the signed webhook it backs up.
+ *
+ * ── D4, 2026-07-30 ──────────────────────────────────────────────────────────
+ * `sessionClerkUserId` is the buyer's LIVE Clerk session on the success page,
+ * and it is what closes the original D4 hole. A signed-out buyer paying with
+ * Stripe Link, Google Pay, or a work card gives us a payment email that may be
+ * nobody's login; granting against it hands access to the wrong account (or
+ * invites an address they never read) while the account they actually sign in
+ * with stays locked out. But the success page loads in THEIR browser seconds
+ * later, so a session cookie there is a far better answer to "whose access is
+ * this?" than the payment email is.
+ *
+ * Three rules keep that from becoming a way in for other people:
+ *   - metadata[clerk_user_id] from checkout still wins when present; it is
+ *     bound to the purchase itself.
+ *   - the claim is sticky: linkSubscriptionToClerkUser only ever fills a NULL,
+ *     so a second visitor cannot move a subscription that has an owner.
+ *   - ★ and it EXPIRES. Stickiness alone was not enough, because on the most
+ *     common path — signed-out buyer, no Clerk account yet, invited by email —
+ *     nothing ever fills that NULL, so the row would stay claimable forever.
+ *     Anyone who later opened the URL while signed in (a support person
+ *     included) would take the subscription and, on the eventual cancellation,
+ *     have their OWN access revoked. So a session-based claim is only accepted
+ *     inside CLAIM_WINDOW_MS of the checkout, which is when the actual buyer is
+ *     standing here. Checkout metadata is not time-limited: it is evidence from
+ *     the purchase itself, not from whoever is holding the link.
  */
+
+/**
+ * How long after checkout a live session may claim the subscription. Long
+ * enough to sign in and come back (the escape hatch on the success page),
+ * short enough that a session id resurfacing from history is worthless.
+ */
+const CLAIM_WINDOW_MS = 60 * 60_000;
 export async function reconcileCheckoutSession(
   sessionId: string,
-  opts?: { resend?: boolean },
+  opts?: { resend?: boolean; sessionClerkUserId?: string | null },
 ): Promise<ReconcileResult> {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const notVerified: ReconcileResult = { verified: false, outcome: "failed", email: "" };
@@ -505,23 +774,82 @@ export async function reconcileCheckoutSession(
       return notVerified;
     }
 
-    const email = (session.customer_details?.email ?? session.customer_email ?? "").trim();
+    const email = normalizeEmail(session.customer_details?.email ?? session.customer_email);
     if (!email) return notVerified;
 
+    const customerId     = typeof session.customer === "string" ? session.customer : null;
+    const subscriptionId = typeof session.subscription === "string" ? session.subscription : null;
+    const checkoutUserId = (session.metadata?.clerk_user_id as string | undefined) ?? null;
+
+    // Record first, unconditionally: the money has moved, and the row must
+    // exist even if every Clerk call below fails.
     await recordSubscription({
       email,
-      customerId:     typeof session.customer === "string" ? session.customer : null,
-      subscriptionId: typeof session.subscription === "string" ? session.subscription : null,
-      status:         "active",
+      customerId,
+      subscriptionId,
+      status:      "active",
+      clerkUserId: checkoutUserId,
     });
+
+    // Who is this purchase for? Checkout metadata beats a live session; a live
+    // session beats the payment email.
+    let targetUserId = checkoutUserId;
+    let claimExpired = false;
+
+    if (!targetUserId && opts?.sessionClerkUserId) {
+      const createdMs = typeof session.created === "number" ? session.created * 1000 : 0;
+      const ageMs     = createdMs > 0 ? Date.now() - createdMs : Number.MAX_SAFE_INTEGER;
+      const fresh     = ageMs >= 0 && ageMs < CLAIM_WINDOW_MS;
+
+      // ★ Never let an owner/admin account claim a customer's subscription.
+      // Support opening a buyer's success URL while signed in is a completely
+      // ordinary thing to do, it lands well inside the claim window, and the
+      // consequence is severe and delayed: the row binds to the admin account,
+      // and the eventual cancellation revokes emos_access from the admin — who
+      // is then locked out of /emos-platform by middleware, which has no admin
+      // bypass. No legitimate flow needs this, so refuse it outright.
+      // On a Clerk error we cannot tell whether this is an admin, so refuse.
+      // The cost of refusing is nil — the buyer falls back to the email path
+      // and can retry by reloading — while wrongly allowing it is the lockout
+      // described above.
+      const claimant = await resolveClerkEmailsById(opts.sessionClerkUserId);
+      const isAdmin  = claimant.errored || claimant.emails.some((e) => isEmosAdminEmail(e));
+
+      if (isAdmin) {
+        console.warn("[emos-billing] claim refused — admin account, or claimant identity could not be verified");
+      } else if (!fresh) {
+        claimExpired = true;
+        console.warn("[emos-billing] session too old to claim — ignoring the live session for", sessionId);
+      } else {
+        const owner = await linkSubscriptionToClerkUser({
+          email,
+          customerId,
+          clerkUserId: opts.sessionClerkUserId,
+        });
+        if (owner && owner !== opts.sessionClerkUserId) {
+          // Someone else already owns this subscription. Grant to THEM — the
+          // rightful owner may be here repairing their own access — and never
+          // to the account presenting the link.
+          console.warn("[emos-billing] subscription already claimed by another account; granting the owner, not the presenter");
+        }
+        targetUserId = owner;
+      }
+    }
 
     const grant = await grantOrInvite({
       email,
-      clerkUserId: session.metadata?.clerk_user_id ?? null,
+      clerkUserId: targetUserId,
       resend:      opts?.resend,
     });
 
-    return { verified: true, ...grant };
+    // NOTE: deliberately NOT linking the row to an account that grantOrInvite
+    // merely resolved from the payment email. That is a guess, not evidence,
+    // and writing it would consume the one-time claim — freezing the buyer out
+    // of the sign-in-and-attach path for exactly the mismatch D4 exists to fix.
+    // Revocation for an email-resolved grant already works through the email,
+    // since the account was found by that email in the first place.
+
+    return { verified: true, claimExpired, ...grant };
   } catch (err) {
     console.error("[emos-billing] reconcileCheckoutSession error:", err);
     return notVerified;
