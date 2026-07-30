@@ -3,6 +3,8 @@ import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
 import PipelineFlowV2 from "../PipelineFlowV2";
 import PitchClinicDemoTravel from "./PitchClinicDemoTravel";
+import SpeakingTestimonials from "@/components/bureau/SpeakingTestimonials";
+import { TESTIMONIALS_TRAVEL } from "../testimonials";
 import {
   DoubleRule,
   HRule,
@@ -142,11 +144,36 @@ const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
   ["~40%", "of US travelers used AI to plan trips in 2025, up 11 points in a year"],
 ];
 
-type Fmt = { t: string; meta: string; body: string };
+// Formats · one photograph per format, so the offer is shown and not just listed.
+// Caption rule: name a venue only where the frame itself carries the branding.
+// The G-Day X and Arabian Travel Market banners are visible in their shots. The
+// workshop photo carries no branding, so its caption claims no venue.
+type Fmt = { t: string; meta: string; body: string; photo: string; alt: string; caption: string };
 const FORMATS: ReadonlyArray<Fmt> = [
-  { t: "Keynote", meta: "30–45 min + Q&A · up to ~500", body: "A fast, story-led mainstage talk with a live “what does AI say about your destination?” moment. Best to open or close a track." },
-  { t: "Interactive workshop", meta: "90 min to half day · capped ~20–40", body: "The full working session: idea sprint, spot-the-slop, and a live pitch clinic on the room’s real pitches. Best as a hands-on breakout." },
-  { t: "Panel or fireside", meta: "30–45 min · any size", body: "I bring the live data and the contrarian takes; you bring the moderator and co-panelists. Best for a debate on AI, PR and destination marketing." },
+  {
+    t: "Keynote",
+    meta: "30 to 45 min + Q&A · up to ~500",
+    body: "A fast, story-led mainstage talk with a live “what does AI say about your destination?” moment. Best to open or close a track.",
+    photo: "/assets/gallery/gdayx-1.jpg",
+    alt: "Syed Irfan Ajmal speaking from the podium to a seated audience at G-Day X in Peshawar",
+    caption: "G-Day X, Peshawar",
+  },
+  {
+    t: "Interactive workshop",
+    meta: "90 min to half day · capped ~20 to 40",
+    body: "The full working session: idea sprint, spot-the-slop, and a live pitch clinic on the room’s real pitches. Best as a hands-on breakout.",
+    photo: "/assets/gallery/ik-workshop.jpg",
+    alt: "Workshop attendees seated at tables during a hands-on session led by Syed Irfan Ajmal",
+    caption: "A working room, tables not rows",
+  },
+  {
+    t: "Panel or fireside",
+    meta: "30 to 45 min · any size",
+    body: "I bring the live data and the contrarian takes, you bring the co-panelists. Happy to take the moderator seat instead. Best for a debate on AI, PR and destination marketing.",
+    photo: "/assets/gallery/atm-dubai-panel.jpg",
+    alt: "Syed Irfan Ajmal on a panel on the main stage at Arabian Travel Market in Dubai",
+    caption: "Arabian Travel Market, Dubai · 2018",
+  },
 ];
 
 // ─── Shared button styles ─────────────────────────────────────────────────────
@@ -205,7 +232,22 @@ const Hero = () => (
         </p>
       </div>
 
-      {/* Right — the session desk */}
+      {/* Right — the room, then the session desk */}
+      <div>
+      <figure style={{ margin: "0 0 16px", padding: 10, background: "#0e0d0a", border: `1px solid ${INK}` }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/assets/gallery/astrolabs-2.jpg"
+          alt="Syed Irfan Ajmal mid gesture, presenting at a workshop at AstroLabs in Dubai"
+          style={{ width: "100%", aspectRatio: "4 / 3", display: "block", border: "1px solid rgba(250,250,250,.25)", objectFit: "cover", objectPosition: "center 35%" }}
+        />
+        <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "10px 4px 2px", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: "#FAFAFA", lineHeight: 1.4 }}>
+            Workshop at AstroLabs, Dubai.
+          </div>
+          <SCaps size={9.5} ls="0.16em" color="rgba(250,250,250,.55)">In the room</SCaps>
+        </figcaption>
+      </figure>
       <aside style={{ border: `1px solid ${INK}`, background: PAPER2, padding: "24px 24px 26px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <SCaps size={10.5} ls="0.18em" color={INK55}>Session Desk</SCaps>
@@ -226,6 +268,7 @@ const Hero = () => (
         <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ ...btnYel, marginTop: 8, display: "block" }}>Speaker one-sheet &darr;</a>
         <a href="/press-kit" style={{ ...btnGhostDark, marginTop: 8, display: "block" }}>View the full press kit &rarr;</a>
       </aside>
+      </div>
     </div>
   </section>
 );
@@ -618,10 +661,24 @@ const Formats = () => (
     </div>
     <div className="emai-cards3">
       {FORMATS.map((f) => (
-        <div key={f.t} style={{ border: `1px solid ${INK}`, background: PAPER, padding: "24px 22px", display: "flex", flexDirection: "column" }}>
-          <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.15 }}>{f.t}</h3>
-          <div style={{ marginTop: 8 }}><SCaps size={10} ls="0.12em" color={BLUE}>{f.meta}</SCaps></div>
-          <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55, flex: 1 }}>{f.body}</p>
+        <div key={f.t} style={{ border: `1px solid ${INK}`, background: PAPER, display: "flex", flexDirection: "column" }}>
+          <figure style={{ margin: 0, borderBottom: `1px solid ${INK}` }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={f.photo}
+              alt={f.alt}
+              loading="lazy"
+              style={{ width: "100%", aspectRatio: "16 / 10", display: "block", objectFit: "cover" }}
+            />
+            <figcaption style={{ padding: "8px 22px 10px", background: INK }}>
+              <SCaps size={9.5} ls="0.14em" color="rgba(250,250,250,.62)">{f.caption}</SCaps>
+            </figcaption>
+          </figure>
+          <div style={{ padding: "22px 22px 24px", display: "flex", flexDirection: "column", flex: 1 }}>
+            <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.15 }}>{f.t}</h3>
+            <div style={{ marginTop: 8 }}><SCaps size={10} ls="0.12em" color={BLUE}>{f.meta}</SCaps></div>
+            <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55, flex: 1 }}>{f.body}</p>
+          </div>
         </div>
       ))}
     </div>
@@ -672,6 +729,17 @@ export default function EarnedMediaAITravelPage() {
       <Speaker />
       <SpeakerPhotoStrip />
       <Formats />
+      <SpeakingTestimonials
+        items={TESTIMONIALS_TRAVEL}
+        heading={
+          <>
+            Fine, but is he any good
+            <br />
+            <span style={{ fontStyle: "italic", color: YEL }}>in the room?</span>
+          </>
+        }
+        standfirst="Three people who booked the session or hosted it, including the organiser of a Dubai summit who works in travel himself. More on the flagship session page."
+      />
       <BottomCTA />
       <CTATicker />
       <Subscriptions sectionNumber="09" />
