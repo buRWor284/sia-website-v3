@@ -160,6 +160,10 @@ const STAGES: ReadonlyArray<Stage> = [
   { yr: "2018",    evt: "Durshal",                      city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding"                                     },
   { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller (~500 audience)", flag: "AE", tag: "Biggest"  },
   { yr: "2017",    evt: "DMSS Conference",              city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (~200 audience)" },
+  // Sourced from NIC Pakistan's own Facebook post about the session, which is
+  // where both the topic and the format come from: "Content Marketing and PR
+  // Consultant sharing his views on Inbound Marketing with the startups at NIC".
+  { yr: "2017",    evt: "National Incubation Center",   city: "Islamabad", country: "Pakistan",  fmt: "Talk",     topic: "Inbound marketing, for startups at NIC"                },
   { yr: "2016",    evt: "MPS2016 · M Powered Summit",   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote"                             },
   { yr: "2016",    evt: "AstroLabs",                    city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success"                  },
   { yr: "2016",    evt: "IK Institute of Business",     city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Co-trainer with Irfan Khairi"                          },
@@ -618,13 +622,15 @@ const Stages = () => (
 // shoot. The Startup Grind frame carries its own proof: the screen behind him
 // reads "Startup Grind, Powered by Google for Entrepreneurs, PESHAWAR".
 //
-// ★ NIC Islamabad is the ONE exception: the frame carries no branding (the wall
-// text is a generic quote) and the room is NOT yet a row in STAGES above. The
-// venue comes from Irfan's own labelling of the source folder. It carries NO
-// year: the files are Facebook exports with the EXIF stripped, so nothing dates
-// them. Add a STAGES row and a year once Irfan confirms one, and do not guess.
-// It earns its place because it is by some distance the most RECENT room on
-// file; every other photograph here is 2018 or earlier.
+// ★ NIC Islamabad = the National Incubation Center, confirmed 2026-07-31. The
+// frame itself carries no branding (the wall text is a generic quote), so the
+// venue, the year and the session topic all come from NIC Pakistan's own
+// Facebook post about the session rather than from the picture.
+//
+// ★ Do NOT date these files from their Facebook IDs. The source filenames are
+// 466xxxxxxx_… exports, an ID range that corresponds to a late-2024 UPLOAD, and
+// reading that as the event date puts the room seven years wrong. It is a 2017
+// event re-uploaded later. Facebook IDs date the upload, never the photograph.
 //
 // Bali is deliberately absent: DMSSStrip already carries a DMSS photograph
 // higher up this same page, and running it twice would read as padding.
@@ -651,8 +657,8 @@ const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
   },
   {
     src: "/assets/speaking/nic-islamabad.jpg",
-    alt: "Syed Irfan Ajmal presenting with a microphone to attendees seated at tables at the National Incubation Center in Islamabad",
-    cap: "NIC Islamabad",
+    alt: "Syed Irfan Ajmal presenting with a microphone to attendees seated at tables at NIC Islamabad",
+    cap: "NIC Islamabad · 2017",
   },
 ];
 
@@ -893,8 +899,14 @@ const HostQuotes = () => {
         <blockquote style={{ margin: 0, fontFamily: SERIF, fontSize: "clamp(15px, 2vw, 18px)", color: INK, lineHeight: 1.5, fontStyle: "italic", flex: 1, minWidth: 260 }}>
           &ldquo;{lastQuote.quote}&rdquo;
         </blockquote>
-        <SCaps size={10} ls="0.14em" color={INK55}>Filed from {lastQuote.place}</SCaps>
+        <SCaps size={10} ls="0.14em" color={INK55}>Room · {lastQuote.place}</SCaps>
       </article>
+      {/* `role` above is each person's CURRENT LinkedIn headline, which in most cases
+          postdates the room they are describing. Say so rather than implying they held
+          that title at the time, and never invent an at-the-time title. */}
+      <p style={{ margin: "16px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5, color: INK55, lineHeight: 1.5 }}>
+        Quoted verbatim from public LinkedIn recommendations. An ellipsis marks a trim, nothing else has been changed. Job titles are current and in most cases postdate the session being described.
+      </p>
     </section>
   );
 };

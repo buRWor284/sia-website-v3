@@ -444,6 +444,44 @@ const Activities = () => (
     <div style={{ marginTop: 48, maxWidth: 760, marginLeft: "auto", marginRight: "auto" }}>
       <PitchClinicDemo />
     </div>
+
+    {/* Two reels of the workshop format actually running. Both already sit in the
+        "Watch the work" section on /speaking; they are repeated here because this
+        is the section that claims the room does the work, and video of a workshop
+        running proves that better than a photograph of one can. Facades only: no
+        autoplay, lazy iframes, so they cost nothing until clicked. */}
+    <div style={{ marginTop: 56 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
+        <SCaps size={11} ls="0.20em" color={YEL}>See the format running</SCaps>
+        <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.2)", minWidth: 40 }} />
+        <a href="/speaking" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: YEL, textDecoration: "underline", textUnderlineOffset: 3 }}>
+          All six reels &rarr;
+        </a>
+      </div>
+      <div className="emai-split">
+        {[
+          { id: "OwQpDj4c1LE", cap: "DMSS Conference, Bali · Media Hacks workshop", meta: "Workshop · Bali" },
+          { id: "2mJ3o2LyWAc", cap: "IN5 Innovation Hub, Dubai · Free publicity online", meta: "Workshop · Dubai" },
+        ].map((r) => (
+          <figure key={r.id} style={{ margin: 0, padding: 10, background: "#0e0d0a", border: "1px solid rgba(241,235,222,.28)" }}>
+            <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(250,250,250,.25)", overflow: "hidden" }}>
+              <iframe
+                src={`https://www.youtube-nocookie.com/embed/${r.id}?rel=0`}
+                title={r.cap}
+                loading="lazy"
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                style={{ width: "100%", height: "100%", border: 0, display: "block" }}
+              />
+            </div>
+            <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "11px 4px 2px", gap: 12, flexWrap: "wrap" }}>
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: "#FAFAFA", lineHeight: 1.4 }}>{r.cap}</div>
+              <SCaps size={9.5} ls="0.16em" color="rgba(250,250,250,.55)">{r.meta}</SCaps>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
   </section>
 );
 
@@ -696,7 +734,7 @@ export default function EarnedMediaInTheAgeOfAIPage() {
             <span style={{ fontStyle: "italic", color: YEL }}>in the room?</span>
           </>
         }
-        standfirst="Six people who booked the session, hosted it, or sat through it. Organisers first, because the question an organiser actually has is whether I will be easy to programme."
+        standfirst="Six people who booked the session, hosted it, or sat through it, in person and online. Organisers first, because the question an organiser actually has is whether I will be easy to programme."
       />
       <Speaker />
       <SpeakerPhotoStrip />

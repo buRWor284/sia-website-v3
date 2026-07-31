@@ -480,6 +480,37 @@ const Activities = () => (
     <div style={{ marginTop: 48, maxWidth: 760, marginLeft: "auto", marginRight: "auto" }}>
       <PitchClinicDemoTravel />
     </div>
+
+    {/* One reel of the workshop format actually running. The travel page already
+        embeds the ATM Dubai panel further down, so this is the workshop half of
+        the offer rather than a second panel. Lazy iframe, no autoplay. */}
+    <div style={{ marginTop: 56 }}>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
+        <SCaps size={11} ls="0.20em" color={YEL}>See the format running</SCaps>
+        <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.2)", minWidth: 40 }} />
+        <a href="/speaking" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: YEL, textDecoration: "underline", textUnderlineOffset: 3 }}>
+          All six reels &rarr;
+        </a>
+      </div>
+      <figure style={{ margin: "0 auto", maxWidth: 760, padding: 10, background: "#0e0d0a", border: "1px solid rgba(241,235,222,.28)" }}>
+        <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(250,250,250,.25)", overflow: "hidden" }}>
+          <iframe
+            src="https://www.youtube-nocookie.com/embed/OwQpDj4c1LE?rel=0"
+            title="Syed Irfan Ajmal running the Media Hacks workshop at DMSS Conference, Bali"
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+            style={{ width: "100%", height: "100%", border: 0, display: "block" }}
+          />
+        </div>
+        <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "11px 4px 2px", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13.5, color: "#FAFAFA", lineHeight: 1.4 }}>
+            DMSS Conference, Bali · The same workshop format, running.
+          </div>
+          <SCaps size={9.5} ls="0.16em" color="rgba(250,250,250,.55)">Workshop · Bali</SCaps>
+        </figcaption>
+      </figure>
+    </div>
   </section>
 );
 

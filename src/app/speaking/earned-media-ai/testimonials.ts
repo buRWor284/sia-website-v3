@@ -12,13 +12,39 @@ import type { Testimonial } from "@/components/bureau/SpeakingTestimonials";
 //      promote an attendee to an organiser.
 //   4. `event` is a chip, so keep it short, and only name an event the quote
 //      itself names.
+//   5. ★ `title` is the person's CURRENT LinkedIn headline, which in most cases
+//      postdates the room they are describing. Brie Moreau became an AI SEO
+//      researcher years after DMSS; Maryam Arshad Mahmood joined Google after
+//      IYDC. That is fine, and it is why the block carries a standing note that
+//      titles are current while the chip is the room. What is NOT fine is
+//      writing a current title as though it were the role held at the event, or
+//      inventing an at-the-time title nobody has confirmed. If Irfan supplies
+//      the roles these people actually held then, use those and drop the note.
 //
 // Ranked, per the picture-first plan: organisers first, then quotes that name a
 // specific room, then general speaking endorsements.
+//
+// ★ TWO DIFFERENT EVENTS BOTH ABBREVIATE TO "MPS". Keep them apart:
+//   • "M Powered Summit" — Dubai, 2016, LIVE. Abd Elmohaimen Mansi's quote, the
+//     mps-*.jpg gallery photographs, and the MPS2016 row in the STAGES inventory
+//     on /speaking all belong to this one.
+//   • "Muslim Marketing Summit" — ONLINE, late 2015, organised by someone else.
+//     Shereen Pasha's quote and Zarinah El-Amin's belong to this one. There are
+//     NO photographs of it, because there was no room.
+// Confirmed by Irfan 2026-07-31. Conflating them would attach Dubai stage
+// photographs to an online talk.
+//
+// ★ profileUrl must be the BARE profile URL. The links Irfan copied out of
+// LinkedIn carried a `?lipi=urn:li:page:d_flagship3_profile_view_base_...`
+// query string. That is a LinkedIn tracking token tied to HIS logged-in browsing
+// session, not part of the address, and publishing it would put a fragment of
+// his session state on a public page and pass it to LinkedIn on every click.
+// Strip everything from the `?` onward. Always.
 
 export const TESTIMONIALS: ReadonlyArray<Testimonial> = [
   {
     name: "Abd Elmohaimen Mansi",
+    profileUrl: "https://www.linkedin.com/in/abdelmohaimenmansi/",
     title: "Co-founder · Travel & Mobility as a Service",
     photo: "/assets/testimonials/abd-elmohaimen-mansi.jpg",
     event: "M Powered Summit · Dubai",
@@ -28,6 +54,7 @@ export const TESTIMONIALS: ReadonlyArray<Testimonial> = [
   },
   {
     name: "Ash Ali",
+    profileUrl: "https://www.linkedin.com/in/ashali/",
     title: "Co-Founder, Uhubs · Author, The Unfair Advantage · Ex-Just Eat",
     photo: "/assets/testimonials/ash-ali.jpg",
     event: "Uhubs workshop",
@@ -37,6 +64,7 @@ export const TESTIMONIALS: ReadonlyArray<Testimonial> = [
   },
   {
     name: "Maryam Arshad Mahmood",
+    profileUrl: "https://www.linkedin.com/in/maryamarshad/",
     title: "Growth and Market Strategy leader · Partnerships @ Google",
     photo: "/assets/testimonials/maryam-arshad-mahmood.jpg",
     event: "IYDC 2015 · Peshawar",
@@ -46,6 +74,7 @@ export const TESTIMONIALS: ReadonlyArray<Testimonial> = [
   },
   {
     name: "Brie Moreau",
+    profileUrl: "https://www.linkedin.com/in/briemoreau/",
     title: "AI SEO researcher",
     photo: "/assets/testimonials/brie-moreau.jpg",
     event: "DMSS · Bali",
@@ -55,15 +84,20 @@ export const TESTIMONIALS: ReadonlyArray<Testimonial> = [
   },
   {
     name: "Shereen Pasha",
+    profileUrl: "https://www.linkedin.com/in/shereenpasha/",
     title: "Launch Strategist · Course Launch & Business Management Expert",
     photo: "/assets/testimonials/shereen-pasha.jpg",
-    event: "Muslim Marketing Summit",
+    // ★ ONLINE, and the chip must say so. Confirmed by Irfan 2026-07-31: she and
+    // Zarinah El-Amin attended the same online event. Presenting this as a live
+    // room would be the exact overclaim the caption rules exist to stop.
+    event: "Muslim Marketing Summit · online",
     role: "Attendee",
     quote:
       "Irfan's talk on How to Get Published in Large Publications at Muslim Marketing Summit was insightful. It was based on the core idea of building authentic trustworthy relationship with media. I highly recommend Irfan for Media & PR related solutions.",
   },
   {
     name: "Chuck Wang",
+    profileUrl: "https://www.linkedin.com/in/thechuckwang/",
     title: "Strategic Operations & Governance Executive · Former Founder/CEO",
     photo: "/assets/testimonials/chuck-wang.jpg",
     role: "Peer",

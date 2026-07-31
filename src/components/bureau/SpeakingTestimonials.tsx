@@ -58,8 +58,11 @@ export default function SpeakingTestimonials({
           flexWrap: "wrap",
         }}
       >
+        {/* Deliberately NOT "what people in the room said". Not every one of these
+            was a live room: the Muslim Marketing Summit was an online event. Label
+            the block so it covers both, and let each chip carry the specifics. */}
         <SCaps size={11} ls="0.22em" color={YEL}>
-          Testimonials · What people in the room said
+          Testimonials · In their own words
         </SCaps>
         <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.2)", minWidth: 40 }} />
       </div>
@@ -237,7 +240,8 @@ export default function SpeakingTestimonials({
         }}
       >
         Quoted verbatim from public LinkedIn recommendations. An ellipsis marks a trim, nothing else
-        has been changed.
+        has been changed. Job titles are current. The chip beside each name is the room that person is
+        describing, which in most cases predates the title.
       </p>
     </section>
   );
