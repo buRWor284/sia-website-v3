@@ -456,3 +456,125 @@ export async function ogCard({
     opts
   );
 }
+
+// ── Direction P — photo card ─────────────────────────────────────────────────
+// A photograph of a real room, with the text in a solid ink band beneath it.
+// Used by the session pages, where a text-only preview is the weakest possible
+// thing to put in front of an organiser who will never open the page.
+//
+// The photo sits ABOVE the band rather than behind the text on purpose: no scrim
+// to tune, nothing sitting on a face, and legibility that cannot regress when the
+// photo is swapped. Same figure-over-caption shape the pages themselves use.
+//
+// `photo` is a filename inside /public/og, cropped to 1200x390 ahead of time.
+// A missing or unreadable file degrades to the plain ink card rather than
+// throwing, so a bad asset can never fail the build.
+
+const PHOTO_H = 390;
+
+const photoCache = new Map<string, Promise<string | null>>();
+function loadOgPhoto(file: string): Promise<string | null> {
+  if (!photoCache.has(file)) {
+    photoCache.set(
+      file,
+      (async () => {
+        try {
+          const buf = await readFile(join(process.cwd(), "public", "og", file));
+          return `data:image/jpeg;base64,${buf.toString("base64")}`;
+        } catch {
+          return null;
+        }
+      })()
+    );
+  }
+  return photoCache.get(file)!;
+}
+
+export async function ogPhotoCard({
+  eyebrow,
+  title,
+  credit,
+  photo,
+}: {
+  eyebrow: string;
+  title: string;
+  /** What the photograph shows. Held to the same accuracy rules as an on-page caption. */
+  credit: string;
+  photo: string;
+}) {
+  const fonts = await loadFonts();
+  const opts = { ...OG_SIZE, fonts: fonts.length ? fonts : undefined };
+  const img = await loadOgPhoto(photo);
+  const lines = title.split("\n");
+  const bandH = img ? H - PHOTO_H : H;
+  const size = fit(lines, lines.length >= 3 ? 46 : lines.length === 2 ? 54 : 64, 1000);
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: W,
+          height: H,
+          background: D_BG,
+          fontFamily: "Archivo",
+        }}
+      >
+        {img ? (
+          <div style={{ display: "flex", width: W, height: PHOTO_H, overflow: "hidden" }}>
+            <img src={img} width={W} height={PHOTO_H} alt="" style={{ objectFit: "cover" }} />
+          </div>
+        ) : null}
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            width: W,
+            height: bandH,
+            background: D_BG,
+            borderTop: `3px solid ${GOLD}`,
+            paddingLeft: SAFE,
+            paddingRight: SAFE,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              color: GOLD,
+              fontSize: 14,
+              fontWeight: 700,
+              letterSpacing: 2.4,
+              marginBottom: 14,
+            }}
+          >
+            {eyebrow}
+          </div>
+          <Headline lines={lines} size={size} color={D_WHITE} />
+          <div style={{ display: "flex", alignItems: "center", marginTop: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                color: D_MUTED,
+                fontSize: 19,
+                fontFamily: "Newsreader",
+                fontStyle: "italic",
+              }}
+            >
+              {credit}
+            </div>
+            <div
+              style={{ display: "flex", width: 1, height: 15, background: D_DIVIDER, marginLeft: 16, marginRight: 16 }}
+            />
+            <div style={{ display: "flex", color: D_FAINT, fontSize: 12, fontWeight: 700, letterSpacing: 2 }}>
+              SYEDIRFANAJMAL.COM
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    opts
+  );
+}

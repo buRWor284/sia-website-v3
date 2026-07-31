@@ -145,9 +145,12 @@ const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
 ];
 
 // Formats · one photograph per format, so the offer is shown and not just listed.
-// Caption rule: name a venue only where the frame itself carries the branding.
-// The G-Day X and Arabian Travel Market banners are visible in their shots. The
-// workshop photo carries no branding, so its caption claims no venue.
+// Caption rule: name a venue only where it is verified. The G-Day X and Arabian
+// Travel Market banners are visible in their own frames. The IK Institute of
+// Business venue was confirmed by Irfan 2026-07-30 and matches the Past Stages
+// inventory on /speaking (IK Institute of Business, Dubai, 2016).
+// NO YEAR on the G-Day X caption: /speaking says 2014, Irfan recalls "probably
+// 2016", and an unverified year does not go in a caption.
 type Fmt = { t: string; meta: string; body: string; photo: string; alt: string; caption: string };
 const FORMATS: ReadonlyArray<Fmt> = [
   {
@@ -163,8 +166,8 @@ const FORMATS: ReadonlyArray<Fmt> = [
     meta: "90 min to half day · capped ~20 to 40",
     body: "The full working session: idea sprint, spot-the-slop, and a live pitch clinic on the room’s real pitches. Best as a hands-on breakout.",
     photo: "/assets/gallery/ik-workshop.jpg",
-    alt: "Workshop attendees seated at tables during a hands-on session led by Syed Irfan Ajmal",
-    caption: "A working room, tables not rows",
+    alt: "Workshop attendees seated at tables at IK Institute of Business in Dubai",
+    caption: "IK Institute of Business, Dubai",
   },
   {
     t: "Panel or fireside",

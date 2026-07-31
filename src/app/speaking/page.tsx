@@ -596,6 +596,67 @@ const Stages = () => (
   </section>
 );
 
+// ─── The rooms · photo band under the stages table ────────────────────────────
+// The stages table is the strongest content on this page and had no pictures at
+// all. One frame per venue, so the inventory has evidence sitting under it.
+//
+// Caption rule: every venue below is corroborated by the STAGES inventory above
+// and, for MPS and AstroLabs, by branding visible in the frames from the same
+// shoot. No years, because the year on the G-Day X row is disputed.
+//
+// Bali is deliberately absent: DMSSStrip already carries a DMSS photograph
+// higher up this same page, and running it twice would read as padding.
+const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
+  {
+    src: "/assets/gallery/mps-emirati.jpg",
+    alt: "Audience members raising hands to ask a question during Syed Irfan Ajmal's talk at MPS2016 in Dubai",
+    cap: "MPS2016, Dubai",
+  },
+  {
+    src: "/assets/gallery/astrolabs-3.jpg",
+    alt: "A full room of attendees during a Syed Irfan Ajmal session at AstroLabs in Dubai",
+    cap: "AstroLabs, Dubai",
+  },
+  {
+    src: "/assets/gallery/in5-dubai.jpg",
+    alt: "Syed Irfan Ajmal presenting to a seated audience at IN5 Innovation Hub in Dubai",
+    cap: "IN5 Innovation Hub, Dubai",
+  },
+  {
+    src: "/assets/gallery/gdayx-1.jpg",
+    alt: "Syed Irfan Ajmal speaking from the podium to a seated audience at G-Day X in Peshawar",
+    cap: "G-Day X, Peshawar",
+  },
+];
+
+const RoomBand = () => (
+  <section className="sx" style={{ background: PAPER, paddingBottom: 84 }}>
+    <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 18, flexWrap: "wrap" }}>
+      <SCaps size={11} ls="0.20em" color={INK55}>The rooms themselves</SCaps>
+      <div style={{ flex: 1, height: 1, background: INK35, minWidth: 40 }} />
+      <a href="/gallery" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, textDecoration: "underline", textUnderlineOffset: 3 }}>
+        See the full gallery &rarr;
+      </a>
+    </div>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+      {ROOMS.map((r) => (
+        <figure key={r.src} style={{ margin: 0, flex: "1 1 220px", minWidth: 200, background: INK, border: `1px solid ${INK}` }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={r.src}
+            alt={r.alt}
+            loading="lazy"
+            style={{ width: "100%", aspectRatio: "4 / 3", display: "block", objectFit: "cover" }}
+          />
+          <figcaption style={{ padding: "9px 12px 11px" }}>
+            <SCaps size={9.5} ls="0.14em" color="rgba(250,250,250,.62)">{r.cap}</SCaps>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </section>
+);
+
 // ─── Client Strip ─────────────────────────────────────────────────────────────
 
 const ClientStripSpeaking = () => {
@@ -638,20 +699,56 @@ const ClientStripSpeaking = () => {
 
 // ─── §04 · Available Formats ──────────────────────────────────────────────────
 
+// Proof thumbnails, keyed by format name. Only the two formats where a
+// photograph proves the exact claim get one: the Past Stages inventory records
+// IK Institute of Business as a Workshop and Arabian Travel Market as a Panel,
+// and both frames show that format actually running.
+//
+// The other four are left clean on purpose. There is no photograph of a webinar,
+// a podcast recording or a radio spot in the library, and a decorative stand-in
+// next to a format claim would prove nothing. Add one here the day a real frame
+// exists, not before.
+const FORMAT_PROOF: Record<string, { src: string; alt: string }> = {
+  Workshop: {
+    src: "/assets/gallery/ik-workshop.jpg",
+    alt: "Workshop attendees seated at tables at IK Institute of Business in Dubai",
+  },
+  Panel: {
+    src: "/assets/gallery/atm-dubai-panel.jpg",
+    alt: "Syed Irfan Ajmal on a panel on the main stage at Arabian Travel Market in Dubai",
+  },
+};
+
 const Formats = () => (
   <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
     <SectionMast n="04" label="Available Formats · Six ways to host" />
     <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
-      {FORMATS.map((f, i) => (
+      {FORMATS.map((f, i) => {
+        const proof = FORMAT_PROOF[f.name];
+        return (
         <div key={f.name} className="card-border" style={{ padding: "26px 24px", background: PAPER, display: "flex", flexDirection: "column", minHeight: 170 }}>
-          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
-            <SCaps size={10} ls="0.18em" color={INK55}>0{i + 1}</SCaps>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
+              {proof ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={proof.src}
+                    alt={proof.alt}
+                    loading="lazy"
+                    style={{ width: 52, height: 52, objectFit: "cover", flexShrink: 0, border: `1px solid ${INK}` }}
+                  />
+                </>
+              ) : null}
+              <SCaps size={10} ls="0.18em" color={INK55}>0{i + 1}</SCaps>
+            </div>
             <SCaps size={10} ls="0.14em" color={INK70}>{f.dur}</SCaps>
           </div>
           <h4 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(18px, 3vw, 26px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>{f.name}</h4>
           <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 14.5, color: INK70, lineHeight: 1.55, fontStyle: "italic", flex: 1 }}>{f.note}</p>
         </div>
-      ))}
+        );
+      })}
     </div>
   </section>
 );
@@ -821,6 +918,13 @@ const FeaturedTravelSession = () => (
         background: INK, border: `2px solid ${INK}`, textDecoration: "none",
       }}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/assets/gallery/atm-dubai-panel.jpg"
+        alt="Syed Irfan Ajmal on a panel on the main stage at Arabian Travel Market in Dubai"
+        loading="lazy"
+        style={{ width: 132, height: 88, objectFit: "cover", flexShrink: 0, border: "1px solid rgba(250,250,250,.25)" }}
+      />
       <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", background: YEL, color: INK, padding: "5px 9px", whiteSpace: "nowrap" }}>
         Saudi Tourism edition
       </span>
@@ -849,6 +953,13 @@ const FeaturedSession = () => (
         background: PAPER2, border: `2px solid ${INK}`, textDecoration: "none",
       }}
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/assets/gallery/astrolabs-2.jpg"
+        alt="Syed Irfan Ajmal mid gesture, presenting at a workshop at AstroLabs in Dubai"
+        loading="lazy"
+        style={{ width: 132, height: 88, objectFit: "cover", objectPosition: "center 30%", flexShrink: 0, border: `1px solid ${INK}` }}
+      />
       <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.16em", textTransform: "uppercase", background: YEL, color: INK, padding: "5px 9px", whiteSpace: "nowrap" }}>
         New · Flagship
       </span>
@@ -880,6 +991,7 @@ export default function SpeakingPage() {
       <Topics />
       <MPSStrip />
       <Stages />
+      <RoomBand />
       <ClientStripSpeaking />
       <Formats />
       <HostQuotes />
