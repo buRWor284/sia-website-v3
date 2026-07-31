@@ -59,6 +59,22 @@ type PrimaryTopic = {
 const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
   {
     no: "01",
+    label: "Primary topic · flagship for 2026",
+    title: "Earned Media in the Age of AI",
+    blurb:
+      "How AI is remaking earned media from both sides at once: agents that can now run a six stage PR pipeline, and the LLMs and AI search that decide which brands get seen. Built from real data inside the earned media OS I run, with three live activities the room works through together.",
+    bullets: [
+      "The six stage AI pipeline: Signal, Authority Content, Verify, Match, Pitch, Attribute",
+      "Three live activities: an idea sprint, spot the slop, and a pitch clinic on real work",
+      "Why LLMs and AI search now decide which brands get seen, and what they reward",
+      "The Coverage Flywheel: how one placement compounds into six returns",
+      "Honest failures: exactly where AI still cannot do the job of a PR team",
+    ],
+    casestudy: { v: "06", l: "stage AI pipeline · run live in the room" },
+    moreHref: "/speaking/earned-media-ai",
+  },
+  {
+    no: "02",
     label: "Primary topic · most-requested",
     title: "Digital PR for Publicity",
     blurb:
@@ -73,7 +89,7 @@ const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
     casestudy: { v: "60+", l: "media placements · single campaign" },
   },
   {
-    no: "02",
+    no: "03",
     label: "Primary topic · most-requested",
     title: "Boosting Organic Visibility Through SEO-PR",
     blurb:
@@ -86,22 +102,6 @@ const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
       "A repeatable system for organic, durable growth",
     ],
     casestudy: { v: "6×", l: "daily signups · Centriq case" },
-  },
-  {
-    no: "03",
-    label: "Primary topic · flagship for 2026",
-    title: "Earned Media in the Age of AI",
-    blurb:
-      "How AI is remaking earned media from both sides at once: agents that can now run a six stage PR pipeline, and the LLMs and AI search that decide which brands get seen. Built from real data inside the earned media OS I run, with three live activities the room works through together.",
-    bullets: [
-      "The six stage AI pipeline: Signal, Authority Content, Verify, Match, Pitch, Attribute",
-      "Three live activities: an idea sprint, spot the slop, and a pitch clinic on real work",
-      "Why LLMs and AI search now decide which brands get seen, and what they reward",
-      "The Coverage Flywheel: how one placement compounds into six returns",
-      "Honest failures: exactly where AI still cannot do the job of a PR team",
-    ],
-    casestudy: { v: "06", l: "stage AI pipeline · run live in the room" },
-    moreHref: "/speaking/earned-media-ai",
   },
 ];
 
@@ -156,6 +156,15 @@ type Stage = {
 };
 
 const STAGES: ReadonlyArray<Stage> = [
+  // ★ MaGIC is 2019, not 2016. Corrected 2026-07-31 against MaGIC's own event
+  // card in the SIA archive ("Magic_Changes.jpg"), which is MaGIC-branded and
+  // reads "Empowering Data, Personal Branding, & Fintech Trends 2019 · 26
+  // February 2019 · Coworking Space, MaGIC Cyberjaya", co-branded SIA Media,
+  // ipay88 and WEBQLO. Every surrounding asset in that folder is dated Feb 2019.
+  // The stale 2016 lived in THREE files: here, app/gallery/GalleryClient.tsx and
+  // components/bureau/CredentialRows.tsx. Change them together or the site
+  // contradicts itself.
+  { yr: "2019",    evt: "MaGIC",                        city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop", topic: "Digital marketing for entrepreneurs"                   },
   { yr: "2018",    evt: "IN5 Innovation Hub",           city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Media Hacks · Free Publicity"                          },
   { yr: "2018",    evt: "Durshal",                      city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding"                                     },
   { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller (~500 audience)", flag: "AE", tag: "Biggest"  },
@@ -167,7 +176,6 @@ const STAGES: ReadonlyArray<Stage> = [
   { yr: "2016",    evt: "MPS2016 · M Powered Summit",   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote"                             },
   { yr: "2016",    evt: "AstroLabs",                    city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success"                  },
   { yr: "2016",    evt: "IK Institute of Business",     city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Co-trainer with Irfan Khairi"                          },
-  { yr: "2016",    evt: "MaGIC",                        city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop", topic: "Digital marketing for entrepreneurs"                   },
   { yr: "2014",    evt: "G-Day X",                      city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship"                  },
   { yr: "2014",    evt: "University of Peshawar",       city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk"                                          },
   { yr: "2015",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion"                       },
@@ -634,7 +642,45 @@ const Stages = () => (
 //
 // Bali is deliberately absent: DMSSStrip already carries a DMSS photograph
 // higher up this same page, and running it twice would read as padding.
+//
+// ★ MaGIC (Cyberjaya) added 2026-07-31. It is the first Malaysian room on the
+// site; before this, Malaysia appeared in no photo strip anywhere. The frame
+// carries its own proof: the roll-up banner beside him reads "MaGIC, Malaysian
+// Global Innovation & Creativity Centre, Building Great Entrepreneurs,
+// www.mymagic.my, #MAGICCYBERJAYA". That hashtag is the reason the caption is
+// allowed to name Cyberjaya rather than just Malaysia.
+//
+// ★ The MaGIC caption deliberately carries NO year, and that is not an
+// oversight. The STAGES inventory now reads 2019, from MaGIC's own event card
+// dated 26 February 2019 at MaGIC Cyberjaya. The source video is titled
+// "@ Malaysia [2018]". Until Irfan resolves which is right, no year goes on
+// the caption. Do not "helpfully" add one.
+//
+// ★ Provenance: magic-malaysia-1 through -4 are frames pulled from the
+// workshop video, not photographs shot in the room. They are unretouched and
+// not upscaled: 1280x720 out of a 1280x720 source. Alternates -2, -3 and -4
+// are in the gallery folder if this one ever needs swapping.
+//
+// ★ atm-dubai-crowd (2026-07-31) is a SECOND ATM image and does NOT replace
+// atm-dubai-panel.jpg, which stays on the Panel card in FORMAT_PROOF. They do
+// different jobs: the panel photo proves the format, this one proves the room.
+// The year is on this caption because the frame earns it. The stage branding
+// behind the panel reads "arabian travel market, DUBAI, Sun 22 to Wed 25 April
+// 2018". Deliberately NO headcount: you cannot count a hall from one camera.
+//
+// ★ durshal-peshawar-1 (2026-07-31) closes the last gap in this band. Unlike
+// MaGIC, this frame carries NO venue branding at all. There is none anywhere in
+// 78 minutes of footage. The venue rests on two things only: Irfan identified
+// the source video as Durshal on 2026-07-31, and Durshal is in the STAGES
+// inventory above. That is why the caption names no year, even though the
+// inventory says 2018. Alternates -2, -3 and -4 are in the gallery folder; -4
+// is the one that shows him in the room rather than the audience.
 const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
+  {
+    src: "/assets/gallery/atm-dubai-crowd.jpg",
+    alt: "A full audience seated in front of the main stage panel at Arabian Travel Market in Dubai, with the event branding on the screens behind the panellists",
+    cap: "Arabian Travel Market, Dubai · 2018",
+  },
   {
     src: "/assets/gallery/mps-emirati.jpg",
     alt: "Audience members raising hands to ask a question during Syed Irfan Ajmal's talk at MPS2016 in Dubai",
@@ -651,6 +697,11 @@ const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
     cap: "IN5 Innovation Hub, Dubai",
   },
   {
+    src: "/assets/gallery/magic-malaysia-1.jpg",
+    alt: "Syed Irfan Ajmal speaking with a handheld microphone beside a MaGIC roll-up banner reading Building Great Entrepreneurs, at MaGIC in Cyberjaya",
+    cap: "MaGIC, Cyberjaya",
+  },
+  {
     src: "/assets/speaking/startup-grind.jpg",
     alt: "Syed Irfan Ajmal in a fireside chat with a microphone, in front of a Startup Grind Powered by Google for Entrepreneurs screen in Peshawar",
     cap: "Startup Grind, Peshawar",
@@ -659,6 +710,11 @@ const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
     src: "/assets/speaking/nic-islamabad.jpg",
     alt: "Syed Irfan Ajmal presenting with a microphone to attendees seated at tables at NIC Islamabad",
     cap: "NIC Islamabad · 2017",
+  },
+  {
+    src: "/assets/gallery/durshal-peshawar-1.jpg",
+    alt: "Attendees seated closely together and listening during a Syed Irfan Ajmal personal branding workshop at Durshal in Peshawar",
+    cap: "Durshal, Peshawar",
   },
 ];
 

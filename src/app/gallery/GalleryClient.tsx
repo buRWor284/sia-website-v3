@@ -48,7 +48,7 @@ const ALL_ITEMS: ReadonlyArray<GalleryItem> = [
   // ── VIDEOS ────────────────────────────────────────────────────────────────
   { format:"video", type:"speaking", country:"UAE",       id:"uSn4s5ZbJcQ", title:"Panel · Marketing to the Modern Muslim Traveller", where:"ATM Dubai, UAE · April 2018",    startAt:743 },
   { format:"video", type:"speaking", country:"UAE",       id:"2mJ3o2LyWAc", title:"Media Hacks · Free Publicity Online",              where:"IN5, Dubai, UAE · 2018"          },
-  { format:"video", type:"speaking", country:"Malaysia",  id:"50SIoLI-TW4", title:"Digital Marketing Workshop @ MaGIC",               where:"Cyberjaya, Malaysia · 2016"      },
+  { format:"video", type:"speaking", country:"Malaysia",  id:"50SIoLI-TW4", title:"Digital Marketing Workshop @ MaGIC",               where:"Cyberjaya, Malaysia · 2019"      },
   { format:"video", type:"speaking", country:"Indonesia", id:"OwQpDj4c1LE", title:"DMSS Conference · Media Hacks workshop",           where:"Bali, Indonesia · October 2017"  },
   { format:"video", type:"speaking", country:"Pakistan",  id:"rRUS5dlJdc4", title:"Personal Branding Workshop",                       where:"Durshal, KP, Pakistan"           },
   { format:"video", type:"speaking", country:null,        id:"zBUeBo4srpA", title:"Writing Your Way to Success",                      where:"20-min webinar · 3 case studies" },

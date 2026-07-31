@@ -35,7 +35,7 @@ const STAGES_ROW: ReadonlyArray<[string, string]> = [
   ["IN5 Innovation Hub", "Dubai · 2018"],
   ["IK Institute of Business", "Dubai · 2016"],
   ["DMSS Conference", "Bali · 2017"],
-  ["MaGIC", "Cyberjaya · 2016"],
+  ["MaGIC", "Cyberjaya · 2019"],
   ["National Incubation Center", "Islamabad · 2017"],
   ["Startup Grind", "Peshawar"],
   ["IYDC", "Peshawar · 2015"],
