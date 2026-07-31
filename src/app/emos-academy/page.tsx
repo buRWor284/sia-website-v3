@@ -236,7 +236,7 @@ export default function EmosPage() {
                   <div className="pc-creds">
                     <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text">Forbes, HBR, HuffPost, World Bank, SEJ, Entrepreneur, The Next Web, Yahoo, MSN, SEMrush, SERPed <em>+ more</em></div></div>
                     <div className="pc-cred"><div className="pc-cred-label">International Speaker</div><div className="pc-cred-text">World Bank · Arabian Travel Market · MaGIC Malaysia · Astrolabs Dubai · DMSS.io Bali</div></div>
-                    <div className="pc-cred"><div className="pc-cred-label">Custom Workshops</div><div className="pc-cred-text">Delivered for SEMrush (NYSE: SEMR) &amp; uHubs(SaaS, UK)</div></div>
+                    <div className="pc-cred"><div className="pc-cred-label">Custom Workshops</div><div className="pc-cred-text">Delivered for SEMrush (NYSE: SEMR) &amp; Uhubs(SaaS, UK)</div></div>
                   </div>
                 </div>
                 <div>

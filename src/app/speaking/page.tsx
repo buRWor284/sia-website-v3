@@ -156,6 +156,13 @@ type Stage = {
 };
 
 const STAGES: ReadonlyArray<Stage> = [
+  // ★ DYS 2017 is verified from the strongest possible source: the World Bank's own
+  // site. Irfan's post "Why an introvert like me looks forward to attending the
+  // digital youth summit?" ran on blogs.worldbank.org on 26 April 2017 and says he
+  // was conducting a workshop on Personal Branding in a Digital Era at DYS 2017 in
+  // Peshawar. Year, city, format and topic all come from that one primary source.
+  // NOTE: the World Bank BACKED this summit. It did not host Irfan. Do not upgrade
+  // this row, or any copy elsewhere, into a World Bank speaking credit.
   // ★ MaGIC is 2019, not 2016. Corrected 2026-07-31 against MaGIC's own event
   // card in the SIA archive ("Magic_Changes.jpg"), which is MaGIC-branded and
   // reads "Empowering Data, Personal Branding, & Fintech Trends 2019 · 26
@@ -164,24 +171,25 @@ const STAGES: ReadonlyArray<Stage> = [
   // The stale 2016 lived in THREE files: here, app/gallery/GalleryClient.tsx and
   // components/bureau/CredentialRows.tsx. Change them together or the site
   // contradicts itself.
-  { yr: "2019",    evt: "MaGIC",                        city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop", topic: "Digital marketing for entrepreneurs",                          flag: "MY" },
-  { yr: "2018",    evt: "IN5 Innovation Hub",           city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Media Hacks · Free Publicity",                                 flag: "AE" },
-  { yr: "2018",    evt: "Durshal",                      city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding",                                            flag: "PK" },
-  { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller (~500 audience)",     flag: "AE", tag: "Biggest" },
-  { yr: "2017",    evt: "DMSS Conference",              city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (~200 audience)",                                  flag: "ID" },
+  { yr: "2019",    evt: "MaGIC",                       city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop", topic: "Digital marketing for entrepreneurs",                          flag: "MY" },
+  { yr: "2018",    evt: "IN5 Innovation Hub",          city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Media Hacks · Free Publicity",                                 flag: "AE" },
+  { yr: "2018",    evt: "Durshal",                     city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding",                                            flag: "PK" },
+  { yr: "2018",    evt: "Arabian Travel Market (ATM)", city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller (~500 audience)",     flag: "AE", tag: "Biggest" },
+  { yr: "2017",    evt: "DMSS Conference",             city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (~200 audience)",                                  flag: "ID" },
+  { yr: "2017",    evt: "Digital Youth Summit (DYS)",  city: "Peshawar",  country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding in a Digital Era",                           flag: "PK" },
   // Sourced from NIC Pakistan's own Facebook post about the session, which is
   // where both the topic and the format come from: "Content Marketing and PR
   // Consultant sharing his views on Inbound Marketing with the startups at NIC".
-  { yr: "2017",    evt: "National Incubation Center",   city: "Islamabad", country: "Pakistan",  fmt: "Talk",     topic: "Inbound marketing, for startups at NIC",                       flag: "PK" },
-  { yr: "2016",    evt: "MPS2016 · M Powered Summit",   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote",                                    flag: "AE" },
-  { yr: "2016",    evt: "AstroLabs",                    city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success",                         flag: "AE" },
-  { yr: "2016",    evt: "IK Institute of Business",     city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Co-trainer with Irfan Khairi",                                 flag: "AE" },
-  { yr: "2014",    evt: "G-Day X",                      city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship",                         flag: "PK" },
-  { yr: "2014",    evt: "University of Peshawar",       city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk",                                                 flag: "PK" },
-  { yr: "2015",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion",                              flag: "PK" },
-  { yr: "2018",    evt: "IDM Pakistan",                 city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu", flag: "PK" },
-  { yr: "On call", evt: "British SaaS startup",         city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training (private)",                           flag: "GB" },
-  { yr: "On call", evt: "Ruth King's Business Radio",   city: "Atlanta",   country: "USA",       fmt: "Radio",    topic: "Guest interview",                                              flag: "US" },
+  { yr: "2017",    evt: "National Incubation Center",  city: "Islamabad", country: "Pakistan",  fmt: "Talk",     topic: "Inbound marketing, for startups at NIC",                       flag: "PK" },
+  { yr: "2016",    evt: "MPS2016 · M Powered Summit",  city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote",                                    flag: "AE" },
+  { yr: "2016",    evt: "AstroLabs",                   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success",                         flag: "AE" },
+  { yr: "2016",    evt: "IK Institute of Business",    city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Co-trainer with Irfan Khairi",                                 flag: "AE" },
+  { yr: "2014",    evt: "G-Day X",                     city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship",                         flag: "PK" },
+  { yr: "2014",    evt: "University of Peshawar",      city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk",                                                 flag: "PK" },
+  { yr: "2015",    evt: "IYDC",                        city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion",                              flag: "PK" },
+  { yr: "2018",    evt: "IDM Pakistan",                city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu", flag: "PK" },
+  { yr: "On call", evt: "Uhubs (SaaS)",                city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training",                                     flag: "GB" },
+  { yr: "On call", evt: "Ruth King's Business Radio",  city: "Atlanta",   country: "USA",       fmt: "Radio",    topic: "Guest interview",                                              flag: "US" },
 ];
 
 type Format = { name: string; dur: string; note: string };
@@ -880,21 +888,24 @@ const Formats = () => (
 // They also could not live in the 52px proof thumbnails on the format cards:
 // a title card and a two-person video call are illegible at that size, so they
 // get a real figure each instead.
-const ON_CAMERA: ReadonlyArray<{ src: string; alt: string; title: string; cap: string }> = [
+const ON_CAMERA: ReadonlyArray<{ src: string; alt: string; title: string; cap: string; pos: string }> = [
   {
     src: "/assets/speaking/semrush-webinar.jpg",
+    pos: "center center",
     alt: "Title slide of the SEMrush webinar hosted by Syed Irfan Ajmal on the guest blogging process",
     title: "Webinar",
     cap: "SEMrush webinar, co-hosted with SEMrush",
   },
   {
     src: "/assets/speaking/podcast-studio.jpg",
+    pos: "center 25%",
     alt: "Syed Irfan Ajmal recording an episode at the microphone, wearing headphones in his studio",
     title: "Podcast",
     cap: "Recording the SIA Business podcast",
   },
   {
     src: "/assets/speaking/video-interview.jpg",
+    pos: "center 50%",
     alt: "Syed Irfan Ajmal in a two way video interview, appearing as a guest on another host's show",
     title: "Video interview",
     cap: "As a guest, on camera",
@@ -915,12 +926,12 @@ const OnCamera = () => (
             src={c.src}
             alt={c.alt}
             loading="lazy"
-            style={{ width: "100%", aspectRatio: "16 / 9", display: "block", objectFit: "cover" }}
+            style={{ width: "100%", aspectRatio: "2 / 1", display: "block", objectFit: "cover", objectPosition: c.pos }}
           />
-          <figcaption style={{ padding: "11px 14px 13px" }}>
-            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 15.5, color: PAPER, lineHeight: 1.2 }}>{c.title}</div>
-            <div style={{ marginTop: 5 }}>
-              <SCaps size={9.5} ls="0.14em" color="rgba(250,250,250,.6)">{c.cap}</SCaps>
+          <figcaption style={{ padding: "18px 20px 20px" }}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(19px, 2.2vw, 23px)", color: PAPER, lineHeight: 1.2, letterSpacing: "-0.012em" }}>{c.title}</div>
+            <div style={{ marginTop: 8 }}>
+              <SCaps size={11} ls="0.14em" color="rgba(250,250,250,.68)">{c.cap}</SCaps>
             </div>
           </figcaption>
         </figure>
