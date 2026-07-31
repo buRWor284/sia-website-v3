@@ -395,17 +395,61 @@ const Demand = () => (
         Ask an AI assistant to plan a week in Saudi Arabia, AlUla to the Red Sea to Diriyah, and ChatGPT, Gemini, Perplexity and Google&rsquo;s AI Overviews assemble the answer from sources they trust: travel press, guides, reviews, expert commentary, in English and Arabic. Earn that coverage once and it pays out to travelers, to search, and to the machines that cite you, at the same time.
       </p>
     </div>
+    {/* The three cards were identical, which flattened an argument that actually
+        escalates: a traveller asks, a search engine decides, and then a
+        generative engine answers on your behalf. The styling now carries that
+        escalation instead of fighting it. Each card is numbered, each takes a
+        distinct accent, and the third inverts to ink so the card carrying the
+        thesis lands hardest and closes the row.
+
+        Colour is doing work here, not decoration. Amber is never set as text on
+        the light cards, per the locked accessibility rule: it appears as an ink
+        rule or as an ink-on-amber chip, and only becomes text on the dark card
+        where the contrast is safe. */}
     <div className="emai-cards3">
-      {AUDIENCES.map((a) => (
-        <div key={a.t} style={{ border: `1px solid ${INK}`, background: PAPER, padding: "24px 22px", display: "flex", flexDirection: "column" }}>
-          <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.15 }}>{a.t}</h3>
-          <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55, flex: 1 }}>{a.body}</p>
-          <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${INK35}` }}>
-            <SCaps size={9.5} ls="0.14em" color={INK55}>They want</SCaps>
-            <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 14.5, color: INK, lineHeight: 1.5, fontStyle: "italic" }}>{a.want}</p>
+      {AUDIENCES.map((a, i) => {
+        const dark = i === 2;
+        const accent = i === 0 ? BLUE : i === 1 ? INK : YEL;
+        return (
+          <div
+            key={a.t}
+            style={{
+              border: `1px solid ${INK}`,
+              borderTop: `5px solid ${accent}`,
+              background: dark ? INK : i === 1 ? PAPER2 : PAPER,
+              padding: "22px 22px 24px",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 10 }}>
+              <span
+                style={{
+                  fontFamily: GROT,
+                  fontWeight: 800,
+                  fontSize: 10,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  background: dark ? YEL : accent === INK ? INK : BLUE,
+                  color: dark ? INK : PAPER,
+                  padding: "4px 8px",
+                }}
+              >
+                {`0${i + 1}`}
+              </span>
+              <SCaps size={9} ls="0.16em" color={dark ? "rgba(241,235,222,.5)" : INK55}>
+                {i === 0 ? "Asks" : i === 1 ? "Decides" : "Answers"}
+              </SCaps>
+            </div>
+            <h3 style={{ margin: "16px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: dark ? PAPER : INK, lineHeight: 1.15 }}>{a.t}</h3>
+            <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15.5, color: dark ? "rgba(241,235,222,.75)" : INK70, lineHeight: 1.55, flex: 1 }}>{a.body}</p>
+            <div style={{ marginTop: 14, paddingTop: 12, borderTop: `1px dashed ${dark ? "rgba(241,235,222,.3)" : INK35}` }}>
+              <SCaps size={9.5} ls="0.14em" color={dark ? YEL : INK55}>They want</SCaps>
+              <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: 14.5, color: dark ? PAPER : INK, lineHeight: 1.5, fontStyle: "italic" }}>{a.want}</p>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
     <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.5, maxWidth: 880 }}>
       Why AI rewards this: about 83% of AI citations point to third-party sources rather than brand-owned pages (Analyze, 83,670 citations); branded mentions are the strongest correlate of Google AI Overview visibility, roughly 3x backlinks (Ahrefs, 75,000 brands); and adding credible citations lifts generative-engine visibility 30 to 40% (Princeton GEO study).
