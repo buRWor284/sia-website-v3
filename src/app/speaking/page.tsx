@@ -181,7 +181,6 @@ const STAGES: ReadonlyArray<Stage> = [
   { yr: "2015",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion",                              flag: "PK" },
   { yr: "2018",    evt: "IDM Pakistan",                 city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu", flag: "PK" },
   { yr: "On call", evt: "British SaaS startup",         city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training (private)",                           flag: "GB" },
-  { yr: "On call", evt: "World-class SEO SaaS",         city: "Remote",    country: "Global",    fmt: "Webinar",  topic: "SEO-PR strategy (audience to thousands)" },
   { yr: "On call", evt: "Ruth King's Business Radio",   city: "Atlanta",   country: "USA",       fmt: "Radio",    topic: "Guest interview",                                              flag: "US" },
 ];
 
@@ -247,8 +246,8 @@ const HOST_QUOTES: ReadonlyArray<HostQuote> = [
   },
   {
     quote: "Recently, Irfan came and delivered a guest lecture on entrepreneurship to my MBA students at IMSciences (a prestigious business school, which ranks 4th in Pakistan at this time). Students' feedback for his lecture were, “Outstanding!”, “Highly recommended for future guest lectures!” and the likes.",
-    name: "abdul GHAFFAR",
-    role: "Entrepreneur · Startup Consultant · Marketing & Sales",
+    name: "Abdul Ghaffar",
+    role: "Lecturer · Entrepreneurship · Strategic Management · Economics",
     place: "IMSciences, Peshawar",
     photo: "/assets/testimonials/abdul-ghaffar.jpg",
   },
@@ -633,12 +632,14 @@ const Stages = () => (
       {STAGES.map((s, i) => (
         <li key={i} className="stages-table-row">
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(16px, 2.5vw, 22px)", color: INK, lineHeight: 1, letterSpacing: "-0.01em" }}>{s.yr}</div>
-          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(14px, 2vw, 20px)", color: INK, lineHeight: 1.25 }}>{s.evt}</div>
+          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(14px, 2vw, 20px)", color: INK, lineHeight: 1.25 }}>
+            {s.evt}
+            {s.tag && <span style={{ marginLeft: 8, whiteSpace: "nowrap" }}><Pill size={9} ls="0.14em">{s.tag}</Pill></span>}
+          </div>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }} className="stages-col-hide">{s.city}, {s.country}</div>
           <div className="stages-col-hide"><SCaps size={10} ls="0.14em" color={INK55}>{s.fmt}</SCaps></div>
           <div className="stages-col-hide" style={{ display: "flex", justifyContent: "center", gap: 4, alignItems: "baseline" }}>
             {s.flag && <Flag c={s.flag} w={22} />}
-            {s.tag && <Pill size={9} ls="0.14em">{s.tag}</Pill>}
           </div>
           <div className="stages-topic" style={{ fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.4 }}>{s.topic}</div>
         </li>
