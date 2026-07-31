@@ -178,7 +178,7 @@ export const SiaLogo = ({
 );
 
 /* ---------- Flag ------------------------------------------------------ */
-type FlagCode = "SE" | "DK" | "US" | "PK" | "EU";
+type FlagCode = "SE" | "DK" | "US" | "PK" | "EU" | "GB" | "AE" | "ID" | "MY";
 export const Flag = ({ c, w = 24 }: { c: FlagCode; w?: number }) => {
   const h = Math.round(w * 0.625);
   const wrap: CSSProperties = {
@@ -226,6 +226,52 @@ export const Flag = ({ c, w = 24 }: { c: FlagCode; w?: number }) => {
         <rect width="4" height="10" fill="#fff" />
         <circle cx="10.5" cy="5" r="2.2" fill="#fff" />
         <circle cx="11.2" cy="4.6" r="1.8" fill="#01411C" />
+      </svg>
+    );
+  // Union Jack, simplified to the same weight as the other flags here: the
+  // white and red saltires are drawn as plain diagonals rather than properly
+  // counterchanged, which reads correctly at the 22px this renders at.
+  if (c === "GB")
+    return (
+      <svg viewBox="0 0 16 10" width={w} height={h} style={wrap}>
+        <rect width="16" height="10" fill="#012169" />
+        <path d="M0 0 L16 10 M16 0 L0 10" stroke="#FFFFFF" strokeWidth="2.2" />
+        <path d="M0 0 L16 10 M16 0 L0 10" stroke="#C8102E" strokeWidth="1.1" />
+        <rect x="6" width="4" height="10" fill="#FFFFFF" />
+        <rect y="3" width="16" height="4" fill="#FFFFFF" />
+        <rect x="6.8" width="2.4" height="10" fill="#C8102E" />
+        <rect y="3.8" width="16" height="2.4" fill="#C8102E" />
+      </svg>
+    );
+  if (c === "AE")
+    return (
+      <svg viewBox="0 0 16 10" width={w} height={h} style={wrap}>
+        <rect x="4" width="12" height="3.34" fill="#00732F" />
+        <rect x="4" y="3.33" width="12" height="3.34" fill="#FFFFFF" />
+        <rect x="4" y="6.66" width="12" height="3.34" fill="#000000" />
+        <rect width="4" height="10" fill="#FF0000" />
+      </svg>
+    );
+  if (c === "ID")
+    return (
+      <svg viewBox="0 0 16 10" width={w} height={h} style={wrap}>
+        <rect width="16" height="5" fill="#CE1126" />
+        <rect y="5" width="16" height="5" fill="#FFFFFF" />
+      </svg>
+    );
+  // Malaysia, simplified like PK above: 14 stripes are kept because the count is
+  // the point, but the 14-point star is a plain disc at this size.
+  if (c === "MY")
+    return (
+      <svg viewBox="0 0 16 10" width={w} height={h} style={wrap}>
+        <rect width="16" height="10" fill="#FFFFFF" />
+        {[0, 2, 4, 6, 8, 10, 12].map((i) => (
+          <rect key={i} y={(i * 10) / 14} width="16" height={10 / 14} fill="#CC0001" />
+        ))}
+        <rect width="8" height="5" fill="#010066" />
+        <circle cx="3.2" cy="2.5" r="1.5" fill="#FFCC00" />
+        <circle cx="3.9" cy="2.5" r="1.25" fill="#010066" />
+        <circle cx="5.7" cy="2.5" r="0.85" fill="#FFCC00" />
       </svg>
     );
   if (c === "EU")

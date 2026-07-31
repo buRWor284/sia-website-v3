@@ -152,7 +152,7 @@ const REELS: ReadonlyArray<Reel> = [
 
 type Stage = {
   yr: string; evt: string; city: string; country: string;
-  fmt: string; topic: string; flag?: "AE" | "GB" | "US"; tag?: string;
+  fmt: string; topic: string; flag?: "AE" | "GB" | "US" | "PK" | "ID" | "MY"; tag?: string;
 };
 
 const STAGES: ReadonlyArray<Stage> = [
@@ -164,25 +164,25 @@ const STAGES: ReadonlyArray<Stage> = [
   // The stale 2016 lived in THREE files: here, app/gallery/GalleryClient.tsx and
   // components/bureau/CredentialRows.tsx. Change them together or the site
   // contradicts itself.
-  { yr: "2019",    evt: "MaGIC",                        city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop", topic: "Digital marketing for entrepreneurs"                   },
-  { yr: "2018",    evt: "IN5 Innovation Hub",           city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Media Hacks · Free Publicity"                          },
-  { yr: "2018",    evt: "Durshal",                      city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding"                                     },
-  { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller (~500 audience)", flag: "AE", tag: "Biggest"  },
-  { yr: "2017",    evt: "DMSS Conference",              city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (~200 audience)" },
+  { yr: "2019",    evt: "MaGIC",                        city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop", topic: "Digital marketing for entrepreneurs",                          flag: "MY" },
+  { yr: "2018",    evt: "IN5 Innovation Hub",           city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Media Hacks · Free Publicity",                                 flag: "AE" },
+  { yr: "2018",    evt: "Durshal",                      city: "KP",        country: "Pakistan",  fmt: "Workshop", topic: "Personal Branding",                                            flag: "PK" },
+  { yr: "2018",    evt: "Arabian Travel Market (ATM)",  city: "Dubai",     country: "UAE",       fmt: "Panel",    topic: "Marketing to the Modern Muslim Traveller (~500 audience)",     flag: "AE", tag: "Biggest" },
+  { yr: "2017",    evt: "DMSS Conference",              city: "Bali",      country: "Indonesia", fmt: "Workshop", topic: "Media Hacks (~200 audience)",                                  flag: "ID" },
   // Sourced from NIC Pakistan's own Facebook post about the session, which is
   // where both the topic and the format come from: "Content Marketing and PR
   // Consultant sharing his views on Inbound Marketing with the startups at NIC".
-  { yr: "2017",    evt: "National Incubation Center",   city: "Islamabad", country: "Pakistan",  fmt: "Talk",     topic: "Inbound marketing, for startups at NIC"                },
-  { yr: "2016",    evt: "MPS2016 · M Powered Summit",   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote"                             },
-  { yr: "2016",    evt: "AstroLabs",                    city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success"                  },
-  { yr: "2016",    evt: "IK Institute of Business",     city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Co-trainer with Irfan Khairi"                          },
-  { yr: "2014",    evt: "G-Day X",                      city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship"                  },
-  { yr: "2014",    evt: "University of Peshawar",       city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk"                                          },
-  { yr: "2015",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion"                       },
-  { yr: "2018",    evt: "IDM Pakistan",                  city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu"  },
-  { yr: "On call", evt: "British SaaS startup",         city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training (private)",        flag: "GB" },
-  { yr: "On call", evt: "World-class SEO SaaS",         city: "Remote",    country: "Global",    fmt: "Webinar",  topic: "SEO-PR strategy (audience to thousands)"               },
-  { yr: "On call", evt: "Ruth King's Business Radio",   city: "Atlanta",   country: "USA",       fmt: "Radio",    topic: "Guest interview",                           flag: "US" },
+  { yr: "2017",    evt: "National Incubation Center",   city: "Islamabad", country: "Pakistan",  fmt: "Talk",     topic: "Inbound marketing, for startups at NIC",                       flag: "PK" },
+  { yr: "2016",    evt: "MPS2016 · M Powered Summit",   city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Digital marketing keynote",                                    flag: "AE" },
+  { yr: "2016",    evt: "AstroLabs",                    city: "Dubai",     country: "UAE",       fmt: "Talk",     topic: "Growth Hacking Your Brand to Success",                         flag: "AE" },
+  { yr: "2016",    evt: "IK Institute of Business",     city: "Dubai",     country: "UAE",       fmt: "Workshop", topic: "Co-trainer with Irfan Khairi",                                 flag: "AE" },
+  { yr: "2014",    evt: "G-Day X",                      city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship",                         flag: "PK" },
+  { yr: "2014",    evt: "University of Peshawar",       city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk",                                                 flag: "PK" },
+  { yr: "2015",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion",                              flag: "PK" },
+  { yr: "2018",    evt: "IDM Pakistan",                 city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu", flag: "PK" },
+  { yr: "On call", evt: "British SaaS startup",         city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training (private)",                           flag: "GB" },
+  { yr: "On call", evt: "World-class SEO SaaS",         city: "Remote",    country: "Global",    fmt: "Webinar",  topic: "SEO-PR strategy (audience to thousands)" },
+  { yr: "On call", evt: "Ruth King's Business Radio",   city: "Atlanta",   country: "USA",       fmt: "Radio",    topic: "Guest interview",                                              flag: "US" },
 ];
 
 type Format = { name: string; dur: string; note: string };
@@ -251,6 +251,13 @@ const HOST_QUOTES: ReadonlyArray<HostQuote> = [
     role: "Entrepreneur · Startup Consultant · Marketing & Sales",
     place: "IMSciences, Peshawar",
     photo: "/assets/testimonials/abdul-ghaffar.jpg",
+  },
+  {
+    quote: "My first introduction to Syed was when I caught his talk on HOW TO GET PUBLISHED IN MAJOR PUBLICATIONS. In just 15 min, he gave practical, easy to follow advice that I will definitely be implementing!",
+    name: "Zarinah El-Amin",
+    role: "Founder, Legacy Storykeepers · Author · 2x TEDx Speaker · Knight Foundation Awardee",
+    place: "Muslim Marketing Summit · online",
+    photo: "/assets/testimonials/zarinah-el-amin.jpg",
   },
   {
     quote: "… it was a pleasure calling Irfan as a distinguished guest speaker for IYDC2015 (Iqra Youth Development Conference) which featured more than 40 international and local speakers in Peshawar. … His friendly nature and humble personality make attendees interact with him a lot more easily (in comparison to other speakers).",
@@ -505,10 +512,11 @@ const Topics = () => (
 
     {/* Primary topics — 2-col centered */}
     <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20, maxWidth: 960, margin: "0 auto 24px" }} className="speaking-topics-2col">
-      {PRIMARY_TOPICS.map((tp, i) => (
+      {PRIMARY_TOPICS.map((tp) => (
         <div key={tp.title} className="letter-card" style={{
           padding: "36px 28px 30px",
-          background: i === 0 ? PAPER : PAPER2,
+          background: PAPER2,
+          borderTop: tp.moreHref ? `4px solid ${YEL}` : undefined,
           display: "flex", flexDirection: "column",
           gridColumn: tp.moreHref ? "1 / -1" : undefined,
         }}>
@@ -629,11 +637,7 @@ const Stages = () => (
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }} className="stages-col-hide">{s.city}, {s.country}</div>
           <div className="stages-col-hide"><SCaps size={10} ls="0.14em" color={INK55}>{s.fmt}</SCaps></div>
           <div className="stages-col-hide" style={{ display: "flex", justifyContent: "center", gap: 4, alignItems: "baseline" }}>
-            {s.flag === "AE" && (
-              <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.10em", padding: "2px 8px", background: INK, color: PAPER }}>{s.flag}</span>
-            )}
-            {s.flag === "GB" && <Flag c="GB" w={22} />}
-            {s.flag === "US" && <Flag c="US" w={22} />}
+            {s.flag && <Flag c={s.flag} w={22} />}
             {s.tag && <Pill size={9} ls="0.14em">{s.tag}</Pill>}
           </div>
           <div className="stages-topic" style={{ fontFamily: SERIF, fontSize: 15, color: INK, lineHeight: 1.4 }}>{s.topic}</div>
@@ -964,7 +968,7 @@ const CourseBlock = () => (
       </p>
     </div>
 
-    <div className="emai-split" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+    <div className="emai-split" style={{ display: "grid", gridTemplateColumns: "0.85fr 1.15fr", gap: 16 }}>
       <div style={{ border: "1px solid rgba(241,235,222,.28)", background: "rgba(241,235,222,.04)", padding: "26px 24px" }}>
         <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.55)">IDM Pakistan · 2018</SCaps>
         <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "auto 1fr", gap: "9px 16px" }}>
@@ -993,9 +997,9 @@ const CourseBlock = () => (
         </a>
       </div>
 
-      <figure style={{ margin: 0, border: "1px solid rgba(241,235,222,.28)", background: "rgba(241,235,222,.04)", padding: "26px 24px", display: "flex", flexDirection: "column" }}>
+      <figure style={{ margin: 0, border: "1px solid rgba(241,235,222,.28)", borderLeft: `4px solid ${YEL}`, background: "rgba(241,235,222,.07)", padding: "30px 28px", display: "flex", flexDirection: "column" }}>
         <div aria-hidden style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 44, lineHeight: 0.6, color: YEL, height: 26 }}>&ldquo;</div>
-        <blockquote style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 16.5, color: "rgba(241,235,222,.86)", lineHeight: 1.6, flex: 1 }}>
+        <blockquote style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: "clamp(18px, 2.2vw, 23px)", color: PAPER, lineHeight: 1.5, flex: 1, fontStyle: "italic" }}>
           Irfan is an exceptional inbound marketer. I hired him as an inbound marketing trainer at IDMPakistan. He received phenomenal feedback from all of our trainees and provided practical knowledge which helped our students immensely. &hellip;
         </blockquote>
         <figcaption style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(241,235,222,.16)", display: "flex", alignItems: "flex-start", gap: 12 }}>
@@ -1024,8 +1028,8 @@ const CourseBlock = () => (
 // ─── §05 · What Hosts Say ─────────────────────────────────────────────────────
 
 const HostQuotes = () => {
-  const gridQuotes = HOST_QUOTES.slice(0, -1);
-  const lastQuote = HOST_QUOTES[HOST_QUOTES.length - 1];
+  const gridQuotes = HOST_QUOTES.slice(0, -2);
+  const barQuotes = HOST_QUOTES.slice(-2);
   return (
     <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
       <SectionMast n="05" label="What Hosts Say · On the record" />
@@ -1036,7 +1040,7 @@ const HostQuotes = () => {
               <Pill size={10.5} ls="0.18em">№ {String(i + 1).padStart(2, "0")}</Pill>
               <SCaps size={10.5} ls="0.18em" color={INK55}>{tm.place}</SCaps>
             </div>
-            <div aria-hidden style={{ marginTop: 18, display: "inline-block", fontFamily: SERIF, fontSize: 56, lineHeight: 0.62, height: 30, color: INK, fontStyle: "italic", background: YEL, padding: "0 7px" }}>&ldquo;</div>
+            <div aria-hidden style={{ marginTop: 18, alignSelf: "flex-start", fontFamily: SERIF, fontSize: 56, lineHeight: 0.62, height: 30, color: INK, fontStyle: "italic", background: YEL, padding: "0 7px" }}>&ldquo;</div>
             <blockquote style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 3vw, 21px)", color: INK, lineHeight: 1.4, fontStyle: "italic" }}>
               {tm.quote}
             </blockquote>
@@ -1058,21 +1062,23 @@ const HostQuotes = () => {
         ))}
       </div>
 
-      {/* Last testimonial — full-width horizontal bar */}
-      <article style={{ marginTop: 20, border: `1px solid ${INK}`, padding: "28px 32px", display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap", background: PAPER2 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={lastQuote.photo} alt={lastQuote.name} width={52} height={52} style={{ width: 52, height: 52, borderRadius: "50%", border: `1.5px solid ${INK}`, objectFit: "cover" }} />
-          <div>
-            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{lastQuote.name}</div>
-            <div style={{ marginTop: 3 }}><SCaps size={10} ls="0.14em" color={INK70}>{lastQuote.role}</SCaps></div>
+      {/* Closing testimonials — full-width horizontal bars */}
+      {barQuotes.map((bq) => (
+        <article key={bq.name} style={{ marginTop: 20, border: `1px solid ${INK}`, padding: "28px 32px", display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap", background: PAPER2 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bq.photo} alt={bq.name} width={52} height={52} style={{ width: 52, height: 52, borderRadius: "50%", border: `1.5px solid ${INK}`, objectFit: "cover" }} />
+            <div>
+              <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK }}>{bq.name}</div>
+              <div style={{ marginTop: 3 }}><SCaps size={10} ls="0.14em" color={INK70}>{bq.role}</SCaps></div>
+            </div>
           </div>
-        </div>
-        <blockquote style={{ margin: 0, fontFamily: SERIF, fontSize: "clamp(15px, 2vw, 18px)", color: INK, lineHeight: 1.5, fontStyle: "italic", flex: 1, minWidth: 260 }}>
-          &ldquo;{lastQuote.quote}&rdquo;
-        </blockquote>
-        <SCaps size={10} ls="0.14em" color={INK55}>Room · {lastQuote.place}</SCaps>
-      </article>
+          <blockquote style={{ margin: 0, fontFamily: SERIF, fontSize: "clamp(15px, 2vw, 18px)", color: INK, lineHeight: 1.5, fontStyle: "italic", flex: 1, minWidth: 260 }}>
+            &ldquo;{bq.quote}&rdquo;
+          </blockquote>
+          <SCaps size={10} ls="0.14em" color={INK55}>Room · {bq.place}</SCaps>
+        </article>
+      ))}
       {/* `role` above is each person's CURRENT LinkedIn headline, which in most cases
           postdates the room they are describing. Say so rather than implying they held
           that title at the time, and never invent an at-the-time title. */}
