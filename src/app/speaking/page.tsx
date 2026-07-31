@@ -629,9 +629,10 @@ const Stages = () => (
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70 }} className="stages-col-hide">{s.city}, {s.country}</div>
           <div className="stages-col-hide"><SCaps size={10} ls="0.14em" color={INK55}>{s.fmt}</SCaps></div>
           <div className="stages-col-hide" style={{ display: "flex", justifyContent: "center", gap: 4, alignItems: "baseline" }}>
-            {(s.flag === "AE" || s.flag === "GB") && (
+            {s.flag === "AE" && (
               <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.10em", padding: "2px 8px", background: INK, color: PAPER }}>{s.flag}</span>
             )}
+            {s.flag === "GB" && <Flag c="GB" w={22} />}
             {s.flag === "US" && <Flag c="US" w={22} />}
             {s.tag && <Pill size={9} ls="0.14em">{s.tag}</Pill>}
           </div>
