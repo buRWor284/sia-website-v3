@@ -179,7 +179,7 @@ const STAGES: ReadonlyArray<Stage> = [
   { yr: "2014",    evt: "G-Day X",                      city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship"                  },
   { yr: "2014",    evt: "University of Peshawar",       city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk"                                          },
   { yr: "2015",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion"                       },
-  { yr: "On call", evt: "IDM Pakistan",                  city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu"  },
+  { yr: "2018",    evt: "IDM Pakistan",                  city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu"  },
   { yr: "On call", evt: "British SaaS startup",         city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training (private)",        flag: "GB" },
   { yr: "On call", evt: "World-class SEO SaaS",         city: "Remote",    country: "Global",    fmt: "Webinar",  topic: "SEO-PR strategy (audience to thousands)"               },
   { yr: "On call", evt: "Ruth King's Business Radio",   city: "Atlanta",   country: "USA",       fmt: "Radio",    topic: "Guest interview",                           flag: "US" },
@@ -230,6 +230,27 @@ const HOST_QUOTES: ReadonlyArray<HostQuote> = [
     role: "AI SEO researcher",
     place: "DMSS, Bali",
     photo: "/assets/testimonials/brie-moreau.jpg",
+  },
+  {
+    quote: "Syed Irfan spoke at our event the M Powered Summit in Dubai on Personal Branding. Based on the feedback we got from the audience, it was a highly informative talk and everyone benefitted from it. We are glad to have him as a speaker and we highly recommend him. …",
+    name: "Abd Elmohaimen Mansi",
+    role: "Co-founder · Travel & Mobility as a Service",
+    place: "M Powered Summit, Dubai",
+    photo: "/assets/testimonials/abd-elmohaimen-mansi.jpg",
+  },
+  {
+    quote: "Irfan's talk on How to Get Published in Large Publications at Muslim Marketing Summit was insightful. It was based on the core idea of building authentic trustworthy relationship with media. I highly recommend Irfan for Media & PR related solutions.",
+    name: "Shereen Pasha",
+    role: "Launch Strategist · Course Launch & Business Management Expert",
+    place: "Muslim Marketing Summit · online",
+    photo: "/assets/testimonials/shereen-pasha.jpg",
+  },
+  {
+    quote: "Recently, Irfan came and delivered a guest lecture on entrepreneurship to my MBA students at IMSciences (a prestigious business school, which ranks 4th in Pakistan at this time). Students' feedback for his lecture were, “Outstanding!”, “Highly recommended for future guest lectures!” and the likes.",
+    name: "abdul GHAFFAR",
+    role: "Entrepreneur · Startup Consultant · Marketing & Sales",
+    place: "IMSciences, Peshawar",
+    photo: "/assets/testimonials/abdul-ghaffar.jpg",
   },
   {
     quote: "… it was a pleasure calling Irfan as a distinguished guest speaker for IYDC2015 (Iqra Youth Development Conference) which featured more than 40 international and local speakers in Peshawar. … His friendly nature and humble personality make attendees interact with him a lot more easily (in comparison to other speakers).",
@@ -905,6 +926,100 @@ const OnCamera = () => (
   </section>
 );
 
+// ─── The course · a full curriculum, taught live ──────────────────────────────
+// Why this exists as its own block rather than a line in the Past Stages table:
+// the booking specs at the top of this page claim "Languages: English (primary),
+// Urdu, Pashto". Until now that was an unsupported assertion. A 10 hour, five
+// session curriculum delivered in Urdu, publicly viewable end to end, is the
+// evidence for it — and in the Gulf, where the Urdu-speaking workforce is large,
+// being able to run internal training in Urdu reaches rooms most international
+// speakers cannot.
+//
+// Accuracy notes, all verified 2026-07-31:
+//   • 2018 confirmed by Irfan. The row in STAGES above now carries the same year.
+//   • 5 sessions / 10 hours / Urdu cross-checked against the public playlist,
+//     which is on his own channel and holds five videos.
+//   • Shoaib Ahmed Baig's quote is VERBATIM from his LinkedIn recommendation,
+//     trimmed with an ellipsis only. He is the founder who HIRED him, which is
+//     what makes it worth more here than an attendee compliment. His title is
+//     his own LinkedIn headline.
+//   • The language is stated plainly rather than buried. Framing it as a
+//     limitation would be dishonest in the other direction: the curriculum is
+//     the same either way, and the delivery language is a capability.
+const CourseBlock = () => (
+  <section className="sx" style={{ background: INK, color: PAPER, paddingTop: 76, paddingBottom: 80 }}>
+    <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 22, flexWrap: "wrap" }}>
+      <SCaps size={11} ls="0.20em" color={YEL}>Training · A full curriculum, not a talk</SCaps>
+      <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.2)", minWidth: 40 }} />
+    </div>
+
+    <div className="grid-intro">
+      <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: PAPER, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
+        Ten hours. Five sessions.<br />
+        <span style={{ fontStyle: "italic", color: YEL }}>One curriculum.</span>
+      </h2>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)", lineHeight: 1.6, maxWidth: 560 }}>
+        A keynote proves I can hold a stage for forty five minutes. A commissioned ten hour inbound marketing curriculum, taught live to a training company&rsquo;s paying students, proves something harder: that the material holds up over five sessions and that people came back for every one. The whole course is public.
+      </p>
+    </div>
+
+    <div className="emai-split" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div style={{ border: "1px solid rgba(241,235,222,.28)", background: "rgba(241,235,222,.04)", padding: "26px 24px" }}>
+        <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.55)">IDM Pakistan · 2018</SCaps>
+        <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "auto 1fr", gap: "9px 16px" }}>
+          {([
+            ["Format", "Live course, five sessions"],
+            ["Length", "10 hours of instruction"],
+            ["Audience", "Enrolled students of a training company"],
+            ["Language", "Urdu"],
+          ] as ReadonlyArray<[string, string]>).map(([k, v]) => (
+            <Fragment key={k}>
+              <div><SCaps size={9.5} ls="0.14em" color="rgba(241,235,222,.5)">{k}</SCaps></div>
+              <div style={{ fontFamily: SERIF, fontSize: 15, color: PAPER, lineHeight: 1.4 }}>{v}</div>
+            </Fragment>
+          ))}
+        </div>
+        <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5, color: "rgba(241,235,222,.6)", lineHeight: 1.5 }}>
+          Taught in Urdu. The curriculum is the same one I teach in English, and I deliver in either.
+        </p>
+        <a
+          href="https://www.youtube.com/playlist?list=PLY3hQIOPokOPlMnsJ_GqCIsAlaipM5j7j"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ display: "inline-block", marginTop: 18, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK, background: YEL, padding: "12px 18px", textDecoration: "none" }}
+        >
+          Watch the full course &rarr;
+        </a>
+      </div>
+
+      <figure style={{ margin: 0, border: "1px solid rgba(241,235,222,.28)", background: "rgba(241,235,222,.04)", padding: "26px 24px", display: "flex", flexDirection: "column" }}>
+        <div aria-hidden style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 44, lineHeight: 0.6, color: YEL, height: 26 }}>&ldquo;</div>
+        <blockquote style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 16.5, color: "rgba(241,235,222,.86)", lineHeight: 1.6, flex: 1 }}>
+          Irfan is an exceptional inbound marketer. I hired him as an inbound marketing trainer at IDMPakistan. He received phenomenal feedback from all of our trainees and provided practical knowledge which helped our students immensely. &hellip;
+        </blockquote>
+        <figcaption style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(241,235,222,.16)", display: "flex", alignItems: "flex-start", gap: 12 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/assets/testimonials/shoaib-ahmed-baig.jpg"
+            alt="Shoaib Ahmed Baig"
+            width={44}
+            height={44}
+            loading="lazy"
+            style={{ width: 44, height: 44, borderRadius: "50%", objectFit: "cover", flexShrink: 0, border: "1px solid rgba(241,235,222,.25)" }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER, lineHeight: 1.25 }}>Shoaib Ahmed Baig</div>
+            <div style={{ marginTop: 3, fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.6)", lineHeight: 1.4 }}>Founder, Elyscents · IDMPakistan · Core47.ai</div>
+            <div style={{ marginTop: 8 }}>
+              <SCaps size={9} ls="0.14em" color="rgba(241,235,222,.45)">Hired him to teach the course</SCaps>
+            </div>
+          </div>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+);
+
 // ─── §05 · What Hosts Say ─────────────────────────────────────────────────────
 
 const HostQuotes = () => {
@@ -918,10 +1033,10 @@ const HostQuotes = () => {
           <article key={i} className="letter-card" style={{ padding: "32px 28px 28px", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 6 }}>
               <Pill size={10.5} ls="0.18em">№ {String(i + 1).padStart(2, "0")}</Pill>
-              <SCaps size={10.5} ls="0.18em" color={INK55}>Filed from {tm.place}</SCaps>
+              <SCaps size={10.5} ls="0.18em" color={INK55}>{tm.place}</SCaps>
             </div>
-            <blockquote style={{ margin: "20px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 3vw, 21px)", color: INK, lineHeight: 1.4, fontStyle: "italic", position: "relative", paddingLeft: 30 }}>
-              <span aria-hidden style={{ position: "absolute", left: -4, top: -8, fontFamily: SERIF, fontSize: 84, lineHeight: 1, color: INK, fontStyle: "italic", background: YEL, padding: "0 4px" }}>&ldquo;</span>
+            <div aria-hidden style={{ marginTop: 18, display: "inline-block", fontFamily: SERIF, fontSize: 56, lineHeight: 0.62, height: 30, color: INK, fontStyle: "italic", background: YEL, padding: "0 7px" }}>&ldquo;</div>
+            <blockquote style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: "clamp(15px, 3vw, 21px)", color: INK, lineHeight: 1.4, fontStyle: "italic" }}>
               {tm.quote}
             </blockquote>
             <HRule style={{ margin: "22px 0 14px", background: INK35 }} />
@@ -1153,6 +1268,7 @@ export default function SpeakingPage() {
       <ClientStripSpeaking />
       <Formats />
       <OnCamera />
+      <CourseBlock />
       <HostQuotes />
       <BookingProcess />
       <BottomBookingCTA />
