@@ -166,7 +166,7 @@ const STAGES: ReadonlyArray<Stage> = [
   { yr: "2016",    evt: "MaGIC",                        city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop", topic: "Digital marketing for entrepreneurs"                   },
   { yr: "2014",    evt: "G-Day X",                      city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",  topic: "Digital marketing & entrepreneurship"                  },
   { yr: "2014",    evt: "University of Peshawar",       city: "Peshawar",  country: "Pakistan",  fmt: "Talk",     topic: "Student talk"                                          },
-  { yr: "2013",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion"                       },
+  { yr: "2015",    evt: "IYDC",                         city: "Peshawar",  country: "Pakistan",  fmt: "Panel",    topic: "Social Media · panel discussion"                       },
   { yr: "On call", evt: "IDM Pakistan",                  city: "Online",    country: "Pakistan",  fmt: "Course",   topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu"  },
   { yr: "On call", evt: "British SaaS startup",         city: "Remote",    country: "UK",        fmt: "Workshop", topic: "Internal SEO-PR training (private)",        flag: "GB" },
   { yr: "On call", evt: "World-class SEO SaaS",         city: "Remote",    country: "Global",    fmt: "Webinar",  topic: "SEO-PR strategy (audience to thousands)"               },
@@ -184,33 +184,46 @@ const FORMATS: ReadonlyArray<Format> = [
 ];
 
 type HostQuote = { quote: string; name: string; role: string; place: string; photo: string; stat?: string };
+// ★ VERBATIM ONLY. Every quote below is reproduced word for word from the public
+// LinkedIn recommendation it came from. An ellipsis marks a trim; nothing else is
+// changed. Do not tidy the grammar, do not re-punctuate, do not condense two
+// paragraphs into one sentence, and do not remove a dash to satisfy house style.
+// House style governs our copy, never someone else's words.
+//
+// These four previously carried lightly rewritten versions of the same
+// recommendations. Restored from the source screenshots 2026-07-30.
+//
+// `role` is the person's own LinkedIn headline, trimmed. Do NOT upgrade an
+// attendee to an "Organizer": Brie Moreau writes "our conference", which
+// establishes affiliation with DMSS but not the organiser title the previous
+// copy asserted. Same for `place`, which is only set where the person states it.
 const HOST_QUOTES: ReadonlyArray<HostQuote> = [
   {
-    quote: "It was a pleasure collaborating with Syed for a Uhubs workshop on 'How We Grew from Zero to 1.5 Million Unique Monthly Visitors.' The audience enjoyed his super practical session, clear slides, and concise answers. He is a great speaker with hands-on, practical advice and an amazing personal story.",
+    quote: "The audience enjoyed his super practical session and approach to helping them understand how to grow an audience online and traffic to websites using various smart methods and enjoyed his friendly and positive presentation style, clear slides and concise answers to many questions he received.",
     name: "Ash Ali",
     role: "Co-Founder, Uhubs · Author, The Unfair Advantage (150k+ copies)",
-    place: "London",
+    place: "Uhubs workshop",
     photo: "/assets/testimonials/ash-ali.jpg",
   },
   {
-    quote: "Being a great speaker takes one part art, one part science, a whole lot of experience, and an understanding of how to lead through storytelling, emotional intelligence, and personal clarity. Irfan delivers on all of this and more. If you are looking for a dynamic global speaker, reach out to Irfan.",
+    quote: "Being a great speaker takes one part art, one part science, a whole lot of experience, an understanding of how to lead a potential customer through storytelling, emotional intelligence, and personal clarity. Irfan delivers on all of this and more. … If you are looking for a dynamic global speaker, reach out to Irfan. He will turn possibilities into realities.",
     name: "Chuck Wang",
-    role: "Strategic Operations Executive, Former Founder/CEO",
-    place: "San Francisco",
+    role: "Strategic Operations & Governance Executive · Former Founder/CEO",
+    place: "",
     photo: "/assets/testimonials/chuck-wang.jpg",
   },
   {
-    quote: "Syed spoke at our DMSS conference and is an excellent public speaker. He gave me great, actionable tips to increase our media exposure. He comes highly recommended.",
+    quote: "Syed spoke at our conference www.dmss.io … He is an excellent public speaker … He comes highly recommended!!",
     name: "Brie Moreau",
-    role: "Organizer, DMSS Conference (Bali)",
-    place: "Bali",
+    role: "AI SEO researcher",
+    place: "DMSS, Bali",
     photo: "/assets/testimonials/brie-moreau.jpg",
   },
   {
-    quote: "Irfan was a distinguished guest speaker at IYDC2015, which featured more than 40 international and local speakers. His knowledge of content marketing, SEO, and growth hacking makes him an ideal speaker for entrepreneurs looking to expand their digital presence. His friendly nature and humble personality make attendees interact with him easily.",
+    quote: "… it was a pleasure calling Irfan as a distinguished guest speaker for IYDC2015 (Iqra Youth Development Conference) which featured more than 40 international and local speakers in Peshawar. … His friendly nature and humble personality make attendees interact with him a lot more easily (in comparison to other speakers).",
     name: "Maryam Arshad Mahmood",
-    role: "Partnerships, Google (Singapore)",
-    place: "Singapore",
+    role: "Growth and Market Strategy leader · Partnerships @ Google",
+    place: "IYDC 2015, Peshawar",
     photo: "/assets/testimonials/maryam-arshad-mahmood.jpg",
   },
 ];
@@ -602,7 +615,16 @@ const Stages = () => (
 //
 // Caption rule: every venue below is corroborated by the STAGES inventory above
 // and, for MPS and AstroLabs, by branding visible in the frames from the same
-// shoot. No years, because the year on the G-Day X row is disputed.
+// shoot. The Startup Grind frame carries its own proof: the screen behind him
+// reads "Startup Grind, Powered by Google for Entrepreneurs, PESHAWAR".
+//
+// ★ NIC Islamabad is the ONE exception: the frame carries no branding (the wall
+// text is a generic quote) and the room is NOT yet a row in STAGES above. The
+// venue comes from Irfan's own labelling of the source folder. It carries NO
+// year: the files are Facebook exports with the EXIF stripped, so nothing dates
+// them. Add a STAGES row and a year once Irfan confirms one, and do not guess.
+// It earns its place because it is by some distance the most RECENT room on
+// file; every other photograph here is 2018 or earlier.
 //
 // Bali is deliberately absent: DMSSStrip already carries a DMSS photograph
 // higher up this same page, and running it twice would read as padding.
@@ -623,9 +645,14 @@ const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
     cap: "IN5 Innovation Hub, Dubai",
   },
   {
-    src: "/assets/gallery/gdayx-1.jpg",
-    alt: "Syed Irfan Ajmal speaking from the podium to a seated audience at G-Day X in Peshawar",
-    cap: "G-Day X, Peshawar",
+    src: "/assets/speaking/startup-grind.jpg",
+    alt: "Syed Irfan Ajmal in a fireside chat with a microphone, in front of a Startup Grind Powered by Google for Entrepreneurs screen in Peshawar",
+    cap: "Startup Grind, Peshawar",
+  },
+  {
+    src: "/assets/speaking/nic-islamabad.jpg",
+    alt: "Syed Irfan Ajmal presenting with a microphone to attendees seated at tables at the National Incubation Center in Islamabad",
+    cap: "NIC Islamabad",
   },
 ];
 
@@ -750,6 +777,69 @@ const Formats = () => (
         );
       })}
     </div>
+  </section>
+);
+
+// ─── On camera and online ─────────────────────────────────────────────────────
+// Kept as its own strip rather than folded into the Available Formats cards
+// above, and the labelling matters: these are on-camera and online work, NOT
+// speaking credits. A webinar title card and a podcast frame do not prove a
+// stage, and captioning them as though they did would be the exact overclaim the
+// project rules exist to prevent. "On the SIA Business podcast" is true; anything
+// implying a room is not.
+//
+// They also could not live in the 52px proof thumbnails on the format cards:
+// a title card and a two-person video call are illegible at that size, so they
+// get a real figure each instead.
+const ON_CAMERA: ReadonlyArray<{ src: string; alt: string; title: string; cap: string }> = [
+  {
+    src: "/assets/speaking/semrush-webinar.jpg",
+    alt: "Title slide of the SEMrush webinar hosted by Syed Irfan Ajmal on the guest blogging process",
+    title: "Webinar",
+    cap: "SEMrush webinar, co-hosted with SEMrush",
+  },
+  {
+    src: "/assets/speaking/podcast-studio.jpg",
+    alt: "Syed Irfan Ajmal recording an episode at the microphone, wearing headphones in his studio",
+    title: "Podcast",
+    cap: "Recording the SIA Business podcast",
+  },
+  {
+    src: "/assets/speaking/video-interview.jpg",
+    alt: "Syed Irfan Ajmal in a two way video interview, appearing as a guest on another host's show",
+    title: "Video interview",
+    cap: "As a guest, on camera",
+  },
+];
+
+const OnCamera = () => (
+  <section className="sx" style={{ background: PAPER, paddingBottom: 84 }}>
+    <div style={{ display: "flex", alignItems: "baseline", gap: 14, marginBottom: 18, flexWrap: "wrap" }}>
+      <SCaps size={11} ls="0.20em" color={INK55}>On camera and online</SCaps>
+      <div style={{ flex: 1, height: 1, background: INK35, minWidth: 40 }} />
+    </div>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+      {ON_CAMERA.map((c) => (
+        <figure key={c.src} style={{ margin: 0, flex: "1 1 280px", minWidth: 240, background: INK, border: `1px solid ${INK}` }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={c.src}
+            alt={c.alt}
+            loading="lazy"
+            style={{ width: "100%", aspectRatio: "16 / 9", display: "block", objectFit: "cover" }}
+          />
+          <figcaption style={{ padding: "11px 14px 13px" }}>
+            <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 15.5, color: PAPER, lineHeight: 1.2 }}>{c.title}</div>
+            <div style={{ marginTop: 5 }}>
+              <SCaps size={9.5} ls="0.14em" color="rgba(250,250,250,.6)">{c.cap}</SCaps>
+            </div>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+    <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70, lineHeight: 1.5 }}>
+      Recorded work, not stage credits. The rooms are in the inventory above.
+    </p>
   </section>
 );
 
@@ -994,6 +1084,7 @@ export default function SpeakingPage() {
       <RoomBand />
       <ClientStripSpeaking />
       <Formats />
+      <OnCamera />
       <HostQuotes />
       <BookingProcess />
       <BottomBookingCTA />

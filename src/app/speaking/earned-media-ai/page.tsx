@@ -135,8 +135,8 @@ const STATS: ReadonlyArray<[string, string]> = [
 // the G-Day X and Arabian Travel Market banners are visible in their own frames.
 // The IK Institute of Business venue was confirmed by Irfan 2026-07-30 and matches
 // the Past Stages inventory on /speaking (IK Institute of Business, Dubai, 2016).
-// NO YEAR on the G-Day X caption: /speaking says 2014, Irfan recalls "probably
-// 2016", and an unverified year does not go in a caption.
+// G-Day X year = 2014, confirmed by Irfan 2026-07-30 and matching the Past
+// Stages inventory on /speaking. (He briefly recalled 2016; 2014 is the ruling.)
 type Fmt = { t: string; meta: string; body: string; photo: string; alt: string; caption: string };
 const FORMATS: ReadonlyArray<Fmt> = [
   {
@@ -145,7 +145,7 @@ const FORMATS: ReadonlyArray<Fmt> = [
     body: "A fast, story-led mainstage talk that maps the shift from both sides, with a live look at what AI currently says about a brand in the room. Best to open or close a track.",
     photo: "/assets/gallery/gdayx-1.jpg",
     alt: "Syed Irfan Ajmal speaking from the podium to a seated audience at G-Day X in Peshawar",
-    caption: "G-Day X, Peshawar",
+    caption: "G-Day X, Peshawar · 2014",
   },
   {
     t: "Interactive workshop",

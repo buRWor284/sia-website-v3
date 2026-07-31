@@ -18,6 +18,12 @@ import { GROT, INK, INK15, INK35, INK55, INK70, PAPER, PAPER2, SERIF } from "@/l
 // Ordering: Gulf first, then international institutions, then Pakistan. A Riyadh
 // or Dubai organiser scans the first row and stops.
 //
+// Years: all confirmed against the Past Stages inventory on /speaking. G-Day X is
+// 2014 and IYDC is 2015, both settled by Irfan 2026-07-30 (the /speaking table
+// previously said IYDC 2013, which contradicted Maryam Arshad Mahmood's
+// recommendation naming IYDC2015; the table was corrected, not her words).
+// Startup Grind carries no year because none is verified. Do not guess one.
+//
 // These are typeset wordmarks rather than image files: the press-kit logo folder
 // covers only some of these names, and a row that mixes real logos with text
 // stand-ins looks worse than a row that is consistently typeset.
@@ -30,9 +36,10 @@ const STAGES_ROW: ReadonlyArray<[string, string]> = [
   ["IK Institute of Business", "Dubai · 2016"],
   ["DMSS Conference", "Bali · 2017"],
   ["MaGIC", "Cyberjaya · 2016"],
-  ["G-Day X", "Peshawar"],
-  ["University of Peshawar", "Peshawar"],
-  ["IYDC", "Peshawar"],
+  ["Startup Grind", "Peshawar"],
+  ["IYDC", "Peshawar · 2015"],
+  ["G-Day X", "Peshawar · 2014"],
+  ["University of Peshawar", "Peshawar · 2014"],
 ];
 
 const PRESS_ROW: ReadonlyArray<string> = [
