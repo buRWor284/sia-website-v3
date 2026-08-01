@@ -234,7 +234,7 @@ const CMOLead = () => (
             "Operator since 2004",
             "DMR.agency since 2013",
             "Forbes · HBR · Entrepreneur",
-            "World Bank keynote",
+            "World Bank Blog contributor",
             "SEMrush workshop",
             "Podcast · season 4",
           ].map((tag) => (
