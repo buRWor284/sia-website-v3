@@ -84,7 +84,7 @@ const CURRENT: ReadonlyArray<CurrentVenture> = [
       { name: "Empowered Summit", loc: "UAE" },
       { name: "Uhubs", loc: "UK" },
       { name: "IKSB", loc: "UAE" },
-      { name: "World Bank", loc: "Pakistan" },
+      { name: "Digital Youth Summit", loc: "Pakistan" },
     ],
   },
   {

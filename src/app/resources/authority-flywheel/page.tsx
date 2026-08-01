@@ -104,7 +104,7 @@ export default function AuthorityFlywheelPage() {
           <h3 style={{ margin: "0 0 12px", fontFamily: SERIF, fontWeight: 700, fontSize: 22, lineHeight: 1.15 }}>Bring this to your stage or team</h3>
           <HRule />
           <p style={{ margin: "14px 0 20px", fontFamily: SERIF, fontSize: 16, lineHeight: 1.6, color: INK70 }}>
-            I give talks and workshops on earned media and the Authority Flywheel, including sessions for the World Bank, SEMrush, and Ahrefs.
+            I give talks and workshops on earned media and the Authority Flywheel, including a SEMrush webinar and a workshop at the World Bank backed Digital Youth Summit.
           </p>
           <a
             href="/speaking"

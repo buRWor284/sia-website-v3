@@ -348,7 +348,7 @@ export default async function RadarPage() {
           </h2>
           <div className="emr-logos" style={{ marginTop: 18 }}>
             Forbes &nbsp;&middot;&nbsp; Harvard Business Review &nbsp;&middot;&nbsp; Business Insider &nbsp;&middot;&nbsp; Entrepreneur &nbsp;&middot;&nbsp; Yahoo
-            &nbsp;&middot;&nbsp; MarketWatch &nbsp;&middot;&nbsp; MSN &nbsp;&middot;&nbsp; World Bank &nbsp;&middot;&nbsp; SEMrush &nbsp;&middot;&nbsp; Ahrefs
+            &nbsp;&middot;&nbsp; MarketWatch &nbsp;&middot;&nbsp; MSN &nbsp;&middot;&nbsp; World Bank &nbsp;&middot;&nbsp; SEMrush
           </div>
           <div className="emr-stats">
             {[
