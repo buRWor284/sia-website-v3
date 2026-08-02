@@ -62,3 +62,7 @@ docs/SignalIQ/
 # Working/design zips - keep big archives out of git
 *.zip
 !public/press-kit/assets/Syed-Irfan-Ajmal-Press-Kit-Assets.zip
+
+# Private notes — never commit (public repo)
+docs/EMOS-PRICING-AND-BUILD-PLAN.md
+eval/factcheck-model-comparison-*
