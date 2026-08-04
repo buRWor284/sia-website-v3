@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useCallback, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import Script from "next/script";
 import { Colophon, Subscriptions } from "@/components/bureau";
@@ -25,6 +26,36 @@ import {
   SERIF,
   YEL,
 } from "@/lib/tokens";
+
+// ★ Irfan's own post on the World Bank blog, 26 April 2017. This is the single
+// most verifiable credential on the site: a primary source on worldbank.org.
+// It replaced the old, unverifiable "World Bank keynote" claim on 2026-07-31.
+const WORLD_BANK_POST =
+  "https://blogs.worldbank.org/en/endpovertyinsouthasia/why-introvert-me-looks-forward-attending-digital-youth-summit";
+
+// A credibility chip. Renders a plain span, or an <a> when an href is supplied,
+// so a claim that can be proven links straight to its proof.
+const Chip = ({
+  href,
+  style,
+  children,
+}: {
+  href?: string;
+  style: CSSProperties;
+  children: ReactNode;
+}) =>
+  href ? (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ ...style, textDecoration: "underline", textUnderlineOffset: 3 }}
+    >
+      {children}
+    </a>
+  ) : (
+    <span style={style}>{children}</span>
+  );
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -230,16 +261,21 @@ const CMOLead = () => (
         </p>
 
         <div style={{ marginTop: "1em", display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+          {/* The World Bank chip carries an href because it is the one credential here
+              a sceptic can verify in a single click: Irfan's own post on
+              blogs.worldbank.org, 26 April 2017. A linked claim beats a bigger
+              unlinked one, which is exactly why this replaced "World Bank keynote". */}
           {[
-            "Operator since 2004",
-            "DMR.agency since 2013",
-            "Forbes · HBR · Entrepreneur",
-            "World Bank Blog contributor",
-            "SEMrush workshop",
-            "Podcast · season 4",
-          ].map((tag) => (
-            <span
+            { t: "Operator since 2004" },
+            { t: "DMR.agency since 2013" },
+            { t: "Forbes · HBR · Entrepreneur" },
+            { t: "World Bank Blog contributor", href: WORLD_BANK_POST },
+            { t: "SEMrush workshop" },
+            { t: "Podcast · season 4" },
+          ].map(({ t: tag, href }) => (
+            <Chip
               key={tag}
+              href={href}
               style={{
                 display: "inline-block",
                 padding: "5px 10px",
@@ -253,7 +289,7 @@ const CMOLead = () => (
               }}
             >
               {tag}
-            </span>
+            </Chip>
           ))}
           <a href="#leadership-audit" style={{ textDecoration: "none" }}>
             <Pill size={9.5} ls="0.10em">$3K audit: smaller first step &rarr;</Pill>

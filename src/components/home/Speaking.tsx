@@ -5,7 +5,7 @@ import { SCaps, SectionMast, SiaLogo } from "@/components/bureau/primitives";
 // Peshawar is 3rd (not 1st, 2nd, or last)
 const ROWS: ReadonlyArray<[string, string, string]> = [
   ["Bali",         "Indonesia", "DMSS · ~200 audience"],
-  ["Kuala Lumpur", "Malaysia",  "MaGIC"],
+  ["Cyberjaya",    "Malaysia",  "MaGIC"],
   ["Peshawar",     "Pakistan",  "G-Day X · Startup Grind · GDG + others"],
   ["Dubai",        "UAE",       "ATM · IN5 · AstroLabs"],
   ["Islamabad",    "Pakistan",  "NIC"],
