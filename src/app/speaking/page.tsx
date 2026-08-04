@@ -156,6 +156,17 @@ type Stage = {
 };
 
 const STAGES: ReadonlyArray<Stage> = [
+  // ★ Durshal is DOCUMENTED, and precisely: Monday 6 August 2018, 5pm to 7pm, at
+  // Durshal Peshawar. A 2 hour workshop on Personal Branding. Source is the
+  // organiser's own announcement, posted by Durshal on Facebook on 2 August 2018,
+  // archived at public/assets/speaking/Durshal 2018/. Durshal+ is a Community
+  // Innovation Lab and a project of KPITB, the Khyber Pakhtunkhwa Information
+  // Technology Board, Government of Khyber Pakhtunkhwa.
+  //
+  // ⚠ Irfan first recalled this as April 2018. The organiser card says 6 August.
+  // The card wins. The same post carries a public attendee comment from Harroon
+  // Rashid, "It was a wonderful session dear sir irfan", if a testimonial is ever
+  // wanted.
   // ★ MaGIC is 2019. Confirmed by Irfan 2026-07-31, corroborated by MaGIC's own event
   // card in the SIA archive ("Magic_Changes.jpg"), which is MaGIC-branded and
   // reads "Empowering Data, Personal Branding, & Fintech Trends 2019 · 26
@@ -166,7 +177,7 @@ const STAGES: ReadonlyArray<Stage> = [
   // contradicts itself.
   { yr: "2019",    evt: "MaGIC",                       city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop",      topic: "Digital marketing for entrepreneurs",                            flag: "MY" },
   { yr: "2018",    evt: "IN5 Innovation Hub",          city: "Dubai",     country: "UAE",       fmt: "Workshop",      topic: "Media Hacks · Free Publicity",                                   flag: "AE" },
-  { yr: "2018",    evt: "Durshal",                     city: "KP",        country: "Pakistan",  fmt: "Workshop",      topic: "Personal Branding",                                              flag: "PK" },
+  { yr: "2018",    evt: "Durshal",                     city: "Peshawar",  country: "Pakistan",  fmt: "Workshop",      topic: "Personal Branding",                                              flag: "PK" },
   { yr: "2018",    evt: "Arabian Travel Market (ATM)", city: "Dubai",     country: "UAE",       fmt: "Panel",         topic: "Marketing to the Modern Muslim Traveller (~500 audience)",       flag: "AE", tag: "Biggest" },
   { yr: "2018",    evt: "IDM Pakistan",                city: "Online",    country: "Pakistan",  fmt: "Course",        topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu",   flag: "PK" },
   // ★ IMSciences 2018. The year is when Abdul Ghaffar posted his LinkedIn
@@ -739,13 +750,13 @@ const Stages = () => (
 // behind the panel reads "arabian travel market, DUBAI, Sun 22 to Wed 25 April
 // 2018". Deliberately NO headcount: you cannot count a hall from one camera.
 //
-// ★ durshal-peshawar-1 (2026-07-31) closes the last gap in this band. Unlike
-// MaGIC, this frame carries NO venue branding at all. There is none anywhere in
-// 78 minutes of footage. The venue rests on two things only: Irfan identified
-// the source video as Durshal on 2026-07-31, and Durshal is in the STAGES
-// inventory above. That is why the caption names no year, even though the
-// inventory says 2018. Alternates -2, -3 and -4 are in the gallery folder; -4
-// is the one that shows him in the room rather than the audience.
+// ★ durshal-peshawar-1 (2026-07-31) closes the last gap in this band. The frame
+// itself carries NO venue branding, and there is none anywhere in 78 minutes of
+// footage. The caption can still name the venue AND the year, because the
+// organiser documented the event: Durshal's own Facebook announcement, 6 August
+// 2018 at Durshal Peshawar, archived under public/assets/speaking/Durshal 2018/.
+// Evidence outside the frame counts, it just has to actually exist. Alternates
+// -2, -3 and -4 are in the gallery folder; -4 shows him, not the audience.
 const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
   {
     src: "/assets/gallery/atm-dubai-crowd.jpg",
@@ -785,7 +796,7 @@ const ROOMS: ReadonlyArray<{ src: string; alt: string; cap: string }> = [
   {
     src: "/assets/gallery/durshal-peshawar-1.jpg",
     alt: "Attendees seated closely together and listening during a Syed Irfan Ajmal personal branding workshop at Durshal in Peshawar",
-    cap: "Durshal, Peshawar",
+    cap: "Durshal, Peshawar · 2018",
   },
 ];
 

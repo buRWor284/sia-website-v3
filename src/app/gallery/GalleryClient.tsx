@@ -26,9 +26,27 @@ const ALL_ITEMS: ReadonlyArray<GalleryItem> = [
   { format:"photo", type:"speaking", country:"UAE", src:GA("mps-banner.jpg"),      cap:'MPS2016, "Personal Branding for Founders"',       venue:"Dubai, Oct 2016"     },
   { format:"photo", type:"speaking", country:"UAE", src:GA("atm-dubai-panel.jpg"), cap:"Panel, Marketing to the Modern Muslim Traveller", venue:"ATM Dubai, Apr 2018" },
   { format:"photo", type:"speaking", country:"UAE", src:GA("astrolabs-1.jpg"),     cap:"Astrolabs, Growth Hacking Your Brand",            venue:"Dubai, Oct 2016"     },
+  // The ATM crowd frame is a SECOND ATM image and does not replace atm-dubai-panel
+  // above. The panel photo proves the format, this one proves the room. Its date is
+  // legible on the stage branding in frame. No headcount: you cannot count a hall
+  // from one camera angle.
+  { format:"photo", type:"speaking", country:"UAE", src:GA("atm-dubai-crowd.jpg"),  cap:"The room at Arabian Travel Market",              venue:"ATM Dubai, Apr 2018" },
 
   // ── SPEAKING · INDONESIA (1 curated) ──────────────────────────────────────
   { format:"photo", type:"speaking", country:"Indonesia", src:GA("dmss-bali.jpg"), cap:"Media Hacks workshop", venue:"DMSS, Bali, Oct 2017" },
+
+  // ── SPEAKING · MALAYSIA (4, added 2026-07-31) ────────────────────────
+  // The first Malaysian SPEAKING photos this gallery has ever carried. Malaysia
+  // previously appeared only under hobbies, via the wall-climbing frames.
+  //
+  // These are frames from the workshop video, not photographs shot in the room.
+  // Unretouched, not upscaled, 1280x720 out of a 1280x720 source. Venue and city are
+  // both provable from the picture: the roll-up banner in frame reads "MaGIC,
+  // Building Great Entrepreneurs, www.mymagic.my, #MAGICCYBERJAYA".
+  { format:"photo", type:"speaking", country:"Malaysia", src:GA("magic-malaysia-1.jpg"), cap:"Personal branding workshop at MaGIC",    venue:"MaGIC Cyberjaya, 2019" },
+  { format:"photo", type:"speaking", country:"Malaysia", src:GA("magic-malaysia-2.jpg"), cap:"Mid session, MaGIC Cyberjaya",           venue:"MaGIC Cyberjaya, 2019" },
+  { format:"photo", type:"speaking", country:"Malaysia", src:GA("magic-malaysia-3.jpg"), cap:"MaGIC, with attendees in the front row", venue:"MaGIC Cyberjaya, 2019" },
+  { format:"photo", type:"speaking", country:"Malaysia", src:GA("magic-malaysia-4.jpg"), cap:"MaGIC, Building Great Entrepreneurs",    venue:"MaGIC Cyberjaya, 2019" },
 
   // ── TRAVEL (2 curated) ────────────────────────────────────────────────────
   { format:"photo", type:"travel", country:"UAE",       src:GA("forbes-me-visit.jpg"), cap:"At Forbes Middle East, APH",     venue:"Dubai"          },
@@ -37,6 +55,22 @@ const ALL_ITEMS: ReadonlyArray<GalleryItem> = [
   // ── SPEAKING · PAKISTAN (2 curated, placed mid-gallery) ───────────────────
   { format:"photo", type:"speaking", country:"Pakistan", src:GA("empower-pakistan.jpg"), cap:"Empower Pakistan, World Bank Group", venue:"Pakistan" },
   { format:"photo", type:"speaking", country:"Pakistan", src:GA("startup-grind.jpg"),    cap:"Startup Grind, Powered by Google",  venue:"Peshawar" },
+  // ── DURSHAL (4, added 2026-07-31) ────────────────────────────────
+  // Frames from the Urdu personal branding workshop video. NO venue branding appears
+  // anywhere in 78 minutes of that footage, so unlike MaGIC the room cannot prove
+  // itself. The date comes from outside the frame and is solid: the organiser's own
+  // Facebook announcement, Monday 6 August 2018, 5pm to 7pm, a 2 hour Personal
+  // Branding workshop at Durshal Peshawar. Archived under
+  // public/assets/speaking/Durshal 2018/.
+  //
+  // ★ DYS 2017 has NO photo here on purpose. Irfan has no DYS footage; the only video
+  // is this Durshal one. He believes a DYS photograph exists somewhere. If it turns up
+  // it belongs here, and DYS is the better-evidenced event of the two: its year, city,
+  // format and topic all come from his own World Bank post of 26 April 2017.
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("durshal-peshawar-1.jpg"), cap:"The room, personal branding workshop", venue:"Durshal Peshawar, Aug 2018" },
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("durshal-peshawar-2.jpg"), cap:"Attendees during the session",         venue:"Durshal Peshawar, Aug 2018" },
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("durshal-peshawar-3.jpg"), cap:"Workshop audience",                    venue:"Durshal Peshawar, Aug 2018" },
+  { format:"photo", type:"speaking", country:"Pakistan", src:GA("durshal-peshawar-4.jpg"), cap:"Mid session at Durshal",               venue:"Durshal Peshawar, Aug 2018" },
 
   // ── FRIENDS (1 curated) ───────────────────────────────────────────────────
   { format:"photo", type:"friends", country:"UAE", src:GA("with-irfan-khairi.jpg"), cap:"With Irfan Khairi, founder of IK Institute", venue:"Dubai" },
