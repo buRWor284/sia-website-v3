@@ -164,11 +164,11 @@ const STAGES: ReadonlyArray<Stage> = [
   // The stale 2016 lived in THREE files: here, app/gallery/GalleryClient.tsx and
   // components/bureau/CredentialRows.tsx. Change them together or the site
   // contradicts itself.
-  { yr: "2019",    evt: "MaGIC",                       city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop",      topic: "Digital marketing for entrepreneurs",                          flag: "MY" },
-  { yr: "2018",    evt: "IN5 Innovation Hub",          city: "Dubai",     country: "UAE",       fmt: "Workshop",      topic: "Media Hacks · Free Publicity",                                 flag: "AE" },
-  { yr: "2018",    evt: "Durshal",                     city: "KP",        country: "Pakistan",  fmt: "Workshop",      topic: "Personal Branding",                                            flag: "PK" },
-  { yr: "2018",    evt: "Arabian Travel Market (ATM)", city: "Dubai",     country: "UAE",       fmt: "Panel",         topic: "Marketing to the Modern Muslim Traveller (~500 audience)",     flag: "AE", tag: "Biggest" },
-  { yr: "2018",    evt: "IDM Pakistan",                city: "Online",    country: "Pakistan",  fmt: "Course",        topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu", flag: "PK" },
+  { yr: "2019",    evt: "MaGIC",                       city: "Cyberjaya", country: "Malaysia",  fmt: "Workshop",      topic: "Digital marketing for entrepreneurs",                            flag: "MY" },
+  { yr: "2018",    evt: "IN5 Innovation Hub",          city: "Dubai",     country: "UAE",       fmt: "Workshop",      topic: "Media Hacks · Free Publicity",                                   flag: "AE" },
+  { yr: "2018",    evt: "Durshal",                     city: "KP",        country: "Pakistan",  fmt: "Workshop",      topic: "Personal Branding",                                              flag: "PK" },
+  { yr: "2018",    evt: "Arabian Travel Market (ATM)", city: "Dubai",     country: "UAE",       fmt: "Panel",         topic: "Marketing to the Modern Muslim Traveller (~500 audience)",       flag: "AE", tag: "Biggest" },
+  { yr: "2018",    evt: "IDM Pakistan",                city: "Online",    country: "Pakistan",  fmt: "Course",        topic: "Inbound Marketing Curriculum · 5 sessions · 10 hrs · In Urdu",   flag: "PK" },
   // ★ IMSciences 2018. The year is when Abdul Ghaffar posted his LinkedIn
   // testimonial, per Irfan 2026-07-31, not a record of the lecture date. His quote
   // opens "Recently, Irfan came and delivered a guest lecture on entrepreneurship to
@@ -176,8 +176,8 @@ const STAGES: ReadonlyArray<Stage> = [
   // topic and audience come straight from that testimonial, which is published in
   // the What Hosts Say section of this very page: rare among these rows, the proof
   // sits on the same screen as the claim.
-  { yr: "2018",    evt: "IMSciences",                  city: "Peshawar",  country: "Pakistan",  fmt: "Guest lecture", topic: "Entrepreneurship, for MBA students",                           flag: "PK" },
-  { yr: "2017",    evt: "DMSS Conference",             city: "Bali",      country: "Indonesia", fmt: "Workshop",      topic: "Media Hacks (~200 audience)",                                  flag: "ID" },
+  { yr: "2018",    evt: "IMSciences",                  city: "Peshawar",  country: "Pakistan",  fmt: "Guest lecture", topic: "Entrepreneurship, for MBA students",                             flag: "PK" },
+  { yr: "2017",    evt: "DMSS Conference",             city: "Bali",      country: "Indonesia", fmt: "Workshop",      topic: "Media Hacks (~200 audience)",                                    flag: "ID" },
   // ★ DYS 2017 is verified from the strongest possible source: the World Bank's own
   // site. Irfan's post "Why an introvert like me looks forward to attending the
   // digital youth summit?" ran on blogs.worldbank.org on 26 April 2017 and says he
@@ -185,12 +185,12 @@ const STAGES: ReadonlyArray<Stage> = [
   // Peshawar. Year, city, format and topic all come from that one primary source.
   // NOTE: the World Bank BACKED this summit. It did not host Irfan. Do not upgrade
   // this row, or any copy elsewhere, into a World Bank speaking credit.
-  { yr: "2017",    evt: "Digital Youth Summit (DYS)",  city: "Peshawar",  country: "Pakistan",  fmt: "Workshop",      topic: "Personal Branding in a Digital Era",                           flag: "PK" },
+  { yr: "2017",    evt: "Digital Youth Summit (DYS)",  city: "Peshawar",  country: "Pakistan",  fmt: "Workshop",      topic: "Personal Branding in a Digital Era",                             flag: "PK" },
   // Sourced from NIC Pakistan's own Facebook post about the session, which is
   // where both the topic and the format come from: "Content Marketing and PR
   // Consultant sharing his views on Inbound Marketing with the startups at NIC".
-  { yr: "2017",    evt: "National Incubation Center",  city: "Islamabad", country: "Pakistan",  fmt: "Talk",          topic: "Inbound marketing, for startups at NIC",                       flag: "PK" },
-  { yr: "2016",    evt: "MPS2016 · M Powered Summit",  city: "Dubai",     country: "UAE",       fmt: "Talk",          topic: "Digital marketing keynote",                                    flag: "AE" },
+  { yr: "2017",    evt: "National Incubation Center",  city: "Islamabad", country: "Pakistan",  fmt: "Talk",          topic: "Inbound marketing, for startups at NIC",                         flag: "PK" },
+  { yr: "2016",    evt: "MPS2016 · M Powered Summit",  city: "Dubai",     country: "UAE",       fmt: "Talk",          topic: "Digital marketing keynote",                                      flag: "AE" },
   // ★ Empower Pakistan 2016 and GBG Peshawar 2016, both added 2026-07-31 from Irfan.
   //
   // Empower Pakistan is the ONLY event behind every World Bank speaking claim this
@@ -200,30 +200,32 @@ const STAGES: ReadonlyArray<Stage> = [
   // hosted him. Four pages used to imply that and were corrected on 2026-07-31.
   // Leave the watermark on that photo; it is the organiser's credit, not ours.
   //
-  // ⚠ The Empower Pakistan TOPIC is a placeholder. It describes the engagement,
-  // not the subject, because Irfan supplied the year and format but not what he
-  // actually spoke about. Replace it the moment he says. Do not infer a subject
-  // from the organiser's mission statement on the banner.
+  // Empower Pakistan topic confirmed by Irfan 2026-07-31: youth entrepreneurship.
+  // Worth remembering how this one went, because it is the pattern to repeat: the
+  // first draft of this topic was INFERRED from the organiser mission statement on
+  // the banner in the photo. That is a guess wearing a fact's clothing. It was
+  // replaced with a placeholder until Irfan confirmed. Never infer a talk subject
+  // from a venue, a sponsor, or an organiser's tagline.
   //
   // GBG was May 2016. The table only carries years, so the month lives here. Topic
   // is condensed from Irfan's original agenda: what growth hacking is, three company
   // case studies, how a strong personal brand attracts inbound opportunity, and his
   // five step process (social media, writing, TV and radio and podcast, video,
   // public speaking), plus an interactive activity and a 45 minute Q&A.
-  { yr: "2016",    evt: "Empower Pakistan",            city: "Peshawar",  country: "Pakistan",  fmt: "Talk",          topic: "Session at a World Bank Group backed youth programme",         flag: "PK" },
-  { yr: "2016",    evt: "Google Business Group (GBG)", city: "Peshawar",  country: "Pakistan",  fmt: "Workshop",      topic: "Growth hacking and the five pillars of personal branding",     flag: "PK" },
-  { yr: "2016",    evt: "AstroLabs",                   city: "Dubai",     country: "UAE",       fmt: "Talk",          topic: "Growth Hacking Your Brand to Success",                         flag: "AE" },
-  { yr: "2016",    evt: "IK Institute of Business",    city: "Dubai",     country: "UAE",       fmt: "Workshop",      topic: "Co-trainer with Irfan Khairi",                                 flag: "AE" },
-  { yr: "2015",    evt: "IYDC",                        city: "Peshawar",  country: "Pakistan",  fmt: "Panel",         topic: "Social Media · panel discussion",                              flag: "PK" },
-  { yr: "2014",    evt: "G-Day X",                     city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",       topic: "Digital marketing & entrepreneurship",                         flag: "PK" },
-  { yr: "2014",    evt: "University of Peshawar",      city: "Peshawar",  country: "Pakistan",  fmt: "Talk",          topic: "Student talk",                                                 flag: "PK" },
+  { yr: "2016",    evt: "Empower Pakistan",            city: "Peshawar",  country: "Pakistan",  fmt: "Talk",          topic: "Youth entrepreneurship, at a World Bank Group backed programme", flag: "PK" },
+  { yr: "2016",    evt: "Google Business Group (GBG)", city: "Peshawar",  country: "Pakistan",  fmt: "Workshop",      topic: "Growth hacking and the five pillars of personal branding",       flag: "PK" },
+  { yr: "2016",    evt: "AstroLabs",                   city: "Dubai",     country: "UAE",       fmt: "Talk",          topic: "Growth Hacking Your Brand to Success",                           flag: "AE" },
+  { yr: "2016",    evt: "IK Institute of Business",    city: "Dubai",     country: "UAE",       fmt: "Workshop",      topic: "Co-trainer with Irfan Khairi",                                   flag: "AE" },
+  { yr: "2015",    evt: "IYDC",                        city: "Peshawar",  country: "Pakistan",  fmt: "Panel",         topic: "Social Media · panel discussion",                                flag: "PK" },
+  { yr: "2014",    evt: "G-Day X",                     city: "Peshawar",  country: "Pakistan",  fmt: "Keynote",       topic: "Digital marketing & entrepreneurship",                           flag: "PK" },
+  { yr: "2014",    evt: "University of Peshawar",      city: "Peshawar",  country: "Pakistan",  fmt: "Talk",          topic: "Student talk",                                                   flag: "PK" },
   // ★ NUST 2013: year and format are Irfan's, given 2026-07-31. The TOPIC is his
   // best recollection ("probably something around entrepreneurship"), not a record.
   // Low risk because the topic field is soft, but do not harden this into a talk
   // title or quote it back as though it were documented.
-  { yr: "2013",    evt: "NUST Islamabad",              city: "Islamabad", country: "Pakistan",  fmt: "Guest lecture", topic: "Entrepreneurship",                                             flag: "PK" },
-  { yr: "On call", evt: "Uhubs (SaaS)",                city: "Remote",    country: "UK",        fmt: "Workshop",      topic: "Internal SEO-PR training",                                     flag: "GB" },
-  { yr: "On call", evt: "Ruth King's Business Radio",  city: "Atlanta",   country: "USA",       fmt: "Radio",         topic: "Guest interview",                                              flag: "US" },
+  { yr: "2013",    evt: "NUST Islamabad",              city: "Islamabad", country: "Pakistan",  fmt: "Guest lecture", topic: "Entrepreneurship",                                               flag: "PK" },
+  { yr: "On call", evt: "Uhubs (SaaS)",                city: "Remote",    country: "UK",        fmt: "Workshop",      topic: "Internal SEO-PR training",                                       flag: "GB" },
+  { yr: "On call", evt: "Ruth King's Business Radio",  city: "Atlanta",   country: "USA",       fmt: "Radio",         topic: "Guest interview",                                                flag: "US" },
 ];
 
 type Format = { name: string; dur: string; note: string };
