@@ -36,7 +36,7 @@ const BOOKING_SPECS: ReadonlyArray<[string, string]> = [
   ["Format",    "Keynote · Workshop · Panel · Webinar"],
   ["Duration",  "20 min · 45 min · half-day · full-day"],
   ["Languages", "English (primary), Urdu, Pashto"],
-  ["Travel",    "Asia, MENA, Europe · virtual worldwide"],
+  ["Travel",    "Asia, MENA, Europe, North America · virtual worldwide"],
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
@@ -224,7 +224,16 @@ const STAGES: ReadonlyArray<Stage> = [
   // five step process (social media, writing, TV and radio and podcast, video,
   // public speaking), plus an interactive activity and a 45 minute Q&A.
   { yr: "2016",    evt: "Empower Pakistan",            city: "Peshawar",  country: "Pakistan",  fmt: "Talk",          topic: "Youth entrepreneurship, at a World Bank Group backed programme", flag: "PK" },
-  { yr: "2016",    evt: "Google Business Group (GBG)", city: "Peshawar",  country: "Pakistan",  fmt: "Workshop",      topic: "Growth hacking and the five pillars of personal branding",       flag: "PK" },
+  // ★ GBG year and topic are SOURCED, 2026-08-04, from Irfan's own outbound
+  // email thread with the organiser (Maryam, the same Maryam Arshad Mahmood who
+  // organised IYDC). 18 May 2016: he sends the workshop outline. 27 May 2016: he
+  // sends the deck. A 3 hour GBG workshop on growth hacking, whose personal
+  // branding section was a FIVE STEP PROCESS by channel (social media, writing,
+  // TV/radio/podcast, video, public speaking). That is NOT the five pillars
+  // framework he uses today (clarity, consistency, content, community,
+  // credibility), and the old topic string here silently retro-fitted the modern
+  // one onto a nine year old room. Do not undo this.
+  { yr: "2016",    evt: "Google Business Group (GBG)", city: "Peshawar",  country: "Pakistan",  fmt: "Workshop",      topic: "Growth Hacking: a five step process for building a personal brand · 3 hrs",       flag: "PK" },
   { yr: "2016",    evt: "AstroLabs",                   city: "Dubai",     country: "UAE",       fmt: "Talk",          topic: "Growth Hacking Your Brand to Success",                           flag: "AE" },
   { yr: "2016",    evt: "IK Institute of Business",    city: "Dubai",     country: "UAE",       fmt: "Workshop",      topic: "Co-trainer with Irfan Khairi",                                   flag: "AE" },
   { yr: "2015",    evt: "IYDC",                        city: "Peshawar",  country: "Pakistan",  fmt: "Panel",         topic: "Social Media · panel discussion",                                flag: "PK" },
@@ -402,8 +411,8 @@ const SpeakingLead = () => (
             webinar &amp; podcast circuits across North America and the UK.
           </p>
           <p style={{ marginTop: "0.6em", fontStyle: "italic", color: INK70 }}>
-            Case-study-led, with the receipts. In person across Asia, MENA and Europe;
-            virtually worldwide. Booking open Q3–Q4 2026.
+            Case-study-led, with the receipts. In person across Asia, MENA, Europe and
+            North America; virtually worldwide. Booking open Q3–Q4 2026.
           </p>
         </div>
 

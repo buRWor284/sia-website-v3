@@ -1109,10 +1109,10 @@ function PodcastTeaser() {
 
 const PRESS_OUTLETS: [string, string][] = [
   ["Forbes", "Contributor & featured"],
-  ["Harvard Business Review", "Guest contributor"],
+  ["Harvard Business Review", "Case study"],
   ["HuffPost", "Contributor"],
   ["The Next Web (TNW)", "Featured"],
-  ["Entrepreneur", "Contributor"],
+  ["Entrepreneur", "Linked from"],
   ["Search Engine Journal", "Contributor"],
   ["SEMrush Blog", "Contributor"],
   ["Business.com", "Contributor"],

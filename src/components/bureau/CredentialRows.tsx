@@ -163,9 +163,71 @@ export default function CredentialRows() {
           letterSpacing: "0.01em",
         }}
       >
-        Quoted in Harvard Business Review and Forbes USA. Bylines in Forbes Middle East, World Bank
+        Profiled as a case study in Harvard Business Review. Quoted in Forbes USA. Bylines in Forbes Middle East, World Bank
         publications, HuffPost, SEMrush and SERPed.
       </p>
+
+      {/* ── The HBR case study ──────────────────────────────────────────────
+          The strongest single credential on the site, and until 2026-08-04 it
+          was described everywhere as a "quote". It is not. He is one of two
+          named case studies in the piece, roughly 350 words, and the article's
+          pull quote is his.
+
+          Shown once, here, rather than repeated as an adjective on five pages.
+          A claim asserted five times reads as insecurity; a claim shown once
+          with the words, the byline, the date and a link reads as fact.
+
+          ★ HBR is paywalled, so the link lands on a preview. That is exactly
+          why the quote travels WITH the link instead of behind it. Never
+          restyle this so the reader has to click to learn what it says.
+          ★ The quote is verbatim from the published article. Per the house
+          rule, a quote on this site is verbatim or it is not a quote. */}
+      <div
+        style={{
+          marginTop: 34,
+          border: `1px solid ${INK35}`,
+          background: PAPER,
+          padding: "26px 28px 24px",
+        }}
+      >
+        <SCaps size={10} ls="0.18em" color={INK55}>
+          Harvard Business Review · Named case study
+        </SCaps>
+        <blockquote
+          style={{
+            margin: "14px 0 0",
+            fontFamily: SERIF,
+            fontSize: "clamp(19px, 2.6vw, 25px)",
+            lineHeight: 1.36,
+            letterSpacing: "-0.014em",
+            color: INK,
+          }}
+        >
+          “You’ve got to know your team well. You have to know what excites them, what scares
+          them, and what their deepest desires and biggest challenges are.”
+        </blockquote>
+        <p
+          style={{
+            margin: "16px 0 0",
+            fontFamily: GROT,
+            fontSize: 12.5,
+            lineHeight: 1.6,
+            letterSpacing: "0.01em",
+            color: INK70,
+          }}
+        >
+          The article’s pull quote, from the case study on Syed Irfan Ajmal in{" "}
+          <a
+            href="https://hbr.org/2019/12/how-to-motivate-your-team-during-crunch-time"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: INK, textDecoration: "underline", textUnderlineOffset: "2px" }}
+          >
+            “How to Motivate Your Team During Crunch Time”
+          </a>{" "}
+          by Rebecca Knight, Harvard Business Review, 18 December 2019.
+        </p>
+      </div>
     </section>
   );
 }

@@ -217,7 +217,7 @@ const Hero = () => (
           <a href="/contact" style={btnGhostDark}>Ask about this session &rarr;</a>
         </div>
         <p style={{ margin: "24px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 15.5, color: INK70, lineHeight: 1.5 }}>
-          By Syed Irfan Ajmal · Founder of EMOS · CEO of DMR.agency · Quoted in Harvard Business Review and Forbes.
+          By Syed Irfan Ajmal · Founder of EMOS · CEO of DMR.agency · Profiled as a case study in Harvard Business Review; quoted in Forbes.
         </p>
         <div style={{ marginTop: 14, display: "flex", alignItems: "baseline", gap: 9, flexWrap: "wrap" }}>
           <SCaps size={10} ls="0.16em" color={INK55}>Also presented as</SCaps>
@@ -632,7 +632,7 @@ const Speaker = () => (
     <div style={{ marginTop: 6, paddingTop: 18, borderTop: "1px solid rgba(241,235,222,.16)" }}>
       <SCaps size={10} ls="0.16em" color="rgba(241,235,222,.55)">As seen in</SCaps>
       <p style={{ margin: "9px 0 0", fontFamily: SERIF, fontSize: 15.5, color: "rgba(241,235,222,.8)", lineHeight: 1.6 }}>
-        Written for: World Bank · HuffPost · Forbes ME · SEMrush · SERPed &nbsp;|&nbsp; Quoted in: Harvard Business Review and Forbes (USA) &nbsp;|&nbsp; Workshops and talks: SEMrush · Uhubs (UK) · DMSS.io (Bali) · MaGIC (Malaysia) · Arabian Travel Market (Dubai)
+        Written for: World Bank · HuffPost · Forbes ME · SEMrush · SERPed &nbsp;|&nbsp; Case study in: Harvard Business Review &nbsp;|&nbsp; Quoted in: Forbes (USA) &nbsp;|&nbsp; Workshops and talks: SEMrush · Uhubs (UK) · DMSS.io (Bali) · MaGIC (Malaysia) · Arabian Travel Market (Dubai)
       </p>
     </div>
     <div className="emai-stats" style={{ marginTop: 16, background: "rgba(241,235,222,.22)", border: "1px solid rgba(241,235,222,.22)" }}>

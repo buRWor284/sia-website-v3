@@ -65,7 +65,7 @@ export const TESTIMONIALS: ReadonlyArray<Testimonial> = [
   {
     name: "Maryam Arshad Mahmood",
     profileUrl: "https://www.linkedin.com/in/maryamarshad/",
-    title: "Growth and Market Strategy leader · Partnerships @ Google",
+    title: "Growth and Market Strategy leader · Partnerships @ Google, Singapore",
     photo: "/assets/testimonials/maryam-arshad-mahmood.jpg",
     event: "IYDC 2015 · Peshawar",
     role: "Organiser",

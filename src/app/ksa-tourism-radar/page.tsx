@@ -321,7 +321,7 @@ export default async function KsaRadarPage() {
           </h2>
           <p className="ksr-body-lg" style={{ margin: "0 0 24px" }}>
             Earned-media strategist and builder of the EMOS suite (SignalIQ, PressIQ, CoverageIQ, FactCheckIQ). 300+ clients, mostly American brands, plus
-            Gulf-government work through DinarStandard. Quoted in Harvard Business Review and Forbes (US); bylines in Forbes Middle East. Available for
+            Gulf-government work through DinarStandard. Profiled as a case study in Harvard Business Review, quoted in Forbes (US); bylines in Forbes Middle East. Available for
             keynotes, masterclasses, and panels across KSA, Sep-Nov 2026.
           </p>
           <div className="ksr-cta-row">
