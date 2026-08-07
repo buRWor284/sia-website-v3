@@ -75,6 +75,33 @@ const isClerkClientRoute = createRouteMatcher(["/clients/:slug", "/clients/:slug
 // Public escape hatch — shown when a logged-in user tries the wrong workspace.
 const isClientUnauthorizedPage = createRouteMatcher(["/clients/unauthorized"]);
 
+// ─── Workspace pages (new prefix, 2026-08-07) ────────────────────────────────
+// /workspace/<slug> is the new home for private client + prospect pages. It exists
+// because /clients is ALSO a public marketing route (the roster page), and
+// src/app/clients/layout.tsx stamps every child with title "Clients · The Roster"
+// and canonical "/clients" — so private workspaces were declaring a public
+// marketing page as their canonical. /workspace has no public parent.
+// Gating mirrors the /clients/:slug Clerk check below, same client_slug metadata.
+const isWorkspaceRoute = createRouteMatcher(["/workspace/:slug", "/workspace/:slug/(.*)"]);
+
+// Slugs served WITHOUT any login. Use only for prospect-facing material that is
+// not confidential. Every page in here must set robots: { index:false, follow:false }.
+// Empty by design: prefer Basic Auth below over a bare public URL.
+const PUBLIC_WORKSPACE_SLUGS = new Set<string>([]);
+
+// ─── Basic Auth workspace slugs ──────────────────────────────────────────────
+// For PROSPECTS and anyone who should not have to create an account. They get a
+// username and password by email and the browser prompts once. Same mechanism as
+// the legacy PT / Resourcex client routes above, different env vars per slug.
+// Real clients with an ongoing relationship should move to the Clerk path instead.
+const isWorkspaceHajjPeopleRoute = createRouteMatcher([
+  "/workspace/hajj-people",
+  "/workspace/hajj-people/(.*)",
+]);
+
+// Keep this in sync with the Basic Auth matchers above.
+const BASIC_AUTH_WORKSPACE_SLUGS = new Set(["hajj-people"]);
+
 // /emos-platform/not-invited is public (no redirect loop).
 // RETIRED as a destination 2026-07-26 (see the no-access redirect below) but the
 // route itself stays — it is now a redirect stub, and it must remain exempt or
@@ -135,6 +162,40 @@ export default clerkMiddleware(async (auth, req) => {
     // Belt-and-suspenders: skip if this slug is on Basic Auth (already returned above).
     if (slug && !BASIC_AUTH_CLIENT_SLUGS.has(slug)) {
       await auth.protect(); // redirects unauthenticated users to the Clerk sign-in URL (/emos-platform/signin)
+
+      const { sessionClaims, userId } = await auth();
+      const meta = (sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
+
+      if (meta.client_slug !== slug) {
+        // JWT may be stale — do a live Clerk API check before rejecting.
+        try {
+          const clerkApi = await clerkClient();
+          const user = await clerkApi.users.getUser(userId!);
+          if (user.publicMetadata?.client_slug !== slug) {
+            return NextResponse.redirect(new URL("/clients/unauthorized", req.url));
+          }
+          // Live metadata matches — let through; JWT will catch up on next refresh.
+        } catch {
+          return NextResponse.redirect(new URL("/clients/unauthorized", req.url));
+        }
+      }
+    }
+  }
+
+  // ── Workspace: Hajj People (Basic Auth, prospect) ────────────────────────
+  if (isWorkspaceHajjPeopleRoute(req)) {
+    return hasValidCredentials(req, "HAJJPEOPLE_USER", "HAJJPEOPLE_PASS")
+      ? NextResponse.next()
+      : requireBasicAuth("Hajj People workspace");
+  }
+
+  // ── Workspace pages: Clerk-gated unless the slug is public ───────────────
+  if (isWorkspaceRoute(req)) {
+    const slug = req.nextUrl.pathname.split("/")[2]; // /workspace/{slug}/...
+
+    // Basic Auth slugs already returned above; skip them here too (belt and suspenders).
+    if (slug && !PUBLIC_WORKSPACE_SLUGS.has(slug) && !BASIC_AUTH_WORKSPACE_SLUGS.has(slug)) {
+      await auth.protect();
 
       const { sessionClaims, userId } = await auth();
       const meta = (sessionClaims?.publicMetadata ?? {}) as Record<string, unknown>;
@@ -217,5 +278,8 @@ export const config = {
     "/clients/pt/:path*",
     "/clients/resourcex",
     "/clients/resourcex/:path*",
+    // Workspace pages, so static .html assets under /workspace are gated too.
+    "/workspace/:slug",
+    "/workspace/:slug/:path*",
   ],
 };
