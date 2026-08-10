@@ -316,6 +316,80 @@ export const BEATS: Beat[] = [
     ],
     blurb: "Saudi giga-projects, mega-events, hospitality, aviation, and faith-travel coverage.",
   },
+  // ─── KSA category-radar probe beats (2026-08-09) ─────────────────────────
+  // Three candidate categories for radar #2 (Riyadh workshop Nov 2026, Seamless /
+  // Shop Arabia thread, Athar). ~30 candidate seeds each, committed together so
+  // ONE 14-day backfill (2026-07-26..2026-08-08, ~$4) prices English press
+  // volume for all three at once — Athar-Category-Radar-Feasibility-Answer.md §6.
+  // Probe rules (founders-beat pattern): these are CANDIDATES, not keepers —
+  // drop any seed returning ~0 GDELT rows before a category ships. Seeds already
+  // tracked by other beats (NEOM, Expo 2030, ...) de-dupe on the canonical
+  // phrase in buildTopicMatchers: zero extra scan cost, full history on arrival.
+  // Noise-collision exclusions (GDELT is multilingual + exact-phrase, lowercase):
+  // "noon" (time word), "Tamara" / "Nana" (first names), "Tabby" (cats),
+  // "Extra" / "Panda" / "Ninja" (common words), "Danube" (the river), "Half
+  // Million" (the phrase), "Alat" (Indonesian: tool), "Humain" (French: human),
+  // "SAMA" (Indonesian/Malay: same), "mada" / "Sarie" / "Lendo" (word noise),
+  // "PIF" (bare acronym), "The Line" / "The Rig" (stop-word phrases),
+  // "Lucid Motors" (volume is US-market and would mislead a KSA radar).
+  {
+    id: "ksa-giga",
+    label: "KSA Giga-Projects",
+    seeds: [
+      // already live via ksa-tourism (de-duped: free, full history)
+      "NEOM", "Red Sea Global", "AlUla", "Diriyah", "Qiddiya",
+      "New Murabba", "Mukaab", "Soudah Peaks", "Expo 2030",
+      // net-new destinations & districts
+      "OXAGON", "Trojena", "Sindalah", "Amaala", "King Salman Park",
+      "Sports Boulevard", "Jeddah Central", "Rua Al Madinah", "Misk City",
+      "King Abdullah Financial District", "Diriyah Square",
+      // developers, capital & delivery
+      "Roshn", "Public Investment Fund", "Vision 2030", "Saudi Aramco",
+      "Jafurah", "Ceer", "DataVolt",
+      // infrastructure & umbrella context (context only, never headline totals)
+      "Riyadh Metro", "Saudi Landbridge", "Saudi construction", "Saudi real estate",
+    ],
+    blurb: "Saudi giga-projects, developers, PIF capital, and delivery-infrastructure coverage.",
+  },
+  {
+    id: "ksa-banking",
+    label: "KSA Banking & Fintech",
+    seeds: [
+      // institutions & regulator
+      "Saudi Central Bank", "Saudi National Bank", "Al Rajhi Bank", "Riyad Bank",
+      "Alinma Bank", "Banque Saudi Fransi", "Arab National Bank", "Saudi Awwal Bank",
+      // markets & capital
+      "Tadawul", "Saudi Exchange", "Saudi IPO", "Saudi stock market", "Saudi sukuk",
+      "Saudi wealth fund", "Sanabil", "Saudi venture capital", "Saudi startups",
+      // fintech & digital banks
+      "Saudi fintech", "Fintech Saudi", "stc pay", "STC Bank", "D360 Bank",
+      // insurance
+      "Tawuniya", "Bupa Arabia", "Saudi insurance",
+      // umbrella context (context only, never headline totals)
+      "Saudi banks", "Saudi banking", "Islamic finance", "Islamic banking",
+      "Saudi riyal", "Saudi mortgage", "Saudi economy",
+    ],
+    blurb: "Saudi banks, Tadawul, fintech, insurance, and Islamic-finance coverage.",
+  },
+  {
+    id: "ksa-retail",
+    label: "KSA Retail & Consumer",
+    seeds: [
+      // e-commerce & delivery
+      "Saudi e-commerce", "Salla", "HungerStation", "Jahez", "Mrsool", "Floward",
+      "Saudi food delivery", "quick commerce", "White Friday",
+      // retailers & consumer brands
+      "Cenomi", "Jarir", "Savola", "Almarai", "BinDawood", "Lulu Hypermarket",
+      "Nahdi", "Al Othaim", "Tamimi Markets", "Alshaya",
+      // lifestyle, fashion & entertainment
+      "Saudi fashion", "Riyadh Fashion Week", "Saudi coffee", "Saudi beauty",
+      "Saudi gaming", "Savvy Games",
+      // umbrella context (context only, never headline totals)
+      "Saudi retail", "Saudi consumer", "Saudi consumer spending", "Saudi malls",
+      "Saudi advertising",
+    ],
+    blurb: "Saudi retail, e-commerce, consumer brands, and lifestyle-economy coverage.",
+  },
 ];
 
 export function beatById(id: BeatId): Beat {
