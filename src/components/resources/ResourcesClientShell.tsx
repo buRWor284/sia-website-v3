@@ -26,7 +26,8 @@ type TopicKey =
   | "personal-branding"
   | "writing"
   | "strategy"
-  | "neuromarketing";
+  | "neuromarketing"
+  | "saudi-arabia";
 
 interface ContentBase {
   id: string;
@@ -212,7 +213,7 @@ const CONTENT: ContentItem[] = [
     id: "radar-ksa-tourism",
     type: "radar",
     badge: "Live Radar",
-    topics: ["pr", "strategy"],
+    topics: ["pr", "strategy", "saudi-arabia"],
     title: "KSA Tourism & Hospitality Radar",
     sub: "What is moving in Saudi tourism now, and which narratives nobody owns yet.",
     blurb:
@@ -567,6 +568,7 @@ const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
   { id: "writing",            label: "Writing" },
   { id: "strategy",           label: "Strategy" },
   { id: "neuromarketing",     label: "Neuromarketing" },
+  { id: "saudi-arabia",       label: "Saudi Arabia" },
 ];
 
 const GROUP_ORDER: ContentType[] = [
@@ -595,6 +597,12 @@ const GROUP_ANCHOR: Record<ContentType, string> = {
   "guide":        "guides",
   "infographic":  "infographics",
 };
+
+// Reverse lookup: #radars → "radar", #quizzes → "quiz", … used to turn an
+// incoming section anchor into the matching Type tab selection.
+const ANCHOR_TO_TYPE: Record<string, ContentType> = Object.fromEntries(
+  (Object.entries(GROUP_ANCHOR) as [ContentType, string][]).map(([t, a]) => [a, t]),
+);
 
 const TYPE_ACCENT: Record<ContentType, string> = {
   "video":        "#C0392B",
@@ -633,6 +641,7 @@ const TOPIC_LABEL: Record<TopicKey, string> = {
   "writing":           "Writing",
   "strategy":          "Strategy",
   "neuromarketing":    "Neuromarketing",
+  "saudi-arabia":      "Saudi Arabia",
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1547,14 +1556,22 @@ export function ResourcesClientShell({ defaultView = "browse", episodeCount }: {
         return;
       }
 
-      // Content-type section anchors (videos, tools, quizzes, playbooks,
-      // guides, infographics) live inside the Browse All ledger.
+      // Content-type section anchors (#videos, #tools, #radars, #quizzes,
+      // #playbooks, #guides, #infographics) select the matching Type tab too,
+      // so a shared link opens on exactly the set the sender was looking at.
+      const anchorType = ANCHOR_TO_TYPE[hash];
+      if (anchorType) {
+        setActiveType(anchorType);
+        setActiveTopics(new Set());
+      }
       setView("browse");
       let tries = 0;
       const tryScroll = () => {
         const el = document.getElementById(hash);
         if (el) { el.scrollIntoView({ block: "start" }); return; }
-        if (tries++ < 40) requestAnimationFrame(tryScroll); // retry ~0.6s for a late-mounting ledger
+        if (tries++ < 40) { requestAnimationFrame(tryScroll); return; } // retry ~0.6s for a late-mounting ledger
+        // Anchor never mounted (e.g. a type with no live items) — land on the ledger.
+        document.getElementById("resources")?.scrollIntoView({ block: "start" });
       };
       requestAnimationFrame(tryScroll);
     }
@@ -1587,6 +1604,12 @@ export function ResourcesClientShell({ defaultView = "browse", episodeCount }: {
   const handleSetType = useCallback((type: "all" | ContentType) => {
     setActiveType(type);
     setActiveTopics(new Set());
+    // Mirror the selection into the URL so any Type view is shareable
+    // (e.g. /resources#radars). replaceState avoids polluting history and
+    // does not re-trigger the hashchange listener.
+    if (typeof window !== "undefined") {
+      history.replaceState(null, "", `#${type === "all" ? "all" : GROUP_ANCHOR[type]}`);
+    }
   }, []);
 
   const filtered = useMemo(() => {
