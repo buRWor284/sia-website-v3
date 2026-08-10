@@ -9,9 +9,9 @@ import "./ksa-radar.css";
 
 export const revalidate = 43200; // 12h; the coverage scan runs daily
 
-// Deliberately unlinked: no nav entry, no sitemap entry (pitch-prop page for
-// the KSA speaking circuit, Sep-Nov 2026). Direct URL only, like
-// /speaking/earned-media-ai/travel.
+// Public since 2026-08-10: linked from the nav (Earned Media dropdown), the
+// /resources ledger (Radars group), and the sitemap. It was deliberately
+// unlinked before that as a direct-URL pitch prop for the KSA speaking circuit.
 export const metadata: Metadata = {
   title: "KSA Tourism & Hospitality Radar",
   description:

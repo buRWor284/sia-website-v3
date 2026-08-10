@@ -85,6 +85,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Earned-media data pages (live SignalIQ coverage; refreshed daily)
     { route: "earned-media-radar",              changeFrequency: "daily"   as const, priority: 0.8 },
     { route: "founder-movers",                  changeFrequency: "daily"   as const, priority: 0.8 },
+    { route: "ksa-tourism-radar",               changeFrequency: "daily"   as const, priority: 0.8 },
   ];
 
   const staticEntries = pages.map(({ route, changeFrequency, priority }) => ({

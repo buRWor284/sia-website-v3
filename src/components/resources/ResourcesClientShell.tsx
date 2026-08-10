@@ -11,6 +11,7 @@ import { GROT, INK, INK15, INK55, INK70, PAPER, PAPER2, SERIF, YEL } from "@/lib
 type ContentType =
   | "kit"
   | "tool"
+  | "radar"
   | "quiz"
   | "playbook"
   | "guide"
@@ -42,7 +43,7 @@ interface ContentBase {
 }
 
 interface InteractiveContent extends ContentBase {
-  type: "kit" | "tool" | "quiz";
+  type: "kit" | "tool" | "radar" | "quiz";
   sub: string;
   blurb: string;
   href: string;
@@ -173,8 +174,8 @@ const CONTENT: ContentItem[] = [
 
   {
     id: "tool-earned-media-radar",
-    type: "tool",
-    badge: "Interactive Tool",
+    type: "radar",
+    badge: "Live Radar",
     beta: true,
     topics: ["pr", "seo", "strategy"],
     title: "Earned Media Radar — Live Coverage Map",
@@ -191,8 +192,8 @@ const CONTENT: ContentItem[] = [
 
   {
     id: "tool-founder-movers",
-    type: "tool",
-    badge: "Interactive Tool",
+    type: "radar",
+    badge: "Live Radar",
     beta: true,
     topics: ["pr", "strategy", "personal-branding"],
     title: "Founder Movers — Weekly Topic Rankings",
@@ -205,6 +206,23 @@ const CONTENT: ContentItem[] = [
     newsDeck: "Founders who compound attention are early, not louder",
     cta: "See This Week's Movers",
     hook: "Founders who compound attention are early, not louder",
+  },
+
+  {
+    id: "radar-ksa-tourism",
+    type: "radar",
+    badge: "Live Radar",
+    topics: ["pr", "strategy"],
+    title: "KSA Tourism & Hospitality Radar",
+    sub: "What is moving in Saudi tourism now, and which narratives nobody owns yet.",
+    blurb:
+      "28 sourced signals on Saudi tourism: giga-projects, mega-events, hospitality and aviation, and faith travel. Curated from official statistics and named industry reports, wired to live press-coverage data via SignalIQ.",
+    href: "/ksa-tourism-radar",
+    y: "2026",
+    newsHeadline: "The Saudi Desk",
+    newsDeck: "Saudi tourism's rise, tracked signal by signal, every number linked to its source",
+    cta: "Open the Radar",
+    hook: "The 2030 story, tracked before it saturates",
   },
 
   // ── CALCULATORS ─────────────────────────────────────────────────────────
@@ -521,6 +539,10 @@ const CONTENT: ContentItem[] = [
   },
 ];
 
+// Single source of truth for the hero badge on /resources — includes the
+// "Being Updated" (private) items, which still render on the page.
+export const RESOURCE_COUNT = CONTENT.length;
+
 // ─────────────────────────────────────────────────────────────────────────────
 // FILTER CONFIG
 // ─────────────────────────────────────────────────────────────────────────────
@@ -528,6 +550,7 @@ const CONTENT: ContentItem[] = [
 const TYPE_TABS: { key: "all" | ContentType; label: string }[] = [
   { key: "all",          label: "All Resources" },
   { key: "tool",         label: "Tools" },
+  { key: "radar",        label: "Radars" },
   { key: "quiz",         label: "Quizzes" },
   { key: "playbook",     label: "Playbooks" },
   { key: "guide",        label: "Guides" },
@@ -547,13 +570,14 @@ const TOPIC_PILLS: { id: TopicKey; label: string }[] = [
 ];
 
 const GROUP_ORDER: ContentType[] = [
-  "video", "kit", "tool", "quiz", "playbook", "guide", "infographic",
+  "video", "kit", "tool", "radar", "quiz", "playbook", "guide", "infographic",
 ];
 
 const GROUP_LABEL: Record<ContentType, string> = {
   "video":        "Videos · Watch the framework in action",
   "kit":          "Kits · Interactive tools & checklists",
   "tool":         "Tools · Use them right now",
+  "radar":        "Radars · Live coverage data, refreshed daily",
   "quiz":         "Quizzes · Score your position",
   "playbook":     "Playbooks · Deep-dive guides",
   "guide":        "Guides · From the archives",
@@ -565,6 +589,7 @@ const GROUP_ANCHOR: Record<ContentType, string> = {
   "video":        "videos",
   "kit":          "kits",
   "tool":         "tools",
+  "radar":        "radars",
   "quiz":         "quizzes",
   "playbook":     "playbooks",
   "guide":        "guides",
@@ -575,6 +600,7 @@ const TYPE_ACCENT: Record<ContentType, string> = {
   "video":        "#C0392B",
   "kit":          "#f5b81f",
   "tool":         "#C17817",
+  "radar":        "#3e6b45",
   "quiz":         "#8B6B99",
   "playbook":     INK,
   "guide":        INK55,
@@ -591,6 +617,7 @@ const THUMB_THEME: Record<ContentType, ThumbnailTheme> = {
   video:       { bg: "#f1ebde", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
   playbook:    { bg: "#1a1410", catColor: "rgba(241,235,222,.40)", hookColor: "#f1ebde", ruleColor: "#f5b81f" },
   tool:        { bg: "#f5b81f", catColor: "rgba(26,20,16,.60)", hookColor: "#1a1410", ruleColor: "#1a1410" },
+  radar:       { bg: "#f5b81f", catColor: "rgba(26,20,16,.60)", hookColor: "#1a1410", ruleColor: "#1a1410" },
   guide:       { bg: "#e8e0cc", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
   kit:         { bg: "#f1ebde", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
   quiz:        { bg: "#f1ebde", catColor: "rgba(26,20,16,.45)", hookColor: "#1a1410", ruleColor: "#f5b81f" },
@@ -640,7 +667,7 @@ function getCardCta(item: ContentItem): string {
 }
 
 function isComingSoon(item: ContentItem): boolean {
-  if (item.type === "kit" || item.type === "tool" || item.type === "quiz") {
+  if (item.type === "kit" || item.type === "tool" || item.type === "radar" || item.type === "quiz") {
     return !!(item as InteractiveContent).comingSoon;
   }
   return false;
@@ -657,7 +684,7 @@ function isExternal(item: ContentItem): boolean {
     if (g.href) return g.href.startsWith("http");
     return !!g.external;
   }
-  if (item.type === "kit" || item.type === "tool" || item.type === "quiz") {
+  if (item.type === "kit" || item.type === "tool" || item.type === "radar" || item.type === "quiz") {
     return (item as InteractiveContent).href.startsWith("http");
   }
   return false;
@@ -982,7 +1009,9 @@ function FilterBar({
         </div>
         {TYPE_TABS.map((tab) => {
           const isActive = activeType === tab.key;
-          const cnt = tab.key === "all" ? CONTENT.length : CONTENT.filter((c) => c.type === tab.key).length;
+          const cnt = tab.key === "all"
+            ? CONTENT.filter((c) => !c.private).length
+            : CONTENT.filter((c) => c.type === tab.key && !c.private).length;
           return (
             <button
               key={tab.key}
@@ -1061,7 +1090,7 @@ function FilterBar({
 // PODCAST TEASER
 // ─────────────────────────────────────────────────────────────────────────────
 
-function PodcastTeaser() {
+function PodcastTeaser({ episodeCount }: { episodeCount: number }) {
   return (
     <section
       id="res-podcast"
@@ -1072,7 +1101,7 @@ function PodcastTeaser() {
         <div style={{ borderTop: "1px solid rgba(241,235,222,.5)" }}><div style={{ marginTop: 3, borderTop: "3px solid rgba(241,235,222,.5)" }} /></div>
         <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "10px 0 7px" }}>
           <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase" }}>§ 02</span>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>Podcast · 39 Episodes</span>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>Podcast · {episodeCount} Episodes</span>
           <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.25)" }} />
           <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.35)" }}>Vol. XV · № 02</span>
         </div>
@@ -1085,7 +1114,7 @@ function PodcastTeaser() {
             The show<br /><em style={{ color: YEL }}>on the air.</em>
           </h2>
           <p style={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.65, color: "rgba(241,235,222,.7)", maxWidth: 380, margin: 0 }}>
-            39 episodes on earned media, SEO-PR, content marketing, and building a brand that gets found.
+            {episodeCount} episodes on earned media, SEO-PR, content marketing, and building a brand that gets found.
           </p>
         </div>
         <div>
@@ -1491,7 +1520,7 @@ function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v:
 // MAIN EXPORT
 // ─────────────────────────────────────────────────────────────────────────────
 
-export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?: "guided" | "browse" }) {
+export function ResourcesClientShell({ defaultView = "browse", episodeCount }: { defaultView?: "guided" | "browse"; episodeCount: number }) {
   const [view, setView] = useState<"guided" | "browse">(defaultView);
   const [activeType, setActiveType] = useState<"all" | ContentType>("all");
   const [activeTopics, setActiveTopics] = useState<Set<TopicKey>>(new Set());
@@ -1587,7 +1616,7 @@ export function ResourcesClientShell({ defaultView = "browse" }: { defaultView?:
           <ResourceLedger filtered={filtered} />
         </>
       )}
-      <PodcastTeaser />
+      <PodcastTeaser episodeCount={episodeCount} />
       <PressSection />
     </>
   );

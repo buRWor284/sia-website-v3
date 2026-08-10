@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/resources" },
 };
-import { ResourcesClientShell } from "@/components/resources/ResourcesClientShell";
+import { ResourcesClientShell, RESOURCE_COUNT } from "@/components/resources/ResourcesClientShell";
+import { getAllEpisodes } from "@/lib/podcast";
 import { GROT, INK, INK55, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { ScrollButtons } from "@/components/ScrollButtons";
 
@@ -33,8 +34,8 @@ const Hero = () => (
     }}
   >
     <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", flexShrink: 0 }}>
-      {/* Keep in sync with CONTENT in ResourcesClientShell.tsx (currently 24 items) */}
-      24 Resources
+      {/* Derived from CONTENT in ResourcesClientShell.tsx — cannot go stale */}
+      {RESOURCE_COUNT} Resources
     </span>
 
     <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.3vw,28px)", lineHeight: 1.15, letterSpacing: "-0.02em", color: INK, margin: 0, flexShrink: 0 }}>
@@ -60,7 +61,7 @@ export default function ResourcesPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Hero />
-      <ResourcesClientShell />
+      <ResourcesClientShell episodeCount={getAllEpisodes().length} />
       <Subscriptions sectionNumber="07" />
       <Colophon />
       <ScrollButtons />
