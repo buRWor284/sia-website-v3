@@ -28,6 +28,7 @@ const LINKS = {
   book: "/strategy-call",
   session: "/speaking/earned-media-ai/travel",
   globalRadar: "/earned-media-radar",
+  retailRadar: "/ksa-retail-radar",
   signaliq: "/tools/signaliq",
 };
 
@@ -333,6 +334,9 @@ export default async function KsaRadarPage() {
             </Link>
             <Link href={LINKS.globalRadar} className="ksr-tlink">
               the live global radar
+            </Link>
+            <Link href={LINKS.retailRadar} className="ksr-tlink">
+              the retail &amp; consumer radar
             </Link>
           </div>
         </section>
