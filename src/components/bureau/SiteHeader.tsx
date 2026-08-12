@@ -49,6 +49,7 @@ const NAV: ReadonlyArray<NavNode> = [
     children: [
       { label: "Earned Media Radar", href: "/earned-media-radar",             tag: "Live", live: true },
       { label: "KSA Tourism Radar",  href: "/ksa-tourism-radar",              tag: "Live", live: true },
+      { label: "KSA Retail Radar",   href: "/ksa-retail-radar",               tag: "Live", live: true },
       { label: "Founder Movers",     href: "/founder-movers",                 tag: "New"            },
       { label: "EMOS Platform",      href: "/emos-platform",     tag: "Do-it-yourself" },
       { label: "EMOS Academy",       href: "/emos-academy",      tag: "Done-with-you"  },

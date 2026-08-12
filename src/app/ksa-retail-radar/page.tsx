@@ -9,10 +9,12 @@ import "./ksa-retail-radar.css";
 
 export const revalidate = 43200; // 12h; the coverage scan runs daily
 
-// Deliberately unlinked from the top nav and the home page (same convention the
-// tourism radar launched under): reciprocal in-page cross-links only, as a
+// Public since 2026-08-11 (same day it shipped): linked from the nav (Earned
+// Media dropdown), the /resources ledger (Radars group, Saudi Arabia topic),
+// the footer Live Radars column, the RadarCallout "Also live" strip, the
+// earned-media-ai speaking pages, and the sitemap. Built 2026-08-10 as a
 // direct-URL pitch prop for the KSA speaking circuit (Seamless, Athar, the
-// Riyadh workshop). Built 2026-08-10.
+// Riyadh workshop).
 export const metadata: Metadata = {
   title: "KSA Retail & Consumer Radar",
   description:

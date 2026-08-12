@@ -590,6 +590,50 @@ const LeaveWith = () => (
   </section>
 );
 
+// ─── Live instruments · the radars this session runs on ─────────────────────
+
+const INSTRUMENTS = [
+  {
+    href: "/ksa-retail-radar",
+    caps: "New · KSA Retail Edition",
+    title: "KSA Retail & Consumer Radar",
+    blurb: "25 sourced signals on Saudi Arabia's consumer economy: e-commerce, retail brands, lifestyle retail, and the macro picture, wired to live press-coverage data.",
+  },
+  {
+    href: "/ksa-tourism-radar",
+    caps: "KSA Tourism Edition",
+    title: "KSA Tourism & Hospitality Radar",
+    blurb: "28 sourced signals across giga-projects, mega-events, hospitality, and faith travel. The instrument the travel edition of this session runs on.",
+  },
+  {
+    href: "/earned-media-radar",
+    caps: "Global Edition",
+    title: "Earned Media Radar",
+    blurb: "The live map of what the press is covering across PR, earned media, SEO, and AI search, powered by SignalIQ.",
+  },
+];
+
+const LiveInstruments = () => (
+  <section className="sx" style={{ background: INK, paddingTop: 72, paddingBottom: 72 }}>
+    <div style={{ maxWidth: 980, margin: "0 auto" }}>
+      <SCaps size={10} ls="0.16em" color={YEL}>Live companions · the data behind the talk</SCaps>
+      <h2 style={{ margin: "12px 0 26px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px, 3.8vw, 36px)", color: PAPER, lineHeight: 1.05, letterSpacing: "-0.02em" }}>
+        This session runs on live instruments, not slideware.
+      </h2>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18 }}>
+        {INSTRUMENTS.map((r) => (
+          <a key={r.href} href={r.href} style={{ border: "1px solid rgba(241,235,222,.28)", background: "rgba(241,235,222,.05)", padding: "22px 24px", textDecoration: "none", display: "block" }}>
+            <SCaps size={9.5} ls="0.16em" color={YEL}>{r.caps}</SCaps>
+            <h3 style={{ margin: "10px 0 8px", fontFamily: SERIF, fontWeight: 700, fontSize: 19, color: PAPER, lineHeight: 1.2 }}>{r.title}</h3>
+            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14.5, color: "rgba(241,235,222,.72)", lineHeight: 1.55 }}>{r.blurb}</p>
+            <span style={{ display: "inline-block", marginTop: 14, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: ".12em", textTransform: "uppercase", color: YEL }}>Open the radar &rarr;</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
 // ─── §07 · Q&A ────────────────────────────────────────────────────────────────
 
 const QandA = () => (
@@ -722,6 +766,7 @@ export default function EarnedMediaInTheAgeOfAIPage() {
       <PipelineV2 />
       <Activities />
       <LeaveWith />
+      <LiveInstruments />
       <QandA />
       <CredentialRows />
       <Formats />

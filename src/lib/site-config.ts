@@ -9,7 +9,7 @@ export const SITE = {
     quarter: "Q3",
     year: 2026,
     /** Number of Fractional CMO seats open this quarter */
-    seatsOpen: 1,
+    seatsOpen: 2,
     service: "Fractional CMO",
   },
 } as const;
@@ -21,3 +21,7 @@ export const availabilityLabel =
 /** "1 seats open · Fractional CMO" */
 export const seatsLabel =
   `${SITE.availability.seatsOpen} seats open · ${SITE.availability.service}`;
+
+/** "2 FRACTIONAL CMO SPOTS · Q3 2026" — footer, CTA ticker, /fractional-cmo */
+export const cmoSpotsLabel =
+  `${SITE.availability.seatsOpen} FRACTIONAL CMO SPOTS · ${SITE.availability.quarter} ${SITE.availability.year}`;

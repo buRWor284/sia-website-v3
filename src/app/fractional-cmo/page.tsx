@@ -7,6 +7,7 @@ import Script from "next/script";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { RadarCallout } from "@/components/bureau/RadarCallout";
 import { Turnstile } from "@/components/Turnstile";
+import { SITE, cmoSpotsLabel } from "@/lib/site-config";
 import {
   DoubleRule,
   HRule,
@@ -194,10 +195,10 @@ const Hero = () => (
       {/* Left: count */}
       <div className="res-hero-left">
         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
-          2
+          {SITE.availability.seatsOpen}
         </div>
         <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
-          ● 2 CMO SPOTS<br />Q3 2026
+          ● {SITE.availability.seatsOpen} CMO SPOTS<br />{SITE.availability.quarter} {SITE.availability.year}
         </div>
       </div>
 
@@ -310,7 +311,7 @@ const CMOLead = () => (
       <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: 24 }}>
         <Pill size={11} ls="0.20em">Availability</Pill>
         <div style={{ marginTop: 14, fontFamily: SERIF, fontSize: 22, lineHeight: 1.25, color: INK, fontWeight: 700 }}>
-          ● 2 FRACTIONAL CMO SPOTS · Q3 2026
+          ● {cmoSpotsLabel}
         </div>
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px 18px" }}>
           {AVAILABILITY_SPECS.map(([k, v]) => (
@@ -1249,7 +1250,7 @@ const BookCall = () => (
             whiteSpace: "nowrap",
           }}
         >
-          ● 2 CMO SPOTS · Q3 2026
+          ● {SITE.availability.seatsOpen} CMO SPOTS · {SITE.availability.quarter} {SITE.availability.year}
         </div>
       </div>
 

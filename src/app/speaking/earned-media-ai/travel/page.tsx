@@ -618,6 +618,12 @@ const SaudiAngle = () => (
           28 sourced signals across giga-projects, mega-events, hospitality, and faith travel, wired to live press-coverage data. The instrument this session runs on.
         </p>
         <a href="/ksa-tourism-radar" style={btnYel}>Open the KSA radar &rarr;</a>
+        <p style={{ margin: "14px 0 0", fontFamily: GROT, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: "rgba(241,235,222,.62)" }}>
+          Sibling instrument:{" "}
+          <a href="/ksa-retail-radar" style={{ color: YEL, textDecoration: "none", borderBottom: "1px solid rgba(245,184,31,.45)", paddingBottom: 1 }}>
+            KSA Retail &amp; Consumer Radar &rarr;
+          </a>
+        </p>
       </div>
       <div style={{ marginTop: 18 }}>
         <SCaps size={8.5} ls="0.12em" color="rgba(241,235,222,.4)">Masmak Fort, Riyadh · Photo Abdul7amid Al Fadhly / Pexels</SCaps>

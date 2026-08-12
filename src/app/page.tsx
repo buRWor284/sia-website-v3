@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Subscriptions, CTATicker, Colophon } from '@/components/bureau';
 import { Reveal } from '@/components/motion/Reveal';
 import { RadarCallout } from '@/components/bureau/RadarCallout';
+import { RESOURCE_COUNT } from '@/components/resources/resources-content';
 
 /**
  * Homepage v4 Cream edition (SIA-homepage-v3 design)
@@ -794,10 +795,10 @@ export default function HomePage() {
         <Reveal className="kits-header">
           <div>
             <h2 className="section-h2" style={{margin:0}}>Resources.</h2>
-            <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Kits · Playbooks · Calculators</p>
+            <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Radars · Kits · Playbooks · Calculators</p>
             <p style={{fontFamily:'var(--sans)',fontWeight:400,fontStyle:'italic',fontSize:'15px',color:'var(--I70)',marginTop:'6px',marginBottom:0}}>Might not stay free for too long.</p>
           </div>
-          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>24 TOTAL IN THE LIBRARY →</a>
+          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>{RESOURCE_COUNT} TOTAL IN THE LIBRARY →</a>
         </Reveal>
         <div className="kits-grid">
           <Reveal className="kit-card">

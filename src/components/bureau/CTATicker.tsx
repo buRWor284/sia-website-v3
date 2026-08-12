@@ -5,6 +5,8 @@
  * Props:
  *   topOnly  — removes top/bottom margin (for placement at page top, e.g. below SiteHeader)
  */
+import { cmoSpotsLabel } from "@/lib/site-config";
+
 interface CTATickerProps {
   topOnly?: boolean;
 }
@@ -18,7 +20,7 @@ export const CTATicker = ({ topOnly = false }: CTATickerProps) => (
       <span key={i} className="sia-ticker-track" aria-hidden={i > 0 ? true : undefined}>
         <span className="sia-ticker__dot">●</span>
         <span className="sia-ticker__bold">
-          <a href="/fractional-cmo">2 FRACTIONAL CMO SPOTS · Q3 2026</a>
+          <a href="/fractional-cmo">{cmoSpotsLabel}</a>
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>
@@ -28,7 +30,7 @@ export const CTATicker = ({ topOnly = false }: CTATickerProps) => (
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>
-          <a href="/resources">NEW TOOLS: PRESSIQ · SIGNALIQ · JOURNOCOLLABIQ — FREE TO USE</a>
+          <a href="/resources#radars">LIVE RADARS: EARNED MEDIA · KSA TOURISM · FOUNDER MOVERS</a>
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>

@@ -86,6 +86,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { route: "earned-media-radar",              changeFrequency: "daily"   as const, priority: 0.8 },
     { route: "founder-movers",                  changeFrequency: "daily"   as const, priority: 0.8 },
     { route: "ksa-tourism-radar",               changeFrequency: "daily"   as const, priority: 0.8 },
+    { route: "ksa-retail-radar",                changeFrequency: "daily"   as const, priority: 0.8 },
   ];
 
   const staticEntries = pages.map(({ route, changeFrequency, priority }) => ({

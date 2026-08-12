@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { availabilityLabel } from "@/lib/site-config";
+import { cmoSpotsLabel } from "@/lib/site-config";
 
 type FooterLink = {
   label: string;
@@ -16,10 +16,20 @@ const COLS: ReadonlyArray<FooterCol> = [
   {
     head: "EMOS",
     items: [
-      { label: "EMOS Platform", href: "/emos-platform" },
-      { label: "EMOS Academy",  href: "/emos-academy" },
-      { label: "Free Tools",    href: "/tools" },
-      { label: "Subscribe",     href: "/emos-platform/subscribe" },
+      { label: "EMOS Platform",   href: "/emos-platform" },
+      { label: "EMOS Academy",    href: "/emos-academy" },
+      { label: "EMOS Curriculum", href: "/resources/emoscurriculum" },
+      { label: "Free Tools",      href: "/tools" },
+      { label: "Subscribe",       href: "/emos-platform/subscribe" },
+    ],
+  },
+  {
+    head: "Live Radars",
+    items: [
+      { label: "Earned Media Radar", href: "/earned-media-radar" },
+      { label: "KSA Tourism Radar",  href: "/ksa-tourism-radar" },
+      { label: "KSA Retail Radar",   href: "/ksa-retail-radar" },
+      { label: "Founder Movers",     href: "/founder-movers" },
     ],
   },
   {
@@ -202,7 +212,7 @@ export const Colophon = () => (
 
       <div className="colophon-bottom-group" style={S.monoFlex}>
         <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
-        <a href="/fractional-cmo" style={S.open}>● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
+        <a href="/fractional-cmo" style={S.open}>● {cmoSpotsLabel}</a>
         <a href="/emos-academy" style={S.open}>● EMOS FOUNDING CLASS · APPLY NOW</a>
       </div>
 

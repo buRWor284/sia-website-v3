@@ -36,11 +36,11 @@ export function RadarCallout({ maxWidth = 1000 }: { maxWidth?: number }) {
         className="rc-band"
         style={{
           maxWidth,
-          margin: "40px auto",
+          margin: "40px auto 0",
           padding: "26px 30px",
           background: INK,
           borderTop: `3px solid ${YEL}`,
-          borderBottom: `3px solid ${YEL}`,
+          borderBottom: "1px solid rgba(245,184,31,.25)",
           textDecoration: "none",
         }}
       >
@@ -124,6 +124,58 @@ export function RadarCallout({ maxWidth = 1000 }: { maxWidth?: number }) {
           Open Radar &rarr;
         </span>
       </Link>
+
+      {/* "Also live" strip — the other SignalIQ-powered radars. Sits inside
+          the same ink band so it works on any page background. */}
+      <div
+        style={{
+          maxWidth,
+          margin: "0 auto 40px",
+          padding: "10px 30px 12px",
+          background: INK,
+          borderBottom: `3px solid ${YEL}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: GROT,
+            fontWeight: 800,
+            fontSize: 8.5,
+            letterSpacing: ".16em",
+            textTransform: "uppercase",
+            color: "rgba(241,235,222,.45)",
+          }}
+        >
+          Also live
+        </span>
+        {[
+          { label: "KSA Tourism & Hospitality Radar", href: "/ksa-tourism-radar" },
+          { label: "KSA Retail & Consumer Radar", href: "/ksa-retail-radar" },
+          { label: "Founder Movers", href: "/founder-movers" },
+        ].map((r) => (
+          <Link
+            key={r.href}
+            href={r.href}
+            style={{
+              fontFamily: GROT,
+              fontWeight: 700,
+              fontSize: 11,
+              letterSpacing: ".08em",
+              textTransform: "uppercase",
+              color: "rgba(241,235,222,.85)",
+              textDecoration: "none",
+              borderBottom: "1px solid rgba(245,184,31,.45)",
+              paddingBottom: 2,
+            }}
+          >
+            {r.label} &rarr;
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
