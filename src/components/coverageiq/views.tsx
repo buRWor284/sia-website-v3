@@ -15,6 +15,7 @@ import {
 import {
   PIPELINE_STAGES, StageBadge, PESOBadge, DRBar, PointsBadge, AlertTypeBadge,
   FilterPill, SectionMast, EmptyState, DetailColHead, DetailRow, MField, StageLegend,
+  MetricsLegend, METRIC_TIPS,
   fmt, daysAgoLabel, logCell, cc,
 } from "@/components/coverageiq/primitives";
 import {
@@ -94,6 +95,7 @@ export function PipelineView({
       </div>
 
       {showStageLegend && <StageLegend />}
+      <MetricsLegend />
 
       {pitches.length === 0 ? (
         <EmptyState message="No pitches yet. Add your first pitch to get started." />
@@ -109,7 +111,7 @@ export function PipelineView({
             letterSpacing: "0.18em", textTransform: "uppercase",
           }}>
             {["Pitch", "Journalist", "Stage", "DR", "PESO", "Points"].map((h, i) => (
-              <div key={h} style={{
+              <div key={h} title={h === "DR" ? METRIC_TIPS.dr : h === "Points" ? METRIC_TIPS.points : undefined} style={{
                 padding: "12px 16px",
                 borderRight: i < 5 ? "1px solid rgba(241,235,222,.15)" : "none",
               }}>
@@ -251,7 +253,7 @@ export function PipelineView({
         <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55 }}>
           {filtered.length} pitch{filtered.length !== 1 ? "es" : ""}{stageFilter !== "all" ? ` in ${stageFilter}` : " total"}
         </span>
-        <span style={{ fontFamily: MONO, fontSize: 12, color: INK55 }}>
+        <span title={METRIC_TIPS.points} style={{ fontFamily: MONO, fontSize: 12, color: INK55 }}>
           Total points: {totalPoints}
         </span>
       </div>
@@ -457,17 +459,19 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", border: `1px solid ${INK}`, marginBottom: 24 }}>
         {[
-          { num: coverageLog.length, label: "TOTAL PLACEMENTS" },
-          { num: totalPoints,        label: "TOTAL POINTS" },
-          { num: avgDR,              label: "AVG DOMAIN RATING" },
-          { num: doFollow,           label: "DO-FOLLOW LINKS" },
+          { num: coverageLog.length, label: "TOTAL PLACEMENTS", tip: undefined as string | undefined },
+          { num: totalPoints,        label: "TOTAL POINTS",      tip: METRIC_TIPS.points },
+          { num: avgDR,              label: "AVG DOMAIN RATING", tip: METRIC_TIPS.dr },
+          { num: doFollow,           label: "DO-FOLLOW LINKS",   tip: "Do-follow links pass SEO authority from the publishing site to yours; no-follow links do not." },
         ].map((item, i) => (
-          <div key={i} style={{ padding: "20px 16px", borderRight: i < 3 ? `1px solid ${INK}` : "none" }}>
+          <div key={i} title={item.tip} style={{ padding: "20px 16px", borderRight: i < 3 ? `1px solid ${INK}` : "none" }}>
             <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 28, lineHeight: 1, color: INK, letterSpacing: "-0.02em" }}>{item.num}</div>
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, marginTop: 6 }}>{item.label}</div>
           </div>
         ))}
       </div>
+
+      <MetricsLegend />
 
       {coverageLog.length === 0 ? (
         <EmptyState message="No placements yet. Pitches marked as Placed or Amplified will appear here." />
@@ -477,7 +481,7 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
             {cols.map((col, i) => (
-              <div key={col.key} onClick={() => handleSort(col.key)} style={{
+              <div key={col.key} onClick={() => handleSort(col.key)} title={col.key === "dr" ? METRIC_TIPS.dr : col.key === "points" ? METRIC_TIPS.points : undefined} style={{
                 padding: "11px 14px", cursor: "pointer",
                 borderRight: i < cols.length - 1 ? "1px solid rgba(241,235,222,.15)" : "none",
                 fontFamily: GROT, fontWeight: 700, fontSize: 9,
@@ -590,6 +594,8 @@ export function ContactsView({
         </div>
       )}
 
+      <MetricsLegend metrics={["dr"]} />
+
       {journalists.length === 0 ? (
         <EmptyState message={contacts ? "No journalists yet. Click '+ Add Contact' to start building your media list." : "No contacts yet."} />
       ) : (
@@ -598,7 +604,7 @@ export function ContactsView({
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
             {headers.map((col, i) => (
-              <div key={col.label} onClick={i !== 5 ? () => handleSort(col.key) : undefined} style={{
+              <div key={col.label} onClick={i !== 5 ? () => handleSort(col.key) : undefined} title={col.key === "dr" ? METRIC_TIPS.dr : undefined} style={{
                 padding: "11px 12px", cursor: i !== 5 ? "pointer" : "default",
                 borderRight: i < headers.length - 1 ? "1px solid rgba(241,235,222,.15)" : "none",
                 fontFamily: GROT, fontWeight: 700, fontSize: 9,
@@ -665,7 +671,7 @@ export function ContactsView({
                       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20 }}>
                         <div>
                           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>Contact</div>
-                          {[["Email", j.email], ["Twitter", j.twitter], ["DR", j.dr?.toString()]].map(([label, value]) => (
+                          {[["Email", j.email], ["Twitter", j.twitter], ["DR (site authority)", j.dr?.toString()]].map(([label, value]) => (
                             <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${INK15}` }}>
                               <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: INK55 }}>{label}</span>
                               <span style={{ fontFamily: SERIF, fontSize: 14, color: INK }}>{value ?? "—"}</span>
@@ -778,7 +784,7 @@ function EditJournalistForm({
           <input value={form.twitter_handle ?? ""} onChange={e => set("twitter_handle", e.target.value)} style={inp} />
         </div>
         <div>
-          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Domain Rating</label>
+          <label title={METRIC_TIPS.dr} style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Domain Rating (site authority, 0-100)</label>
           <input type="number" min={0} max={100} value={form.domain_rating ?? ""} onChange={e => set("domain_rating", e.target.value ? parseInt(e.target.value) : null)} style={inp} />
         </div>
       </div>
@@ -868,8 +874,8 @@ function AddContactModal({
             <MField label="Twitter / X">
               <input value={form.twitter_handle ?? ""} onChange={e => set("twitter_handle", e.target.value)} placeholder="@handle" style={inp} />
             </MField>
-            <MField label="Domain Rating">
-              <input type="number" min={0} max={100} value={form.domain_rating ?? ""} onChange={e => set("domain_rating", e.target.value ? parseInt(e.target.value) : null)} placeholder="0–100" style={inp} />
+            <MField label="Domain Rating (site authority)">
+              <input title={METRIC_TIPS.dr} type="number" min={0} max={100} value={form.domain_rating ?? ""} onChange={e => set("domain_rating", e.target.value ? parseInt(e.target.value) : null)} placeholder="0–100" style={inp} />
             </MField>
           </div>
           <MField label="Notes">
@@ -946,7 +952,7 @@ export function PESODashboard({
               </div>
               <div style={{ borderTop: earned ? "1px solid rgba(241,235,222,.2)" : `1px solid ${INK15}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
                 {([["Pitches", p.total], ["Placed", p.placed], ["Points", p.points], ["Avg DR", p.avgDR || "—"]] as [string, number | string][]).map(([label, value]) => (
-                  <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                  <div key={label} title={label === "Avg DR" ? METRIC_TIPS.dr : label === "Points" ? METRIC_TIPS.points : undefined} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                     <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: earned ? "rgba(241,235,222,.5)" : INK55 }}>{label}</span>
                     <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, color: earned ? PAPER : INK }}>{value}</span>
                   </div>

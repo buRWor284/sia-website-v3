@@ -15,7 +15,7 @@ import { PAPER, PAPER2, INK, INK55, INK35, INK15, YEL, SERIF, GROT, MONO } from 
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { EmailCaptureStrip, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
-import { SectionMast } from "@/components/coverageiq/primitives";
+import { SectionMast, DataSourceNote } from "@/components/coverageiq/primitives";
 import { CIQ_CSS } from "@/components/coverageiq/core-css";
 import {
   PipelineView, FollowUpsView, CoverageLogView, ContactsView, PESODashboard, NewPitchModal,
@@ -246,6 +246,13 @@ export default function CoverageIQ() {
         </div>
       </div>
 
+      {/* ── Who it's for (Camper-demo fix: filter wrong-fit demos early) ─── */}
+      <div style={{ borderBottom: `1px solid ${INK15}`, background: PAPER2 }}>
+        <div style={{ maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)", paddingBlock: 8, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+          Built for founders and small teams running their own PR, not enterprise press offices.
+        </div>
+      </div>
+
       {/* ── Main content ─────────────────────────────────────────────────── */}
       <main style={{ maxWidth: 1240, marginInline: "auto", padding: "32px clamp(20px,4vw,56px) 80px" }}>
         <SectionMast {...sectionMastProps[activeTab]} />
@@ -254,6 +261,9 @@ export default function CoverageIQ() {
         {activeTab === "coverage"  && <CoverageLogView pitches={vmPitches} />}
         {activeTab === "contacts"  && <ContactsView journalists={vmJournalists} />}
         {activeTab === "peso"      && <PESODashboard pitches={vmPitches} alerts={vmAlerts} alertsPublicChrome />}
+
+        {/* Data-source transparency (Camper-demo fix). */}
+        <DataSourceNote variant="public" />
 
         {/* Conversion strips — deliver value, capture the email, pitch EMOS. */}
         <EmailCaptureStrip

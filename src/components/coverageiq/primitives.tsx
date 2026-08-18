@@ -83,11 +83,19 @@ export function PESOBadge({ type }: { type: PesoType }) {
   );
 }
 
+// ─── Metric help copy (Camper-demo fix: plain language for non-SEO users) ─────
+// One canonical place for what DR and Points mean. Used as hover tooltips on
+// badges + column headers, and rendered visibly in MetricsLegend below.
+export const METRIC_TIPS = {
+  dr: "DR (Domain Rating): how strong the publishing website's reputation is, on a 0-100 scale (an SEO measure, similar to Ahrefs Domain Rating). Major outlets like TechCrunch sit in the 90s; a niche blog might be 20-40. Higher means a mention there carries more weight.",
+  points: "Points: a simple win score for coverage you have logged. Points are awarded only once a pitch reaches Placed or Amplified. Bigger placements on higher-DR sites earn more.",
+} as const;
+
 export function DRBar({ value }: { value: number | null }) {
   if (!value) return <span style={{ color: INK35, fontFamily: MONO, fontSize: 12 }}>—</span>;
   const fill = value >= 80 ? YEL : value >= 50 ? INK : INK55;
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+    <div title={METRIC_TIPS.dr} style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 13, minWidth: 24 }}>{value}</span>
       <div style={{ flex: 1, height: 4, background: INK15, maxWidth: 60 }}>
         <div style={{ height: "100%", width: `${Math.min(value, 100)}%`, background: fill }} />
@@ -99,7 +107,7 @@ export function DRBar({ value }: { value: number | null }) {
 export function PointsBadge({ points }: { points: number | null }) {
   if (!points) return <span style={{ color: INK35, fontFamily: MONO, fontSize: 12 }}>—</span>;
   return (
-    <span style={{
+    <span title={METRIC_TIPS.points} style={{
       fontFamily: MONO, fontWeight: 700, fontSize: 14,
       borderBottom: `2px solid ${YEL}`, paddingBottom: 2,
     }}>
@@ -241,9 +249,88 @@ export const STAGE_DESCRIPTIONS: Record<Stage, { short: string; when: string }> 
   sent:      { short: "Pitch emailed to the journalist.",  when: "You hit send — waiting for any response." },
   opened:    { short: "Journalist opened your email.",     when: "Tracked via email open pixel or confirmed manually." },
   replied:   { short: "Journalist replied.",               when: "Any reply — even a rejection or request for more info." },
-  placed:    { short: "Coverage confirmed and published.", when: "The piece is live. Add the URL and DR in the expanded view." },
+  placed:    { short: "Coverage confirmed and published.", when: "The piece is live. Add the URL and DR (Domain Rating) in the expanded view." },
   amplified: { short: "Placement shared and promoted.",    when: "You've shared it on social, in newsletters, or via outreach." },
 };
+
+// ─── Metrics legend (Camper-demo fix) ─────────────────────────────────────────
+// Visible, collapsible plain-language explainer for DR and Points, mirroring
+// StageLegend. Hover tooltips alone fail on touch devices; this is the
+// no-hover path. Pass metrics to show a subset (Contacts tab has only DR).
+const METRIC_LEGEND_ITEMS: { id: "dr" | "points"; label: string; short: string; detail: string }[] = [
+  {
+    id: "dr",
+    label: "DR (Domain Rating)",
+    short: "How strong the publishing website's reputation is, on a 0-100 scale (an SEO measure, similar to Ahrefs Domain Rating).",
+    detail: "Major outlets like TechCrunch or Forbes sit in the 90s; a niche blog might be 20-40. Higher means a mention or link there carries more weight.",
+  },
+  {
+    id: "points",
+    label: "Points",
+    short: "A simple win score for the coverage you have logged. Awarded only once a pitch reaches Placed or Amplified.",
+    detail: "Bigger placements on higher-DR sites earn more points. The formula is DR-based and still being finalized; there is no composite score in CoverageIQ.",
+  },
+];
+
+export function MetricsLegend({ metrics }: { metrics?: ("dr" | "points")[] }) {
+  const [open, setOpen] = useState(false);
+  const items = METRIC_LEGEND_ITEMS.filter(m => !metrics || metrics.includes(m.id));
+  const title = items.length === 1
+    ? (items[0].id === "dr" ? "What does DR mean?" : "What do Points mean?")
+    : "What do DR and Points mean?";
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, padding: "4px 0" }}
+      >
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55 }}>
+          {open ? "▲" : "▼"} {title}
+        </span>
+      </button>
+      {open && (
+        <div style={{ marginTop: 8, border: `1px solid ${INK15}`, background: PAPER2, display: "grid", gridTemplateColumns: `repeat(${items.length}, 1fr)` }}>
+          {items.map((m, i) => (
+            <div key={m.id} style={{ padding: "12px 16px", borderRight: i < items.length - 1 ? `1px solid ${INK15}` : "none" }}>
+              <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK }}>
+                {m.label}
+              </div>
+              <div style={{ fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.45, marginTop: 6 }}>
+                {m.short}
+              </div>
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, marginTop: 3, lineHeight: 1.4 }}>
+                {m.detail}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Data-source note (Camper-demo fix) ───────────────────────────────────────
+// "What IP/data do you use" was Camper's first product question. This states it
+// plainly, per surface. Verified against the code 2026-08-18: the dashboard
+// reads/writes only its own Supabase tables (coverageiq_pitches, journalists,
+// coverageiq_alerts); the public tool is seeded sample data in localStorage.
+// CoverageIQ imports nothing from src/lib/signaliq — the GDELT/BigQuery
+// coverage cache is SignalIQ's alone. Keep this note truthful if that changes.
+export function DataSourceNote({ variant }: { variant: "public" | "dashboard" }) {
+  const body = variant === "public"
+    ? "CoverageIQ tracks what you put into it: the pitches you log and the coverage you record, including pitches sent across from PressIQ. There is no third-party monitoring API behind it, and nothing is scraped from external services. (This public demo runs on invented sample data, stored only in your browser.) The live media radars on this site are different: SignalIQ reads real global news data from GDELT via Google BigQuery. CoverageIQ makes no external data calls."
+    : "CoverageIQ tracks what your team puts into it: the pitches you log (or send across from PressIQ) and the coverage you record. Everything lives in your workspace's private database; there is no third-party monitoring API behind this screen, and nothing is scraped from external services. SignalIQ's radars are the exception in the suite: they read global news data from GDELT via Google BigQuery. CoverageIQ does not touch that feed.";
+  return (
+    <div style={{ marginTop: 40, border: `1px solid ${INK15}`, background: PAPER2, padding: "16px 22px", display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
+      <span style={{ background: INK, color: YEL, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", padding: "5px 10px", flexShrink: 0 }}>
+        Where this data comes from
+      </span>
+      <p style={{ fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.55, color: INK70, margin: 0, flex: 1, minWidth: 260 }}>
+        {body}
+      </p>
+    </div>
+  );
+}
 
 export function StageLegend() {
   const [open, setOpen] = useState(false);

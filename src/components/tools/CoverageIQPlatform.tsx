@@ -23,7 +23,7 @@ import {
   updateJournalist,
   deleteJournalist,
 } from "@/app/emos-platform/actions/coverageiq";
-import { SectionMast } from "@/components/coverageiq/primitives";
+import { SectionMast, DataSourceNote } from "@/components/coverageiq/primitives";
 import { CIQ_CSS } from "@/components/coverageiq/core-css";
 import {
   PipelineView, FollowUpsView, CoverageLogView, ContactsView, PESODashboard, NewPitchModal,
@@ -219,6 +219,9 @@ export default function CoverageIQPlatform({
         {activeTab === "peso"      && (
           <PESODashboard pitches={vmPitches} alerts={vmAlerts} onAlertStatusChange={handleAlertStatusChange} alertsComingSoon />
         )}
+
+        {/* Data-source transparency (Camper-demo fix). */}
+        <DataSourceNote variant="dashboard" />
       </main>
 
       {/* Modal */}
