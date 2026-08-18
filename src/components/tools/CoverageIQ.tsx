@@ -249,7 +249,7 @@ export default function CoverageIQ() {
       {/* ── Who it's for (Camper-demo fix: filter wrong-fit demos early) ─── */}
       <div style={{ borderBottom: `1px solid ${INK15}`, background: PAPER2 }}>
         <div style={{ maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)", paddingBlock: 8, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-          Built for founders and small teams running their own PR, not enterprise press offices.
+          Built for founders and small teams running their own PR.
         </div>
       </div>
 
