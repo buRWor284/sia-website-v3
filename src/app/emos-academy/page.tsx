@@ -96,7 +96,7 @@ export default function EmosPage() {
                 <div className="cta-meta-row"><b>5</b> founder seats</div>
                 <div className="cta-meta-row"><b>48h</b> decision</div>
               </div>
-              <div className="cta-seats" title="Seats remaining"><div className="cta-seat" /><div className="cta-seat" /><div className="cta-seat" /><div className="cta-seat open" /><div className="cta-seat open" /></div>
+              <div className="cta-seats" title="Seats remaining"><div className="cta-seat open" /><div className="cta-seat open" /><div className="cta-seat open" /><div className="cta-seat open" /><div className="cta-seat open" /></div>
               <a href="#apply" className="cta-btn">Submit Application →</a>
               <p className="cta-fine">5 min · reviewed personally</p>
             </div>
@@ -131,7 +131,7 @@ export default function EmosPage() {
               </div>
 
               <p className="emos-hero-sub">
-                <strong>EMOS Academy</strong>, built on EMOS — the Earned Media Operating System — is a
+                <strong>EMOS Academy</strong>, built on EMOS, the Earned Media Operating System, is a
                 Guided Implementation System for founders <strong>3 to 12 months from a Series A</strong>.
               </p>
 
@@ -166,7 +166,7 @@ export default function EmosPage() {
               <div style={{ overflow: "hidden", border: `1px solid ${INK15}`, padding: "14px 0" }}>
                 <p className="emos-marquee-label" style={{ marginBottom: 10 }}>Where we&#39;ve placed clients</p>
             <div className="emos-marquee-track">
-              {["Forbes","Harvard Business Review","Yahoo","Business Insider","MSN","AOL","Reader's Digest","Apartment Therapy","Healthline","Forbes","Harvard Business Review","Yahoo","Business Insider","MSN","AOL","Reader's Digest","Apartment Therapy","Healthline"].map((n, i) => (
+              {["Forbes","Yahoo","Business Insider","MSN","AOL","Reader's Digest","Apartment Therapy","Healthline","Forbes","Yahoo","Business Insider","MSN","AOL","Reader's Digest","Apartment Therapy","Healthline"].map((n, i) => (
                 <span key={i}>{n}</span>
               ))}
             </div>
@@ -234,9 +234,9 @@ export default function EmosPage() {
                     <div className="pc-title">Columnist · Agency Operator · ~13 Years</div>
                   </div>
                   <div className="pc-creds">
-                    <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text">Forbes, HBR, HuffPost, World Bank, SEJ, Entrepreneur, The Next Web, Yahoo, MSN, SEMrush, SERPed <em>+ more</em></div></div>
+                    <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text">Forbes, HBR, HuffPost, World Bank, SEJ, The Next Web, Yahoo, MSN, SEMrush, SERPed <em>+ more</em></div></div>
                     <div className="pc-cred"><div className="pc-cred-label">International Speaker</div><div className="pc-cred-text">Arabian Travel Market · MaGIC Malaysia · Astrolabs Dubai · DMSS.io Bali</div></div>
-                    <div className="pc-cred"><div className="pc-cred-label">Custom Workshops</div><div className="pc-cred-text">Delivered for SEMrush (NYSE: SEMR) &amp; Uhubs(SaaS, UK)</div></div>
+                    <div className="pc-cred"><div className="pc-cred-label">Custom Workshops</div><div className="pc-cred-text">Delivered for SEMrush (NYSE: SEMR) &amp; Uhubs (SaaS, UK)</div></div>
                   </div>
                 </div>
                 <div>
@@ -592,6 +592,7 @@ export default function EmosPage() {
                   <h2 className="sec-h2" style={{ marginBottom: 24, color: PAPER }}>Two tracks. One-time investment. Capability you keep forever.</h2>
                   <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(250,250,250,.60)", marginBottom: 16 }}>A traditional agency charges <strong style={{ color: PAPER }}>$60,000 to $240,000 a year</strong> for content, SEO, and digital PR, before a single result lands, and the knowledge walks out when the contract ends.</p>
                   <p style={{ fontFamily: SERIF, fontSize: 18, lineHeight: 1.65, color: "rgba(250,250,250,.60)" }}>EMOS: <strong style={{ color: YEL }}>$2,000 to $3,500 one-time</strong>. The capability stays. Forever.</p>
+                  <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: "rgba(250,250,250,.55)" }}>This is founding cohort pricing. Cohort 2 will cost more.</p>
                   <p style={{ marginTop: 24, fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: PAPER, lineHeight: 1.4, borderLeft: `3px solid ${YEL}`, paddingLeft: 16 }}>One placement on a DA 80+ site is worth more than the program.</p>
                   <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 16, color: "rgba(250,250,250,.60)" }}>Use the <a href="#calculator" className="emos-tool-link">SIA Authority ROI Calculator ↑</a> to run the numbers for your business.</p>
                 </div>
@@ -688,6 +689,7 @@ export default function EmosPage() {
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span><strong style={{ color: PAPER }}>Accelerate:</strong> 2 verified placements within 90 days</span></div>
                   <div className="emos-commit-item emos-commit-item-inv"><span className="emos-commit-check">✓</span><span>If I miss either: <strong style={{ color: PAPER }}>full refund of the investment</strong></span></div>
                   <p className="emos-commit-note">EMOS is new, but the playbook behind it isn&#39;t. It&#39;s the same earned-media approach my agency has used for ~13 years, and clients who work it consistently earn placements.</p>
+                  <p className="emos-commit-note" style={{ marginTop: 12 }}>A &ldquo;verified placement&rdquo; counts in any earned form: an article or feature, an expert quote, a podcast interview, or a roundup inclusion, in a recognized outlet that names you. Full terms in the <a href="/refund-policy" style={{ color: "inherit", textDecoration: "underline" }}>Refund Policy</a>.</p>
                 </div>
               </div>
             </div>
@@ -727,7 +729,7 @@ export default function EmosPage() {
                 This time next year, your team owns the system. Your name lives in the publications your buyers and investors already trust. The coverage compounds long after the program ends.
               </p>
               <p style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "rgba(250,250,250,.40)", marginBottom: 28 }}>
-                Rolling applications — next cohort forming now &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
+                Rolling applications, next cohort forming now &nbsp;·&nbsp; Five founders &nbsp;·&nbsp; Application required
               </p>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
                 <a href="/emos-academy/apply" className="emos-cta-yellow" style={{ fontSize: 13, padding: "18px 36px" }}>Submit Your Application →</a>

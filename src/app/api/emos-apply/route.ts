@@ -60,7 +60,8 @@ export async function POST(req: NextRequest) {
   }
 
   const { first_name, last_name, email, company, tier, arr_range,
-          timeline_to_raise, current_press, what_tried, why_now, message } = body;
+          timeline_to_raise, current_press, what_tried, why_now, message,
+          referral_source, utm_source, utm_medium, utm_campaign, ref, referrer } = body;
 
   if (!first_name || !last_name || !email || !tier) {
     return NextResponse.json(
@@ -75,14 +76,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "A valid email address is required." }, { status: 400 });
   }
 
-  const tierLabel = tier === "accelerate" ? "Accelerate – $3,500" : "Foundation – $2,000";
+  const tierLabel = tier === "accelerate" ? "Accelerate: $3,500" : "Foundation: $2,000";
+
+  // Attribution line for the notification email (e.g. utm_source=yc from the
+  // Awan post). Values are attacker-controlled like everything else — escaped
+  // at the interpolation point below.
+  const attribution = [
+    referral_source && `Heard via: ${referral_source}`,
+    utm_source && `utm_source=${utm_source}`,
+    utm_medium && `utm_medium=${utm_medium}`,
+    utm_campaign && `utm_campaign=${utm_campaign}`,
+    ref && `ref=${ref}`,
+    referrer && `referrer: ${referrer}`,
+  ].filter(Boolean).join(" · ");
 
   // M2: every value below is attacker-controlled (public form) and this mail
   // arrives from Irfan's own domain — escape at each interpolation point.
   const html = `
     <div style="font-family: Georgia, serif; max-width: 640px; color: #1a1410;">
       <h2 style="margin-bottom: 4px;">New EMOS Application</h2>
-      <p style="color: #888; font-size: 14px; margin-top: 0;">Received from syedirfanajmal.com/emos/apply</p>
+      <p style="color: #888; font-size: 14px; margin-top: 0;">Received from syedirfanajmal.com/emos-academy/apply</p>
       <hr style="border: none; border-top: 2px solid #f5b81f; margin: 24px 0;" />
       <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
         <tr>
@@ -104,6 +117,7 @@ export async function POST(req: NextRequest) {
         ${what_tried ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">What They've Tried</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(what_tried)}</td></tr>` : ""}
         ${why_now ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Why Now</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(why_now)}</td></tr>` : ""}
         ${message ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Message</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(message)}</td></tr>` : ""}
+        ${attribution ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Attribution</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(attribution)}</td></tr>` : ""}
       </table>
       <p style="margin-top: 24px; font-size: 13px; color: #888;">Reply directly to reach the applicant at ${escapeHtml(email)}.</p>
     </div>
@@ -135,6 +149,41 @@ export async function POST(req: NextRequest) {
     }
 
     const data = await res.json();
+
+    // Acknowledgment email to the applicant. Best-effort: a failure here must
+    // never fail the application itself (awaited, errors swallowed — do NOT
+    // fire-and-forget on serverless, the runtime may freeze before it sends).
+    try {
+      const ackHtml = `
+        <div style="font-family: Georgia, serif; max-width: 560px; color: #1a1410; line-height: 1.6;">
+          <h2 style="margin-bottom: 4px;">Application received</h2>
+          <p>Hi ${escapeHtml(first_name)},</p>
+          <p>Thanks for applying to EMOS Academy (${tierLabel}). I read every application personally and will get back to you within 48 hours. If it looks like a fit, my reply will include a Calendly link for a 15-minute call.</p>
+          <p>No payment is due at this stage. If anything changes on your side in the meantime, just reply to this email.</p>
+          <p style="margin-top: 20px;">Syed Irfan Ajmal<br /><span style="color: #888; font-size: 14px;">EMOS Academy · syedirfanajmal.com/emos-academy</span></p>
+        </div>
+      `;
+      const ackRes = await fetch(RESEND_API, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "Syed Irfan Ajmal <contact@syedirfanajmal.com>",
+          to: [email],
+          reply_to: "sia@syedirfanajmal.com",
+          subject: "Your EMOS Academy application is in. Reply within 48 hours.",
+          html: ackHtml,
+        }),
+      });
+      if (!ackRes.ok) {
+        console.error("Ack email failed:", ackRes.status, await ackRes.text());
+      }
+    } catch (ackErr) {
+      console.error("Ack email error:", ackErr);
+    }
+
     return NextResponse.json({ success: true, id: data.id });
   } catch (err) {
     console.error("Resend fetch error:", err);

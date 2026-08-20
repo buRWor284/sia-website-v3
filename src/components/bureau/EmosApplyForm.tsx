@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, type FormEvent } from "react";
+import { useState, useCallback, useEffect, type FormEvent } from "react";
 import {
   GROT,
   INK,
@@ -49,6 +49,20 @@ export function EmosApplyForm() {
 
   const handleToken = useCallback((token: string) => setTurnstileToken(token), []);
 
+  // Attribution: capture utm params + referrer once on mount so campaign
+  // traffic (e.g. ?utm_source=yc) survives into the application email.
+  const [tracking, setTracking] = useState<Record<string, string>>({});
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const t: Record<string, string> = {};
+    for (const k of ["utm_source", "utm_medium", "utm_campaign", "ref"]) {
+      const v = params.get(k);
+      if (v) t[k] = v.slice(0, 100);
+    }
+    if (document.referrer) t.referrer = document.referrer.slice(0, 200);
+    setTracking(t);
+  }, []);
+
   const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSending(true);
@@ -61,7 +75,7 @@ export function EmosApplyForm() {
       const res = await fetch("/api/emos-apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, turnstileToken }),
+        body: JSON.stringify({ ...formData, ...tracking, turnstileToken }),
       });
 
       if (!res.ok) {
@@ -74,7 +88,7 @@ export function EmosApplyForm() {
     } finally {
       setSending(false);
     }
-  }, []);
+  }, [tracking, turnstileToken]);
 
   if (sent) {
     return (
@@ -164,7 +178,7 @@ export function EmosApplyForm() {
             }}
           >
             <input type="radio" name="tier" value="foundation" required style={{ accentColor: INK }} />
-            Foundation – $2,000
+            Foundation: $2,000
           </label>
           <label
             style={{
@@ -178,7 +192,7 @@ export function EmosApplyForm() {
             }}
           >
             <input type="radio" name="tier" value="accelerate" style={{ accentColor: INK }} />
-            Accelerate – $3,500
+            Accelerate: $3,500
           </label>
         </div>
       </div>
@@ -189,10 +203,10 @@ export function EmosApplyForm() {
         <select name="arr_range" style={{ ...INPUT, cursor: "pointer" }}>
           <option value="">Select...</option>
           <option value="pre-revenue">Pre-revenue</option>
-          <option value="0-500k">$0 – $500K</option>
-          <option value="500k-1m">$500K – $1M</option>
-          <option value="1m-3m">$1M – $3M</option>
-          <option value="3m-10m">$3M – $10M</option>
+          <option value="0-500k">$0 - $500K</option>
+          <option value="500k-1m">$500K - $1M</option>
+          <option value="1m-3m">$1M - $3M</option>
+          <option value="3m-10m">$3M - $10M</option>
           <option value="10m+">$10M+</option>
         </select>
       </div>
@@ -203,8 +217,8 @@ export function EmosApplyForm() {
         <select name="timeline_to_raise" style={{ ...INPUT, cursor: "pointer" }}>
           <option value="">Select...</option>
           <option value="3-months">Within 3 months</option>
-          <option value="3-6-months">3 – 6 months</option>
-          <option value="6-12-months">6 – 12 months</option>
+          <option value="3-6-months">3 - 6 months</option>
+          <option value="6-12-months">6 - 12 months</option>
           <option value="12-plus">12+ months</option>
           <option value="not-raising">Not raising / bootstrapped</option>
         </select>
@@ -240,6 +254,17 @@ export function EmosApplyForm() {
           rows={2}
           style={{ ...INPUT, resize: "vertical" as const }}
           placeholder="What's driving the urgency? (Optional)"
+        />
+      </div>
+
+      {/* ── How did you hear ── */}
+      <div style={{ marginBottom: 20 }}>
+        <label style={LABEL}>How Did You Hear About EMOS? (Not Required)</label>
+        <input
+          name="referral_source"
+          type="text"
+          style={INPUT}
+          placeholder="A friend, YC community, Google, LinkedIn..."
         />
       </div>
 

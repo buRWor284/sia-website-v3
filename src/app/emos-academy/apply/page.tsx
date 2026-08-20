@@ -29,7 +29,7 @@ export default function EmosApplyPage() {
     <>
       {/* ── Announcement bar ──────────────────────────────────────────── */}
       <div className="emos-announce">
-        Rolling applications — next cohort forming now &nbsp;·&nbsp; 5 founders
+        Rolling applications, next cohort forming now &nbsp;·&nbsp; 5 founders
         &nbsp;·&nbsp; Application required
       </div>
 
@@ -167,7 +167,7 @@ export default function EmosApplyPage() {
                     marginBottom: 36,
                   }}
                 >
-                  An in-house earned media engine &mdash; not another agency
+                  An in-house earned media engine, not another agency
                   retainer.
                 </h2>
 
@@ -176,7 +176,7 @@ export default function EmosApplyPage() {
                     {
                       icon: "🏆",
                       title: "Investor-grade media credibility",
-                      body: "Verified placements in the publications buyers and investors trust — the kind of presence checked before your first Series A meeting.",
+                      body: "Verified placements in the publications buyers and investors trust: the kind of presence checked before your first Series A meeting.",
                     },
                     {
                       icon: "💡",
@@ -253,8 +253,8 @@ export default function EmosApplyPage() {
                       margin: 0,
                     }}
                   >
-                    <strong>5 seats only.</strong> Rolling applications — next cohort forming now.
-                    We close applications as soon as the cohort fills &mdash; early
+                    <strong>5 seats only.</strong> Rolling applications, next cohort forming now.
+                    We close applications as soon as the cohort fills, and early
                     applicants get priority on the 15-minute call slots.
                   </p>
                 </div>

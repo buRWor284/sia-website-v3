@@ -15,7 +15,7 @@ import {
 export const metadata: Metadata = {
   title: "Complete Your EMOS Payment",
   description:
-    "Secure your seat in EMOS Cohort 1. Foundation ($2,000) or Accelerate ($3,500) — one-time investment, capability you keep forever.",
+    "Secure your seat in EMOS Cohort 1. Foundation ($2,000) or Accelerate ($3,500): one-time investment, capability you keep forever.",
   robots: { index: false, follow: false },
 };
 
@@ -24,21 +24,18 @@ export const metadata: Metadata = {
    ========================================================================= */
 
 /*
- * ── PAYMENT LINK PLACEHOLDERS ──────────────────────────────────────────
- * Replace these with your actual Wise / Payoneer payment-request URLs.
- * Each link should be for the specific amount ($2,000 or $3,500).
+ * Stripe Payment Links (live mode, SIA Enterprises INC). One-time prices:
+ * Foundation $2,000 · Accelerate $3,500. Created 2026-08-20 for Cohort 1.
  */
-const WISE_FOUNDATION_LINK  = "#wise-foundation-placeholder";
-const WISE_ACCELERATE_LINK  = "#wise-accelerate-placeholder";
-const PAYONEER_FOUNDATION_LINK = "#payoneer-foundation-placeholder";
-const PAYONEER_ACCELERATE_LINK = "#payoneer-accelerate-placeholder";
+const STRIPE_FOUNDATION_LINK = "https://buy.stripe.com/dRm7sMeXRcay7r0ejo6c003";
+const STRIPE_ACCELERATE_LINK = "https://buy.stripe.com/cNibJ21712zYaDc8Z46c004";
 
 export default function EmosPayPage() {
   return (
     <>
       {/* ── Announcement bar ──────────────────────────────────────────── */}
       <div className="emos-announce">
-        Rolling applications — next cohort forming now &nbsp;·&nbsp; 5 founders
+        Rolling applications, next cohort forming now &nbsp;·&nbsp; 5 founders
         &nbsp;·&nbsp; Application required
       </div>
 
@@ -120,9 +117,8 @@ export default function EmosPayPage() {
                 marginBottom: 0,
               }}
             >
-              Choose your track below and complete payment via{" "}
-              <strong style={{ color: INK }}>Wise</strong> or{" "}
-              <strong style={{ color: INK }}>Payoneer</strong>. Your seat is
+              Choose your track below and pay securely by card via{" "}
+              <strong style={{ color: INK }}>Stripe</strong>. Your seat is
               held once payment clears.
             </p>
           </div>
@@ -191,7 +187,7 @@ export default function EmosPayPage() {
                     "Group cohort format",
                     "30-day Slack access",
                     "1 placement guaranteed in 60 days",
-                    "Journo Tracker [Beta]",
+                    "The Journo Outreach Checklist",
                   ].map((feat) => (
                     <div
                       key={feat}
@@ -213,7 +209,7 @@ export default function EmosPayPage() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <a
-                    href={WISE_FOUNDATION_LINK}
+                    href={STRIPE_FOUNDATION_LINK}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -234,32 +230,20 @@ export default function EmosPayPage() {
                       cursor: "pointer",
                     }}
                   >
-                    Pay $2,000 via Wise →
+                    Pay $2,000 by card →
                   </a>
-                  <a
-                    href={PAYONEER_FOUNDATION_LINK}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <p
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
-                      padding: "14px 24px",
-                      border: `1px solid ${INK15}`,
-                      background: "transparent",
-                      fontFamily: GROT,
-                      fontWeight: 700,
-                      fontSize: 12,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase" as const,
+                      fontFamily: SERIF,
+                      fontStyle: "italic",
+                      fontSize: 12.5,
                       color: INK55,
-                      textDecoration: "none",
-                      cursor: "pointer",
+                      textAlign: "center" as const,
+                      margin: 0,
                     }}
                   >
-                    Pay $2,000 via Payoneer →
-                  </a>
+                    Secure checkout via Stripe
+                  </p>
                 </div>
               </div>
 
@@ -335,7 +319,7 @@ export default function EmosPayPage() {
                     "2 placements guaranteed in 90 days",
                     "Priority pitch reviews (4 hrs)",
                     "VA sourcing module",
-                    "Linkable asset build (Weeks 5–8)",
+                    "Linkable asset build (Weeks 5 to 8)",
                     "Full EMOS Tools suite",
                     "Lifetime access to future cohorts",
                   ].map((feat) => (
@@ -359,7 +343,7 @@ export default function EmosPayPage() {
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   <a
-                    href={WISE_ACCELERATE_LINK}
+                    href={STRIPE_ACCELERATE_LINK}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -380,32 +364,20 @@ export default function EmosPayPage() {
                       cursor: "pointer",
                     }}
                   >
-                    Pay $3,500 via Wise →
+                    Pay $3,500 by card →
                   </a>
-                  <a
-                    href={PAYONEER_ACCELERATE_LINK}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <p
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 8,
-                      padding: "14px 24px",
-                      border: `1px solid ${INK15}`,
-                      background: "transparent",
-                      fontFamily: GROT,
-                      fontWeight: 700,
-                      fontSize: 12,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase" as const,
+                      fontFamily: SERIF,
+                      fontStyle: "italic",
+                      fontSize: 12.5,
                       color: INK55,
-                      textDecoration: "none",
-                      cursor: "pointer",
+                      textAlign: "center" as const,
+                      margin: 0,
                     }}
                   >
-                    Pay $3,500 via Payoneer →
-                  </a>
+                    Secure checkout via Stripe
+                  </p>
                 </div>
               </div>
             </div>
@@ -461,15 +433,15 @@ export default function EmosPayPage() {
                 {[
                   {
                     n: "1",
-                    text: "Click your preferred payment method above. You'll be taken to a secure Wise or Payoneer payment page.",
+                    text: "Click the payment button for your track. You'll be taken to a secure Stripe checkout page.",
                   },
                   {
                     n: "2",
-                    text: "Complete the payment using bank transfer, card, or your Wise/Payoneer balance.",
+                    text: "Complete the payment by card. Stripe emails you a receipt automatically.",
                   },
                   {
                     n: "3",
-                    text: "Once payment clears, you'll receive a confirmation email with onboarding details and Slack access within 24 hours.",
+                    text: "Once payment clears, you'll receive an onboarding email with cohort details and Slack access within 24 hours.",
                   },
                 ].map((step) => (
                   <div

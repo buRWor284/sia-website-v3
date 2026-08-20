@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/refund-policy" },
 };
 
-const LAST_UPDATED = "June 4, 2026";
+const LAST_UPDATED = "August 20, 2026";
 
 const sections: { heading: string; body: React.ReactNode }[] = [
   {
@@ -22,11 +22,11 @@ const sections: { heading: string; body: React.ReactNode }[] = [
           We stand behind EMOS with a <strong>placements-or-refund guarantee</strong>:
         </p>
         <ul style={{ paddingLeft: 20, lineHeight: 1.8, marginTop: 12 }}>
-          <li><strong>Foundation tier ($2,000):</strong> secure 1 verified media placement within 60 days of cohort end, or receive a full refund — no negotiation.</li>
+          <li><strong>Foundation tier ($2,000):</strong> secure 1 verified media placement within 60 days of cohort end, or receive a full refund, no negotiation.</li>
           <li style={{ marginTop: 8 }}><strong>Accelerate tier ($3,500):</strong> secure 2 verified media placements within 90 days of cohort end, or receive a full refund.</li>
         </ul>
         <p style={{ marginTop: 14 }}>
-          A "verified media placement" means a published article, interview, or feature in a recognized outlet that names you as a source or subject, obtained using the EMOS system during your cohort.
+          A "verified media placement" means any earned coverage in a recognized outlet that names you as a source or subject, obtained using the EMOS system during your cohort. All earned forms count: a published article or feature, an expert quote, a podcast interview, or an inclusion in a roundup. It does not need to be a Tier 1 outlet.
         </p>
       </>
     ),
@@ -37,10 +37,9 @@ const sections: { heading: string; body: React.ReactNode }[] = [
       <>
         <p>To qualify for the guarantee, you must:</p>
         <ul style={{ paddingLeft: 20, lineHeight: 1.8, marginTop: 12 }}>
-          <li>complete the full EMOS curriculum;</li>
-          <li style={{ marginTop: 8 }}>attend the scheduled group calls (or review recordings within 7 days);</li>
-          <li style={{ marginTop: 8 }}>submit your pitches and outreach as directed within the cohort timeline; and</li>
-          <li style={{ marginTop: 8 }}>show evidence of completed outreach activity upon request.</li>
+          <li>complete all cohort sessions (Foundation: all 4 weekly sessions; Accelerate: all 8), live or by reviewing recordings within 7 days;</li>
+          <li style={{ marginTop: 8 }}>submit at least 15 pitches (Foundation) or 30 pitches (Accelerate) within the cohort timeline, using the EMOS system; and</li>
+          <li style={{ marginTop: 8 }}>keep and share your tracking spreadsheet as evidence of completed outreach activity.</li>
         </ul>
         <p style={{ marginTop: 14 }}>
           Refund claims that cannot demonstrate genuine participation and outreach effort will not qualify.
@@ -60,7 +59,7 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     heading: "How refunds are issued",
     body: (
       <p>
-        Approved refunds are returned to your original payment method through our payment processor (2Checkout / Verifone, Wise, Payoneer, or ElevatePay, depending on how you paid). Depending on your bank or card issuer, it may take several business days for the refund to appear.
+        Approved refunds are returned to your original payment method through our payment processor (typically Stripe; Wise or Payoneer where a bank transfer was arranged). Depending on your bank or card issuer, it may take several business days for the refund to appear.
       </p>
     ),
   },
