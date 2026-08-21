@@ -25,6 +25,11 @@
 # emitted a bogus "fetched 0 topics" warning. Keep this block in sync with the
 # route's JSON response shape.
 #
+# TIMEOUTS (2026-08-21): the route's maxDuration is 300s (was 60s, which the
+# 45-56s v2 scan + derive breached whenever BigQuery ran slow -> 504 -> red run
+# on 08-11, 08-14, 08-19). curl waits up to 330s and the job up to 7 min so a
+# legitimately slow scan is reported by the route, not cut off by the client.
+#
 # Required GitHub secret: CRON_SECRET (same value as the Vercel env var)
 # Add it at: Settings -> Secrets and variables -> Actions -> New repository secret
 
@@ -38,11 +43,11 @@ on:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 7
     steps:
       - name: Trigger coverage refresh
         run: |
-          RESPONSE=$(curl -s --max-time 90 -w "\nHTTP_STATUS:%{http_code}" -X GET \
+          RESPONSE=$(curl -s --max-time 330 -w "\nHTTP_STATUS:%{http_code}" -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             https://www.syedirfanajmal.com/api/signaliq/refresh-coverage)
           BODY=$(echo "$RESPONSE" | sed '/HTTP_STATUS:/d')

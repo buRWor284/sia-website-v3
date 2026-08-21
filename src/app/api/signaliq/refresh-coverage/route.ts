@@ -65,7 +65,17 @@ import {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60; // seconds (Vercel Hobby cap)
+// 2026-08-21: 60 → 300. The v2 day-scan alone measures 45-56s on weekdays
+// (~49 GB billed), and upsert + scan-log + the 60-day derive + cache write sit
+// on top of it, so the route lived within a few seconds of the cap. Whenever
+// BigQuery ran slow the function was killed at 60s (504 FUNCTION_INVOCATION_
+// TIMEOUT) and the Actions job went red: 08-11, 08-14, 08-19 (x3). The day was
+// never logged, so the NEXT run redid the whole ~49 GB scan (billed twice) and
+// the data stayed correct, but the failure emails were real. "60s = Hobby cap"
+// was stale: with Fluid compute every plan allows 300s (factcheck routes already
+// run at 300 on this project). The workflow's curl --max-time and job timeout
+// were raised to match.
+export const maxDuration = 300;
 
 // v2 = COUNT(DISTINCT url) article counting (2026-07-20 parity probe: occurrence
 // counting inflated low-volume topics; see signaliq-parity-probe memory / WORKLOG).
@@ -77,8 +87,11 @@ const MATCHER = "webngrams_v2";
 // dropping 2026-07-24. 7 costs nothing in steady state (still MAX_DAYS_PER_RUN
 // per run, and only MISSING days are scanned) and survives a full quota outage.
 const RECENT_WINDOW_DAYS = 7; // steady state scans within [today-7, yesterday]
-const MAX_DAYS_PER_RUN = 1; // 1 BigQuery scan per invocation - 2 v2 days (~66s+) breach the 60s route cap; frequent invocations still self-heal
-const MAX_BACKFILL_DAYS_PER_RUN = 1; // backfill: ONE day per call - 3-day v2 batches exceeded the 60s cap and left billed-but-discarded BigQuery jobs (2026-07-21)
+// Kept at 1 even after maxDuration went to 300: steady state only ever has one
+// missing day, and one scan per call keeps the billed-but-discarded failure mode
+// (2026-07-21) impossible. Backfills still use the Actions backfill workflow.
+const MAX_DAYS_PER_RUN = 1;
+const MAX_BACKFILL_DAYS_PER_RUN = 1; // backfill: ONE day per call - 3-day v2 batches exceeded the old 60s cap and left billed-but-discarded BigQuery jobs (2026-07-21)
 const DERIVE_WINDOW_DAYS = 60;
 // § DERIVE — derive is a pure function of signaliq_daily_counts + today, so on a
 // no-op run it recomputes an identical result. Re-running it on all ~48
