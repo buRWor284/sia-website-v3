@@ -14,6 +14,7 @@ export const metadata: Metadata = {
     title: "AI Visibility Checker · Can AI See Your Website?",
     description:
       "One click on any page shows which AI crawlers can read it, why, and how to fix it. Free, private, by Syed Irfan Ajmal | EMOS.",
+    images: [{ url: "/og/headshot-card.jpg", width: 1200, height: 630, alt: "AI Visibility Checker by EMOS" }],
   },
   alternates: { canonical: "/ai-visibility" },
 };
