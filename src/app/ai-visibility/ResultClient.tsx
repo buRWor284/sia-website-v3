@@ -22,6 +22,22 @@ const FIX_COPY: Record<string, { label: string; fix: string }> = {
   sb: { label: "Sitemap unreachable", fix: "robots.txt declares a sitemap that does not load. Fix the URL." },
 };
 
+/* Answer-readiness fix codes sent by the extension (v0.6+, g= grade letter,
+   a= up to two codes). Keep in sync with js/aeo-score.js in the extension. */
+const AEO_COPY: Record<string, { label: string; fix: string }> = {
+  af: { label: "No short, direct answer near the top of each section", fix: "AI copies a short clear sentence from near the top of a section. Open each section with one plain sentence of 6 to 20 words that answers the heading, then expand." },
+  as: { label: "Sections are stubs or walls", fix: "Sections of 80 to 250 words get cited most (120 to 180 is the sweet spot). Merge stubs under 50 words into their neighbours; split anything over 250 with a new heading." },
+  al: { label: "Sentences run too long", fix: "AI quotes sentences of about ten words and never one over 17. Cut the longest sentences in two, one idea per sentence." },
+  ax: { label: "Too few lists, tables and definitions", fix: "Structured pages get lifted whole 2.3 times as often as prose. Turn any run of three parallel points into a list; define your key term in one 'X is a...' sentence." },
+  an: { label: "Too few specific numbers", fix: "Pages with 19 or more data points get almost twice the citations. Replace vague claims with a number and its source." },
+  aq: { label: "No quotes from named people", fix: "A named expert's words are something AI can attribute. Add one or two short quotes with a name and role." },
+  ad: { label: "No visible, recent 'updated' date", fix: "Updated within three months nearly doubles citations on ChatGPT, Perplexity, Copilot and Gemini. Show 'Updated on' near the top, and only bump it when the content changes." },
+  au: { label: "No visible author", fix: "Pages that say who wrote them and why they know get cited more. Add a byline, one sentence of credentials, and a profile link." },
+  ae: { label: "Vague text, few named entities", fix: "Cited passages run about 20% proper nouns. Name the specific company, product, person or place instead of 'a leading provider'." },
+  ah: { label: "Sales language", fix: "Promotional tone is the one text signal the data says gets you skipped. Cut 'game-changing', 'unlock', 'cutting-edge' and exclamation marks; state the fact." },
+};
+const GRADE_COLOR: Record<string, string> = { A: "#1f7a3f", B: "#3f8f5a", C: "#9a6a0c", D: "#c04a1e", E: "#b3261e" };
+
 /* Bot order MUST mirror js/bots.js in the extension (the b= payload is
    positional: one verdict character per bot, a=allowed x=blocked p=partial
    u=unknown; for the two opt-out tokens x means opted out). */
@@ -63,6 +79,8 @@ type Result = {
   verdicts: string[] | null;   // per-bot chars, positional
   parts: number[] | null;      // crawler, js, llms, meta, sitemap
   jsPct: number | null;
+  grade: string | null;        // answer readiness A-E, N = not a content page
+  aeoFixes: string[];
 };
 
 function parseResult(): Result | null {
@@ -79,7 +97,10 @@ function parseResult(): Result | null {
   const parts = pRaw.length === 5 && pRaw.every((n) => Number.isFinite(n) && n >= 0) ? pRaw : null;
   const jRaw = parseInt(p.get("j") || "", 10);
   const jsPct = Number.isFinite(jRaw) && jRaw >= 0 && jRaw <= 100 ? jRaw : null;
-  return { domain, score, band, color, fixes, verdicts, parts, jsPct };
+  const gRaw = (p.get("g") || "").toUpperCase();
+  const grade = /^[A-EN]$/.test(gRaw) ? gRaw : null;
+  const aeoFixes = grade && grade !== "N" ? (p.get("a") || "").split(",").filter((c) => AEO_COPY[c]).slice(0, 2) : [];
+  return { domain, score, band, color, fixes, verdicts, parts, jsPct, grade, aeoFixes };
 }
 
 function chipStyle(ch: string, isOptout: boolean): { bg: string; fg: string; word: string } {
@@ -98,6 +119,13 @@ function buildMd(r: Result): string {
   L.push(`Date: ${date} | Score: ${r.score}/100 (${r.band})`);
   if (r.parts) L.push(`Parts: crawler access ${r.parts[0]}/40, JavaScript visibility ${r.parts[1]}/30, llms.txt ${r.parts[2]}/5, metadata ${r.parts[3]}/15, sitemap ${r.parts[4]}/10`);
   if (r.jsPct !== null) L.push(`${r.jsPct}% of the page's visible text needs JavaScript that AI crawlers do not run.`);
+  if (r.grade) L.push(r.grade === "N" ? "Answer readiness: not graded (not a content page)." : `Answer readiness of the checked page: grade ${r.grade}.`);
+  if (r.aeoFixes.length) {
+    L.push("");
+    L.push("## Answer readiness fixes");
+    L.push("");
+    r.aeoFixes.forEach((c) => L.push(`- ${AEO_COPY[c].label}. ${AEO_COPY[c].fix}`));
+  }
   if (r.fixes.length) {
     L.push("");
     L.push("## Your biggest fixes, in order");
@@ -194,6 +222,11 @@ export function ResultClient() {
           <span style={{ display: "inline-block", background: res.color, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.05em", textTransform: "uppercase", padding: "5px 12px", borderRadius: 3 }}>
             {res.band}
           </span>
+          {res.grade && (
+            <span title="Answer readiness of the page that was checked: is it shaped like something an AI answer would quote?" style={{ display: "inline-block", marginLeft: 8, background: GRADE_COLOR[res.grade] || "#52493d", color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.05em", textTransform: "uppercase", padding: "5px 12px", borderRadius: 3 }}>
+              {res.grade === "N" ? "Answer readiness: n/a" : `Answer readiness: ${res.grade}`}
+            </span>
+          )}
           {partDefs && (
             <div style={{ marginTop: 16 }}>
               {partDefs.map((pd) => (
@@ -248,6 +281,23 @@ export function ResultClient() {
               <div style={{ fontFamily: GROT, fontSize: 13.5, color: INK70, lineHeight: 1.55, marginTop: 3 }}>{FIX_COPY[code].fix}</div>
             </div>
           ))}
+        </div>
+      )}
+
+      {res.aeoFixes.length > 0 && (
+        <div style={{ marginTop: 20, textAlign: "left" }}>
+          <div style={{ fontFamily: GROT, fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: INK70, borderBottom: `2px solid ${INK}`, paddingBottom: 6, marginBottom: 6 }}>
+            Answer readiness: what to change on that page
+          </div>
+          {res.aeoFixes.map((code) => (
+            <div key={code} style={{ padding: "10px 0", borderBottom: `1px solid ${RULE}` }}>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 15, color: INK }}>{AEO_COPY[code].label}</div>
+              <div style={{ fontFamily: GROT, fontSize: 13.5, color: INK70, lineHeight: 1.55, marginTop: 3 }}>{AEO_COPY[code].fix}</div>
+            </div>
+          ))}
+          <div style={{ fontFamily: GROT, fontSize: 12, color: INK55, lineHeight: 1.5, marginTop: 8 }}>
+            The grade checks the shape of one page: a short direct sentence up top, real sections, lists and numbers, a named author, a fresh date. It cannot see how often the web mentions you, which is the bigger factor.
+          </div>
         </div>
       )}
 
