@@ -66,3 +66,6 @@ docs/SignalIQ/
 # Private notes — never commit (public repo)
 docs/EMOS-PRICING-AND-BUILD-PLAN.md
 eval/factcheck-model-comparison-*
+
+# Chrome extensions workspace (not part of the site)
+/My chrome plug-ins/
