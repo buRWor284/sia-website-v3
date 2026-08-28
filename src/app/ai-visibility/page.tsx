@@ -46,8 +46,8 @@ const LADDER = [
 
 const MEASURES = [
   { k: "Crawler access", v: "40 pts", d: "Does your robots.txt let the 16 AI crawlers in, or tell them to stay out?" },
-  { k: "JavaScript visibility", v: "25 pts", d: "AI reads your page before scripts run. How much of your text is invisible ink?" },
-  { k: "llms.txt", v: "10 pts", d: "The menu card for AI readers: does your site publish one, correctly?" },
+  { k: "JavaScript visibility", v: "30 pts", d: "AI reads your page before scripts run. How much of your text is invisible ink?" },
+  { k: "llms.txt", v: "5 pts", d: "The menu card for AI and agent readers: a nicety today, not a ranking lever." },
   { k: "Metadata and sitemap", v: "25 pts", d: "Titles, descriptions, structured data and a working sitemap: the filing system robots rely on." },
 ];
 
