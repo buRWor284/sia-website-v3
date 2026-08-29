@@ -54,9 +54,9 @@ export const CHECKS: Check[] = [
 export type Refusal = { what: string; why: string; src: number[] };
 
 export const REFUSALS: Refusal[] = [
-  { what: "Schema markup (FAQPage, HowTo, Article) as a citation lever", why: "The closest thing to a controlled test: 1,885 pages that added JSON-LD were compared with 4,000 matched controls over seven months. AI Overview citations fell 4.6%; AI Mode and ChatGPT moved by amounts indistinguishable from zero. Pages with FAQ schema were cited slightly less than pages without (3.6 vs 4.2). Google removed FAQ rich results from Search on 7 May 2026 and says no special structured data is needed for AI features. We list your schema and warn when it does not match what readers see, but we give it no points.", src: [1, 2, 3, 4, 15] },
-  { what: "Question-shaped headings", why: "Pages with question headings averaged 3.4 ChatGPT citations vs 4.3 for plain headings, and 4.6 vs 4.5 in AI Mode. What gets quoted is the direct answer under the heading, whatever the heading's grammar. We count them and say 'fine either way'.", src: [2, 5] },
-  { what: "Word count", why: "Across 174,000 cited pages, length correlates with AI Overview citation at 0.04. More than half of cited pages are under 1,000 words. We show the count and score nothing.", src: [13] },
+  { what: "Schema markup (FAQPage, HowTo, Article) as a citation lever", why: "In the closest thing to a controlled test, 1,885 pages that added JSON-LD were compared with 4,000 matched controls for seven months: AI Overview citations fell 4.6% and ChatGPT and AI Mode did not move. Google removed FAQ rich results in May 2026 and says no special structured data is needed for AI features, so we list your schema, warn when it does not match the visible page, and give it no points.", src: [1, 2, 3, 4, 15] },
+  { what: "Question-shaped headings", why: "Pages with question headings averaged 3.4 ChatGPT citations vs 4.3 for plain headings. What gets quoted is the direct answer under the heading, whatever its grammar, so we count them and say 'fine either way'.", src: [2, 5] },
+  { what: "Word count", why: "Across 174,000 cited pages, length correlates with AI Overview citation at 0.04, and more than half of cited pages are under 1,000 words. We show the count and score nothing.", src: [13] },
   { what: "Links to other websites", why: "Whether a page links to domains of trust 70 or 100, the measured influence on being cited was almost zero. Nice for readers; not a lever.", src: [2] },
   { what: "Keyword-rich URLs and titles", why: "Across 1.03M URLs, path depth, length and 'how-to' or 'best' patterns showed no relationship with citations, and heavily keyword-matched titles were cited less. Not checked at all.", src: [14] },
   { what: "Reading grade level", why: "Citations are bimodal: very easy and very dense pages are both cited more than the middle. Sentence length is the usable signal, so that is what we score.", src: [7] },
@@ -80,6 +80,10 @@ export const COMPARE: CompareRow[] = [
   { check: "Corrected robots.txt, starter llms.txt, client report, share card, compare view", adobe: "No", typical: "Schema generators", ours: "Yes" },
   { check: "Tracks whether AI actually mentions your brand", adobe: "In its paid parent product", typical: "Some, with your own API key", ours: "No, on purpose: that is EMOS", note: "The biggest factor in every study, and unmeasurable from one page." },
 ];
+
+/* The four largest AEO/GEO audit extensions on the Chrome Web Store on 28 Aug 2026,
+   with their listed user counts that day. "Typical" in the table means these four. */
+export const TYPICAL_SET = "SAGE (828 users), RankSEO (688), SellOnLLM (619) and Zicy (456), per their Chrome Web Store listings on 28 August 2026; Adobe's AI Content Visibility Checker listed 10,000+ users the same day. Columns describe public listings and documentation, not hands-on tests.";
 
 export type Example = { where: string; line: string; instead: string };
 

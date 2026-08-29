@@ -81,13 +81,23 @@ type Result = {
   jsPct: number | null;
   grade: string | null;        // answer readiness A-E, N = not a content page
   aeoFixes: string[];
+  sample?: boolean;            // true when no result travelled in the link
+};
+
+/* Shown when the page is opened without a result in the link, so visitors
+   see what the extension produces instead of a blank card. Real figures from
+   a run on syedirfanajmal.com/resources/authority-flywheel, 28 Aug 2026. */
+const SAMPLE: Result = {
+  domain: "syedirfanajmal.com", score: 100, band: "visible to AI", color: "#1f7a3f",
+  fixes: [], verdicts: "aaaaaaaaaaaaaaaa".split(""), parts: [40, 30, 5, 15, 10], jsPct: 0,
+  grade: "C", aeoFixes: ["ax", "an"], sample: true,
 };
 
 function parseResult(): Result | null {
   const p = new URLSearchParams(window.location.search);
   const domain = (p.get("d") || "").toLowerCase().replace(/[^a-z0-9.-]/g, "").slice(0, 80);
   const score = parseInt(p.get("s") || "", 10);
-  if (!domain || !Number.isFinite(score) || score < 0 || score > 100) return null;
+  if (!domain || !Number.isFinite(score) || score < 0 || score > 100) return SAMPLE;
   const band = score >= 80 ? "visible to AI" : score >= 50 ? "partially visible to AI" : "invisible to AI";
   const color = score >= 80 ? GREEN : score >= 50 ? AMBER : RED;
   const fixes = (p.get("f") || "").split(",").filter((c) => FIX_COPY[c]).slice(0, 3);
@@ -204,7 +214,15 @@ export function ResultClient() {
   };
 
   return (
-    <div id="result-card" style={{ maxWidth: 780, margin: "0 auto", border: `1px solid ${RULE}`, borderTop: `6px solid ${res.color}`, background: "#fff", padding: "28px 28px 24px" }}>
+    <div id="result-card" style={{ maxWidth: 780, margin: "0 auto", border: `1px solid ${RULE}`, borderTop: `6px solid ${res.color}`, background: "#fff", padding: "28px 28px 24px", position: "relative" }}>
+      {res.sample && (
+        <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginBottom: 18, paddingBottom: 14, borderBottom: `1px dashed ${RULE}` }}>
+          <span style={{ background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 10px", borderRadius: 3 }}>Sample result</span>
+          <span style={{ fontFamily: GROT, fontSize: 13, color: INK70, lineHeight: 1.5 }}>
+            What the extension produced on this site&apos;s Authority Flywheel page. Run it on your own site and the &quot;How do I fix this?&quot; button brings your result here.
+          </span>
+        </div>
+      )}
       <div style={{ display: "flex", gap: 28, alignItems: "center", flexWrap: "wrap", justifyContent: "center" }}>
         <div style={{ position: "relative", width: 160, height: 160, flex: "0 0 auto" }}>
           <svg viewBox="0 0 200 200" style={{ width: 160, height: 160, transform: "rotate(135deg)" }} role="img" aria-label={`Score ${res.score} out of 100`}>
