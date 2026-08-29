@@ -158,20 +158,20 @@ const TH = { textAlign: "left" as const, padding: "10px 12px", fontSize: 11, let
 /* Two boxes: the site and the page. Inline SVG so it inherits the page palette. */
 function SitePageDiagram() {
   return (
-    <svg viewBox="0 0 560 150" role="img" aria-label="One click returns a score for the whole site and a grade for the page you are on" style={{ width: "100%", maxWidth: 560, height: "auto", display: "block", margin: "0 auto 22px" }}>
+    <svg viewBox="0 0 560 150" role="img" aria-label="One click returns a visibility score out of 100, with 55 points from site-wide files and 45 from the open page, plus an answer-readiness grade for that page" style={{ width: "100%", maxWidth: 560, height: "auto", display: "block", margin: "0 auto 22px" }}>
       <rect x="1" y="1" width="250" height="148" rx="4" fill="#fff" stroke={RULE} />
-      <text x="16" y="28" fontFamily="var(--font-grot)" fontSize="10" fontWeight="800" letterSpacing="1.5" fill={INK55}>WHOLE SITE · 0 TO 100</text>
+      <text x="16" y="28" fontFamily="var(--font-grot)" fontSize="10" fontWeight="800" letterSpacing="1.5" fill={INK55}>AI VISIBILITY · 0 TO 100</text>
       <text x="16" y="70" fontFamily="var(--font-grot)" fontSize="40" fontWeight="800" fill={INK}>100</text>
-      <text x="16" y="98" fontFamily="var(--font-grot)" fontSize="12" fill={INK70}>robots.txt · JavaScript · llms.txt</text>
-      <text x="16" y="116" fontFamily="var(--font-grot)" fontSize="12" fill={INK70}>metadata · sitemap</text>
-      <text x="16" y="138" fontFamily="var(--font-grot)" fontSize="11" fontWeight="700" fill={GREEN}>Same on every page</text>
+      <text x="16" y="96" fontFamily="var(--font-grot)" fontSize="12" fill={INK70}><tspan fontWeight="700" fill={GREEN}>55 site-wide:</tspan> robots.txt · llms.txt · sitemap</text>
+      <text x="16" y="116" fontFamily="var(--font-grot)" fontSize="12" fill={INK70}><tspan fontWeight="700" fill={AMBER}>45 this page:</tspan> JavaScript · metadata</text>
+      <text x="16" y="138" fontFamily="var(--font-grot)" fontSize="11" fontWeight="700" fill={INK55}>Shown as two numbers in the popup</text>
       <rect x="309" y="1" width="250" height="148" rx="4" fill="#fff" stroke={YEL} strokeWidth="2" />
-      <text x="324" y="28" fontFamily="var(--font-grot)" fontSize="10" fontWeight="800" letterSpacing="1.5" fill={INK55}>THIS PAGE · A TO E</text>
+      <text x="324" y="28" fontFamily="var(--font-grot)" fontSize="10" fontWeight="800" letterSpacing="1.5" fill={INK55}>ANSWER READINESS · A TO E</text>
       <rect x="324" y="44" width="58" height="32" rx="3" fill={AMBER} />
       <text x="353" y="66" textAnchor="middle" fontFamily="var(--font-grot)" fontSize="16" fontWeight="800" fill="#fff">C</text>
       <text x="324" y="98" fontFamily="var(--font-grot)" fontSize="12" fill={INK70}>answer shape · substance · trust</text>
       <text x="324" y="116" fontFamily="var(--font-grot)" fontSize="12" fill={INK70}>ten checks, each with evidence</text>
-      <text x="324" y="138" fontFamily="var(--font-grot)" fontSize="11" fontWeight="700" fill={AMBER}>Changes page by page</text>
+      <text x="324" y="138" fontFamily="var(--font-grot)" fontSize="11" fontWeight="700" fill={AMBER}>This page only, changes page by page</text>
       <path d="M255 75 H305" stroke={INK55} strokeWidth="1.5" strokeDasharray="3 3" />
       <text x="280" y="66" textAnchor="middle" fontFamily="var(--font-grot)" fontSize="10" fontWeight="700" fill={INK55}>one click</text>
     </svg>
@@ -209,9 +209,9 @@ export default function AiVisibilityPage() {
           </div>
           <div className="aiv-hero-shot">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ai-visibility/score-popup.png" width={800} height={1110} alt="The extension popup: a 100 out of 100 site score for syedirfanajmal.com, a grade C for the page, and a Show on page button" loading="eager" />
+            <img src="/ai-visibility/score-popup.png" width={800} height={1110} alt="The extension popup: an AI visibility score of 100 for syedirfanajmal.com, split 55 site-wide and 45 this page, a grade C for the page, and a Show on page button" loading="eager" />
             <p className="aiv-caption">
-              <strong style={{ color: INK }}>Sample.</strong> The extension run on this site&rsquo;s own Authority Flywheel page, 28 Aug 2026: the site scores 100, that page grades C. Yours will differ.
+              <strong style={{ color: INK }}>Sample.</strong> The extension run on this site&rsquo;s own Authority Flywheel page, 28 Aug 2026: visibility 100 (site-wide files 55 of 55, that page 45 of 45), answer readiness grade C. Yours will differ.
             </p>
           </div>
         </div>
@@ -258,19 +258,22 @@ export default function AiVisibilityPage() {
       <section id="how" style={{ background: PAPER, padding: "44px 20px" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
           <Eyebrow>Two results, one click</Eyebrow>
-          <H2 anchor="how">A score for the site, a grade for the page</H2>
+          <H2 anchor="how">A visibility score, split site and page. A grade for the page.</H2>
           <Lede>
-            Visibility is a property of the whole site: robots.txt, llms.txt and the
-            sitemap are the same on every page. Whether AI would quote you is a
-            property of one page. Merging them would punish a homepage for not being
-            an article, so the extension reports them separately.
+            Some visibility checks belong to the whole site: robots.txt, llms.txt and
+            the sitemap are the same on every page, and they carry 55 of the 100
+            points. The other 45 are measured on the page you have open, because
+            JavaScript rendering and metadata differ page by page. The popup shows
+            both numbers, so two pages of one site are never mistaken for two
+            verdicts on the site. Whether AI would quote you is a third question,
+            about one page only, so it gets its own grade instead of being folded in.
           </Lede>
           <SitePageDiagram />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12 }}>
             {SITE_PARTS.map((m) => (
               <div key={m.k} style={{ border: `1px solid ${RULE}`, background: "#fff", padding: "16px 16px 14px", display: "flex", flexDirection: "column" }}>
                 <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 13, color: INK }}>{m.k}</div>
-                <div style={{ fontFamily: GROT, fontSize: 11, fontWeight: 700, color: INK55, margin: "2px 0 8px" }}>{m.pts} of 100 site points</div>
+                <div style={{ fontFamily: GROT, fontSize: 11, fontWeight: 700, color: INK55, margin: "2px 0 8px" }}>{m.pts} of 100 · {m.scope}</div>
                 <div style={{ fontFamily: GROT, fontSize: 13, color: INK70, lineHeight: 1.55 }}>{m.d}</div>
                 <div style={{ fontFamily: GROT, fontSize: 12, color: INK55, lineHeight: 1.5, marginTop: 8, paddingTop: 8, borderTop: `1px dashed ${RULE}`, flex: 1 }}>
                   <strong style={{ color: INK }}>Why this weight:</strong> {m.why} <Src ids={m.src} />
