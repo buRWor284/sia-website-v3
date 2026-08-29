@@ -219,7 +219,7 @@ export function ResultClient() {
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 10, marginBottom: 18, paddingBottom: 14, borderBottom: `1px dashed ${RULE}` }}>
           <span style={{ background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", padding: "4px 10px", borderRadius: 3 }}>Sample result</span>
           <span style={{ fontFamily: GROT, fontSize: 13, color: INK70, lineHeight: 1.5 }}>
-            What the extension produced on this site&apos;s Authority Flywheel page. Run it on your own site and the &quot;How do I fix this?&quot; button brings your result here.
+            Not your site: this is what the extension produced on syedirfanajmal.com/resources/authority-flywheel on 28 Aug 2026. Run it on your own site and the &quot;How do I fix this?&quot; button brings your result here.
           </span>
         </div>
       )}

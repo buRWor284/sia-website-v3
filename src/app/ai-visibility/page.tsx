@@ -103,6 +103,9 @@ const CSS = `
 .aiv-details summary::after{content:" +";color:${INK55}}
 .aiv-details[open] summary::after{content:" \\2013"}
 section[id]{scroll-margin-top:56px}
+.aiv-anchor{font-family:${GROT};font-weight:700;font-size:.55em;color:${INK55};text-decoration:none;margin-left:10px;vertical-align:middle;opacity:.55;border:1px solid ${RULE};border-radius:4px;padding:2px 7px}
+.aiv-anchor:hover{opacity:1;background:${YEL};color:${INK};border-color:${YEL}}
+.aiv-caption{font-family:${GROT};font-size:12px;color:${INK55};line-height:1.5;text-align:center;margin:10px auto 0;max-width:400px}
 `;
 
 function Eyebrow({ children }: { children: ReactNode }) {
@@ -113,10 +116,13 @@ function Eyebrow({ children }: { children: ReactNode }) {
   );
 }
 
-function H2({ children }: { children: ReactNode }) {
+function H2({ children, anchor }: { children: ReactNode; anchor?: string }) {
   return (
     <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px, 3vw, 32px)", lineHeight: 1.12, letterSpacing: "-0.02em", color: INK, textAlign: "center", margin: "0 auto 12px", maxWidth: 680 }}>
       {children}
+      {anchor ? (
+        <a href={`#${anchor}`} className="aiv-anchor" title="Link to this section" aria-label="Link to this section">#</a>
+      ) : null}
     </h2>
   );
 }
@@ -204,6 +210,9 @@ export default function AiVisibilityPage() {
           <div className="aiv-hero-shot">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/ai-visibility/score-popup.png" width={800} height={1110} alt="The extension popup: a 100 out of 100 site score for syedirfanajmal.com, a grade C for the page, and a Show on page button" loading="eager" />
+            <p className="aiv-caption">
+              <strong style={{ color: INK }}>Sample.</strong> The extension run on this site&rsquo;s own Authority Flywheel page, 28 Aug 2026: the site scores 100, that page grades C. Yours will differ.
+            </p>
           </div>
         </div>
       </section>
@@ -225,7 +234,7 @@ export default function AiVisibilityPage() {
       <section id="receipts" style={{ background: "#fff", borderBottom: `1px solid ${RULE}`, padding: "44px 20px" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
           <Eyebrow>Every line shows the receipt</Eyebrow>
-          <H2>The sentence, the number and the study, not a mystery score</H2>
+          <H2 anchor="receipts">The sentence, the number and the study, not a mystery score</H2>
           <Lede>
             Real lines from real checks. Each one names the place on the page, gives the
             measurement, and cites the rule, so a writer knows what to change and a client
@@ -249,7 +258,7 @@ export default function AiVisibilityPage() {
       <section id="how" style={{ background: PAPER, padding: "44px 20px" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
           <Eyebrow>Two results, one click</Eyebrow>
-          <H2>A score for the site, a grade for the page</H2>
+          <H2 anchor="how">A score for the site, a grade for the page</H2>
           <Lede>
             Visibility is a property of the whole site: robots.txt, llms.txt and the
             sitemap are the same on every page. Whether AI would quote you is a
@@ -276,7 +285,7 @@ export default function AiVisibilityPage() {
       <section id="checks" style={{ background: "#fff", borderTop: `1px solid ${RULE}`, borderBottom: `1px solid ${RULE}`, padding: "44px 20px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           <Eyebrow>The page grade, A to E</Eyebrow>
-          <H2>Ten checks. Each one has a study behind it.</H2>
+          <H2 anchor="checks">Ten checks. Each one has a study behind it.</H2>
           <Lede>
             AI answers are assembled from pages that already look like answers. In
             2025 and 2026, several teams measured which page features actually
@@ -361,7 +370,7 @@ export default function AiVisibilityPage() {
       <section id="ignores" style={{ background: PAPER, padding: "44px 20px" }}>
         <div style={{ maxWidth: 880, margin: "0 auto" }}>
           <Eyebrow>Equally important</Eyebrow>
-          <H2>What it refuses to score, and why</H2>
+          <H2 anchor="ignores">What it refuses to score, and why</H2>
           <Lede>
             Most AI-visibility tools still reward things the data says do not matter.
             This one lists them, gives them zero points, and says so on every result.
@@ -389,7 +398,7 @@ export default function AiVisibilityPage() {
       <section id="compare" style={{ background: "#fff", borderTop: `1px solid ${RULE}`, borderBottom: `1px solid ${RULE}`, padding: "44px 20px" }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           <Eyebrow>How it compares</Eyebrow>
-          <H2>Against Adobe&rsquo;s checker and the typical AEO extension</H2>
+          <H2 anchor="compare">Against Adobe&rsquo;s checker and the typical AEO extension</H2>
           <Lede>
             Adobe&rsquo;s AI Content Visibility Checker does one thing well: it shows how much
             of a page survives with JavaScript off. The small AEO and GEO extensions on the
@@ -467,7 +476,7 @@ export default function AiVisibilityPage() {
       <section id="sources" style={{ background: "#fff", borderTop: `1px solid ${RULE}`, padding: "44px 20px 20px" }}>
         <div style={{ maxWidth: 940, margin: "0 auto" }}>
           <Eyebrow>Sources</Eyebrow>
-          <H2>The studies behind every number on this page</H2>
+          <H2 anchor="sources">The studies behind every number on this page</H2>
           <Lede>
             All of these are correlation studies unless noted; only the Ahrefs schema test
             approaches a controlled design. Sample sizes are given so you can weigh them yourself.
