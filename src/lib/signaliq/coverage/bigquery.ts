@@ -34,7 +34,16 @@ import type { TopicMatcher } from "./tokenize";
 const WEBNGRAMS = "`gdelt-bq.gdeltv2.webngrams`";
 const LOCATION = "US"; // webngrams is US multi-region — mandatory
 const MAX_BYTES_BILLED = "100000000000"; // 100 GB hard cap per query
-const JOB_TIMEOUT_MS = 45_000; // stay inside the route's 60s maxDuration
+// 2026-08-31: 45s -> 240s. This was the THIRD timeout in the chain and the one
+// the 2026-08-21 fix (852ec12) missed: the route's maxDuration went 60->300 and
+// the workflow's curl/job timeouts were raised to match, but BigQuery itself was
+// still told to kill the job at 45s — while the weekday day-scan measures
+// 45-56s. Result: intermittent 500s at ~45s of route time (red Actions runs
+// 08-26, 08-28, 08-29) whenever the scan crossed 45s; weekend scans (~30-45s)
+// squeaked under. 240s keeps ~60s of the route's 300s budget for upsert +
+// scan-log + derive + cache write. If scans ever creep past ~120s, investigate
+// BigQuery (bytes billed / shared-slot variance), not this constant.
+const JOB_TIMEOUT_MS = 240_000; // must stay well inside the route's 300s maxDuration
 const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
 
 interface SaKey {
