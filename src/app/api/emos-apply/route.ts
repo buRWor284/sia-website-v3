@@ -78,6 +78,25 @@ export async function POST(req: NextRequest) {
 
   const tierLabel = tier === "accelerate" ? "Accelerate: $3,500" : "Foundation: $2,000";
 
+  // Human-readable labels for the raw <select> values (email readability).
+  const ARR_LABELS: Record<string, string> = {
+    "pre-revenue": "Pre-revenue",
+    "0-500k": "$0 - $500K",
+    "500k-1m": "$500K - $1M",
+    "1m-3m": "$1M - $3M",
+    "3m-10m": "$3M - $10M",
+    "10m+": "$10M+",
+  };
+  const TIMELINE_LABELS: Record<string, string> = {
+    "3-months": "Within 3 months",
+    "3-6-months": "3 - 6 months",
+    "6-12-months": "6 - 12 months",
+    "12-plus": "12+ months",
+    "not-raising": "Not raising / bootstrapped",
+  };
+  const arrLabel = arr_range ? (ARR_LABELS[arr_range] || arr_range) : "";
+  const timelineLabel = timeline_to_raise ? (TIMELINE_LABELS[timeline_to_raise] || timeline_to_raise) : "";
+
   // Attribution line for the notification email (e.g. utm_source=yc from the
   // Awan post). Values are attacker-controlled like everything else — escaped
   // at the interpolation point below.
@@ -111,8 +130,8 @@ export async function POST(req: NextRequest) {
           <td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Tier</td>
           <td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${tierLabel}</td>
         </tr>
-        ${arr_range ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">ARR Range</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(arr_range)}</td></tr>` : ""}
-        ${timeline_to_raise ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Timeline to Raise</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(timeline_to_raise)}</td></tr>` : ""}
+        ${arrLabel ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">ARR Range</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(arrLabel)}</td></tr>` : ""}
+        ${timelineLabel ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Timeline to Raise</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(timelineLabel)}</td></tr>` : ""}
         ${current_press ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Current Press</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(current_press)}</td></tr>` : ""}
         ${what_tried ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">What They've Tried</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(what_tried)}</td></tr>` : ""}
         ${why_now ? `<tr><td style="padding: 10px 12px; font-weight: bold; vertical-align: top; border-bottom: 1px solid #F0F0EE;">Why Now</td><td style="padding: 10px 12px; border-bottom: 1px solid #F0F0EE;">${escapeHtml(why_now)}</td></tr>` : ""}
@@ -134,7 +153,7 @@ export async function POST(req: NextRequest) {
         from: FROM_EMAIL,
         to: TO_EMAILS,
         reply_to: email,
-        subject: `EMOS Application: ${first_name} ${last_name} — ${tierLabel}`,
+        subject: `EMOS Application: ${first_name} ${last_name} · ${tierLabel}`,
         html,
       }),
     });
