@@ -58,10 +58,10 @@ export const SIGNALS: RetailSignal[] = [
     demand: "mada online sales SAR 69.3B in Q1 2025, up 56%",
     catalyst: "monthly SAMA bulletins; White Friday spike 28 Nov 2026",
     stat: "Official SAMA data shows e-commerce sales via mada cards hit a record SAR 69.3 billion in Q1 2025, up 56 percent year on year across 370 million plus transactions, then a record SAR 30.7 billion ($8.18 billion) in the single month of October 2025, up 68 percent.",
-    statS: [S("Saudi Press Agency, 3 Jul 2025", "https://www.spa.gov.sa/en/N2351771"), S("Arab News, 25 Dec 2025", "https://www.arabnews.com/node/2627424/business-economy")],
+    statS: [S("Saudi Press Agency, 3 Jul 2025", "https://www.spa.gov.sa/en/N2351771"), S("Arab News, 25 Dec 2025", "https://www.arabnews.com/node/2627424/business-economy"), S("Saudi Gazette, Jul 2025", "https://saudigazette.com.sa/article/653165")],
     sig: "The Ministry of Commerce's Q2 2026 bulletin, issued July 2026, logged over 71,000 new commercial registrations in the quarter and 1.91 million total, naming e-commerce among the Vision 2030 priority sectors driving new business formation.",
     sigS: [S("Arab News, 10 Jul 2026", "https://www.arabnews.com/node/2650362/business-economy")],
-    talk: "Saudi shoppers moved SAR 30B online in one month and almost nobody in the English press told the story. First movers own the narrative.",
+    talk: "Saudi shoppers moved SAR 30B online in one month; English coverage in monitored sources (SignalIQ x GDELT) was thin and one-off relative to a $294B market, and the weekly SAMA data draws one-line notes, not trend analysis. First movers own the narrative.",
   },
   {
     id: "salla", name: "Salla", ar: "سلة", lens: "ecom", ring: 2, status: "steady", size: 2,
@@ -127,7 +127,7 @@ export const SIGNALS: RetailSignal[] = [
     statS: [S("Arab News, 23 Jul 2026", "https://www.arabnews.com/node/2652050/business-economy"), S("Rest of World, 10 Mar 2025", "https://restofworld.org/2025/delivery-app-keeta-hungerstation-saudi-arabia/")],
     sig: "Uber's $14.8 billion Delivery Hero acquisition, announced July 2026, is set to reshape the Saudi market, with analysts framing the coming fight as Uber versus Keeta while Jahez spends into the price war and Ninja circles Delivery Hero's regional assets.",
     sigS: [S("Arab News, 23 Jul 2026", "https://www.arabnews.com/node/2652050/business-economy")],
-    talk: "A three-way superpower fight over Saudi dinner tables, in a market the global press barely covers as a story.",
+    talk: "A three-way superpower fight over Saudi dinner tables, in a market that stays thinly covered as a story in monitored sources (SignalIQ x GDELT).",
   },
   /* ---- retail groups & brands ---- */
   {
@@ -217,12 +217,12 @@ export const SIGNALS: RetailSignal[] = [
     statS: [S("Arab News, 19 Sep 2024", "https://www.arabnews.com/node/2572069/saudi-arabia")],
     sig: "Saudi 100 Brands, the Fashion Commission's designer accelerator, staged its first landmark runway presentation at the Saudi Cup in Riyadh in February 2026, its biggest domestic showcase to date.",
     sigS: [S("Saudi Press Agency, Feb 2026", "https://www.spa.gov.sa/en/N2512230")],
-    talk: "Position clients inside a $30B fashion economy that global press has not yet mapped.",
+    talk: "Position clients inside a $30B fashion economy that remains thinly covered in monitored sources (SignalIQ x GDELT).",
   },
   {
     id: "riyadh-fashion-week", name: "Riyadh Fashion Week", ar: "أسبوع الموضة في الرياض", lens: "lifestyle", ring: 1, status: "watch", size: 1,
     topics: ["riyadh fashion week"],
-    demand: "30+ shows in 2025, near zero global English coverage",
+    demand: "30+ shows in 2025, thin English coverage in monitored sources (SignalIQ x GDELT)",
     catalyst: "fourth Riyadh Fashion Week, October 2026",
     stat: "The third edition, 16 to 21 October 2025, staged more than 30 shows and presentations across couture, ready-to-wear and menswear at JAX district, with Cenomi Centers and Saudia as partners.",
     statS: [S("FashionNetwork, 8 Oct 2025", "https://us.fashionnetwork.com/news/Fashion-week-returns-to-riyadh-from-october-16-to-21,1771490.html")],
@@ -322,13 +322,13 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-advertising", name: "Saudi advertising", ar: "سوق الإعلان السعودي", lens: "macro", ring: 1, status: "early", size: 1,
     topics: ["saudi advertising"],
-    demand: "$4.68B digital ad market, minimal English trade coverage",
+    demand: "$4.68B digital ad market, thin English trade coverage in monitored sources (SignalIQ x GDELT)",
     catalyst: "Athar Festival, Riyadh, 24 to 25 Nov 2026",
     stat: "Saudi digital ad spend is forecast to grow 16.8 percent in 2026 to reach $4.68 billion, per the Q1 2026 Saudi Arabia Digital Ad Spend Databook.",
     statS: [S("GlobeNewswire, 10 Feb 2026", "https://www.globenewswire.com/news-release/2026/02/10/3235538/0/en/Saudi-Arabia-Digital-Ad-Spend-Business-Databook-Report-2026-Market-to-Grow-by-16-8-to-Reach-4-68-Billion-this-Year-Market-Size-Forecast-by-Spend-Value-Across-100-KPIs-2020-2029.html")],
     sig: "Athar, the Saudi Festival of Creativity, opened its 2026 call for content in June and is expanding to more than 150 speakers and 80 brand activations for the 24 to 25 November edition in Riyadh, after drawing 3,000+ attendees last year.",
     sigS: [S("Campaign Middle East, 4 Jun 2026", "https://campaignme.com/athar-saudi-festival-of-creativity-opens-call-for-content-for-2026-edition/")],
-    talk: "A $4.7B digital ad market with almost no dedicated English trade coverage: be the source.",
+    talk: "A $4.7B digital ad market with thin dedicated English trade coverage in monitored sources (SignalIQ x GDELT): be the source.",
   },
 ];
 
@@ -387,13 +387,13 @@ export interface RetailTalk {
 
 export const TALKS: RetailTalk[] = [
   {
-    n: 1, t: "The $294B Story Nobody Files", s: "Whitespace strategy for the Saudi consumer economy",
-    p: "Saudi shoppers moved a record SAR 30B online in one month; the retail market is heading past $400B; and global English press assigns almost nobody to the story. This radar shows exactly which categories are unclaimed, and how a brand, a retailer, or an agency takes one before the desks arrive.",
+    n: 1, t: "The $294B Story Almost Nobody Files", s: "Whitespace strategy for the Saudi consumer economy",
+    p: "Saudi shoppers moved a record SAR 30B online in one month; the retail market is heading past $400B; and English coverage in monitored sources (SignalIQ x GDELT) is thin and one-off relative to the market's size. This radar shows exactly which categories are unclaimed, and how a brand, a retailer, or an agency takes one before the desks arrive.",
     fmt: ["Keynote", "Masterclass"], ev: "Built on: SAMA and Knight Frank data · this radar's whitespace panel",
   },
   {
     n: 2, t: "Newsjack the Weekly Wire", s: "SAMA's point-of-sale bulletin as a comms calendar",
-    p: "The Saudi Central Bank publishes consumer spending every single week, by sector and by city, and almost no comms team builds on it. A working session on turning a public weekly data series into a repeatable earned-media engine.",
+    p: "The Saudi Central Bank publishes consumer spending every single week, by sector and by city, yet in monitored sources (SignalIQ x GDELT) it draws one-line notes rather than trend analysis, and few comms teams build on it. A working session on turning a public weekly data series into a repeatable earned-media engine.",
     fmt: ["Workshop", "Masterclass"], ev: "Built on: SAMA weekly POS series · SignalIQ methodology",
   },
   {
@@ -403,7 +403,7 @@ export const TALKS: RetailTalk[] = [
   },
   {
     n: 4, t: "From Earnings Call to Earned Media", s: "Tadawul-listed retail as year-round authority",
-    p: "Jarir, Cenomi, Savola and Almarai report in public every quarter; BinDawood books billions in revenue with almost zero share of voice. What listed retailers and their agencies can do to convert quarterly numbers into ongoing coverage instead of one wire story per quarter.",
+    p: "Jarir, Cenomi, Savola and Almarai report in public every quarter; BinDawood books billions in revenue with a low share of voice in monitored sources (SignalIQ x GDELT). What listed retailers and their agencies can do to convert quarterly numbers into ongoing coverage instead of one wire story per quarter.",
     fmt: ["Masterclass", "Panel"], ev: "Built on: the Tadawul filings behind the brands lens",
   },
 ];

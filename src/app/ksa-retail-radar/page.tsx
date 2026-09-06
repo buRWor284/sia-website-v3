@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/ksa-retail-radar" },
   openGraph: {
     title: "KSA Retail & Consumer Radar · Syed Irfan Ajmal",
-    description: "A consumer economy approaching $294B that global English press barely writes about. Live coverage data shows exactly where the gaps are.",
+    description: "A consumer economy approaching $294B with thin English coverage in monitored sources (SignalIQ x GDELT). Live coverage data shows exactly where the gaps are.",
     url: "/ksa-retail-radar",
   },
 };
@@ -105,7 +105,7 @@ function TheWindow({ live }: { live: RetailRadarData }) {
         moving. <b>Demand</b>, the revenue, transactions, and dated catalysts in each signal file, says whether quiet means opportunity or nothing. Quiet
         plus demand is whitespace you can own. Loud plus rising is a newsjack you enter fast, with data. Loud plus flat means wait for the next catalyst.
         In this category most dots sit left of the median: that is not a failure of the market, it is the finding. A $294B consumer economy is trading
-        every day while the global English press file stays thin, and each quiet dot with a demand line is a story someone gets to own first.
+        every day while the English press file in monitored sources (SignalIQ x GDELT) stays thin, and each quiet dot with a demand line is a story someone gets to own first.
       </p>
       <div className="krr-verdict-legend">
         {(["early", "whitespace", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
@@ -149,8 +149,8 @@ export default async function RetailRadarPage() {
             <div className="krr-scaps">Signal Radar · KSA Retail Edition · إصدار التجزئة السعودية</div>
             <h1 className="krr-h1">KSA Retail &amp; Consumer Radar</h1>
             <p className="krr-hero-sub">
-              Twenty-five Saudi retail and consumer signals, one live instrument: a consumer economy approaching $294B, the coverage the global press is
-              not filing, and exactly where the open stories are.
+              Twenty-five Saudi retail and consumer signals, one live instrument: a consumer economy approaching $294B, where English coverage stays thin
+              in monitored sources (SignalIQ x GDELT), and exactly where the open stories are.
             </p>
           </div>
         </section>
@@ -211,7 +211,7 @@ export default async function RetailRadarPage() {
         <div className="krr-honesty">
           <b>Read this first.</b> This is a curated intelligence layer: official statistics and named reports, compiled 10 Aug 2026, each figure linked to
           its source. Status badges reflect July and August 2026 news activity, assessed editorially. Unlike the tourism edition, most topics here sit
-          under the low-sample floor in global English press, and the page says so instead of dressing it up: thin coverage against a $294B market is
+          under the low-sample floor in global English press as measured in monitored sources (SignalIQ x GDELT), and the page says so instead of dressing it up: thin coverage against a $294B market is
           precisely the whitespace argument. The daily-refreshing SignalIQ wire adds Arabic and English press volume per topic in the live-wire band above.
         </div>
 

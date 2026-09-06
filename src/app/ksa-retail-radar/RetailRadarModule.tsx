@@ -531,7 +531,7 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
                 {trendRisers.length === 0 ? (
                   <div className="krr-panel-explain">
                     No tracked retail topic currently clears the {LOW_SAMPLE_N}-article floor with rising momentum. In this category that is the finding:
-                    the coverage is thin enough that the whitespace panel on the right is where the opportunity lives.
+                    coverage in monitored sources (SignalIQ x GDELT) is thin enough that the whitespace panel on the right is where the opportunity lives.
                   </div>
                 ) : (
                   trendRisers.map((t, i) => (

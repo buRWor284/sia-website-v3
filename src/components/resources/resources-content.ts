@@ -214,7 +214,7 @@ export const CONTENT: ContentItem[] = [
     badge: "Live Radar",
     topics: ["pr", "strategy", "saudi-arabia"],
     title: "KSA Tourism & Hospitality Radar",
-    sub: "What is moving in Saudi tourism now, and which narratives nobody owns yet.",
+    sub: "What is moving in Saudi tourism now, and which narratives are still under-claimed.",
     blurb:
       "28 sourced signals on Saudi tourism: giga-projects, mega-events, hospitality and aviation, and faith travel. Curated from official statistics and named industry reports, wired to live press-coverage data via SignalIQ.",
     href: "/ksa-tourism-radar",
@@ -231,7 +231,7 @@ export const CONTENT: ContentItem[] = [
     badge: "Live Radar",
     topics: ["pr", "strategy", "saudi-arabia"],
     title: "KSA Retail & Consumer Radar",
-    sub: "A consumer economy approaching $294B, and the coverage nobody is filing.",
+    sub: "A consumer economy approaching $294B, and where English coverage stays thin.",
     blurb:
       "25 sourced signals on Saudi Arabia's consumer economy: e-commerce and delivery, retail groups and brands, lifestyle retail, and the macro picture. Curated from official statistics and named reports, wired to live press-coverage data via SignalIQ.",
     href: "/ksa-retail-radar",

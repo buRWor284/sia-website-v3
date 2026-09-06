@@ -347,7 +347,7 @@ export const SIGNALS: KsaSignal[] = [
     statS: [S("Salaam Gateway", "https://salaamgateway.com/story/sgie-report-2026-large-scale-investments-destination-developments-digitalization-continue-to-boost-m")],
     sig: "The digital pilgrim stack is quietly becoming the template other faith destinations study.",
     sigS: [S("Salaam Gateway", "https://salaamgateway.com/story/sgie-report-2026-large-scale-investments-destination-developments-digitalization-continue-to-boost-m")],
-    talk: "GovTech nobody writes about: the pilgrim super-app story.",
+    talk: "GovTech that stays under-covered in monitored sources (SignalIQ x GDELT): the pilgrim super-app story.",
   },
   {
     id: "haramain", name: "Haramain high-speed rail", ar: "قطار الحرمين", lens: "faith", ring: 1, status: "steady", size: 1,
@@ -422,17 +422,17 @@ export interface KsaGap {
 export const GAPS: KsaGap[] = [
   {
     n: "01", t: "Answer-engine visibility for Saudi destinations", talk: 1,
-    p: "GMTI 2026's own headline says 80% of Muslim travelers plan with AI tools, yet nobody audits how Saudi destinations actually surface in ChatGPT-era answers, or what DMOs should do about it. The conversation exists; the Saudi chapter is unclaimed.",
+    p: "GMTI 2026's own headline says 80% of Muslim travelers plan with AI tools, yet little published analysis audits how Saudi destinations actually surface in ChatGPT-era answers, or what DMOs should do about it. The conversation exists; the Saudi chapter is unclaimed.",
     src: S("Travel Weekly · destinations vs AI", "https://www.travelweekly.com/Travel-News/Travel-Technology/Destinations-high-stakes-game-with-AI"),
   },
   {
     n: "02", t: "The Arabic-language AI content gap", talk: 2,
-    p: "Arabic is documented as underrepresented in AI training data, and GCC Arabic-LLM building is covered as a tech story, but nobody connects it to tourism and Umrah discovery content in Arabic. A bilingual visibility strategy is open territory.",
+    p: "Arabic is documented as underrepresented in AI training data, and GCC Arabic-LLM building is covered as a tech story, but little coverage in monitored sources (SignalIQ x GDELT) connects it to tourism and Umrah discovery content in Arabic. A bilingual visibility strategy is open territory.",
     src: S("Welo Data · bridging the Arabic AI gap", "https://welodata.ai/2025/09/03/bridging-the-arabic-ai-gap/"),
   },
   {
     n: "03", t: "Earned media ROI vs paid spend for giga-projects", talk: 3,
-    p: "Coverage tracks the paid side (KSA digital ad spend heading to ~$4.68B in 2026), but there is almost no analysis of earned share-of-voice for NEOM, Red Sea Global or Diriyah. The measurement story is unowned.",
+    p: "Coverage tracks the paid side (KSA digital ad spend heading to ~$4.68B in 2026), but there is little analysis in monitored sources (SignalIQ x GDELT) of earned share-of-voice for NEOM, Red Sea Global or Diriyah. The measurement story is unowned.",
     src: S("Campaign ME · 2025 vs 2026 marketing in KSA", "https://campaignme.com/2025-vs-2026-evaluating-marketing-and-advertising-in-saudi-arabia/"),
   },
   {

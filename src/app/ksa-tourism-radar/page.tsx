@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/ksa-tourism-radar" },
   openGraph: {
     title: "KSA Tourism & Hospitality Radar · Syed Irfan Ajmal",
-    description: "What is moving in Saudi tourism now, what is building toward 2030, and which narratives nobody owns yet. Every number links to its source.",
+    description: "What is moving in Saudi tourism now, what is building toward 2030, and which narratives are still under-claimed in monitored sources (SignalIQ x GDELT). Every number links to its source.",
     url: "/ksa-tourism-radar",
   },
 };
@@ -170,7 +170,7 @@ export default async function KsaRadarPage() {
             <div className="ksr-scaps">Signal Radar · KSA Edition · إصدار المملكة العربية السعودية</div>
             <h1 className="ksr-h1">KSA Tourism &amp; Hospitality Radar</h1>
             <p className="ksr-hero-sub">
-              Twenty-eight Saudi tourism signals, one live instrument: what is moving now, what is building toward 2030, and which stories nobody owns yet.
+              Twenty-eight Saudi tourism signals, one live instrument: what is moving now, what is building toward 2030, and which stories are still under-claimed in monitored sources (SignalIQ x GDELT).
             </p>
           </div>
         </section>
@@ -246,10 +246,10 @@ export default async function KsaRadarPage() {
             <span className="ksr-scaps">Ownable narratives · the coverage gaps</span>
           </div>
           <h2 className="ksr-h2" style={{ maxWidth: 820 }}>
-            The angles nobody in this market has claimed yet.
+            The angles still under-claimed in this market.
           </h2>
           <p className="ksr-body" style={{ maxWidth: 720, marginTop: 10 }}>
-            Under-covered relative to their weight, as of July 2026. In earned media the gap is the opportunity: these are the stories a speaker, a
+            Under-covered relative to their weight in monitored sources (SignalIQ x GDELT), as of July 2026. In earned media the gap is the opportunity: these are the stories a speaker, a
             destination, or a brand can still own.
           </p>
           <div className="ksr-gapgrid">
