@@ -26,7 +26,7 @@ export default function SignInPage() {
 
       {/* 2026-07-26: the "Private beta — access by invitation only" note that
           used to sit here is gone. Two reasons. It is factually wrong now that
-          EMOS is sold self-serve at $50/month, and it sat OUTSIDE the <SignIn>
+          EMOS is sold self-serve at $149/month, and it sat OUTSIDE the <SignIn>
           widget: on submit Clerk unmounts the box while the redirect resolves,
           leaving this line alone on screen. A customer who had just paid and
           signed in watched the page tell them they were not invited. */}

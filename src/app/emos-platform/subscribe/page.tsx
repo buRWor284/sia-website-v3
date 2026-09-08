@@ -103,7 +103,7 @@ export default function SubscribePage() {
               The earned media pipeline,<br /><em>in one platform.</em>
             </h1>
             <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-              <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 38, letterSpacing: "-.02em", color: YEL }}>$50</span>
+              <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 38, letterSpacing: "-.02em", color: YEL }}>$149</span>
               <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 14, color: "rgba(241,235,222,.45)" }}>/month · cancel any time</span>
             </div>
           </div>
@@ -170,7 +170,7 @@ export default function SubscribePage() {
                 transition: "background .15s ease",
               }}
             >
-              {loading ? "Redirecting to Stripe…" : "Subscribe — $50 / month →"}
+              {loading ? "Redirecting to Stripe…" : "Subscribe — $149 / month →"}
             </button>
             <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: "rgba(241,235,222,.3)", textAlign: "center" as const, marginTop: 12, marginBottom: 0, lineHeight: 1.5 }}>
               Secure payment via Stripe. Cancel from your Stripe billing portal at any time.

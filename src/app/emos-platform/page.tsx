@@ -100,7 +100,7 @@ export default async function EmostoolLandingPage() {
               EMOS subscription yet.
             </p>
             <Link href="/emos-platform/subscribe" style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK, textDecoration: "underline", textDecorationColor: INK15 }}>
-              Activate for $50/month →
+              Activate for $149/month →
             </Link>
           </div>
         </div>
@@ -128,17 +128,17 @@ export default async function EmostoolLandingPage() {
               accepting the emailed invitation is the only way in for a new
               customer. The old "Request access →" link beside these pointed at
               /not-invited and was removed with that page: on a page that sells a
-              $50/month product, inviting people to apply instead of buy was the
+              $149/month product, inviting people to apply instead of buy was the
               clearest expression of the invite-only/self-serve split. */}
           <Link href="/emos-platform/subscribe" style={{ padding: "14px 34px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-            Get EMOS · $50/month
+            Get EMOS · $149/month
           </Link>
           <Link href="/emos-platform/signin" style={{ padding: "14px 30px", background: "transparent", color: INK, border: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
             Sign in
           </Link>
         </div>
         <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-          $50/month · cancel any time · secure payment via Stripe
+          $149/month · cancel any time · secure payment via Stripe
         </p>
       </section>
 
@@ -202,7 +202,7 @@ export default async function EmostoolLandingPage() {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 220 }}>
             <Link href="/emos-platform/subscribe" style={{ textAlign: "center", padding: "15px 30px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-              Get EMOS · $50/month
+              Get EMOS · $149/month
             </Link>
             <Link href="/emos-platform/signin" style={{ textAlign: "center", padding: "14px 30px", background: "transparent", color: CREAM, border: `1px solid ${CREAM70}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
               Sign in

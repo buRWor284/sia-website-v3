@@ -1,7 +1,7 @@
 /**
  * /api/emos-checkout
  *
- * Creates a Stripe Checkout Session for the EMOS Platform $50/month subscription.
+ * Creates a Stripe Checkout Session for the EMOS Platform $149/month subscription.
  * Returns { url } which the client immediately redirects to.
  *
  * Public route — no Clerk auth required (a new buyer hasn't signed up yet).
@@ -11,7 +11,7 @@
  *
  * Required env vars:
  *   STRIPE_SECRET_KEY   — from Stripe Dashboard → Developers → API keys
- *   STRIPE_PRICE_ID     — the recurring price ID (price_xxx) for $50/month
+ *   STRIPE_PRICE_ID     — the recurring price ID (price_xxx) for $149/month
  *   NEXT_PUBLIC_SITE_URL — https://www.syedirfanajmal.com (already set)
  */
 
