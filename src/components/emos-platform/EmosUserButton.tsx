@@ -16,7 +16,15 @@ export function EmosUserButton() {
     <div
       style={{
         position: "fixed",
-        bottom: 24,
+        // 76, not 24: SignalIQ / JournoCollabIQ / CollabIQ each render a wizard
+        // footer fixed at bottom:0 (~60px tall) whose Next/Scan button sits at
+        // the RIGHT edge - exactly under this chip, which wins on z-index and
+        // swallowed the primary action on every step of every wizard. Found
+        // 2026-09-08 in the gate-03 run, on a new customer's very first action.
+        // Never hit on /tools/* because the chip only renders inside
+        // /emos-platform, so the public tools are clean and this stayed
+        // invisible to the only account that had ever used the dashboard.
+        bottom: 76,
         right: 24,
         zIndex: 9999,
         display: "flex",
