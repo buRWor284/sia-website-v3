@@ -36,5 +36,13 @@ export default async function EmosDashboardLayout({
     }
   }
 
-  return <>{children}</>;
+  // The floating account chip (EmosUserButton) is fixed at bottom-right, and
+  // bottom-right is where this design system puts primary actions: the wizard
+  // footer's Next/Scan button (fixed, in SignalIQ / JournoCollabIQ / CollabIQ)
+  // and ToolPipelineFooter's "Go to <next tool>" CTA (in-page, at the very end).
+  // Raising the chip to bottom:76 cleared the fixed bars but then landed it on
+  // the in-page CTA. Reserving space here is what actually fixes it: dashboard
+  // content now always ends above the chip, so nothing can sit under it.
+  // Found 2026-09-08 in the gate-03 run. Do not remove without moving the chip.
+  return <div style={{ paddingBottom: 140 }}>{children}</div>;
 }
