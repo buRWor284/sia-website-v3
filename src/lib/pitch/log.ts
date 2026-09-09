@@ -22,6 +22,11 @@ export async function logPitch(
   input: PitchInput,
   result: ScoreResponse,
   clerkUserId?: string,
+  /** 2026-09-09 (state layer): who and what this pitch was for. All three come
+   * from the browser, so each is verified against the caller's org before it is
+   * written — the service client bypasses RLS, so nothing here can be trusted
+   * on its own. */
+  context?: { journalistId?: string | null; assetId?: string | null; companyId?: string | null },
 ): Promise<void> {
   try {
     const pitchHash = createHash("sha256").update(input.pitch).digest("hex").slice(0, 16);
@@ -59,6 +64,20 @@ export async function logPitch(
     // per-dimension analysis text, and the top-fix text — keeping only anonymous
     // aggregate scores (composite/tier/layer scores, authenticity flag, radar numbers).
     const stored = input.store !== false;
+
+    // Verify each supplied id belongs to this org. An id that does not is
+    // dropped silently rather than rejected: the score itself is still worth
+    // saving, and a mismatched id can only come from a stale tab or a tampered
+    // request, neither of which should cost the customer their score.
+    async function ownedId(table: string, id?: string | null): Promise<string | null> {
+      if (!id || !orgId) return null;
+      const { data } = await db.from(table).select("id").eq("id", id).eq("org_id", orgId).maybeSingle();
+      return (data?.id as string | undefined) ?? null;
+    }
+    const journalistId = await ownedId("journalists", context?.journalistId);
+    const assetId      = await ownedId("linkable_assets", context?.assetId);
+    const companyId    = await ownedId("companies", context?.companyId);
+
     const { error } = await db.from("pressiq_scores").insert({
       org_id:               orgId,
       user_id:              internalUserId,
@@ -74,6 +93,15 @@ export async function logPitch(
       dimension_breakdown:  stored ? areas : null,
       radar_axes:           result.radar ?? null,
       top_fixes:            stored ? (result.topFixes ?? null) : null,
+      // The whole ScoreResponse, so the score can be REOPENED later showing
+      // exactly what was shown at the time. dimension_breakdown alone cannot
+      // rebuild it: metrics, relevanceAssessed, strongestLine, the authenticity
+      // note and the full tier object are not in it. Honours the same D-13
+      // toggle as the other pitch-derived columns.
+      score_response:       stored ? result : null,
+      journalist_id:        journalistId,
+      asset_id:             assetId,
+      company_id:           companyId,
     });
 
     if (error) {

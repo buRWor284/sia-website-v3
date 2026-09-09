@@ -39,10 +39,19 @@ export async function POST(req: NextRequest) {
   const run = await runScoreRequest(input, { remaining: 999, tier: "email" });
   if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
+  // 2026-09-09 (state layer): carry who and what this pitch was for. Read off
+  // the raw body rather than PitchInput — these are dashboard-only context, not
+  // part of the scoring input the public route shares.
+  const context = {
+    journalistId: typeof raw.journalistId === "string" ? raw.journalistId : null,
+    assetId:      typeof raw.assetId      === "string" ? raw.assetId      : null,
+    companyId:    typeof raw.companyId    === "string" ? raw.companyId    : null,
+  };
+
   // Always log — platform users are always authenticated. MUST be awaited: a
   // fire-and-forget insert is dropped when the function freezes post-response
   // (this was why Score History was always empty). logPitch never throws.
-  await logPitch(input, run.result, userId);
+  await logPitch(input, run.result, userId, context);
 
   return NextResponse.json(run.result);
 }

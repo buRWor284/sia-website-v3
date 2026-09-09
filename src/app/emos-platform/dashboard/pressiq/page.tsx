@@ -2,6 +2,8 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import PressIQPlatformClient from "@/components/emos-platform/PressIQPlatformClient";
+import { getJournalists } from "@/app/emos-platform/actions/coverageiq";
+import { getAssets } from "@/app/emos-platform/actions/assetiq";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
 
@@ -33,6 +35,13 @@ interface DbScore {
   authenticity_risk: boolean;
   outcome: string | null;
   scored_at: string;
+  // 2026-09-09 (state layer): context + enough to reopen the score.
+  journalist_id: string | null;
+  journalist_name: string | null;
+  journalist_outlet: string | null;
+  asset_id: string | null;
+  asset_title: string | null;
+  score_response: unknown | null;
 }
 
 export default async function PressIQPlatformPage({
@@ -61,13 +70,51 @@ export default async function PressIQPlatformPage({
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");
 
-  const { data: scores } = await db
-    .from("pressiq_scores")
-    .select("id, pitch_text, journalist_query, platform, composite_score, tier, layer1_score, layer2_score, layer3_score, authenticity_risk, outcome, scored_at")
-    .order("scored_at", { ascending: false })
-    .limit(50);
+  const [{ data: scores }, journalists, assets] = await Promise.all([
+    db
+      .from("pressiq_scores")
+      .select(
+        "id, pitch_text, journalist_query, platform, composite_score, tier, " +
+        "layer1_score, layer2_score, layer3_score, authenticity_risk, outcome, " +
+        "scored_at, journalist_id, asset_id, score_response",
+      )
+      .order("scored_at", { ascending: false })
+      .limit(50),
+    getJournalists(),
+    getAssets(),
+  ]);
 
-  const rows = (scores ?? []) as DbScore[];
+  // Resolve the journalist and asset a score was written for, from the lists we
+  // already have in hand — no extra queries.
+  const journalistById = new Map(journalists.map(j => [j.id, j]));
+  const assetById = new Map(assets.map(a => [a.id, a]));
+
+  const rows: DbScore[] = ((scores ?? []) as unknown as Record<string, unknown>[]).map(r => {
+    const jid = (r.journalist_id as string | null) ?? null;
+    const aid = (r.asset_id as string | null) ?? null;
+    const j = jid ? journalistById.get(jid) : undefined;
+    const a = aid ? assetById.get(aid) : undefined;
+    return {
+      id:                r.id as string,
+      pitch_text:        (r.pitch_text as string | null) ?? null,
+      journalist_query:  (r.journalist_query as string | null) ?? null,
+      platform:          (r.platform as string | null) ?? null,
+      composite_score:   r.composite_score as number,
+      tier:              r.tier as string,
+      layer1_score:      (r.layer1_score as number | null) ?? null,
+      layer2_score:      (r.layer2_score as number | null) ?? null,
+      layer3_score:      (r.layer3_score as number | null) ?? null,
+      authenticity_risk: !!r.authenticity_risk,
+      outcome:           (r.outcome as string | null) ?? null,
+      scored_at:         r.scored_at as string,
+      journalist_id:     jid,
+      journalist_name:   j?.name ?? null,
+      journalist_outlet: j?.outlet ?? null,
+      asset_id:          aid,
+      asset_title:       a?.title ?? null,
+      score_response:    r.score_response ?? null,
+    };
+  });
 
   const avgScore = rows.length ? Math.round(rows.reduce((s, r) => s + r.composite_score, 0) / rows.length) : 0;
   const eliteCount = rows.filter(r => r.tier === "Elite" || r.tier === "Strong").length;
@@ -120,7 +167,12 @@ export default async function PressIQPlatformPage({
           ))}
         </div>
 
-        <PressIQPlatformClient initialScores={rows} initialQuery={initialQuery} />
+        <PressIQPlatformClient
+          initialScores={rows}
+          initialQuery={initialQuery}
+          initialJournalists={journalists}
+          initialAssets={assets}
+        />
 
         <PipelineNav
           current="press"

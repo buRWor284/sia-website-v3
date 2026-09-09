@@ -26,6 +26,9 @@ import { buildPressIqReport } from "@/lib/pdf/pressiq-report";
 import PressIQToolCore from "@/components/pressiq/PressIQToolCore";
 import { PIQ_CSS } from "@/components/pressiq/core-css";
 import type { ScoreResponse } from "@/lib/pitch/types";
+import type { DbJournalist } from "@/lib/coverageiq/types";
+import type { DbAsset } from "@/app/emos-platform/actions/assetiq";
+import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -54,6 +57,14 @@ interface DbScore {
   authenticity_risk: boolean;
   outcome: string | null;
   scored_at: string;
+  // 2026-09-09 (state layer): who and what the pitch was for, plus the stored
+  // ScoreResponse that makes reopening it exact rather than reconstructed.
+  journalist_id: string | null;
+  journalist_name: string | null;
+  journalist_outlet: string | null;
+  asset_id: string | null;
+  asset_title: string | null;
+  score_response: unknown | null;
 }
 
 function fmt(iso: string): string {
@@ -70,18 +81,35 @@ function daysAgo(iso: string): string {
 }
 
 // ── Track this pitch → CoverageIQ (docked inside the core's Score tab) ──────────
-function TrackCTA({ result, pitchSubject }: { result: ScoreResponse; pitchSubject: string }) {
+function TrackCTA({
+  result, pitchSubject, journalist, asset,
+}: {
+  result: ScoreResponse;
+  pitchSubject: string;
+  journalist: DbJournalist | null;
+  asset: DbAsset | null;
+}) {
   const [tracking, startTrack] = useTransition();
   const [tracked, setTracked] = useState<string | null>(null);
 
   function handleTrack() {
     startTrack(async () => {
       const subject = pitchSubject.slice(0, 120) || "Pitch from PressIQ";
+      // journalist_id has been accepted by createPitch since CoverageIQ was
+      // built; PressIQ simply never passed one, so a tracked pitch arrived in
+      // the CRM with no person attached. It does now.
+      const notes = [
+        `PressIQ score: ${result.composite}/100 (${result.tier.label})`,
+        journalist ? `Pitched to ${journalist.name}${journalist.outlet ? ` at ${journalist.outlet}` : ""}` : null,
+        asset ? `Asset: ${asset.title}` : null,
+      ].filter(Boolean).join(" · ");
+
       const draft = await createPitch({
         subject,
         data_source: "PressIQ",
         stage: "drafted",
-        notes: `PressIQ score: ${result.composite}/100 (${result.tier.label})`,
+        journalist_id: journalist?.id ?? null,
+        notes,
       });
       if (draft?.id) setTracked(draft.id);
     });
@@ -112,7 +140,9 @@ function TrackCTA({ result, pitchSubject }: { result: ScoreResponse; pitchSubjec
         </button>
       )}
       <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
-        Creates a drafted pitch in CoverageIQ with this score in notes
+        {journalist
+          ? `Creates a drafted pitch in CoverageIQ, attached to ${journalist.name}`
+          : "Creates a drafted pitch in CoverageIQ with this score in notes"}
       </span>
     </div>
   );
@@ -126,7 +156,16 @@ const TIER_COLORS: Record<string, { bg: string; fg: string }> = {
   "Needs Work": { bg: PAPER2,        fg: INK55 },
 };
 
-function ScoreHistory({ scores, newCount }: { scores: DbScore[]; newCount: number }) {
+function ScoreHistory({
+  scores, newCount, onReopen, openId,
+}: {
+  scores: DbScore[];
+  newCount: number;
+  /** 2026-09-09: a scored pitch could not be reopened — the row sat in the DB
+   * with its full breakdown and nothing could get back to it. */
+  onReopen: (score: DbScore) => void;
+  openId: string | null;
+}) {
   if (scores.length === 0) {
     return (
       <div style={{ padding: "32px 24px", textAlign: "center", border: `1px solid ${INK15}`, background: PAPER2 }}>
@@ -157,17 +196,55 @@ function ScoreHistory({ scores, newCount }: { scores: DbScore[]; newCount: numbe
           const preview = row.pitch_text
             ? row.pitch_text.replace(/\n/g, " ").substring(0, 90)
             : "(text not stored)";
+          const reopenable = !!row.score_response;
+          const isOpen = openId === row.id;
           return (
-            <div key={row.id} style={{ display: "grid", gridTemplateColumns: "1fr 72px 72px 72px 72px 90px", borderBottom: idx < scores.length - 1 ? `1px solid ${INK15}` : "none" }}>
+            <div key={row.id} style={{
+              display: "grid", gridTemplateColumns: "1fr 72px 72px 72px 72px 90px",
+              borderBottom: idx < scores.length - 1 ? `1px solid ${INK15}` : "none",
+              background: isOpen ? "rgba(245,184,31,.14)" : "transparent",
+            }}>
               <div style={{ padding: "12px 14px", overflow: "hidden", minWidth: 0 }}>
-                <div style={{ fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.35, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                  {preview}
-                </div>
-                {row.authenticity_risk && (
-                  <span style={{ fontFamily: GROT, fontSize: 8, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, background: PAPER2, padding: "2px 5px", marginTop: 3, display: "inline-block" }}>
-                    ⚠ AUTHENTICITY FLAG
-                  </span>
+                {reopenable ? (
+                  <button
+                    onClick={() => onReopen(row)}
+                    title="Reopen this score"
+                    style={{
+                      background: "none", border: "none", padding: 0, margin: 0, cursor: "pointer",
+                      textAlign: "left", width: "100%", fontFamily: SERIF, fontSize: 13.5,
+                      color: INK, lineHeight: 1.35, whiteSpace: "nowrap", overflow: "hidden",
+                      textOverflow: "ellipsis", borderBottom: `1px solid ${INK35}`,
+                    }}
+                  >
+                    {preview}
+                  </button>
+                ) : (
+                  <div style={{ fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.35, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {preview}
+                  </div>
                 )}
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginTop: 4 }}>
+                  {row.journalist_name && (
+                    <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".08em", textTransform: "uppercase", color: INK, background: YEL, padding: "2px 6px" }}>
+                      {row.journalist_name}{row.journalist_outlet ? ` · ${row.journalist_outlet}` : ""}
+                    </span>
+                  )}
+                  {row.asset_title && (
+                    <span style={{ fontFamily: MONO, fontSize: 9, fontWeight: 700, color: INK55, border: `1px solid ${INK15}`, padding: "2px 6px" }}>
+                      {row.asset_title.length > 34 ? row.asset_title.slice(0, 34) + "…" : row.asset_title}
+                    </span>
+                  )}
+                  {row.authenticity_risk && (
+                    <span style={{ fontFamily: GROT, fontSize: 8, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, background: PAPER2, padding: "2px 5px", display: "inline-block" }}>
+                      ⚠ AUTHENTICITY FLAG
+                    </span>
+                  )}
+                  {!reopenable && (
+                    <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: INK35 }}>
+                      scored before reopening was added
+                    </span>
+                  )}
+                </div>
               </div>
               <div style={{ padding: "12px 10px", borderLeft: `1px solid ${INK15}`, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3 }}>
                 <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 16 }}>{row.composite_score}</span>
@@ -201,13 +278,37 @@ function ScoreHistory({ scores, newCount }: { scores: DbScore[]; newCount: numbe
 export default function PressIQPlatformClient({
   initialScores,
   initialQuery = "",
+  initialJournalists,
+  initialAssets,
 }: {
   initialScores: DbScore[];
   initialQuery?: string;
+  /** Saved CRM journalists and linkable assets, so a pitch can be aimed at a
+   * person and pointed at a thing (state layer, 2026-09-09). */
+  initialJournalists: DbJournalist[];
+  initialAssets: DbAsset[];
 }) {
   const [scoreSubject, setScoreSubject] = useState("");
   const [newScoreCount, setNewScoreCount] = useState(0);
+  const [journalistId, setJournalistId] = useState<string>("");
+  const [assetId, setAssetId] = useState<string>("");
+  // Reopening remounts the tool core with a stored result, so the whole result
+  // view comes back exactly as scored rather than being rebuilt from parts.
+  const [reopened, setReopened] = useState<DbScore | null>(null);
+  const [coreKey, setCoreKey] = useState(0);
+  const companyCtx = useCompanyOptional();
   const router = useRouter();
+
+  const journalist = initialJournalists.find(j => j.id === journalistId) ?? null;
+  const asset = initialAssets.find(a => a.id === assetId) ?? null;
+
+  function handleReopen(score: DbScore) {
+    setReopened(score);
+    setJournalistId(score.journalist_id ?? "");
+    setAssetId(score.asset_id ?? "");
+    setCoreKey(k => k + 1);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   // 2026-09-09: clear the "n new scores this session" hint once a refresh has
   // actually brought the new rows down, so the hint never outlives its own fix.
@@ -216,10 +317,18 @@ export default function PressIQPlatformClient({
   // ── transport: Clerk-guarded platform route (no Turnstile, no quota) ────────
   const api = {
     score: async (body: Record<string, unknown>) => {
+      // Dashboard-only context. Deliberately added here rather than inside the
+      // shared tool core, which is also the public /tools/pressiq component and
+      // has no CRM, no assets and no company rows behind it.
       const res = await fetch("/api/emos-platform/pitch-score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          ...body,
+          journalistId: journalistId || undefined,
+          assetId: assetId || undefined,
+          companyId: companyCtx?.company?.id || undefined,
+        }),
       });
       const data = await res.json();
       return { ok: res.ok, data };
@@ -244,10 +353,107 @@ export default function PressIQPlatformClient({
       <style>{PIQ_CSS}</style>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" strategy="lazyOnload" />
 
+      {/* ── Who and what this pitch is for ───────────────────────────────────
+             Before 2026-09-09 PressIQ could not aim a pitch at a saved
+             journalist or point it at a saved asset, so a scored pitch was
+             anonymous and the CRM never learned it existed. ─────────────── */}
+      <div style={{ border: `1px solid ${INK}`, background: PAPER2, marginBottom: 22 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "10px 14px" }}>
+          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 7px", flexShrink: 0 }}>
+            Pitching to
+          </span>
+
+          {initialJournalists.length === 0 ? (
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+              No saved journalists yet. Find some in JournoCollabIQ and they will appear here.
+            </span>
+          ) : (
+            <select
+              value={journalistId}
+              onChange={e => setJournalistId(e.target.value)}
+              style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 340 }}
+            >
+              <option value="">Nobody in particular</option>
+              {initialJournalists.map(j => (
+                <option key={j.id} value={j.id}>
+                  {j.name}{j.outlet ? ` · ${j.outlet}` : ""}{j.beat ? ` · ${j.beat}` : ""}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {initialAssets.length > 0 && (
+            <>
+              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+                about
+              </span>
+              <select
+                value={assetId}
+                onChange={e => setAssetId(e.target.value)}
+                style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 320 }}
+              >
+                <option value="">No particular asset</option>
+                {initialAssets.map(a => <option key={a.id} value={a.id}>{a.title}</option>)}
+              </select>
+            </>
+          )}
+
+          <span style={{ marginLeft: "auto", fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+            Saved with the score, and carried into CoverageIQ when you track it.
+          </span>
+        </div>
+
+        {journalist && (
+          <div style={{ padding: "10px 14px", borderTop: `1px solid ${INK15}`, background: PAPER, display: "flex", gap: 14, flexWrap: "wrap", alignItems: "baseline" }}>
+            <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: INK }}>{journalist.name}</span>
+            {journalist.outlet && <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: INK55 }}>{journalist.outlet}</span>}
+            {journalist.beat && (
+              <span style={{ fontFamily: GROT, fontSize: 8, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: INK55, border: `1px solid ${INK15}`, padding: "1px 6px" }}>
+                {journalist.beat}
+              </span>
+            )}
+            {journalist.domain_rating != null && (
+              <span style={{ fontFamily: MONO, fontSize: 10, color: INK55 }}>DR {journalist.domain_rating}</span>
+            )}
+            {journalist.pitches_sent > 0 && (
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+                {journalist.pitches_sent} pitched · {journalist.placements} placed
+              </span>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ── Reopened-score banner ─────────────────────────────────────────── */}
+      {reopened && (
+        <div style={{ border: `1px solid ${YEL}`, background: "rgba(245,184,31,.12)", padding: "10px 14px", marginBottom: 18, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 7px" }}>
+            Reopened
+          </span>
+          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+            Showing the score from {fmt(reopened.scored_at)}, exactly as it was returned.
+          </span>
+          <button
+            onClick={() => { setReopened(null); setCoreKey(k => k + 1); }}
+            style={{ marginLeft: "auto", background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, borderBottom: `1px solid ${INK35}` }}
+          >
+            Score a new pitch
+          </button>
+        </div>
+      )}
+
       {/* ── The shared tool core (full parity with the public tool) ── */}
       <PressIQToolCore
+        key={coreKey}
         api={api}
-        initial={{ journalistBeat: initialQuery, pitchMode: initialQuery ? "standalone" : undefined }}
+        initial={{
+          journalistBeat: reopened
+            ? (reopened.journalist_query ?? "")
+            : initialQuery,
+          pitchMode: initialQuery ? "standalone" : undefined,
+          result: (reopened?.score_response as ScoreResponse | undefined) ?? undefined,
+          pitch: reopened?.pitch_text ?? undefined,
+        }}
         hideMasthead
         showStoreToggle={false}
         quotaLine={<>Score a pitch · no rate limit · auto-saves to your history</>}
@@ -266,7 +472,9 @@ export default function PressIQPlatformClient({
           router.refresh();
           void scored;
         }}
-        scoreTabCta={(r) => <TrackCTA result={r} pitchSubject={scoreSubject} />}
+        scoreTabCta={(r) => (
+          <TrackCTA result={r} pitchSubject={scoreSubject} journalist={journalist} asset={asset} />
+        )}
       />
 
       {/* ── Score history ─────────────────────────────────────────────────── */}
@@ -276,7 +484,12 @@ export default function PressIQPlatformClient({
           <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 20, color: INK }}>{initialScores.length}</span>
           <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>saved</span>
         </div>
-        <ScoreHistory scores={initialScores} newCount={newScoreCount} />
+        <ScoreHistory
+          scores={initialScores}
+          newCount={newScoreCount}
+          onReopen={handleReopen}
+          openId={reopened?.id ?? null}
+        />
       </div>
     </div>
   );

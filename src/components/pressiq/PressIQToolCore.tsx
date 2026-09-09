@@ -108,6 +108,12 @@ export interface PressIQCoreProps {
     pitchMode?: "standalone" | "query";
     platform?: Platform;
     store?: boolean;
+    /** 2026-09-09: mount straight into the post-score view with an already
+     * scored result, so the dashboard can REOPEN a row from Score History.
+     * The public tool never passes this, so its behaviour is unchanged. */
+    result?: ScoreResponse;
+    pitch?: string;
+    subject?: string;
   };
   /** localStorage key for persisting UI prefs (platform/pitchMode/store). Public
    * passes "sia.pressiq.v2"; dashboard omits (no persistence). */
@@ -358,17 +364,17 @@ export default function PressIQToolCore({
   quotaLine, turnstileSlot, submitDisabled, onStepChange,
   pdfAction, onScored, emailUnlockNode, scoreTabCta,
 }: PressIQCoreProps) {
-  const [pitch,    setPitch]    = useState("");
+  const [pitch,    setPitch]    = useState(initial?.pitch ?? "");
   const [query,    setQuery]    = useState(initial?.query ?? "");
-  const [subject,  setSubject]  = useState("");
+  const [subject,  setSubject]  = useState(initial?.subject ?? "");
   const [platform, setPlatform] = useState<Platform>(initial?.platform ?? "haro");
   const [brand,    setBrand]    = useState<BrandSignals>(EMPTY_BRAND);
   const [store,    setStore]    = useState(initial?.store ?? false);
   const [pitchMode, setPitchMode] = useState<"standalone" | "query">(initial?.pitchMode ?? "standalone");
   const [journalistBeat, setJournalistBeat] = useState(initial?.journalistBeat ?? "");
-  const [view,     setView]     = useState<"pre" | "loading" | "post">("pre");
+  const [view,     setView]     = useState<"pre" | "loading" | "post">(initial?.result ? "post" : "pre");
   const [formStep, setFormStep] = useState<1 | 2>(1);
-  const [result,   setResult]   = useState<ScoreResponse | null>(null);
+  const [result,   setResult]   = useState<ScoreResponse | null>(initial?.result ?? null);
   const [error,    setError]    = useState<string | null>(null);
   // P4: the server sets `upgrade: true` on an email-tier 429 (public route only)
   // — render the EMOS platform CTA next to the error. Never set on the dashboard.
