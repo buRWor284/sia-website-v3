@@ -325,7 +325,13 @@ export const BEATS: Beat[] = [
       //   Forward-accruing probe only - NO backfill; drop any that return zero
       //   GDELT rows (founders-beat probe pattern). Glosses:
       //   NEOM / Riyadh Season / AlUla / Diriyah / Riyadh Air / Umrah
-      "\u0646\u064a\u0648\u0645", "\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0644\u0627", "\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "\u0627\u0644\u0639\u0645\u0631\u0629",
+      // ★ 2026-09-08: now carry the "ar:" language prefix. They had read ZERO on
+      //   every scanned day since 24 Jul for one reason - the scan hard-coded
+      //   AND n.lang = 'en', so Arabic could never match. Fixed in bigquery.ts /
+      //   tokenize.ts (per-seed language, zero extra cost). Their DB keys become
+      //   "ar:<phrase>". VERIFY the lang literal (tokenize.ts LANGS) with the
+      //   one-day probe before reading anything into these counts.
+      "ar:\u0646\u064a\u0648\u0645", "ar:\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0644\u0627", "ar:\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "ar:\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0645\u0631\u0629",
     ],
     blurb: "Saudi giga-projects, mega-events, hospitality, aviation, and faith-travel coverage.",
   },

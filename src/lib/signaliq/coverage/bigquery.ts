@@ -23,7 +23,16 @@
  *     (open-banking spike days collapsed 47→12 articles, matching the DOC API's
  *     13/12 almost exactly) and sank parity Spearman to 0.35. Distinct articles
  *     ≈ ground truth; the extra ~20 GB/day is ~$0.15/mo worst case.
- *   - English only (`lang = 'en'`).
+ *   - Language is PER SEED (2026-09-08). The blanket `AND n.lang = 'en'` moved
+ *     into the JOIN as `n.lang = t.lang`, where t.lang defaults to 'en'. English
+ *     topics are therefore bit-for-bit unchanged (the predicate still resolves to
+ *     lang='en' for them), while a seed tagged "ar:<phrase>" now matches Arabic
+ *     coverage instead of silently returning zero, which is what the six Arabic
+ *     KSA probe seeds had been doing since 2026-07-24.
+ *     ★ This costs NOTHING: BigQuery bills columns x partitions scanned, not rows
+ *     returned, and `lang` was already being read. See tokenize.ts LANGS for the
+ *     literal values and the verification probe that must be run before trusting
+ *     any non-English count.
  *
  * Auth: JSON.parse(process.env.GCP_SA_KEY) — the raw service-account JSON stored
  * in Vercel env (Phase 1). The SA has roles/bigquery.jobUser only.
@@ -74,14 +83,15 @@ function buildSql(day: string): string {
     SELECT t.topic AS topic, COUNT(DISTINCT n.url) AS article_count
     FROM ${WEBNGRAMS} n
     JOIN topics t ON (
+      n.lang = t.lang AND (
          (t.nwords = 1 AND LOWER(n.ngram) = t.w1)
       OR (t.nwords = 2 AND LOWER(n.ngram) = t.w1 AND STARTS_WITH(LOWER(n.post), t.w2))
       OR (t.nwords >= 3 AND LOWER(n.ngram) = t.w2
             AND ENDS_WITH(RTRIM(LOWER(n.pre)), t.pre_w)
             AND STARTS_WITH(LOWER(n.post), t.post_rest))
+      )
     )
     WHERE DATE(n.date) = DATE '${day}'
-      AND n.lang = 'en'
     GROUP BY t.topic`;
 }
 
@@ -119,6 +129,7 @@ export async function scanDay(day: string, topics: TopicMatcher[]): Promise<DayS
           w2: "STRING",
           pre_w: "STRING",
           post_rest: "STRING",
+          lang: "STRING",
         },
       ],
     },
