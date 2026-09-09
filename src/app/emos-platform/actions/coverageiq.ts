@@ -78,7 +78,7 @@ export async function getJournalists(): Promise<DbJournalist[]> {
 
   const { data, error } = await db
     .from("journalists")
-    .select("id, name, outlet, beat, email, twitter_handle, domain_rating, last_contact, pitches_sent, placements, notes, tags")
+    .select("id, name, outlet, beat, email, twitter_handle, domain_rating, last_contact, pitches_sent, placements, notes, tags, recent_work")
     .order("last_contact", { ascending: false });
 
   if (error) {

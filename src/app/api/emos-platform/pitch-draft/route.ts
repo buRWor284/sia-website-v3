@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     assetId
       ? db.from("linkable_assets").select("title, description, published_url").eq("id", assetId).eq("org_id", orgId).maybeSingle()
       : Promise.resolve({ data: null }),
-    db.from("journalists").select("id, name, outlet, beat, notes").in("id", journalistIds).eq("org_id", orgId),
+    db.from("journalists").select("id, name, outlet, beat, notes, recent_work").in("id", journalistIds).eq("org_id", orgId),
   ]);
 
   if (!company) {
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-  const rows = (journalists ?? []) as { id: string; name: string; outlet: string | null; beat: string | null; notes: string | null }[];
+  const rows = (journalists ?? []) as { id: string; name: string; outlet: string | null; beat: string | null; notes: string | null; recent_work: string | null }[];
   if (rows.length === 0) {
     return NextResponse.json({ error: "None of those journalists are in your CRM." }, { status: 400 });
   }
@@ -88,8 +88,38 @@ export async function POST(req: NextRequest) {
   const targets: DraftTarget[] = journalistIds
     .map(id => byId.get(id))
     .filter(Boolean)
-    .map(r => ({ id: r!.id, name: r!.name, outlet: r!.outlet, beat: r!.beat, fitNote: r!.notes }));
+    .map(r => ({ id: r!.id, name: r!.name, outlet: r!.outlet, beat: r!.beat, fitNote: r!.notes, recentWork: r!.recent_work }));
 
   const drafts = await draftPitches(brief, targets);
-  return NextResponse.json({ drafts });
+
+  // Persist every successful draft. AWAITED: a draft that vanishes with the tab
+  // is the exact failure this was changed to fix, and regenerating produces A
+  // draft rather than THAT draft. A save failure is logged and never costs the
+  // user the drafts they can already see on screen.
+  const toSave = drafts
+    .filter(d => !d.error && d.subject && d.body)
+    .map(d => ({
+      org_id:          orgId,
+      journalist_id:   d.journalistId,
+      journalist_name: d.journalistName,
+      company_id:      companyId,
+      asset_id:        assetId,
+      subject:         d.subject,
+      body:            d.body,
+      angle,
+      status:          "draft" as const,
+    }));
+
+  let saved: { id: string; journalist_id: string | null }[] = [];
+  if (toSave.length > 0) {
+    const { data, error } = await db.from("pitch_drafts").insert(toSave).select("id, journalist_id");
+    if (error) console.error("pitch-draft: could not save drafts:", error.message);
+    else saved = (data ?? []) as { id: string; journalist_id: string | null }[];
+  }
+
+  // Hand back the saved row id so the UI can edit in place immediately.
+  const idByJournalist = new Map(saved.map(r => [r.journalist_id, r.id]));
+  return NextResponse.json({
+    drafts: drafts.map(d => ({ ...d, draftId: idByJournalist.get(d.journalistId) ?? null })),
+  });
 }

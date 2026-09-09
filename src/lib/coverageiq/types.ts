@@ -70,6 +70,9 @@ export interface DbJournalist {
   asset_title?: string | null;
   angle?: string | null;
   strategy?: string | null;
+  /** 2026-09-09: what they have been writing lately, pasted by the user. Feeds
+   * the pitch opening as a relevance bridge, never as a compliment. */
+  recent_work?: string | null;
 }
 
 /** The context a journalist was found for, written alongside the journalist. */

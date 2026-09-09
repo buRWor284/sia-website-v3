@@ -18,6 +18,8 @@ import { useCompanyOptional } from "./CompanyProvider";
 import type { DbJournalist } from "@/lib/coverageiq/types";
 import type { DbAsset } from "@/app/emos-platform/actions/assetiq";
 import PriorContact from "./PriorContact";
+import { updatePitchDraft, deletePitchDraft, updateJournalistRecentWork } from "@/app/emos-platform/actions/pitch-drafts";
+import type { DbPitchDraft } from "@/lib/pitch-draft-types";
 import type { JournalistHistory } from "@/lib/journalist-history-types";
 
 const PAPER  = "#f1ebde";
@@ -41,6 +43,8 @@ interface Draft {
   subject: string;
   body: string;
   error?: string;
+  /** Row id in pitch_drafts, so an edit saves in place. */
+  draftId?: string | null;
 }
 
 const LABEL: React.CSSProperties = {
@@ -57,15 +61,43 @@ const LINK: React.CSSProperties = {
   textTransform: "uppercase", color: INK55, borderBottom: `1px solid ${INK35}`, lineHeight: 1,
 };
 
-function DraftCard({ draft, onUse }: { draft: Draft; onUse: (d: Draft) => void }) {
+function DraftCard({
+  draft, onUse, onDeleted,
+}: {
+  draft: Draft;
+  onUse: (d: Draft) => void;
+  onDeleted?: (draftId: string) => void;
+}) {
   const [copied, setCopied] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [subject, setSubject] = useState(draft.subject);
+  const [body, setBody] = useState(draft.body);
+  const [saving, setSaving] = useState(false);
+  const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(`Subject: ${draft.subject}\n\n${draft.body}`);
+      await navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* clipboard blocked */ }
+  }
+
+  async function save() {
+    if (!draft.draftId) { setEditing(false); return; }
+    setSaving(true);
+    const ok = await updatePitchDraft(draft.draftId, { subject, body });
+    setSaving(false);
+    if (ok) { setEditing(false); setSavedAt(Date.now()); setTimeout(() => setSavedAt(null), 2500); }
+  }
+
+  async function remove() {
+    if (!draft.draftId) return;
+    setSaving(true);
+    const ok = await deletePitchDraft(draft.draftId);
+    setSaving(false);
+    if (ok) onDeleted?.(draft.draftId);
   }
 
   if (draft.error) {
@@ -77,27 +109,106 @@ function DraftCard({ draft, onUse }: { draft: Draft; onUse: (d: Draft) => void }
     );
   }
 
+  const FIELD: React.CSSProperties = {
+    width: "100%", boxSizing: "border-box", background: PAPER2, border: `1px solid ${INK15}`,
+    color: INK, fontFamily: SERIF, fontSize: 13.5, padding: "8px 10px", outline: "none",
+  };
+
   return (
     <div style={{ border: `1px solid ${INK}`, background: PAPER }}>
       <div style={{ background: INK, color: PAPER, padding: "8px 14px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 13.5 }}>{draft.journalistName}</span>
+        {!draft.draftId && (
+          <span style={{ fontFamily: MONO, fontSize: 8.5, color: "rgba(241,235,222,.55)" }}>not saved</span>
+        )}
         <span style={{ marginLeft: "auto", fontFamily: MONO, fontSize: 9, color: "rgba(241,235,222,.6)" }}>
-          {draft.body.trim().split(/\s+/).length} words
+          {body.trim().split(/\s+/).filter(Boolean).length} words
         </span>
       </div>
+
       <div style={{ padding: "12px 14px" }}>
         <div style={FIELD_LABEL}>Subject</div>
-        <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontSize: 14, fontWeight: 600, color: INK }}>{draft.subject}</p>
+        {editing ? (
+          <input value={subject} onChange={e => setSubject(e.target.value)} style={{ ...FIELD, fontWeight: 600, marginBottom: 12 }} />
+        ) : (
+          <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontSize: 14, fontWeight: 600, color: INK }}>{subject}</p>
+        )}
+
         <div style={FIELD_LABEL}>Body</div>
-        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.6, color: INK, whiteSpace: "pre-wrap" }}>{draft.body}</p>
-        <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap" }}>
+        {editing ? (
+          <textarea value={body} onChange={e => setBody(e.target.value)} rows={12}
+            style={{ ...FIELD, lineHeight: 1.6, resize: "vertical" }} />
+        ) : (
+          <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.6, color: INK, whiteSpace: "pre-wrap" }}>{body}</p>
+        )}
+
+        <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap", alignItems: "center" }}>
           <button onClick={copy} style={{ ...LINK, color: copied ? GREEN : INK55, borderBottomColor: copied ? GREEN : INK35 }}>
             {copied ? "✓ Copied" : "Copy"}
           </button>
-          <button onClick={() => onUse(draft)} style={LINK}>Score this one →</button>
+          {editing ? (
+            <button onClick={save} disabled={saving} style={{ ...LINK, color: INK, borderBottomColor: INK }}>
+              {saving ? "Saving…" : "Save changes"}
+            </button>
+          ) : (
+            <button onClick={() => setEditing(true)} style={LINK}>Edit</button>
+          )}
+          <button onClick={() => onUse({ ...draft, subject, body })} style={LINK}>Score this one →</button>
+          {draft.draftId && (
+            confirmDelete ? (
+              <span style={{ display: "inline-flex", gap: 10 }}>
+                <button onClick={remove} disabled={saving} style={{ ...LINK, color: RED, borderBottomColor: RED }}>
+                  {saving ? "Deleting…" : "Yes, delete"}
+                </button>
+                <button onClick={() => setConfirmDelete(false)} style={LINK}>Keep</button>
+              </span>
+            ) : (
+              <button onClick={() => setConfirmDelete(true)} style={{ ...LINK, color: RED, borderBottomColor: RED }}>Delete</button>
+            )
+          )}
+          {savedAt && (
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: GREEN }}>✓ Saved</span>
+          )}
         </div>
       </div>
     </div>
+  );
+}
+
+/** The personalisation source: what this journalist has been writing lately.
+ * Saved on the journalist, editable right where you pick who to pitch. */
+function RecentWorkField({ journalist }: { journalist: DbJournalist }) {
+  const [value, setValue] = useState(journalist.recent_work ?? "");
+  // Track what is on the server locally rather than mutating the prop, so a
+  // re-blur without changes does not fire a pointless write.
+  const [persisted, setPersisted] = useState(journalist.recent_work ?? "");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  async function blur() {
+    if (value === persisted) return;
+    setSaving(true);
+    const ok = await updateJournalistRecentWork(journalist.id, value);
+    setSaving(false);
+    if (ok) { setPersisted(value); setSaved(true); setTimeout(() => setSaved(false), 2000); }
+  }
+
+  return (
+    <span style={{ display: "block", marginTop: 5 }}>
+      <input
+        value={value}
+        onChange={e => setValue(e.target.value.slice(0, 2000))}
+        onBlur={blur}
+        onClick={e => e.preventDefault()}
+        placeholder="Recent work: what they have covered lately. The pitch opens by bridging from this."
+        style={{
+          width: "100%", boxSizing: "border-box", background: PAPER2, border: `1px solid ${INK15}`,
+          color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, padding: "5px 8px", outline: "none",
+        }}
+      />
+      {saving && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: INK55 }}>Saving…</span>}
+      {saved && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 10.5, color: GREEN }}>✓ Saved</span>}
+    </span>
   );
 }
 
@@ -105,10 +216,13 @@ export default function PitchDrafter({
   journalists,
   assets,
   history,
+  savedDrafts,
   onUseDraft,
 }: {
   journalists: DbJournalist[];
   assets: DbAsset[];
+  /** Drafts already saved, so they survive the tab. */
+  savedDrafts: DbPitchDraft[];
   /** Prior contact per journalist, so a repeat approach is visible BEFORE the
    * batch is drafted rather than after it is sent. */
   history: JournalistHistory[];
@@ -128,6 +242,7 @@ export default function PitchDrafter({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Draft[] | null>(null);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
   // "All journalists for one company" is the ask. It only works because the
   // CRM now records which company each journalist was found for.
@@ -237,6 +352,7 @@ export default function PitchDrafter({
                           compact
                         />
                       </span>
+                      {selected.has(j.id) && <RecentWorkField journalist={j} />}
                     </span>
                   </label>
                 ))}
@@ -302,6 +418,28 @@ export default function PitchDrafter({
             </div>
           </div>
 
+          {savedDrafts.filter(d => !dismissed.has(d.id)).length > 0 && (
+            <div style={{ borderTop: `1px solid ${INK15}`, padding: "14px", display: "grid", gap: 12 }}>
+              <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".16em", textTransform: "uppercase", color: INK55 }}>
+                Saved drafts · {savedDrafts.filter(d => !dismissed.has(d.id)).length}
+              </div>
+              {savedDrafts.filter(d => !dismissed.has(d.id)).map(d => (
+                <DraftCard
+                  key={d.id}
+                  draft={{
+                    journalistId: d.journalist_id ?? "",
+                    journalistName: d.journalist_name ?? "Unknown journalist",
+                    subject: d.subject,
+                    body: d.body,
+                    draftId: d.id,
+                  }}
+                  onUse={u => onUseDraft({ journalistId: u.journalistId, subject: u.subject, body: u.body })}
+                  onDeleted={id => setDismissed(prev => new Set(prev).add(id))}
+                />
+              ))}
+            </div>
+          )}
+
           {drafts && drafts.length > 0 && (
             <div style={{ borderTop: `1px solid ${INK15}`, padding: "14px", display: "grid", gap: 12, background: PAPER2 }}>
               <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
@@ -311,7 +449,8 @@ export default function PitchDrafter({
                 <DraftCard
                   key={d.journalistId}
                   draft={d}
-                  onUse={() => onUseDraft({ journalistId: d.journalistId, subject: d.subject, body: d.body })}
+                  onUse={u => onUseDraft({ journalistId: u.journalistId, subject: u.subject, body: u.body })}
+                  onDeleted={id => setDismissed(prev => new Set(prev).add(id))}
                 />
               ))}
             </div>

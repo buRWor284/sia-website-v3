@@ -4,6 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import PressIQPlatformClient from "@/components/emos-platform/PressIQPlatformClient";
 import { getJournalists, getJournalistHistory } from "@/app/emos-platform/actions/coverageiq";
 import { getAssets } from "@/app/emos-platform/actions/assetiq";
+import { getPitchDrafts } from "@/app/emos-platform/actions/pitch-drafts";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
 
@@ -70,7 +71,7 @@ export default async function PressIQPlatformPage({
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");
 
-  const [{ data: scores }, journalists, assets, history] = await Promise.all([
+  const [{ data: scores }, journalists, assets, history, drafts] = await Promise.all([
     db
       .from("pressiq_scores")
       .select(
@@ -83,6 +84,7 @@ export default async function PressIQPlatformPage({
     getJournalists(),
     getAssets(),
     getJournalistHistory(),
+    getPitchDrafts(),
   ]);
 
   // Resolve the journalist and asset a score was written for, from the lists we
@@ -174,6 +176,7 @@ export default async function PressIQPlatformPage({
           initialJournalists={journalists}
           initialAssets={assets}
           initialHistory={history}
+          initialDrafts={drafts}
         />
 
         <PipelineNav

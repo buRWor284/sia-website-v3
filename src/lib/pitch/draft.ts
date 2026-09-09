@@ -45,6 +45,10 @@ export interface DraftTarget {
   outlet?: string | null;
   beat?: string | null;
   fitNote?: string | null;
+  /** What they have been writing lately. When present the opening bridges from
+   * it to the sender's data; when absent the pitch leads with the strongest
+   * number, which is the correct fallback rather than a failure. */
+  recentWork?: string | null;
 }
 
 export interface DraftResult {
@@ -62,7 +66,8 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - Open with the most specific, checkable fact available. Never open with a greeting paragraph about who the sender is.
 - Name what the journalist gets: the dataset, the methodology, the interview, the exclusive window. Be concrete about what is actually being offered.
 - Tie the story to the journalist's own beat and, where one exists, to a dated hook.
-- LEAD WITH THE PART OF THE STORY THAT MATTERS TO THIS JOURNALIST. Two reporters given the same dataset should receive genuinely different openings: an e-commerce and fintech reporter leads on merchant and payments behaviour, a macro or markets reporter leads on what the number says about the economy, a consumer reporter leads on what shoppers are doing. Do not write one pitch and change the name.
+- WHEN "RECENT WORK" IS SUPPLIED, open by bridging from what they are already covering to the sender's data, in one sentence, then go straight to the number. The bridge must do real work: it explains why THIS data is the natural next question for a story they have already told. NEVER compliment the piece. Do not write "I loved", "I enjoyed", "great piece", "I was reading", "your excellent". Praise is the most recognisable tell of an automated pitch and journalists discount it instantly. Reference the substance, not the quality.
+- WHEN NO RECENT WORK IS SUPPLIED, lead with the strongest checkable number. That is the correct choice, not a fallback to apologise for. Do not manufacture a fake personal connection to avoid it.
 - 120 to 180 words in the body. Shorter is better than padded.
 - Plain punctuation only. Do NOT use em dashes or en dashes. Use full stops and commas.
 - No superlatives, no "I hope this finds you well", no "game-changing", "revolutionary", "excited to share", "reaching out", "circle back", "leverage", "in today's landscape". No flattery about their recent article unless a specific one is named in the brief.
@@ -92,6 +97,9 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
   if (target.outlet) lines.push(`Outlet: ${target.outlet}`);
   if (target.beat) lines.push(`Beat: ${target.beat}`);
   if (target.fitNote) lines.push(`Why they fit this story: ${target.fitNote}`);
+  if (target.recentWork) {
+    lines.push(`Recent work (bridge from this, never compliment it): ${target.recentWork}`);
+  }
   lines.push("");
   lines.push(`THE SENDER`);
   lines.push(`Name: ${brief.companyName}`);

@@ -33,6 +33,7 @@ import CompanyPicker from "@/components/emos-platform/CompanyPicker";
 import PitchDrafter from "@/components/emos-platform/PitchDrafter";
 import PriorContact from "@/components/emos-platform/PriorContact";
 import type { JournalistHistory } from "@/lib/journalist-history-types";
+import type { DbPitchDraft } from "@/lib/pitch-draft-types";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -285,6 +286,7 @@ export default function PressIQPlatformClient({
   initialJournalists,
   initialAssets,
   initialHistory,
+  initialDrafts,
 }: {
   initialScores: DbScore[];
   initialQuery?: string;
@@ -294,6 +296,7 @@ export default function PressIQPlatformClient({
   initialAssets: DbAsset[];
   /** Prior contact per journalist, for the duplicate-pitch warning. */
   initialHistory: JournalistHistory[];
+  initialDrafts: DbPitchDraft[];
 }) {
   const [scoreSubject, setScoreSubject] = useState("");
   const [newScoreCount, setNewScoreCount] = useState(0);
@@ -534,6 +537,7 @@ export default function PressIQPlatformClient({
         journalists={initialJournalists}
         assets={initialAssets}
         history={initialHistory}
+        savedDrafts={initialDrafts}
         onUseDraft={handleUseDraft}
       />
     </div>
