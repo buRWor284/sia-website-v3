@@ -60,6 +60,27 @@ export interface DbJournalist {
   placements: number;
   notes: string | null;
   tags: string[];
+  /** 2026-09-09 (state layer phase 5): WHY this journalist is in the CRM —
+   * resolved from the most recent journalist_context row. All optional so every
+   * pre-existing consumer keeps working; null for the journalists saved before
+   * the context layer existed. */
+  company_id?: string | null;
+  company_name?: string | null;
+  asset_id?: string | null;
+  asset_title?: string | null;
+  angle?: string | null;
+  strategy?: string | null;
+}
+
+/** The context a journalist was found for, written alongside the journalist. */
+export interface JournalistContextInput {
+  company_id?: string | null;
+  asset_id?: string | null;
+  angle?: string | null;
+  beat_query?: string | null;
+  geography?: string | null;
+  strategy?: string | null;
+  fit_note?: string | null;
 }
 
 export interface DbAlert {
@@ -96,6 +117,9 @@ export interface CreateJournalistInput {
   tags?: string[];
   /** Where this journalist came from (e.g. "JournoCollabIQ" AI saves). Default "manual". */
   data_source?: DataSource;
+  /** 2026-09-09: the company, asset and angle this journalist was found for.
+   * Written to journalist_context, not onto the journalist row. */
+  context?: JournalistContextInput;
 }
 
 // ─── Public mock shapes (the /tools surface, localStorage-backed) ──────────────

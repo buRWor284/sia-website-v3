@@ -171,6 +171,8 @@ function JournalistCard({
   prefillAssetTitle,
   prefillAssetType,
   prefillAssetIdea,
+  companyId,
+  assetId,
 }: {
   j: AIJournalist;
   formData: Record<string, string>;
@@ -179,6 +181,10 @@ function JournalistCard({
   prefillAssetTitle?: string;
   prefillAssetType?: string;
   prefillAssetIdea?: string;
+  /** The company and asset this search was run for, saved alongside the
+   * journalist so the CRM knows why they are in it (2026-09-09). */
+  companyId?: string | null;
+  assetId?: string | null;
 }) {
   const [saving, startSave] = useTransition();
   const [angle, setAngle] = useState<string | null>(null);
@@ -239,6 +245,18 @@ function JournalistCard({
         domain_rating: parsedDr,
         notes: j.why,
         data_source: "JournoCollabIQ",
+        // 2026-09-09 (state layer phase 5): record WHY this journalist is being
+        // saved. Without this a journalist found for the KSA retail radar is
+        // indistinguishable from one found for a health-tech story.
+        context: {
+          company_id: companyId ?? null,
+          asset_id:   assetId ?? null,
+          angle:      formData.audDesc || null,
+          beat_query: formData.industry || null,
+          geography:  formData.geo || null,
+          strategy:   formData.strategy || null,
+          fit_note:   j.why ?? null,
+        },
       };
       const created = await createJournalist(input);
       // Only mark saved + insert into the CRM list when the write actually
@@ -387,6 +405,20 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleting, startDelete] = useTransition();
 
+  // 2026-09-09 (state layer phase 5): filter the CRM by the company a
+  // journalist was found for. Journalists saved before the context layer have
+  // no company and are reachable under "Not recorded" rather than hidden.
+  const [companyFilter, setCompanyFilter] = useState<string>("all");
+  const companyNames = Array.from(
+    new Set(journalists.map(j => j.company_name).filter(Boolean) as string[]),
+  ).sort();
+  const uncategorised = journalists.filter(j => !j.company_name).length;
+  const visible = journalists.filter(j =>
+    companyFilter === "all" ? true
+    : companyFilter === "__none__" ? !j.company_name
+    : j.company_name === companyFilter,
+  );
+
   function fmt(iso: string | null): string {
     if (!iso) return "—";
     const d = new Date(iso);
@@ -405,6 +437,33 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
   }
 
   return (
+    <>
+    {(companyNames.length > 0 || uncategorised > 0) && (
+      <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+          Found for
+        </span>
+        <select
+          value={companyFilter}
+          onChange={e => setCompanyFilter(e.target.value)}
+          style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".06em", padding: "5px 10px", outline: "none", cursor: "pointer" }}
+        >
+          <option value="all">All companies · {journalists.length}</option>
+          {companyNames.map(c => (
+            <option key={c} value={c}>
+              {c} · {journalists.filter(j => j.company_name === c).length}
+            </option>
+          ))}
+          {uncategorised > 0 && <option value="__none__">Not recorded · {uncategorised}</option>}
+        </select>
+        {uncategorised > 0 && companyFilter === "all" && (
+          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+            {uncategorised} saved before the company was tracked.
+          </span>
+        )}
+      </div>
+    )}
+
     <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 60px 52px 52px 90px", background: INK, color: PAPER }}>
         {["Journalist", "Outlet / Beat", "DR", "Sent", "Won", "Last contact"].map((h, i) => (
@@ -412,10 +471,30 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
         ))}
       </div>
 
-      {journalists.map((j, idx) => (
-        <div key={j.id} style={{ display: "grid", gridTemplateColumns: "1fr 110px 60px 52px 52px 90px", borderBottom: idx < journalists.length - 1 ? `1px solid ${INK15}` : "none" }}>
+      {visible.length === 0 && (
+        <div style={{ padding: "20px", textAlign: "center", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+          Nothing matches this filter.
+        </div>
+      )}
+
+      {visible.map((j, idx) => (
+        <div key={j.id} style={{ display: "grid", gridTemplateColumns: "1fr 110px 60px 52px 52px 90px", borderBottom: idx < visible.length - 1 ? `1px solid ${INK15}` : "none" }}>
           <div style={{ padding: "11px 13px" }}>
             <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 13.5, color: INK }}>{j.name}</div>
+            {(j.company_name || j.asset_title) && (
+              <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 3 }}>
+                {j.company_name && (
+                  <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".08em", textTransform: "uppercase", color: INK, background: YEL, padding: "2px 5px" }}>
+                    {j.company_name}
+                  </span>
+                )}
+                {j.asset_title && (
+                  <span style={{ fontFamily: MONO, fontSize: 8.5, fontWeight: 700, color: INK55, border: `1px solid ${INK15}`, padding: "1px 5px" }}>
+                    {j.asset_title.length > 28 ? j.asset_title.slice(0, 28) + "…" : j.asset_title}
+                  </span>
+                )}
+              </div>
+            )}
             {j.notes && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, marginTop: 2, lineHeight: 1.35 }}>{j.notes.slice(0, 80)}{j.notes.length > 80 ? "…" : ""}</div>}
           </div>
           <div style={{ padding: "11px 10px", borderLeft: `1px solid ${INK15}` }}>
@@ -448,6 +527,7 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
         </div>
       ))}
     </div>
+    </>
   );
 }
 
@@ -663,6 +743,8 @@ export default function JournoCollabIQClient({
               prefillAssetTitle={prefillAssetTitle}
               prefillAssetType={prefillAssetType}
               prefillAssetIdea={prefillAssetIdea}
+              companyId={companyCtx?.company?.id ?? null}
+              assetId={null}
             />
           ))}
 

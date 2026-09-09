@@ -85,7 +85,50 @@ export async function getJournalists(): Promise<DbJournalist[]> {
     return [];
   }
 
-  return (data ?? []) as DbJournalist[];
+  const rows = (data ?? []) as DbJournalist[];
+  if (rows.length === 0) return rows;
+
+  // 2026-09-09 (state layer phase 5): resolve WHY each journalist is here from
+  // journalist_context, newest row per journalist. Denormalised onto the read so
+  // every existing consumer — the CRM table, the PressIQ picker, CoverageIQ —
+  // gets the company and angle without changing its own query.
+  const { data: ctxRows } = await db
+    .from("journalist_context")
+    .select("journalist_id, company_id, asset_id, angle, strategy, created_at")
+    .order("created_at", { ascending: false });
+
+  const latest = new Map<string, Record<string, unknown>>();
+  for (const c of (ctxRows ?? []) as Record<string, unknown>[]) {
+    const jid = c.journalist_id as string;
+    if (!latest.has(jid)) latest.set(jid, c);   // ordered desc, so first wins
+  }
+  if (latest.size === 0) return rows;
+
+  const companyIds = Array.from(new Set([...latest.values()].map(c => c.company_id).filter(Boolean) as string[]));
+  const assetIds   = Array.from(new Set([...latest.values()].map(c => c.asset_id).filter(Boolean) as string[]));
+
+  const [companies, assets] = await Promise.all([
+    companyIds.length ? db.from("companies").select("id, name").in("id", companyIds) : Promise.resolve({ data: [] }),
+    assetIds.length   ? db.from("linkable_assets").select("id, title").in("id", assetIds) : Promise.resolve({ data: [] }),
+  ]);
+  const companyName = new Map(((companies.data ?? []) as { id: string; name: string }[]).map(c => [c.id, c.name]));
+  const assetTitle  = new Map(((assets.data ?? []) as { id: string; title: string }[]).map(a => [a.id, a.title]));
+
+  return rows.map(j => {
+    const c = latest.get(j.id);
+    if (!c) return j;
+    const cid = (c.company_id as string | null) ?? null;
+    const aid = (c.asset_id as string | null) ?? null;
+    return {
+      ...j,
+      company_id:   cid,
+      company_name: cid ? companyName.get(cid) ?? null : null,
+      asset_id:     aid,
+      asset_title:  aid ? assetTitle.get(aid) ?? null : null,
+      angle:        (c.angle as string | null) ?? null,
+      strategy:     (c.strategy as string | null) ?? null,
+    };
+  });
 }
 
 export async function getAlerts(): Promise<DbAlert[]> {
@@ -223,6 +266,25 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
     .single();
 
   if (error) { console.error("createJournalist error:", error.message); return null; }
+
+  // 2026-09-09: record WHY this journalist was saved. Awaited, not
+  // fire-and-forget — a dropped context row is exactly the failure this phase
+  // exists to fix. A failure here is logged and never loses the journalist.
+  const ctx = input.context;
+  if (data?.id && ctx && (ctx.company_id || ctx.asset_id || ctx.angle || ctx.fit_note)) {
+    const { error: ctxError } = await db.from("journalist_context").insert({
+      org_id:        org.id,
+      journalist_id: data.id,
+      company_id:    ctx.company_id ?? null,
+      asset_id:      ctx.asset_id ?? null,
+      angle:         ctx.angle?.slice(0, 2000) ?? null,
+      beat_query:    ctx.beat_query?.slice(0, 500) ?? null,
+      geography:     ctx.geography?.slice(0, 200) ?? null,
+      strategy:      ctx.strategy ?? null,
+      fit_note:      ctx.fit_note?.slice(0, 2000) ?? null,
+    });
+    if (ctxError) console.error("createJournalist context error:", ctxError.message);
+  }
 
   revalidatePath("/emos-platform/dashboard/coverageiq");
   revalidatePath("/emos-platform/dashboard/journocollabiq");
