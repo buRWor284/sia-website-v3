@@ -6,6 +6,8 @@ Reverse-chronological log of substantive changes. Newest entries on top.
 
 ## 2026-09-09 (2) · Arabic (RTL) editions of both KSA radars — noindex staging drafts
 
+**Commit:** `e3a176e` (pushed).
+
 **Why:** follow-on from the Arabic travel page earlier the same day. The radars are the strongest Arabic candidates on the site: they are Saudi market analysis in the market's own language rather than a translated brochure, and both content files already carried a curated Arabic name for every signal (53 across the two).
 
 **Added**
@@ -28,6 +30,8 @@ Reverse-chronological log of substantive changes. Newest entries on top.
 - **A full `npm run build` was NOT run by me** — impossible from device_bash, see project memory `sandbox-device-bash-limits` (linux/arm64 VM vs macOS node_modules).
 - Neither page has been viewed in a browser. First look should check RTL flow, the signal-card grid, and that The Window's SVG stays left-to-right inside the RTL page.
 
+**Ideas captured** — "Arabic radars should count Arabic press, plus a language toggle on all four radar pages" → Ideas Inbox (SIA Website Updates v2); cross-referenced from "Extend Arabic seeds using the radar Arabic labels", which is its blocker.
+
 **Pending / next**
 - Native Gulf Arabic review of both `content.ar.ts` files, then the shared go-live checklist.
 - Fold `/ar/speaking/earned-media-ai/travel` onto `_components/chrome.tsx`; it still has its own inline header and footer, so there are two Arabic headers in the codebase right now.
@@ -36,6 +40,8 @@ Reverse-chronological log of substantive changes. Newest entries on top.
 ---
 
 ## 2026-09-09 · Arabic (RTL) edition of the travel speaking page — noindex staging draft
+
+**Commit:** `669e194` (pushed).
 
 **Why:** Irfan asked how to make the site multilingual. Research pass (study artifact "Eight Pages, Six Languages") found (a) Google's spam-policy clause on unreviewed machine translation was REMOVED in the March 2024 update, so the compliance risk he was worried about is largely gone; (b) Arabic is the only clearly worthwhile language of the six he named, and it is a Saudi play, not a UAE one; (c) Simplified Chinese is impossible on this stack because Vercel is blocked in mainland China. Decision: Arabic only, this page first, as an unlinked noindex draft for language review.
 
