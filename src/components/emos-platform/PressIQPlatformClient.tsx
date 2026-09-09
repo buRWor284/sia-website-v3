@@ -17,7 +17,8 @@
  *   - the PDF report (ungated parity)
  */
 
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { createPitch } from "@/app/emos-platform/actions/coverageiq";
 import { getJsPDF } from "@/lib/pdf/house-style";
@@ -206,6 +207,11 @@ export default function PressIQPlatformClient({
 }) {
   const [scoreSubject, setScoreSubject] = useState("");
   const [newScoreCount, setNewScoreCount] = useState(0);
+  const router = useRouter();
+
+  // 2026-09-09: clear the "n new scores this session" hint once a refresh has
+  // actually brought the new rows down, so the hint never outlives its own fix.
+  useEffect(() => { setNewScoreCount(0); }, [initialScores.length]);
 
   // ── transport: Clerk-guarded platform route (no Turnstile, no quota) ────────
   const api = {
@@ -246,7 +252,20 @@ export default function PressIQPlatformClient({
         showStoreToggle={false}
         quotaLine={<>Score a pitch · no rate limit · auto-saves to your history</>}
         pdfAction={handleDownloadPdf}
-        onScored={(scored, ctx) => { setScoreSubject(ctx.subject); setNewScoreCount(c => c + 1); void scored; }}
+        onScored={(scored, ctx) => {
+          setScoreSubject(ctx.subject);
+          setNewScoreCount(c => c + 1);
+          // 2026-09-09 (gate-03 finding): the score is written by the API route
+          // the moment it is produced, but Score History and the stat tiles are
+          // server-rendered at page load and nothing told them to look again —
+          // so a customer scored a pitch and read "No scores yet". Worse, the
+          // "refresh the page" hint below only renders when scores.length > 0,
+          // so the FIRST score, the one a new subscriber makes, got no hint at
+          // all. actions/signaliq.ts calls revalidatePath for exactly this
+          // reason; the pitch path is an API route, so it refreshes from here.
+          router.refresh();
+          void scored;
+        }}
         scoreTabCta={(r) => <TrackCTA result={r} pitchSubject={scoreSubject} />}
       />
 
