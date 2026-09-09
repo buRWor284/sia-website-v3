@@ -11,7 +11,7 @@
  * THAT company — so results are genuinely personalised, not just re-ordered.
  */
 import type { BeatId, Opportunity, ProfileExpansion, Signal } from "./types";
-import { BEAT_SLOTS, MAX_OPPORTUNITIES, beatById } from "./config";
+import { BEAT_SLOTS, MAX_OPPORTUNITIES, MAX_SEEDS_PER_SCAN, beatById } from "./config";
 import { SIGNAL_SOURCES } from "./sources";
 import { getStoredCoverage } from "./coverage-store";
 import { expandCompanyProfile } from "./profile";
@@ -56,8 +56,11 @@ export interface ScanOptions {
   companyContext?: string;
 }
 
-/** Max distinct seeds scanned per run (keeps external fan-out bounded). */
-const MAX_SEEDS = 18;
+/** Max distinct seeds scanned per run (keeps external fan-out bounded).
+ *  Single source of truth lives in config.ts because the public methodology page
+ *  quotes this number: it said "20 seeds per beat" for months while the real cap
+ *  was 18. Change it there, and the copy follows on the next deploy. */
+const MAX_SEEDS = MAX_SEEDS_PER_SCAN;
 
 export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise<ScanResult> {
   const beatList = normalizeBeats(beats);
