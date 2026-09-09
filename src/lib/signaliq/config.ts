@@ -22,6 +22,12 @@ export const EMAIL_PACKS = QUOTA_LIMITS["signaliq-pack"].email; // with email
 /** How many opportunities a scan returns. */
 export const MAX_OPPORTUNITIES = 12;
 
+/** Seeds sampled in ONE user scan (mirrors MAX_SEEDS in scan.ts). Exported so
+ *  public copy derives the number instead of hardcoding it: /tools/signaliq/about
+ *  claimed "20 seeds per beat" for months while the real cap was 18 and a beat's
+ *  pool had grown past 50. */
+export const MAX_SEEDS_PER_SCAN = 18;
+
 /**
  * Seed slots per selected beat, keyed by how many beats the user chose (total
  * always ≤ MAX_SEEDS=18 in scan.ts). Weighted, NOT even: the primary beat keeps

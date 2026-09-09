@@ -32,7 +32,7 @@ import { CountUp, SOURCES_DATA } from "@/components/signaliq/cards";
 import { DoubleRule, Mark, SCaps } from "@/components/bureau/primitives";
 import { RadarCallout } from "@/components/bureau/RadarCallout";
 import { INK, INK15, INK35, INK55, INK70, MONO, PAPER, SERIF, GROT, YEL } from "@/lib/tokens";
-import { BEATS, EMAIL_SCANS, FREE_SCANS, PRODUCT } from "@/lib/signaliq/config";
+import { BEATS, visibleBeats, EMAIL_SCANS, FREE_SCANS, PRODUCT } from "@/lib/signaliq/config";
 import type { BeatId } from "@/lib/signaliq/types";
 
 const EMOS_URL = "/emos-platform";
@@ -176,7 +176,10 @@ function SIQHero({ onStart }: { onStart: () => void }) {
           <SCaps size={9} ls="0.20em" color={INK55}>How it works</SCaps>
           <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 0 }}>
             {([
-              ["01", "Pick a beat", "Choose your industry vertical: SaaS, Fintech, Health, Climate, AI, Cybersecurity, or Agency & Marketing."],
+              // Derived, never hardcoded: this line listed seven beats and had been
+              // stale since the founders beat shipped (2026-09-09 check found it
+              // still naming seven while the picker showed twelve).
+              ["01", "Pick a beat", `Choose your industry vertical: ${visibleBeats().map((b) => b.label).join(", ")}.`],
               ["02", "Scan the radar", "5 live open-data sources scanned in seconds. No API key. No cost."],
               ["03", "Get an asset pack", "Pitch angle, data brief, journalist list: ready to send."],
             ] as [string, string, string][]).map(([n, title, desc], idx, arr) => (

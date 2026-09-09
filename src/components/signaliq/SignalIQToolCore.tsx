@@ -202,7 +202,9 @@ function BeatPicker({
               className={`siq-tab${isActive ? " active" : ""}`}
             >
               <span style={{ display: "flex", alignItems: "center", gap: 5, justifyContent: "center" }}>
-                <span className="siq-tab-no">0{i + 1}</span>
+                {/* padStart, not a literal "0": with twelve beats the old `0{i+1}`
+                    rendered 010 / 011 / 012. Caught on prod 2026-09-09. */}
+                <span className="siq-tab-no">{String(i + 1).padStart(2, "0")}</span>
                 <span>{b.label}</span>
                 <InfoTooltip text={seedsNode} dark={isActive} width={320} />
               </span>
@@ -627,7 +629,8 @@ export default function SignalIQToolCore({
                 Pick your <em style={{ fontStyle: "italic", fontWeight: 600 }}>beat.</em>
               </h2>
               <p style={{ margin: 0, maxWidth: 620, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, color: INK55, lineHeight: 1.5 }}>
-                Choose the vertical your <em>target journalists</em> cover — that&rsquo;s where filings, research and news actually discuss your space.
+                Choose the vertical your <em>target journalists</em>{" "}
+                cover — that&rsquo;s where filings, research and news actually discuss your space.
               </p>
             </div>
             <BeatPicker beats={beats} setBeats={handleBeatsChange} wizardMode />

@@ -15,6 +15,7 @@ import {
 import { DoubleRule, HRule, SCaps } from "@/components/bureau/primitives";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { visibleBeats } from "@/lib/signaliq/config";
+import { MAX_SEEDS_PER_SCAN } from "@/lib/signaliq/config";
 
 const HDR_BG = "#0e0d0a";
 const HDR_BORDER = "#2a2318";
@@ -218,16 +219,18 @@ export default function SignalIQAboutPage() {
 
           <div style={{ marginBottom: 24, padding: "18px 20px", border: `1px solid ${INK15}`, background: PAPER2 }}>
             <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".08em", textTransform: "uppercase", color: INK, marginBottom: 10 }}>
-              20 seeds per beat
+              {MAX_SEEDS_PER_SCAN} seeds per scan
             </div>
             <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: INK70 }}>
-              Each beat scans 20 pre-written search phrases (seeds) across all five data sources. For example,
-              the Health &amp; Wellness beat searches for &ldquo;GLP-1 drugs&rdquo;, &ldquo;chronic disease management&rdquo;,
-              &ldquo;clinical AI&rdquo;, and 17 others. The results you see are drawn from these 20 topics only.
+              A scan reads {MAX_SEEDS_PER_SCAN} pre-written search phrases (seeds) across all five data sources,
+              drawn from the beat you pick. Each beat holds a larger curated pool than that
+              (Health &amp; Wellness currently holds {visibleBeats().find((b) => b.id === "health")?.seeds.length ?? 0},
+              from &ldquo;GLP-1 drugs&rdquo; to &ldquo;chronic disease management&rdquo; and &ldquo;clinical AI&rdquo;),
+              and the whole pool is tracked daily for coverage even though one scan samples {MAX_SEEDS_PER_SCAN} of it.
             </p>
             <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: INK70 }}>
-              We chose 20 because it balances coverage with cost and speed. Fewer seeds meant too many gaps
-              (the original v1 had only 5). More seeds means slower scans and harder-to-audit results.
+              We cap a single scan because it balances coverage with cost and speed. Fewer seeds meant too many gaps
+              (the original v1 had only 5). More per scan means slower results and a harder audit trail.
               The seeds are hand-curated by journalists and PR practitioners who cover each beat.
             </p>
             <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55, lineHeight: 1.5 }}>
@@ -252,7 +255,9 @@ export default function SignalIQAboutPage() {
               to tech press).
             </p>
             <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55, lineHeight: 1.5 }}>
-              More beats (Legal &amp; Policy, Consumer, Media &amp; Publishing, etc.) are planned for future versions.
+              More beats are in the pipeline: energy, mobility, property, future of work, media, manufacturing,
+              food, education, policy and web3 are already being tracked daily and will open up once each has
+              proved it carries enough coverage to be worth picking.
               If you need a beat that isn&rsquo;t here,{" "}
               <a href="/contact" style={{ color: INK, textDecorationColor: "rgba(26,20,16,.35)" }}>let us know</a>.
             </p>
