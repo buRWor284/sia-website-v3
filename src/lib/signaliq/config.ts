@@ -332,6 +332,36 @@ export const BEATS: Beat[] = [
       //   "ar:<phrase>". VERIFY the lang literal (tokenize.ts LANGS) with the
       //   one-day probe before reading anything into these counts.
       "ar:\u0646\u064a\u0648\u0645", "ar:\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0644\u0627", "ar:\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "ar:\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0645\u0631\u0629",
+      // - Arabic seeds 2026-09-09 (tourism radar). Lifted from the `ar` labels already
+      //   curated on every signal card in the radar content.ts files, so the
+      //   wording is Irfan-reviewed, not machine-translated. Enabled by the
+      //   per-seed language support (tokenize.ts LANGS); lang literal "ar"
+      //   VERIFIED against webngrams 2026-09-07 (ar = 3,576,344 rows/day).
+      //   Excluded as common-word traps: sal-la (basket), jahez (ready),
+      //   nusuk (rite) - single everyday nouns, the "noon"/"Panda" class.
+      //   ZERO history until the backfill: do NOT wire these into radar cards
+      //   yet or the momentum scores will read a fake surge.
+      "ar:\u0645\u0634\u0631\u0648\u0639 \u0627\u0644\u0628\u062d\u0631 \u0627\u0644\u0623\u062d\u0645\u0631", // Red Sea Global
+      "ar:\u0627\u0644\u0642\u062f\u064a\u0629", // Qiddiya
+      "ar:\u0627\u0644\u0645\u0631\u0628\u0639 \u0627\u0644\u062c\u062f\u064a\u062f", // New Murabba / Mukaab
+      "ar:\u0642\u0645\u0645 \u0627\u0644\u0633\u0648\u062f\u0629", // Soudah Peaks
+      "ar:\u0625\u0643\u0633\u0628\u0648 2030 \u0627\u0644\u0631\u064a\u0627\u0636", // Expo 2030 Riyadh
+      "ar:\u0643\u0623\u0633 \u0627\u0644\u0639\u0627\u0644\u0645 2034", // FIFA World Cup 2034
+      "ar:\u062c\u0627\u0626\u0632\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629 \u0627\u0644\u0643\u0628\u0631\u0649", // Saudi Arabian GP
+      "ar:\u0643\u0623\u0633 \u0627\u0644\u0639\u0627\u0644\u0645 \u0644\u0644\u0631\u064a\u0627\u0636\u0627\u062a \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a\u0629", // Esports World Cup
+      "ar:\u0633\u0627\u0648\u0646\u062f\u0633\u062a\u0648\u0631\u0645", // Soundstorm (MDLBEAST)
+      "ar:\u0645\u0648\u0633\u0645 \u062c\u062f\u0629", // Jeddah Season
+      "ar:\u0627\u0644\u062e\u0637\u0648\u0637 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudia
+      "ar:\u0623\u0631\u0648\u064a\u0627", // AROYA Cruises / Cruise Saudi
+      "ar:\u0627\u0644\u062a\u0648\u0633\u0639 \u0627\u0644\u0641\u0646\u062f\u0642\u064a", // Hotel pipeline
+      "ar:\u0645\u0637\u0627\u0631 \u0627\u0644\u0645\u0644\u0643 \u0633\u0644\u0645\u0627\u0646 \u0627\u0644\u062f\u0648\u0644\u064a", // King Salman Intl Airport
+      "ar:\u0642\u0637\u0627\u0639 \u0641\u0639\u0627\u0644\u064a\u0627\u062a \u0627\u0644\u0623\u0639\u0645\u0627\u0644", // MICE & business events
+      "ar:\u0627\u0644\u0627\u0633\u062a\u062b\u0645\u0627\u0631 \u0627\u0644\u0633\u064a\u0627\u062d\u064a", // Tourism investment
+      "ar:\u0627\u0644\u062d\u062c", // Hajj operations
+      "ar:\u0645\u0643\u0629 \u0627\u0644\u0645\u0643\u0631\u0645\u0629", // Makkah hospitality
+      "ar:\u0627\u0644\u0645\u062f\u064a\u0646\u0629 \u0627\u0644\u0645\u0646\u0648\u0631\u0629", // Madinah hospitality
+      "ar:\u0627\u0644\u0633\u0641\u0631 \u0627\u0644\u0635\u062f\u064a\u0642 \u0644\u0644\u0645\u0633\u0644\u0645\u064a\u0646", // Muslim-friendly travel
+      "ar:\u0642\u0637\u0627\u0631 \u0627\u0644\u062d\u0631\u0645\u064a\u0646", // Haramain high-speed rail
     ],
     blurb: "Saudi giga-projects, mega-events, hospitality, aviation, and faith-travel coverage.",
   },
@@ -406,6 +436,38 @@ export const BEATS: Beat[] = [
       // umbrella context (context only, never headline totals)
       "Saudi retail", "Saudi consumer", "Saudi consumer spending", "Saudi malls",
       "Saudi advertising",
+      // - Arabic seeds 2026-09-09 (retail radar). Lifted from the `ar` labels already
+      //   curated on every signal card in the radar content.ts files, so the
+      //   wording is Irfan-reviewed, not machine-translated. Enabled by the
+      //   per-seed language support (tokenize.ts LANGS); lang literal "ar"
+      //   VERIFIED against webngrams 2026-09-07 (ar = 3,576,344 rows/day).
+      //   Excluded as common-word traps: sal-la (basket), jahez (ready),
+      //   nusuk (rite) - single everyday nouns, the "noon"/"Panda" class.
+      //   ZERO history until the backfill: do NOT wire these into radar cards
+      //   yet or the momentum scores will read a fake surge.
+      "ar:\u0627\u0644\u062a\u062c\u0627\u0631\u0629 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi e-commerce
+      "ar:\u0647\u0646\u0642\u0631\u0633\u062a\u064a\u0634\u0646", // HungerStation
+      "ar:\u0627\u0644\u062c\u0645\u0639\u0629 \u0627\u0644\u0628\u064a\u0636\u0627\u0621", // White Friday
+      "ar:\u0627\u0644\u062a\u062c\u0627\u0631\u0629 \u0627\u0644\u0633\u0631\u064a\u0639\u0629", // Quick commerce
+      "ar:\u062a\u0648\u0635\u064a\u0644 \u0627\u0644\u0637\u0639\u0627\u0645 \u0641\u064a \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi food delivery
+      "ar:\u0645\u062c\u0645\u0648\u0639\u0629 \u0627\u0644\u0634\u0627\u064a\u0639", // Alshaya Group
+      "ar:\u0645\u0643\u062a\u0628\u0629 \u062c\u0631\u064a\u0631", // Jarir Bookstore
+      "ar:\u0633\u064a\u0646\u0648\u0645\u064a", // Cenomi (Centers + Retail)
+      "ar:\u0645\u062c\u0645\u0648\u0639\u0629 \u0635\u0627\u0641\u0648\u0644\u0627", // Savola Group
+      "ar:\u0627\u0644\u0645\u0631\u0627\u0639\u064a", // Almarai
+      "ar:\u0644\u0648\u0644\u0648 \u0647\u0627\u064a\u0628\u0631\u0645\u0627\u0631\u0643\u062a", // Lulu Retail
+      "ar:\u0635\u064a\u062f\u0644\u064a\u0627\u062a \u0627\u0644\u0646\u0647\u062f\u064a", // Nahdi Medical
+      "ar:\u0627\u0644\u0623\u0632\u064a\u0627\u0621 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi fashion
+      "ar:\u0623\u0633\u0628\u0648\u0639 \u0627\u0644\u0645\u0648\u0636\u0629 \u0641\u064a \u0627\u0644\u0631\u064a\u0627\u0636", // Riyadh Fashion Week
+      "ar:\u0627\u0644\u0642\u0647\u0648\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi coffee
+      "ar:\u0627\u0644\u062c\u0645\u0627\u0644 \u0648\u0627\u0644\u0639\u0637\u0648\u0631 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi beauty
+      "ar:\u0645\u062c\u0645\u0648\u0639\u0629 \u0633\u0627\u0641\u064a \u0644\u0644\u0623\u0644\u0639\u0627\u0628", // Savvy Games
+      "ar:\u0642\u0637\u0627\u0639 \u0627\u0644\u0623\u0644\u0639\u0627\u0628 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi gaming
+      "ar:\u0645\u0631\u0627\u0643\u0632 \u0627\u0644\u062a\u0633\u0648\u0642 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi malls
+      "ar:\u0642\u0637\u0627\u0639 \u0627\u0644\u062a\u062c\u0632\u0626\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi retail
+      "ar:\u0627\u0644\u0645\u0633\u062a\u0647\u0644\u0643 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi consumer
+      "ar:\u0627\u0644\u0625\u0646\u0641\u0627\u0642 \u0627\u0644\u0627\u0633\u062a\u0647\u0644\u0627\u0643\u064a \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi consumer spending
+      "ar:\u0633\u0648\u0642 \u0627\u0644\u0625\u0639\u0644\u0627\u0646 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi advertising
     ],
     blurb: "Saudi retail, e-commerce, consumer brands, and lifestyle-economy coverage.",
   },
