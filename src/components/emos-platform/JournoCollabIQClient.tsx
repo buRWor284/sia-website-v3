@@ -12,6 +12,8 @@
 
 import React, { useState, useTransition, useEffect } from "react";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
+import CompanyPicker from "@/components/emos-platform/CompanyPicker";
+import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
 import {
   createJournalist,
   updateJournalist,
@@ -83,6 +85,10 @@ function StoryForm({
   onSearch: (form: typeof initial) => void;
   searching: boolean;
 }) {
+  // Seeded once. Switching company in the picker remounts this form via the
+  // `key` at the call site, which re-seeds brand / website / description from
+  // the new company — cheaper and less surprising than syncing three fields
+  // through an effect.
   const [form, setForm] = useState(initial);
   const set = (k: keyof typeof form, v: string) => setForm(p => ({ ...p, [k]: v }));
 
@@ -493,6 +499,7 @@ export default function JournoCollabIQClient({
   prefillAssetIdea?: string;
 }) {
   const [companyContext] = useCompanyContext();
+  const companyCtx = useCompanyOptional();
   const [journalists, setJournalists] = useState<DbJournalist[]>(initialJournalists);
   const [results, setResults] = useState<AIJournalist[] | null>(null);
   const [searching, setSearching] = useState(false);
@@ -501,20 +508,10 @@ export default function JournoCollabIQClient({
   const [brief, setBrief] = useState<string | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
   const [lastForm, setLastForm] = useState<Record<string, string> | null>(null);
-  const [formBiz, setFormBiz] = useState("");
-  const [formDesc, setFormDesc] = useState("");
-
-  // Pre-fill brand/desc from persisted company context after hydration
-  useEffect(() => {
-    if (companyContext) {
-      // Extract first sentence as desc, rest as biz (heuristic)
-      const firstSentence = companyContext.split(/[.!?]/)[0]?.trim() ?? "";
-      if (!formBiz && !formDesc) {
-        setFormDesc(companyContext);
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [companyContext]);
+  // Brand, website and description come from the selected company row, so a
+  // user arriving here from SignalIQ or AssetIQ never retypes them. Before
+  // 2026-09-09 this was a heuristic over one localStorage string, and the name
+  // was not carried at all.
 
   // Build enriched story text from asset context
   const enrichedStory = prefillAssetTitle
@@ -526,9 +523,9 @@ export default function JournoCollabIQClient({
     : prefillStory;
 
   const defaultForm = {
-    biz: formBiz,
-    domain: "",
-    desc: formDesc || companyContext,
+    biz: companyCtx?.company?.name ?? "",
+    domain: companyCtx?.company?.website ?? "",
+    desc: companyContext,
     industry: prefillBeat,
     audDesc: enrichedStory,
     geo: "",
@@ -597,8 +594,17 @@ export default function JournoCollabIQClient({
   return (
     <div style={{ fontFamily: SERIF }}>
 
+      {/* ── Which company we are finding journalists for. Carried from
+             SignalIQ / AssetIQ automatically; switchable here. ──────────── */}
+      <CompanyPicker note="Used by every EMOS tool" />
+
       {/* Story form */}
-      <StoryForm initial={defaultForm} onSearch={handleSearch} searching={searching} />
+      <StoryForm
+        key={companyCtx?.company?.id ?? "no-company"}
+        initial={defaultForm}
+        onSearch={handleSearch}
+        searching={searching}
+      />
 
       {searchError && (
         <div style={{ marginBottom: 20, padding: "12px 16px", border: `1px solid ${RED}`, background: "rgba(193,74,50,.06)", fontFamily: SERIF, fontSize: 14, color: INK, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>

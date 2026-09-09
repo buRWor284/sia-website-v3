@@ -10,6 +10,7 @@
 
 import React, { useState, useTransition } from "react";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
+import CompanyPicker from "@/components/emos-platform/CompanyPicker";
 import {
   createAsset,
   updateAsset,
@@ -630,6 +631,10 @@ export default function AssetIQClient({
   return (
     <div style={{ fontFamily: SERIF }}>
 
+      {/* ── Which company these assets belong to (shared with SignalIQ and
+             JournoCollabIQ; stored on the org, not in this browser) ─────── */}
+      <CompanyPicker note="Used by every EMOS tool" />
+
       {/* ── Signal / Asset Pack Context ──────────────────────────────────── */}
       {hasPackContext && (
         <div style={{ border: `1px solid ${INK}`, marginBottom: 28, overflow: "hidden" }}>
@@ -670,7 +675,7 @@ export default function AssetIQClient({
             {/* Company context — persists across all EMOS tools */}
             <div style={{ marginBottom: 12 }}>
               <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>
-                Your company context <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}>(saved across all EMOS tools)</span>
+                Your company context <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}>(saved to the company above, on your account)</span>
               </label>
               <textarea
                 value={companyContext}

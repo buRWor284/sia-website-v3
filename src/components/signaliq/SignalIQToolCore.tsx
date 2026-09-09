@@ -103,7 +103,8 @@ export interface SignalIQCoreProps {
   beats: BeatId[];
   onBeatsChange: (beats: BeatId[]) => void;
   /** Company context — controlled by the wrapper (public: per-visit useState;
-   * dashboard: useCompanyContext localStorage hook). */
+   * dashboard: useCompanyContext, which since 2026-09-09 reads and writes the
+   * selected `companies` row rather than a localStorage string). */
   companyContext: string;
   onCompanyContextChange: (v: string) => void;
   /** Company-profile behavior (dashboard: name field + required context). */

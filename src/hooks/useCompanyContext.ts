@@ -1,34 +1,45 @@
 "use client";
 
 /**
- * useCompanyContext — persists the user's startup context across the EMOS pipeline.
+ * useCompanyContext — the company DESCRIPTION for the currently selected
+ * company, shared across the EMOS pipeline.
  *
- * Stored in localStorage under "emos_company_context" so it survives
- * page navigation without needing a DB round-trip.
+ * Rewritten 2026-09-09 (state layer, phase 1). It used to be a single
+ * localStorage string, which meant a new browser, a teammate, a server-side
+ * run and a headless caller all saw nothing. It now reads and writes the
+ * selected row in `public.companies` through <CompanyProvider>.
  *
- * Usage:
+ * The call signature is unchanged on purpose, so existing call sites keep
+ * working:
  *   const [companyContext, setCompanyContext] = useCompanyContext();
+ *
+ * Writes are optimistic and persisted after typing settles. Outside the
+ * provider (the public /tools/* pages), it falls back to the old per-visit
+ * localStorage behaviour so nothing there changes.
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
+import { LEGACY_CONTEXT_KEY } from "@/lib/company-types";
 
-const STORAGE_KEY = "emos_company_context";
+function readInitial(): string {
+  if (typeof window === "undefined") return "";
+  try { return localStorage.getItem(LEGACY_CONTEXT_KEY) ?? ""; } catch { return ""; }
+}
 
 export function useCompanyContext(): [string, (v: string) => void] {
-  const [context, setContextState] = useState("");
+  const ctx = useCompanyOptional();
 
-  // Hydrate from localStorage after mount (avoids SSR mismatch)
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setContextState(saved);
-    } catch { /* storage unavailable */ }
-  }, []);
+  // Fallback state — hooks must run unconditionally, so this is always here
+  // and only used when no provider is mounted. Lazy initializer rather than an
+  // effect, matching useCompanyName.
+  const [local, setLocal] = useState<string>(readInitial);
 
-  function setContext(v: string) {
-    setContextState(v);
-    try { localStorage.setItem(STORAGE_KEY, v); } catch { /* noop */ }
+  if (ctx) return [ctx.company?.context ?? "", ctx.setActiveContext];
+
+  function setLocalContext(v: string) {
+    setLocal(v);
+    try { localStorage.setItem(LEGACY_CONTEXT_KEY, v); } catch { /* noop */ }
   }
-
-  return [context, setContext];
+  return [local, setLocalContext];
 }

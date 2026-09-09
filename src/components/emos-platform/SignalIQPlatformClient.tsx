@@ -13,7 +13,8 @@
  *   - transport to the Clerk-guarded /api/emos-platform/signaliq/* routes
  *     (no Turnstile, no quota — platform scans are unmetered)
  *   - company name + context persistence across the EMOS pipeline
- *     (useCompanyName / useCompanyContext localStorage hooks)
+ *     (useCompanyName / useCompanyContext, backed by the org's `companies`
+ *      rows via <CompanyProvider> since 2026-09-09 — no longer localStorage)
  *   - "Save to EMOS" via the saveSignalFromScan server action
  *   - the saved-signals library below the tool
  *   - AssetIQ / dashboard-PressIQ handoff links (its place in the
@@ -24,6 +25,8 @@ import React, { useState } from "react";
 import Script from "next/script";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import { useCompanyName } from "@/hooks/useCompanyName";
+import CompanyPicker from "@/components/emos-platform/CompanyPicker";
+import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
 import { getJsPDF } from "@/lib/pdf/house-style";
 import { buildSignalIqReport } from "@/lib/pdf/signaliq-report";
 import { BEATS } from "@/lib/signaliq/config";
@@ -74,6 +77,7 @@ function SignalLibrary({
 }) {
   void refreshKey; // parent re-render cue (server refresh via revalidatePath)
 
+  const companyCtx = useCompanyOptional();
   const GRID = "1fr 78px 84px 84px 92px 156px";
   const [statusFilter, setStatusFilter] = useState<"all" | DbSignal["status"]>("all");
   const [companyFilter, setCompanyFilter] = useState<string>("all");
@@ -83,7 +87,18 @@ function SignalLibrary({
 
   const statusOf = (s: DbSignal): DbSignal["status"] => localStatus[s.id] ?? s.status;
   const live = signals.filter(s => !removed.has(s.id));
-  const companies = Array.from(new Set(live.map(s => s.company_name).filter(Boolean) as string[]));
+
+  // 2026-09-09: the company filter now lists the org's real `companies` rows
+  // rather than whatever distinct strings happened to be denormalised onto
+  // saved signals. The denormalised company_name column stays as the
+  // historical record of what each signal was scanned for, so names belonging
+  // to a company that has since been renamed or deleted are still offered —
+  // otherwise those signals would become unreachable through this filter.
+  const realNames = (companyCtx?.companies ?? []).map(c => c.name);
+  const orphanNames = Array.from(
+    new Set(live.map(s => s.company_name).filter(Boolean) as string[]),
+  ).filter(n => !realNames.some(r => r.toLowerCase() === n.toLowerCase()));
+  const companies = [...realNames, ...orphanNames];
   const counts = {
     all: live.length,
     saved: live.filter(s => statusOf(s) === "saved").length,
@@ -134,7 +149,7 @@ function SignalLibrary({
             </button>
           );
         })}
-        {companies.length > 0 && (
+        {companies.length > 1 && (
           <select value={companyFilter} onChange={e => setCompanyFilter(e.target.value)}
             style={{ marginLeft: "auto", padding: "5px 10px", border: `1px solid ${INK15}`, background: PAPER,
               color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".06em", textTransform: "uppercase", cursor: "pointer" }}>
@@ -334,6 +349,11 @@ export default function SignalIQPlatformClient({
     <div style={{ fontFamily: SERIF }}>
       <style>{SIQ_CSS}</style>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" strategy="lazyOnload" />
+
+      {/* ── Which company this scan is for. The name/context fields inside the
+             tool core edit this same row, so entering a company here or in
+             step 2 is the same act. ─────────────────────────────────────── */}
+      <CompanyPicker note="Used by every EMOS tool" />
 
       {/* ── The shared 5-step tool core (full parity with the public tool) ── */}
       <SignalIQToolCore

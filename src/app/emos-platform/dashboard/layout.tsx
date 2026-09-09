@@ -1,6 +1,9 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { EMOS_ADMIN_EMAILS, getSubscriptionStatus } from "@/lib/emos-guard";
+import CompanyProvider from "@/components/emos-platform/CompanyProvider";
+import { listCompanies } from "@/app/emos-platform/actions/companies";
+import type { Company } from "@/lib/company-types";
 
 /**
  * Subscription gate for the PAID area only (dashboard + all tool pages + settings).
@@ -44,5 +47,17 @@ export default async function EmosDashboardLayout({
   // the in-page CTA. Reserving space here is what actually fixes it: dashboard
   // content now always ends above the chip, so nothing can sit under it.
   // Found 2026-09-08 in the gate-03 run. Do not remove without moving the chip.
-  return <div style={{ paddingBottom: 140 }}>{children}</div>;
+  // Company profiles (state layer phase 1, 2026-09-09). Fetched here rather
+  // than in each tool so every dashboard page shares one list and renders with
+  // the right company on first paint. Only for a signed-in user: listCompanies
+  // redirects to signin otherwise, and this layout deliberately lets the
+  // unauthenticated case fall through to middleware.
+  let companies: Company[] = [];
+  if (userId) companies = await listCompanies();
+
+  return (
+    <CompanyProvider initialCompanies={companies}>
+      <div style={{ paddingBottom: 140 }}>{children}</div>
+    </CompanyProvider>
+  );
 }
