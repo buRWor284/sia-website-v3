@@ -58,15 +58,38 @@ export const LANGS: Record<string, string> = {
   ar: "ar",
   es: "es",
   fr: "fr",
-  ms: "ms",
-  id: "id",
+  id: "id", // ★ also the right code for MALAY: `ms` does not appear in the data.
+  zh: "zh", // Simplified Chinese — 2nd largest language in webngrams.
+  "zh-tw": "zh-TW", // Traditional Chinese, a separate value in the column.
+  ja: "ja",
+  th: "th",
 };
+
+/**
+ * Languages that do NOT separate words with spaces, so a seed is tokenised into
+ * CHARACTERS rather than whitespace words and re-joined with no separator.
+ *
+ * Verified against a real 2026-09-07 `zh` sample: webngrams stores one row per
+ * CHARACTER for these languages (ngram = a single character, `pre`/`post` = the
+ * raw character stream either side, no spaces). That means the existing 3+ token
+ * matcher shape already works unchanged — anchor on the 2nd character, require
+ * `pre` to end with the 1st and `post` to start with the rest. Worked example:
+ * seed 拼多多 -> ngram=多, pre ENDS WITH 拼, post STARTS WITH 多, which matches the
+ * sampled row (…一方面，拼 | 多 | 多长期坚持的…). Korean is deliberately NOT here:
+ * it spaces its words.
+ */
+const CHAR_TOKENISED = new Set(["zh", "zh-tw", "ja", "th"]);
+
+/** Minimum characters for a seed in a character-tokenised language. A 1- or
+ *  2-character Chinese seed matches far too much ordinary prose to be usable —
+ *  the CJK equivalent of seeding the English word "noon". */
+export const MIN_CJK_CHARS = 3;
 
 /** Default language for a seed with no prefix. */
 export const DEFAULT_LANG = "en";
 
 // No `s` flag: the repo targets pre-ES2018, and a seed never spans lines.
-const LANG_PREFIX = /^([a-z]{2}):([\s\S]+)$/;
+const LANG_PREFIX = /^([a-z]{2}(?:-[a-z]{2})?):([\s\S]+)$/;
 
 /**
  * Split "ar:<phrase>" into its language code and phrase. An unknown or absent
@@ -108,8 +131,21 @@ export interface TopicMatcher {
  * Split a seed phrase into lowercased whitespace tokens, keeping hyphens, digits
  * and apostrophes inside a token. Collapses runs of whitespace and trims.
  */
-export function tokenizeWords(phrase: string): string[] {
-  return phrase.toLowerCase().trim().split(/\s+/).filter(Boolean);
+export function tokenizeWords(phrase: string, langCode: string = DEFAULT_LANG): string[] {
+  const lowered = phrase.toLowerCase().trim();
+  if (CHAR_TOKENISED.has(langCode)) {
+    // One token per character, whitespace dropped: webngrams indexes these
+    // languages character by character. [...str] splits by code point, so
+    // surrogate pairs are not torn in half.
+    return [...lowered].filter((c) => !/\s/.test(c));
+  }
+  return lowered.split(/\s+/).filter(Boolean);
+}
+
+/** How tokens are re-joined into a canonical phrase: no separator for the
+ *  character-tokenised languages, a single space everywhere else. */
+function joiner(langCode: string): string {
+  return CHAR_TOKENISED.has(langCode) ? "" : " ";
 }
 
 /**
@@ -119,7 +155,7 @@ export function tokenizeWords(phrase: string): string[] {
  */
 export function canonicalTopic(seed: string): string {
   const { lang, phrase } = splitSeedLang(seed);
-  const body = tokenizeWords(phrase).join(" ");
+  const body = tokenizeWords(phrase, lang).join(joiner(lang));
   return lang === DEFAULT_LANG ? body : `${lang}:${body}`;
 }
 
@@ -127,8 +163,10 @@ export function canonicalTopic(seed: string): string {
 export function tokenizeTopic(seed: string): TopicMatcher {
   const { lang: code, phrase } = splitSeedLang(seed);
   const lang = LANGS[code] ?? LANGS[DEFAULT_LANG];
-  const words = tokenizeWords(phrase);
-  const topic = code === DEFAULT_LANG ? words.join(" ") : `${code}:${words.join(" ")}`;
+  const words = tokenizeWords(phrase, code);
+  const sep = joiner(code);
+  const body = words.join(sep);
+  const topic = code === DEFAULT_LANG ? body : `${code}:${body}`;
   const nwords = words.length;
 
   if (nwords <= 1) {
@@ -145,7 +183,7 @@ export function tokenizeTopic(seed: string): TopicMatcher {
     w1: words[0],
     w2: words[1],
     pre_w: words[0],
-    post_rest: words.slice(2).join(" "),
+    post_rest: words.slice(2).join(sep),
     lang,
   };
 }
@@ -160,6 +198,9 @@ export function buildTopicMatchers(seeds: string[]): TopicMatcher[] {
   for (const s of seeds) {
     const m = tokenizeTopic(s);
     if (!m.topic || !m.w1) continue;
+    // A too-short seed in a character-tokenised language would match constantly.
+    const { lang: code } = splitSeedLang(s);
+    if (CHAR_TOKENISED.has(code) && m.nwords < MIN_CJK_CHARS) continue;
     if (!byTopic.has(m.topic)) byTopic.set(m.topic, m);
   }
   return [...byTopic.values()];
