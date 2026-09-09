@@ -1,30 +1,147 @@
 name: SignalIQ Coverage Backfill
 
+# Drains a date range one day at a time, then RE-DISPATCHES ITSELF if the range
+# is not finished. Replaces the old fixed 70-call loop.
+#
+# Why it changed (2026-09-09). The old job had `timeout-minutes: 20` and looped
+# at most 70 times. A v2 day-scan takes 45-60s, so a dispatch drained only ~13
+# days before the runner killed it, and project memory recorded that 20 minutes
+# as if it were a GitHub ceiling. It never was: a GitHub-hosted job may run for
+# SIX HOURS ("Each job in a workflow can run for up to 6 hours of execution
+# time"). At ~50s/day one dispatch can therefore drain ~380 days instead of 13.
+# The 1,095-day history buy needs 983 days = 75 manual dispatches under the old
+# shape, versus 3 self-chaining ones now.
+#
+# Chaining uses the built-in GITHUB_TOKEN. Since Sep 2022 GitHub allows exactly
+# this: "Customers will now be able to use the GITHUB_TOKEN with
+# workflow_dispatch and repository_dispatch events to trigger workflows" - the
+# documented exception to the no-recursive-runs rule. `chain_limit` decrements on
+# every hop and hard-stops at 0, so a bug can never spawn an endless chain.
+#
+# ★ BEFORE A LARGE RUN, RAISE THE BIGQUERY QUOTA. QueryUsagePerDay is a 0.15 TiB
+# kill-switch and one day-scan bills ~42 GB, so the default cap allows only ~3-4
+# days of backfill per CALENDAR day. Raise it for the run, then put it back only
+# after the next midnight PACIFIC (= 12:00 PKT) or every scan for the rest of
+# that Pacific day is rejected. See project memory bigquery-quota-ops.
+
 on:
   workflow_dispatch:
     inputs:
       start:
         description: 'First day (YYYY-MM-DD)'
         required: true
-        default: '2026-05-19'
       end:
         description: 'Last day (YYYY-MM-DD)'
         required: true
-        default: '2026-07-17'
+      chain_limit:
+        description: 'Max self-re-dispatches left (0 = never chain)'
+        required: false
+        default: '4'
+
+# Two backfills over the same range would scan and BILL the same days twice.
+concurrency:
+  group: signaliq-backfill
+  cancel-in-progress: false
+
+permissions:
+  actions: write # required to re-dispatch this workflow
 
 jobs:
   backfill:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 350 # GitHub hard-kills a job at 360
+    outputs:
+      remaining: ${{ steps.drain.outputs.remaining }}
     steps:
-      - name: Backfill coverage in 3-day chunks
+      - name: Drain the range
+        id: drain
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          START: ${{ github.event.inputs.start }}
+          END: ${{ github.event.inputs.end }}
         run: |
-          URL="https://www.syedirfanajmal.com/api/signaliq/refresh-coverage?mode=backfill&start=${{ github.event.inputs.start }}&end=${{ github.event.inputs.end }}"
-          for i in $(seq 1 70); do
-            RESP=$(curl -s -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" "$URL")
-            REM=$(echo "$RESP" | jq -r '.remaining // "?"' 2>/dev/null || echo "?")
-            SC=$(echo "$RESP" | jq -c '.scanned // []' 2>/dev/null || echo "[]")
-            echo "call $i -> scanned=$SC remaining=$REM"
-            if [ "$REM" = "0" ]; then echo "== BACKFILL COMPLETE =="; break; fi
-            sleep 3
+          set -uo pipefail
+          case "$START" in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) echo "::error::bad start '$START'"; exit 1;; esac
+          case "$END"   in [0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]) ;; *) echo "::error::bad end '$END'";   exit 1;; esac
+          if [ "$START" \> "$END" ]; then echo "::error::start is after end"; exit 1; fi
+
+          URL="https://www.syedirfanajmal.com/api/signaliq/refresh-coverage?mode=backfill&start=${START}&end=${END}"
+          BUDGET=$((330 * 60))   # leave ~20 min of the 350 for the chain step
+          T0=$(date +%s)
+          CALLS=0; SCANNED=0; FAILS=0; REM="?"; STOP=""
+
+          while :; do
+            ELAPSED=$(( $(date +%s) - T0 ))
+            if [ "$ELAPSED" -ge "$BUDGET" ]; then STOP="time budget reached"; break; fi
+
+            BODY=$(curl -sS --max-time 330 -w '\n%{http_code}' \
+                    -H "Authorization: Bearer ${CRON_SECRET}" "$URL" 2>/dev/null) || BODY=$'\n000'
+            CODE=$(printf '%s' "$BODY" | tail -n1)
+            JSON=$(printf '%s' "$BODY" | sed '$d')
+            CALLS=$((CALLS + 1))
+
+            if [ "$CODE" != "200" ]; then
+              FAILS=$((FAILS + 1))
+              echo "call $CALLS -> HTTP $CODE (failure $FAILS/5)"
+              if [ "$FAILS" -ge 5 ]; then STOP="5 consecutive failures, last HTTP $CODE"; break; fi
+              sleep $((FAILS * 20)); continue
+            fi
+            FAILS=0
+
+            if [ "$(printf '%s' "$JSON" | jq -r '.quotaBlocked // false')" = "true" ]; then
+              # Expected, self-clearing: the custom cap resets at midnight Pacific.
+              # Chaining now would just burn runner minutes failing, so stop clean.
+              STOP="BigQuery daily quota exhausted - resumes after midnight Pacific (12:00 PKT)"
+              break
+            fi
+
+            REM=$(printf '%s' "$JSON" | jq -r '.remaining // "?"')
+            N=$(printf '%s' "$JSON" | jq -r '(.scanned // []) | length')
+            SCANNED=$((SCANNED + N))
+            echo "call $CALLS -> scanned $(printf '%s' "$JSON" | jq -c '.scanned // []') remaining=$REM (${ELAPSED}s elapsed)"
+
+            if [ "$REM" = "0" ]; then STOP="range complete"; break; fi
+            if [ "$N" = "0" ]; then STOP="no day scanned but remaining=$REM - investigate"; break; fi
+            sleep 2
           done
+
+          echo "remaining=$REM" >> "$GITHUB_OUTPUT"
+          echo "stop=$STOP"     >> "$GITHUB_OUTPUT"
+          {
+            echo "### SignalIQ backfill ${START} → ${END}"
+            echo ""
+            echo "| calls | days scanned | remaining | stopped because |"
+            echo "|---|---|---|---|"
+            echo "| $CALLS | $SCANNED | $REM | $STOP |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Chain the next dispatch
+        if: steps.drain.outputs.remaining != '0' && steps.drain.outputs.remaining != '?'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LIMIT: ${{ github.event.inputs.chain_limit }}
+        run: |
+          set -euo pipefail
+          NEXT=$(( ${LIMIT:-0} - 1 ))
+          STOPPED='${{ steps.drain.outputs.stop }}'
+          case "$STOPPED" in
+            *quota*) echo "::warning::Quota stop - not chaining. Re-dispatch after midnight Pacific (12:00 PKT)."; exit 0;;
+            *investigate*|*failures*) echo "::warning::Abnormal stop - not chaining. Investigate: $STOPPED"; exit 0;;
+          esac
+          if [ "${LIMIT:-0}" -le 0 ]; then
+            echo "::warning::chain_limit exhausted, ${{ steps.drain.outputs.remaining }} days still pending. Re-dispatch manually."
+            exit 0
+          fi
+          echo "Chaining: $NEXT hop(s) left after this one."
+          # Never fail the job over a failed chain: the days already scanned are
+          # committed and correct, only the follow-on dispatch is missing. The
+          # usual cause is Settings > Actions > General > Workflow permissions
+          # being set to read-only, which blocks `actions: write`.
+          if gh workflow run signaliq-backfill.yml \
+               -f start='${{ github.event.inputs.start }}' \
+               -f end='${{ github.event.inputs.end }}' \
+               -f chain_limit="$NEXT"; then
+            echo "Dispatched."
+          else
+            echo "::warning::Could not self-dispatch (check Workflow permissions = read and write). ${{ steps.drain.outputs.remaining }} days still pending; re-run this workflow with the same start/end."
+          fi

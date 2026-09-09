@@ -49,7 +49,7 @@ import {
   SERIF,
   YEL,
 } from "@/lib/tokens";
-import { BEATS, EMAIL_SCANS, FREE_SCANS } from "@/lib/signaliq/config";
+import { BEATS, visibleBeats, EMAIL_SCANS, FREE_SCANS } from "@/lib/signaliq/config";
 import {
   AMBER,
   GREEN,
@@ -165,8 +165,12 @@ function BeatPicker({
   // additive (weighted, still one scan). Setting primary keeps any secondary /
   // tertiary that don't collide with the new primary.
   const setPrimary = (id: BeatId) => setBeats([id, ...beats.slice(1).filter((b) => b !== id)]);
-  const secondaryOptions = BEATS.filter((b) => b.id !== primary && b.id !== tertiary);
-  const tertiaryOptions = BEATS.filter((b) => b.id !== primary && b.id !== secondary);
+  // Selection lists show only pickable beats; the radar / non-English sets are
+  // hidden (Beat.hidden). Label lookups below still read BEATS so a saved scan
+  // naming a hidden beat keeps rendering.
+  const PICKABLE = visibleBeats();
+  const secondaryOptions = PICKABLE.filter((b) => b.id !== primary && b.id !== tertiary);
+  const tertiaryOptions = PICKABLE.filter((b) => b.id !== primary && b.id !== secondary);
   const addSecondary = () => {
     const first = secondaryOptions[0];
     if (first) setBeats([primary, first.id]);
@@ -184,7 +188,7 @@ function BeatPicker({
   return (
     <section style={{ padding: "clamp(16px,3vw,28px) clamp(22px,5vw,56px) 0" }}>
       <div className="siq-beat-tabs">
-        {BEATS.map((b, i) => {
+        {PICKABLE.map((b, i) => {
           const isActive = b.id === primary;
           const seedsNode = (
             <span>

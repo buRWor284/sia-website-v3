@@ -120,9 +120,12 @@ export const SIQ_CSS = `
     white-space: nowrap;
   }
   .siq-tab:nth-child(3n)       { border-right: none; }
-  /* 7 beats in a 3-col grid: the 7th (Agency) spans the full last row so there's
-     no dangling half-row. Bottom border only comes off the very last tab. */
-  .siq-tab:nth-child(7)        { grid-column: 1 / -1; border-right: none; }
+  /* 2026-09-09: the old nth-child(7) full-row-span hack assumed
+     EXACTLY seven beats. The founders beat made eight, so the 7th was still
+     spanning the row and the 8th sat alone - the grid had been mis-rendering
+     since. The visible picker is now 12 beats, which fills a 3-column grid
+     exactly, so no span rule is needed. Keep the visible count a multiple of 3
+     (see visibleBeats() in config.ts) or reinstate a rule that matches. */
   .siq-tab:last-child          { border-bottom: none; }
   .siq-tab.active { background: ${INK}; color: ${PAPER}; }
   .siq-tab-no {

@@ -14,7 +14,7 @@ import {
 } from "@/lib/tokens";
 import { DoubleRule, HRule, SCaps } from "@/components/bureau/primitives";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
-import { BEATS } from "@/lib/signaliq/config";
+import { visibleBeats } from "@/lib/signaliq/config";
 
 const HDR_BG = "#0e0d0a";
 const HDR_BORDER = "#2a2318";
@@ -238,10 +238,10 @@ export default function SignalIQAboutPage() {
 
           <div style={{ marginBottom: 24, padding: "18px 20px", border: `1px solid ${INK15}`, background: PAPER2 }}>
             <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".08em", textTransform: "uppercase", color: INK, marginBottom: 10 }}>
-              5 beat categories
+              {visibleBeats().length} beat categories
             </div>
             <p style={{ margin: "0 0 12px", fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.6, color: INK70 }}>
-              SignalIQ currently covers five beats: {BEATS.map(b => b.label).join(", ")}.
+              SignalIQ currently covers {visibleBeats().length} beats: {visibleBeats().map(b => b.label).join(", ")}.
               These were chosen because they represent the highest-volume PR beats for the startup and scale-up
               companies most likely to use this tool.
             </p>

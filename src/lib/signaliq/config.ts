@@ -116,6 +116,14 @@ export function isSensitive(text: string): boolean {
 }
 
 /** Preset founder beats (MVP). Pro/custom beats are a v2 upgrade. */
+/**
+ * The beats offered in the public picker. Everything else in BEATS is a hidden
+ * data-collection set (radars, non-English markets) that still rides the nightly
+ * scan. Resolve a beat LABEL from BEATS, never from this - a saved scan may name
+ * a hidden beat and must still render.
+ */
+export const visibleBeats = (): Beat[] => BEATS.filter((b) => !b.hidden);
+
 export const BEATS: Beat[] = [
   {
     id: "saas",
@@ -131,6 +139,12 @@ export const BEATS: Beat[] = [
       "venture capital", "seed funding", "integration platform", "low-code development", "tech IPO",
       // - widened 2026-07-21 (Irfan: client-work + geography coverage) -
       "staff augmentation", "IT outsourcing",
+      // - widened 2026-09-09 (B2B depth). PROBE-PENDING.
+      "B2B SaaS", "enterprise software", "procurement software", "supply chain software", "ERP implementation",
+      "CRM platform", "sales enablement", "revenue operations", "net revenue retention", "annual recurring revenue",
+      "customer retention", "vertical software", "data warehouse", "business intelligence", "HR software",
+      "payroll software", "legal tech", "proptech", "edtech", "logistics software",
+      "field service software", "B2B payments",
     ],
     blurb: "Software, product, and go-to-market stories.",
   },
@@ -201,6 +215,12 @@ export const BEATS: Beat[] = [
       "AI coding assistant", "AI video generation", "small language model", "edge AI", "GPU cloud",
       "synthetic data", "multimodal AI", "AI companion apps", "AI in legal", "AI drug discovery",
       "humanoid robot", "robotics automation", "deepfake detection", "AI inference cost", "AI talent shortage", "AI evaluation",
+      // - widened 2026-09-09 (AI depth incl. compute and hardware). PROBE-PENDING.
+      "AI chip", "AI data center", "AI energy demand", "model training", "inference cost",
+      "open source AI", "AI talent", "AI copyright", "synthetic data", "AI benchmark",
+      "reinforcement learning", "computer vision", "speech recognition", "AI drug discovery", "AI in education",
+      "AI hallucination", "prompt injection", "AI red teaming", "small language model", "on-device AI",
+      "quantum computing", "autonomous vehicle",
     ],
     blurb: "Models, applications, and the policy fight around them.",
   },
@@ -288,8 +308,74 @@ export const BEATS: Beat[] = [
     blurb: "Funding climate, the AI wave, and go-to-market — the stories a pre-Series-A / Series-A founder builds authority around.",
   },
   {
+    id: "travel",
+    label: "Travel & Hospitality",
+    // New beat 2026-09-09 (Irfan: "let's go wide"). Visible in the picker.
+    // PROBE-PENDING: drop whatever returns zero after the first scans.
+    seeds: [
+      "travel technology", "online travel agency", "hotel booking", "short-term rental", "vacation rental",
+      "business travel", "corporate travel", "travel insurance", "airline loyalty", "frequent flyer",
+      "low-cost carrier", "airline capacity", "airline profitability", "airport expansion", "cruise industry",
+      "luxury travel", "sustainable tourism", "overtourism", "digital nomad", "remote work visa",
+      "travel visa", "visa policy", "e-visa", "biometric border", "medical tourism",
+      "halal tourism", "religious tourism", "pilgrimage travel", "adventure tourism", "ecotourism",
+      "hotel investment", "hospitality technology", "contactless check-in", "revenue management", "destination marketing",
+      "tourism board", "business events", "wellness tourism", "culinary tourism", "sports tourism",
+      "hotel occupancy", "travel demand",
+    ],
+    blurb: "Travel, hospitality, aviation, visas and tourism demand - the global beat behind the KSA radars, the Zoom Viza visa work and the Hajj People conversations.",
+  },
+  {
+    id: "longevity",
+    label: "Longevity & Biotech",
+    // New beat 2026-09-09 (Irfan: "let's go wide"). Visible in the picker.
+    // PROBE-PENDING: drop whatever returns zero after the first scans.
+    seeds: [
+      "longevity research", "healthy lifespan", "biological age", "epigenetic clock", "senolytics",
+      "cellular senescence", "rapamycin", "caloric restriction", "anti-aging", "regenerative medicine",
+      "stem cell therapy", "gene therapy", "gene editing", "CRISPR", "mRNA vaccine",
+      "biotech funding", "biotech IPO", "drug discovery", "clinical trial", "precision medicine",
+      "biomarker testing", "microbiome", "gut health", "peptide therapy", "hormone therapy",
+      "sleep science", "cold exposure", "sarcopenia", "muscle health", "cognitive decline",
+      "brain health", "dementia prevention", "metabolic health", "continuous glucose monitor", "longevity clinic",
+      "cell therapy", "health span",
+    ],
+    blurb: "Lifespan science, biotech funding and the clinical pipeline - the beat behind the BioPalace conversation.",
+  },
+  {
+    id: "beauty",
+    label: "Beauty & Skincare",
+    // New beat 2026-09-09 (Irfan: "let's go wide"). Visible in the picker.
+    // PROBE-PENDING: drop whatever returns zero after the first scans.
+    seeds: [
+      "skincare science", "skin barrier", "retinol", "sunscreen", "sun protection",
+      "dermatology", "cosmetic surgery", "medical aesthetics", "injectables", "dermal filler",
+      "collagen supplement", "beauty technology", "clean beauty", "K-beauty", "hair loss treatment",
+      "hair transplant", "beauty retail", "prestige beauty", "indie beauty brand", "fragrance market",
+      "men's grooming", "cosmetics regulation", "beauty influencer", "skin microbiome", "laser treatment",
+      "acne treatment", "beauty subscription", "cosmetic ingredients", "aesthetic clinic",
+    ],
+    blurb: "Skincare science, aesthetics and the beauty industry - a dense consumer-PR beat adjacent to longevity.",
+  },
+  {
+    id: "commerce",
+    label: "Retail & E-commerce",
+    // New beat 2026-09-09 (Irfan: "let's go wide"). Visible in the picker.
+    // PROBE-PENDING: drop whatever returns zero after the first scans.
+    seeds: [
+      "e-commerce growth", "online retail", "marketplace seller", "direct-to-consumer", "retail media network",
+      "omnichannel retail", "click and collect", "last mile delivery", "same-day delivery", "returns management",
+      "supply chain disruption", "inventory management", "private label", "grocery delivery", "social commerce",
+      "live shopping", "resale market", "circular fashion", "fast fashion", "luxury retail",
+      "duty free", "shopping mall", "store closures", "retail footfall", "consumer confidence",
+      "discount retail", "subscription commerce", "cross-border shopping", "loyalty program", "dynamic pricing",
+    ],
+    blurb: "Global retail and e-commerce - the worldwide counterpart to the KSA Retail radar.",
+  },
+  {
     id: "ksa-tourism",
     label: "KSA Tourism & Hospitality",
+    hidden: true, // radar data set, not a beat a user would pick
     // New beat 2026-07-24 (Irfan): powers the /ksa-tourism-radar page + KSA
     // speaking-circuit positioning (Sep-Nov 2026 events). Destination/brand
     // names chosen over generic head-terms ("hotel") so totals stay honest.
@@ -384,6 +470,7 @@ export const BEATS: Beat[] = [
   {
     id: "ksa-giga",
     label: "KSA Giga-Projects",
+    hidden: true, // radar data set, not a beat a user would pick
     seeds: [
       // already live via ksa-tourism (de-duped: free, full history)
       "NEOM", "Red Sea Global", "AlUla", "Diriyah", "Qiddiya",
@@ -403,6 +490,7 @@ export const BEATS: Beat[] = [
   {
     id: "ksa-banking",
     label: "KSA Banking & Fintech",
+    hidden: true, // radar data set, not a beat a user would pick
     seeds: [
       // institutions & regulator
       "Saudi Central Bank", "Saudi National Bank", "Al Rajhi Bank", "Riyad Bank",
@@ -423,6 +511,7 @@ export const BEATS: Beat[] = [
   {
     id: "ksa-retail",
     label: "KSA Retail & Consumer",
+    hidden: true, // radar data set, not a beat a user would pick
     seeds: [
       // e-commerce & delivery
       "Saudi e-commerce", "Salla", "HungerStation", "Jahez", "Mrsool", "Floward",
@@ -470,6 +559,320 @@ export const BEATS: Beat[] = [
       "ar:\u0633\u0648\u0642 \u0627\u0644\u0625\u0639\u0644\u0627\u0646 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi advertising
     ],
     blurb: "Saudi retail, e-commerce, consumer brands, and lifestyle-economy coverage.",
+  },
+  {
+    id: "energy",
+    label: "Energy & Utilities (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "power grid", "grid resilience", "energy storage", "battery storage", "nuclear power",
+      "small modular reactor", "offshore wind", "solar capacity", "green hydrogen", "carbon capture",
+      "energy prices", "electricity demand", "data center power", "transmission lines", "energy security",
+      "LNG exports", "oil demand", "refining capacity", "utility regulation", "smart meter",
+      "demand response", "virtual power plant", "heat pump", "district cooling", "desalination",
+      "water scarcity", "critical minerals", "lithium supply", "rare earths", "power purchase agreement",
+      "energy efficiency", "fusion energy", "geothermal energy", "biofuels", "grid interconnection",
+    ],
+    blurb: "Energy & Utilities coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "mobility",
+    label: "Automotive & Mobility (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "electric vehicle sales", "EV charging", "charging network", "battery technology", "solid-state battery",
+      "autonomous driving", "ride hailing", "micromobility", "fleet electrification", "automotive tariffs",
+      "car production", "used car market", "connected car", "vehicle software", "over-the-air update",
+      "hydrogen vehicle", "commercial vehicles", "urban mobility", "public transit", "high-speed rail",
+      "sustainable aviation fuel", "drone delivery", "urban air mobility", "automotive recall", "dealership model",
+      "vehicle safety", "car subscription", "telematics",
+    ],
+    blurb: "Automotive & Mobility coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "property",
+    label: "Real Estate & Construction (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "commercial real estate", "office vacancy", "return to office", "housing affordability", "mortgage rates",
+      "rental market", "build to rent", "student housing", "data center construction", "warehouse demand",
+      "industrial real estate", "REIT performance", "construction costs", "construction labour", "modular construction",
+      "green building", "building retrofit", "smart building", "facility management", "real estate investment",
+      "property valuation", "co-working space", "hotel development", "mixed use development", "urban planning",
+      "zoning reform", "infrastructure spending", "megaproject delays", "housing supply", "real estate tokenization",
+      "property management software",
+    ],
+    blurb: "Real Estate & Construction coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "work",
+    label: "Future of Work & HR (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "remote work", "hybrid work", "employee engagement", "talent shortage", "skills gap",
+      "reskilling", "upskilling", "workforce planning", "gig economy", "freelance economy",
+      "contingent workforce", "employee benefits", "workplace wellbeing", "four day week", "pay transparency",
+      "gender pay gap", "workplace surveillance", "AI and jobs", "job displacement", "hiring freeze",
+      "graduate hiring", "employer branding", "internal mobility", "performance management", "employee retention",
+      "workplace culture", "global employment", "employer of record", "payroll compliance", "work visa",
+    ],
+    blurb: "Future of Work & HR coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "media",
+    label: "Media, Sport & Entertainment (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "streaming wars", "subscriber growth", "advertising revenue", "podcast industry", "music streaming",
+      "live events", "concert touring", "box office", "film production", "video game industry",
+      "esports", "sports rights", "broadcast rights", "sports sponsorship", "athlete endorsement",
+      "women's sport", "sports betting", "fan engagement", "media consolidation", "local news",
+      "newsroom cuts", "paywall strategy", "publisher traffic", "AI and journalism", "content licensing",
+      "short form video", "celebrity brand", "stadium development", "film incentives", "sports club ownership",
+    ],
+    blurb: "Media, Sport & Entertainment coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "industry",
+    label: "Manufacturing & Supply Chain (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "reshoring", "nearshoring", "friendshoring", "factory investment", "industrial automation",
+      "industrial robots", "digital twin", "predictive maintenance", "additive manufacturing", "3D printing",
+      "semiconductor fab", "chip shortage", "export controls", "trade tariffs", "port congestion",
+      "freight rates", "container shipping", "air cargo", "warehouse automation", "supplier diversification",
+      "raw material costs", "procurement strategy", "lean manufacturing", "industrial safety", "manufacturing PMI",
+      "industrial policy", "supply chain visibility", "logistics technology", "cold chain", "customs delays",
+    ],
+    blurb: "Manufacturing & Supply Chain coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "food",
+    label: "Food, Drink & Agriculture (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "food security", "food inflation", "crop yields", "precision agriculture", "vertical farming",
+      "alternative protein", "plant based food", "cultivated meat", "food waste", "sustainable packaging",
+      "food safety", "supply chain traceability", "coffee prices", "cocoa prices", "wheat exports",
+      "fertiliser prices", "irrigation technology", "livestock emissions", "regenerative agriculture", "agritech funding",
+      "ghost kitchen", "restaurant industry", "quick service restaurant", "grocery inflation", "functional beverages",
+      "energy drinks", "non alcoholic", "food labelling", "sugar tax", "dairy alternatives",
+    ],
+    blurb: "Food, Drink & Agriculture coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "education",
+    label: "Education & EdTech (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "higher education", "university funding", "student debt", "international students", "online learning",
+      "microcredentials", "vocational training", "corporate training", "professional certification", "AI in classrooms",
+      "academic integrity", "teacher shortage", "school funding", "early childhood education", "STEM education",
+      "digital literacy", "learning outcomes", "education technology", "tutoring market", "language learning",
+      "university rankings", "research funding", "academic publishing", "apprenticeships", "adult education",
+      "skills based hiring", "campus safety", "school technology",
+    ],
+    blurb: "Education & EdTech coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "policy",
+    label: "Policy, Trade & Development (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "trade agreement", "tariff policy", "economic sanctions", "export ban", "industrial subsidies",
+      "sovereign wealth fund", "foreign direct investment", "emerging markets", "debt restructuring", "development finance",
+      "climate finance", "carbon market", "carbon tax", "ESG regulation", "antitrust enforcement",
+      "data localisation", "digital tax", "privacy regulation", "competition policy", "interest rate decision",
+      "inflation data", "currency devaluation", "remittances", "informal economy", "public private partnership",
+      "sovereign debt", "aid budget", "trade deficit",
+    ],
+    blurb: "Policy, Trade & Development coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "web3",
+    label: "Crypto & Web3 (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan: "go even wider"). HIDDEN on purpose: these accrue
+    // nightly coverage at zero extra cost and join the 1,095-day backfill, but
+    // 18 picker tabs would be unusable and a beat has to prove it is rich before
+    // it earns a tab. Promote to visible by deleting `hidden` - keep the visible
+    // count a multiple of 3 (the tab grid is 3 columns). ALL PROBE-PENDING.
+    seeds: [
+      "bitcoin ETF", "digital assets", "decentralized finance", "smart contract", "blockchain adoption",
+      "crypto exchange", "crypto mining", "crypto treasury", "tokenized deposits", "real world assets",
+      "layer 2", "staking rewards", "crypto venture funding", "stablecoin regulation", "NFT market",
+      "web3 gaming", "crypto fraud", "proof of stake", "digital asset custody", "crypto ETF inflows",
+    ],
+    blurb: "Crypto & Web3 coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "intl-es",
+    label: "Spanish (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan). NOT a user-facing beat: a data-collection set so
+    // Spanish coverage accrues nightly at ZERO extra cost and is
+    // included in the 1,095-day backfill, ready for a future non-English radar.
+    // Cross-cutting product beats only (AI, funding, cyber, digital economy,
+    // marketing/PR, climate) - deliberately NOT country-specific, since the
+    // country still has to live in the phrase. ALL PROBE-PENDING: drop any that
+    // return zero once the first scans land, per the founders-beat pattern.
+    seeds: [
+      "es:inteligencia artificial", "es:capital de riesgo", "es:ronda de financiaci\u00f3n",  // AI, venture capital, funding round
+      "es:ciberseguridad", "es:fuga de datos", "es:protecci\u00f3n de datos",  // cybersecurity, data leak, data protection
+      "es:comercio electr\u00f3nico", "es:transformaci\u00f3n digital", "es:econom\u00eda digital",  // e-commerce, digital transformation, digital economy
+      "es:banca digital", "es:criptomonedas", "es:veh\u00edculo el\u00e9ctrico",  // digital banking, cryptocurrencies, electric vehicle
+      "es:energ\u00edas renovables", "es:cambio clim\u00e1tico", "es:salud digital",  // renewable energy, climate change, digital health
+      "es:marketing digital", "es:relaciones p\u00fablicas", "es:suplantaci\u00f3n de identidad",  // digital marketing, public relations, identity theft / phishing
+    ],
+    blurb: "Spanish-language coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "intl-fr",
+    label: "French (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan). NOT a user-facing beat: a data-collection set so
+    // French coverage accrues nightly at ZERO extra cost and is
+    // included in the 1,095-day backfill, ready for a future non-English radar.
+    // Cross-cutting product beats only (AI, funding, cyber, digital economy,
+    // marketing/PR, climate) - deliberately NOT country-specific, since the
+    // country still has to live in the phrase. ALL PROBE-PENDING: drop any that
+    // return zero once the first scans land, per the founders-beat pattern.
+    seeds: [
+      "fr:intelligence artificielle", "fr:capital-risque", "fr:lev\u00e9e de fonds",  // AI, venture capital, funding round
+      "fr:cybers\u00e9curit\u00e9", "fr:fuite de donn\u00e9es", "fr:protection des donn\u00e9es",  // cybersecurity, data leak, data protection
+      "fr:commerce \u00e9lectronique", "fr:transformation num\u00e9rique", "fr:\u00e9conomie num\u00e9rique",  // e-commerce, digital transformation, digital economy
+      "fr:souverainet\u00e9 num\u00e9rique", "fr:cryptomonnaie", "fr:voiture \u00e9lectrique",  // digital sovereignty, cryptocurrency, electric car
+      "fr:\u00e9nergies renouvelables", "fr:changement climatique", "fr:sant\u00e9 num\u00e9rique",  // renewable energy, climate change, digital health
+      "fr:marketing digital", "fr:relations publiques", "fr:hame\u00e7onnage",  // digital marketing, public relations, phishing
+    ],
+    blurb: "French-language coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "intl-id",
+    label: "Indonesian (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan). NOT a user-facing beat: a data-collection set so
+    // Indonesian coverage accrues nightly at ZERO extra cost and is
+    // included in the 1,095-day backfill, ready for a future non-English radar.
+    // Cross-cutting product beats only (AI, funding, cyber, digital economy,
+    // marketing/PR, climate) - deliberately NOT country-specific, since the
+    // country still has to live in the phrase. ALL PROBE-PENDING: drop any that
+    // return zero once the first scans land, per the founders-beat pattern.
+    seeds: [
+      "id:kecerdasan buatan", "id:modal ventura", "id:pendanaan startup",  // AI, venture capital, startup funding
+      "id:keamanan siber", "id:kebocoran data", "id:perlindungan data",  // cybersecurity, data leak, data protection
+      "id:perdagangan elektronik", "id:transformasi digital", "id:ekonomi digital",  // e-commerce, digital transformation, digital economy
+      "id:dompet digital", "id:teknologi finansial", "id:kendaraan listrik",  // digital wallet, fintech, electric vehicle
+      "id:energi terbarukan", "id:perubahan iklim", "id:kesehatan digital",  // renewable energy, climate change, digital health
+      "id:pemasaran digital", "id:media sosial", "id:penipuan online",  // digital marketing, social media, online fraud
+    ],
+    blurb: "Indonesian-language coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "intl-zh",
+    label: "Simplified Chinese (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan). NOT a user-facing beat: a data-collection set so
+    // Simplified Chinese coverage accrues nightly at ZERO extra cost and is
+    // included in the 1,095-day backfill, ready for a future non-English radar.
+    // Cross-cutting product beats only (AI, funding, cyber, digital economy,
+    // marketing/PR, climate) - deliberately NOT country-specific, since the
+    // country still has to live in the phrase. ALL PROBE-PENDING: drop any that
+    // return zero once the first scans land, per the founders-beat pattern.
+    seeds: [
+      "zh:\u4eba\u5de5\u667a\u80fd", "zh:\u751f\u6210\u5f0f\u4eba\u5de5\u667a\u80fd", "zh:\u5927\u8bed\u8a00\u6a21\u578b",  // AI, generative AI, large language model
+      "zh:\u98ce\u9669\u6295\u8d44", "zh:\u7f51\u7edc\u5b89\u5168", "zh:\u6570\u636e\u6cc4\u9732",  // venture capital, cybersecurity, data leak
+      "zh:\u4e2a\u4eba\u4fe1\u606f\u4fdd\u62a4", "zh:\u7535\u5b50\u5546\u52a1", "zh:\u8de8\u5883\u7535\u5546",  // personal data protection, e-commerce, cross-border e-commerce
+      "zh:\u6570\u5b57\u5316\u8f6c\u578b", "zh:\u6570\u5b57\u7ecf\u6d4e", "zh:\u79fb\u52a8\u652f\u4ed8",  // digital transformation, digital economy, mobile payment
+      "zh:\u65b0\u80fd\u6e90\u6c7d\u8f66", "zh:\u6c14\u5019\u53d8\u5316", "zh:\u534a\u5bfc\u4f53",  // new-energy vehicle, climate change, semiconductor
+      "zh:\u82af\u7247\u5236\u9020", "zh:\u6570\u5b57\u8425\u9500", "zh:\u52d2\u7d22\u8f6f\u4ef6",  // chip manufacturing, digital marketing, ransomware
+    ],
+    blurb: "Simplified Chinese-language coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "intl-th",
+    label: "Thai (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan). NOT a user-facing beat: a data-collection set so
+    // Thai coverage accrues nightly at ZERO extra cost and is
+    // included in the 1,095-day backfill, ready for a future non-English radar.
+    // Cross-cutting product beats only (AI, funding, cyber, digital economy,
+    // marketing/PR, climate) - deliberately NOT country-specific, since the
+    // country still has to live in the phrase. ALL PROBE-PENDING: drop any that
+    // return zero once the first scans land, per the founders-beat pattern.
+    seeds: [
+      "th:\u0e1b\u0e31\u0e0d\u0e0d\u0e32\u0e1b\u0e23\u0e30\u0e14\u0e34\u0e29\u0e10\u0e4c", "th:\u0e04\u0e27\u0e32\u0e21\u0e1b\u0e25\u0e2d\u0e14\u0e20\u0e31\u0e22\u0e44\u0e0b\u0e40\u0e1a\u0e2d\u0e23\u0e4c", "th:\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e23\u0e31\u0e48\u0e27\u0e44\u0e2b\u0e25",  // AI, cybersecurity, data leak
+      "th:\u0e40\u0e28\u0e23\u0e29\u0e10\u0e01\u0e34\u0e08\u0e14\u0e34\u0e08\u0e34\u0e17\u0e31\u0e25", "th:\u0e1e\u0e32\u0e13\u0e34\u0e0a\u0e22\u0e4c\u0e2d\u0e34\u0e40\u0e25\u0e47\u0e01\u0e17\u0e23\u0e2d\u0e19\u0e34\u0e01\u0e2a\u0e4c", "th:\u0e23\u0e16\u0e22\u0e19\u0e15\u0e4c\u0e44\u0e1f\u0e1f\u0e49\u0e32",  // digital economy, e-commerce, electric vehicle
+      "th:\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e2a\u0e20\u0e32\u0e1e\u0e20\u0e39\u0e21\u0e34\u0e2d\u0e32\u0e01\u0e32\u0e28", "th:\u0e2a\u0e15\u0e32\u0e23\u0e4c\u0e17\u0e2d\u0e31\u0e1e", "th:\u0e01\u0e32\u0e23\u0e15\u0e25\u0e32\u0e14\u0e14\u0e34\u0e08\u0e34\u0e17\u0e31\u0e25",  // climate change, startup, digital marketing
+      "th:\u0e1e\u0e25\u0e31\u0e07\u0e07\u0e32\u0e19\u0e2b\u0e21\u0e38\u0e19\u0e40\u0e27\u0e35\u0e22\u0e19", "th:\u0e40\u0e17\u0e04\u0e42\u0e19\u0e42\u0e25\u0e22\u0e35\u0e17\u0e32\u0e07\u0e01\u0e32\u0e23\u0e40\u0e07\u0e34\u0e19", "th:\u0e04\u0e27\u0e32\u0e21\u0e22\u0e31\u0e48\u0e07\u0e22\u0e37\u0e19",  // renewable energy, fintech, sustainability
+    ],
+    blurb: "Thai-language coverage for future radars. Not offered in the beat picker.",
+  },
+  {
+    id: "intl-vi",
+    label: "Vietnamese (data only)",
+    hidden: true,
+    // New 2026-09-09 (Irfan). NOT a user-facing beat: a data-collection set so
+    // Vietnamese coverage accrues nightly at ZERO extra cost and is
+    // included in the 1,095-day backfill, ready for a future non-English radar.
+    // Cross-cutting product beats only (AI, funding, cyber, digital economy,
+    // marketing/PR, climate) - deliberately NOT country-specific, since the
+    // country still has to live in the phrase. ALL PROBE-PENDING: drop any that
+    // return zero once the first scans land, per the founders-beat pattern.
+    seeds: [
+      "vi:tr\u00ed tu\u1ec7 nh\u00e2n t\u1ea1o", "vi:an ninh m\u1ea1ng", "vi:r\u00f2 r\u1ec9 d\u1eef li\u1ec7u",  // AI, cybersecurity, data leak
+      "vi:th\u01b0\u01a1ng m\u1ea1i \u0111i\u1ec7n t\u1eed", "vi:chuy\u1ec3n \u0111\u1ed5i s\u1ed1", "vi:kinh t\u1ebf s\u1ed1",  // e-commerce, digital transformation, digital economy
+      "vi:thanh to\u00e1n \u0111i\u1ec7n t\u1eed", "vi:\u0111\u1ea7u t\u01b0 m\u1ea1o hi\u1ec3m", "vi:kh\u1edfi nghi\u1ec7p",  // electronic payment, venture capital, startup
+      "vi:xe \u0111i\u1ec7n", "vi:n\u0103ng l\u01b0\u1ee3ng t\u00e1i t\u1ea1o", "vi:bi\u1ebfn \u0111\u1ed5i kh\u00ed h\u1eadu",  // electric vehicle, renewable energy, climate change
+      "vi:ti\u1ebfp th\u1ecb s\u1ed1", "vi:c\u00f4ng ngh\u1ec7 t\u00e0i ch\u00ednh", "vi:b\u1ea3o m\u1eadt th\u00f4ng tin",  // digital marketing, fintech, information security
+      "vi:trung t\u00e2m d\u1eef li\u1ec7u",  // data centre
+    ],
+    blurb: "Vietnamese-language coverage for future radars. Not offered in the beat picker.",
   },
 ];
 

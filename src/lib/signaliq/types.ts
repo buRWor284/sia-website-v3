@@ -8,7 +8,14 @@
  * will break. Every signal carries its primary-source `url` (receipts).
  */
 
-export type BeatId = "saas" | "fintech" | "health" | "climate" | "ai" | "cybersecurity" | "agency" | "founders" | "ksa-tourism" | "ksa-giga" | "ksa-banking" | "ksa-retail";
+export type BeatId =
+  | "saas" | "fintech" | "health" | "climate" | "ai" | "cybersecurity" | "agency" | "founders"
+  | "travel" | "longevity" | "beauty" | "commerce"
+  // Radar/data-collection beats — hidden from the public beat picker (see Beat.hidden).
+  | "ksa-tourism" | "ksa-giga" | "ksa-banking" | "ksa-retail"
+  | "intl-es" | "intl-fr" | "intl-id" | "intl-zh" | "intl-th" | "intl-vi"
+  | "energy" | "mobility" | "property" | "work" | "media" | "industry"
+  | "food" | "education" | "policy" | "web3";
 
 export interface Beat {
   id: BeatId;
@@ -16,6 +23,15 @@ export interface Beat {
   /** Search seeds used to query sources for this beat. */
   seeds: string[];
   blurb: string;
+  /**
+   * Hidden beats still ride the nightly coverage scan (which reads every beat)
+   * but are NOT offered in the public beat picker. They exist to accrue data for
+   * the radar pages and for future non-English markets, and would be nonsense as
+   * a user's "primary beat" — a SaaS founder has no use for "KSA Retail" or a
+   * bag of Spanish phrases. Label lookups must still search ALL beats so saved
+   * scans keep rendering; only the SELECTION lists filter on this.
+   */
+  hidden?: boolean;
 }
 
 export type SourceId = "gdelt" | "hackernews" | "sec" | "wikipedia" | "arxiv";

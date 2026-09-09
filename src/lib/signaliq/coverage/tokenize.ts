@@ -59,6 +59,7 @@ export const LANGS: Record<string, string> = {
   es: "es",
   fr: "fr",
   id: "id", // ★ also the right code for MALAY: `ms` does not appear in the data.
+  vi: "vi", // Vietnamese — spaces separate SYLLABLES, so normal word tokenising works.
   zh: "zh", // Simplified Chinese — 2nd largest language in webngrams.
   "zh-tw": "zh-TW", // Traditional Chinese, a separate value in the column.
   ja: "ja",
