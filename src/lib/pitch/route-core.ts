@@ -131,7 +131,14 @@ export async function runScoreRequest(
       },
       body: JSON.stringify({
         model: PITCH_MODEL,
-        max_tokens: 3500,
+        // Raised 3500 -> 8000 on 2026-09-09. The tool schema asks for a score,
+        // a note, a topFix AND an analysis paragraph for each of seven
+        // dimensions, and a long pitch reliably blew the 3500 ceiling. When it
+        // did, the tool_use block came back TRUNCATED — relevance populated,
+        // everything after it missing — and parseAiResult scored each missing
+        // dimension 0, so a good pitch was reported to the customer as
+        // "COLD · will be ignored". Found in the first real EMOS run.
+        max_tokens: 8000,
         temperature: 0.2,
         system: SYSTEM_PROMPT,
         tools: [SCORE_TOOL],
@@ -146,7 +153,24 @@ export async function runScoreRequest(
       return { ok: false, error: "Couldn't score the pitch right now. Please try again in a moment.", status: 502 };
     }
 
-    const json = (await res.json()) as { content?: Array<{ type: string; name?: string; input?: unknown }> };
+    const json = (await res.json()) as {
+      content?: Array<{ type: string; name?: string; input?: unknown }>;
+      stop_reason?: string;
+    };
+
+    // A max_tokens stop means the model was cut off mid tool-call. The block
+    // that arrives still parses, so without this check a partial answer is
+    // indistinguishable from a complete one and silently becomes a score.
+    // Failing loudly is right: a wrong verdict is worse than no verdict.
+    if (json.stop_reason === "max_tokens") {
+      console.error("pitch-score: model output truncated (stop_reason=max_tokens)");
+      return {
+        ok: false,
+        error: "The analysis was cut short before it finished. Please try again — a shorter pitch scores more reliably.",
+        status: 502,
+      };
+    }
+
     aiContent = json.content ?? [];
   } catch (e) {
     console.error("pitch-score route error:", e);

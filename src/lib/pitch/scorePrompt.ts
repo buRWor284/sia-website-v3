@@ -222,13 +222,24 @@ export function parseAiResult(content: ToolUseBlock[]): AiScore {
   const raw = block.input as Record<string, unknown>;
 
   const obj = (v: unknown): Record<string, unknown> => (typeof v === "object" && v !== null ? (v as Record<string, unknown>) : {});
-  const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? Math.max(0, Math.min(100, Math.round(v))) : 0);
+
+  // 2026-09-09: a dimension that never ARRIVED must not be reported as a
+  // dimension the model scored ZERO. Before this, `num` mapped both to 0, so a
+  // truncated tool call produced a confident "COLD · will be ignored" verdict
+  // on a strong pitch — five dimensions at exactly 0 with no analysis text.
+  // Throwing here routes into the existing parse-error path in route-core,
+  // which returns a 502 and asks the user to retry, instead of inventing a
+  // score. Found in the first real EMOS run (KSA retail radar → Arab News).
+  const numRequired = (v: unknown, label: string): number => {
+    if (typeof v === "number" && Number.isFinite(v)) return Math.max(0, Math.min(100, Math.round(v)));
+    throw new Error(`Incomplete model output: "${label}" score missing (likely a truncated tool call).`);
+  };
   const str = (v: unknown): string | undefined => (typeof v === "string" && v.trim() ? v.trim() : undefined);
   const bool = (v: unknown): boolean | undefined => (typeof v === "boolean" ? v : undefined);
 
   const rel = obj(raw.relevance);
   const relevance = rel.assessed === true
-    ? { score: num(rel.score), note: str(rel.note), topFix: str(rel.topFix), analysis: str(rel.analysis), answersExactQuestion: bool(rel.answersExactQuestion) }
+    ? { score: numRequired(rel.score, "relevance"), note: str(rel.note), topFix: str(rel.topFix), analysis: str(rel.analysis), answersExactQuestion: bool(rel.answersExactQuestion) }
     : null;
 
   const checklistRaw = obj(raw.checklist);
@@ -249,11 +260,11 @@ export function parseAiResult(content: ToolUseBlock[]): AiScore {
 
   return {
     relevance,
-    checklist: { score: num(checklistRaw.score), analysis: str(checklistRaw.analysis), steps },
-    storytelling: { score: num(story.score), note: str(story.note), topFix: str(story.topFix), analysis: str(story.analysis), hasArc: bool(story.hasArc), hasCharacter: bool(story.hasCharacter) },
-    neuromarketing: { score: num(neuro.score), note: str(neuro.note), topFix: str(neuro.topFix), analysis: str(neuro.analysis), usesOriginalData: bool(neuro.usesOriginalData), borrowedStatsOnly: bool(neuro.borrowedStatsOnly), subjectTwoSecond: bool(neuro.subjectTwoSecond) },
-    personalBrand: { score: num(brand.score), note: str(brand.note), topFix: str(brand.topFix), analysis: str(brand.analysis), reflectsAuthority: bool(brand.reflectsAuthority) },
-    newsroomReady: { score: num(nr.score), note: str(nr.note), topFix: str(nr.topFix), analysis: str(nr.analysis), originalData: bool(nr.originalData), sourceAccess: bool(nr.sourceAccess), assets: bool(nr.assets), timeliness: bool(nr.timeliness) },
+    checklist: { score: numRequired(checklistRaw.score, "checklist"), analysis: str(checklistRaw.analysis), steps },
+    storytelling: { score: numRequired(story.score, "storytelling"), note: str(story.note), topFix: str(story.topFix), analysis: str(story.analysis), hasArc: bool(story.hasArc), hasCharacter: bool(story.hasCharacter) },
+    neuromarketing: { score: numRequired(neuro.score, "neuromarketing"), note: str(neuro.note), topFix: str(neuro.topFix), analysis: str(neuro.analysis), usesOriginalData: bool(neuro.usesOriginalData), borrowedStatsOnly: bool(neuro.borrowedStatsOnly), subjectTwoSecond: bool(neuro.subjectTwoSecond) },
+    personalBrand: { score: numRequired(brand.score, "personalBrand"), note: str(brand.note), topFix: str(brand.topFix), analysis: str(brand.analysis), reflectsAuthority: bool(brand.reflectsAuthority) },
+    newsroomReady: { score: numRequired(nr.score, "newsroomReady"), note: str(nr.note), topFix: str(nr.topFix), analysis: str(nr.analysis), originalData: bool(nr.originalData), sourceAccess: bool(nr.sourceAccess), assets: bool(nr.assets), timeliness: bool(nr.timeliness) },
     authenticityRisk: auth.flagged === true ? { flagged: true, note: str(auth.note) } : { flagged: false },
     strongestLine: str(raw.strongestLine),
     overallNote: str(raw.overallNote),
