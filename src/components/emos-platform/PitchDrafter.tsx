@@ -30,6 +30,7 @@ const INK35  = "rgba(26,20,16,.32)";
 const INK15  = "rgba(26,20,16,.15)";
 const YEL    = "#f5b81f";
 const GREEN  = "#3e6b45";
+const AMBER  = "#d99211";
 const RED    = "#c14a32";
 const GROT   = "var(--font-grot)";
 const SERIF  = "var(--font-serif)";
@@ -62,13 +63,18 @@ const LINK: React.CSSProperties = {
 };
 
 function DraftCard({
-  draft, onUse, onDeleted,
+  draft, onUse, onDeleted, defaultOpen,
 }: {
   draft: Draft;
   onUse: (d: Draft) => void;
   onDeleted?: (draftId: string) => void;
+  /** Freshly generated drafts open; saved ones start collapsed. */
+  defaultOpen?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
+  // Collapsed by default. Three expanded pitches ran to roughly 1200px of prose
+  // and buried everything below them — the same mistake PackLibrary avoids.
+  const [open, setOpen] = useState(defaultOpen ?? false);
   const [editing, setEditing] = useState(false);
   const [subject, setSubject] = useState(draft.subject);
   const [body, setBody] = useState(draft.body);
@@ -116,16 +122,31 @@ function DraftCard({
 
   return (
     <div style={{ border: `1px solid ${INK}`, background: PAPER }}>
-      <div style={{ background: INK, color: PAPER, padding: "8px 14px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 13.5 }}>{draft.journalistName}</span>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: "100%", textAlign: "left", cursor: "pointer", border: "none",
+          background: INK, color: PAPER, padding: "8px 14px",
+          display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
+        }}
+      >
+        <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 13.5 }}>
+          {open ? "▾ " : "▸ "}{draft.journalistName}
+        </span>
+        {!open && (
+          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: "rgba(241,235,222,.7)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 420 }}>
+            {subject}
+          </span>
+        )}
         {!draft.draftId && (
           <span style={{ fontFamily: MONO, fontSize: 8.5, color: "rgba(241,235,222,.55)" }}>not saved</span>
         )}
         <span style={{ marginLeft: "auto", fontFamily: MONO, fontSize: 9, color: "rgba(241,235,222,.6)" }}>
           {body.trim().split(/\s+/).filter(Boolean).length} words
         </span>
-      </div>
+      </button>
 
+      {open && (
       <div style={{ padding: "12px 14px" }}>
         <div style={FIELD_LABEL}>Subject</div>
         {editing ? (
@@ -171,6 +192,7 @@ function DraftCard({
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
@@ -231,6 +253,7 @@ export default function PitchDrafter({
 }) {
   const ctx = useCompanyOptional();
   const historyById = useMemo(() => new Map(history.map(h => [h.journalistId, h])), [history]);
+
   const activeCompanyId = ctx?.company?.id ?? null;
   const activeCompanyName = ctx?.company?.name ?? null;
 
@@ -243,9 +266,21 @@ export default function PitchDrafter({
   const [error, setError] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Draft[] | null>(null);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
+  const [confirmRedraft, setConfirmRedraft] = useState(false);
+  // How many drafts already exist per journalist, so a second one is a
+  // deliberate choice rather than a surprise. Counted before the call is made,
+  // because the point is to save the spend, not to explain it afterwards.
+  const draftCountById = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const d of savedDrafts) {
+      if (!d.journalist_id || dismissed.has(d.id)) continue;
+      m.set(d.journalist_id, (m.get(d.journalist_id) ?? 0) + 1);
+    }
+    return m;
+  }, [savedDrafts, dismissed]);
 
   // "All journalists for one company" is the ask. It only works because the
-  // CRM now records which company each journalist was found for.
+  // journalist list now records which company each journalist was found for.
   const pool = useMemo(() => {
     if (scope === "all" || !activeCompanyId) return journalists;
     return journalists.filter(j => j.company_id === activeCompanyId);
@@ -264,8 +299,14 @@ export default function PitchDrafter({
   function selectAll() { setSelected(new Set(pool.slice(0, MAX_BATCH).map(j => j.id))); }
   function clearAll() { setSelected(new Set()); }
 
-  async function run() {
+  const alreadyDrafted = chosen.filter(j => (draftCountById.get(j.id) ?? 0) > 0);
+
+  async function run(force = false) {
     if (chosen.length === 0 || busy) return;
+    // Warn BEFORE the call: re-drafting for someone who already has one costs a
+    // model call and quietly leaves two versions to choose between later.
+    if (!force && alreadyDrafted.length > 0) { setConfirmRedraft(true); return; }
+    setConfirmRedraft(false);
     setBusy(true); setError(null); setDrafts(null);
     try {
       const res = await fetch("/api/emos-platform/pitch-draft", {
@@ -316,7 +357,7 @@ export default function PitchDrafter({
                 <option value="company">
                   {activeCompanyName ? `${activeCompanyName} only` : "The selected company"}
                 </option>
-                <option value="all">Every journalist in the CRM</option>
+                <option value="all">Every journalist in the list</option>
               </select>
               <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
                 {pool.length} journalist{pool.length === 1 ? "" : "s"} · {chosen.length} selected
@@ -330,7 +371,7 @@ export default function PitchDrafter({
             {pool.length === 0 ? (
               <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
                 No journalists recorded against this company yet. Find some in JournoCollabIQ, or switch to
-                every journalist in the CRM.
+                every journalist in the list.
               </p>
             ) : (
               <div style={{ maxHeight: 220, overflowY: "auto", border: `1px solid ${INK15}`, background: PAPER }}>
@@ -352,6 +393,17 @@ export default function PitchDrafter({
                           compact
                         />
                       </span>
+                      {(draftCountById.get(j.id) ?? 0) > 0 && (
+                        <span style={{ display: "block", marginTop: 3 }}>
+                          <span style={{
+                            fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".06em",
+                            textTransform: "uppercase", color: AMBER, border: `1px solid ${AMBER}`,
+                            padding: "1px 5px",
+                          }}>
+                            {draftCountById.get(j.id)} draft{(draftCountById.get(j.id) ?? 0) > 1 ? "s" : ""} already
+                          </span>
+                        </span>
+                      )}
                       {selected.has(j.id) && <RecentWorkField journalist={j} />}
                     </span>
                   </label>
@@ -394,7 +446,7 @@ export default function PitchDrafter({
 
             <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <button
-                onClick={run}
+                onClick={() => run()}
                 disabled={chosen.length === 0 || busy}
                 style={{
                   background: chosen.length && !busy ? YEL : "transparent",
@@ -416,6 +468,25 @@ export default function PitchDrafter({
               )}
               {error && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: RED }}>{error}</span>}
             </div>
+
+            {confirmRedraft && (
+              <div style={{ border: `1px solid ${AMBER}`, background: "rgba(217,146,17,.10)", padding: "11px 13px", display: "grid", gap: 9 }}>
+                <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, lineHeight: 1.5, color: INK }}>
+                  {alreadyDrafted.length === 1
+                    ? <>You already have a draft for <strong>{alreadyDrafted[0].name}</strong>. Drafting again costs another call and leaves you two versions to choose between.</>
+                    : <>{alreadyDrafted.length} of these already have drafts ({alreadyDrafted.map(j => j.name).join(", ")}). Drafting again costs another call each and leaves duplicate versions.</>}
+                </p>
+                <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                  <button onClick={() => run(true)} style={{ ...LINK, color: INK, borderBottomColor: INK }}>
+                    Draft again anyway
+                  </button>
+                  <button onClick={() => setConfirmRedraft(false)} style={LINK}>Cancel</button>
+                  <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+                    Existing drafts are in Saved drafts below.
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
           {savedDrafts.filter(d => !dismissed.has(d.id)).length > 0 && (
@@ -448,6 +519,7 @@ export default function PitchDrafter({
               {drafts.map(d => (
                 <DraftCard
                   key={d.journalistId}
+                  defaultOpen
                   draft={d}
                   onUse={u => onUseDraft({ journalistId: u.journalistId, subject: u.subject, body: u.body })}
                   onDeleted={id => setDismissed(prev => new Set(prev).add(id))}

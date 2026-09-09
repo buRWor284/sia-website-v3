@@ -17,7 +17,7 @@
  *   - the PDF report (ungated parity)
  */
 
-import React, { useEffect, useMemo, useState, useTransition } from "react";
+import React, { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { createPitch } from "@/app/emos-platform/actions/coverageiq";
@@ -339,7 +339,13 @@ export default function PressIQPlatformClient({
 
   // 2026-09-09: clear the "n new scores this session" hint once a refresh has
   // actually brought the new rows down, so the hint never outlives its own fix.
-  useEffect(() => { setNewScoreCount(0); }, [initialScores.length]);
+  // Adjusted during render rather than in an effect — the effect version was a
+  // react-hooks/set-state-in-effect error and cost an extra render pass.
+  const [seenScoreCount, setSeenScoreCount] = useState(initialScores.length);
+  if (seenScoreCount !== initialScores.length) {
+    setSeenScoreCount(initialScores.length);
+    setNewScoreCount(0);
+  }
 
   // ── transport: Clerk-guarded platform route (no Turnstile, no quota) ────────
   const api = {
@@ -380,64 +386,58 @@ export default function PressIQPlatformClient({
       <style>{PIQ_CSS}</style>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" strategy="lazyOnload" />
 
-      {/* ── Which company this pitch is for. PressIQ was the only
-             company-consuming tool without a visible picker: it read the active
-             company correctly for the score, but you could not see or change
-             it from this page (found 2026-09-09). ─────────────────────────── */}
-      <CompanyPicker note="Used by every EMOS tool" />
-
-      {/* ── Who and what this pitch is for ───────────────────────────────────
-             Before 2026-09-09 PressIQ could not aim a pitch at a saved
-             journalist or point it at a saved asset, so a scored pitch was
-             anonymous and the CRM never learned it existed. ─────────────── */}
-      <div style={{ border: `1px solid ${INK}`, background: PAPER2, marginBottom: 22 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "10px 14px" }}>
-          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 7px", flexShrink: 0 }}>
-            Pitching to
-          </span>
-
-          {initialJournalists.length === 0 ? (
-            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-              No saved journalists yet. Find some in JournoCollabIQ and they will appear here.
+      {/* ── One context bar: company, journalist, asset ───────────────────
+             Until 2026-09-09 this page opened with two stacked full-width
+             bars (WORKING FOR, then PITCHING TO) plus the stats strip above
+             them — roughly 400px of chrome before the tool itself. They are
+             one bar now, and the picker's own add/edit/delete links moved
+             behind "Manage". ────────────────────────────────────────────── */}
+      <CompanyPicker
+        note="Used by every EMOS tool"
+        extra={
+          <>
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 7px", flexShrink: 0 }}>
+              Pitching to
             </span>
-          ) : (
-            <select
-              value={journalistId}
-              onChange={e => setJournalistId(e.target.value)}
-              style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 340 }}
-            >
-              <option value="">Nobody in particular</option>
-              {initialJournalists.map(j => (
-                <option key={j.id} value={j.id}>
-                  {j.name}{j.outlet ? ` · ${j.outlet}` : ""}{j.beat ? ` · ${j.beat}` : ""}
-                </option>
-              ))}
-            </select>
-          )}
 
-          {initialAssets.length > 0 && (
-            <>
-              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
-                about
+            {initialJournalists.length === 0 ? (
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+                No saved journalists yet — find some in JournoCollabIQ.
               </span>
+            ) : (
               <select
-                value={assetId}
-                onChange={e => setAssetId(e.target.value)}
-                style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 320 }}
+                value={journalistId}
+                onChange={e => setJournalistId(e.target.value)}
+                style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 260 }}
               >
-                <option value="">No particular asset</option>
-                {initialAssets.map(a => <option key={a.id} value={a.id}>{a.title}</option>)}
+                <option value="">Nobody in particular</option>
+                {initialJournalists.map(j => (
+                  <option key={j.id} value={j.id}>
+                    {j.name}{j.outlet ? ` · ${j.outlet}` : ""}{j.beat ? ` · ${j.beat}` : ""}
+                  </option>
+                ))}
               </select>
-            </>
-          )}
+            )}
 
-          <span style={{ marginLeft: "auto", fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
-            Saved with the score, and carried into CoverageIQ when you track it.
-          </span>
-        </div>
-
-        {journalist && (
-          <div style={{ padding: "10px 14px", borderTop: `1px solid ${INK15}`, background: PAPER, display: "flex", gap: 14, flexWrap: "wrap", alignItems: "baseline" }}>
+            {initialAssets.length > 0 && (
+              <>
+                <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+                  about
+                </span>
+                <select
+                  value={assetId}
+                  onChange={e => setAssetId(e.target.value)}
+                  style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 240 }}
+                >
+                  <option value="">No particular asset</option>
+                  {initialAssets.map(a => <option key={a.id} value={a.id}>{a.title}</option>)}
+                </select>
+              </>
+            )}
+          </>
+        }
+        detail={journalist ? (
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", alignItems: "baseline" }}>
             <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: INK }}>{journalist.name}</span>
             {journalist.outlet && <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, color: INK55 }}>{journalist.outlet}</span>}
             {journalist.beat && (
@@ -458,8 +458,8 @@ export default function PressIQPlatformClient({
               activeCompanyId={companyCtx?.company?.id ?? null}
             />
           </div>
-        )}
-      </div>
+        ) : null}
+      />
 
       {/* ── Reopened-score banner ─────────────────────────────────────────── */}
       {reopened && (

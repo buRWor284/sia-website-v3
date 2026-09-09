@@ -94,7 +94,7 @@ export default async function JournoCollabIQPage({
         {/* Stats strip */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", border: `1px solid ${INK}`, marginBottom: 32 }}>
           {[
-            { num: journalists.length, label: "In CRM" },
+            { num: journalists.length, label: "In list" },
             { num: pitchesTotal,       label: "Pitches sent" },
             { num: placementsTotal,    label: "Placements" },
             { num: avgDR > 0 ? avgDR : "—", label: "Avg DR" },

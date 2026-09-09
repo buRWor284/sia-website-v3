@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * JournoCollabIQ Platform — AI journalist discovery wizard + CRM
+ * JournoCollabIQ Platform — AI journalist discovery wizard + journalist list
  *
  * Layout:
  *   ① Story setup form (pre-fillable from SignalIQ/AssetIQ context)
  *   ② AI journalist suggestions — 8 journalists ranked by fit
- *   ③ Per journalist: why they'd cover it, angle generator, "Save to CRM →"
+ *   ③ Per journalist: why they'd cover it, angle generator, "Save to list →"
  *   ④ Saved journalist CRM list below
  */
 
@@ -261,7 +261,7 @@ function JournalistCard({
       const created = await createJournalist(input);
       // Only mark saved + insert into the CRM list when the write actually
       // succeeded (createJournalist returns null on failure). Prepending the new
-      // row makes it appear in the CRM table instantly — no page refresh needed.
+      // row makes it appear in the list instantly — no page refresh needed.
       if (created?.id) {
         onSaved(j.name, {
           id:             created.id,
@@ -391,7 +391,7 @@ function JournalistCard({
           )}
           <button onClick={handleSave} disabled={saving || alreadySaved}
             style={{ padding: "8px 16px", border: "none", background: alreadySaved ? PAPER2 : YEL, color: alreadySaved ? INK55 : INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", cursor: alreadySaved ? "default" : saving ? "wait" : "pointer" }}>
-            {saving ? "Saving…" : alreadySaved ? "✓ Saved to CRM" : "Save to CRM →"}
+            {saving ? "Saving…" : alreadySaved ? "✓ Saved to list" : "Save to list →"}
           </button>
         </div>
       </div>
@@ -399,7 +399,7 @@ function JournalistCard({
   );
 }
 
-// ── CRM list ───────────────────────────────────────────────────────────────────
+// ── Journalist list ───────────────────────────────────────────────────────────────────
 
 function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDelete: (id: string) => void }) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -762,7 +762,7 @@ export default function JournoCollabIQClient({
       {/* CRM */}
       <div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 14 }}>
-          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase" }}>Journalist CRM</span>
+          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase" }}>Journalist List</span>
           <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 20, color: INK }}>{journalists.length}</span>
           <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>saved</span>
         </div>

@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
   }
   const rows = (journalists ?? []) as { id: string; name: string; outlet: string | null; beat: string | null; notes: string | null; recent_work: string | null }[];
   if (rows.length === 0) {
-    return NextResponse.json({ error: "None of those journalists are in your CRM." }, { status: 400 });
+    return NextResponse.json({ error: "None of those journalists are in your list." }, { status: 400 });
   }
 
   const brief: DraftBrief = {

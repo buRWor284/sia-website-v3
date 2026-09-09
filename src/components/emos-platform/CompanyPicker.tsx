@@ -12,6 +12,12 @@
  * Three panels, one open at a time: add, edit (rename / description / website),
  * and an inline delete confirm. Deliberately no window.confirm — a native
  * dialog blocks the page and reads as an alert rather than a choice.
+ *
+ * 2026-09-09: add/edit/delete moved behind one "Manage" link, and the bar took
+ * two optional slots — `extra` (more context controls on the same line) and
+ * `detail` (a sub-row under it). PressIQ was stacking this bar and its own
+ * "Pitching to" bar, ~90px of chrome before the tool; they are now one box.
+ * Tools that pass neither slot render exactly as before, minus the three links.
  */
 
 import React, { useState } from "react";
@@ -121,9 +127,18 @@ function EditCompanyForm({
   );
 }
 
-export default function CompanyPicker({ note }: { note?: string }) {
+export default function CompanyPicker({
+  note, extra, detail,
+}: {
+  note?: string;
+  /** Further context controls for this tool, shown on the same line. */
+  extra?: React.ReactNode;
+  /** A sub-row under the bar — detail about whatever `extra` selected. */
+  detail?: React.ReactNode;
+}) {
   const ctx = useCompanyOptional();
   const [panel, setPanel] = useState<Panel>("none");
+  const [manage, setManage] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -145,6 +160,14 @@ export default function CompanyPicker({ note }: { note?: string }) {
   function toggle(p: Panel) {
     setError(null);
     setPanel(cur => (cur === p ? "none" : p));
+  }
+
+  function toggleManage() {
+    setError(null);
+    setManage(m => {
+      if (m) setPanel("none");
+      return !m;
+    });
   }
 
   async function handleAdd() {
@@ -178,7 +201,7 @@ export default function CompanyPicker({ note }: { note?: string }) {
     <div style={{ border: `1px solid ${INK}`, marginBottom: 22, background: PAPER2 }}>
       <div style={{
         display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
-        padding: "10px 14px", borderBottom: panel === "none" ? "none" : `1px solid ${INK15}`,
+        padding: "10px 14px",
       }}>
         <span style={LABEL}>Working for</span>
 
@@ -200,23 +223,23 @@ export default function CompanyPicker({ note }: { note?: string }) {
           </select>
         )}
 
-        <button onClick={() => toggle("add")} style={LINK}>
-          {panel === "add" ? "Cancel" : "+ Add company"}
-        </button>
-
-        {saved && (
-          <button onClick={() => toggle("edit")} style={LINK}>
-            {panel === "edit" ? "Cancel" : "Edit"}
+        {/* With nothing saved, "Manage" would bury the only action that
+            matters, so the first company is added straight from the bar. */}
+        {empty ? (
+          <button onClick={() => toggle("add")} style={LINK}>
+            {panel === "add" ? "Cancel" : "+ Add company"}
+          </button>
+        ) : (
+          <button onClick={toggleManage} style={LINK}>
+            {manage ? "Done" : "Manage"}
           </button>
         )}
 
-        {saved && (
-          <button
-            onClick={() => toggle("confirmDelete")}
-            style={{ ...LINK, color: RED, borderBottomColor: RED }}
-          >
-            {panel === "confirmDelete" ? "Cancel" : "Delete"}
-          </button>
+        {extra && (
+          <>
+            <span aria-hidden style={{ width: 1, alignSelf: "stretch", background: INK15, margin: "0 2px" }} />
+            {extra}
+          </>
         )}
 
         <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
@@ -227,21 +250,56 @@ export default function CompanyPicker({ note }: { note?: string }) {
           )}
           {!saving && saved && (
             <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: GREEN }}>
-              ✓ Saved to your account
+              ✓ Saved
             </span>
           )}
-          {!empty && (
+          {/* On a crowded bar (PressIQ) the standing explanations are dropped —
+              they are one-time learning, and they cost a line every visit. */}
+          {!extra && !empty && (
             <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
               Switching here switches every tool.
             </span>
           )}
-          {note && (
+          {!extra && note && (
             <span style={{ fontFamily: GROT, fontSize: 8.5, letterSpacing: ".1em", textTransform: "uppercase", color: INK55 }}>
               {note}
             </span>
           )}
         </span>
       </div>
+
+      {detail && (
+        <div style={{ padding: "9px 14px", borderTop: `1px solid ${INK15}`, background: PAPER }}>
+          {detail}
+        </div>
+      )}
+
+      {manage && (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
+          padding: "9px 14px", borderTop: `1px solid ${INK15}`, background: PAPER,
+        }}>
+          <button onClick={() => toggle("add")} style={LINK}>
+            {panel === "add" ? "Cancel" : "+ Add company"}
+          </button>
+          {saved && (
+            <button onClick={() => toggle("edit")} style={LINK}>
+              {panel === "edit" ? "Cancel" : "Edit"}
+            </button>
+          )}
+          {saved && (
+            <button
+              onClick={() => toggle("confirmDelete")}
+              style={{ ...LINK, color: RED, borderBottomColor: RED }}
+            >
+              {panel === "confirmDelete" ? "Cancel" : "Delete"}
+            </button>
+          )}
+          <span style={{ marginLeft: "auto", fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+            Switching the company above switches every EMOS tool.
+          </span>
+        </div>
+      )}
 
       {error && (
         <div style={{

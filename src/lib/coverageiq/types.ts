@@ -60,7 +60,7 @@ export interface DbJournalist {
   placements: number;
   notes: string | null;
   tags: string[];
-  /** 2026-09-09 (state layer phase 5): WHY this journalist is in the CRM —
+  /** 2026-09-09 (state layer phase 5): WHY this journalist is in the list —
    * resolved from the most recent journalist_context row. All optional so every
    * pre-existing consumer keeps working; null for the journalists saved before
    * the context layer existed. */

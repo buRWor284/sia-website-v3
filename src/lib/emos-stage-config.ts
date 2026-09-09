@@ -78,7 +78,7 @@ export const STAGE_META: Record<EmosStage, {
   },
   collab:   {
     label:       "JournoCollabIQ",
-    tool:        "Journalist CRM",
+    tool:        "Journalist List",
     path:        "/emos-platform/dashboard/journocollabiq",
     description: "Build and manage journalist relationships. Track every touchpoint.",
     threshold:   "Save 3 journalists to advance to PressIQ",

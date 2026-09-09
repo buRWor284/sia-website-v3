@@ -50,7 +50,7 @@ const MONO   = "var(--font-mono)";
 const PIPELINE: Array<{ n: string; label: string; tool: string; desc: string }> = [
   { n: "01", label: "SignalIQ",       tool: "Story Detection",       desc: "Scan open data for newsworthy signals and save the strongest opportunities." },
   { n: "02", label: "AssetIQ",        tool: "Linkable Asset Builder", desc: "Turn a signal into a linkable asset — a report, calculator, or quiz worth citing." },
-  { n: "03", label: "JournoCollabIQ", tool: "Journalist CRM",        desc: "Build and manage journalist relationships and track every touchpoint." },
+  { n: "03", label: "JournoCollabIQ", tool: "Journalist List",        desc: "Build and manage journalist relationships and track every touchpoint." },
   { n: "04", label: "PressIQ",        tool: "Pitch Scoring",         desc: "Score and sharpen each pitch against a 32-point journalist rubric before you send." },
   { n: "05", label: "CoverageIQ",     tool: "Pitch Tracking",        desc: "Track the full pipeline from drafted to published to amplified." },
 ];
