@@ -125,6 +125,66 @@ function Markdown({ text, size = 13.5 }: { text: string; size?: number }) {
   return <div style={{ fontFamily: SERIF, color: INK }}>{out}</div>;
 }
 
+/**
+ * Print rules for the two AI panels (2026-09-09, Irfan's request during the
+ * gate-03 follow-up). "Save as PDF" is deliberately the browser's own print
+ * dialog rather than jsPDF: the panel is already typeset the way we want it,
+ * and Cmd+P -> Save as PDF is a route every user already knows.
+ *
+ * visibility (not display) hides the rest of the page, because display:none
+ * collapses layout and takes the printable panel's own positioning with it.
+ */
+const AIQ_PRINT_CSS = `
+@media print {
+  body * { visibility: hidden !important; }
+  .aiq-print, .aiq-print * { visibility: visible !important; }
+  .aiq-print {
+    position: absolute !important; left: 0 !important; top: 0 !important;
+    width: 100% !important; border: none !important; padding: 0 !important;
+    background: #fff !important;
+  }
+  .aiq-noprint, .aiq-noprint * { display: none !important; }
+}`;
+
+/** Copy / Save-as-PDF actions for a generated panel. */
+function BriefActions({ text }: { text: string }) {
+  const [copied, setCopied] = useState<"idle" | "ok" | "fail">("idle");
+
+  const btn: React.CSSProperties = {
+    background: "transparent",
+    border: `1px solid ${INK15}`,
+    fontFamily: GROT,
+    fontWeight: 700,
+    fontSize: 8.5,
+    letterSpacing: ".10em",
+    textTransform: "uppercase",
+    color: INK55,
+    padding: "4px 9px",
+    cursor: "pointer",
+  };
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied("ok");
+    } catch {
+      // Clipboard can be blocked (permissions, insecure context, older Safari).
+      setCopied("fail");
+    }
+    setTimeout(() => setCopied("idle"), 2000);
+  }
+
+  return (
+    <div className="aiq-noprint" style={{ display: "flex", gap: 6, alignItems: "center" }}>
+      <style>{AIQ_PRINT_CSS}</style>
+      <button type="button" onClick={copy} style={copied === "ok" ? { ...btn, color: GREEN, borderColor: GREEN } : btn}>
+        {copied === "ok" ? "\u2713 Copied" : copied === "fail" ? "Select & copy" : "Copy"}
+      </button>
+      <button type="button" onClick={() => window.print()} style={btn}>Save as PDF</button>
+    </div>
+  );
+}
+
 // ── helpers ────────────────────────────────────────────────────────────────────
 const ASSET_TYPES: { id: AssetType; label: string; description: string }[] = [
   { id: "research_report", label: "Research Report",  description: "Original data study or survey with shareable findings" },
@@ -424,13 +484,16 @@ function AssetRow({
 
           {/* Brief output */}
           {brief && (
-            <div style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "14px 16px" }} onClick={e => e.stopPropagation()}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <div className="aiq-print" style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "14px 16px" }} onClick={e => e.stopPropagation()}>
+              <div className="aiq-noprint" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 10, flexWrap: "wrap" }}>
                 <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>AI creation brief</span>
-                <button onClick={() => setBrief(null)} style={{ background: "transparent", border: "none", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, color: INK35, cursor: "pointer", letterSpacing: ".10em", textTransform: "uppercase" }}>✕ Close</button>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <BriefActions text={brief} />
+                  <button onClick={() => setBrief(null)} style={{ background: "transparent", border: "none", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, color: INK35, cursor: "pointer", letterSpacing: ".10em", textTransform: "uppercase" }}>✕ Close</button>
+                </div>
               </div>
               <Markdown text={brief} size={13.5} />
-              <div style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
+              <div className="aiq-noprint" style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
                 <a
                   href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent((asset.description ?? "").slice(0, 200))}`}
                   style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}
@@ -645,12 +708,15 @@ export default function AssetIQClient({
             {planError && <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: RED }}>{planError}</p>}
 
             {creationPlan && (
-              <div style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "16px 18px", marginTop: 14 }}>
-                <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 12 }}>
-                  Asset creation plan
+              <div className="aiq-print" style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "16px 18px", marginTop: 14 }}>
+                <div className="aiq-noprint" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+                  <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+                    Asset creation plan
+                  </span>
+                  <BriefActions text={creationPlan} />
                 </div>
                 <Markdown text={creationPlan} size={14} />
-                <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
+                <div className="aiq-noprint" style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
                   <a
                     href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle || signalHeadline || "")}&story=${encodeURIComponent((pitchAngle ?? assetIdea ?? "").slice(0, 300))}&assetTitle=${encodeURIComponent(planTitle)}&assetType=${encodeURIComponent(planAssetType)}&assetIdea=${encodeURIComponent((assetIdea ?? "").slice(0, 200))}`}
                     style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}
