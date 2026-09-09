@@ -4,6 +4,37 @@ Reverse-chronological log of substantive changes. Newest entries on top.
 
 ---
 
+## 2026-09-09 (2) · Arabic (RTL) editions of both KSA radars — noindex staging drafts
+
+**Why:** follow-on from the Arabic travel page earlier the same day. The radars are the strongest Arabic candidates on the site: they are Saudi market analysis in the market's own language rather than a translated brochure, and both content files already carried a curated Arabic name for every signal (53 across the two).
+
+**Added**
+- `src/app/ar/ksa-tourism-radar/` — `page.tsx` + `content.ar.ts` (28 signals, 6 KPIs, 5 coverage gaps, 4 talks, full UI chrome)
+- `src/app/ar/ksa-retail-radar/` — `page.tsx` + `content.ar.ts` (25 signals, 6 KPIs, 4 talks, full UI chrome)
+- `src/app/ar/_components/chrome.tsx` — shared Arabic header, footer and draft banner for everything under /ar/
+- `src/app/ar/radar-ar.css` — self-contained RTL stylesheet, logical properties throughout
+- `src/app/ar/REVIEW-NOTES-RADARS.md` — what to ask the reviewer, plus the go-live checklist
+
+**★ THE OVERLAY MODEL — read this before touching either Arabic radar.** These are NOT copies of the English pages. Each Arabic page imports the SAME live data function (`getKsaRadarData` / `getRetailRadarData`) and the SAME curated English content module, and adds only an Arabic prose overlay keyed by signal id. Three consequences: (a) article counts, momentum and freshness come from ONE source so the languages cannot drift; (b) the verdict engine, median and `LOW_SAMPLE_N` are shared, so the two pages can never disagree about what a signal is doing; (c) a signal added in English appears on the Arabic page immediately, in English, carrying a `لم تُترجم بعد` chip. Untranslated is visible; missing would not be. Signal NAMES are not in the overlay: both English content files already carry a curated `ar` name and the pages read those.
+
+**Not ported, deliberately:** the English interactive filter modules (`KsaRadarModule` / `RetailRadarModule`, ~600 lines each) are English client components. Every signal renders on the Arabic pages, grouped by horizon, unfiltered.
+
+**Status:** both pages `robots: index false, follow false, nocache`, absent from `sitemap.ts`, unlinked from the English site, and carrying NO hreflang in either direction. That last point is deliberate and must stay until review is applied: hreflang pointing at a noindexed URL is an invalid cluster.
+
+**★ FALSE ALARM WORTH RECORDING — do not repeat it.** Arabic text read back from the repo through `device_bash` appeared corrupted (the Umrah signal's `ar` label looked like `الع` + U+FFFD replacement chars). It is NOT corrupted; the file on disk is correct and `git diff` confirmed no change was needed. The mangling happened in transit to the tooling. **Never "repair" Arabic in a source file based on how it renders in shell output** — verify against the file itself or in a browser first. A session that trusts the shell rendering here will corrupt working content while believing it is fixing it.
+
+**Verification**
+- `npx tsc --noEmit -p tsconfig.json` on the Mac via device_bash: CLEAN. Two real errors were caught and fixed in-run (React SVG props have no `dir`; the LTR isolation moved to a wrapper div in both pages). Remaining output is only the pre-existing `vitest` types error in `src/lib/factcheck/grade.test.ts`.
+- **A full `npm run build` was NOT run by me** — impossible from device_bash, see project memory `sandbox-device-bash-limits` (linux/arm64 VM vs macOS node_modules).
+- Neither page has been viewed in a browser. First look should check RTL flow, the signal-card grid, and that The Window's SVG stays left-to-right inside the RTL page.
+
+**Pending / next**
+- Native Gulf Arabic review of both `content.ar.ts` files, then the shared go-live checklist.
+- Fold `/ar/speaking/earned-media-ai/travel` onto `_components/chrome.tsx`; it still has its own inline header and footer, so there are two Arabic headers in the codebase right now.
+- Ideas Inbox item "Extend Arabic seeds using the radar Arabic labels" is now much more valuable: if Arabic seeds ship, the Arabic radars could show Arabic press volume rather than English, making them more useful to a Saudi reader than the English originals.
+
+---
+
 ## 2026-09-09 · Arabic (RTL) edition of the travel speaking page — noindex staging draft
 
 **Why:** Irfan asked how to make the site multilingual. Research pass (study artifact "Eight Pages, Six Languages") found (a) Google's spam-policy clause on unreviewed machine translation was REMOVED in the March 2024 update, so the compliance risk he was worried about is largely gone; (b) Arabic is the only clearly worthwhile language of the six he named, and it is a Saudi play, not a UAE one; (c) Simplified Chinese is impossible on this stack because Vercel is blocked in mainland China. Decision: Arabic only, this page first, as an unlinked noindex draft for language review.

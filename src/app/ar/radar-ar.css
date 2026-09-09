@@ -1,0 +1,417 @@
+/**
+ * Self-contained stylesheet for the Arabic radar pages.
+ *
+ * It does NOT extend ksa-radar.css or ksa-retail-radar.css. Those carry 23
+ * physical-direction declarations each (margin-left, border-right, text-align:
+ * left) that would need overriding one by one under [dir="rtl"], and patching
+ * a stylesheet you do not own is how an English page breaks by accident. This
+ * file restates the Bureau look using logical properties throughout, so the
+ * whole layout flips with direction instead of fighting it.
+ *
+ * Everything is scoped under .ar-radar. Nothing here can reach an English page.
+ */
+
+.ar-radar {
+  /* Bureau tokens, restated locally so this file has no external dependency. */
+  --paper: #f1ebde;
+  --paper2: #e8e0cc;
+  --ink: #1a1410;
+  --ink70: rgba(26, 20, 16, 0.7);
+  --ink55: rgba(26, 20, 16, 0.55);
+  --ink35: rgba(26, 20, 16, 0.32);
+  --ink15: rgba(26, 20, 16, 0.15);
+  --yel: #f5b81f;
+  --blue: #2e90c3;
+  --serif: var(--font-ar-serif), "Noto Naskh Arabic", Georgia, serif;
+  --grot: var(--font-ar-grot), system-ui, sans-serif;
+
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+.ar-radar .ar-shell {
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 26px;
+}
+
+@media (max-width: 700px) {
+  .ar-radar .ar-shell { padding-inline: 16px; }
+}
+
+/* ── hero ─────────────────────────────────────────────────────────────── */
+.ar-radar .ar-hero { padding-block: 52px 34px; }
+.ar-radar .ar-eyebrow {
+  font-family: var(--grot);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--ink55);
+  display: block;
+  margin-bottom: 14px;
+}
+.ar-radar .ar-h1 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(32px, 5.4vw, 56px);
+  line-height: 1.3;
+  margin: 0 0 18px;
+  text-wrap: balance;
+}
+.ar-radar .ar-lead {
+  font-size: clamp(17px, 2.1vw, 20px);
+  line-height: 1.9;
+  color: var(--ink70);
+  max-width: 62ch;
+  margin: 0;
+}
+.ar-radar .ar-double {
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  height: 4px;
+  margin-block: 8px 0;
+}
+
+/* ── section masthead ─────────────────────────────────────────────────── */
+.ar-radar .ar-mast {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-block: 48px 20px;
+}
+.ar-radar .ar-pill {
+  font-family: var(--grot);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 4px 9px;
+  flex-shrink: 0;
+  direction: ltr;
+}
+.ar-radar .ar-mast h2 {
+  font-family: var(--grot);
+  font-weight: 700;
+  font-size: 15px;
+  margin: 0;
+}
+.ar-radar .ar-rule { flex: 1; height: 1px; background: var(--ink35); min-width: 40px; }
+.ar-radar .ar-fresh {
+  font-family: var(--grot);
+  font-size: 11.5px;
+  color: var(--ink55);
+  flex-shrink: 0;
+}
+
+/* ── metastrip ────────────────────────────────────────────────────────── */
+.ar-radar .ar-metastrip {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-block: 1px solid var(--ink15);
+  padding-block: 10px;
+  font-family: var(--grot);
+  font-size: 11.5px;
+  color: var(--ink55);
+  line-height: 1.8;
+}
+.ar-radar .ar-metastrip a { color: var(--ink); }
+
+/* ── signal files ─────────────────────────────────────────────────────── */
+.ar-radar .ar-ring {
+  font-family: var(--grot);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  background: var(--yel);
+  color: var(--ink);
+  padding: 5px 10px;
+  display: inline-block;
+  margin-block: 30px 12px;
+}
+.ar-radar .ar-files {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 0;
+  border: 1px solid var(--ink);
+}
+.ar-radar .ar-file {
+  border-inline-end: 1px solid var(--ink15);
+  border-bottom: 1px solid var(--ink15);
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.ar-radar .ar-file-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.ar-radar .ar-file-name {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.4;
+  margin: 0;
+}
+.ar-radar .ar-status {
+  font-family: var(--grot);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink55);
+  border: 1px solid var(--ink15);
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+.ar-radar .ar-verdict {
+  font-family: var(--grot);
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  flex-shrink: 0;
+}
+.ar-radar .v-gold { background: var(--yel); color: var(--ink); }
+.ar-radar .v-ink { background: var(--ink); color: var(--paper); }
+.ar-radar .v-quiet { background: transparent; color: var(--ink55); border: 1px solid var(--ink15); }
+.ar-radar .v-warn { background: transparent; color: #8a4a12; border: 1px solid #8a4a12; }
+
+.ar-radar .ar-wire {
+  font-family: var(--grot);
+  font-size: 11.5px;
+  color: var(--ink55);
+  border-block: 1px solid var(--ink15);
+  padding-block: 7px;
+  margin-block: 4px 12px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.ar-radar .ar-wire b { color: var(--ink); font-weight: 700; }
+.ar-radar .ar-num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums; }
+
+.ar-radar .ar-file p { margin: 0 0 10px; font-size: 15px; line-height: 1.85; color: var(--ink70); }
+.ar-radar .ar-file p.ar-sig {
+  border-inline-start: 2px solid var(--ink15);
+  padding-inline-start: 12px;
+  color: var(--ink70);
+}
+.ar-radar .ar-file .ar-talk {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px dashed var(--ink15);
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.8;
+}
+.ar-radar .ar-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.ar-radar .ar-chip {
+  font-family: var(--grot);
+  font-size: 11px;
+  color: var(--ink70);
+  background: var(--paper2);
+  border: 1px solid var(--ink15);
+  padding: 3px 8px;
+  line-height: 1.6;
+}
+.ar-radar .ar-srcs {
+  font-family: var(--grot);
+  font-size: 11px;
+  line-height: 1.9;
+  margin-top: 4px;
+}
+.ar-radar .ar-srcs a {
+  color: var(--ink55);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--ink35);
+  margin-inline-end: 12px;
+  display: inline-block;
+  direction: ltr;
+}
+.ar-radar .ar-untranslated {
+  font-family: var(--grot);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  background: var(--ink);
+  color: var(--yel);
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+
+/* ── KPI band ─────────────────────────────────────────────────────────── */
+.ar-radar .ar-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  border: 1px solid var(--ink);
+  background: var(--paper2);
+}
+.ar-radar .ar-kpi {
+  padding: 22px 24px;
+  border-inline-end: 1px solid var(--ink15);
+  border-bottom: 1px solid var(--ink15);
+  min-width: 0;
+}
+.ar-radar .ar-kpi-label {
+  font-family: var(--grot);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink55);
+  line-height: 1.7;
+}
+.ar-radar .ar-kpi-val {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(26px, 3.6vw, 38px);
+  line-height: 1.3;
+  margin-top: 6px;
+}
+.ar-radar .ar-kpi-delta {
+  font-family: var(--grot);
+  font-size: 12px;
+  font-weight: 600;
+  color: #3f6b3a;
+  margin-top: 2px;
+}
+.ar-radar .ar-kpi-sub { font-size: 14.5px; color: var(--ink70); line-height: 1.8; margin-top: 8px; }
+.ar-radar .ar-kpi-src { font-family: var(--grot); font-size: 11px; margin-top: 10px; line-height: 1.9; }
+.ar-radar .ar-kpi-src a {
+  color: var(--ink55);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--ink35);
+  margin-inline-end: 10px;
+  display: inline-block;
+  direction: ltr;
+}
+
+.ar-radar .ar-honesty {
+  border: 1px solid var(--ink);
+  border-inline-start: 3px solid var(--yel);
+  background: var(--paper);
+  padding: 20px 24px;
+  margin-top: 26px;
+  font-size: 15.5px;
+  line-height: 1.95;
+  color: var(--ink);
+}
+
+/* ── the window ───────────────────────────────────────────────────────── */
+.ar-radar .ar-window { margin-top: 6px; }
+.ar-radar .ar-window svg { width: 100%; height: auto; display: block; border: 1px solid var(--ink); background: var(--paper); }
+.ar-radar .ar-window .zl {
+  font-family: var(--grot);
+  font-size: 10.5px;
+  font-weight: 700;
+  fill: rgba(26, 20, 16, 0.62);
+}
+.ar-radar .ar-window .ax { font-family: var(--grot); font-size: 11px; fill: rgba(26, 20, 16, 0.62); }
+.ar-radar .ar-window .axm { font-family: var(--grot); font-size: 10px; fill: rgba(26, 20, 16, 0.5); }
+.ar-radar .ar-window .dl { font-family: var(--grot); font-size: 11px; fill: var(--ink); }
+.ar-radar .ar-window-rules { font-size: 15.5px; line-height: 1.95; color: var(--ink70); margin-top: 16px; max-width: 80ch; }
+.ar-radar .ar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin-top: 16px;
+  font-family: var(--grot);
+  font-size: 12px;
+  color: var(--ink55);
+}
+.ar-radar .ar-legend > span { display: flex; align-items: center; gap: 8px; }
+.ar-radar .ar-micro { font-family: var(--grot); font-size: 11.5px; line-height: 1.9; color: var(--ink55); margin-top: 12px; }
+
+/* ── bands ────────────────────────────────────────────────────────────── */
+.ar-radar .ar-band-p2 { background: var(--paper2); border-block: 1px solid var(--ink); padding-block: 56px; margin-top: 56px; }
+.ar-radar .ar-band-ink { background: var(--ink); color: var(--paper); padding-block: 60px; }
+.ar-radar .ar-band-ink .ar-mast h2,
+.ar-radar .ar-band-ink .ar-h2 { color: var(--paper); }
+.ar-radar .ar-band-ink .ar-pill { background: var(--yel); color: var(--ink); }
+.ar-radar .ar-band-ink .ar-rule { background: rgba(241, 235, 222, 0.25); }
+.ar-radar .ar-h2 {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: clamp(24px, 3.8vw, 38px);
+  line-height: 1.4;
+  margin: 0 0 12px;
+  max-width: 24ch;
+  text-wrap: balance;
+}
+
+.ar-radar .ar-gapgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0;
+  border: 1px solid var(--ink);
+  margin-top: 24px;
+  background: var(--paper);
+}
+.ar-radar .ar-gapcard { padding: 20px 22px; border-inline-end: 1px solid var(--ink15); border-bottom: 1px solid var(--ink15); min-width: 0; }
+.ar-radar .ar-gapnum {
+  font-family: var(--grot);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink55);
+  display: block;
+  margin-bottom: 8px;
+}
+.ar-radar .ar-gapcard h3 { font-family: var(--serif); font-weight: 700; font-size: 19px; line-height: 1.5; margin: 0 0 8px; }
+.ar-radar .ar-gapcard p { font-size: 15px; line-height: 1.85; color: var(--ink70); margin: 0 0 10px; }
+.ar-radar .ar-gapsrc { font-family: var(--grot); font-size: 11px; color: var(--ink55); text-decoration: none; border-bottom: 1px dotted var(--ink35); direction: ltr; display: inline-block; }
+
+.ar-radar .ar-talks { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0; border: 1px solid rgba(241, 235, 222, 0.3); margin-top: 24px; }
+.ar-radar .ar-talk-card { padding: 22px 24px; border-inline-end: 1px solid rgba(241, 235, 222, 0.18); border-bottom: 1px solid rgba(241, 235, 222, 0.18); min-width: 0; }
+.ar-radar .ar-talk-num { font-family: var(--grot); font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; color: var(--yel); margin-bottom: 8px; }
+.ar-radar .ar-talk-card h3 { font-family: var(--serif); font-weight: 700; font-size: 21px; line-height: 1.5; margin: 0 0 6px; color: var(--paper); }
+.ar-radar .ar-talk-card .sub { font-size: 14.5px; color: rgba(241, 235, 222, 0.7); margin: 0 0 10px; line-height: 1.8; }
+.ar-radar .ar-talk-card .body { font-size: 15px; color: rgba(241, 235, 222, 0.8); margin: 0 0 12px; line-height: 1.9; }
+.ar-radar .ar-talk-card .fmt { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.ar-radar .ar-talk-card .fmt span { font-family: var(--grot); font-size: 11px; border: 1px solid rgba(241, 235, 222, 0.35); padding: 3px 9px; color: var(--paper); }
+.ar-radar .ar-talk-card .ev { font-family: var(--grot); font-size: 11px; color: rgba(241, 235, 222, 0.55); margin: 0; line-height: 1.8; }
+
+/* ── final CTA + sources ──────────────────────────────────────────────── */
+.ar-radar .ar-final { border: 1px solid var(--ink); background: var(--paper2); padding: 30px 30px 32px; margin-top: 48px; }
+.ar-radar .ar-cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 20px; }
+.ar-radar .ar-btn {
+  font-family: var(--grot);
+  font-weight: 700;
+  font-size: 13px;
+  background: var(--yel);
+  color: var(--ink);
+  padding: 14px 24px;
+  text-decoration: none;
+  display: inline-block;
+}
+.ar-radar .ar-tlink { font-family: var(--grot); font-size: 13px; color: var(--ink70); text-decoration: none; border-bottom: 1px solid var(--ink35); }
+
+.ar-radar .ar-sources { margin-top: 44px; border-top: 1px solid var(--ink15); padding-top: 22px; }
+.ar-radar .ar-sources summary { cursor: pointer; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; list-style: none; }
+.ar-radar .ar-sources summary::-webkit-details-marker { display: none; }
+.ar-radar .ar-sources summary::after { content: "+"; font-family: var(--grot); color: var(--ink55); font-size: 15px; margin-inline-start: 2px; }
+.ar-radar .ar-sources[open] summary::after,
+.ar-radar .ar-sources details[open] summary::after { content: "−"; }
+.ar-radar .ar-srcflow { margin-top: 16px; }
+.ar-radar .ar-srcflow p { font-family: var(--grot); font-size: 12px; line-height: 2.1; margin: 0 0 14px; color: var(--ink55); }
+.ar-radar .ar-srcflow p b { font-size: 10.5px; letter-spacing: 0.1em; color: var(--ink); margin-inline-end: 12px; display: block; margin-bottom: 4px; }
+.ar-radar .ar-srcflow a { color: var(--ink70); text-decoration: none; border-bottom: 1px dotted var(--ink55); margin-inline-end: 14px; display: inline-block; direction: ltr; }
+
+.ar-radar a:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-radar * { animation: none !important; transition: none !important; }
+}
