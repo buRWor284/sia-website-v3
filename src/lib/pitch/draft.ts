@@ -62,6 +62,7 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - Open with the most specific, checkable fact available. Never open with a greeting paragraph about who the sender is.
 - Name what the journalist gets: the dataset, the methodology, the interview, the exclusive window. Be concrete about what is actually being offered.
 - Tie the story to the journalist's own beat and, where one exists, to a dated hook.
+- LEAD WITH THE PART OF THE STORY THAT MATTERS TO THIS JOURNALIST. Two reporters given the same dataset should receive genuinely different openings: an e-commerce and fintech reporter leads on merchant and payments behaviour, a macro or markets reporter leads on what the number says about the economy, a consumer reporter leads on what shoppers are doing. Do not write one pitch and change the name.
 - 120 to 180 words in the body. Shorter is better than padded.
 - Plain punctuation only. Do NOT use em dashes or en dashes. Use full stops and commas.
 - No superlatives, no "I hope this finds you well", no "game-changing", "revolutionary", "excited to share", "reaching out", "circle back", "leverage", "in today's landscape". No flattery about their recent article unless a specific one is named in the brief.

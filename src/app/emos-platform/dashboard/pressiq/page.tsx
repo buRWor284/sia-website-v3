@@ -2,7 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import PressIQPlatformClient from "@/components/emos-platform/PressIQPlatformClient";
-import { getJournalists } from "@/app/emos-platform/actions/coverageiq";
+import { getJournalists, getJournalistHistory } from "@/app/emos-platform/actions/coverageiq";
 import { getAssets } from "@/app/emos-platform/actions/assetiq";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
@@ -70,7 +70,7 @@ export default async function PressIQPlatformPage({
   const token = await getToken();
   const db = createSupabaseServerClient(token ?? "");
 
-  const [{ data: scores }, journalists, assets] = await Promise.all([
+  const [{ data: scores }, journalists, assets, history] = await Promise.all([
     db
       .from("pressiq_scores")
       .select(
@@ -82,6 +82,7 @@ export default async function PressIQPlatformPage({
       .limit(50),
     getJournalists(),
     getAssets(),
+    getJournalistHistory(),
   ]);
 
   // Resolve the journalist and asset a score was written for, from the lists we
@@ -172,6 +173,7 @@ export default async function PressIQPlatformPage({
           initialQuery={initialQuery}
           initialJournalists={journalists}
           initialAssets={assets}
+          initialHistory={history}
         />
 
         <PipelineNav

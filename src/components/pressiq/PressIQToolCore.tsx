@@ -114,6 +114,10 @@ export interface PressIQCoreProps {
     result?: ScoreResponse;
     pitch?: string;
     subject?: string;
+    /** Which form step to open on. A loaded draft passes 2, otherwise the user
+     * lands on step 1 and their pitch looks like it never arrived — it is on
+     * step 2, just off screen (found in the 9 Sep drafting test). */
+    step?: 1 | 2;
   };
   /** localStorage key for persisting UI prefs (platform/pitchMode/store). Public
    * passes "sia.pressiq.v2"; dashboard omits (no persistence). */
@@ -397,7 +401,7 @@ export default function PressIQToolCore({
   const [pitchMode, setPitchMode] = useState<"standalone" | "query">(initial?.pitchMode ?? "standalone");
   const [journalistBeat, setJournalistBeat] = useState(initial?.journalistBeat ?? "");
   const [view,     setView]     = useState<"pre" | "loading" | "post">(initial?.result ? "post" : "pre");
-  const [formStep, setFormStep] = useState<1 | 2>(1);
+  const [formStep, setFormStep] = useState<1 | 2>(initial?.step ?? 1);
   const [result,   setResult]   = useState<ScoreResponse | null>(initial?.result ?? null);
   const [error,    setError]    = useState<string | null>(null);
   // P4: the server sets `upgrade: true` on an email-tier 429 (public route only)

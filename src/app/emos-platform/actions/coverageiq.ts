@@ -15,6 +15,7 @@ import type {
   Stage, PesoType, LinkType, ContentType, DataSource, AlertStatus,
   DbPitch, DbJournalist, DbAlert, CreatePitchInput, CreateJournalistInput,
 } from "@/lib/coverageiq/types";
+import type { JournalistHistory } from "@/lib/journalist-history-types";
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
 
@@ -318,4 +319,67 @@ export async function deleteJournalist(journalistId: string): Promise<boolean> {
   revalidatePath("/emos-platform/dashboard/coverageiq");
   revalidatePath("/emos-platform/dashboard/journocollabiq");
   return true;
+}
+
+// ─── Prior contact, for the duplicate-pitch warning (2026-09-09) ─────────────
+// Answers "have I already pitched this person, and was it for this company?"
+// Built from data already held — pressiq_scores carries journalist_id and
+// company_id since the state layer, and coverageiq_pitches has always carried
+// journalist_id. No new table, and nothing an outreach tool could tell us.
+
+export async function getJournalistHistory(): Promise<JournalistHistory[]> {
+  const db = await getAuthenticatedClient();
+
+  const [{ data: scores }, { data: pitches }] = await Promise.all([
+    db.from("pressiq_scores")
+      .select("journalist_id, company_id, scored_at")
+      .not("journalist_id", "is", null)
+      .order("scored_at", { ascending: false }),
+    db.from("coverageiq_pitches")
+      .select("journalist_id, created_at, sent_date")
+      .not("journalist_id", "is", null)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const byJournalist = new Map<string, JournalistHistory>();
+
+  function touch(id: string): JournalistHistory {
+    let h = byJournalist.get(id);
+    if (!h) {
+      h = { journalistId: id, lastPitchedAt: null, lastCompanyId: null, lastCompanyName: null, pitchCount: 0 };
+      byJournalist.set(id, h);
+    }
+    return h;
+  }
+
+  for (const r of (scores ?? []) as { journalist_id: string; company_id: string | null; scored_at: string }[]) {
+    const h = touch(r.journalist_id);
+    h.pitchCount += 1;
+    // Ordered newest first, so the first row seen is the most recent.
+    if (!h.lastPitchedAt) {
+      h.lastPitchedAt = r.scored_at;
+      h.lastCompanyId = r.company_id;
+    }
+  }
+
+  for (const r of (pitches ?? []) as { journalist_id: string; created_at: string; sent_date: string | null }[]) {
+    const h = touch(r.journalist_id);
+    const when = r.sent_date ?? r.created_at;
+    h.pitchCount += 1;
+    if (!h.lastPitchedAt || when > h.lastPitchedAt) h.lastPitchedAt = when;
+  }
+
+  // Resolve the company names in one go.
+  const companyIds = Array.from(
+    new Set([...byJournalist.values()].map(h => h.lastCompanyId).filter(Boolean) as string[]),
+  );
+  if (companyIds.length > 0) {
+    const { data: companies } = await db.from("companies").select("id, name").in("id", companyIds);
+    const names = new Map(((companies ?? []) as { id: string; name: string }[]).map(c => [c.id, c.name]));
+    for (const h of byJournalist.values()) {
+      if (h.lastCompanyId) h.lastCompanyName = names.get(h.lastCompanyId) ?? null;
+    }
+  }
+
+  return [...byJournalist.values()];
 }

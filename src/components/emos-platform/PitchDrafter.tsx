@@ -17,6 +17,8 @@ import React, { useMemo, useState } from "react";
 import { useCompanyOptional } from "./CompanyProvider";
 import type { DbJournalist } from "@/lib/coverageiq/types";
 import type { DbAsset } from "@/app/emos-platform/actions/assetiq";
+import PriorContact from "./PriorContact";
+import type { JournalistHistory } from "@/lib/journalist-history-types";
 
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -102,14 +104,19 @@ function DraftCard({ draft, onUse }: { draft: Draft; onUse: (d: Draft) => void }
 export default function PitchDrafter({
   journalists,
   assets,
+  history,
   onUseDraft,
 }: {
   journalists: DbJournalist[];
   assets: DbAsset[];
+  /** Prior contact per journalist, so a repeat approach is visible BEFORE the
+   * batch is drafted rather than after it is sent. */
+  history: JournalistHistory[];
   /** Load a draft into the scorer above, with its journalist selected. */
   onUseDraft: (d: { journalistId: string; subject: string; body: string }) => void;
 }) {
   const ctx = useCompanyOptional();
+  const historyById = useMemo(() => new Map(history.map(h => [h.journalistId, h])), [history]);
   const activeCompanyId = ctx?.company?.id ?? null;
   const activeCompanyName = ctx?.company?.name ?? null;
 
@@ -223,6 +230,13 @@ export default function PitchDrafter({
                           {j.beat.length > 90 ? j.beat.slice(0, 90) + "…" : j.beat}
                         </span>
                       )}
+                      <span style={{ display: "block", marginTop: 3 }}>
+                        <PriorContact
+                          history={historyById.get(j.id)}
+                          activeCompanyId={activeCompanyId}
+                          compact
+                        />
+                      </span>
                     </span>
                   </label>
                 ))}

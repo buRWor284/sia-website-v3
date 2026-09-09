@@ -17,7 +17,7 @@
  *   - the PDF report (ungated parity)
  */
 
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { createPitch } from "@/app/emos-platform/actions/coverageiq";
@@ -31,6 +31,8 @@ import type { DbAsset } from "@/app/emos-platform/actions/assetiq";
 import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
 import PitchDrafter from "@/components/emos-platform/PitchDrafter";
+import PriorContact from "@/components/emos-platform/PriorContact";
+import type { JournalistHistory } from "@/lib/journalist-history-types";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -282,6 +284,7 @@ export default function PressIQPlatformClient({
   initialQuery = "",
   initialJournalists,
   initialAssets,
+  initialHistory,
 }: {
   initialScores: DbScore[];
   initialQuery?: string;
@@ -289,6 +292,8 @@ export default function PressIQPlatformClient({
    * person and pointed at a thing (state layer, 2026-09-09). */
   initialJournalists: DbJournalist[];
   initialAssets: DbAsset[];
+  /** Prior contact per journalist, for the duplicate-pitch warning. */
+  initialHistory: JournalistHistory[];
 }) {
   const [scoreSubject, setScoreSubject] = useState("");
   const [newScoreCount, setNewScoreCount] = useState(0);
@@ -302,6 +307,10 @@ export default function PressIQPlatformClient({
   const companyCtx = useCompanyOptional();
   const router = useRouter();
 
+  const historyById = useMemo(
+    () => new Map(initialHistory.map(h => [h.journalistId, h])),
+    [initialHistory],
+  );
   const journalist = initialJournalists.find(j => j.id === journalistId) ?? null;
   const asset = initialAssets.find(a => a.id === assetId) ?? null;
 
@@ -441,6 +450,10 @@ export default function PressIQPlatformClient({
                 {journalist.pitches_sent} pitched · {journalist.placements} placed
               </span>
             )}
+            <PriorContact
+              history={historyById.get(journalist.id)}
+              activeCompanyId={companyCtx?.company?.id ?? null}
+            />
           </div>
         )}
       </div>
@@ -475,6 +488,7 @@ export default function PressIQPlatformClient({
           result: (reopened?.score_response as ScoreResponse | undefined) ?? undefined,
           pitch: draft?.pitch ?? reopened?.pitch_text ?? undefined,
           subject: draft?.subject ?? undefined,
+          step: draft ? 2 : undefined,
         }}
         hideMasthead
         showStoreToggle={false}
@@ -519,6 +533,7 @@ export default function PressIQPlatformClient({
       <PitchDrafter
         journalists={initialJournalists}
         assets={initialAssets}
+        history={initialHistory}
         onUseDraft={handleUseDraft}
       />
     </div>
