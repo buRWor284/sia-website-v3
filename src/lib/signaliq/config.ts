@@ -104,7 +104,7 @@ export function normalizeVolume(rawVolume: number, ref: number = VOLUME_LOG_REF)
  * all non-sensitive opportunities in the ranking.
  */
 export const SENSITIVE_TERMS = [
-  "death", "died", "dead", "killed", "killing", "casualt", "fatal", "fatalities",
+      "death", "died", "dead", "killed", "killing", "casualt", "fatal", "fatalities",
   "shooting", "massacre", "terror", "bombing", "earthquake", "wildfire",
   "hurricane", "flood victim", "disaster", "suicide", "abuse", "assault",
   "war crime", "genocide", "hostage", "murder", "overdose death",
@@ -121,16 +121,16 @@ export const BEATS: Beat[] = [
     id: "saas",
     label: "SaaS & startups",
     seeds: [
-      "product-led growth", "developer tools", "B2B software pricing", "vertical SaaS", "startup layoffs",
-      "SaaS churn", "no-code platform", "API economy", "enterprise software consolidation", "cloud cost optimization",
-      "platform engineering", "open source monetization", "SaaS valuation", "developer experience", "startup funding",
-      "B2B marketplace", "software security breach", "subscription fatigue", "AI productivity software", "startup acquisition",
+      "product-led growth", "developer tools", "vertical SaaS",
+      "no-code platform", "cloud cost optimization",
+      "platform engineering", "SaaS valuation", "developer experience", "startup funding",
+      "B2B marketplace", "subscription fatigue", "startup acquisition",
       // — widened 2026-07-10 (Fix B1) —
       "usage-based pricing", "remote work software", "product analytics", "customer success", "sales automation",
       "marketing automation", "workflow automation", "AI copilot", "app store fees", "SOC 2 compliance",
-      "venture capital", "seed funding", "micro SaaS", "integration platform", "low-code development", "tech IPO",
+      "venture capital", "seed funding", "integration platform", "low-code development", "tech IPO",
       // - widened 2026-07-21 (Irfan: client-work + geography coverage) -
-      "staff augmentation", "IT outsourcing", "Pakistan startups",
+      "staff augmentation", "IT outsourcing",
     ],
     blurb: "Software, product, and go-to-market stories.",
   },
@@ -139,9 +139,9 @@ export const BEATS: Beat[] = [
     label: "Fintech",
     seeds: [
       "earned wage access", "buy now pay later", "stablecoin", "neobank", "payments fraud",
-      "embedded finance", "open banking", "crypto regulation", "financial inclusion", "credit scoring AI",
+      "embedded finance", "open banking", "crypto regulation", "financial inclusion",
       "insurtech", "remittance", "banking as a service", "BNPL regulation", "central bank digital currency",
-      "fraud detection", "payroll fintech", "wealth management AI", "debit card startup", "lending discrimination",
+      "fraud detection", "wealth management AI", "lending discrimination",
       // — widened 2026-07-10 (Fix B1) —
       "digital wallet", "real-time payments", "cross-border payments", "mortgage technology", "robo-advisor",
       "small business lending", "invoice financing", "expense management", "financial compliance", "KYC verification",
@@ -208,17 +208,25 @@ export const BEATS: Beat[] = [
     id: "cybersecurity",
     label: "Cybersecurity & Privacy",
     seeds: [
-      "SIM swap attack", "SS7 vulnerability", "telecom data breach", "account takeover fraud",
-      "eSIM security", "phone number hijacking", "two-factor authentication bypass", "mobile identity theft",
-      "AI voice scam", "identity verification bypass", "cryptocurrency theft hack", "zero trust mobile",
-      "mobile carrier fraud", "data broker privacy", "cybersecurity insurance", "biometric authentication",
-      "social engineering attack", "digital privacy regulation", "MVNO market growth", "password manager breach",
+      "SIM swap attack", "account takeover fraud",
+      "AI voice scam",
+      "cybersecurity insurance", "biometric authentication",
+      "social engineering attack",
       // — widened 2026-07-10 (Fix B1) —
       "ransomware", "phishing", "supply chain attack", "passkey adoption", "API security",
       "IoT security", "children's online privacy", "age verification", "facial recognition", "spyware",
       "encrypted messaging", "post-quantum encryption", "bug bounty", "insider threat", "critical infrastructure security", "cloud security",
       // - widened 2026-07-21 (Efani conversation) -
       "mobile security", "phone scam", "digital identity",
+      // - widened 2026-09-08 (US cyber / SIM-swap radar for Efani + competitors; PROBE-PENDING,
+      //   replaces 14 invented-sounding seeds that returned 0 articles over 60 days) -
+      "data breach", "cyberattack", "identity theft", "zero trust", "zero-day",
+      "credential stuffing", "account takeover", "business email compromise", "dark web", "data leak",
+      "endpoint security", "penetration testing", "vulnerability disclosure", "cyber insurance", "SIM swapping",
+      "SIM swap", "port-out fraud", "smishing", "deepfake fraud", "voice cloning",
+      "wire fraud", "telecom fraud", "stalkerware", "ransomware gang", "ransomware attack",
+      "phishing attack", "multi-factor authentication", "two-factor authentication", "passkeys", "cybersecurity funding",
+      "social engineering", "number porting",
     ],
     blurb: "Mobile security, identity fraud, privacy, and the policy fight around them.",
   },
@@ -243,7 +251,7 @@ export const BEATS: Beat[] = [
       "press release", "newsroom layoffs", "data journalism", "podcast advertising",
       "fact checking", "misinformation", "AI generated content",
       "SEO", "LLM visibility", "link building", "backlinking", "editorial backlinks", "SEO PR",
-      "media pitching", "media outreach", "cold email", "cold email outreach", "brand mentions",
+      "media pitching", "media outreach", "cold email", "brand mentions",
     ],
     blurb: "Marketing, SEO/GEO, digital PR, content, and web/app agency stories.",
   },
@@ -271,6 +279,11 @@ export const BEATS: Beat[] = [
       "generative AI", "large language model", "AI infrastructure", "AI bubble", "tech layoffs",
       "agentic AI", "AI startup", "venture debt", "robotaxi", "sovereign AI",
       "Series A funding", "down round", "enterprise AI", "AI chatbot", "startup accelerator",
+      // - widened 2026-09-08 (US founders/funding radar; PROBE-PENDING) -
+      "Silicon Valley", "Y Combinator", "Series B funding", "Series C funding", "unicorn startup",
+      "IPO filing", "private equity", "angel investor", "startup valuation", "term sheet",
+      "product market fit", "growth equity", "startup exit", "tech valuation", "mergers and acquisitions",
+      "dry powder", "bootstrapped startup",
     ],
     blurb: "Funding climate, the AI wave, and go-to-market — the stories a pre-Series-A / Series-A founder builds authority around.",
   },
