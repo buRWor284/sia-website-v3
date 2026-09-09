@@ -142,13 +142,24 @@ export interface PressIQCoreProps {
   emailUnlockNode?: React.ReactNode;
   /** Public renders the EMOS CTA strip inside the Score tab (needs the result). */
   scoreTabCta?: (result: ScoreResponse) => React.ReactNode;
+  /** 2026-09-09. The single "+ Score another" button is misleading: reset()
+   * returns to the pitch step and KEEPS the pitch and the result, so nobody
+   * clicks it to edit the pitch they just scored, and the working back
+   * navigation goes unused. Passing this splits it into an honest pair —
+   * "Edit this pitch" (keeps everything) and "Score a new pitch" (clears the
+   * pitch first). OPT-IN so the public /tools/pressiq surface is unchanged
+   * until that copy change is made deliberately. */
+  splitResetActions?: boolean;
 }
 
 // ── Post-score panel (the 4 result views) ─────────────────────────────────────
 function PostScorePanel({
-  result, tab, setTab, onReset, pitchMode, onDownloadPdf, emailUnlockNode, scoreTabCta,
+  result, tab, setTab, onReset, onFresh, pitchMode, onDownloadPdf, emailUnlockNode, scoreTabCta,
 }: {
   result: ScoreResponse; tab: Tab; setTab: (t: Tab) => void; onReset: () => void;
+  /** When supplied, the toolbar shows "Edit this pitch" + "Score a new pitch"
+   * instead of the single ambiguous "+ Score another". */
+  onFresh?: () => void;
   pitchMode: "standalone" | "query";
   onDownloadPdf?: () => void;
   emailUnlockNode?: React.ReactNode;
@@ -197,10 +208,23 @@ function PostScorePanel({
             {tb.label}
           </button>
         ))}
-        {/* Always-visible "score another" so it isn't buried on the last tab. */}
-        <button onClick={onReset} style={{ marginLeft: "auto", alignSelf: "center", display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 13px", marginRight: 8, background: INK, color: PAPER, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
-          + Score another
-        </button>
+        {/* Always-visible, so it isn't buried on the last tab. Two buttons when
+            the wrapper opts in: going "back" preserves the pitch AND the
+            result, which the old single label actively hid. */}
+        {onFresh ? (
+          <span style={{ marginLeft: "auto", alignSelf: "center", display: "inline-flex", gap: 6, marginRight: 8 }}>
+            <button onClick={onReset} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 13px", background: "transparent", color: INK, border: `1px solid ${ra(INK, 0.3)}`, fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
+              ← Edit this pitch
+            </button>
+            <button onClick={onFresh} style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 13px", background: INK, color: PAPER, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
+              + Score a new pitch
+            </button>
+          </span>
+        ) : (
+          <button onClick={onReset} style={{ marginLeft: "auto", alignSelf: "center", display: "inline-flex", alignItems: "center", gap: 5, padding: "7px 13px", marginRight: 8, background: INK, color: PAPER, border: "none", fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap", borderRadius: 0 }}>
+            + Score another
+          </button>
+        )}
       </div>
 
       {/* ── Tab: Score ────────────────────────────────────────────────── */}
@@ -362,7 +386,7 @@ function PostScorePanel({
 export default function PressIQToolCore({
   api, initial, persistKey, hideMasthead, showStoreToggle = true,
   quotaLine, turnstileSlot, submitDisabled, onStepChange,
-  pdfAction, onScored, emailUnlockNode, scoreTabCta,
+  pdfAction, onScored, emailUnlockNode, scoreTabCta, splitResetActions,
 }: PressIQCoreProps) {
   const [pitch,    setPitch]    = useState(initial?.pitch ?? "");
   const [query,    setQuery]    = useState(initial?.query ?? "");
@@ -638,7 +662,9 @@ export default function PressIQToolCore({
         {view === "loading" && <LoadingPanel />}
         {view === "post" && result && (
           <PostScorePanel
-            result={result} tab={tab} setTab={setTab} onReset={reset} pitchMode={pitchMode}
+            result={result} tab={tab} setTab={setTab} onReset={reset}
+            onFresh={splitResetActions ? () => { clearPitch(); reset(); } : undefined}
+            pitchMode={pitchMode}
             onDownloadPdf={pdfAction ? () => pdfAction(result, { pitch, subject: resolveSubject(pitch, subject) }) : undefined}
             emailUnlockNode={emailUnlockNode}
             scoreTabCta={scoreTabCta}

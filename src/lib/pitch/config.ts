@@ -10,6 +10,13 @@ import { QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 /** D-9: Sonnet by default, overridable via env. */
 export const PITCH_MODEL = process.env.PITCH_SCORE_MODEL || "claude-sonnet-4-6";
 
+/** Pitch DRAFTING model (2026-09-09). Sonnet on purpose, decided with Irfan:
+ * writing from a fixed brief is far less demanding than scoring against a
+ * 32-factor rubric, every draft is reviewed before it is sent, and a batch of
+ * ten has to stay trivially cheap. One constant so the Opus-vs-Sonnet money
+ * question can be settled in one place later. */
+export const DRAFT_MODEL = process.env.PITCH_DRAFT_MODEL || "claude-sonnet-4-6";
+
 /** D-12: launch name + EMOS links (mirrors other tools in this repo). */
 export const PRODUCT_NAME = "PressIQ";
 export const EMOS_URL = "/emos-academy";

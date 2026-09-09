@@ -29,6 +29,8 @@ import type { ScoreResponse } from "@/lib/pitch/types";
 import type { DbJournalist } from "@/lib/coverageiq/types";
 import type { DbAsset } from "@/app/emos-platform/actions/assetiq";
 import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
+import CompanyPicker from "@/components/emos-platform/CompanyPicker";
+import PitchDrafter from "@/components/emos-platform/PitchDrafter";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -295,6 +297,7 @@ export default function PressIQPlatformClient({
   // Reopening remounts the tool core with a stored result, so the whole result
   // view comes back exactly as scored rather than being rebuilt from parts.
   const [reopened, setReopened] = useState<DbScore | null>(null);
+  const [draft, setDraft] = useState<{ pitch: string; subject: string } | null>(null);
   const [coreKey, setCoreKey] = useState(0);
   const companyCtx = useCompanyOptional();
   const router = useRouter();
@@ -302,8 +305,20 @@ export default function PressIQPlatformClient({
   const journalist = initialJournalists.find(j => j.id === journalistId) ?? null;
   const asset = initialAssets.find(a => a.id === assetId) ?? null;
 
+  // A draft goes into the scorer above rather than into a drafts table: the
+  // draft is cheap to regenerate on Sonnet, and the SCORE is the thing already
+  // persisted with journalist and asset attached.
+  function handleUseDraft(d: { journalistId: string; subject: string; body: string }) {
+    setReopened(null);
+    setJournalistId(d.journalistId);
+    setDraft({ pitch: d.body, subject: d.subject });
+    setCoreKey(k => k + 1);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function handleReopen(score: DbScore) {
     setReopened(score);
+    setDraft(null);
     setJournalistId(score.journalist_id ?? "");
     setAssetId(score.asset_id ?? "");
     setCoreKey(k => k + 1);
@@ -352,6 +367,12 @@ export default function PressIQPlatformClient({
     <div style={{ fontFamily: SERIF }}>
       <style>{PIQ_CSS}</style>
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" strategy="lazyOnload" />
+
+      {/* ── Which company this pitch is for. PressIQ was the only
+             company-consuming tool without a visible picker: it read the active
+             company correctly for the score, but you could not see or change
+             it from this page (found 2026-09-09). ─────────────────────────── */}
+      <CompanyPicker note="Used by every EMOS tool" />
 
       {/* ── Who and what this pitch is for ───────────────────────────────────
              Before 2026-09-09 PressIQ could not aim a pitch at a saved
@@ -452,12 +473,14 @@ export default function PressIQPlatformClient({
             : initialQuery,
           pitchMode: initialQuery ? "standalone" : undefined,
           result: (reopened?.score_response as ScoreResponse | undefined) ?? undefined,
-          pitch: reopened?.pitch_text ?? undefined,
+          pitch: draft?.pitch ?? reopened?.pitch_text ?? undefined,
+          subject: draft?.subject ?? undefined,
         }}
         hideMasthead
         showStoreToggle={false}
         quotaLine={<>Score a pitch · no rate limit · auto-saves to your history</>}
         pdfAction={handleDownloadPdf}
+        splitResetActions
         onScored={(scored, ctx) => {
           setScoreSubject(ctx.subject);
           setNewScoreCount(c => c + 1);
@@ -491,6 +514,13 @@ export default function PressIQPlatformClient({
           openId={reopened?.id ?? null}
         />
       </div>
+
+      {/* ── Draft pitches for saved journalists ───────────────────────────── */}
+      <PitchDrafter
+        journalists={initialJournalists}
+        assets={initialAssets}
+        onUseDraft={handleUseDraft}
+      />
     </div>
   );
 }

@@ -349,6 +349,10 @@ export default function PressIQPage() {
             onScored={(scored, ctx) => { setResult(scored); lastCtx.current = { pitch: ctx.pitch, subject: ctx.subject }; }}
             emailUnlockNode={emailUnlockNode}
             scoreTabCta={scoreTabCta}
+            // 2026-09-09, at Irfan's request: the old single "+ Score another"
+            // hid the fact that going back keeps your pitch AND your result.
+            // Same honest pair as the dashboard.
+            splitResetActions
           />
         )}
 
