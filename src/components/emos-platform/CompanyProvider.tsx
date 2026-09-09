@@ -23,7 +23,7 @@ import React, {
 } from "react";
 import {
   LEGACY_CONTEXT_KEY, LEGACY_NAME_KEY, COMPANY_CONTEXT_MAX,
-  type Company, type CreateCompanyInput,
+  type Company, type CreateCompanyInput, type UpdateCompanyInput,
 } from "@/lib/company-types";
 import {
   createCompany as createCompanyAction,
@@ -52,6 +52,9 @@ export interface CompanyContextValue {
   setActiveName: (v: string) => void;
   /** Edit the selected company's description. Same optimistic + debounced write. */
   setActiveContext: (v: string) => void;
+  /** Explicit save of a whole company from the manage form — awaited, not
+   * debounced, so the form can show a real result. */
+  editCompany: (id: string, patch: UpdateCompanyInput) => Promise<Company | null>;
   removeCompany: (id: string) => Promise<boolean>;
 }
 
@@ -164,6 +167,18 @@ export default function CompanyProvider({
     return created;
   }, []);
 
+  const editCompany = useCallback(async (id: string, patch: UpdateCompanyInput) => {
+    // A pending debounced write from the SignalIQ fields would land after this
+    // one and undo it, so cancel it first.
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+    setSaving(true);
+    const saved = await updateCompanyAction(id, patch);
+    setSaving(false);
+    if (!saved) return null;
+    setCompanies(prev => prev.map(c => (c.id === id ? saved : c)));
+    return saved;
+  }, []);
+
   const removeCompany = useCallback(async (id: string) => {
     const ok = await deleteCompanyAction(id);
     if (!ok) return false;
@@ -256,9 +271,9 @@ export default function CompanyProvider({
     );
     return {
       companies, company: exposed, saving,
-      setActive, addCompany, setActiveName, setActiveContext, removeCompany,
+      setActive, addCompany, setActiveName, setActiveContext, editCompany, removeCompany,
     };
-  }, [companies, company, draft, saving, setActive, addCompany, setActiveName, setActiveContext, removeCompany]);
+  }, [companies, company, draft, saving, setActive, addCompany, setActiveName, setActiveContext, editCompany, removeCompany]);
 
   return <CompanyCtx.Provider value={value}>{children}</CompanyCtx.Provider>;
 }
