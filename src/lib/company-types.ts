@@ -28,10 +28,9 @@ export type UpdateCompanyInput = Partial<{
   website: string | null;
 }>;
 
-/** localStorage key holding only the SELECTED company id for this device.
- * The company data itself lives in Postgres — this is a per-device preference,
- * which is the one thing localStorage is actually good for. */
-export const ACTIVE_COMPANY_KEY = "emos_active_company_id";
+// Note: there is deliberately no localStorage key for the selection. It lives
+// on `users.active_company_id`, so choosing a company in one tool sets it in
+// every tool and on every browser that person signs in from.
 
 /** Legacy keys written by the pre-2026-09-09 localStorage-only hooks. Read once
  * on first load so an existing user's typed context becomes their first company

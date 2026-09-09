@@ -105,6 +105,11 @@ export default function CompanyPicker({ note }: { note?: string }) {
               ✓ Saved to your account
             </span>
           )}
+          {!empty && (
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+              Switching here switches every tool.
+            </span>
+          )}
           {note && (
             <span style={{ fontFamily: GROT, fontSize: 8.5, letterSpacing: ".1em", textTransform: "uppercase", color: INK55 }}>
               {note}

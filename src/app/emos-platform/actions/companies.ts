@@ -39,6 +39,15 @@ async function getAuthenticatedClient() {
   return createSupabaseServerClient(token ?? "");
 }
 
+/** The Supabase client plus the Clerk user id, for the two actions that need
+ * to touch this user's own row rather than the whole org's. */
+async function getAuthenticatedClientAndUser() {
+  const { userId, getToken } = await auth();
+  if (!userId) redirect("/emos-platform/signin");
+  const token = await getToken();
+  return { db: createSupabaseServerClient(token ?? ""), clerkUserId: userId };
+}
+
 function revalidateCompanyPaths() {
   for (const p of COMPANY_PATHS) revalidatePath(p);
 }
@@ -140,5 +149,40 @@ export async function deleteCompany(companyId: string): Promise<boolean> {
   if (!data?.length) { console.warn(`deleteCompany: no row matched ${companyId}`); return false; }
 
   revalidateCompanyPaths();
+  return true;
+}
+
+// ─── Which company this person is working on ─────────────────────────────────
+// Stored on the user row, not in localStorage, so choosing a company in any one
+// tool sets it in every tool AND on every browser this person signs in from.
+// Per user rather than per org on purpose: two teammates in the same org can be
+// working on different clients at the same time.
+
+export async function getActiveCompanyId(): Promise<string | null> {
+  const { db, clerkUserId } = await getAuthenticatedClientAndUser();
+  const { data, error } = await db
+    .from("users")
+    .select("active_company_id")
+    .eq("clerk_user_id", clerkUserId)
+    .maybeSingle();
+
+  if (error) { console.error("getActiveCompanyId error:", error.message); return null; }
+  return (data?.active_company_id as string | null) ?? null;
+}
+
+export async function setActiveCompanyId(companyId: string | null): Promise<boolean> {
+  const { db, clerkUserId } = await getAuthenticatedClientAndUser();
+  const { data, error } = await db
+    .from("users")
+    .update({ active_company_id: companyId })
+    .eq("clerk_user_id", clerkUserId)
+    .select("id");
+
+  if (error) { console.error("setActiveCompanyId error:", error.message); return false; }
+  if (!data?.length) { console.warn("setActiveCompanyId: no user row matched"); return false; }
+
+  // Deliberately NO revalidatePath here. The dashboard layout is dynamic (it
+  // calls auth()), so the next tool the user opens re-reads this anyway, and
+  // revalidating would refresh the page they are standing on mid-switch.
   return true;
 }

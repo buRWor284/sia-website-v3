@@ -8,8 +8,10 @@
  * every new browser, invisible to a teammate on the same org, one company only,
  * and unreadable by anything server-side or headless.
  *
- * Now: the companies live in Postgres (org-scoped by RLS) and localStorage
- * holds ONE thing — which company this device has selected.
+ * Now: the companies live in Postgres (org-scoped by RLS), and so does the
+ * selection — on the user's own row (`users.active_company_id`). Choosing a
+ * company in any one tool therefore sets it in EVERY tool, and on every browser
+ * that person signs in from. localStorage holds nothing any more.
  *
  * Mounted once in src/app/emos-platform/dashboard/layout.tsx with the org's
  * companies already fetched server-side, so tools render with the right company
@@ -18,16 +20,16 @@
 
 import React, {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
-  useSyncExternalStore,
 } from "react";
 import {
-  ACTIVE_COMPANY_KEY, LEGACY_CONTEXT_KEY, LEGACY_NAME_KEY, COMPANY_CONTEXT_MAX,
+  LEGACY_CONTEXT_KEY, LEGACY_NAME_KEY, COMPANY_CONTEXT_MAX,
   type Company, type CreateCompanyInput,
 } from "@/lib/company-types";
 import {
   createCompany as createCompanyAction,
   updateCompany as updateCompanyAction,
   deleteCompany as deleteCompanyAction,
+  setActiveCompanyId as setActiveCompanyIdAction,
 } from "@/app/emos-platform/actions/companies";
 
 const LEGACY_DONE_KEY = "emos_company_migrated_v1";
@@ -67,42 +69,22 @@ export function useCompany(): CompanyContextValue {
   return v;
 }
 
-// The stored selection is read through useSyncExternalStore rather than an
-// effect: it is external per-device state, the server snapshot is null so
-// hydration cannot mismatch, and it keeps this out of the cascading-render
-// path that react-hooks/set-state-in-effect (correctly) rejects.
-function subscribeActiveId(onChange: () => void) {
-  if (typeof window === "undefined") return () => {};
-  window.addEventListener("storage", onChange);
-  return () => window.removeEventListener("storage", onChange);
-}
-function readActiveId(): string | null {
-  if (typeof window === "undefined") return null;
-  try { return localStorage.getItem(ACTIVE_COMPANY_KEY); } catch { return null; }
-}
-function serverActiveId(): null { return null; }
-function writeActiveId(id: string | null) {
-  try {
-    if (id) localStorage.setItem(ACTIVE_COMPANY_KEY, id);
-    else localStorage.removeItem(ACTIVE_COMPANY_KEY);
-  } catch { /* storage unavailable */ }
-}
-
 export default function CompanyProvider({
   initialCompanies,
+  initialActiveCompanyId,
   children,
 }: {
   initialCompanies: Company[];
+  /** This user's saved selection, read server-side in the dashboard layout so
+   * every tool renders with the right company on first paint. */
+  initialActiveCompanyId: string | null;
   children: React.ReactNode;
 }) {
   const [companies, setCompanies] = useState<Company[]>(initialCompanies);
-  // In-session selection. Null means "no explicit choice yet this session", in
-  // which case the device's stored id wins, and failing that the most recently
-  // updated company — i.e. the last one used.
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Seeded from the user's saved selection; updated optimistically on a switch
+  // and written back to the user row.
+  const [selectedId, setSelectedId] = useState<string | null>(initialActiveCompanyId);
   const [saving, setSaving] = useState(false);
-
-  const storedId = useSyncExternalStore(subscribeActiveId, readActiveId, serverActiveId);
 
   // Draft used only before the org's first company exists, so the SignalIQ
   // name/description fields have somewhere to put keystrokes.
@@ -114,12 +96,11 @@ export default function CompanyProvider({
 
   // ── Which company is active ───────────────────────────────────────────────
   const activeId = useMemo(() => {
-    const candidate = selectedId ?? storedId;
-    if (candidate && companies.some(c => c.id === candidate)) return candidate;
-    // A stale or deleted stored id falls through to the newest company rather
-    // than leaving the tools with nothing selected.
+    if (selectedId && companies.some(c => c.id === selectedId)) return selectedId;
+    // A stale or deleted selection falls through to the most recently updated
+    // company rather than leaving the tools with nothing selected.
     return companies[0]?.id ?? null;
-  }, [selectedId, storedId, companies]);
+  }, [selectedId, companies]);
 
   const company = useMemo(
     () => companies.find(c => c.id === activeId) ?? null,
@@ -152,7 +133,7 @@ export default function CompanyProvider({
       if (created) {
         setCompanies([created]);
         setSelectedId(created.id);
-        writeActiveId(created.id);
+        void setActiveCompanyIdAction(created.id);
         try { localStorage.setItem(LEGACY_DONE_KEY, "1"); } catch { /* noop */ }
       }
     })();
@@ -164,8 +145,10 @@ export default function CompanyProvider({
   // ── Actions ───────────────────────────────────────────────────────────────
 
   const setActive = useCallback((id: string) => {
+    // Optimistic: the dropdown must not wait on a round trip. The write is what
+    // makes the choice show up in the other tools and in other browsers.
     setSelectedId(id);
-    writeActiveId(id);
+    void setActiveCompanyIdAction(id);
   }, []);
 
   const addCompany = useCallback(async (input: CreateCompanyInput) => {
@@ -175,7 +158,7 @@ export default function CompanyProvider({
     if (!created) return null;
     setCompanies(prev => [created, ...prev.filter(c => c.id !== created.id)]);
     setSelectedId(created.id);
-    writeActiveId(created.id);
+    void setActiveCompanyIdAction(created.id);
     draftRef.current = { name: "", context: "" };
     setDraft({ name: "", context: "" });
     return created;
@@ -189,7 +172,7 @@ export default function CompanyProvider({
     if (id === activeId) {
       const fallback = next[0]?.id ?? null;
       setSelectedId(fallback);
-      writeActiveId(fallback);
+      void setActiveCompanyIdAction(fallback);
     }
     return true;
   }, [companies, activeId]);
@@ -251,7 +234,7 @@ export default function CompanyProvider({
 
         setCompanies(prev => [row, ...prev.filter(c => c.id !== row.id)]);
         setSelectedId(row.id);
-        writeActiveId(row.id);
+        void setActiveCompanyIdAction(row.id);
         draftRef.current = { name: "", context: "" };
         setDraft({ name: "", context: "" });
         setSaving(false);

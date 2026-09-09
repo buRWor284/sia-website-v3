@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { EMOS_ADMIN_EMAILS, getSubscriptionStatus } from "@/lib/emos-guard";
 import CompanyProvider from "@/components/emos-platform/CompanyProvider";
-import { listCompanies } from "@/app/emos-platform/actions/companies";
+import { listCompanies, getActiveCompanyId } from "@/app/emos-platform/actions/companies";
 import type { Company } from "@/lib/company-types";
 
 /**
@@ -53,10 +53,13 @@ export default async function EmosDashboardLayout({
   // redirects to signin otherwise, and this layout deliberately lets the
   // unauthenticated case fall through to middleware.
   let companies: Company[] = [];
-  if (userId) companies = await listCompanies();
+  let activeCompanyId: string | null = null;
+  if (userId) {
+    [companies, activeCompanyId] = await Promise.all([listCompanies(), getActiveCompanyId()]);
+  }
 
   return (
-    <CompanyProvider initialCompanies={companies}>
+    <CompanyProvider initialCompanies={companies} initialActiveCompanyId={activeCompanyId}>
       <div style={{ paddingBottom: 140 }}>{children}</div>
     </CompanyProvider>
   );
