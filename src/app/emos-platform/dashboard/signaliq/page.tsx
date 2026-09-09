@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getSignals } from "@/app/emos-platform/actions/signaliq";
+import { getAssetPacks } from "@/app/emos-platform/actions/asset-packs";
 import SignalIQPlatformClient from "@/components/emos-platform/SignalIQPlatformClient";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
@@ -24,7 +25,7 @@ export default async function SignalIQPlatformPage() {
   const { userId } = await auth();
   if (!userId) redirect("/emos-platform/signin");
 
-  const signals = await getSignals();
+  const [signals, packs] = await Promise.all([getSignals(), getAssetPacks()]);
 
   // Build next-tool href: point to AssetIQ with most recent saved signal
   const latestSignal = signals.find(s => s.status === "saved") ?? signals[0];
@@ -71,7 +72,7 @@ export default async function SignalIQPlatformPage() {
         </div>
 
         {/* Client shell: scan UI + library */}
-        <SignalIQPlatformClient initialSignals={signals} />
+        <SignalIQPlatformClient initialSignals={signals} initialPacks={packs} />
 
         <PipelineNav current="signal" nextHref={assetIQHref} />
       </div>

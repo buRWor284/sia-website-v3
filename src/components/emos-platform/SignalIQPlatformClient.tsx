@@ -26,6 +26,7 @@ import Script from "next/script";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
+import PackLibrary from "@/components/emos-platform/PackLibrary";
 import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
 import { getJsPDF } from "@/lib/pdf/house-style";
 import { buildSignalIqReport } from "@/lib/pdf/signaliq-report";
@@ -35,6 +36,7 @@ import { SIQ_CSS } from "@/components/signaliq/core-css";
 import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emos-platform/actions/signaliq";
 import type { BeatId, Opportunity, AssetPack } from "@/lib/signaliq/types";
 import type { DbSignal } from "@/app/emos-platform/actions/signaliq";
+import type { DbAssetPack } from "@/lib/asset-pack-types";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER   = "#f1ebde";
@@ -287,11 +289,15 @@ function SignalLibrary({
 
 export default function SignalIQPlatformClient({
   initialSignals,
+  initialPacks,
 }: {
   initialSignals: DbSignal[];
+  /** Saved asset packs (state layer phase 2) — packs used to die with the tab. */
+  initialPacks: DbAssetPack[];
 }) {
   // Ordered beat selection (primary first), length 1–3.
   const [beats, setBeats] = useState<BeatId[]>(["saas"]);
+  const companyCtx = useCompanyOptional();
   const [companyContext, setCompanyContext] = useCompanyContext();
   const [companyName, setCompanyName] = useCompanyName();
   const [refreshKey, setRefreshKey] = useState(0);
@@ -308,10 +314,17 @@ export default function SignalIQPlatformClient({
       return { ok: res.ok, data };
     },
     pack: async (body: { opportunity: Opportunity; companyContext?: string }) => {
+      // companyId and beatLabel are added here rather than by the shared tool
+      // core: the core is also the PUBLIC /tools/signaliq component, which has
+      // no company rows and nothing to attribute a pack to.
       const res = await fetch("/api/emos-platform/signaliq/pack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          ...body,
+          companyId: companyCtx?.company?.id || undefined,
+          beatLabel: beats.map(id => BEATS.find(b => b.id === id)?.label ?? String(id)).join(" + "),
+        }),
       });
       const data = await res.json();
       return { ok: res.ok, data };
@@ -402,6 +415,9 @@ export default function SignalIQPlatformClient({
 
         <SignalLibrary signals={initialSignals} refreshKey={refreshKey} />
       </div>
+
+      {/* ── Saved pitch packs ─────────────────────────────────────────────── */}
+      <PackLibrary initialPacks={initialPacks} />
 
     </div>
   );

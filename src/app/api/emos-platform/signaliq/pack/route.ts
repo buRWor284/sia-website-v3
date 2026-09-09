@@ -9,11 +9,17 @@
  * P6 also raised maxDuration 30→60: packs measure 27–30s live, so the old
  * copy-pasted 30s ceiling was a latent 504 for platform users.
  *
- * POST body: { opportunity, companyContext? }
+ * POST body: { opportunity, companyContext?, companyId?, beatLabel? }
+ *
+ * 2026-09-09 (state layer phase 2): the generated pack is now PERSISTED to
+ * signaliq_asset_packs before it is returned. This route previously had no
+ * Supabase import at all, so an Opus call's entire output lived only in the
+ * browser tab that requested it.
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { coerceOpportunity, runPackRequest } from "@/lib/signaliq/route-core";
+import { saveAssetPackForUser } from "@/lib/signaliq/save-pack";
 import type { AssetPack } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
@@ -37,6 +43,8 @@ export async function POST(req: NextRequest) {
   if (!opp) return NextResponse.json({ error: "Missing or invalid opportunity." }, { status: 400 });
 
   const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 500) : undefined;
+  const companyId = typeof raw.companyId === "string" ? raw.companyId : null;
+  const beatLabel = typeof raw.beatLabel === "string" ? raw.beatLabel.slice(0, 120) : null;
 
   const result = await runPackRequest(opp, companyContext);
   if (!result.ok) {
@@ -44,5 +52,13 @@ export async function POST(req: NextRequest) {
   }
 
   const pack: AssetPack = { ...result.pack, usage: { remaining: 999, tier: "email" } };
-  return NextResponse.json(pack);
+
+  // AWAITED, not fire-and-forget. This is the write the whole change exists
+  // for, it is a single insert against a call that already took ~30s, and a
+  // `void save()` here would be the same latent race as the 13 Jul logPitch
+  // bug. A failed save is logged and never blocks the response — the customer
+  // still gets the pack they paid an Opus call for.
+  const savedId = await saveAssetPackForUser(guard.userId, pack, opp, { companyId, beatLabel });
+
+  return NextResponse.json({ ...pack, savedPackId: savedId });
 }
