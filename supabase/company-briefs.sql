@@ -20,3 +20,12 @@ alter table public.company_briefs enable row level security;
 drop policy if exists org_isolation on public.company_briefs;
 create policy org_isolation on public.company_briefs
   for all using (org_id = get_current_org_id());
+
+-- Added the same day (migration "company_briefs_locked_sections"):
+alter table public.company_briefs
+  add column if not exists locked_sections text[] not null default '{}';
+
+-- Added the same day (migration "company_briefs_grants"). New tables in this
+-- project get no default grant for `authenticated`; without this the
+-- dashboard read/save failed with "permission denied for table".
+grant select, insert, update, delete on public.company_briefs to authenticated;

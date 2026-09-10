@@ -22,7 +22,7 @@
 import type { BeatId, ProfileExpansion } from "./types";
 import { recordAiUsage } from "@/lib/ai-usage";
 import { SIGNALIQ_MODEL, beatById } from "./config";
-import { briefPromptBlock, clipAtHeading } from "@/lib/company-brief-prompt";
+import { briefPromptBlock, fitBrief } from "@/lib/company-brief-prompt";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 
@@ -111,7 +111,7 @@ export function buildExpandPrompt(description: string, beats: BeatId[], companyB
     .join("\n\n");
   // The brief is capped harder here than elsewhere: topic choice needs the
   // gist, goals and off-limits list, not every proof point.
-  const briefBlock = companyBrief ? briefPromptBlock(clipAtHeading(companyBrief, 4000)) : "";
+  const briefBlock = companyBrief ? briefPromptBlock(fitBrief(companyBrief, 4000)) : "";
   return `COMPANY DESCRIPTION (from the founder):
 ${description.trim()}
 ${briefBlock}

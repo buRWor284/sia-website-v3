@@ -11,7 +11,7 @@
 
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { BRIEF_PROMPT_MAX } from "@/lib/company-brief-types";
-import { clipAtHeading } from "@/lib/company-brief-prompt";
+import { fitBrief } from "@/lib/company-brief-prompt";
 
 /**
  * The approved brief for `companyId`, or for the caller's active company when
@@ -41,7 +41,7 @@ export async function getApprovedBrief(
       .maybeSingle();
     if (!brief || brief.status !== "approved") return null;
     const text = String(brief.content ?? "").trim();
-    return text ? clipAtHeading(text, BRIEF_PROMPT_MAX) : null;
+    return text ? fitBrief(text, BRIEF_PROMPT_MAX) : null;
   } catch (e) {
     console.error("[company-brief] getApprovedBrief failed:", e);
     return null;

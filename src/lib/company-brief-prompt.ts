@@ -1,7 +1,40 @@
 /**
- * Company Brief: the prompt block every tool adds (pure, no imports), so the
- * shared tool cores can use it without pulling in database code.
+ * Company Brief: the prompt block every tool adds (pure: no database code), so
+ * the shared tool cores can use it without pulling in server-only modules.
  */
+
+import { headingKey, joinBrief, splitBrief } from "@/lib/company-brief-types";
+
+/** Sections a tool must always see in full: the user's own rules. */
+const KEEP_WHOLE = new Set([
+  "goals", "challenges", "off limits and policies", "what counts as a good or bad result",
+  "voice and style", "founder and spokesperson stories",
+].map(headingKey));
+
+/**
+ * Fit a brief into `max` characters without losing the sections that matter
+ * most. Test 10 Sep 2026: a one-click research brief for Efani came to 10,328
+ * characters, and a plain cut at 8,000 would have dropped "Off limits" and
+ * "What counts as a good or bad result". Order: drop "Gaps and open
+ * questions" (tools don't need it), then take the last line off the longest
+ * trimmable section, repeatedly, until it fits.
+ */
+export function fitBrief(text: string, max: number): string {
+  if (text.length <= max) return text;
+  const parts = splitBrief(text);
+  parts.sections = parts.sections.filter(s => headingKey(s.heading) !== headingKey("Gaps and open questions"));
+  let out = joinBrief(parts);
+  let guard = 500;
+  while (out.length > max && guard-- > 0) {
+    const trimmable = parts.sections
+      .filter(s => !KEEP_WHOLE.has(headingKey(s.heading)) && s.body.includes("\n"))
+      .sort((a, b) => b.body.length - a.body.length)[0];
+    if (!trimmable) break;
+    trimmable.body = trimmable.body.slice(0, trimmable.body.lastIndexOf("\n"));
+    out = joinBrief(parts);
+  }
+  return out.length <= max ? out : clipAtHeading(out, max);
+}
 
 /** Cut a long brief at the last "## " heading that fits, so a section is
  * never sent half-finished. */

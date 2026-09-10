@@ -83,6 +83,7 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - After the offer, END WITH EXACTLY ONE short question that is easy to say yes to (for example, whether they would like the data or a call this week), then a one-line offer to send more. Never end on a pleasantry.
 - Plain punctuation only. Do NOT use em dashes or en dashes. Use full stops and commas.
 - No superlatives, no "I hope this finds you well", no "game-changing", "revolutionary", "excited to share", "reaching out", "circle back", "leverage", "in today's landscape". No flattery about their recent article unless a specific one is named in the brief.
+- WHEN A COMPANY BRIEF IS SUPPLIED, add exactly ONE sentence of authority from it straight after the hook: the sender's own true story (e.g. why they started the company) or one proof point, in the first person. A pitch without it scores low on personal brand, and the brief is where it comes from. Keep a self-reported claim framed as the company's own claim. Use a customer story only if the brief marks it public or anonymised. Make room by trimming elsewhere, never by going over the word limit.
 - Never invent a statistic, a source, a date or a credential. Use only what the brief gives you. If the brief is thin, write a shorter pitch rather than padding it with invention.
 - Close with a signature block, one item per line: the sender's full name, their title and company, the company website, then their email and LinkedIn if given. Copy the SIGNATURE lines from the brief exactly. Where the brief shows a [bracketed placeholder], keep the placeholder exactly as written so the user fills it in. Never sign with the company name alone and never invent a name, title or contact.
 - The subject line is 6 to 9 words, concrete, and contains the strongest fact or the offer. Tailor it to this journalist's beat so two journalists in the same batch do not get the same subject. No colons used as clickbait, no questions.
@@ -119,10 +120,11 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
   if (brief.companyWebsite) lines.push(`Website: ${brief.companyWebsite}`);
   if (brief.senderName) lines.push(`Person sending the pitch: ${brief.senderName}${brief.senderTitle ? `, ${brief.senderTitle}` : ""}`);
   if (brief.companyBrief) {
-    // Proof points and true stories come from here. Pick ONE proof point and at
-    // most one story that fit this journalist; the length limits still apply.
+    // Proof points and true stories come from here. Test 10 Sep 2026: with the
+    // brief supplied but "at most one" wording, the drafter used none; adding
+    // two founder facts by hand had lifted the same pitch from 77 to 80.
     lines.push(briefPromptBlock(brief.companyBrief).trim());
-    lines.push("Use at most one proof point and one short story from the brief, whichever fits this journalist best. Stay inside the word limit.");
+    lines.push("From the brief, use exactly one authority sentence (the sender's own story or one proof point), whichever fits this journalist best. Stay inside the word limit.");
   }
   lines.push("");
   // The signature is assembled here, not left to the model: a missing field

@@ -9,9 +9,9 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { BRIEF_MAX, type BriefStatus, type CompanyBrief } from "@/lib/company-brief-types";
+import { BRIEF_MAX, changedSections, headingKey, type BriefStatus, type CompanyBrief } from "@/lib/company-brief-types";
 
-const COLUMNS = "company_id, content, status, source, sources, researched_at, updated_at";
+const COLUMNS = "company_id, content, status, source, sources, researched_at, updated_at, locked_sections";
 
 async function db() {
   const { userId, getToken } = await auth();
@@ -31,12 +31,15 @@ export async function getCompanyBrief(companyId: string): Promise<CompanyBrief |
 /**
  * Save the user's text. `status` "approved" is the switch that lets tools use
  * it; any edit saved as "draft" takes it back out of the tools until approved
- * again. An empty brief is deleted rather than stored.
+ * again. An empty brief is deleted rather than stored. Sections the user
+ * edited are recorded in locked_sections so research never overwrites them.
  */
 export async function saveCompanyBrief(
   companyId: string,
   content: string,
   status: BriefStatus,
+  /** Headings the user handed back to research ("Let research update this"). */
+  unlock: string[] = [],
 ): Promise<CompanyBrief | null> {
   if (!companyId) return null;
   const client = await db();
@@ -51,7 +54,18 @@ export async function saveCompanyBrief(
   const { data: company } = await client.from("companies").select("org_id").eq("id", companyId).maybeSingle();
   if (!company) { console.warn(`saveCompanyBrief: no company ${companyId}`); return null; }
 
-  const { data: existing } = await client.from("company_briefs").select("source").eq("company_id", companyId).maybeSingle();
+  const { data: existing } = await client
+    .from("company_briefs")
+    .select("source, content, locked_sections")
+    .eq("company_id", companyId)
+    .maybeSingle();
+
+  // Any section whose text the user changed becomes theirs: a later
+  // "Research their website" will not overwrite it.
+  const unlockKeys = new Set(unlock.map(headingKey));
+  const locked = new Set<string>((existing?.locked_sections as string[] | undefined) ?? []);
+  for (const k of changedSections((existing?.content as string | undefined) ?? "", text)) locked.add(k);
+  for (const k of unlockKeys) locked.delete(k);
 
   const { data, error } = await client
     .from("company_briefs")
@@ -61,6 +75,7 @@ export async function saveCompanyBrief(
       content: text,
       status: status === "approved" ? "approved" : "draft",
       source: (existing?.source as string | undefined) ?? "manual",
+      locked_sections: [...locked],
       updated_at: new Date().toISOString(),
     }, { onConflict: "company_id" })
     .select(COLUMNS)

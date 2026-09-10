@@ -4,7 +4,8 @@
  * POST { companyId, mode: "research" }                  → read the company's website, draft the brief
  * POST { companyId, mode: "condense", text, fileName }  → rewrite an uploaded / pasted doc into the brief
  *
- * Either way the result is saved as a DRAFT. Tools only use a brief once the
+ * Either way the result is saved as a DRAFT, merged into any existing brief:
+ * sections the user wrote themselves are kept, research fills the rest. Tools only use a brief once the
  * user approves it (actions/company-briefs.ts), so a bad read can never reach
  * a pitch unseen. The company row is loaded server-side and scoped to the
  * caller's org; the browser sends ids only.
@@ -14,7 +15,7 @@ import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { withAiUsage } from "@/lib/ai-usage";
 import { researchCompany, condenseToBrief } from "@/lib/company-brief-research";
-import { BRIEF_UPLOAD_MAX } from "@/lib/company-brief-types";
+import { BRIEF_MAX, BRIEF_UPLOAD_MAX, mergeBriefs } from "@/lib/company-brief-types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -77,6 +78,18 @@ export async function POST(req: NextRequest) {
     source = "upload";
   }
 
+  // Never overwrite the user's own words: sections they wrote or edited
+  // (locked_sections) are kept; research only fills the rest.
+  const { data: existing } = await db
+    .from("company_briefs")
+    .select("content, locked_sections")
+    .eq("company_id", companyId)
+    .eq("org_id", orgId)
+    .maybeSingle();
+  if (existing?.content) {
+    content = mergeBriefs(existing.content as string, content, (existing.locked_sections as string[]) ?? [], co.name).slice(0, BRIEF_MAX);
+  }
+
   const now = new Date().toISOString();
   const { data: saved, error } = await db
     .from("company_briefs")
@@ -90,7 +103,7 @@ export async function POST(req: NextRequest) {
       researched_at: source === "research" ? now : null,
       updated_at: now,
     }, { onConflict: "company_id" })
-    .select("company_id, content, status, source, sources, researched_at, updated_at")
+    .select("company_id, content, status, source, sources, researched_at, updated_at, locked_sections")
     .single();
 
   if (error || !saved) {

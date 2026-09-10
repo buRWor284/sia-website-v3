@@ -4,15 +4,19 @@
  * CompanyBriefPanel — the Company Brief for the selected company (2026-09-10).
  *
  * Three ways in: "Research their website" (EMOS reads it), "Upload .md / .txt"
- * or paste (EMOS rewrites it under the fixed headings), or write it by hand
- * from a blank template. Whatever comes back is a DRAFT; the tools only use it
+ * or paste (EMOS rewrites it under the fixed headings), or type straight into
+ * the section boxes. Whatever comes back is a DRAFT; the tools only use it
  * after "Approve". Opened from CompanyPicker → Manage → Company brief.
+ *
+ * One box per heading. Any box the user types in becomes theirs ("Yours") and
+ * research never overwrites it again, unless they hand it back.
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getCompanyBrief, saveCompanyBrief } from "@/app/emos-platform/actions/company-briefs";
 import {
-  BRIEF_MAX, BRIEF_UPLOAD_MAX, blankBrief, selfServePrompt, type CompanyBrief,
+  BRIEF_MAX, BRIEF_UPLOAD_MAX, BRIEF_SECTION_HINTS, BRIEF_SECTIONS, changedSections,
+  headingKey, joinBrief, normaliseParts, selfServePrompt, splitBrief, type CompanyBrief,
 } from "@/lib/company-brief-types";
 
 const PAPER  = "#f1ebde";
@@ -51,6 +55,8 @@ export default function CompanyBriefPanel({
   const [pasteOpen, setPasteOpen] = useState(false);
   const [paste, setPaste] = useState("");
   const [pending, setPending] = useState<Pending>(null);
+  const [raw, setRaw] = useState(false);
+  const [unlock, setUnlock] = useState<string[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -64,12 +70,28 @@ export default function CompanyBriefPanel({
     return () => { live = false; };
   }, [companyId]);
 
-  const dirty = text !== (brief?.content ?? "");
+  const dirty = text !== (brief?.content ?? "") || unlock.length > 0;
   const hasContent = !!(brief?.content ?? "").trim();
+  const parts = useMemo(() => normaliseParts(splitBrief(text), companyName), [text, companyName]);
+  const editedNow = useMemo(() => new Set(changedSections(brief?.content ?? "", text)), [brief?.content, text]);
+  const lockedKeys = useMemo(() => {
+    const k = new Set([...(brief?.locked_sections ?? []), ...editedNow]);
+    for (const u of unlock) k.delete(u);
+    return k;
+  }, [brief?.locked_sections, editedNow, unlock]);
+
+  function setSection(i: number, body: string) {
+    const next = parts.sections.map((s, j) => (j === i ? { ...s, body } : s));
+    setText(joinBrief({ title: parts.title, sections: next }).slice(0, BRIEF_MAX));
+    const k = headingKey(parts.sections[i].heading);
+    setUnlock(u => u.filter(x => x !== k));
+  }
 
   function run(p: Exclude<Pending, null>) {
-    // Replacing existing work needs a second click, never a native dialog.
-    if (hasContent || text.trim()) { setPending(p); return; }
+    // Research never overwrites the user's own sections, so the only thing to
+    // confirm is taking an approved brief back out of the tools (a second
+    // click, never a native dialog).
+    if (hasContent && brief?.status === "approved") { setPending(p); return; }
     void execute(p);
   }
 
@@ -88,6 +110,7 @@ export default function CompanyBriefPanel({
       if (!res.ok || !data.brief) { setError(data.error || "Something went wrong. Please try again."); return; }
       setBrief(data.brief);
       setText(data.brief.content);
+      setUnlock([]);
       setPasteOpen(false); setPaste("");
       setInfo("Draft ready. Read it, fix anything wrong, then approve it so the tools can use it.");
     } catch {
@@ -109,11 +132,12 @@ export default function CompanyBriefPanel({
 
   async function save(status: "draft" | "approved") {
     setBusy("save"); setError(null); setInfo(null);
-    const saved = await saveCompanyBrief(companyId, text, status);
+    const saved = await saveCompanyBrief(companyId, text, status, unlock);
     setBusy(null);
     if (!saved && text.trim()) { setError("Could not save. Please try again."); return; }
     setBrief(saved);
     setText(saved?.content ?? "");
+    setUnlock([]);
     setInfo(!saved ? "Brief removed." : status === "approved"
       ? "Approved. SignalIQ, AssetIQ, JournoCollabIQ and the pitch drafter now use it for this company."
       : "Saved as a draft. The tools won't use it until you approve it.");
@@ -166,9 +190,6 @@ export default function CompanyBriefPanel({
         <button onClick={() => setPasteOpen(o => !o)} disabled={!!busy} style={BTN(false, !busy)}>
           {pasteOpen ? "Close paste" : "Paste notes"}
         </button>
-        <button onClick={() => { setText(blankBrief(companyName)); setInfo("Blank template added. Fill in what you know, then save or approve."); }} disabled={!!busy} style={BTN(false, !busy)}>
-          Blank template
-        </button>
         <button onClick={copyPrompt} style={{ ...BTN(false), border: "none", textDecoration: "underline", padding: "7px 4px" }}>
           Copy prompt for your own AI
         </button>
@@ -176,16 +197,16 @@ export default function CompanyBriefPanel({
 
       <p style={{ ...NOTE, margin: 0, fontSize: 11.5 }}>
         {website
-          ? <>Research reads up to 10 pages of <strong>{website}</strong> and costs about as much as one pitch score in AI fees (a few cents). Upload or paste costs about the same. Both replace the current draft and nothing is used until you approve it.</>
+          ? <>Research reads up to 10 pages of <strong>{website}</strong> and takes 20 to 60 seconds. It only fills sections you haven&apos;t written yourself, and nothing is used until you approve it.</>
           : <>Add the company&apos;s website (Manage → Edit) to use Research. Upload, paste or the template work without it.</>}
       </p>
 
       {pending && (
         <div style={{ border: `1px solid ${YEL}`, background: "rgba(245,184,31,.10)", padding: "9px 12px", display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <span style={{ fontFamily: SERIF, fontSize: 13, color: INK }}>
-            This replaces the brief below with a new draft{hasContent && status === "approved" ? " and takes it out of use until you approve again" : ""}.
+            This updates the brief (your own sections stay) and takes it out of use until you approve it again.
           </span>
-          <button onClick={() => void execute(pending)} style={BTN(true)}>Replace it</button>
+          <button onClick={() => void execute(pending)} style={BTN(true)}>Update it</button>
           <button onClick={() => setPending(null)} style={{ ...BTN(false), border: "none" }}>Cancel</button>
         </div>
       )}
@@ -221,19 +242,60 @@ export default function CompanyBriefPanel({
 
       {busy === "load" ? (
         <p style={{ ...NOTE, margin: 0 }}>Loading…</p>
-      ) : (text || brief) ? (
+      ) : (
         <>
           {brief?.source === "research" && brief.status === "draft" && !dirty && (
             <p style={{ ...NOTE, margin: 0, color: INK }}>
               Check it before approving: everything here came from their website, and their claims about themselves are marked self-reported.
             </p>
           )}
-          <textarea
-            value={text}
-            onChange={e => setText(e.target.value.slice(0, BRIEF_MAX))}
-            rows={18}
-            style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK}`, color: INK, fontFamily: MONO, fontSize: 12, padding: "10px 12px", lineHeight: 1.55, resize: "vertical" }}
-          />
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button onClick={() => setRaw(r => !r)} style={{ ...BTN(false), border: "none", textDecoration: "underline", padding: "2px 0" }}>
+              {raw ? "Edit section by section" : "Edit as one document"}
+            </button>
+          </div>
+          {raw ? (
+            <textarea
+              value={text}
+              onChange={e => setText(e.target.value.slice(0, BRIEF_MAX))}
+              rows={18}
+              style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK}`, color: INK, fontFamily: MONO, fontSize: 12, padding: "10px 12px", lineHeight: 1.55, resize: "vertical" }}
+            />
+          ) : (
+            <div style={{ display: "grid", gap: 10 }}>
+              {parts.sections.map((sec, i) => {
+                const k = headingKey(sec.heading);
+                const fixed = BRIEF_SECTIONS.find(h => headingKey(h) === k);
+                const mine = lockedKeys.has(k);
+                const lines = sec.body.split("\n").length;
+                return (
+                  <div key={k} style={{ border: `1px solid ${INK15}`, background: PAPER, padding: "8px 10px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: INK }}>{sec.heading}</span>
+                      {sec.body.trim() && (
+                        <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".12em", textTransform: "uppercase", padding: "2px 6px", background: mine ? INK : "transparent", color: mine ? PAPER : INK55, border: mine ? "none" : `1px solid ${INK15}` }}>
+                          {mine ? "Yours" : brief?.source === "research" ? "From website" : brief?.source === "upload" ? "From your document" : "Draft"}
+                        </span>
+                      )}
+                      {mine && (brief?.locked_sections ?? []).includes(k) && (
+                        <button onClick={() => setUnlock(u => [...u, k])} style={{ ...BTN(false), border: "none", textDecoration: "underline", padding: 0, fontSize: 8 }}>
+                          Let research update this
+                        </button>
+                      )}
+                    </div>
+                    {fixed && <div style={{ ...NOTE, fontSize: 11, marginBottom: 5 }}>{BRIEF_SECTION_HINTS[fixed]}</div>}
+                    <textarea
+                      value={sec.body}
+                      onChange={e => setSection(i, e.target.value)}
+                      rows={Math.min(10, Math.max(2, lines + 1))}
+                      placeholder="Leave empty if unknown."
+                      style={{ width: "100%", boxSizing: "border-box", background: "#fbf8f1", border: `1px solid ${INK15}`, color: INK, fontFamily: MONO, fontSize: 12, padding: "7px 9px", lineHeight: 1.5, resize: "vertical" }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <button onClick={() => void save("approved")} disabled={!!busy || !text.trim()} style={BTN(true, !busy && !!text.trim())}>
               {status === "approved" && !dirty ? "Approved" : "Approve and use"}
@@ -256,8 +318,6 @@ export default function CompanyBriefPanel({
             </details>
           )}
         </>
-      ) : (
-        <p style={{ ...NOTE, margin: 0 }}>No brief yet. Pick one of the options above.</p>
       )}
     </div>
   );
