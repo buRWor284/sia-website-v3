@@ -536,6 +536,11 @@ export function OppCard({
         <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 17, lineHeight: 1.2, color: INK, letterSpacing: "-0.01em" }}>
           {opp.headline}
         </h3>
+        {opp.thinEvidence && (
+          <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK70 }}>
+            Thin evidence: every signal here is a very small sample, so the score is capped at 59. Check the counts before you pitch it.
+          </p>
+        )}
         {/* Why now — market-timing driver (coverage gap) */}
         <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
           <span style={{ flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>

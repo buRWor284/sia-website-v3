@@ -119,7 +119,10 @@ export async function runPackRequest(
       },
       body: JSON.stringify({
         model: SIGNALIQ_MODEL,
-        max_tokens: 1600,
+        // Raised 1600 -> 2500 on 2026-09-10: the first two logged packs used
+        // 1,257 and 1,302 tokens, over 80% of the old cap. Output is only as
+        // long as it needs to be, so the headroom costs nothing.
+        max_tokens: 2500,
         temperature: 0.4,
         system: PACK_SYSTEM,
         tools: [PACK_TOOL],
@@ -133,8 +136,14 @@ export async function runPackRequest(
       return { ok: false, error: err?.error?.message || `Anthropic API error ${res.status}`, status: res.status };
     }
 
-    const json = (await res.json()) as { content?: Array<{ type: string; name?: string; input?: unknown }> };
+    const json = (await res.json()) as { content?: Array<{ type: string; name?: string; input?: unknown }>; stop_reason?: string };
     await recordAiUsage("signaliq-pack", SIGNALIQ_MODEL, json); // cost log (stage 3)
+    // Same guard as PressIQ (97d91e6) and the profile call (cdda9c0): a cut-off
+    // tool call still parses, and a half pack would be saved as a whole one.
+    if (json.stop_reason === "max_tokens") {
+      console.error("signaliq pack: output truncated (stop_reason=max_tokens)");
+      return { ok: false, error: "The pack was cut short before it finished. Please try again.", status: 502 };
+    }
     content = json.content ?? [];
   } catch (e) {
     console.error("signaliq pack core error:", e);

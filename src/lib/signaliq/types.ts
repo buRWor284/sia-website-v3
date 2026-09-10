@@ -108,6 +108,9 @@ export interface Opportunity {
    *  cooling off, not building toward a lead. Whitespace / "ahead of the coverage" framing
    *  should not apply. See SignalIQ-Notes-and-TODOs.md, "Scoring logic gap" (2026-07-08). */
   cooling?: boolean;
+  /** Every signal behind this topic is a sample too small to call a trend, so
+   *  the score is capped inside the Early band (score.ts, 2026-09-10). */
+  thinEvidence?: boolean;
   coverage: Coverage | null;
   signals: Signal[];       // the receipts
   sensitive: boolean;      // tasteful-newsjacking flag (RFP §11.4)

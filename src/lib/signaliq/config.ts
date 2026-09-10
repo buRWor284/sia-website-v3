@@ -82,6 +82,11 @@ export const BANDS: { min: number; band: OppBand; label: string }[] = [
   { min: 0, band: "noise", label: "Noise / late" },
 ];
 
+/** Highest score a topic can show when EVERY signal behind it is a too-small
+ * sample (2026-09-10). 59 = top of "Early", so a single SEC filing plus a
+ * Wikipedia blip can no longer be labelled a "Hot lead". */
+export const THIN_EVIDENCE_MAX_SCORE = 59;
+
 export function bandFor(score: number): { min: number; band: OppBand; label: string } {
   return BANDS.find((b) => score >= b.min) ?? BANDS[BANDS.length - 1];
 }

@@ -14,7 +14,7 @@
  * so the radar is focused on THIS company without faking the strength numbers.
  */
 import type { BeatId, Coverage, Opportunity, ProfileExpansion, Signal } from "./types";
-import { RELEVANCE_FLOOR, WEIGHTS, bandFor, beatById, isSensitive } from "./config";
+import { RELEVANCE_FLOOR, THIN_EVIDENCE_MAX_SCORE, WEIGHTS, bandFor, beatById, isSensitive } from "./config";
 
 const clamp01 = (n: number): number => Math.max(0, Math.min(1, Number.isFinite(n) ? n : 0));
 const maxOr0 = (xs: number[]): number => (xs.length ? Math.max(...xs) : 0);
@@ -162,7 +162,13 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     WEIGHTS.corroborationBonus * corr;
 
   // Displayed score = honest signal strength (NOT scaled by relevance).
-  const score = Math.round(clamp01(base) * 100);
+  // Thin evidence (2026-09-10, Efani test run): when EVERY signal is a sample too
+  // small to call a trend, the ratios can still come out large ("number
+  // porting" scored 82 "Hot lead" on 1 SEC filing and 12 Wikipedia views/day).
+  // Cap it inside the Early band so the label cannot oversell a handful of data.
+  const thinEvidence = signals.length > 0 && signals.every((s) => s.lowSample === true);
+  const rawScore = Math.round(clamp01(base) * 100);
+  const score = thinEvidence ? Math.min(rawScore, THIN_EVIDENCE_MAX_SCORE) : rawScore;
   const band = bandFor(score);
 
   const headline = signals[0]?.title?.trim() || topic;
@@ -181,6 +187,7 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     tailored,
     fit: fitTier,
     cooling,
+    thinEvidence,
     coverage,
     signals,
     sensitive,

@@ -10,7 +10,8 @@ export const PACK_SYSTEM = `You are an earned-media strategist helping a founder
 
 Rules you MUST follow:
 - This is an early signal, NOT a prediction. Never claim the story will break or use forecast language. Frame it as being "ahead of the coverage."
-- Ground everything in the SIGNAL DATA provided. Do not invent statistics, quotes, studies, or events. You may add widely-known context, but never fabricate specifics.
+- Ground everything in the SIGNAL DATA provided. Do not invent statistics, quotes, studies, or events. You may add widely-known context in words, but never a number, date, dollar figure or named study that is not in the SIGNAL DATA or the company context.
+- Never open the pitch angle with a number that your own cautions say is unreliable or too small to call a trend. Lead instead with what only this founder can offer.
 - Never invent the names of specific real journalists, and never make allegations about named private individuals. For outreach targets, give the OUTLET and the DESK/beat (e.g. "Consumer-finance reporter at American Banker"), not a fabricated person.
 - Whitespace only exists when the underlying activity is rising (or steady) while press coverage lags behind it. If the signal data says this topic is COOLING (falling or flat activity AND falling press coverage), do NOT call it whitespace, a lead, or "ahead of the coverage" — that framing is backwards. Instead frame it as retrospective/analysis context at most, and say plainly in "cautions" that coverage of this topic already peaked.
 - If a signal or the press-coverage line says the sample is too small to call a trend, or that the baseline is dominated by one filer, do NOT state a specific % change as settled fact (e.g. never assert something like "filings are down 64%" off a handful of data points or one company's disclosure calendar) — soften the language and put the caveat plainly in "cautions" instead.
@@ -89,7 +90,11 @@ export function buildPackPrompt(opp: Opportunity, companyContext?: string): stri
 Beat: ${opp.beat}
 Topic: ${opp.topic}
 Working headline from the data: ${opp.headline}
-Opportunity score: ${opp.score}/100 (${opp.bandLabel}) — a lead/whitespace measure, not a probability.
+Opportunity score: ${opp.score}/100 (${opp.bandLabel}) — a lead/whitespace measure, not a probability.${
+    opp.thinEvidence
+      ? "\nEVIDENCE IS THIN: every signal below is a sample too small to call a trend. Do not open the pitch angle with any of these numbers. Lead with the founder's own expertise, data or offer, and mention the signal only as light context, if at all."
+      : ""
+  }
 ${contextBlock}
 SIGNAL DATA (the receipts — ground everything here):
 ${signalLines}

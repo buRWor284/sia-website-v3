@@ -11,6 +11,11 @@ import { SOURCE_CREDIBILITY } from "../config";
 import { avg, clamp01, getJson, ymd } from "./http";
 
 const VIEW_CAP = 5000; // ~5k views/day with no prior baseline = strong
+/** Below this many daily readers a percentage "spike" is a handful of people,
+ * not attention (2026-09-10: an "84% jump" at 12 views/day helped a single-
+ * filing topic score "Hot"). Flagged lowSample so the scorer and the pack
+ * prompt treat it as too small to call a trend. A heuristic floor. */
+const MIN_DAILY_VIEWS = 50;
 
 interface SearchResp {
   pages?: { key: string; title: string }[];
@@ -60,6 +65,7 @@ export async function wikipediaSignal(seed: string): Promise<Signal | null> {
     const magnitude = clamp01(prior > 0 ? recent / (prior * 3) : recent / VIEW_CAP);
     const velocity = clamp01(spike - 1); // +100% → 1.0
     const label = key.replace(/_/g, " ");
+    const lowSample = recent < MIN_DAILY_VIEWS;
 
     return {
       source: "wikipedia",
@@ -73,7 +79,8 @@ export async function wikipediaSignal(seed: string): Promise<Signal | null> {
       magnitude,
       velocity,
       credibility: SOURCE_CREDIBILITY.wikipedia,
-      detail: `${Math.round(recent)} views/day (14d avg)`,
+      detail: `${Math.round(recent)} views/day (14d avg)${lowSample ? "; too few readers to call a spike" : ""}`,
+      lowSample,
     };
   } catch {
     return null;
