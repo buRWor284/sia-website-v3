@@ -496,7 +496,7 @@ function AssetRow({
               </div>
               <Markdown text={brief} size={13.5} />
               <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
-                Written by AI. Anything in [square brackets] is a number to look up. Check every other figure against its original source before you publish or pitch it.
+                Drafted with AI assistance, for you to edit. Anything in [square brackets] is a number to look up. Check every other figure against its original source before you publish or pitch it.
               </p>
               <div className="aiq-noprint" style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
                 <a
@@ -732,7 +732,7 @@ export default function AssetIQClient({
                 </div>
                 <Markdown text={creationPlan} size={14} />
                 <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
-                  Written by AI. Anything in [square brackets] is a number to look up. Check every other figure against its original source before you publish or pitch it.
+                  Drafted with AI assistance, for you to edit. Anything in [square brackets] is a number to look up. Check every other figure against its original source before you publish or pitch it.
                 </p>
                 <div className="aiq-noprint" style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
                   <a

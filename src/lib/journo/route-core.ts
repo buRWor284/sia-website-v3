@@ -73,7 +73,7 @@ Return ONLY a valid JSON array — no text before or after, no markdown fences. 
     "beat": "Their actual beat in a few words, e.g. 'cybersecurity and privacy' or 'consumer fintech'. Describe what THEY cover, not the user's search.",
     "linkPage": "URL of a recent relevant article BY this journalist (the proof they cover this) — or their author/section page if no specific article URL is known. Never invent a URL.",
     "contact": "Public contact only: an X/Twitter handle you are certain of (e.g. @karaswisher), otherwise the outlet desk/section. NEVER a guessed personal email or a guessed handle.",
-    "contactLinkedIn": "Muck Rack or X profile URL if known, else empty string",
+    "contactLinkedIn": "A LinkedIn, Muck Rack or X profile URL ONLY if you are certain it is this journalist's real profile, else empty string. Never build a URL from their name.",
     "seoNote": "Outlet authority + reach and tier, e.g. 'DA 94 · national business desk · very high reach · Tier 1'",
     "tier": "A or B or C — A = highest-fit, approach first"
   }

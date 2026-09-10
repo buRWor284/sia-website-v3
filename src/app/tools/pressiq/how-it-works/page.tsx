@@ -24,6 +24,7 @@ import Link from "next/link";
 import { GROT, INK, INK15, INK35, INK55, INK70, MONO, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { ToolHeader } from "@/components/tools/ToolHeader";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
+import ScoreTargets from "@/components/pressiq/ScoreTargets";
 
 /* ── Handoff-local colors (no token equivalents) ─────────────────────── */
 const PAPER3 = "#faf6ec";            // card / input fill (slightly lighter than paper)
@@ -802,6 +803,11 @@ Newsroom-ready: (100 − 90) × 0.12 = 1.20`}</pre>
                 </div>
               </div>
             </div>
+          </section>
+
+          {/* ===== WHAT TO AIM FOR (2026-09-10) — same numbers as the scorer ===== */}
+          <section style={{ padding: "6px 0 20px" }}>
+            <ScoreTargets />
           </section>
 
           {/* ===== 32-POINT CHECKLIST (collapsible) ===== */}

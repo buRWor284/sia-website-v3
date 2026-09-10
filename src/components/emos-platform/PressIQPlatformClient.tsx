@@ -34,6 +34,7 @@ import PitchDrafter from "@/components/emos-platform/PitchDrafter";
 import PriorContact from "@/components/emos-platform/PriorContact";
 import type { JournalistHistory } from "@/lib/journalist-history-types";
 import type { DbPitchDraft } from "@/lib/pitch-draft-types";
+import ScoreTargets from "@/components/pressiq/ScoreTargets";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -540,6 +541,17 @@ export default function PressIQPlatformClient({
 
       {/* ── Score ─────────────────────────────────────────────────────────── */}
       <div role="tabpanel" hidden={tab !== "score"}>
+        {/* What to aim for (2026-09-10): the same targets the scorer and the
+            drafter use, visible where the pitch is written. Collapsed by
+            default so it never pushes the tool down. */}
+        <details style={{ marginBottom: 16 }}>
+          <summary style={{ cursor: "pointer", fontFamily: "var(--font-grot)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(26,20,16,.55)", padding: "6px 0" }}>
+            What a sendable pitch looks like (aim for 85+)
+          </summary>
+          <div style={{ marginTop: 8 }}>
+            <ScoreTargets compact />
+          </div>
+        </details>
         {reopened && (
           <div style={{ border: `1px solid ${YEL}`, background: "rgba(245,184,31,.12)", padding: "10px 14px", marginBottom: 18, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 7px" }}>
