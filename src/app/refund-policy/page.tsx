@@ -28,6 +28,9 @@ const sections: { heading: string; body: React.ReactNode }[] = [
         <p style={{ marginTop: 14 }}>
           A "verified media placement" means any earned coverage in a recognized outlet that names you as a source or subject, obtained using the EMOS system during your cohort. All earned forms count: a published article or feature, an expert quote, a podcast interview, or an inclusion in a roundup. It does not need to be a Tier 1 outlet.
         </p>
+        <p style={{ marginTop: 14 }}>
+          <strong>Withdrawing before the cohort starts:</strong> payment is due after the fit call and before the cohort starts, invoiced in USD by SIA Enterprises Inc. If you withdraw before day one you get a full refund, no questions. After day one the placements-or-refund guarantee applies as written.
+        </p>
       </>
     ),
   },

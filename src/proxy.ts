@@ -1,3 +1,4 @@
+// Next.js 16 "proxy" convention (renamed from middleware.ts 2026-09-02; runs on the Node runtime).
 import { clerkMiddleware, clerkClient, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse, type NextRequest } from "next/server";
 

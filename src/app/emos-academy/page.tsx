@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { SectionMast } from "@/components/bureau/primitives";
 import AuthorityCalculator from "@/components/bureau/AuthorityCalculator";
 import {
@@ -24,6 +25,34 @@ import {
   MONO,
   YEL,
 } from "@/lib/tokens";
+
+// A credibility chip. Renders a plain span, or an <a> when an href is supplied,
+// so a claim that can be proven links straight to its proof. Same pattern as fractional-cmo/page.tsx.
+const Chip = ({
+  href,
+  style,
+  children,
+}: {
+  href?: string;
+  style?: CSSProperties;
+  children: ReactNode;
+}) =>
+  href ? (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ ...style, textDecoration: "underline", textUnderlineOffset: 3 }}
+    >
+      {children}
+    </a>
+  ) : (
+    <span style={style}>{children}</span>
+  );
+
+const FORBES_AUTHOR_PAGE = "https://www.forbesmiddleeast.com/author/syed-irfan-ajmal";
+const HBR_CASE_STUDY = "https://hbr.org/2019/12/how-to-motivate-your-team-during-crunch-time";
+const WORLD_BANK_POST = "https://blogs.worldbank.org/en/endpovertyinsouthasia/why-introvert-me-looks-forward-attending-digital-youth-summit";
 
 const OG_TITLE = "EMOS Academy · Build the Media Presence Investors Check";
 const OG_DESC =
@@ -234,7 +263,7 @@ export default function EmosPage() {
                     <div className="pc-title">Columnist · Agency Operator · ~13 Years</div>
                   </div>
                   <div className="pc-creds">
-                    <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text">Forbes, HBR, HuffPost, World Bank, SEJ, The Next Web, Yahoo, MSN, SEMrush, SERPed <em>+ more</em></div></div>
+                    <div className="pc-cred"><div className="pc-cred-label">Written &amp; Cited In</div><div className="pc-cred-text"><Chip href={FORBES_AUTHOR_PAGE}>Forbes</Chip>, <Chip href={HBR_CASE_STUDY}>HBR</Chip>, HuffPost, <Chip href={WORLD_BANK_POST}>World Bank</Chip>, SEJ, The Next Web, Yahoo, MSN, SEMrush, SERPed <em>+ more</em></div></div>
                     <div className="pc-cred"><div className="pc-cred-label">International Speaker</div><div className="pc-cred-text">Arabian Travel Market · MaGIC Malaysia · Astrolabs Dubai · DMSS.io Bali</div></div>
                     <div className="pc-cred"><div className="pc-cred-label">Custom Workshops</div><div className="pc-cred-text">Delivered for SEMrush (NYSE: SEMR) &amp; Uhubs (SaaS, UK)</div></div>
                   </div>
@@ -508,7 +537,7 @@ export default function EmosPage() {
             <div className="max">
               <SectionMast noVol n="9" label="Proof · The Same System. Their Results." />
               <h2 className="sec-h2" style={{ marginBottom: 12 }}>The same system. Their results.</h2>
-              <p className="sec-sub" style={{ marginBottom: 40 }}>Five results from client campaigns across the US, UK, and Gulf. Click any card to read the full testimony.</p>
+              <p className="sec-sub" style={{ marginBottom: 40 }}>Five results from client campaigns across the US, UK, and Gulf. Click any card to read the full testimony. Delivered through my agency, <a href="https://www.dmr.agency/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: 3 }}>DMR.agency</a>.</p>
               <div style={{ overflow: "hidden", border: `1px solid ${INK15}`, padding: "14px 0", marginBottom: 44 }}>
                 <p className="emos-marquee-label" style={{ marginBottom: 10 }}>Founders we&#39;ve worked with</p>
                 <div className="emos-marquee-track" style={{ gap: 40 }}>
@@ -710,6 +739,7 @@ export default function EmosPage() {
                   { q:"When can I expect my first placement?", a:"Most participants submit their first pitches in Week 2 and land their first verified placement within 4 to 6 weeks of cohort end. Tier 1 placements generally take 60 to 120 days from a cold start." },
                   { q:"Will this still work as AI changes search?", a:"Earned media is the most resilient channel against AI-driven shifts. For AI visibility, brand mentions matter even more than backlinks: ChatGPT, Perplexity, and Google's AI Overviews surface the names credible publications talk about, linked or not. Earned coverage gets you both at once: the brand mentions AI cites you for, and the high-authority backlinks that lift your SEO and rank your domain for the terms your buyers use. EMOS doesn't just survive the AI shift; it's built to benefit from it." },
                   { q:"How exactly does the placement guarantee work?", a:"Foundation: 15 pitches, 1 placement in 60 days. Accelerate: 30 pitches, 2 in 90 days. Miss it and I refund in full. Full terms, and what each side commits to, are in The Guarantee above." },
+                  { q:"When do I pay, and can I change my mind?", a:"Payment is due after the fit call and before the cohort starts, invoiced in USD by SIA Enterprises Inc. If you withdraw before day one you get a full refund, no questions. After day one the placements-or-refund guarantee applies as written." },
                   { q:"What are the EMOS tools? And do I really get them free?", a:"Yes. Cohort 1 founding members get free 3-month access. The Journo Outreach Checklist tracks every pitch, follow-up, and placement, and is included on both tracks. Accelerate adds the full suite: PressIQ [Beta], the PR pitch scorer that grades your pitch on mechanics, personalization, and strength; and JournoCollabIQ [Beta], which surfaces the journalists most likely to respond by beat and coverage fit." },
                 ].map(item => (
                   <div className="emos-acc-item" key={item.q}>
