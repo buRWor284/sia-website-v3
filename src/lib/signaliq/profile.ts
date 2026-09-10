@@ -229,7 +229,15 @@ export async function expandCompanyProfile(
       },
       body: JSON.stringify({
         model: SIGNALIQ_MODEL,
-        max_tokens: 1100,
+        // Raised 1100 -> 2000 on 2026-09-10. The first call the new cost log
+        // ever recorded (ai_usage, stage 3) came back with output_tokens = 1100
+        // exactly and stop_reason = max_tokens: a multi-beat selection (up to
+        // ~50 candidates to rate) plus 12-20 themes and 6-12 negatives does not
+        // fit in 1100. The tool call streams its fields in order, so the cut
+        // lands on the relevance lexicon (themes / negatives) first. Output is
+        // only as long as it needs to be, so the higher cap costs nothing on a
+        // short profile.
+        max_tokens: 2000,
         temperature: 0.3,
         system: EXPAND_SYSTEM,
         tools: [EXPAND_TOOL],
@@ -241,8 +249,16 @@ export async function expandCompanyProfile(
       console.error("expandCompanyProfile: anthropic error", res.status);
       return null;
     }
-    const json = (await res.json()) as { content?: ToolUseBlock[] };
+    const json = (await res.json()) as { content?: ToolUseBlock[]; stop_reason?: string };
     await recordAiUsage("signaliq-profile", SIGNALIQ_MODEL, json); // cost log (stage 3); cache hits never reach here
+    // Same lesson as PressIQ's 97d91e6: a cut-off tool call still parses, so
+    // without this check a partial profile (topics present, lexicon missing)
+    // would be used AND cached as if complete. Returning null takes the
+    // documented fallback (generic beat seeds) and caches nothing.
+    if (json.stop_reason === "max_tokens") {
+      console.error("expandCompanyProfile: output truncated (stop_reason=max_tokens), falling back to beat seeds");
+      return null;
+    }
     const expansion = parseExpansion(json.content ?? []);
     if (expansion) cache.set(key, expansion);
     return expansion;
