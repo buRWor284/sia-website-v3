@@ -562,10 +562,16 @@ export default function PressIQPlatformClient({
           key={coreKey}
           api={api}
           initial={{
+            // A saved journalist's beat now seeds the relevance field. Before
+            // 2026-09-10 only ?beat= did, so "Score this one" on a draft for a
+            // named journalist scored with NO beat and the result said
+            // "relevance wasn't assessed" while the bar above showed the beat
+            // (found in the Efani test run). Seeded on remount only (use draft,
+            // reopen), never on a dropdown change, so a half-typed pitch is kept.
             journalistBeat: reopened
               ? (reopened.journalist_query ?? "")
-              : initialQuery,
-            pitchMode: initialQuery ? "standalone" : undefined,
+              : (initialQuery || journalist?.beat || ""),
+            pitchMode: (initialQuery || journalist?.beat) ? "standalone" : undefined,
             result: (reopened?.score_response as ScoreResponse | undefined) ?? undefined,
             pitch: draft?.pitch ?? reopened?.pitch_text ?? undefined,
             subject: draft?.subject ?? undefined,

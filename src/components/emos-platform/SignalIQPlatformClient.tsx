@@ -23,6 +23,7 @@
 
 import React, { useState } from "react";
 import Script from "next/script";
+import { useRouter } from "next/navigation";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import { useCompanyName } from "@/hooks/useCompanyName";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
@@ -302,6 +303,7 @@ export default function SignalIQPlatformClient({
   const [companyContext, setCompanyContext] = useCompanyContext();
   const [companyName, setCompanyName] = useCompanyName();
   const [refreshKey, setRefreshKey] = useState(0);
+  const router = useRouter();
 
   // ── transport: Clerk-guarded platform routes (no Turnstile, no quota) ──────
   const api = {
@@ -328,6 +330,12 @@ export default function SignalIQPlatformClient({
         }),
       });
       const data = await res.json();
+      // The route saves the pack, but a fetch route (unlike a server action)
+      // does not refresh the page's server data, so the Pitch Packs library
+      // below kept showing the old list until a manual reload (found in the
+      // 10 Sep Efani test run). router.refresh() re-reads initialPacks while
+      // keeping this component's state, so the pack on screen stays put.
+      if (res.ok && (data as { savedPackId?: string | null })?.savedPackId) router.refresh();
       return { ok: res.ok, data };
     },
   };
@@ -418,7 +426,9 @@ export default function SignalIQPlatformClient({
       </div>
 
       {/* ── Saved pitch packs ─────────────────────────────────────────────── */}
-      <PackLibrary initialPacks={initialPacks} />
+      {/* Keyed on the pack ids: PackLibrary copies initialPacks into state once,
+          so a refreshed list must remount it to show the new pack. */}
+      <PackLibrary key={initialPacks.map(p => p.id).join(",")} initialPacks={initialPacks} />
 
     </div>
   );
