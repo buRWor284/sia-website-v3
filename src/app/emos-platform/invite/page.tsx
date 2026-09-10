@@ -1,83 +1,33 @@
-"use client";
+import { currentUser } from "@clerk/nextjs/server";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { isEmosAdminEmail } from "@/lib/emos-admins";
+import InviteForm from "./InviteForm";
 
-import { useState } from "react";
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+  title: "Invite (admin)",
+};
 
-const PAPER = "#f1ebde";
-const INK   = "#1a1410";
-const INK55 = "rgba(26,20,16,.55)";
-const INK35 = "rgba(26,20,16,.32)";
-const YEL   = "#f5b81f";
-const GROT  = "var(--font-grot)";
-const SERIF = "var(--font-serif)";
+/**
+ * /emos-platform/invite — admin only.
+ *
+ * Until 2026-09-10 this was a bare client page: any signed-in EMOS user could
+ * open it and see the form. The send button never worked for them (the API
+ * refuses non-admins), but the page advertised an admin surface. Now a
+ * non-admin gets a 404, the same way /emos-platform/admin/costs does, so the
+ * page's existence is not advertised. Middleware has already required a
+ * signed-in account with emos_access before this runs.
+ *
+ * Admin = the VERIFIED primary email is on EMOS_ADMIN_EMAILS. No fallback to
+ * other addresses on the account: an unverified one proves nothing.
+ */
+export default async function InvitePage() {
+  const user = await currentUser();
+  const primary = user?.primaryEmailAddress;
+  const email = primary?.verification?.status === "verified" ? primary.emailAddress : "";
+  if (!isEmosAdminEmail(email)) notFound();
 
-export default function InvitePage() {
-  const [email, setEmail]   = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [msg, setMsg]       = useState("");
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setStatus("loading");
-    setMsg("");
-
-    const res  = await fetch("/api/emos-send-invite", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-    const data = await res.json();
-
-    if (!res.ok) {
-      setMsg(data.error ?? "Something went wrong.");
-      setStatus("error");
-    } else {
-      setMsg(`Invite sent to ${email}`);
-      setStatus("success");
-      setEmail("");
-    }
-  }
-
-  return (
-    <div style={{ minHeight: "100vh", background: PAPER, display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 24px" }}>
-      <div style={{ maxWidth: 440, width: "100%" }}>
-
-        <div style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".18em", textTransform: "uppercase", color: YEL, marginBottom: 12 }}>
-          EMOS Admin
-        </div>
-
-        <h1 style={{ fontFamily: GROT, fontWeight: 900, fontSize: 24, color: INK, margin: "0 0 32px" }}>
-          Send Invite
-        </h1>
-
-        <form onSubmit={handleSubmit}>
-          <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>
-            Email address
-          </label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="invitee@example.com"
-            style={{ display: "block", width: "100%", padding: "10px 12px", background: "rgba(26,20,16,.05)", border: `1px solid ${INK35}`, fontFamily: SERIF, fontSize: 14, color: INK, outline: "none", boxSizing: "border-box", marginBottom: 16 }}
-          />
-
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            style={{ display: "block", width: "100%", padding: "12px", background: status === "loading" ? INK55 : INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", border: "none", cursor: status === "loading" ? "not-allowed" : "pointer" }}
-          >
-            {status === "loading" ? "Sending…" : "Send Invite →"}
-          </button>
-        </form>
-
-        {msg && (
-          <p style={{ marginTop: 16, fontFamily: GROT, fontSize: 12, color: status === "error" ? "#c0392b" : INK55 }}>
-            {msg}
-          </p>
-        )}
-
-      </div>
-    </div>
-  );
+  return <InviteForm />;
 }

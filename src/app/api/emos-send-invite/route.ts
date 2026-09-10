@@ -12,8 +12,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import { isEmosAdminEmail } from "@/lib/emos-admins";
 
-const ADMIN_EMAILS = ["syedirfanajmal@gmail.com", "sia@syedirfanajmal.com"];
 const RESEND_API   = "https://api.resend.com/emails";
 const FROM_EMAIL   = "EMOS Platform <contact@syedirfanajmal.com>";
 
@@ -169,9 +169,19 @@ export async function POST(req: NextRequest) {
   if (!userRes.ok) {
     return NextResponse.json({ error: "Could not verify identity" }, { status: 500 });
   }
-  const userData    = await userRes.json();
-  const callerEmail = userData.email_addresses?.[0]?.email_address;
-  if (!ADMIN_EMAILS.includes(callerEmail)) {
+  // 2026-09-10 hardening. This used to read email_addresses[0] against a
+  // private copy of the admin list: not necessarily the PRIMARY address, never
+  // checked for verification, and case-sensitive. Now: the account's primary
+  // address, only if Clerk has verified it, against the one shared list. A
+  // signed-in customer cannot become an admin by adding an unverified address.
+  type ClerkEmail = { id: string; email_address: string; verification?: { status?: string } | null };
+  const userData = await userRes.json() as {
+    primary_email_address_id?: string | null;
+    email_addresses?: ClerkEmail[];
+  };
+  const primary = userData.email_addresses?.find(e => e.id === userData.primary_email_address_id);
+  const callerEmail = primary?.verification?.status === "verified" ? primary.email_address : "";
+  if (!isEmosAdminEmail(callerEmail)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
