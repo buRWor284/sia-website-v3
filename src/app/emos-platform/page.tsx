@@ -24,12 +24,38 @@ import { RadarCallout } from "@/components/bureau/RadarCallout";
  * Distinct from /emos, which markets the EMOS Academy. This page is the paid
  * *platform* (the connected tool suite). Copy is a concise first pass — refine
  * as the platform's naming/pricing settles.
+ * 2026-09-10: quick-fix pass (indexing, stale copy, radar moved below the
+ * pipeline). A full rebuild is specced separately; see WORKLOG.
  */
 
+const META_TITLE = "EMOS Platform: the earned media operating system";
+const META_DESC =
+  "Five connected earned media tools for founders: find the story, plan the asset, pick the journalists, score the pitch, log the coverage. Everything saved under one login. $149/month, cancel any time.";
+
 export const metadata: Metadata = {
-  title: "EMOS Platform — the earned-media operating system",
-  description:
-    "EMOS connects the SIA earned-media tools into one workflow: detect the story, build the asset, find the journalist, score the pitch, track the coverage.",
+  title: META_TITLE,
+  description: META_DESC,
+  // The /emos-platform layout sets noindex for the whole prefix, which is right
+  // for the dashboard and auth pages but was wrongly swept onto this public
+  // sales page too (found 2026-09-10). Page-level robots replaces the layout's.
+  robots: { index: true, follow: true },
+  // Without this the root layout's canonical ("/") applied, pointing the page
+  // at the homepage.
+  alternates: { canonical: "/emos-platform" },
+  openGraph: {
+    type: "website",
+    siteName: "Syed Irfan Ajmal",
+    url: "https://www.syedirfanajmal.com/emos-platform",
+    title: META_TITLE,
+    description: META_DESC,
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@syedirfanajmal",
+    creator: "@syedirfanajmal",
+    title: META_TITLE,
+    description: META_DESC,
+  },
 };
 
 // ── design tokens (match the dashboard / bureau system) ──────────────────────
@@ -46,13 +72,16 @@ const GROT   = "var(--font-grot)";
 const SERIF  = "var(--font-serif)";
 const MONO   = "var(--font-mono)";
 
-// The connected pipeline (order + copy mirror lib/emos-stage-config STAGE_META).
+// The connected pipeline. Order mirrors lib/emos-stage-config STAGE_META; the
+// descriptions here are buyer-facing and deliberately differ from STAGE_META
+// (2026-09-10: no CRM claim for JournoCollabIQ, CoverageIQ = proof of what the
+// work produced, per EMOS-Architecture-Decisions-2026-09-09.md).
 const PIPELINE: Array<{ n: string; label: string; tool: string; desc: string }> = [
-  { n: "01", label: "SignalIQ",       tool: "Story Detection",       desc: "Scan open data for newsworthy signals and save the strongest opportunities." },
-  { n: "02", label: "AssetIQ",        tool: "Linkable Asset Builder", desc: "Turn a signal into a linkable asset — a report, calculator, or quiz worth citing." },
-  { n: "03", label: "JournoCollabIQ", tool: "Journalist List",        desc: "Build and manage journalist relationships and track every touchpoint." },
-  { n: "04", label: "PressIQ",        tool: "Pitch Scoring",         desc: "Score and sharpen each pitch against a 32-point journalist rubric before you send." },
-  { n: "05", label: "CoverageIQ",     tool: "Pitch Tracking",        desc: "Track the full pipeline from drafted to published to amplified." },
+  { n: "01", label: "SignalIQ",       tool: "Story Detection",       desc: "Scan open data for stories rising in your beat and save the strongest as an asset pack." },
+  { n: "02", label: "AssetIQ",        tool: "Linkable Asset Builder", desc: "Turn a saved signal into a brief for a linkable asset: a report, calculator or quiz a journalist would cite." },
+  { n: "03", label: "JournoCollabIQ", tool: "Journalist List",        desc: "Find journalists by beat and save the ones who fit, with a note on why, so every pitch starts from context." },
+  { n: "04", label: "PressIQ",        tool: "Pitch Scoring",         desc: "Draft pitches aimed at a saved journalist, then score each one on seven dimensions and a 32-point checklist before you send." },
+  { n: "05", label: "CoverageIQ",     tool: "Pitch Tracking",        desc: "Log your pitches and placements in one place, with each outlet's authority, so you can show what the work produced." },
 ];
 
 export default async function EmostoolLandingPage() {
@@ -118,9 +147,9 @@ export default async function EmostoolLandingPage() {
           </span>
         </h1>
         <p style={{ margin: "22px 0 0", maxWidth: 660, fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(16px,1.9vw,21px)", color: INK70, lineHeight: 1.5 }}>
-          The free SIA tools each do one job. EMOS connects them into a single workflow — detect the
-          story, build the asset, find the journalist, score the pitch, track the coverage — under one
-          login, with your pipeline saved as you go.
+          Five tools, one workflow: find the story, plan the asset, pick the journalists, score the
+          pitch, log the coverage. Your company profile, your journalist list and every draft stay
+          saved under one login, so each step starts where the last one stopped.
         </p>
         <div style={{ marginTop: "clamp(24px,3vw,34px)", display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
           {/* P4: the purchase path. Checkout is the primary CTA — sign-up is
@@ -140,9 +169,10 @@ export default async function EmostoolLandingPage() {
         <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
           $149/month · cancel any time · secure payment via Stripe
         </p>
+        <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+          After checkout we email you an invite to set your password. That becomes your login.
+        </p>
       </section>
-
-      <RadarCallout />
 
       {/* ── The connected pipeline ───────────────────────────────────────── */}
       <section style={{ maxWidth: 1120, marginInline: "auto", padding: "clamp(20px,3vw,32px) clamp(20px,4vw,56px) clamp(48px,7vw,88px)" }}>
@@ -188,6 +218,9 @@ export default async function EmostoolLandingPage() {
         </div>
       </section>
 
+      {/* Free radar sits after the pipeline, not under the buy button (2026-09-10). */}
+      <RadarCallout />
+
       {/* ── CTA band ─────────────────────────────────────────────────────── */}
       <section style={{ background: INK, color: CREAM }}>
         <div style={{ maxWidth: 1120, marginInline: "auto", padding: "clamp(40px,6vw,72px) clamp(20px,4vw,56px)", display: "flex", flexWrap: "wrap", gap: "clamp(20px,4vw,48px)", alignItems: "center", justifyContent: "space-between" }}>
@@ -196,8 +229,9 @@ export default async function EmostoolLandingPage() {
               Run the whole play in-house.
             </h2>
             <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(14px,1.7vw,18px)", color: CREAM70, lineHeight: 1.5 }}>
-              The public tools are the shop window. EMOS is the system behind it — the playbooks,
-              the journalist workflow, and every stage of the pipeline in one place.
+              The free tools on this site each answer one question. EMOS keeps the answers: your
+              company profile, saved asset packs, your journalist list with the reason each one is on
+              it, and every pitch you have drafted or scored.
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 220 }}>
@@ -209,6 +243,9 @@ export default async function EmostoolLandingPage() {
             </Link>
             <Link href="/tools" style={{ textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: CREAM70, textDecoration: "underline", textDecorationColor: "rgba(250,250,250,.25)", marginTop: 2 }}>
               Try the free tools first
+            </Link>
+            <Link href="/emos-academy" style={{ textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "underline", textDecorationColor: "rgba(245,184,31,.35)" }}>
+              Rather have it set up with you? EMOS Academy
             </Link>
           </div>
         </div>
