@@ -64,6 +64,10 @@ export const LANGS: Record<string, string> = {
   "zh-tw": "zh-TW", // Traditional Chinese, a separate value in the column.
   ja: "ja",
   th: "th",
+  pt: "pt",
+  de: "de",
+  tr: "tr",
+  ko: "ko", // Korean DOES space its words -> keep it out of CHAR_TOKENISED.
 };
 
 /**

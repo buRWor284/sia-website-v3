@@ -14,6 +14,7 @@ export type BeatId =
   // Radar/data-collection beats — hidden from the public beat picker (see Beat.hidden).
   | "ksa-tourism" | "ksa-giga" | "ksa-banking" | "ksa-retail"
   | "intl-es" | "intl-fr" | "intl-id" | "intl-zh" | "intl-th" | "intl-vi"
+  | "intl-pt" | "intl-de" | "intl-tr" | "intl-ja" | "intl-ko" | "intl-ar"
   | "energy" | "mobility" | "property" | "work" | "media" | "industry"
   | "food" | "education" | "policy" | "web3";
 
