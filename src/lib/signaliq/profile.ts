@@ -31,9 +31,9 @@ export const EXPAND_SYSTEM = `You are an earned-media strategist. Given a founde
 
 Return, via the emit_profile tool:
 
-1. selectedTopics — the subset of the CANDIDATE topics this specific company could credibly comment on, attach a story to, or has standing in (copy each topic verbatim). For each, give a fit rating. These candidates are proven to return signals, so they matter most — but only pick ones that genuinely fit. Match the company's modality, inferred from the description: pick topics the company can actually speak to, and favour topics its product and audience are about over adjacent ones it doesn't build or operate in.
+1. selectedTopics — the subset of the CANDIDATE topics this specific company could credibly comment on, attach a story to, or has standing in (copy each topic verbatim). For each, give a fit rating. These candidates are proven to return signals, so they matter most — but only pick ones that genuinely fit. Return AT MOST 12, strongest fit first, and leave low-fit topics out: the scan only uses 16 topics in total, so anything beyond that is thrown away. Match the company's modality, inferred from the description: pick topics the company can actually speak to, and favour topics its product and audience are about over adjacent ones it doesn't build or operate in.
 
-2. extraTopics — up to 6 ADDITIONAL real market/industry/research phrases (2–3 words) NOT in the candidate list that fit this company and appear in SEC filings, news, and research (e.g. "remote patient monitoring", "value-based care"). NEVER product features or brand names. Give each a fit rating.
+2. extraTopics — up to 4 ADDITIONAL real market/industry/research phrases (2–3 words) NOT in the candidate list that fit this company and appear in SEC filings, news, and research (e.g. "remote patient monitoring", "value-based care"). NEVER product features or brand names. Give each a fit rating.
 
 3. themes — 12–20 lowercase keywords/phrases that signal relevance to this company (its audience, problem space, adjacent concepts).
 
@@ -47,9 +47,14 @@ export const EXPAND_TOOL = {
   input_schema: {
     type: "object",
     properties: {
+      // maxItems 12 + 4 = the 16 topics parseExpansion keeps (2026-09-10).
+      // Before this the model rated most of a 30-70 topic candidate list, the
+      // answer outgrew its 1,100-token cap, and most of it was discarded anyway.
+      // The count now stays flat however many beats are selected.
       selectedTopics: {
         type: "array",
-        description: "Subset of the provided CANDIDATE topics relevant to this company, each with a fit rating.",
+        maxItems: 12,
+        description: "At most 12 of the provided CANDIDATE topics, the strongest fits first, each with a fit rating. Leave low-fit topics out.",
         items: {
           type: "object",
           properties: {
@@ -61,7 +66,8 @@ export const EXPAND_TOOL = {
       },
       extraTopics: {
         type: "array",
-        description: "Up to 6 NEW real market/research phrases (2–3 words) not in the candidate list, each with a fit rating. No product features or brand names.",
+        maxItems: 4,
+        description: "Up to 4 NEW real market/research phrases (2–3 words) not in the candidate list, each with a fit rating. No product features or brand names.",
         items: {
           type: "object",
           properties: {
@@ -105,7 +111,7 @@ export function buildExpandPrompt(description: string, beats: BeatId[]): string 
   return `COMPANY DESCRIPTION (from the founder):
 ${description.trim()}
 
-The founder chose ${list.length > 1 ? `these beats: ${beatLabels}` : `the ${beatLabels} beat`}. Select the candidate topics — from ANY group below — that genuinely fit this company and rate each (copy each topic verbatim):
+The founder chose ${list.length > 1 ? `these beats: ${beatLabels}` : `the ${beatLabels} beat`}. Select the candidate topics — from ANY group below — that genuinely fit this company and rate each (copy each topic verbatim). At most 12, best fits first:
 
 ${groups}
 

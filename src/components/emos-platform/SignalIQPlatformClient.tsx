@@ -31,6 +31,7 @@ import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
 import { getJsPDF } from "@/lib/pdf/house-style";
 import { buildSignalIqReport } from "@/lib/pdf/signaliq-report";
 import { BEATS } from "@/lib/signaliq/config";
+import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import SignalIQToolCore, { type SiqPdfContext } from "@/components/signaliq/SignalIQToolCore";
 import { SIQ_CSS } from "@/components/signaliq/core-css";
 import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emos-platform/actions/signaliq";
@@ -380,7 +381,7 @@ export default function SignalIQPlatformClient({
           companyName,
           onCompanyNameChange: setCompanyName,
           contextRequired: true,
-          contextMaxLength: 600,
+          contextMaxLength: COMPANY_CONTEXT_MAX, // same number the save path and both routes use
         }}
         quotaUi={null}
         scanNote="Platform scan — unlimited, tailored to your company"

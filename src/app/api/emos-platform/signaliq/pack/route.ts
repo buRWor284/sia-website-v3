@@ -19,6 +19,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { coerceOpportunity, runPackRequest } from "@/lib/signaliq/route-core";
+import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { withAiUsage } from "@/lib/ai-usage";
 import { saveAssetPackForUser } from "@/lib/signaliq/save-pack";
 import type { AssetPack } from "@/lib/signaliq/types";
@@ -43,7 +44,9 @@ export async function POST(req: NextRequest) {
   const opp = coerceOpportunity(raw.opportunity);
   if (!opp) return NextResponse.json({ error: "Missing or invalid opportunity." }, { status: 400 });
 
-  const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 500) : undefined;
+  // Was slice(0, 500) while a saved company description holds up to 600, so
+  // the last 100 characters silently never reached the pack (fixed 2026-09-10).
+  const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, COMPANY_CONTEXT_MAX) : undefined;
   const companyId = typeof raw.companyId === "string" ? raw.companyId : null;
   const beatLabel = typeof raw.beatLabel === "string" ? raw.beatLabel.slice(0, 120) : null;
 

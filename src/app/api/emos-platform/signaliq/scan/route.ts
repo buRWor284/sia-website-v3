@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { parseBeats, runScanRequest } from "@/lib/signaliq/route-core";
+import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { withAiUsage } from "@/lib/ai-usage";
 import type { ScanResponse } from "@/lib/signaliq/types";
 
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unknown or missing beat." }, { status: 400 });
   }
 
-  const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 600) : undefined;
+  const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, COMPANY_CONTEXT_MAX) : undefined;
 
   try {
     const core = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>

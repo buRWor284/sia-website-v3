@@ -11,6 +11,7 @@
 import React, { useState, useTransition } from "react";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
+import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import {
   createAsset,
   updateAsset,
@@ -680,10 +681,16 @@ export default function AssetIQClient({
               <textarea
                 value={companyContext}
                 onChange={e => setCompanyContext(e.target.value)}
+                maxLength={COMPANY_CONTEXT_MAX}
                 rows={2}
                 placeholder="e.g. We're a B2B SaaS helping SMBs access working capital. Founder is a former Goldman analyst with data on 10,000+ lending decisions."
                 style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.55, padding: "9px 12px", resize: "none", outline: "none" }}
               />
+              {/* The save path caps this at COMPANY_CONTEXT_MAX; without a counter
+                  the box simply stopped accepting text with no explanation. */}
+              <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: companyContext.length >= COMPANY_CONTEXT_MAX ? INK : INK35, letterSpacing: ".06em" }}>
+                {companyContext.length}/{COMPANY_CONTEXT_MAX}{companyContext.length >= COMPANY_CONTEXT_MAX ? " · limit reached" : ""}
+              </p>
             </div>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: planLoading || creationPlan ? 14 : 0 }}>
