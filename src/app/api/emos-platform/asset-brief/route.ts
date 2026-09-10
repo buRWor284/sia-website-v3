@@ -11,6 +11,7 @@ import { requireEmosAccess } from "@/lib/emos-guard";
 import { getApprovedBrief } from "@/lib/company-brief";
 import { briefPromptBlock } from "@/lib/company-brief-prompt";
 import { recordAiUsage } from "@/lib/ai-usage";
+import { reserveUsage } from "@/lib/usage-limits";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -67,6 +68,10 @@ NUMBERS AND FACTS RULE (strict):
 - When an outside number would strengthen a point, do NOT write the number from memory. Write a placeholder in square brackets naming what to look up and where, for example: [STAT TO SOURCE: FBI IC3 annual SIM swap losses, latest year, ic3.gov].
 - A placeholder the builder fills from the primary source is correct. A remembered number is not, because remembered numbers are often from the wrong year.
 
+DIRECTION AND STATUS RULE (strict):
+- Only call a number rising, a spike, a surge or a record when the data brief says it is ABOVE its usual level. If the data brief says it is below its baseline, or gives no baseline, state the number plainly and build the hook on something else (the founder's story, the reader's own risk).
+- This is a plan for an asset that does not exist yet. Write methodology, reviews and data collection as steps to do ("Have the security team review the weights"), never as things already done ("Weights were reviewed by...").
+
 Write in direct, practical prose. No fluff. Length: 500–700 words total.`;
 }
 
@@ -91,6 +96,10 @@ export async function POST(request: NextRequest) {
   // Loaded server-side for the active company; never taken from the body.
   const prompt = buildBriefPrompt(data, await getApprovedBrief(guard.userId));
 
+  // Monthly allowance: reserved now, handed back on any failure below.
+  const seat = await reserveUsage(guard, "asset-plan");
+  if (!seat.ok) return seat.res;
+
   try {
     const res = await fetch(ANTHROPIC_API, {
       method: "POST",
@@ -107,6 +116,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!res.ok) {
+      await seat.release();
       const err = await res.json().catch(() => ({})) as { error?: { message?: string } };
       return NextResponse.json({ error: err?.error?.message || `Anthropic API error ${res.status}` }, { status: res.status });
     }
@@ -115,6 +125,7 @@ export async function POST(request: NextRequest) {
     await recordAiUsage("asset-brief", MODEL, json, { surface: "platform", clerkUserId: guard.userId }); // cost log (stage 3)
     if (json.stop_reason === "max_tokens") {
       // A brief that stops mid-section reads as complete in the UI. Say so instead.
+      await seat.release();
       return NextResponse.json({ error: "The brief was cut short before it finished. Please try again." }, { status: 502 });
     }
     const result = (json.content ?? [])
@@ -125,6 +136,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ brief: result });
   } catch (e) {
     console.error("asset-brief route error:", e);
+    await seat.release();
     return NextResponse.json({ error: "Internal server error." }, { status: 500 });
   }
 }

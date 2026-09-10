@@ -4,6 +4,7 @@ import { getJournalists } from "@/app/emos-platform/actions/coverageiq";
 import JournoCollabIQClient from "@/components/emos-platform/JournoCollabIQClient";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
+import { stripMd } from "@/lib/md-text";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -31,10 +32,10 @@ export default async function JournoCollabIQPage({
 
   // Pre-fill from AssetIQ or SignalIQ context
   const prefillBeat      = params.topic     ? params.topic     : params.beat      ? params.beat      : "";
-  const prefillStory     = params.story     ? params.story     : "";
+  const prefillStory     = params.story     ? stripMd(params.story)     : "";
   const prefillAssetTitle = params.assetTitle ? params.assetTitle : undefined;
   const prefillAssetType  = params.assetType  ? params.assetType  : undefined;
-  const prefillAssetIdea  = params.assetIdea  ? params.assetIdea  : undefined;
+  const prefillAssetIdea  = params.assetIdea  ? stripMd(params.assetIdea)  : undefined;
 
   const journalists = await getJournalists();
 

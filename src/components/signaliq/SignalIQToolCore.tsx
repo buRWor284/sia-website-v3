@@ -739,7 +739,7 @@ export default function SignalIQToolCore({
                     <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
                       <Pill size={10} ls="0.14em">Radar</Pill>
                       <SCaps size={11} ls="0.14em" color={INK}>
-                        {scan.opportunities.length} opportunities · ranked by signal-vs-coverage
+                        {scan.opportunities.length} opportunities · ranked by {usedContext ? "signal strength × fit to you" : "signal-vs-coverage"}
                         {usedContext && <span style={{ color: INK55 }}> · personalised to your startup</span>}
                       </SCaps>
                     </div>
@@ -749,7 +749,11 @@ export default function SignalIQToolCore({
                           {scan.usage.remaining} scan{scan.usage.remaining === 1 ? "" : "s"} left this month
                         </SCaps>
                       ) : scanNote ? (
-                        <SCaps size={10} ls="0.14em" color={INK55}>{scanNote}</SCaps>
+                        <SCaps size={10} ls="0.14em" color={INK55}>
+                          {scanNote}
+                          {/* Platform: monthly allowance left (999 = not counted, e.g. admin). */}
+                          {scan.usage.remaining < 999 && ` · ${scan.usage.remaining} left this month`}
+                        </SCaps>
                       ) : null}
                       <Link href="/tools/signaliq/about" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
                         About the data

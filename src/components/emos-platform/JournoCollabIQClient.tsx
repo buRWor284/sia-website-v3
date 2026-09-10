@@ -21,6 +21,7 @@ import {
 } from "@/app/emos-platform/actions/coverageiq";
 import type { DbJournalist, CreateJournalistInput } from "@/lib/coverageiq/types";
 import { clipWords } from "@/lib/clip-words";
+import Markdown from "@/components/emos-platform/Markdown";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -593,6 +594,7 @@ export default function JournoCollabIQClient({
   const [savedNames, setSavedNames] = useState<Set<string>>(new Set());
   const [brief, setBrief] = useState<string | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
+  const [briefError, setBriefError] = useState<string | null>(null);
   const [lastForm, setLastForm] = useState<Record<string, string> | null>(null);
   // Brand, website and description come from the selected company row, so a
   // user arriving here from SignalIQ or AssetIQ never retypes them. Before
@@ -659,6 +661,7 @@ export default function JournoCollabIQClient({
   async function generateBrief() {
     if (!lastForm) return;
     setLoadingBrief(true);
+    setBriefError(null);
     try {
       const res = await fetch("/api/emos-platform/journo-ai", {
         method: "POST",
@@ -672,8 +675,11 @@ export default function JournoCollabIQClient({
         }),
       });
       const data = await res.json() as { result?: string; error?: string };
-      if (data.result) setBrief(data.result);
-    } catch { /* non-fatal */ }
+      // Was silent on failure, so a spent allowance or an API error looked
+      // like a button that did nothing (2026-09-10).
+      if (!res.ok || !data.result) { setBriefError(data.error ?? "Could not generate the media brief."); return; }
+      setBrief(data.result);
+    } catch { setBriefError("Network error. Please try again."); }
     finally { setLoadingBrief(false); }
   }
 
@@ -729,10 +735,14 @@ export default function JournoCollabIQClient({
             <span style={{ fontFamily: SERIF, fontSize: 12, color: INK70, lineHeight: 1.5 }}>Each journalist is scored against 8 fit criteria: beat match, recent coverage, outlet authority, audience fit, responsiveness, exclusivity fit, contact findability, and brand-safety fit.</span>
           </div>
 
+          {briefError && (
+            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: RED, marginBottom: 16 }}>{briefError}</div>
+          )}
+
           {brief && (
             <div style={{ background: PAPER2, border: `1px solid ${INK}`, padding: "18px 22px", marginBottom: 24 }}>
               <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".16em", textTransform: "uppercase", color: INK55, marginBottom: 12 }}>Media targeting brief</div>
-              <div style={{ fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{brief}</div>
+              <Markdown text={brief} size={14} />
             </div>
           )}
 

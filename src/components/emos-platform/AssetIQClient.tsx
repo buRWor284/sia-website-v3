@@ -22,6 +22,7 @@ import {
   type CreateAssetInput,
 } from "@/app/emos-platform/actions/assetiq";
 import { clipWords } from "@/lib/clip-words";
+import Markdown from "@/components/emos-platform/Markdown";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -39,94 +40,8 @@ const GROT   = "var(--font-grot)";
 const SERIF  = "var(--font-serif)";
 const MONO   = "var(--font-mono)";
 
-/**
- * ── Minimal Markdown renderer ────────────────────────────────────────────────
- *
- * The AI creation brief and the creation plan both come back from Claude as
- * Markdown. Until 2026-09-09 each was dropped into a `whiteSpace: "pre-wrap"`
- * div as plain text, so a customer read literal "##" and "**" on screen. Found
- * in the gate-03 run, on a panel a paying subscriber reaches on day one.
- *
- * This project carries no Markdown dependency and adding one for two panels is
- * not worth the install, so this handles exactly what the model emits:
- * headings, bold, ordered and unordered lists, paragraphs. Anything it does not
- * recognise falls through as a paragraph, so text is never silently dropped.
- */
-function mdInline(text: string, key: string): React.ReactNode[] {
-  return text.split(/\*\*(.+?)\*\*/g).map((part, i) =>
-    i % 2 === 1
-      ? <strong key={`${key}-s${i}`}>{part}</strong>
-      : <React.Fragment key={`${key}-t${i}`}>{part}</React.Fragment>,
-  );
-}
-
-function Markdown({ text, size = 13.5 }: { text: string; size?: number }) {
-  const out: React.ReactNode[] = [];
-  let para: string[] = [];
-  let items: string[] = [];
-  let ordered = false;
-
-  const flushPara = () => {
-    if (!para.length) return;
-    const k = `p${out.length}`;
-    out.push(
-      <p key={k} style={{ margin: "0 0 10px", fontSize: size, lineHeight: 1.7, color: INK70 }}>
-        {mdInline(para.join(" "), k)}
-      </p>,
-    );
-    para = [];
-  };
-
-  const flushList = () => {
-    if (!items.length) return;
-    const k = `l${out.length}`;
-    const body = items.map((it, i) => (
-      <li key={i} style={{ marginBottom: 5, lineHeight: 1.6 }}>{mdInline(it, `${k}-${i}`)}</li>
-    ));
-    const listStyle: React.CSSProperties = { margin: "0 0 12px", paddingLeft: 20, fontSize: size, color: INK70 };
-    out.push(ordered
-      ? <ol key={k} style={listStyle}>{body}</ol>
-      : <ul key={k} style={listStyle}>{body}</ul>);
-    items = [];
-  };
-
-  const flushAll = () => { flushPara(); flushList(); };
-
-  for (const raw of text.replace(/\r\n/g, "\n").split("\n")) {
-    const line = raw.trim();
-    if (!line) { flushAll(); continue; }
-
-    const heading = /^(#{1,4})\s+(.*)$/.exec(line);
-    if (heading) {
-      flushAll();
-      const level = heading[1].length;
-      const k = `h${out.length}`;
-      const hStyle: React.CSSProperties = {
-        fontFamily: level <= 2 ? SERIF : GROT,
-        fontWeight: level <= 2 ? 700 : 800,
-        fontSize: level <= 1 ? size + 5 : level === 2 ? size + 2 : size - 3.5,
-        letterSpacing: level >= 3 ? ".12em" : "-.01em",
-        textTransform: level >= 3 ? "uppercase" : "none",
-        color: INK,
-        margin: out.length ? "18px 0 8px" : "0 0 8px",
-      };
-      out.push(<div key={k} style={hStyle}>{mdInline(heading[2], k)}</div>);
-      continue;
-    }
-
-    const ol = /^(\d+)[.)]\s+(.*)$/.exec(line);
-    if (ol) { flushPara(); if (!ordered) flushList(); ordered = true; items.push(ol[2]); continue; }
-
-    const ul = /^[-*\u2022]\s+(.*)$/.exec(line);
-    if (ul) { flushPara(); if (ordered) flushList(); ordered = false; items.push(ul[1]); continue; }
-
-    flushList();
-    para.push(line);
-  }
-  flushAll();
-
-  return <div style={{ fontFamily: SERIF, color: INK }}>{out}</div>;
-}
+// The Markdown renderer moved to ./Markdown.tsx (2026-09-10), shared with
+// the JournoCollabIQ media brief.
 
 /**
  * Print rules for the two AI panels (2026-09-09, Irfan's request during the

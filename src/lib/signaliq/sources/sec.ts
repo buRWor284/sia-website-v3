@@ -49,7 +49,17 @@ interface FilingSearch {
 
 async function searchFilings(phrase: string, startdt: string, enddt: string): Promise<FilingSearch> {
   const url = `${FTS}${encodeURIComponent(`"${phrase}"`)}&startdt=${startdt}&enddt=${enddt}`;
-  const json = (await secLimit(() => getJson(url))) as FtsResp;
+  let json: FtsResp;
+  try {
+    json = (await secLimit(() => getJson(url))) as FtsResp;
+  } catch {
+    // One retry after a short pause. Test 10 Sep 2026: the same Efani scan 45
+    // minutes apart got 160 filings for "identity theft" once and nothing the
+    // second time (card fell from 63 to 46), because a transient EDGAR failure
+    // was swallowed as "no filings".
+    await new Promise(r => setTimeout(r, 1200));
+    json = (await secLimit(() => getJson(url))) as FtsResp;
+  }
   return { total: json.hits?.total?.value ?? 0, hits: json.hits?.hits ?? [] };
 }
 
@@ -112,7 +122,10 @@ export async function secSignal(seed: string): Promise<Signal | null> {
       lowSample,
       singleFilerDominant,
     };
-  } catch {
+  } catch (e) {
+    // Still null (the scan must not fail on one feed), but logged: a failure
+    // and "zero filings" used to look identical.
+    console.warn(`[signaliq] SEC EDGAR failed for "${seed}":`, e instanceof Error ? e.message : e);
     return null;
   }
 }

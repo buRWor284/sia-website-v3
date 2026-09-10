@@ -17,7 +17,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 import { consumeQuota } from "@/lib/gate/quota";
-import { PREVIEW_REVEAL } from "@/lib/gate/quota-limits";
+import { PREVIEW_REVEAL, QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 import { recordAiUsage } from "@/lib/ai-usage";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
@@ -244,8 +244,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: quota.tier === "email"
-            ? "You've used all 30 partner searches this month. Unlimited runs live in the EMOS platform."
-            : "You've used your 3 free partner searches this month. Add your email for 30 a month, free.",
+            ? `You've used all ${QUOTA_LIMITS["pciq-preview"].email} free partner searches this month. More runs live in the EMOS platform.`
+            : `You've used your ${QUOTA_LIMITS["pciq-preview"].anonymous} free partner searches this month. Add your email for ${QUOTA_LIMITS["pciq-preview"].email} a month, free.`,
           usage: { remaining: 0, tier: quota.tier },
         },
         { status: 429 },

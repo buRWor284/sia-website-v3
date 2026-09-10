@@ -15,7 +15,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 import { consumeQuota } from "@/lib/gate/quota";
-import { PREVIEW_REVEAL } from "@/lib/gate/quota-limits";
+import { PREVIEW_REVEAL, QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 import { runJournoAI, clampResults } from "@/lib/journo/route-core";
 import { withAiUsage } from "@/lib/ai-usage";
 
@@ -85,8 +85,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: quota.tier === "email"
-            ? "You've used all 30 journalist searches this month. Unlimited runs live in the EMOS platform."
-            : "You've used your 3 free journalist searches this month. Add your email for 30 a month, free.",
+            ? `You've used all ${QUOTA_LIMITS["jciq-preview"].email} free journalist searches this month. More runs, saved lists and pitch drafting live in the EMOS platform.`
+            : `You've used your ${QUOTA_LIMITS["jciq-preview"].anonymous} free journalist searches this month. Add your email for ${QUOTA_LIMITS["jciq-preview"].email} a month, free.`,
           usage: { remaining: 0, tier: quota.tier },
           ...(quota.tier === "email" ? { upgrade: true } : {}),
         },

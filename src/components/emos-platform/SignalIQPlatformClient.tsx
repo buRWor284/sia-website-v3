@@ -11,7 +11,7 @@
  *
  * This wrapper owns ONLY the platform-surface concerns:
  *   - transport to the Clerk-guarded /api/emos-platform/signaliq/* routes
- *     (no Turnstile, no quota — platform scans are unmetered)
+ *     (no Turnstile, no public quota; platform scans count against the monthly allowance)
  *   - company name + context persistence across the EMOS pipeline
  *     (useCompanyName / useCompanyContext, backed by the org's `companies`
  *      rows via <CompanyProvider> since 2026-09-09 — no longer localStorage)
@@ -393,7 +393,7 @@ export default function SignalIQPlatformClient({
           contextMaxLength: COMPANY_CONTEXT_MAX, // same number the save path and both routes use
         }}
         quotaUi={null}
-        scanNote="Platform scan — unlimited, tailored to your company"
+        scanNote="Platform scan, tailored to your company"
         onSaveOpportunity={handleSaveOpportunity}
         packActions={{
           onDownloadPDF: handleDownloadPDF,

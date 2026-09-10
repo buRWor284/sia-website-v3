@@ -8,6 +8,7 @@ import { isEmosAdminEmail } from "@/lib/emos-admins";
 import Link from "next/link";
 import { STAGE_META, STAGE_ORDER, STAGE_THRESHOLDS, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
+import { getUsageMeter, type UsageRow } from "@/lib/usage-limits";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -23,9 +24,56 @@ const INK35  = "rgba(26,20,16,.32)";
 const INK15  = "rgba(26,20,16,.15)";
 const YEL    = "#f5b81f";
 const GREEN  = "#3e6b45";
+const RED    = "#c14a32";
 const GROT   = "var(--font-grot)";
 const SERIF  = "var(--font-serif)";
 const MONO   = "var(--font-mono)";
+
+/**
+ * Monthly allowance meter (2026-09-10). One row per metered action: used / limit
+ * and a bar that turns amber at 80% and red when spent. Read through the service
+ * client with the org id the RLS-scoped lookup above already resolved.
+ */
+function UsageMeter({ rows, resetsOn, isAdmin }: { rows: UsageRow[]; resetsOn: string; isAdmin: boolean }) {
+  return (
+    <div style={{ border: `1px solid ${INK}`, background: PAPER, marginBottom: 32 }}>
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: "14px 18px", borderBottom: `1px solid ${INK15}` }}>
+        <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase", color: INK }}>
+          This month&apos;s allowance
+        </span>
+        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+          Included in your plan. Resets on {resetsOn}.{isAdmin ? " Admin: counted, never blocked." : ""}
+        </span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 1, background: INK15 }}>
+        {rows.map((r) => {
+          const pct = r.limit > 0 ? Math.min(100, Math.round((r.used / r.limit) * 100)) : 0;
+          const left = Math.max(r.limit - r.used, 0);
+          const colour = pct >= 100 ? RED : pct >= 80 ? YEL : GREEN;
+          return (
+            <div key={r.action} style={{ background: PAPER, padding: "12px 18px 14px" }}>
+              <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".12em", textTransform: "uppercase", color: INK35, marginBottom: 3 }}>
+                {r.tool}
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontFamily: SERIF, fontSize: 13.5, color: INK, textTransform: "capitalize" }}>{r.label}</span>
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 12, color: INK, whiteSpace: "nowrap" }}>
+                  {r.used} / {r.limit}
+                </span>
+              </div>
+              <div style={{ height: 4, background: INK15, marginTop: 8, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${pct}%`, background: colour }} />
+              </div>
+              <div style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".06em", color: pct >= 100 ? RED : INK55, marginTop: 5 }}>
+                {pct >= 100 ? `All used, back on ${resetsOn}` : `${left} left`}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 // Tool icons in pipeline order
 const TOOL_ICONS: Record<EmosStage, string> = {
@@ -152,6 +200,9 @@ export default async function EmosDashboardPage() {
   const progressCurrent   = stageCountMap[activeStage] ?? 0;
   const progressThreshold = STAGE_THRESHOLDS[activeStage] ?? 0;
   const progressPct       = progressThreshold > 0 ? Math.min(100, Math.round((progressCurrent / progressThreshold) * 100)) : 100;
+
+  // Monthly allowance meter. Never lets a meter failure break the dashboard.
+  const meter = org ? await getUsageMeter(org.id as string).catch(() => null) : null;
 
   return (
     <div style={{ minHeight: "100vh", background: PAPER, fontFamily: SERIF }}>
@@ -336,6 +387,9 @@ export default async function EmosDashboardPage() {
             );
           })}
         </div>
+
+        {/* ── Monthly allowance ────────────────────────────────────────────── */}
+        {meter && <UsageMeter rows={meter.rows} resetsOn={meter.resetsOn} isAdmin={isEmosAdminEmail(userEmail)} />}
 
         {/* ── Org info ─────────────────────────────────────────────────────── */}
         {org && (

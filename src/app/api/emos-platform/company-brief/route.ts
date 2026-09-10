@@ -14,6 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { withAiUsage } from "@/lib/ai-usage";
+import { reserveUsage } from "@/lib/usage-limits";
 import { researchCompany, condenseToBrief } from "@/lib/company-brief-research";
 import { BRIEF_MAX, BRIEF_UPLOAD_MAX, mergeBriefs } from "@/lib/company-brief-types";
 
@@ -54,13 +55,28 @@ export async function POST(req: NextRequest) {
 
   const co = { name: company.name as string, context: (company.context as string) || "", website: (company.website as string | null) ?? null };
 
+  // Monthly allowance: research and condense share one bucket (10 a month).
+  // Reserved once the request is known to be valid, handed back on failure.
+  if (mode === "condense") {
+    const t = typeof raw.text === "string" ? raw.text.trim() : "";
+    if (t.length < 40) return NextResponse.json({ error: "That document is too short to build a brief from." }, { status: 400 });
+    if (t.length > BRIEF_UPLOAD_MAX) {
+      return NextResponse.json({ error: `That document is too long (${t.length.toLocaleString()} characters). The limit is ${BRIEF_UPLOAD_MAX.toLocaleString()}.` }, { status: 413 });
+    }
+  }
+  const seat = await reserveUsage(guard, "company-research");
+  if (!seat.ok) return seat.res;
+
   let content: string;
   let sources: string[];
   let source: "research" | "upload";
 
   if (mode === "research") {
     const out = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () => researchCompany(co));
-    if (!out.ok) return NextResponse.json({ error: out.error }, { status: out.status });
+    if (!out.ok) {
+      await seat.release();
+      return NextResponse.json({ error: out.error }, { status: out.status });
+    }
     content = out.result.content;
     sources = out.result.sources;
     source = "research";
@@ -72,7 +88,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `That document is too long (${text.length.toLocaleString()} characters). The limit is ${BRIEF_UPLOAD_MAX.toLocaleString()}.` }, { status: 413 });
     }
     const out = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () => condenseToBrief(co, text, fileName));
-    if (!out.ok) return NextResponse.json({ error: out.error }, { status: out.status });
+    if (!out.ok) {
+      await seat.release();
+      return NextResponse.json({ error: out.error }, { status: out.status });
+    }
     content = out.content;
     sources = [fileName];
     source = "upload";

@@ -13,6 +13,7 @@
 
 import { useEffect, useState } from "react";
 import { useUser, SignOutButton } from "@clerk/nextjs";
+import { PLATFORM_ACTION_ORDER, PLATFORM_MONTHLY_LIMITS } from "@/lib/gate/quota-limits";
 
 const PAPER = "#f1ebde";
 const INK   = "#1a1410";
@@ -119,6 +120,24 @@ export default function SubscribePage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Monthly allowance (2026-09-10): what $149 includes, in plain units. */}
+          <div style={{ padding: "20px 40px 22px", borderBottom: "1px solid rgba(241,235,222,.1)" }}>
+            <p style={{ fontFamily: GROT, fontWeight: 900, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase" as const, color: "rgba(241,235,222,.35)", margin: "0 0 12px" }}>
+              Included every month
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "6px 18px" }}>
+              {PLATFORM_ACTION_ORDER.map((a) => (
+                <div key={a} style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
+                  <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 12, color: YEL, minWidth: 30 }}>{PLATFORM_MONTHLY_LIMITS[a].limit}</span>
+                  <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.6)" }}>{PLATFORM_MONTHLY_LIMITS[a].many}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: "rgba(241,235,222,.4)", margin: "12px 0 0" }}>
+              Resets on the 1st of each month. Your dashboard shows what is left.
+            </p>
           </div>
 
           {/* How it works */}

@@ -5,6 +5,7 @@ import { getSignals } from "@/app/emos-platform/actions/signaliq";
 import AssetIQClient from "@/components/emos-platform/AssetIQClient";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
+import { stripMd, titleFromIdea } from "@/lib/md-text";
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -30,9 +31,10 @@ export default async function AssetIQPage({
   // "%" in the text (e.g. "37% of saturation" in a pack brief) and crashed the page.
   const params = await searchParams;
   const signalId    = params.signal ?? null;
-  const assetIdea   = params.assetIdea   ? params.assetIdea   : null;
-  const dataBrief   = params.dataBrief   ? params.dataBrief   : null;
-  const pitchAngle  = params.pitchAngle  ? params.pitchAngle  : null;
+  // Pack text is light Markdown; these land in one-line slots, so flatten it.
+  const assetIdea   = params.assetIdea   ? stripMd(params.assetIdea)   : null;
+  const dataBrief   = params.dataBrief   ? stripMd(params.dataBrief)   : null;
+  const pitchAngle  = params.pitchAngle  ? stripMd(params.pitchAngle)  : null;
   const signalHeadlineFromParam = params.headline ? params.headline : null;
 
   // If signal ID provided, fetch its headline from DB as backup
@@ -47,7 +49,7 @@ export default async function AssetIQPage({
 
   // Pre-fill title from asset idea (preferred) or signal headline
   const prefillTitle = assetIdea
-    ? assetIdea.length > 80 ? assetIdea.slice(0, 80) : assetIdea
+    ? titleFromIdea(assetIdea)
     : signalHeadline
     ? signalHeadline.length > 80 ? signalHeadline.slice(0, 80) + "…" : signalHeadline
     : "";

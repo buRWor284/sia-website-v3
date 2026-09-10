@@ -15,6 +15,7 @@ import { getApprovedBrief } from "@/lib/company-brief";
 import { parseBeats, runScanRequest } from "@/lib/signaliq/route-core";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { withAiUsage } from "@/lib/ai-usage";
+import { reserveUsage } from "@/lib/usage-limits";
 import type { ScanResponse } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
@@ -42,18 +43,22 @@ export async function POST(req: NextRequest) {
   // The active company's approved brief, if any. Null = today's behaviour.
   const companyBrief = await getApprovedBrief(guard.userId);
 
+  const seat = await reserveUsage(guard, "scan");
+  if (!seat.ok) return seat.res;
+
   try {
     const core = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
       runScanRequest(beats, companyContext, companyBrief),
     );
     const body: ScanResponse = {
       ...core,
-      // Platform users have unlimited scans
-      usage: { remaining: 999, tier: "email" },
+      // Monthly allowance left after this scan (999 = not counted, e.g. admin).
+      usage: { remaining: seat.remaining ?? 999, tier: "email" },
     };
     return NextResponse.json(body);
   } catch (e) {
     console.error("emostool signaliq scan route error:", e);
+    await seat.release();
     return NextResponse.json({ error: "Scan failed. Please try again." }, { status: 500 });
   }
 }

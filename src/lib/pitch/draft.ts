@@ -78,6 +78,7 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - WHEN "RECENT WORK" IS SUPPLIED, open by bridging from what they are already covering to the sender's data, in one sentence, then go straight to the number. The bridge must do real work: it explains why THIS data is the natural next question for a story they have already told. NEVER compliment the piece. Do not write "I loved", "I enjoyed", "great piece", "I was reading", "your excellent". Praise is the most recognisable tell of an automated pitch and journalists discount it instantly. Reference the substance, not the quality.
 - WHEN NO RECENT WORK IS SUPPLIED, lead with the strongest checkable number. That is the correct choice, not a fallback to apologise for. Do not manufacture a fake personal connection to avoid it.
 - 90 to 135 words in the body, not counting the signature. PressIQ counts the whole email and aims for 100 to 150, and the signature adds about 15. Shorter is better than padded.
+- Word budget, in sentences: the greeting line; the hook in 2 sentences; the authority line in 1 sentence; the offer in 2 sentences; the question in 1 sentence; a one-line offer to send more. That lands near 110 words. Adding the authority line means cutting elsewhere, usually the offer.
 - Write at a reading level of grade 7 or below: sentences of about 15 words or fewer, everyday words, one idea per sentence. Journalists skim.
 - Write as the named sender in the first person ("I", "we") from the first line to the last. Never switch to describing the sender or the company in the third person.
 - After the offer, END WITH EXACTLY ONE short question that is easy to say yes to (for example, whether they would like the data or a call this week), then a one-line offer to send more. Never end on a pleasantry.
@@ -152,12 +153,65 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
   return lines.join("\n");
 }
 
+/** Longest body we accept before one "shorter, please" retry (signature excluded). */
+const BODY_WORD_CAP = 140;
+
+/**
+ * Words in the body above the signature. The signature is assembled by us, so
+ * its first line is known: everything from there down is not counted.
+ */
+export function bodyWords(body: string, signatureFirstLine: string): number {
+  const at = signatureFirstLine ? body.lastIndexOf(signatureFirstLine) : -1;
+  const main = at > 0 ? body.slice(0, at) : body;
+  return main.split(/\s+/).filter(Boolean).length;
+}
+
+/** House rule for outbound copy; the prompt asks, this makes sure. */
+function noDashes(text: string): string {
+  return text
+    .replace(/\s+[—–]\s+/g, ", ")
+    .replace(/(\w)[—–](\w)/g, "$1-$2")
+    .replace(/[—–]/g, ",");
+}
+
+/**
+ * Drafts ran about 30 words long once the brief's authority line was added
+ * (full-pass test, 10 Sep 2026): the model added the sentence but did not trim.
+ * One retry with the word count is cheaper than a pitch PressIQ marks down.
+ */
 async function draftOne(
   apiKey: string,
   brief: DraftBrief,
   target: DraftTarget,
 ): Promise<DraftResult> {
   const base: DraftResult = { journalistId: target.id, journalistName: target.name, subject: "", body: "" };
+  const first = await callDraft(apiKey, brief, target, null);
+  if (first.error) return { ...base, error: first.error };
+
+  const sigLine = brief.senderName?.trim() || "[Your full name]";
+  const words = bodyWords(first.body, sigLine);
+  if (words <= BODY_WORD_CAP) return { ...base, subject: first.subject, body: first.body };
+
+  const retry = await callDraft(apiKey, brief, target, {
+    words,
+    previous: first.body,
+  });
+  if (retry.error) return { ...base, subject: first.subject, body: first.body };
+  const retryWords = bodyWords(retry.body, sigLine);
+  const pick = retryWords < words ? retry : first;
+  return { ...base, subject: pick.subject, body: pick.body };
+}
+
+async function callDraft(
+  apiKey: string,
+  brief: DraftBrief,
+  target: DraftTarget,
+  tooLong: { words: number; previous: string } | null,
+): Promise<{ subject: string; body: string; error?: string }> {
+  const base = { subject: "", body: "" };
+  const userText = buildPrompt(brief, target) + (tooLong
+    ? `\n\nYOUR LAST DRAFT WAS ${tooLong.words} WORDS ABOVE THE SIGNATURE. The limit is 135. Rewrite it at 110 to 125 words: keep the hook, the one authority sentence and the question, cut the rest. Last draft for reference:\n${tooLong.previous}`
+    : "");
   try {
     const res = await fetch(ANTHROPIC_API, {
       method: "POST",
@@ -173,7 +227,7 @@ async function draftOne(
         system: SYSTEM_PROMPT,
         tools: [DRAFT_TOOL],
         tool_choice: { type: "tool", name: DRAFT_TOOL.name },
-        messages: [{ role: "user", content: buildPrompt(brief, target) }],
+        messages: [{ role: "user", content: userText }],
       }),
     });
 
@@ -203,7 +257,7 @@ async function draftOne(
     const body = typeof input.body === "string" ? input.body.trim() : "";
     if (!subject || !body) return { ...base, error: "The draft came back incomplete. Try again." };
 
-    return { ...base, subject, body };
+    return { subject: noDashes(subject), body: noDashes(body) };
   } catch (e) {
     console.error("pitch-draft error for", target.name, e);
     return { ...base, error: "Could not draft this one. Try again." };

@@ -102,7 +102,14 @@ Write:
 1. A one-line ANGLE — why THIS journalist, on THIS beat, would want THIS story now (tie it to the kind of thing they cover).
 2. A short starter pitch (under 150 words) they could adapt: a specific subject line, an opening that references the journalist's beat or recent work, the news hook or data on offer, and a single low-friction ask.
 
-Keep it warm, specific, and non-salesy. End with one line: "Verify the journalist's name, outlet, and contact before sending — then score the final pitch in PressIQ."
+Keep it warm, specific, and non-salesy.
+
+Rules (strict):
+- Only claim what the SOURCE says. If the story says the asset is being built or planned, say it is coming and offer early or exclusive access. Never say it is finished, never say it already has findings or data, and never invent results, numbers or quotes.
+- Keep the founder's story in the words given. Do not add details (people, agencies, amounts) that are not in the SOURCE.
+- Use commas, colons or full stops, never em dashes or en dashes. This text goes to a journalist.
+
+End with one line: "Verify the journalist's name, outlet, and contact before sending, then score the final pitch in PressIQ."
 
 Format:
 Angle: [one line]
@@ -175,34 +182,65 @@ export function clampResults(raw: string, limit: number): { text: string; total:
   return { text: JSON.stringify(sliced), total, revealed: sliced.length };
 }
 
-/**
- * Lowercased name pieces (first 4 letters of each part) that a journalist's real
- * handle or profile slug nearly always contains: @lorenzofb, @JBrodkin, @ajdell.
- */
-function nameFragments(name: string): string[] {
+/** Lowercased name parts, accents removed: "Lorenzo Franceschi-Bicchierai" -> [lorenzo, franceschi, bicchierai]. */
+function nameParts(name: string): string[] {
   return name
     .toLowerCase()
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
     .split(/[^a-z]+/)
-    .filter((t) => t.length >= 3)
-    .map((t) => t.slice(0, 4));
+    .filter(Boolean);
 }
 
-/** True when a handle or profile slug plausibly belongs to this person. */
+/**
+ * True when a handle or profile slug plausibly belongs to this person.
+ *
+ * v2 (2026-09-10). v1 only asked for any 4-letter piece of the name, and the
+ * model's lookalikes slipped through because they end in the real surname:
+ * @braborkrebs (Brian Krebs), @zaborwhittaker (Zack Whittaker), @snaborlyngaas
+ * (Sean Lyngaas). Now the handle must be BUILT from the name: read left to
+ * right, every stretch has to be a name part (or its first 3+ letters) or a
+ * single initial, with at most one stray letter. That keeps @lorenzofb,
+ * @jbrodkin, @josephfcox, @mattburgess1, @dnvolz and "jon-brodkin-4b2a1b", and
+ * drops the three above. A real handle that ignores the name is lost too; that
+ * is the cheaper mistake.
+ */
 export function handleMatchesName(name: string, handleOrSlug: string): boolean {
-  const h = handleOrSlug.toLowerCase().replace(/[^a-z]/g, "");
-  const frags = nameFragments(name);
-  if (!h || frags.length === 0) return false;
-  return frags.some((f) => h.includes(f));
+  const parts = nameParts(name);
+  if (parts.length === 0) return false;
+  // LinkedIn-style slugs end in an id segment ("-4b2a1b"); drop later segments
+  // that contain a digit. The first segment is kept (@mattburgess1).
+  const segs = handleOrSlug.toLowerCase().split(/[-_.]/).filter(Boolean);
+  const h = segs
+    .filter((seg, i) => i === 0 || !/\d/.test(seg))
+    .join("")
+    .replace(/[^a-z]/g, "");
+  if (!h) return false;
+
+  let i = 0;
+  let stray = 0;
+  let longHit = false;
+  while (i < h.length) {
+    let best = 0;
+    for (const p of parts) {
+      for (let len = p.length; len >= Math.min(3, p.length); len--) {
+        if (len > best && h.startsWith(p.slice(0, len), i)) { best = len; break; }
+      }
+    }
+    if (best >= 2) { i += best; longHit = true; continue; }
+    if (parts.some((p) => p[0] === h[i])) { i += 1; continue; } // an initial
+    stray += 1;
+    i += 1;
+  }
+  return longHit && stray <= 1;
 }
 
 /**
  * The prompt says "a handle only if certain", but the model still invents
- * lookalikes (test run 10 Sep 2026: @braborescua for Brian Krebs, @zaborescuack
- * for Zack Whittaker, @lilohmeg for Lily Hay Newman). A wrong handle sends the
- * pitch to a stranger, so any handle or profile URL that shares no piece of the
- * journalist's name is dropped: the contact falls back to the outlet and the UI's
+ * lookalikes (test runs 10 Sep 2026: @braborescua and @braborkrebs for Brian
+ * Krebs, @zaborescuack and @zaborwhittaker for Zack Whittaker, @lilohmeg for
+ * Lily Hay Newman). A wrong handle sends the pitch to a stranger, so any handle
+ * or profile URL that is not built from the journalist's name is dropped: the contact falls back to the outlet and the UI's
  * "Find on LinkedIn" search link covers the rest. A real handle that uses none of
  * their name is lost too; that is the cheaper mistake. Fails open on bad JSON.
  */
@@ -231,6 +269,20 @@ export function scrubContacts(raw: string): string {
     return j;
   });
   return JSON.stringify(cleaned);
+}
+
+/**
+ * Outbound copy never carries em or en dashes (house rule). The full-pass test
+ * on 10 Sep 2026 got five in one pitch angle despite the prompt. A spaced dash
+ * becomes a comma; an unspaced one between words becomes a hyphen (ranges like
+ * "30–60" stay readable).
+ */
+export function noDashes(text: string): string {
+  return text
+    .replace(/\s+[—–]\s+/g, ", ")
+    .replace(/(\w)[—–](\w)/g, "$1-$2")
+    .replace(/[—–]/g, ",")
+    .replace(/,\s*,/g, ",");
 }
 
 /**
@@ -287,7 +339,10 @@ export async function runJournoAI(
       .filter((b) => b.type === "text")
       .map((b) => b.text)
       .join("\n");
-    return { ok: true, result: type === "partner-suggestions" ? scrubContacts(result) : result };
+    if (type === "partner-suggestions") return { ok: true, result: scrubContacts(result) };
+    // The angle is outbound copy: the prompt bans dashes, this makes sure.
+    if (type === "email-writer") return { ok: true, result: noDashes(result) };
+    return { ok: true, result };
   } catch (e) {
     console.error("[journo-ai] runJournoAI error:", e);
     return { ok: false, status: 500, error: "Internal server error." };

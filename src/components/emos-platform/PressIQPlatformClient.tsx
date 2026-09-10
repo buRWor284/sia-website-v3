@@ -11,7 +11,7 @@
  *
  * This wrapper owns ONLY the platform-surface concerns:
  *   - transport to the Clerk-guarded /api/emos-platform/pitch-score route
- *     (no Turnstile, no quota — platform scores are unmetered + auto-stored)
+ *     (no Turnstile, no public quota; platform scores count against the monthly allowance + auto-stored)
  *   - "Track this pitch in CoverageIQ" (createPitch) — the PressIQ→CoverageIQ handoff
  *   - the saved Score History table below the tool
  *   - the PDF report (ungated parity)

@@ -22,6 +22,7 @@ import { getApprovedBrief } from "@/lib/company-brief";
 import { coerceOpportunity, runPackRequest } from "@/lib/signaliq/route-core";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { withAiUsage } from "@/lib/ai-usage";
+import { reserveUsage } from "@/lib/usage-limits";
 import { saveAssetPackForUser } from "@/lib/signaliq/save-pack";
 import type { AssetPack } from "@/lib/signaliq/types";
 
@@ -52,14 +53,19 @@ export async function POST(req: NextRequest) {
   const beatLabel = typeof raw.beatLabel === "string" ? raw.beatLabel.slice(0, 120) : null;
 
   const companyBrief = await getApprovedBrief(guard.userId, companyId);
+
+  const seat = await reserveUsage(guard, "pack");
+  if (!seat.ok) return seat.res;
+
   const result = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
     runPackRequest(opp, companyContext, companyBrief),
   );
   if (!result.ok) {
+    await seat.release();
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
 
-  const pack: AssetPack = { ...result.pack, usage: { remaining: 999, tier: "email" } };
+  const pack: AssetPack = { ...result.pack, usage: { remaining: seat.remaining ?? 999, tier: "email" } };
 
   // AWAITED, not fire-and-forget. This is the write the whole change exists
   // for, it is a single insert against a call that already took ~30s, and a

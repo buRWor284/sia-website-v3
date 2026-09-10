@@ -15,6 +15,7 @@ import { requireEmosAccess } from "@/lib/emos-guard";
 import { runJournoAI } from "@/lib/journo/route-core";
 import { withAiUsage } from "@/lib/ai-usage";
 import { getApprovedBrief } from "@/lib/company-brief";
+import { reserveUsage } from "@/lib/usage-limits";
 
 // Match the public route: Opus generations run 20-40s, so lift the ceiling to
 // 60s to avoid a latent 504 cutting a real generation short.
@@ -36,11 +37,22 @@ export async function POST(request: NextRequest) {
   const { type, data } = body;
   if (!type || !data) return NextResponse.json({ error: "Missing type or data." }, { status: 400 });
 
+  // Journalist searches and angles/briefs are separate monthly allowances.
+  const action =
+    type === "partner-suggestions" ? "journalist-search" :
+    type === "email-writer" || type === "campaign-brief" ? "pitch-angle" : null;
+  if (!action) return NextResponse.json({ error: `Unknown type: ${type}` }, { status: 400 });
+  const seat = await reserveUsage(guard, action);
+  if (!seat.ok) return seat.res;
+
   const companyBrief = await getApprovedBrief(guard.userId); // active company, approved only
   const run = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
     runJournoAI(type, data, companyBrief),
   );
-  if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
+  if (!run.ok) {
+    await seat.release();
+    return NextResponse.json({ error: run.error }, { status: run.status });
+  }
 
   return NextResponse.json({ result: run.result });
 }

@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { withAiUsage } from "@/lib/ai-usage";
+import { reserveUsage } from "@/lib/usage-limits";
 import { getApprovedBrief } from "@/lib/company-brief";
 import { draftPitches, MAX_DRAFT_BATCH, type DraftBrief, type DraftTarget } from "@/lib/pitch/draft";
 
@@ -97,9 +98,15 @@ export async function POST(req: NextRequest) {
     .filter(Boolean)
     .map(r => ({ id: r!.id, name: r!.name, outlet: r!.outlet, beat: r!.beat, fitNote: r!.notes, recentWork: r!.recent_work }));
 
+  // One unit per journalist, reserved up front; failed drafts are handed back.
+  const seat = await reserveUsage(guard, "draft", targets.length);
+  if (!seat.ok) return seat.res;
+
   const drafts = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
     draftPitches(brief, targets),
   );
+  const failed = drafts.filter(d => d.error || !d.subject || !d.body).length;
+  if (failed > 0) await seat.release(failed);
 
   // Persist every successful draft. AWAITED: a draft that vanishes with the tab
   // is the exact failure this was changed to fix, and regenerating produces A

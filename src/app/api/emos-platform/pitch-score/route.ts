@@ -1,10 +1,10 @@
 /**
  * /api/emos-platform/pitch-score
  *
- * PressIQ scoring — DASHBOARD surface. Authenticated (Clerk EMOS guard), no rate
- * limit, no Turnstile, always stores. The scoring logic lives in the shared
- * `lib/pitch/route-core.ts` (Phase P6); this file owns only the Clerk guard and
- * its own unmetered `usage` block.
+ * PressIQ scoring — DASHBOARD surface. Authenticated (Clerk EMOS guard), no
+ * Turnstile, always stores, counted against the monthly allowance (200 scores).
+ * The scoring logic lives in the shared `lib/pitch/route-core.ts` (Phase P6);
+ * this file owns the Clerk guard and the allowance.
  *
  * POST body: same shape as /api/pitch-score (PitchInput), minus turnstileToken.
  */
@@ -13,6 +13,7 @@ import { requireEmosAccess } from "@/lib/emos-guard";
 import { parsePitchInput, runScoreRequest } from "@/lib/pitch/route-core";
 import { logPitch } from "@/lib/pitch/log";
 import { withAiUsage } from "@/lib/ai-usage";
+import { reserveUsage } from "@/lib/usage-limits";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,11 +37,17 @@ export async function POST(req: NextRequest) {
   if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: parsed.status });
   const input = parsed.input;
 
-  // Platform users are unmetered; usage is woven into composeScore for shape parity.
+  // Monthly allowance (2026-09-10; was unmetered). Reserved before the call,
+  // handed back if it fails. `usage` is woven into composeScore for shape parity.
+  const seat = await reserveUsage(guard, "score");
+  if (!seat.ok) return seat.res;
   const run = await withAiUsage({ surface: "platform", clerkUserId: userId }, () =>
-    runScoreRequest(input, { remaining: 999, tier: "email" }),
+    runScoreRequest(input, { remaining: seat.remaining ?? 999, tier: "email" }),
   );
-  if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
+  if (!run.ok) {
+    await seat.release();
+    return NextResponse.json({ error: run.error }, { status: run.status });
+  }
 
   // 2026-09-09 (state layer): carry who and what this pitch was for. Read off
   // the raw body rather than PitchInput — these are dashboard-only context, not
