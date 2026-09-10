@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { EMOS_ADMIN_EMAILS, getSubscriptionStatus } from "@/lib/emos-guard";
+import { subscriptionAllowsAccess } from "@/lib/emos-guard";
 import CompanyProvider from "@/components/emos-platform/CompanyProvider";
 import { listCompanies, getActiveCompanyId } from "@/app/emos-platform/actions/companies";
 import type { Company } from "@/lib/company-types";
@@ -29,13 +29,10 @@ export default async function EmosDashboardLayout({
       user?.emailAddresses?.[0]?.emailAddress ??
       "";
 
-    if (email && !EMOS_ADMIN_EMAILS.includes(email)) {
-      // D4: pass the Clerk user id so a subscription bought under a different
-      // payment address still resolves to this account.
-      const status = await getSubscriptionStatus(email, userId);
-      if (status !== "active" && status !== "none") {
-        redirect("/emos-platform/subscribe");
-      }
+    // D4: pass the Clerk user id so a subscription bought under a different
+    // payment address still resolves to this account.
+    if (!(await subscriptionAllowsAccess(email, userId))) {
+      redirect("/emos-platform/subscribe");
     }
   }
 

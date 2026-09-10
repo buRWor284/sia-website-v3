@@ -3,11 +3,9 @@ import { redirect } from "next/navigation";
 import { SignOutButton } from "@clerk/nextjs";
 import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase";
 import { ensureOrgProvisioned } from "@/lib/emos-provision";
+import { subscriptionAllowsAccess } from "@/lib/emos-guard";
 import { STAGE_META, STAGE_ORDER, STAGE_THRESHOLDS, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
-
-// Admin emails bypass the subscription gate (Irfan + ops aliases)
-const ADMIN_EMAILS = ["syedirfanajmal@gmail.com", "sia@syedirfanajmal.com"];
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -42,7 +40,12 @@ export default async function EmosDashboardPage() {
   if (!userId) redirect("/emos-platform/signin");
 
   // ── Subscription gate ─────────────────────────────────────────────────────
-  // Non-admin users must have an active Stripe subscription to access the platform.
+  // Same rule as the layout and the API guard, from the same function. It sits
+  // here as well as in layout.tsx because a layout does not re-run on
+  // client-side navigation between its pages, so it cannot be the only check.
+  // ★ This page used to carry its own stricter copy (no row = redirected to
+  //   the sales page), which locked out every admin-invited beta account. See
+  //   subscriptionAllowsAccess in emos-guard.ts. Fixed 2026-09-10.
   const user      = await currentUser();
   const userEmail = (
     user?.primaryEmailAddress?.emailAddress ??
@@ -50,24 +53,8 @@ export default async function EmosDashboardPage() {
     ""
   ).toLowerCase().trim();
 
-  const isAdmin = ADMIN_EMAILS.some((e) => e.toLowerCase() === userEmail);
-
-  console.log(`[emos-dashboard] userId=${userId} email="${userEmail}" isAdmin=${isAdmin}`);
-
-  if (!isAdmin) {
-    const serviceDb = createSupabaseServiceClient();
-    const { data: sub, error: subErr } = await serviceDb
-      .from("stripe_subscriptions")
-      .select("status")
-      .ilike("email", userEmail)
-      .maybeSingle();
-
-    console.log(`[emos-dashboard] subscription lookup for "${userEmail}": sub=${JSON.stringify(sub)} error=${subErr ? JSON.stringify(subErr) : "none"}`);
-
-    if (!sub || sub.status !== "active") {
-      console.log(`[emos-dashboard] REDIRECTING to /emos-platform/subscribe — no active subscription for "${userEmail}"`);
-      redirect("/emos-platform/subscribe");
-    }
+  if (!(await subscriptionAllowsAccess(userEmail, userId))) {
+    redirect("/emos-platform/subscribe");
   }
 
   const token = await getToken();

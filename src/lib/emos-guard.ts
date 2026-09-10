@@ -19,7 +19,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 import { normalizeEmail } from "@/lib/emos-billing";
-import { EMOS_ADMIN_EMAILS } from "@/lib/emos-admins";
+import { EMOS_ADMIN_EMAILS, isEmosAdminEmail } from "@/lib/emos-admins";
 
 // Moved to src/lib/emos-admins.ts (D4, 2026-07-30) so emos-billing can read it
 // without importing this file, which imports emos-billing. Re-exported here so
@@ -82,11 +82,14 @@ export async function getSubscriptionStatus(
 
   if (!normalized) return linked ?? "none";
 
+  // Not unique by email either, for the same reason, so never .maybeSingle()
+  // here: a second row makes it error, and a re-subscriber would silently fall
+  // through to the fail-open branch instead of being read correctly (2026-09-10).
   const { data, error } = await db
     .from("stripe_subscriptions")
-    .select("status")
+    .select("status, updated_at")
     .eq("email", normalized)
-    .maybeSingle();
+    .order("updated_at", { ascending: false });
   if (error) {
     // Fail open on DB outage — the emos_access flag is the primary gate and
     // is revoked on cancellation by the Stripe webhook.
@@ -94,9 +97,33 @@ export async function getSubscriptionStatus(
     return linked ?? "none";
   }
 
-  const byEmail = (data?.status as string | undefined) ?? null;
-  if (byEmail === "active") return "active";
+  const emailRows = (data ?? []) as Array<{ status: string }>;
+  if (emailRows.some((r) => r.status === "active")) return "active";
+  const byEmail = emailRows[0]?.status ?? null;
   return linked ?? byEmail ?? "none";
+}
+
+/**
+ * THE subscription rule, in one place. true = let this person in.
+ *
+ * Every gate calls this and nothing else: requireEmosAccess (API routes), the
+ * dashboard layout (every tool page) and the dashboard home page. Until
+ * 2026-09-10 the home page carried its own inline copy that read "no row" as
+ * "hasn't paid" and used .maybeSingle() on this non-unique table, so an
+ * admin-invited beta account could call every API but was bounced from
+ * /emos-platform/dashboard to the sales page. Do not re-inline this anywhere.
+ *
+ * Admins skip the lookup. "active" and "none" pass; anything else
+ * ("canceled", "past_due", …) does not. An empty email passes, as it always
+ * has in the guard: the emos_access flag is the primary gate.
+ */
+export async function subscriptionAllowsAccess(
+  email: string,
+  clerkUserId?: string | null,
+): Promise<boolean> {
+  if (!email || isEmosAdminEmail(email)) return true;
+  const status = await getSubscriptionStatus(email, clerkUserId);
+  return status === "active" || status === "none";
 }
 
 export async function requireEmosAccess(opts?: {
@@ -136,11 +163,8 @@ export async function requireEmosAccess(opts?: {
   }
 
   // ── Subscription ───────────────────────────────────────────────────────────
-  if (email && !EMOS_ADMIN_EMAILS.includes(email)) {
-    const status = await getSubscriptionStatus(email, userId);
-    if (status !== "active" && status !== "none") {
-      return deny(402, "Your EMOS subscription is not active. Renew it to keep using the platform.");
-    }
+  if (!(await subscriptionAllowsAccess(email, userId))) {
+    return deny(402, "Your EMOS subscription is not active. Renew it to keep using the platform.");
   }
 
   // ── Rate limit ─────────────────────────────────────────────────────────────
