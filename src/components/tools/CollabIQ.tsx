@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useReducer, useRef } from "react";
+import { QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 import { EmailGateModal } from "@/components/tools/ToolCTAStrips";
 
 // ── Design tokens ──────────────────────────────────────────────────────────────
@@ -1602,7 +1603,7 @@ export function PartnerCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: n
         <EmailGateModal variant="subscribe" tool="pciq"
           heading={gatedAction === "unlock-preview" ? "Unlock all your matches." : undefined}
           blurb={gatedAction === "unlock-preview"
-            ? "Verify your email to reveal every partner and lift your limit to 30 searches a month. No password, no dashboard. One email, honored across every tool here."
+            ? `Verify your email to reveal every partner and lift your limit to ${QUOTA_LIMITS["pciq-preview"].email} searches a month. No password, no dashboard. One email, honored across every tool here.`
             : undefined}
           show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>

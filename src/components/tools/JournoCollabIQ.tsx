@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useReducer, useRef } from "react";
+import { QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { EmailGateModal, EmosCTAStrip } from "@/components/tools/ToolCTAStrips";
 
@@ -1605,7 +1606,7 @@ export function JournoCollabIQ({ toolHeaderHeight = 0 }: { toolHeaderHeight?: nu
         <EmailGateModal variant="subscribe" tool="jciq"
           heading={gatedAction === "unlock-preview" ? "Unlock all your matches." : undefined}
           blurb={gatedAction === "unlock-preview"
-            ? "Verify your email to reveal every journalist and lift your limit to 30 searches a month. No password, no dashboard. One email, honored across every tool here."
+            ? `Verify your email to reveal every journalist and lift your limit to ${QUOTA_LIMITS["jciq-preview"].email} searches a month. No password, no dashboard. One email, honored across every tool here.`
             : undefined}
           show={showGate} onClose={()=>{setShowGate(false);setGatedAction(null);}} onSubscribe={handleSub} />
       </div>
