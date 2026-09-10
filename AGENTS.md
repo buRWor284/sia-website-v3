@@ -128,3 +128,9 @@ Authenticated EMOS tool. Engine lives in `src/lib/factcheck/`, routes under `src
 - Always fetch `org_id` from the `organizations` table before any INSERT — never rely on RLS to inject it.
 - Use `createSupabaseServiceClient()` in API routes and background jobs. Use `createSupabaseServerClient(token)` in Server Actions with Clerk JWT.
 - Do NOT make unsolicited UI/UX changes to public tools at `/tools/*`. They are lead magnets and should stay as-is.
+
+## Test data vs real data (2026-09-10)
+- Test data is marked at the ORGANISATION: `organizations.is_test`. No other table has (or should get) an `is_test` column; every org-scoped table inherits it through `org_id`.
+- Real-only reads: `join organizations o on o.id = t.org_id where o.is_test = false`. `pressiq_scores` and `ai_usage` also hold NULL-org rows (anonymous public-tool runs), which that inner join drops. Full how-to: `supabase/organizations-is-test.sql`.
+- Test accounts are flagged AUTOMATICALLY: emails listed in `internal_test_accounts` (service-only table; `irfan@dmr.agency` is the designated test account) get their org set `is_test = true` by the `users_flag_test_org` trigger when provisioned. No test-mode button in the product, by Irfan's decision: it would confuse real customers.
+- Only an operator (SQL editor / service role) can flip the flag; a trigger refuses it from `anon`/`authenticated`. The dashboard shows a red TEST ORG chip in the "Working for" bar (`TestOrgBadge.tsx`) when the signed-in org is flagged.

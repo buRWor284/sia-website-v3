@@ -22,6 +22,7 @@
 
 import React, { useState } from "react";
 import { useCompanyOptional } from "./CompanyProvider";
+import TestOrgBadge from "./TestOrgBadge";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 
 const PAPER  = "#f1ebde";
@@ -203,6 +204,9 @@ export default function CompanyPicker({
         display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
         padding: "10px 14px",
       }}>
+        {/* Renders only for an org flagged organizations.is_test. First in the
+            bar so the mode is the first thing read, on every tool. */}
+        <TestOrgBadge />
         <span style={LABEL}>Working for</span>
 
         {empty ? (
