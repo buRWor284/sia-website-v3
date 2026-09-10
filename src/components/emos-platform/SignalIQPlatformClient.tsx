@@ -39,6 +39,7 @@ import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emos
 import type { BeatId, Opportunity, AssetPack } from "@/lib/signaliq/types";
 import type { DbSignal } from "@/app/emos-platform/actions/signaliq";
 import type { DbAssetPack } from "@/lib/asset-pack-types";
+import { clipWords } from "@/lib/clip-words";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER   = "#f1ebde";
@@ -398,7 +399,7 @@ export default function SignalIQPlatformClient({
           onDownloadPDF: handleDownloadPDF,
           pressIqHref: "/emos-platform/dashboard/pressiq",
           buildAssetHref: (opp: Opportunity, pack: AssetPack) =>
-            `/emos-platform/dashboard/assetiq?headline=${encodeURIComponent(opp.headline)}&assetIdea=${encodeURIComponent(pack.linkableAssetIdea ?? "")}&dataBrief=${encodeURIComponent((pack.brief ?? "").slice(0, 400))}&pitchAngle=${encodeURIComponent((pack.angle ?? "").slice(0, 300))}`,
+            `/emos-platform/dashboard/assetiq?headline=${encodeURIComponent(opp.headline)}&assetIdea=${encodeURIComponent(pack.linkableAssetIdea ?? "")}&dataBrief=${encodeURIComponent(clipWords(pack.brief ?? "", 400))}&pitchAngle=${encodeURIComponent(clipWords(pack.angle ?? "", 300))}`,
         }}
         // No onExit: the dashboard has no landing screen, so the stage-1 back
         // button is hidden. The dashboard header's "← EMOS" covers leaving.

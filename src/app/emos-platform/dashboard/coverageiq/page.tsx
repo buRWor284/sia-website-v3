@@ -19,7 +19,7 @@ export default async function CoverageIQPlatformPage({
   if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
-  const prefillSubject = params.pitch ? decodeURIComponent(params.pitch) : undefined;
+  const prefillSubject = params.pitch ? params.pitch : undefined;
 
   // Parallel data fetch — all three queries run simultaneously
   const [pitches, journalists, alerts] = await Promise.all([

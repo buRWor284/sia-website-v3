@@ -21,6 +21,7 @@ import {
   type AssetStatus,
   type CreateAssetInput,
 } from "@/app/emos-platform/actions/assetiq";
+import { clipWords } from "@/lib/clip-words";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -465,7 +466,7 @@ function AssetRow({
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* Find journalists CTA */}
           <a
-            href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent((asset.description ?? "").slice(0, 200))}`}
+            href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent(clipWords(asset.description ?? "", 200))}`}
             style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}
           >
             Find journalists →
@@ -500,7 +501,7 @@ function AssetRow({
               </p>
               <div className="aiq-noprint" style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
                 <a
-                  href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent((asset.description ?? "").slice(0, 200))}`}
+                  href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent(clipWords(asset.description ?? "", 200))}`}
                   style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}
                 >
                   Find journalists for this asset →
@@ -736,7 +737,7 @@ export default function AssetIQClient({
                 </p>
                 <div className="aiq-noprint" style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
                   <a
-                    href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle || signalHeadline || "")}&story=${encodeURIComponent((pitchAngle ?? assetIdea ?? "").slice(0, 300))}&assetTitle=${encodeURIComponent(planTitle)}&assetType=${encodeURIComponent(planAssetType)}&assetIdea=${encodeURIComponent((assetIdea ?? "").slice(0, 200))}`}
+                    href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle || signalHeadline || "")}&story=${encodeURIComponent(clipWords(pitchAngle ?? assetIdea ?? "", 300))}&assetTitle=${encodeURIComponent(planTitle)}&assetType=${encodeURIComponent(planAssetType)}&assetIdea=${encodeURIComponent(clipWords(assetIdea ?? "", 200))}`}
                     style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}
                   >
                     Find journalists for this asset →

@@ -30,11 +30,11 @@ export default async function JournoCollabIQPage({
   const params = await searchParams;
 
   // Pre-fill from AssetIQ or SignalIQ context
-  const prefillBeat      = params.topic     ? decodeURIComponent(params.topic)     : params.beat      ? decodeURIComponent(params.beat)      : "";
-  const prefillStory     = params.story     ? decodeURIComponent(params.story)     : "";
-  const prefillAssetTitle = params.assetTitle ? decodeURIComponent(params.assetTitle) : undefined;
-  const prefillAssetType  = params.assetType  ? decodeURIComponent(params.assetType)  : undefined;
-  const prefillAssetIdea  = params.assetIdea  ? decodeURIComponent(params.assetIdea)  : undefined;
+  const prefillBeat      = params.topic     ? params.topic     : params.beat      ? params.beat      : "";
+  const prefillStory     = params.story     ? params.story     : "";
+  const prefillAssetTitle = params.assetTitle ? params.assetTitle : undefined;
+  const prefillAssetType  = params.assetType  ? params.assetType  : undefined;
+  const prefillAssetIdea  = params.assetIdea  ? params.assetIdea  : undefined;
 
   const journalists = await getJournalists();
 

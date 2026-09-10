@@ -175,6 +175,64 @@ export function clampResults(raw: string, limit: number): { text: string; total:
 }
 
 /**
+ * Lowercased name pieces (first 4 letters of each part) that a journalist's real
+ * handle or profile slug nearly always contains: @lorenzofb, @JBrodkin, @ajdell.
+ */
+function nameFragments(name: string): string[] {
+  return name
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .split(/[^a-z]+/)
+    .filter((t) => t.length >= 3)
+    .map((t) => t.slice(0, 4));
+}
+
+/** True when a handle or profile slug plausibly belongs to this person. */
+export function handleMatchesName(name: string, handleOrSlug: string): boolean {
+  const h = handleOrSlug.toLowerCase().replace(/[^a-z]/g, "");
+  const frags = nameFragments(name);
+  if (!h || frags.length === 0) return false;
+  return frags.some((f) => h.includes(f));
+}
+
+/**
+ * The prompt says "a handle only if certain", but the model still invents
+ * lookalikes (test run 10 Sep 2026: @braborescua for Brian Krebs, @zaborescuack
+ * for Zack Whittaker, @lilohmeg for Lily Hay Newman). A wrong handle sends the
+ * pitch to a stranger, so any handle or profile URL that shares no piece of the
+ * journalist's name is dropped: the contact falls back to the outlet and the UI's
+ * "Find on LinkedIn" search link covers the rest. A real handle that uses none of
+ * their name is lost too; that is the cheaper mistake. Fails open on bad JSON.
+ */
+export function scrubContacts(raw: string): string {
+  let arr: unknown;
+  try { arr = JSON.parse(stripFences(raw)); } catch { return raw; }
+  if (!Array.isArray(arr)) return raw;
+  const cleaned = arr.map((item) => {
+    if (!item || typeof item !== "object") return item;
+    const j = { ...(item as Record<string, unknown>) };
+    const name = typeof j.name === "string" ? j.name : "";
+    if (typeof j.contact === "string") {
+      const m = j.contact.match(/@([A-Za-z0-9_]{1,15})/);
+      if (m && !handleMatchesName(name, m[1])) {
+        const outlet = typeof j.url === "string" && j.url ? j.url : "the outlet";
+        j.contact = `Via ${outlet} (no verified handle)`;
+      }
+    }
+    if (typeof j.contactLinkedIn === "string" && j.contactLinkedIn) {
+      const slug = j.contactLinkedIn
+        .replace(/^https?:\/\//, "")
+        .replace(/^(www\.)?(linkedin\.com\/in|x\.com|twitter\.com|muckrack\.com)\//i, "")
+        .split(/[/?#]/)[0];
+      if (!handleMatchesName(name, slug)) j.contactLinkedIn = "";
+    }
+    return j;
+  });
+  return JSON.stringify(cleaned);
+}
+
+/**
  * Build the prompt for the given call type and run it through the Anthropic
  * Messages API. Returns the joined text on success, or a { status, error } the
  * caller can pass straight to NextResponse. The caller owns all gating (auth,
@@ -222,7 +280,7 @@ export async function runJournoAI(
       .filter((b) => b.type === "text")
       .map((b) => b.text)
       .join("\n");
-    return { ok: true, result };
+    return { ok: true, result: type === "partner-suggestions" ? scrubContacts(result) : result };
   } catch (e) {
     console.error("[journo-ai] runJournoAI error:", e);
     return { ok: false, status: 500, error: "Internal server error." };

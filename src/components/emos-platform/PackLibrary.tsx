@@ -15,6 +15,7 @@
 import React, { useState } from "react";
 import { deleteAssetPack } from "@/app/emos-platform/actions/asset-packs";
 import type { DbAssetPack } from "@/lib/asset-pack-types";
+import { clipWords } from "@/lib/clip-words";
 
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -95,8 +96,8 @@ function PackDetail({ pack }: { pack: DbAssetPack }) {
   const buildHref =
     `/emos-platform/dashboard/assetiq?headline=${encodeURIComponent(pack.headline ?? "")}` +
     `&assetIdea=${encodeURIComponent(pack.linkable_asset_idea ?? "")}` +
-    `&dataBrief=${encodeURIComponent((pack.story_brief ?? "").slice(0, 400))}` +
-    `&pitchAngle=${encodeURIComponent((pack.pitch_angle ?? "").slice(0, 300))}` +
+    `&dataBrief=${encodeURIComponent(clipWords(pack.story_brief ?? "", 400))}` +
+    `&pitchAngle=${encodeURIComponent(clipWords(pack.pitch_angle ?? "", 300))}` +
     (pack.signal_id ? `&signal=${pack.signal_id}` : "");
 
   return (

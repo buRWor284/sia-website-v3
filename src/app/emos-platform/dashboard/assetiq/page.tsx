@@ -26,12 +26,14 @@ export default async function AssetIQPage({
   const { userId } = await auth();
   if (!userId) redirect("/emos-platform/signin");
 
+  // Next.js hands searchParams over already decoded. Decoding again threw on any
+  // "%" in the text (e.g. "37% of saturation" in a pack brief) and crashed the page.
   const params = await searchParams;
   const signalId    = params.signal ?? null;
-  const assetIdea   = params.assetIdea   ? decodeURIComponent(params.assetIdea)   : null;
-  const dataBrief   = params.dataBrief   ? decodeURIComponent(params.dataBrief)   : null;
-  const pitchAngle  = params.pitchAngle  ? decodeURIComponent(params.pitchAngle)  : null;
-  const signalHeadlineFromParam = params.headline ? decodeURIComponent(params.headline) : null;
+  const assetIdea   = params.assetIdea   ? params.assetIdea   : null;
+  const dataBrief   = params.dataBrief   ? params.dataBrief   : null;
+  const pitchAngle  = params.pitchAngle  ? params.pitchAngle  : null;
+  const signalHeadlineFromParam = params.headline ? params.headline : null;
 
   // If signal ID provided, fetch its headline from DB as backup
   let signalHeadline = signalHeadlineFromParam;

@@ -54,13 +54,13 @@ export default async function PressIQPlatformPage({
   if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
-  const assetTitle = params.assetTitle ? decodeURIComponent(params.assetTitle) : null;
-  const assetType  = params.assetType  ? decodeURIComponent(params.assetType)  : null;
-  const assetIdea  = params.assetIdea  ? decodeURIComponent(params.assetIdea)  : null;
+  const assetTitle = params.assetTitle ? params.assetTitle : null;
+  const assetType  = params.assetType  ? params.assetType  : null;
+  const assetIdea  = params.assetIdea  ? params.assetIdea  : null;
 
   // Build query pre-fill: beat + journalist + asset context combined
-  const beatPart      = params.beat       ? decodeURIComponent(params.beat)       : "";
-  const journalistPart = params.journalist ? decodeURIComponent(params.journalist) : "";
+  const beatPart      = params.beat       ? params.beat       : "";
+  const journalistPart = params.journalist ? params.journalist : "";
   const assetPart     = assetTitle        ? `, pitching asset: ${assetTitle}`    : "";
   const initialQuery  = beatPart
     ? `${beatPart}${assetPart}`
