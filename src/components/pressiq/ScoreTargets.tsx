@@ -48,7 +48,8 @@ export default function ScoreTargets({ compact = false }: { compact?: boolean })
         <p style={{ margin: 0, fontFamily: SERIF, fontSize: compact ? 14 : 16, lineHeight: 1.5, color: INK }}>
           Send at <strong>{placement.min} or above</strong> ({placement.label}). {competitive.min} to {competitive.max} is{" "}
           {competitive.label.toLowerCase()}: close, but tighten it first. EMOS drafts are written to start at {competitive.min} or
-          above; the last points come from what only you have: your own data, the journalist&apos;s recent work, and a real news hook.
+          above. SignalIQ finds the news hook; the last points come from what only you can add: your own data and the
+          journalist&apos;s recent work.
         </p>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
