@@ -18,6 +18,10 @@ export interface JournalistHistory {
   lastCompanyName: string | null;
   /** Total scored pitches recorded against this journalist. */
   pitchCount: number;
+  /** What the most recent touch actually was (2026-09-10). A PressIQ score is
+   * not a send, so the warning must not say "pitched" for one. Optional so
+   * older callers still type-check; absent reads as "scored". */
+  lastKind?: "scored" | "tracked" | "sent";
 }
 
 /** Days below which a repeat approach to the SAME company is worth warning about. */

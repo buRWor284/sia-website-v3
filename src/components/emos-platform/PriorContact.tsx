@@ -31,17 +31,25 @@ export function priorContactNote(
   const days = daysSince(history.lastPitchedAt);
   const when = days === 0 ? "today" : days === 1 ? "yesterday" : `${days} days ago`;
   const sameCompany = !!activeCompanyId && history.lastCompanyId === activeCompanyId;
+  // Say what actually happened. Before 2026-09-10 a PressIQ SCORE read as
+  // "Already pitched today", which is false: nothing was sent.
+  const verb = history.lastKind === "sent" ? "Pitched" : history.lastKind === "tracked" ? "Pitch tracked" : "Pitch scored";
 
   if (sameCompany && days <= REPEAT_WARN_DAYS) {
-    return { text: `Already pitched ${when} for this same company.`, level: "warn" };
+    return {
+      text: history.lastKind === "sent"
+        ? `Already pitched ${when} for this same company.`
+        : `${verb} ${when} for this same company.`,
+      level: "warn",
+    };
   }
   if (sameCompany) {
-    return { text: `Last pitched ${when} for this company.`, level: "info" };
+    return { text: `${verb} ${when} for this company.`, level: "info" };
   }
   if (history.lastCompanyName) {
-    return { text: `Pitched ${when} for ${history.lastCompanyName}.`, level: "info" };
+    return { text: `${verb} ${when} for ${history.lastCompanyName}.`, level: "info" };
   }
-  return { text: `Pitched ${when}.`, level: "info" };
+  return { text: `${verb} ${when}.`, level: "info" };
 }
 
 export default function PriorContact({

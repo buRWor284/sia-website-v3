@@ -59,6 +59,7 @@ Generate 8 REAL, NAMED journalists who genuinely cover this beat. Prefer reporte
 
 CRITICAL HONESTY RULES:
 - Never fabricate a personal email address. For contact, give a public handle (X/Twitter) or the outlet section/desk only.
+- Only give an X/Twitter handle if you are CERTAIN it is this journalist's real, current handle. If you are not certain, give the outlet desk or section instead. A wrong handle is worse than none: it sends the pitch to a stranger.
 - Treat every journalist as "verify before pitching" — people and beats change.
 - For the recent article, give a real, specific article by that journalist on this beat if you know one; otherwise give their author/section page. Never invent a URL.
 
@@ -69,8 +70,9 @@ Return ONLY a valid JSON array — no text before or after, no markdown fences. 
     "name": "Journalist full name (e.g. Kara Swisher)",
     "url": "their outlet's domain, e.g. forbes.com",
     "why": "2-3 sentences: which beat they cover, why this story fits their recent coverage, and the angle that would land with them",
+    "beat": "Their actual beat in a few words, e.g. 'cybersecurity and privacy' or 'consumer fintech'. Describe what THEY cover, not the user's search.",
     "linkPage": "URL of a recent relevant article BY this journalist (the proof they cover this) — or their author/section page if no specific article URL is known. Never invent a URL.",
-    "contact": "Public contact only: an X/Twitter handle (e.g. @karaswisher) or the outlet desk/section. NEVER a guessed personal email.",
+    "contact": "Public contact only: an X/Twitter handle you are certain of (e.g. @karaswisher), otherwise the outlet desk/section. NEVER a guessed personal email or a guessed handle.",
     "contactLinkedIn": "Muck Rack or X profile URL if known, else empty string",
     "seoNote": "Outlet authority + reach and tier, e.g. 'DA 94 · national business desk · very high reach · Tier 1'",
     "tier": "A or B or C — A = highest-fit, approach first"

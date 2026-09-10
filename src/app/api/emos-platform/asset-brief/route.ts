@@ -60,6 +60,11 @@ A single sentence a journalist could use as the lede for their story about this 
 ## Distribution Angles
 3 specific journalist beats or outlet types that would genuinely want to cover this asset and why.
 
+NUMBERS AND FACTS RULE (strict):
+- Do not state any statistic, dollar figure, percentage, date, year or named study unless it appears in the ASSET CONTEXT above.
+- When an outside number would strengthen a point, do NOT write the number from memory. Write a placeholder in square brackets naming what to look up and where, for example: [STAT TO SOURCE: FBI IC3 annual SIM swap losses, latest year, ic3.gov].
+- A placeholder the builder fills from the primary source is correct. A remembered number is not, because remembered numbers are often from the wrong year.
+
 Write in direct, practical prose. No fluff. Length: 500–700 words total.`;
 }
 
@@ -93,7 +98,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 2000,
+        max_tokens: 3000, // was 2000; the first logged brief used 1,392 (2026-09-10)
         messages: [{ role: "user", content: prompt }],
       }),
     });
@@ -103,8 +108,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: err?.error?.message || `Anthropic API error ${res.status}` }, { status: res.status });
     }
 
-    const json = await res.json() as { content?: Array<{ type: string; text: string }> };
+    const json = await res.json() as { content?: Array<{ type: string; text: string }>; stop_reason?: string };
     await recordAiUsage("asset-brief", MODEL, json, { surface: "platform", clerkUserId: guard.userId }); // cost log (stage 3)
+    if (json.stop_reason === "max_tokens") {
+      // A brief that stops mid-section reads as complete in the UI. Say so instead.
+      return NextResponse.json({ error: "The brief was cut short before it finished. Please try again." }, { status: 502 });
+    }
     const result = (json.content ?? [])
       .filter(b => b.type === "text")
       .map(b => b.text)

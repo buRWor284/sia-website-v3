@@ -359,6 +359,7 @@ export async function getJournalistHistory(): Promise<JournalistHistory[]> {
     if (!h.lastPitchedAt) {
       h.lastPitchedAt = r.scored_at;
       h.lastCompanyId = r.company_id;
+      h.lastKind = "scored";
     }
   }
 
@@ -366,7 +367,10 @@ export async function getJournalistHistory(): Promise<JournalistHistory[]> {
     const h = touch(r.journalist_id);
     const when = r.sent_date ?? r.created_at;
     h.pitchCount += 1;
-    if (!h.lastPitchedAt || when > h.lastPitchedAt) h.lastPitchedAt = when;
+    if (!h.lastPitchedAt || when > h.lastPitchedAt) {
+      h.lastPitchedAt = when;
+      h.lastKind = r.sent_date ? "sent" : "tracked";
+    }
   }
 
   // Resolve the company names in one go.

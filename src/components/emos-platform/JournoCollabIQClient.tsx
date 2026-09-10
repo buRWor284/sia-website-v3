@@ -64,6 +64,8 @@ interface AIJournalist {
   name: string;
   url: string;
   why: string;
+  /** Their own beat, from the model (2026-09-10). Older responses lack it. */
+  beat?: string;
   linkPage: string;
   contact: string;
   contactLinkedIn: string;
@@ -239,7 +241,10 @@ function JournalistCard({
       const input: CreateJournalistInput = {
         name: j.name,
         outlet: j.url,
-        beat: formData.industry || null,
+        // The journalist's OWN beat when the model gave one; before 2026-09-10
+        // this saved the user's search text, so every journalist from one
+        // search carried the same "beat" and PressIQ scored relevance against it.
+        beat: j.beat?.trim() || formData.industry || null,
         email: null,
         twitter_handle: j.contact?.startsWith("@") ? j.contact : null,
         domain_rating: parsedDr,

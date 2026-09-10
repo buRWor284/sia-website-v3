@@ -17,7 +17,6 @@ const INK55  = "rgba(26,20,16,.55)";
 const INK35  = "rgba(26,20,16,.32)";
 const INK15  = "rgba(26,20,16,.15)";
 const YEL    = "#f5b81f";
-const GREEN  = "#3e6b45";
 const GROT   = "var(--font-grot)";
 const SERIF  = "var(--font-serif)";
 
@@ -40,7 +39,6 @@ export default function PipelineNav({ current, nextHref }: PipelineNavProps) {
       <div style={{ display: "flex", overflow: "hidden", borderBottom: `1px solid ${INK15}` }}>
         {tools.map((stage, i) => {
           const isCurrent = stage === current;
-          const isPast    = i < currentIdx;
           return (
             <a
               key={stage}
@@ -57,9 +55,13 @@ export default function PipelineNav({ current, nextHref }: PipelineNavProps) {
               <div style={{
                 fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em",
                 textTransform: "uppercase",
-                color: isCurrent ? PAPER : isPast ? GREEN : INK55,
+                color: isCurrent ? PAPER : INK55,
               }}>
-                {isPast ? "✓ " : ""}{STAGE_META[stage].label}
+                {/* Step number, not a tick. The strip shows WHERE you are in the
+                    pipeline; a ✓ on every earlier step read as "done" even when
+                    that tool had never been used (AssetIQ ticked with 0 assets,
+                    10 Sep test run). */}
+                <span style={{ opacity: 0.6 }}>{String(i + 1).padStart(2, "0")} </span>{STAGE_META[stage].label}
               </div>
             </a>
           );
@@ -101,7 +103,7 @@ export default function PipelineNav({ current, nextHref }: PipelineNavProps) {
             Pipeline complete — Full EMOS
           </div>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: "rgba(241,235,222,.65)", marginTop: 4 }}>
-            You've worked through every stage. Keep logging and tracking to compound your results.
+            You&apos;ve worked through every stage. Keep logging and tracking to compound your results.
           </div>
         </div>
       )}

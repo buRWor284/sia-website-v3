@@ -495,6 +495,9 @@ function AssetRow({
                 </div>
               </div>
               <Markdown text={brief} size={13.5} />
+              <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
+                Written by AI. Anything in [square brackets] is a number to look up. Check every other figure against its original source before you publish or pitch it.
+              </p>
               <div className="aiq-noprint" style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
                 <a
                   href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent((asset.description ?? "").slice(0, 200))}`}
@@ -728,6 +731,9 @@ export default function AssetIQClient({
                   <BriefActions text={creationPlan} />
                 </div>
                 <Markdown text={creationPlan} size={14} />
+                <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
+                  Written by AI. Anything in [square brackets] is a number to look up. Check every other figure against its original source before you publish or pitch it.
+                </p>
                 <div className="aiq-noprint" style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
                   <a
                     href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle || signalHeadline || "")}&story=${encodeURIComponent((pitchAngle ?? assetIdea ?? "").slice(0, 300))}&assetTitle=${encodeURIComponent(planTitle)}&assetType=${encodeURIComponent(planAssetType)}&assetIdea=${encodeURIComponent((assetIdea ?? "").slice(0, 200))}`}
