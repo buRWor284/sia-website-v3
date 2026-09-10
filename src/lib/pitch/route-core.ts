@@ -17,6 +17,7 @@
  * 504 on both surfaces. Routes calling this MUST set maxDuration = 60.
  */
 import { PITCH_MODEL } from "./config";
+import { recordAiUsage } from "@/lib/ai-usage";
 import { computeMetrics, resolveSubject, scoreLayer1 } from "./metrics";
 import { buildUserPrompt, parseAiResult, SCORE_TOOL, SYSTEM_PROMPT } from "./scorePrompt";
 import { composeScore } from "./composite";
@@ -157,6 +158,8 @@ export async function runScoreRequest(
       content?: Array<{ type: string; name?: string; input?: unknown }>;
       stop_reason?: string;
     };
+    // Cost log (stage 3). Before the truncation check: a cut-off answer is billed too.
+    await recordAiUsage("pressiq-score", PITCH_MODEL, json);
 
     // A max_tokens stop means the model was cut off mid tool-call. The block
     // that arrives still parses, so without this check a partial answer is

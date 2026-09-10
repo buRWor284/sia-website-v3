@@ -20,6 +20,7 @@ import "server-only";
  */
 
 import { DRAFT_MODEL } from "./config";
+import { recordAiUsage } from "@/lib/ai-usage";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 
@@ -157,6 +158,8 @@ async function draftOne(
       content?: Array<{ type: string; name?: string; input?: unknown }>;
       stop_reason?: string;
     };
+    // Cost log (stage 3). Before the truncation check: a cut-off draft is billed too.
+    await recordAiUsage("pitch-draft", DRAFT_MODEL, json);
 
     // Same lesson as the scoring truncation bug found earlier today: a cut-off
     // response must never be presented as a finished one.

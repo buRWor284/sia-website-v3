@@ -17,6 +17,7 @@ import { consumeQuota } from "@/lib/gate/quota";
 import { EMAIL_LIMIT } from "@/lib/pitch/config";
 import { parsePitchInput, runScoreRequest } from "@/lib/pitch/route-core";
 import { logPitch } from "@/lib/pitch/log";
+import { withAiUsage } from "@/lib/ai-usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,14 +81,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const run = await runScoreRequest(input, { remaining: quota.remaining, tier: usageTier });
+  // Read the session before scoring (was after) so the cost log can attribute a
+  // signed-in visitor's run to their org as well as the flywheel log below.
+  const { userId: clerkUserId } = await auth();
+
+  const run = await withAiUsage({ surface: "public", clerkUserId }, () =>
+    runScoreRequest(input, { remaining: quota.remaining, tier: usageTier }),
+  );
   if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
   // Flywheel — pass the Clerk user ID if a session is present so the score is
   // org-scoped. MUST be awaited: a fire-and-forget insert is dropped when the
   // serverless function is frozen right after the response is sent (logPitch is
   // internally try/caught, so awaiting can never break the response).
-  const { userId: clerkUserId } = await auth();
   await logPitch(input, run.result, clerkUserId ?? undefined);
 
   return NextResponse.json(run.result);

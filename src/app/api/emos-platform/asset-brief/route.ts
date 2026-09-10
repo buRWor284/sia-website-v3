@@ -8,6 +8,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
+import { recordAiUsage } from "@/lib/ai-usage";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -103,6 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     const json = await res.json() as { content?: Array<{ type: string; text: string }> };
+    await recordAiUsage("asset-brief", MODEL, json, { surface: "platform", clerkUserId: guard.userId }); // cost log (stage 3)
     const result = (json.content ?? [])
       .filter(b => b.type === "text")
       .map(b => b.text)

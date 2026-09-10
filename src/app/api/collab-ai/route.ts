@@ -18,6 +18,7 @@ import { rateLimitDb } from "@/lib/rate-limit-db";
 import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 import { consumeQuota } from "@/lib/gate/quota";
 import { PREVIEW_REVEAL } from "@/lib/gate/quota-limits";
+import { recordAiUsage } from "@/lib/ai-usage";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -285,6 +286,7 @@ export async function POST(request: NextRequest) {
     }
 
     const json = await res.json() as { content?: Array<{ type: string; text: string }> };
+    await recordAiUsage("collab-ai", MODEL, json, { surface: "public" }); // cost log (stage 3)
     const result = (json.content ?? [])
       .filter(b => b.type === "text")
       .map(b => b.text)

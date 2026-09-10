@@ -17,6 +17,7 @@ import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 import { consumeQuota } from "@/lib/gate/quota";
 import { PREVIEW_REVEAL } from "@/lib/gate/quota-limits";
 import { runJournoAI, clampResults } from "@/lib/journo/route-core";
+import { withAiUsage } from "@/lib/ai-usage";
 
 // Opus generations run 20-40s (esp. the 8-journalist search at max_tokens 3000).
 // Without this the platform default could cut a genuine generation short with a
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const run = await runJournoAI(type, capToolInput(data));
+  const run = await withAiUsage({ surface: "public" }, () => runJournoAI(type, capToolInput(data)));
   if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
   // Preview search (P3): withhold the rows beyond the caller's tier reveal cap

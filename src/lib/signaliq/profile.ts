@@ -20,6 +20,7 @@
  * and the scan falls back to the generic beat seeds with neutral relevance.
  */
 import type { BeatId, ProfileExpansion } from "./types";
+import { recordAiUsage } from "@/lib/ai-usage";
 import { SIGNALIQ_MODEL, beatById } from "./config";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
@@ -241,6 +242,7 @@ export async function expandCompanyProfile(
       return null;
     }
     const json = (await res.json()) as { content?: ToolUseBlock[] };
+    await recordAiUsage("signaliq-profile", SIGNALIQ_MODEL, json); // cost log (stage 3); cache hits never reach here
     const expansion = parseExpansion(json.content ?? []);
     if (expansion) cache.set(key, expansion);
     return expansion;

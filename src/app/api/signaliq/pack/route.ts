@@ -14,6 +14,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 import { consumeQuota } from "@/lib/gate/quota";
 import { clientIp } from "@/lib/public-tool-guard";
 import { coerceOpportunity, runPackRequest } from "@/lib/signaliq/route-core";
+import { withAiUsage } from "@/lib/ai-usage";
 import type { AssetPack, UsageTier } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
@@ -62,7 +63,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const result = await runPackRequest(opp, companyContext);
+  const result = await withAiUsage({ surface: "public" }, () => runPackRequest(opp, companyContext));
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }

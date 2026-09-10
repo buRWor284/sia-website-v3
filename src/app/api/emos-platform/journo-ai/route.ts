@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { runJournoAI } from "@/lib/journo/route-core";
+import { withAiUsage } from "@/lib/ai-usage";
 
 // Match the public route: Opus generations run 20-40s, so lift the ceiling to
 // 60s to avoid a latent 504 cutting a real generation short.
@@ -34,7 +35,9 @@ export async function POST(request: NextRequest) {
   const { type, data } = body;
   if (!type || !data) return NextResponse.json({ error: "Missing type or data." }, { status: 400 });
 
-  const run = await runJournoAI(type, data);
+  const run = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
+    runJournoAI(type, data),
+  );
   if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
   return NextResponse.json({ result: run.result });

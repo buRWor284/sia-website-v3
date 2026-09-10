@@ -12,6 +12,7 @@
  * copy-pasted emostool twin silently kept 30s (a latent 504) until P6.
  */
 import { BEATS, SIGNALIQ_MODEL } from "./config";
+import { recordAiUsage } from "@/lib/ai-usage";
 import { scanBeat } from "./scan";
 import { logScan, logPack } from "./log";
 import {
@@ -133,6 +134,7 @@ export async function runPackRequest(
     }
 
     const json = (await res.json()) as { content?: Array<{ type: string; name?: string; input?: unknown }> };
+    await recordAiUsage("signaliq-pack", SIGNALIQ_MODEL, json); // cost log (stage 3)
     content = json.content ?? [];
   } catch (e) {
     console.error("signaliq pack core error:", e);

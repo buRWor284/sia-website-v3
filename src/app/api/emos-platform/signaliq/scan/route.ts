@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { parseBeats, runScanRequest } from "@/lib/signaliq/route-core";
+import { withAiUsage } from "@/lib/ai-usage";
 import type { ScanResponse } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
@@ -37,7 +38,9 @@ export async function POST(req: NextRequest) {
   const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 600) : undefined;
 
   try {
-    const core = await runScanRequest(beats, companyContext);
+    const core = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
+      runScanRequest(beats, companyContext),
+    );
     const body: ScanResponse = {
       ...core,
       // Platform users have unlimited scans

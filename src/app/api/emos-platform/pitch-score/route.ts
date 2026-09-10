@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { parsePitchInput, runScoreRequest } from "@/lib/pitch/route-core";
 import { logPitch } from "@/lib/pitch/log";
+import { withAiUsage } from "@/lib/ai-usage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -36,7 +37,9 @@ export async function POST(req: NextRequest) {
   const input = parsed.input;
 
   // Platform users are unmetered; usage is woven into composeScore for shape parity.
-  const run = await runScoreRequest(input, { remaining: 999, tier: "email" });
+  const run = await withAiUsage({ surface: "platform", clerkUserId: userId }, () =>
+    runScoreRequest(input, { remaining: 999, tier: "email" }),
+  );
   if (!run.ok) return NextResponse.json({ error: run.error }, { status: run.status });
 
   // 2026-09-09 (state layer): carry who and what this pitch was for. Read off

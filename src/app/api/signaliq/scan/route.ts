@@ -19,6 +19,7 @@ import { verifyTurnstile } from "@/lib/turnstile";
 import { consumeQuota } from "@/lib/gate/quota";
 import { clientIp } from "@/lib/public-tool-guard";
 import { parseBeats, runScanRequest } from "@/lib/signaliq/route-core";
+import { withAiUsage } from "@/lib/ai-usage";
 import type { ScanResponse, UsageTier } from "@/lib/signaliq/types";
 
 export const runtime = "nodejs";
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
   const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, 600) : undefined;
 
   try {
-    const core = await runScanRequest(beats, companyContext);
+    const core = await withAiUsage({ surface: "public" }, () => runScanRequest(beats, companyContext));
     const body: ScanResponse = { ...core, usage: { remaining: quota.remaining, tier } };
     return NextResponse.json(body);
   } catch (e) {

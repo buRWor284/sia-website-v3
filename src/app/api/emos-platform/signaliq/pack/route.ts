@@ -19,6 +19,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { coerceOpportunity, runPackRequest } from "@/lib/signaliq/route-core";
+import { withAiUsage } from "@/lib/ai-usage";
 import { saveAssetPackForUser } from "@/lib/signaliq/save-pack";
 import type { AssetPack } from "@/lib/signaliq/types";
 
@@ -46,7 +47,9 @@ export async function POST(req: NextRequest) {
   const companyId = typeof raw.companyId === "string" ? raw.companyId : null;
   const beatLabel = typeof raw.beatLabel === "string" ? raw.beatLabel.slice(0, 120) : null;
 
-  const result = await runPackRequest(opp, companyContext);
+  const result = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
+    runPackRequest(opp, companyContext),
+  );
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
