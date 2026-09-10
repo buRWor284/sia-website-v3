@@ -261,7 +261,6 @@ export default function PitchDrafter({
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [assetId, setAssetId] = useState("");
   const [angle, setAngle] = useState("");
-  const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Draft[] | null>(null);
@@ -332,19 +331,21 @@ export default function PitchDrafter({
   const failed = drafts?.filter(d => d.error).length ?? 0;
 
   return (
-    <div style={{ marginTop: 40 }}>
+    // 2026-09-09: this used to sit at the bottom of the PressIQ page behind an
+    // Open/Hide toggle. It now owns the Drafts tab, so it starts open and drops
+    // the leading gap — collapsing a section inside its own tab is a click that
+    // buys nothing.
+    <div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
         <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase" }}>
           Draft pitches
         </span>
-        <button onClick={() => setOpen(o => !o)} style={LINK}>{open ? "Hide" : "Open"}</button>
         <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
           Write a personalised pitch for one journalist, or for all of them at once.
         </span>
       </div>
 
-      {open && (
-        <div style={{ border: `1px solid ${INK}`, background: PAPER2 }}>
+      <div style={{ border: `1px solid ${INK}`, background: PAPER2 }}>
           <div style={{ padding: "12px 14px", display: "grid", gap: 12 }}>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -527,8 +528,7 @@ export default function PitchDrafter({
               ))}
             </div>
           )}
-        </div>
-      )}
+      </div>
     </div>
   );
 }

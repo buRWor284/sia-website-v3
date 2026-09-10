@@ -175,7 +175,7 @@ function ScoreHistory({
     return (
       <div style={{ padding: "32px 24px", textAlign: "center", border: `1px solid ${INK15}`, background: PAPER2 }}>
         <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK55 }}>
-          No scores yet. Score your first pitch above.
+          No scores yet. Score your first pitch in the Score tab.
         </p>
       </div>
     );
@@ -279,6 +279,69 @@ function ScoreHistory({
   );
 }
 
+// ── Tabs ───────────────────────────────────────────────────────────────────────
+/**
+ * 2026-09-09: the page was one long scroll — scorer, then score history, then
+ * the drafter — so getting back to the scorer after reading a draft meant
+ * scrolling past everything. Three tabs instead.
+ *
+ * The panels are hidden with CSS rather than unmounted. Unmounting would throw
+ * away a half-typed pitch the moment you glanced at your drafts, which is worse
+ * than any rendering cost.
+ */
+type Tab = "score" | "drafts" | "history";
+
+function Tabs({
+  tab, onChange, draftCount, scoreCount,
+}: {
+  tab: Tab;
+  onChange: (t: Tab) => void;
+  draftCount: number;
+  scoreCount: number;
+}) {
+  const items: { id: Tab; label: string; count: number | null }[] = [
+    { id: "score",   label: "Score",   count: null },
+    { id: "drafts",  label: "Drafts",  count: draftCount },
+    { id: "history", label: "History", count: scoreCount },
+  ];
+
+  return (
+    <div role="tablist" aria-label="PressIQ sections" style={{ display: "flex", borderBottom: `1px solid ${INK}`, marginBottom: 22 }}>
+      {items.map(it => {
+        const on = tab === it.id;
+        return (
+          <button
+            key={it.id}
+            role="tab"
+            aria-selected={on}
+            onClick={() => onChange(it.id)}
+            style={{
+              display: "flex", alignItems: "baseline", gap: 7,
+              padding: "9px 18px",
+              background: on ? INK : "transparent",
+              color: on ? PAPER : INK55,
+              border: `1px solid ${on ? INK : INK15}`,
+              borderBottom: "none",
+              marginBottom: -1,
+              marginRight: 4,
+              fontFamily: GROT, fontWeight: 800, fontSize: 9.5,
+              letterSpacing: ".16em", textTransform: "uppercase",
+              cursor: on ? "default" : "pointer",
+            }}
+          >
+            {it.label}
+            {it.count != null && it.count > 0 && (
+              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11, letterSpacing: 0, color: on ? YEL : INK35 }}>
+                {it.count}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Main component ─────────────────────────────────────────────────────────────
 export default function PressIQPlatformClient({
   initialScores,
@@ -307,6 +370,7 @@ export default function PressIQPlatformClient({
   const [reopened, setReopened] = useState<DbScore | null>(null);
   const [draft, setDraft] = useState<{ pitch: string; subject: string } | null>(null);
   const [coreKey, setCoreKey] = useState(0);
+  const [tab, setTab] = useState<Tab>("score");
   const companyCtx = useCompanyOptional();
   const router = useRouter();
 
@@ -317,15 +381,21 @@ export default function PressIQPlatformClient({
   const journalist = initialJournalists.find(j => j.id === journalistId) ?? null;
   const asset = initialAssets.find(a => a.id === assetId) ?? null;
 
-  // A draft goes into the scorer above rather than into a drafts table: the
-  // draft is cheap to regenerate on Sonnet, and the SCORE is the thing already
-  // persisted with journalist and asset attached.
+  /** Both "use this draft" and "reopen this score" land in the Score tab with
+   * the tool primed. Tabbing there is a jump rather than the old scroll, so
+   * the destination announces itself: the reopened banner, or the draft
+   * already sitting in step 2. */
+  function toScoreTab() {
+    setTab("score");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   function handleUseDraft(d: { journalistId: string; subject: string; body: string }) {
     setReopened(null);
     setJournalistId(d.journalistId);
     setDraft({ pitch: d.body, subject: d.subject });
     setCoreKey(k => k + 1);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    toScoreTab();
   }
 
   function handleReopen(score: DbScore) {
@@ -334,7 +404,7 @@ export default function PressIQPlatformClient({
     setJournalistId(score.journalist_id ?? "");
     setAssetId(score.asset_id ?? "");
     setCoreKey(k => k + 1);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    toScoreTab();
   }
 
   // 2026-09-09: clear the "n new scores this session" hint once a refresh has
@@ -461,64 +531,84 @@ export default function PressIQPlatformClient({
         ) : null}
       />
 
-      {/* ── Reopened-score banner ─────────────────────────────────────────── */}
-      {reopened && (
-        <div style={{ border: `1px solid ${YEL}`, background: "rgba(245,184,31,.12)", padding: "10px 14px", marginBottom: 18, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 7px" }}>
-            Reopened
-          </span>
-          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-            Showing the score from {fmt(reopened.scored_at)}, exactly as it was returned.
-          </span>
-          <button
-            onClick={() => { setReopened(null); setCoreKey(k => k + 1); }}
-            style={{ marginLeft: "auto", background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, borderBottom: `1px solid ${INK35}` }}
-          >
-            Score a new pitch
-          </button>
-        </div>
-      )}
-
-      {/* ── The shared tool core (full parity with the public tool) ── */}
-      <PressIQToolCore
-        key={coreKey}
-        api={api}
-        initial={{
-          journalistBeat: reopened
-            ? (reopened.journalist_query ?? "")
-            : initialQuery,
-          pitchMode: initialQuery ? "standalone" : undefined,
-          result: (reopened?.score_response as ScoreResponse | undefined) ?? undefined,
-          pitch: draft?.pitch ?? reopened?.pitch_text ?? undefined,
-          subject: draft?.subject ?? undefined,
-          step: draft ? 2 : undefined,
-        }}
-        hideMasthead
-        showStoreToggle={false}
-        quotaLine={<>Score a pitch · no rate limit · auto-saves to your history</>}
-        pdfAction={handleDownloadPdf}
-        splitResetActions
-        onScored={(scored, ctx) => {
-          setScoreSubject(ctx.subject);
-          setNewScoreCount(c => c + 1);
-          // 2026-09-09 (gate-03 finding): the score is written by the API route
-          // the moment it is produced, but Score History and the stat tiles are
-          // server-rendered at page load and nothing told them to look again —
-          // so a customer scored a pitch and read "No scores yet". Worse, the
-          // "refresh the page" hint below only renders when scores.length > 0,
-          // so the FIRST score, the one a new subscriber makes, got no hint at
-          // all. actions/signaliq.ts calls revalidatePath for exactly this
-          // reason; the pitch path is an API route, so it refreshes from here.
-          router.refresh();
-          void scored;
-        }}
-        scoreTabCta={(r) => (
-          <TrackCTA result={r} pitchSubject={scoreSubject} journalist={journalist} asset={asset} />
-        )}
+      <Tabs
+        tab={tab}
+        onChange={setTab}
+        draftCount={initialDrafts.length}
+        scoreCount={initialScores.length}
       />
 
-      {/* ── Score history ─────────────────────────────────────────────────── */}
-      <div style={{ marginTop: 40 }}>
+      {/* ── Score ─────────────────────────────────────────────────────────── */}
+      <div role="tabpanel" hidden={tab !== "score"}>
+        {reopened && (
+          <div style={{ border: `1px solid ${YEL}`, background: "rgba(245,184,31,.12)", padding: "10px 14px", marginBottom: 18, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK, background: YEL, padding: "3px 7px" }}>
+              Reopened
+            </span>
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+              Showing the score from {fmt(reopened.scored_at)}, exactly as it was returned.
+            </span>
+            <button
+              onClick={() => { setReopened(null); setCoreKey(k => k + 1); }}
+              style={{ marginLeft: "auto", background: "none", border: "none", padding: 0, cursor: "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, borderBottom: `1px solid ${INK35}` }}
+            >
+              Score a new pitch
+            </button>
+          </div>
+        )}
+
+        {/* The shared tool core — full parity with the public tool. */}
+        <PressIQToolCore
+          key={coreKey}
+          api={api}
+          initial={{
+            journalistBeat: reopened
+              ? (reopened.journalist_query ?? "")
+              : initialQuery,
+            pitchMode: initialQuery ? "standalone" : undefined,
+            result: (reopened?.score_response as ScoreResponse | undefined) ?? undefined,
+            pitch: draft?.pitch ?? reopened?.pitch_text ?? undefined,
+            subject: draft?.subject ?? undefined,
+            step: draft ? 2 : undefined,
+          }}
+          hideMasthead
+          showStoreToggle={false}
+          quotaLine={<>Score a pitch · no rate limit · auto-saves to your history</>}
+          pdfAction={handleDownloadPdf}
+          splitResetActions
+          onScored={(scored, ctx) => {
+            setScoreSubject(ctx.subject);
+            setNewScoreCount(c => c + 1);
+            // 2026-09-09 (gate-03 finding): the score is written by the API route
+            // the moment it is produced, but Score History and the stat tiles are
+            // server-rendered at page load and nothing told them to look again —
+            // so a customer scored a pitch and read "No scores yet". Worse, the
+            // "refresh the page" hint below only renders when scores.length > 0,
+            // so the FIRST score, the one a new subscriber makes, got no hint at
+            // all. actions/signaliq.ts calls revalidatePath for exactly this
+            // reason; the pitch path is an API route, so it refreshes from here.
+            router.refresh();
+            void scored;
+          }}
+          scoreTabCta={(r) => (
+            <TrackCTA result={r} pitchSubject={scoreSubject} journalist={journalist} asset={asset} />
+          )}
+        />
+      </div>
+
+      {/* ── Drafts ────────────────────────────────────────────────────────── */}
+      <div role="tabpanel" hidden={tab !== "drafts"}>
+        <PitchDrafter
+          journalists={initialJournalists}
+          assets={initialAssets}
+          history={initialHistory}
+          savedDrafts={initialDrafts}
+          onUseDraft={handleUseDraft}
+        />
+      </div>
+
+      {/* ── History ───────────────────────────────────────────────────────── */}
+      <div role="tabpanel" hidden={tab !== "history"}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 16 }}>
           <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase" }}>Score History</span>
           <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 20, color: INK }}>{initialScores.length}</span>
@@ -532,14 +622,6 @@ export default function PressIQPlatformClient({
         />
       </div>
 
-      {/* ── Draft pitches for saved journalists ───────────────────────────── */}
-      <PitchDrafter
-        journalists={initialJournalists}
-        assets={initialAssets}
-        history={initialHistory}
-        savedDrafts={initialDrafts}
-        onUseDraft={handleUseDraft}
-      />
     </div>
   );
 }
