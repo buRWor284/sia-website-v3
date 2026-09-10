@@ -16,11 +16,14 @@ import { PRICE_VERSION } from "@/lib/ai-usage";
  * ACCESS: middleware already requires a signed-in account with emos_access for
  * everything under /emos-platform. On top of that this page 404s for anyone
  * whose email is not on EMOS_ADMIN_EMAILS, because it reads EVERY org's rows
- * through the service client (and the two report functions are service-role
+ * through the service client (and the three report functions are service-role
  * only). A 404 rather than a redirect, so the page's existence isn't advertised.
  *
- * No test / internal filtering here on purpose: separating test runs from real
- * ones is being designed in a separate session (10 Sep).
+ * TEST ACCOUNTS are hidden by default (?test=show brings them back), so the
+ * numbers answer "what do CUSTOMERS cost me". The flag itself is
+ * organizations.is_test, owned by the test-separation work
+ * (supabase/organizations-is-test.sql) — this page only reads it. Anonymous
+ * public-tool runs have no org, so they are never treated as test.
  */
 
 export const dynamic = "force-dynamic";
@@ -63,12 +66,23 @@ interface ToolRow {
   avg_in: number | null; avg_out: number | null; unpriced: number;
 }
 interface OrgRow {
-  org_id: string; org_name: string | null; calls: number; total_usd: number;
-  first_call: string; last_call: string;
+  org_id: string; org_name: string | null; is_test: boolean; owner_email: string | null;
+  calls: number; total_usd: number; first_call: string; last_call: string;
 }
 interface RecentRow {
-  created_at: string; org_id: string | null; surface: string; tool: string; model: string;
+  created_at: string; org_id: string | null; org_name: string | null; is_test: boolean;
+  owner_email: string | null; surface: string; tool: string; model: string;
   input_tokens: number; output_tokens: number; cost_usd: number | null; stop_reason: string | null;
+}
+
+/** How an account is named on this page. A test account shows as
+ * "TEST (its sign-in email)" so it can't be mistaken for a customer; an account
+ * belonging to an admin is marked "(you)". */
+function accountLabel(name: string | null, isTest: boolean, ownerEmail: string | null): string {
+  const firstEmail = (ownerEmail ?? "").split(",")[0].trim();
+  if (isTest) return `TEST (${firstEmail || name || "unknown"})`;
+  const base = name || firstEmail || "Unnamed account";
+  return firstEmail && isEmosAdminEmail(firstEmail) ? `${base} (you)` : base;
 }
 
 /** Money: cents for anything a dollar or more, four places below that, so a
@@ -112,13 +126,14 @@ function Stat({ label, value, note }: { label: string; value: string; note?: str
 export default async function AdminCostsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ days?: string }>;
+  searchParams: Promise<{ days?: string; test?: string }>;
 }) {
   const user = await currentUser();
   const email = user?.primaryEmailAddress?.emailAddress ?? user?.emailAddresses?.[0]?.emailAddress ?? "";
   if (!isEmosAdminEmail(email)) notFound();
 
-  const { days: daysParam } = await searchParams;
+  const { days: daysParam, test: testParam } = await searchParams;
+  const includeTest = testParam === "show";
   const now = requestTime();
   const period = PERIODS.find((p) => p.key === daysParam) ?? PERIODS[1];
   const since = period.days
@@ -126,16 +141,14 @@ export default async function AdminCostsPage({
     : "2000-01-01T00:00:00Z";
 
   const db = createSupabaseServiceClient();
-  const [toolRes, orgRes, recentRes] = await Promise.all([
-    db.rpc("admin_ai_usage_by_tool", { p_since: since }),
-    db.rpc("admin_ai_usage_by_org", { p_since: since }),
-    db.from("ai_usage")
-      .select("created_at, org_id, surface, tool, model, input_tokens, output_tokens, cost_usd, stop_reason")
-      .gte("created_at", since)
-      .order("created_at", { ascending: false })
-      .limit(25),
+  const [toolRes, orgRes, recentRes, allToolRes] = await Promise.all([
+    db.rpc("admin_ai_usage_by_tool", { p_since: since, p_include_test: includeTest }),
+    db.rpc("admin_ai_usage_by_org", { p_since: since, p_include_test: includeTest }),
+    db.rpc("admin_ai_usage_recent", { p_since: since, p_include_test: includeTest, p_limit: 25 }),
+    // Only to say what the filter is hiding. Skipped when nothing is hidden.
+    includeTest ? Promise.resolve({ data: null, error: null }) : db.rpc("admin_ai_usage_by_tool", { p_since: since, p_include_test: true }),
   ]);
-  const loadError = toolRes.error ?? orgRes.error ?? recentRes.error;
+  const loadError = toolRes.error ?? orgRes.error ?? recentRes.error ?? allToolRes.error;
 
   const tools: ToolRow[] = ((toolRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
     tool: String(r.tool), surface: String(r.surface), model: String(r.model),
@@ -144,13 +157,24 @@ export default async function AdminCostsPage({
   }));
   const orgs: OrgRow[] = ((orgRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
     org_id: String(r.org_id), org_name: (r.org_name as string | null) ?? null,
+    is_test: r.is_test === true, owner_email: (r.owner_email as string | null) ?? null,
     calls: Number(r.calls), total_usd: Number(r.total_usd),
     first_call: String(r.first_call), last_call: String(r.last_call),
   }));
-  const recent = (recentRes.data ?? []) as RecentRow[];
+  const recent: RecentRow[] = ((recentRes.data ?? []) as Record<string, unknown>[]).map((r) => ({
+    created_at: String(r.created_at), org_id: (r.org_id as string | null) ?? null,
+    org_name: (r.org_name as string | null) ?? null, is_test: r.is_test === true,
+    owner_email: (r.owner_email as string | null) ?? null,
+    surface: String(r.surface), tool: String(r.tool), model: String(r.model),
+    input_tokens: Number(r.input_tokens), output_tokens: Number(r.output_tokens),
+    cost_usd: num(r.cost_usd), stop_reason: (r.stop_reason as string | null) ?? null,
+  }));
 
-  // Names for the recent-calls table (the by-org report already carries them).
-  const orgName = new Map(orgs.map((o) => [o.org_id, o.org_name ?? "Unnamed account"]));
+  // What the default view is hiding: everything minus the customers-only view.
+  const allTools = ((allToolRes.data ?? []) as Record<string, unknown>[]);
+  const hiddenCalls = includeTest ? 0 : allTools.reduce((a, r) => a + Number(r.runs), 0) - tools.reduce((a, r) => a + r.runs, 0);
+  const hiddenUsd = includeTest ? 0 : allTools.reduce((a, r) => a + Number(r.total_usd), 0) - tools.reduce((a, r) => a + r.total_usd, 0);
+  const qs = (days: string, test: boolean) => `/emos-platform/admin/costs?days=${days}${test ? "&test=show" : ""}`;
 
   // ── Headline numbers ─────────────────────────────────────────────────────
   const sum = (rows: ToolRow[]) => rows.reduce((a, r) => a + r.total_usd, 0);
@@ -191,17 +215,30 @@ export default async function AdminCostsPage({
       </section>
 
       <div style={{ maxWidth: 1200, marginInline: "auto", padding: "28px clamp(16px,4vw,48px) 140px" }}>
-        {/* Period switcher */}
+        {/* Period switcher + test-account filter */}
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         <div style={{ display: "flex", gap: 0, flexWrap: "wrap", border: `1px solid ${INK}`, width: "fit-content", maxWidth: "100%" }}>
           {PERIODS.map((p, i) => {
             const on = p.key === period.key;
             return (
-              <Link key={p.key} href={`/emos-platform/admin/costs?days=${p.key}`}
+              <Link key={p.key} href={qs(p.key, includeTest)}
                 style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", padding: "8px 14px", textDecoration: "none", background: on ? INK : PAPER, color: on ? PAPER : INK, borderRight: i < PERIODS.length - 1 ? `1px solid ${INK}` : "none" }}>
                 {p.label}
               </Link>
             );
           })}
+        </div>
+        <div style={{ display: "flex", gap: 0, flexWrap: "wrap", border: `1px solid ${INK}`, width: "fit-content", maxWidth: "100%" }}>
+          {[
+            { on: !includeTest, label: "Customers only", href: qs(period.key, false) },
+            { on: includeTest, label: "Include test accounts", href: qs(period.key, true) },
+          ].map((o, i) => (
+            <Link key={o.label} href={o.href}
+              style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", padding: "8px 14px", textDecoration: "none", background: o.on ? INK : PAPER, color: o.on ? PAPER : INK, borderRight: i === 0 ? `1px solid ${INK}` : "none" }}>
+              {o.label}
+            </Link>
+          ))}
+        </div>
         </div>
 
         {loadError && (
@@ -211,13 +248,20 @@ export default async function AdminCostsPage({
         )}
 
         {/* §1 Headline */}
-        <Bar n="1" title="The headline" tag={period.label} />
+        <Bar n="1" title="The headline" tag={`${period.label} · ${includeTest ? "including test accounts" : "customers only"}`} />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 10, marginTop: 10 }}>
           <Stat label="Total AI spend" value={usd(total)} note={`${int(calls)} calls`} />
           <Stat label="Dashboard (paid)" value={usd(platformTotal)} note="Runs inside /emos-platform" />
           <Stat label="Free public tools" value={usd(publicTotal)} note="What the lead magnets cost you" />
           <Stat label="Avg per account / month" value={usd(avgPerAccountMonth)} note={orgs.length ? `Across ${orgs.length} account${orgs.length === 1 ? "" : "s"} with activity` : "No account activity yet"} />
         </div>
+
+        {!includeTest && hiddenCalls > 0 && (
+          <div style={{ marginTop: 12, border: `1px solid ${INK}`, background: PAPER2, padding: "10px 14px", fontFamily: GROT, fontSize: 12, color: INK, lineHeight: 1.5 }}>
+            <strong>Hidden: {int(hiddenCalls)} call{hiddenCalls === 1 ? "" : "s"} ({usd(hiddenUsd)}) from test accounts.</strong>{" "}
+            <Link href={qs(period.key, true)} style={{ color: INK }}>Show them</Link>
+          </div>
+        )}
 
         {(unattributed > 0 || unpriced > 0) && (
           <div style={{ marginTop: 12, border: `1px solid ${INK}`, background: YEL, padding: "10px 14px", fontFamily: GROT, fontSize: 12, color: INK, lineHeight: 1.5 }}>
@@ -228,7 +272,7 @@ export default async function AdminCostsPage({
 
         {calls === 0 && !loadError && (
           <div style={{ marginTop: 12, border: `1px solid ${INK}`, padding: "18px 20px", fontFamily: SERIF, fontSize: 16, color: INK, lineHeight: 1.5 }}>
-            No AI calls recorded in this window yet. Recording starts once the stage 3 commit is live; run any tool once and it shows up here.
+            {includeTest ? "No AI calls in this window yet." : "No customer AI calls in this window yet."} Run any tool once and it shows up here.
           </div>
         )}
 
@@ -279,7 +323,7 @@ export default async function AdminCostsPage({
               )}
               {orgs.map((o) => (
                 <tr key={o.org_id}>
-                  <td style={{ ...td, fontFamily: GROT, fontWeight: 700 }}>{o.org_name ?? "Unnamed account"}</td>
+                  <td style={{ ...td, fontFamily: GROT, fontWeight: 700 }}>{accountLabel(o.org_name, o.is_test, o.owner_email)}</td>
                   <td style={tdR}>{int(o.calls)}</td>
                   <td style={tdR}>{usd(o.total_usd)}</td>
                   <td style={{ ...tdR, fontWeight: 700 }}>{usd(perMonth(o))}</td>
@@ -308,12 +352,12 @@ export default async function AdminCostsPage({
                 <tr key={`${r.created_at}-${i}`}>
                   <td style={td}>{new Date(r.created_at).toISOString().slice(0, 16).replace("T", " ")}</td>
                   <td style={{ ...td, fontFamily: GROT }}>
-                    {r.org_id ? (orgName.get(r.org_id) ?? "Account") : r.surface === "public" ? "Anonymous visitor" : "Unknown"}
+                    {r.org_id ? accountLabel(r.org_name, r.is_test, r.owner_email) : r.surface === "public" ? "Anonymous visitor" : "Unknown"}
                   </td>
                   <td style={{ ...td, fontFamily: GROT }}>{TOOL_LABELS[r.tool] ?? r.tool}</td>
                   <td style={td}>{r.model}</td>
                   <td style={tdR}>{int(r.input_tokens)} / {int(r.output_tokens)}</td>
-                  <td style={{ ...tdR, fontWeight: 700 }}>{usd(r.cost_usd === null ? null : Number(r.cost_usd))}</td>
+                  <td style={{ ...tdR, fontWeight: 700 }}>{usd(r.cost_usd)}</td>
                   <td style={td}>{r.stop_reason === "max_tokens" ? "cut short" : (r.stop_reason ?? "—")}</td>
                 </tr>
               ))}
@@ -325,6 +369,7 @@ export default async function AdminCostsPage({
           AI calls only (Anthropic). Hosting, database, BigQuery and Stripe fees are not included. Prices from
           Anthropic&apos;s published per-token rates, version {PRICE_VERSION}. &ldquo;Cut short&rdquo; calls are billed even though
           the tool rejects the answer. &ldquo;≈ per month&rdquo; scales the selected window to 30 days.
+          &ldquo;Customers only&rdquo; hides accounts flagged as test (organizations.is_test); anonymous public-tool visitors always count.
         </p>
       </div>
     </div>

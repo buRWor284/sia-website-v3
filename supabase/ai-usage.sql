@@ -60,31 +60,58 @@ group by 1 order by usd_30d desc nulls last;
 -- 4. Anything logged outside a route wrapper (should stay empty).
 select tool, count(*) from public.ai_usage where surface = 'unattributed' group by 1;
 
--- ── Admin report functions (applied 2026-09-10 as migration `admin_ai_usage_reports`) ──
+-- ── Admin report functions ────────────────────────────────────────────────
 -- Used by /emos-platform/admin/costs. SERVICE ROLE ONLY (they read every org).
+-- v1 applied 2026-09-10 as `admin_ai_usage_reports`; replaced the same day by
+-- `admin_ai_usage_reports_test_filter` (below), which adds p_include_test
+-- (default false = hide organizations.is_test accounts), owner emails for
+-- labelling, and the recent-calls function. The one-argument versions were
+-- DROPPED so a call naming only p_since is not ambiguous.
 
-create or replace function public.admin_ai_usage_by_tool(p_since timestamptz)
+drop function if exists public.admin_ai_usage_by_tool(timestamptz);
+drop function if exists public.admin_ai_usage_by_org(timestamptz);
+
+create or replace function public.admin_ai_usage_by_tool(p_since timestamptz, p_include_test boolean default false)
 returns table (tool text, surface text, model text, runs bigint, total_usd numeric, avg_usd numeric,
                p90_usd numeric, avg_in numeric, avg_out numeric, unpriced bigint)
 language sql stable security invoker set search_path = public as $$
-  select tool, surface, model, count(*), coalesce(sum(cost_usd), 0), avg(cost_usd),
-         (percentile_cont(0.9) within group (order by cost_usd))::numeric,
-         avg(input_tokens), avg(output_tokens), count(*) filter (where cost_usd is null)
-  from public.ai_usage where created_at >= p_since
-  group by tool, surface, model order by coalesce(sum(cost_usd), 0) desc
+  select a.tool, a.surface, a.model, count(*), coalesce(sum(a.cost_usd), 0), avg(a.cost_usd),
+         (percentile_cont(0.9) within group (order by a.cost_usd))::numeric,
+         avg(a.input_tokens), avg(a.output_tokens), count(*) filter (where a.cost_usd is null)
+  from public.ai_usage a left join public.organizations o on o.id = a.org_id
+  where a.created_at >= p_since and (p_include_test or coalesce(o.is_test, false) = false)
+  group by a.tool, a.surface, a.model order by coalesce(sum(a.cost_usd), 0) desc
 $$;
 
-create or replace function public.admin_ai_usage_by_org(p_since timestamptz)
-returns table (org_id uuid, org_name text, calls bigint, total_usd numeric,
-               first_call timestamptz, last_call timestamptz)
+create or replace function public.admin_ai_usage_by_org(p_since timestamptz, p_include_test boolean default false)
+returns table (org_id uuid, org_name text, is_test boolean, owner_email text,
+               calls bigint, total_usd numeric, first_call timestamptz, last_call timestamptz)
 language sql stable security invoker set search_path = public as $$
-  select u.org_id, o.name, count(*), coalesce(sum(u.cost_usd), 0), min(u.created_at), max(u.created_at)
-  from public.ai_usage u left join public.organizations o on o.id = u.org_id
-  where u.created_at >= p_since and u.org_id is not null
-  group by u.org_id, o.name order by coalesce(sum(u.cost_usd), 0) desc
+  select a.org_id, o.name, coalesce(o.is_test, false),
+         (select string_agg(u.email, ', ' order by u.created_at) from public.users u where u.org_id = a.org_id),
+         count(*), coalesce(sum(a.cost_usd), 0), min(a.created_at), max(a.created_at)
+  from public.ai_usage a left join public.organizations o on o.id = a.org_id
+  where a.created_at >= p_since and a.org_id is not null
+    and (p_include_test or coalesce(o.is_test, false) = false)
+  group by a.org_id, o.name, o.is_test order by coalesce(sum(a.cost_usd), 0) desc
 $$;
 
-revoke all on function public.admin_ai_usage_by_tool(timestamptz) from public, anon, authenticated;
-revoke all on function public.admin_ai_usage_by_org(timestamptz)  from public, anon, authenticated;
-grant execute on function public.admin_ai_usage_by_tool(timestamptz) to service_role;
-grant execute on function public.admin_ai_usage_by_org(timestamptz)  to service_role;
+create or replace function public.admin_ai_usage_recent(p_since timestamptz, p_include_test boolean default false, p_limit integer default 25)
+returns table (created_at timestamptz, org_id uuid, org_name text, is_test boolean, owner_email text,
+               surface text, tool text, model text, input_tokens integer, output_tokens integer,
+               cost_usd numeric, stop_reason text)
+language sql stable security invoker set search_path = public as $$
+  select a.created_at, a.org_id, o.name, coalesce(o.is_test, false),
+         (select string_agg(u.email, ', ' order by u.created_at) from public.users u where u.org_id = a.org_id),
+         a.surface, a.tool, a.model, a.input_tokens, a.output_tokens, a.cost_usd, a.stop_reason
+  from public.ai_usage a left join public.organizations o on o.id = a.org_id
+  where a.created_at >= p_since and (p_include_test or coalesce(o.is_test, false) = false)
+  order by a.created_at desc limit least(greatest(p_limit, 1), 200)
+$$;
+
+revoke all on function public.admin_ai_usage_by_tool(timestamptz, boolean)         from public, anon, authenticated;
+revoke all on function public.admin_ai_usage_by_org(timestamptz, boolean)          from public, anon, authenticated;
+revoke all on function public.admin_ai_usage_recent(timestamptz, boolean, integer) from public, anon, authenticated;
+grant execute on function public.admin_ai_usage_by_tool(timestamptz, boolean)         to service_role;
+grant execute on function public.admin_ai_usage_by_org(timestamptz, boolean)          to service_role;
+grant execute on function public.admin_ai_usage_recent(timestamptz, boolean, integer) to service_role;
