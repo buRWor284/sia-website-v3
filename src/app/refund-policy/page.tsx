@@ -7,15 +7,15 @@ import { GROT, INK, INK15, INK55, INK70, PAPER, SERIF, YEL } from "@/lib/tokens"
 export const metadata: Metadata = {
   title: "Refund Policy",
   description:
-    "EMOS refund terms, including our placements-or-refund guarantee, eligibility, and how to request a refund.",
+    "EMOS refund terms: the EMOS Academy placements-or-refund guarantee, eligibility, how to request a refund, and cancellation terms for the EMOS Platform subscription.",
   alternates: { canonical: "/refund-policy" },
 };
 
-const LAST_UPDATED = "August 20, 2026";
+const LAST_UPDATED = "September 10, 2026";
 
 const sections: { heading: string; body: React.ReactNode }[] = [
   {
-    heading: "Our guarantee",
+    heading: "EMOS Academy guarantee",
     body: (
       <>
         <p>
@@ -75,6 +75,28 @@ const sections: { heading: string; body: React.ReactNode }[] = [
     ),
   },
   {
+    // 2026-09-10: the monthly Platform had no written terms. Access-until-period-end
+    // assumes Stripe cancels at the end of the billing period (the customer
+    // portal's default); if the portal is ever set to cancel immediately, change
+    // the second bullet.
+    heading: "EMOS Platform subscription",
+    body: (
+      <>
+        <p>
+          The EMOS Platform is a monthly subscription, billed at the price shown at checkout. The placements-or-refund guarantee above applies to EMOS Academy only; the Platform does not include a placement guarantee.
+        </p>
+        <ul style={{ paddingLeft: 20, lineHeight: 1.8, marginTop: 12 }}>
+          <li><strong>Cancel any time.</strong> Cancelling stops the next charge.</li>
+          <li style={{ marginTop: 8 }}>You keep access until the end of the billing period you have already paid for.</li>
+          <li style={{ marginTop: 8 }}>We do not refund partial months or unused time.</li>
+          <li style={{ marginTop: 8 }}>
+            Charged in error, or charged after you cancelled? Email <a href="mailto:sia@syedirfanajmal.com" style={{ color: INK, textDecoration: "underline" }}>sia[@]syedirfanajmal[dot]com</a> from your account email. We review it within <strong>5 business days</strong> and refund any charge made in error.
+          </li>
+        </ul>
+      </>
+    ),
+  },
+  {
     heading: "Contact",
     body: (
       <p>
@@ -121,7 +143,7 @@ export default function RefundPolicyPage() {
             Last updated: {LAST_UPDATED}
           </p>
           <p style={{ marginTop: 20, fontFamily: SERIF, fontSize: 17, color: INK70, lineHeight: 1.65, maxWidth: 600 }}>
-            We want you to get results. This policy explains how our placements-or-refund guarantee works and how to claim it.
+            We want you to get results. This policy explains how the EMOS Academy placements-or-refund guarantee works and how to claim it, and how cancellation works for the EMOS Platform subscription.
           </p>
         </div>
       </section>
