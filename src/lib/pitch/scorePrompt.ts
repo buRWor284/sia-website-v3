@@ -203,6 +203,7 @@ Scoring guidance:
 - authenticityRisk: flag (do not score) if the pitch reads like a generic template — no first-hand detail, no specific number, boilerplate phrasing.
 - analysis: for every dimension, 2-4 sentences specific to THIS pitch.
 - strongestLine: quote the single best sentence verbatim.
+- topFix wording: when you show an example rewrite, never invent specifics the user did not give (a person, city, dollar amount, date, count, customer or incident). Put anything the user must supply in [square brackets], e.g. "Open with one real customer: [who, what they lost, when]". A made-up example gets pasted into a pitch as if it were true.
 Call return_pitch_score with integer 0-100 scores and concrete, specific notes and analysis.`;
 }
 
@@ -212,6 +213,12 @@ interface ToolUseBlock {
   type: string;
   name?: string;
   input?: unknown;
+}
+
+/** Strip one pair of wrapping double quotes (straight or curly); the UI adds its own. */
+function unquote(s: string | undefined): string | undefined {
+  const m = s?.match(/^["\u201c]([\s\S]*)["\u201d]$/);
+  return m ? m[1].trim() || undefined : s;
 }
 
 export function parseAiResult(content: ToolUseBlock[]): AiScore {
@@ -266,7 +273,8 @@ export function parseAiResult(content: ToolUseBlock[]): AiScore {
     personalBrand: { score: numRequired(brand.score, "personalBrand"), note: str(brand.note), topFix: str(brand.topFix), analysis: str(brand.analysis), reflectsAuthority: bool(brand.reflectsAuthority) },
     newsroomReady: { score: numRequired(nr.score, "newsroomReady"), note: str(nr.note), topFix: str(nr.topFix), analysis: str(nr.analysis), originalData: bool(nr.originalData), sourceAccess: bool(nr.sourceAccess), assets: bool(nr.assets), timeliness: bool(nr.timeliness) },
     authenticityRisk: auth.flagged === true ? { flagged: true, note: str(auth.note) } : { flagged: false },
-    strongestLine: str(raw.strongestLine),
+    // The UI adds its own quote marks; the model sometimes includes them too.
+    strongestLine: unquote(str(raw.strongestLine)),
     overallNote: str(raw.overallNote),
   };
 }
