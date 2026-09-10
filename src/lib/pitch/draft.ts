@@ -79,6 +79,8 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - WHEN NO RECENT WORK IS SUPPLIED, lead with the strongest checkable number. That is the correct choice, not a fallback to apologise for. Do not manufacture a fake personal connection to avoid it.
 - 90 to 135 words in the body, not counting the signature. PressIQ counts the whole email and aims for 100 to 150, and the signature adds about 15. Shorter is better than padded.
 - Word budget, in sentences: the greeting line; the hook in 2 sentences; the authority line in 1 sentence; the offer in 2 sentences; the question in 1 sentence; a one-line offer to send more. That lands near 110 words. Adding the authority line means cutting elsewhere, usually the offer.
+- Never list more than three items. Name the most telling ones and summarise the rest ("AT&T, Verizon, T-Mobile and five prepaid brands"). The full lists, sources and method go in the follow-up, so one short line offering them is enough.
+- Use at most two statistics. The angle often gives more facts than fit: pick the strongest, drop the rest.
 - Write at a reading level of grade 7 or below: sentences of about 15 words or fewer, everyday words, one idea per sentence. Journalists skim.
 - Write as the named sender in the first person ("I", "we") from the first line to the last. Never switch to describing the sender or the company in the third person.
 - After the offer, END WITH EXACTLY ONE short question that is easy to say yes to (for example, whether they would like the data or a call this week), then a one-line offer to send more. Never end on a pleasantry.
@@ -210,7 +212,7 @@ async function callDraft(
 ): Promise<{ subject: string; body: string; error?: string }> {
   const base = { subject: "", body: "" };
   const userText = buildPrompt(brief, target) + (tooLong
-    ? `\n\nYOUR LAST DRAFT WAS ${tooLong.words} WORDS ABOVE THE SIGNATURE. The limit is 135. Rewrite it at 110 to 125 words: keep the hook, the one authority sentence and the question, cut the rest. Last draft for reference:\n${tooLong.previous}`
+    ? `\n\nYOUR LAST DRAFT WAS ${tooLong.words} WORDS ABOVE THE SIGNATURE. The limit is 135. Rewrite it at 100 words or fewer above the signature (you tend to run long, so aim low). Keep the hook, the one authority sentence and the question. Cut in this order until it fits: lists longer than three items, source and method details, a second statistic, any sentence that repeats the hook. Last draft for reference:\n${tooLong.previous}`
     : "");
   try {
     const res = await fetch(ANTHROPIC_API, {

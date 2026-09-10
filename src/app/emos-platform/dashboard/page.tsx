@@ -56,7 +56,7 @@ function UsageMeter({ rows, resetsOn, isAdmin }: { rows: UsageRow[]; resetsOn: s
                 {r.tool}
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                <span style={{ fontFamily: SERIF, fontSize: 13.5, color: INK, textTransform: "capitalize" }}>{r.label}</span>
+                <span style={{ fontFamily: SERIF, fontSize: 13.5, color: INK }}>{r.label.charAt(0).toUpperCase() + r.label.slice(1)}</span>
                 <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 12, color: INK, whiteSpace: "nowrap" }}>
                   {r.used} / {r.limit}
                 </span>
