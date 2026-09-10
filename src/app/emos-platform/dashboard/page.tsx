@@ -4,6 +4,8 @@ import { SignOutButton } from "@clerk/nextjs";
 import { createSupabaseServerClient, createSupabaseServiceClient } from "@/lib/supabase";
 import { ensureOrgProvisioned } from "@/lib/emos-provision";
 import { subscriptionAllowsAccess } from "@/lib/emos-guard";
+import { isEmosAdminEmail } from "@/lib/emos-admins";
+import Link from "next/link";
 import { STAGE_META, STAGE_ORDER, STAGE_THRESHOLDS, computeEarnedStage, type EmosStage } from "@/lib/emos-stage-config";
 import type { Metadata } from "next";
 
@@ -169,6 +171,13 @@ export default async function EmosDashboardPage() {
               <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: ".10em", textTransform: "uppercase", color: "rgba(241,235,222,.45)" }}>
                 {org.name}
               </span>
+            )}
+            {/* Admin-only: the stage 3 costs page. Everyone else never sees the link,
+                and the page itself 404s for non-admins. */}
+            {isEmosAdminEmail(userEmail) && (
+              <Link href="/emos-platform/admin/costs" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: INK, background: YEL, padding: "5px 10px", textDecoration: "none" }}>
+                AI costs
+              </Link>
             )}
             <span style={{ display: "flex", alignItems: "center", gap: 5, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: YEL }}>
               <span style={{ width: 6, height: 6, background: YEL, borderRadius: "50%" }} />

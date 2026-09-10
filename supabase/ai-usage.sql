@@ -59,3 +59,32 @@ group by 1 order by usd_30d desc nulls last;
 
 -- 4. Anything logged outside a route wrapper (should stay empty).
 select tool, count(*) from public.ai_usage where surface = 'unattributed' group by 1;
+
+-- ── Admin report functions (applied 2026-09-10 as migration `admin_ai_usage_reports`) ──
+-- Used by /emos-platform/admin/costs. SERVICE ROLE ONLY (they read every org).
+
+create or replace function public.admin_ai_usage_by_tool(p_since timestamptz)
+returns table (tool text, surface text, model text, runs bigint, total_usd numeric, avg_usd numeric,
+               p90_usd numeric, avg_in numeric, avg_out numeric, unpriced bigint)
+language sql stable security invoker set search_path = public as $$
+  select tool, surface, model, count(*), coalesce(sum(cost_usd), 0), avg(cost_usd),
+         (percentile_cont(0.9) within group (order by cost_usd))::numeric,
+         avg(input_tokens), avg(output_tokens), count(*) filter (where cost_usd is null)
+  from public.ai_usage where created_at >= p_since
+  group by tool, surface, model order by coalesce(sum(cost_usd), 0) desc
+$$;
+
+create or replace function public.admin_ai_usage_by_org(p_since timestamptz)
+returns table (org_id uuid, org_name text, calls bigint, total_usd numeric,
+               first_call timestamptz, last_call timestamptz)
+language sql stable security invoker set search_path = public as $$
+  select u.org_id, o.name, count(*), coalesce(sum(u.cost_usd), 0), min(u.created_at), max(u.created_at)
+  from public.ai_usage u left join public.organizations o on o.id = u.org_id
+  where u.created_at >= p_since and u.org_id is not null
+  group by u.org_id, o.name order by coalesce(sum(u.cost_usd), 0) desc
+$$;
+
+revoke all on function public.admin_ai_usage_by_tool(timestamptz) from public, anon, authenticated;
+revoke all on function public.admin_ai_usage_by_org(timestamptz)  from public, anon, authenticated;
+grant execute on function public.admin_ai_usage_by_tool(timestamptz) to service_role;
+grant execute on function public.admin_ai_usage_by_org(timestamptz)  to service_role;
