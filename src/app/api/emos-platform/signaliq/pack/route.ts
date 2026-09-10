@@ -18,6 +18,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
+import { getApprovedBrief } from "@/lib/company-brief";
 import { coerceOpportunity, runPackRequest } from "@/lib/signaliq/route-core";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { withAiUsage } from "@/lib/ai-usage";
@@ -50,8 +51,9 @@ export async function POST(req: NextRequest) {
   const companyId = typeof raw.companyId === "string" ? raw.companyId : null;
   const beatLabel = typeof raw.beatLabel === "string" ? raw.beatLabel.slice(0, 120) : null;
 
+  const companyBrief = await getApprovedBrief(guard.userId, companyId);
   const result = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
-    runPackRequest(opp, companyContext),
+    runPackRequest(opp, companyContext, companyBrief),
   );
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });

@@ -23,6 +23,7 @@
 import React, { useState } from "react";
 import { useCompanyOptional } from "./CompanyProvider";
 import TestOrgBadge from "./TestOrgBadge";
+import CompanyBriefPanel from "./CompanyBriefPanel";
 import { COMPANY_CONTEXT_MAX, type Spokesperson } from "@/lib/company-types";
 
 const PAPER  = "#f1ebde";
@@ -70,7 +71,7 @@ function primaryBtn(enabled: boolean): React.CSSProperties {
   };
 }
 
-type Panel = "none" | "add" | "edit" | "confirmDelete";
+type Panel = "none" | "add" | "edit" | "confirmDelete" | "brief";
 
 /** Who pitches go out FROM (2026-09-10). Without it every drafted pitch was
  * signed with the company name, which PressIQ's own scorer then marks down. */
@@ -341,6 +342,11 @@ export default function CompanyPicker({
             </button>
           )}
           {saved && (
+            <button onClick={() => toggle("brief")} style={LINK}>
+              {panel === "brief" ? "Close brief" : "Company brief"}
+            </button>
+          )}
+          {saved && (
             <button
               onClick={() => toggle("confirmDelete")}
               style={{ ...LINK, color: RED, borderBottomColor: RED }}
@@ -407,6 +413,10 @@ export default function CompanyPicker({
           busy={busy}
           onSave={handleSaveEdit}
         />
+      )}
+
+      {panel === "brief" && company && (
+        <CompanyBriefPanel key={companyId} companyId={companyId} companyName={company.name} website={company.website ?? null} />
       )}
 
       {panel === "confirmDelete" && (

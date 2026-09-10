@@ -22,6 +22,7 @@
 import type { BeatId, ProfileExpansion } from "./types";
 import { recordAiUsage } from "@/lib/ai-usage";
 import { SIGNALIQ_MODEL, beatById } from "./config";
+import { briefPromptBlock, clipAtHeading } from "@/lib/company-brief-prompt";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 
@@ -96,7 +97,7 @@ export const EXPAND_TOOL = {
   },
 } as const;
 
-export function buildExpandPrompt(description: string, beats: BeatId[]): string {
+export function buildExpandPrompt(description: string, beats: BeatId[], companyBrief?: string | null): string {
   const list = beats && beats.length ? beats : (["saas"] as BeatId[]);
   const beatLabels = list.map((id) => beatById(id).label).join(" + ");
   // Candidates are listed GROUPED per beat so the model can pick across a
@@ -108,9 +109,12 @@ export function buildExpandPrompt(description: string, beats: BeatId[]): string 
       return `CANDIDATE TOPICS (${b.label}):\n${b.seeds.join(", ")}`;
     })
     .join("\n\n");
+  // The brief is capped harder here than elsewhere: topic choice needs the
+  // gist, goals and off-limits list, not every proof point.
+  const briefBlock = companyBrief ? briefPromptBlock(clipAtHeading(companyBrief, 4000)) : "";
   return `COMPANY DESCRIPTION (from the founder):
 ${description.trim()}
-
+${briefBlock}
 The founder chose ${list.length > 1 ? `these beats: ${beatLabels}` : `the ${beatLabels} beat`}. Select the candidate topics — from ANY group below — that genuinely fit this company and rate each (copy each topic verbatim). At most 12, best fits first:
 
 ${groups}
@@ -211,6 +215,7 @@ const cacheKey = (s: string): string => {
 export async function expandCompanyProfile(
   companyContext: string,
   beats: BeatId[],
+  companyBrief?: string | null,
 ): Promise<ProfileExpansion | null> {
   const desc = (companyContext ?? "").trim();
   if (desc.length < 12) return null; // too thin to tailor on
@@ -218,7 +223,7 @@ export async function expandCompanyProfile(
   const beatList = beats && beats.length ? beats : (["saas"] as BeatId[]);
   // Cache key includes ALL selected beats in order — a Health+AI selection must
   // not collide with a Health-only one.
-  const key = cacheKey(`${beatList.join(",")}|${desc}`);
+  const key = cacheKey(`${beatList.join(",")}|${desc}|${companyBrief ?? ""}`);
   const hit = cache.get(key);
   if (hit) return hit;
 
@@ -248,7 +253,7 @@ export async function expandCompanyProfile(
         system: EXPAND_SYSTEM,
         tools: [EXPAND_TOOL],
         tool_choice: { type: "tool", name: EXPAND_TOOL.name },
-        messages: [{ role: "user", content: buildExpandPrompt(desc, beatList) }],
+        messages: [{ role: "user", content: buildExpandPrompt(desc, beatList, companyBrief) }],
       }),
     });
     if (!res.ok) {

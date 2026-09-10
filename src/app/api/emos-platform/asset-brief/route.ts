@@ -8,6 +8,8 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
+import { getApprovedBrief } from "@/lib/company-brief";
+import { briefPromptBlock } from "@/lib/company-brief-prompt";
 import { recordAiUsage } from "@/lib/ai-usage";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
@@ -21,7 +23,7 @@ const ASSET_TYPE_LABELS: Record<string, string> = {
   data_study:      "Data Study (analysis of datasets)",
 };
 
-function buildBriefPrompt(d: Record<string, unknown>): string {
+function buildBriefPrompt(d: Record<string, unknown>, companyBrief: string | null): string {
   return `You are a senior content strategist and digital-PR expert. Your job is to write a detailed CREATION PLAN for a linkable asset that a founder/marketer will actually build and pitch to journalists.
 
 ASSET CONTEXT:
@@ -33,7 +35,7 @@ ASSET CONTEXT:
 - Data brief from signal: ${d.dataBrief || "Not provided"}
 - Pitch angle: ${d.pitchAngle || "Not provided"}
 - Company / brand context: ${d.companyContext || "Not provided"}
-
+${companyBrief ? briefPromptBlock(companyBrief) : ""}
 Write a practical creation plan with these sections:
 
 ## Why This Asset Will Earn Links
@@ -61,7 +63,7 @@ A single sentence a journalist could use as the lede for their story about this 
 3 specific journalist beats or outlet types that would genuinely want to cover this asset and why.
 
 NUMBERS AND FACTS RULE (strict):
-- Do not state any statistic, dollar figure, percentage, date, year or named study unless it appears in the ASSET CONTEXT above.
+- Do not state any statistic, dollar figure, percentage, date, year or named study unless it appears in the ASSET CONTEXT or the COMPANY BRIEF above.
 - When an outside number would strengthen a point, do NOT write the number from memory. Write a placeholder in square brackets naming what to look up and where, for example: [STAT TO SOURCE: FBI IC3 annual SIM swap losses, latest year, ic3.gov].
 - A placeholder the builder fills from the primary source is correct. A remembered number is not, because remembered numbers are often from the wrong year.
 
@@ -86,7 +88,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "assetType and title are required." }, { status: 400 });
   }
 
-  const prompt = buildBriefPrompt(data);
+  // Loaded server-side for the active company; never taken from the body.
+  const prompt = buildBriefPrompt(data, await getApprovedBrief(guard.userId));
 
   try {
     const res = await fetch(ANTHROPIC_API, {

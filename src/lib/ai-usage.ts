@@ -47,7 +47,8 @@ export type AiTool =
   | "signaliq-profile"
   | "journo-ai"
   | "collab-ai"
-  | "asset-brief";
+  | "asset-brief"
+  | "company-brief";
 
 const context = new AsyncLocalStorage<AiUsageContext>();
 

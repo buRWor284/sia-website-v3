@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { withAiUsage } from "@/lib/ai-usage";
+import { getApprovedBrief } from "@/lib/company-brief";
 import { draftPitches, MAX_DRAFT_BATCH, type DraftBrief, type DraftTarget } from "@/lib/pitch/draft";
 
 export const runtime = "nodejs";
@@ -86,6 +87,7 @@ export async function POST(req: NextRequest) {
     assetDescription: (asset?.description as string | null) ?? null,
     assetUrl:         (asset?.published_url as string | null) ?? null,
     angle,
+    companyBrief:     await getApprovedBrief(guard.userId, companyId),
   };
 
   // Preserve the order the user picked rather than whatever the DB returned.

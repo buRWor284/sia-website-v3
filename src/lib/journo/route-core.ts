@@ -17,6 +17,7 @@
  */
 
 import { recordAiUsage } from "@/lib/ai-usage";
+import { briefPromptBlock } from "@/lib/company-brief-prompt";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -241,6 +242,9 @@ export function scrubContacts(raw: string): string {
 export async function runJournoAI(
   type: string,
   data: Record<string, unknown>,
+  /** Approved Company Brief, platform only. A separate argument, never read
+   * from `data`, so a public caller cannot inject one through the body. */
+  companyBrief?: string | null,
 ): Promise<{ ok: true; result: string } | { ok: false; status: number; error: string }> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return { ok: false, status: 500, error: "ANTHROPIC_API_KEY not set in environment." };
@@ -252,6 +256,9 @@ export async function runJournoAI(
     case "campaign-brief":      prompt = buildMediaPlanPrompt(data);  break; // media targeting brief
     default:
       return { ok: false, status: 400, error: `Unknown type: ${type}` };
+  }
+  if (companyBrief) {
+    prompt += `\n${briefPromptBlock(companyBrief)}\nFor journalists: prefer ones who fit the brief's goals and "what counts as a good result", skip anyone it says not to contact, and mention past coverage when relevant. The output format required above still applies exactly.`;
   }
 
   try {

@@ -58,6 +58,7 @@ const TOOL_LABELS: Record<string, string> = {
   "journo-ai": "JournoCollabIQ",
   "collab-ai": "PartnerCollabIQ",
   "asset-brief": "AssetIQ · brief",
+  "company-brief": "Company brief · research / condense",
 };
 
 interface ToolRow {

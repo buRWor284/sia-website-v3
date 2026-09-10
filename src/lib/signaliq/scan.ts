@@ -54,6 +54,8 @@ function normalizeBeats(beats: BeatId[]): BeatId[] {
 export interface ScanOptions {
   /** Founder's company description — tailors seeds + relevance scoring. */
   companyContext?: string;
+  /** Approved Company Brief (platform only, server-loaded). */
+  companyBrief?: string | null;
 }
 
 /** Max distinct seeds scanned per run (keeps external fan-out bounded).
@@ -81,7 +83,7 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
   // 1) Expand the company profile into tailored seeds + relevance lexicon, using
   //    the union of all selected beats' candidate seeds (grouped per beat inside).
   let expansion: ProfileExpansion | null = null;
-  if (ctx) expansion = await expandCompanyProfile(ctx, beatList);
+  if (ctx) expansion = await expandCompanyProfile(ctx, beatList, opts.companyBrief);
 
   // 2) Build the seed list: tailored first (flagged), then generic beat seeds for
   //    breadth — weighted per BEAT_SLOTS so the primary beat keeps most of the

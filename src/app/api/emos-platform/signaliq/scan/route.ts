@@ -11,6 +11,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
+import { getApprovedBrief } from "@/lib/company-brief";
 import { parseBeats, runScanRequest } from "@/lib/signaliq/route-core";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { withAiUsage } from "@/lib/ai-usage";
@@ -38,9 +39,12 @@ export async function POST(req: NextRequest) {
 
   const companyContext = typeof raw.companyContext === "string" ? raw.companyContext.slice(0, COMPANY_CONTEXT_MAX) : undefined;
 
+  // The active company's approved brief, if any. Null = today's behaviour.
+  const companyBrief = await getApprovedBrief(guard.userId);
+
   try {
     const core = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
-      runScanRequest(beats, companyContext),
+      runScanRequest(beats, companyContext, companyBrief),
     );
     const body: ScanResponse = {
       ...core,

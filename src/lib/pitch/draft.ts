@@ -1,4 +1,5 @@
 import "server-only";
+import { briefPromptBlock } from "@/lib/company-brief-prompt";
 
 /**
  * Pitch drafting — write a personalised pitch for a saved journalist.
@@ -43,6 +44,8 @@ export interface DraftBrief {
   assetDescription?: string | null;
   assetUrl?: string | null;
   angle?: string | null;
+  /** The approved Company Brief, if any (2026-09-10). Server-loaded only. */
+  companyBrief?: string | null;
 }
 
 export interface DraftTarget {
@@ -115,6 +118,12 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
   lines.push(`Background: ${brief.companyContext}`);
   if (brief.companyWebsite) lines.push(`Website: ${brief.companyWebsite}`);
   if (brief.senderName) lines.push(`Person sending the pitch: ${brief.senderName}${brief.senderTitle ? `, ${brief.senderTitle}` : ""}`);
+  if (brief.companyBrief) {
+    // Proof points and true stories come from here. Pick ONE proof point and at
+    // most one story that fit this journalist; the length limits still apply.
+    lines.push(briefPromptBlock(brief.companyBrief).trim());
+    lines.push("Use at most one proof point and one short story from the brief, whichever fits this journalist best. Stay inside the word limit.");
+  }
   lines.push("");
   // The signature is assembled here, not left to the model: a missing field
   // becomes a visible [placeholder] instead of an invented name or email.

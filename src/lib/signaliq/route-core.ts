@@ -72,8 +72,9 @@ export type ScanCore = Omit<ScanResponse, "usage">;
 export async function runScanRequest(
   beats: BeatId[],
   companyContext?: string,
+  companyBrief?: string | null,
 ): Promise<ScanCore> {
-  const { opportunities, partial, notes, beats: scanned } = await scanBeat(beats, { companyContext });
+  const { opportunities, partial, notes, beats: scanned } = await scanBeat(beats, { companyContext, companyBrief });
   logScan(scanned.join("+"), opportunities.length);
   return {
     beat: scanned[0], // legacy field = primary beat
@@ -102,6 +103,7 @@ export type PackResult =
 export async function runPackRequest(
   opp: Opportunity,
   companyContext?: string,
+  companyBrief?: string | null,
 ): Promise<PackResult> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -127,7 +129,7 @@ export async function runPackRequest(
         system: PACK_SYSTEM,
         tools: [PACK_TOOL],
         tool_choice: { type: "tool", name: PACK_TOOL.name },
-        messages: [{ role: "user", content: buildPackPrompt(opp, companyContext) }],
+        messages: [{ role: "user", content: buildPackPrompt(opp, companyContext, companyBrief) }],
       }),
     });
 

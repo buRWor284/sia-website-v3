@@ -5,6 +5,7 @@
  * fabricated stats, no invented journalist names. (RFP §7, §11.)
  */
 import type { AssetPackAi, ChartSpec, JournalistLead, Opportunity } from "./types";
+import { briefPromptBlock } from "@/lib/company-brief-prompt";
 
 export const PACK_SYSTEM = `You are an earned-media strategist helping a founder turn an EARLY, open-data signal into a proactive PR pitch — "newsjacking" a story before it breaks.
 
@@ -68,7 +69,7 @@ export const PACK_TOOL = {
   },
 } as const;
 
-export function buildPackPrompt(opp: Opportunity, companyContext?: string): string {
+export function buildPackPrompt(opp: Opportunity, companyContext?: string, companyBrief?: string | null): string {
   const signalLines =
     opp.signals.map((s) => `- [${s.source}] ${s.title}${s.detail ? ` (${s.detail})` : ""} — ${s.url}`).join("\n") ||
     "(no individual signals)";
@@ -87,6 +88,7 @@ export function buildPackPrompt(opp: Opportunity, companyContext?: string): stri
   const contextBlock = companyContext?.trim()
     ? `\nCOMPANY CONTEXT (from the founder — use this to personalise the angle, voice, and credibility hook):\n${companyContext.trim()}\n`
     : "";
+  const briefBlock = companyBrief ? briefPromptBlock(companyBrief) : "";
 
   return `EARLY SIGNAL TO WORK FROM
 Beat: ${opp.beat}
@@ -97,7 +99,7 @@ Opportunity score: ${opp.score}/100 (${opp.bandLabel}) — a lead/whitespace mea
       ? "\nEVIDENCE IS THIN: every signal below is a sample too small to call a trend. Do not open the pitch angle with any of these numbers. Lead with the founder's own expertise, data or offer, and mention the signal only as light context, if at all."
       : ""
   }
-${contextBlock}
+${contextBlock}${briefBlock}
 SIGNAL DATA (the receipts — ground everything here):
 ${signalLines}
 
