@@ -23,7 +23,7 @@
 import React, { useState } from "react";
 import { useCompanyOptional } from "./CompanyProvider";
 import TestOrgBadge from "./TestOrgBadge";
-import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
+import { COMPANY_CONTEXT_MAX, type Spokesperson } from "@/lib/company-types";
 
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -72,6 +72,50 @@ function primaryBtn(enabled: boolean): React.CSSProperties {
 
 type Panel = "none" | "add" | "edit" | "confirmDelete";
 
+/** Who pitches go out FROM (2026-09-10). Without it every drafted pitch was
+ * signed with the company name, which PressIQ's own scorer then marks down. */
+type SpokespersonDraft = { name: string; title: string; email: string; linkedin: string };
+const EMPTY_SP: SpokespersonDraft = { name: "", title: "", email: "", linkedin: "" };
+
+function spFromCompany(c: Spokesperson | null | undefined): SpokespersonDraft {
+  return {
+    name: c?.spokesperson_name ?? "",
+    title: c?.spokesperson_title ?? "",
+    email: c?.spokesperson_email ?? "",
+    linkedin: c?.spokesperson_linkedin ?? "",
+  };
+}
+
+function spToPatch(sp: SpokespersonDraft): Spokesperson {
+  return {
+    spokesperson_name: sp.name,
+    spokesperson_title: sp.title,
+    spokesperson_email: sp.email,
+    spokesperson_linkedin: sp.linkedin,
+  };
+}
+
+function SpokespersonFields({ value, onChange }: { value: SpokespersonDraft; onChange: (v: SpokespersonDraft) => void }) {
+  const set = (k: keyof SpokespersonDraft) => (e: React.ChangeEvent<HTMLInputElement>) => onChange({ ...value, [k]: e.target.value });
+  const opt = <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}>(optional)</span>;
+  return (
+    <div>
+      <label style={FIELD_LABEL}>
+        Pitches go out from {opt}
+      </label>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
+        <input type="text" value={value.name} onChange={set("name")} placeholder="Full name, e.g. Jane Doe" style={FIELD} maxLength={120} />
+        <input type="text" value={value.title} onChange={set("title")} placeholder="Title, e.g. Founder and CEO" style={FIELD} maxLength={120} />
+        <input type="email" value={value.email} onChange={set("email")} placeholder="Email" style={FIELD} maxLength={200} />
+        <input type="text" value={value.linkedin} onChange={set("linkedin")} placeholder="LinkedIn URL" style={FIELD} maxLength={200} />
+      </div>
+      <p style={{ margin: "5px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+        Used to sign drafted pitches. Leave blank and drafts carry [placeholders] to fill before sending.
+      </p>
+    </div>
+  );
+}
+
 /** Seeded once from the company it is given, and remounted via `key` when the
  * selection changes. That keeps the seeding out of an effect, which the
  * react-hooks/set-state-in-effect rule (correctly) rejects. */
@@ -79,18 +123,21 @@ function EditCompanyForm({
   name: initialName,
   context: initialContext,
   website: initialWebsite,
+  spokesperson: initialSp,
   busy,
   onSave,
 }: {
   name: string;
   context: string;
   website: string;
+  spokesperson: SpokespersonDraft;
   busy: boolean;
-  onSave: (patch: { name: string; context: string; website: string }) => void;
+  onSave: (patch: { name: string; context: string; website: string } & Spokesperson) => void;
 }) {
   const [name, setName] = useState(initialName);
   const [context, setContext] = useState(initialContext);
   const [website, setWebsite] = useState(initialWebsite);
+  const [sp, setSp] = useState<SpokespersonDraft>(initialSp);
 
   return (
     <div style={{ padding: "13px 14px", display: "grid", gap: 9 }}>
@@ -112,9 +159,10 @@ function EditCompanyForm({
         <input type="text" value={website} onChange={e => setWebsite(e.target.value)}
           placeholder="acme.com" style={FIELD} />
       </div>
+      <SpokespersonFields value={sp} onChange={setSp} />
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
         <button
-          onClick={() => onSave({ name, context, website })}
+          onClick={() => onSave({ name, context, website, ...spToPatch(sp) })}
           disabled={!name.trim() || busy}
           style={primaryBtn(!!name.trim() && !busy)}
         >
@@ -147,6 +195,7 @@ export default function CompanyPicker({
   const [addName, setAddName] = useState("");
   const [addContext, setAddContext] = useState("");
   const [addWebsite, setAddWebsite] = useState("");
+  const [addSp, setAddSp] = useState<SpokespersonDraft>(EMPTY_SP);
 
   const company = ctx?.company ?? null;
   const companyId = company?.id ?? "";
@@ -174,13 +223,13 @@ export default function CompanyPicker({
   async function handleAdd() {
     if (!addName.trim() || busy) return;
     setBusy(true); setError(null);
-    const created = await addCompany({ name: addName, context: addContext, website: addWebsite });
+    const created = await addCompany({ name: addName, context: addContext, website: addWebsite, ...spToPatch(addSp) });
     setBusy(false);
     if (!created) { setError("Could not save that company. Please try again."); return; }
-    setAddName(""); setAddContext(""); setAddWebsite(""); setPanel("none");
+    setAddName(""); setAddContext(""); setAddWebsite(""); setAddSp(EMPTY_SP); setPanel("none");
   }
 
-  async function handleSaveEdit(patch: { name: string; context: string; website: string }) {
+  async function handleSaveEdit(patch: { name: string; context: string; website: string } & Spokesperson) {
     if (!companyId || !patch.name.trim() || busy) return;
     setBusy(true); setError(null);
     const updated = await editCompany(companyId, patch);
@@ -336,6 +385,7 @@ export default function CompanyPicker({
             <input type="text" value={addWebsite} onChange={e => setAddWebsite(e.target.value)}
               placeholder="acme.com" style={FIELD} />
           </div>
+          <SpokespersonFields value={addSp} onChange={setAddSp} />
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button onClick={handleAdd} disabled={!addName.trim() || busy} style={primaryBtn(!!addName.trim() && !busy)}>
               {busy ? "Saving…" : "Save company"}
@@ -353,6 +403,7 @@ export default function CompanyPicker({
           name={company.name}
           context={company.context}
           website={company.website ?? ""}
+          spokesperson={spFromCompany(company)}
           busy={busy}
           onSave={handleSaveEdit}
         />

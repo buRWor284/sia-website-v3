@@ -17,9 +17,15 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import type { Company, CreateCompanyInput, UpdateCompanyInput } from "@/lib/company-types";
-import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
+import { COMPANY_CONTEXT_MAX, SPOKESPERSON_FIELDS } from "@/lib/company-types";
 
-const COLUMNS = "id, name, context, website, created_at, updated_at";
+const COLUMNS = "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin, created_at, updated_at";
+
+/** Trimmed, length-capped, empty → null. */
+function cleanOptional(v: string | null | undefined, max = 200): string | null {
+  const t = (v ?? "").trim().slice(0, max);
+  return t || null;
+}
 
 // Every dashboard surface that reads a company. Kept in one place so a new
 // tool cannot forget one.
@@ -88,6 +94,7 @@ export async function createCompany(input: CreateCompanyInput): Promise<Company 
       name,
       context: (input.context ?? "").slice(0, COMPANY_CONTEXT_MAX),
       website: input.website?.trim() || null,
+      ...Object.fromEntries(SPOKESPERSON_FIELDS.map(f => [f, cleanOptional(input[f])])),
     })
     .select(COLUMNS)
     .single();
@@ -120,6 +127,9 @@ export async function updateCompany(
   if (input.name !== undefined)    patch.name    = input.name.trim();
   if (input.context !== undefined) patch.context = input.context.slice(0, COMPANY_CONTEXT_MAX);
   if (input.website !== undefined) patch.website = input.website?.trim() || null;
+  for (const f of SPOKESPERSON_FIELDS) {
+    if (input[f] !== undefined) patch[f] = cleanOptional(input[f]);
+  }
 
   // `.select()` so a no-op write (stale id, or another org's row, which RLS
   // silently filters out rather than erroring) reports null, not success.

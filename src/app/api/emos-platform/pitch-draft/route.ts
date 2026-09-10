@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   // client bypasses RLS, so the org filter is the only thing protecting it.
   const [{ data: company }, { data: asset }, { data: journalists }] = await Promise.all([
     companyId
-      ? db.from("companies").select("name, context, website").eq("id", companyId).eq("org_id", orgId).maybeSingle()
+      ? db.from("companies").select("name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin").eq("id", companyId).eq("org_id", orgId).maybeSingle()
       : Promise.resolve({ data: null }),
     assetId
       ? db.from("linkable_assets").select("title, description, published_url").eq("id", assetId).eq("org_id", orgId).maybeSingle()
@@ -78,6 +78,10 @@ export async function POST(req: NextRequest) {
     companyName:      company.name as string,
     companyContext:   (company.context as string) || "",
     companyWebsite:   (company.website as string | null) ?? null,
+    senderName:       (company.spokesperson_name as string | null) ?? null,
+    senderTitle:      (company.spokesperson_title as string | null) ?? null,
+    senderEmail:      (company.spokesperson_email as string | null) ?? null,
+    senderLinkedIn:   (company.spokesperson_linkedin as string | null) ?? null,
     assetTitle:       (asset?.title as string | null) ?? null,
     assetDescription: (asset?.description as string | null) ?? null,
     assetUrl:         (asset?.published_url as string | null) ?? null,

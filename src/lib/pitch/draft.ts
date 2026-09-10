@@ -34,6 +34,11 @@ export interface DraftBrief {
   companyName: string;
   companyContext: string;
   companyWebsite?: string | null;
+  /** The person the pitch is FROM (companies.spokesperson_*, 2026-09-10). */
+  senderName?: string | null;
+  senderTitle?: string | null;
+  senderEmail?: string | null;
+  senderLinkedIn?: string | null;
   assetTitle?: string | null;
   assetDescription?: string | null;
   assetUrl?: string | null;
@@ -69,12 +74,15 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - Tie the story to the journalist's own beat and, where one exists, to a dated hook.
 - WHEN "RECENT WORK" IS SUPPLIED, open by bridging from what they are already covering to the sender's data, in one sentence, then go straight to the number. The bridge must do real work: it explains why THIS data is the natural next question for a story they have already told. NEVER compliment the piece. Do not write "I loved", "I enjoyed", "great piece", "I was reading", "your excellent". Praise is the most recognisable tell of an automated pitch and journalists discount it instantly. Reference the substance, not the quality.
 - WHEN NO RECENT WORK IS SUPPLIED, lead with the strongest checkable number. That is the correct choice, not a fallback to apologise for. Do not manufacture a fake personal connection to avoid it.
-- 120 to 180 words in the body. Shorter is better than padded.
+- 90 to 135 words in the body, not counting the signature. PressIQ counts the whole email and aims for 100 to 150, and the signature adds about 15. Shorter is better than padded.
+- Write at a reading level of grade 7 or below: sentences of about 15 words or fewer, everyday words, one idea per sentence. Journalists skim.
+- Write as the named sender in the first person ("I", "we") from the first line to the last. Never switch to describing the sender or the company in the third person.
+- After the offer, END WITH EXACTLY ONE short question that is easy to say yes to (for example, whether they would like the data or a call this week), then a one-line offer to send more. Never end on a pleasantry.
 - Plain punctuation only. Do NOT use em dashes or en dashes. Use full stops and commas.
 - No superlatives, no "I hope this finds you well", no "game-changing", "revolutionary", "excited to share", "reaching out", "circle back", "leverage", "in today's landscape". No flattery about their recent article unless a specific one is named in the brief.
 - Never invent a statistic, a source, a date or a credential. Use only what the brief gives you. If the brief is thin, write a shorter pitch rather than padding it with invention.
-- Sign off with the sender's name only.
-- The subject line is 6 to 9 words, concrete, and contains the strongest fact or the offer. No colons used as clickbait, no questions.
+- Close with a signature block, one item per line: the sender's full name, their title and company, the company website, then their email and LinkedIn if given. Copy the SIGNATURE lines from the brief exactly. Where the brief shows a [bracketed placeholder], keep the placeholder exactly as written so the user fills it in. Never sign with the company name alone and never invent a name, title or contact.
+- The subject line is 6 to 9 words, concrete, and contains the strongest fact or the offer. Tailor it to this journalist's beat so two journalists in the same batch do not get the same subject. No colons used as clickbait, no questions.
 
 Return the subject and body through the tool. Write nothing else.`;
 
@@ -85,7 +93,7 @@ const DRAFT_TOOL = {
     type: "object" as const,
     properties: {
       subject: { type: "string", description: "6 to 9 words, concrete." },
-      body: { type: "string", description: "120 to 180 words. Plain punctuation, no em dashes." },
+      body: { type: "string", description: "90 to 135 words plus the signature block. Grade 7 reading level, first person throughout, ends with one question. Plain punctuation, no em dashes." },
     },
     required: ["subject", "body"],
   },
@@ -103,9 +111,19 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
   }
   lines.push("");
   lines.push(`THE SENDER`);
-  lines.push(`Name: ${brief.companyName}`);
+  lines.push(`Company: ${brief.companyName}`);
   lines.push(`Background: ${brief.companyContext}`);
   if (brief.companyWebsite) lines.push(`Website: ${brief.companyWebsite}`);
+  if (brief.senderName) lines.push(`Person sending the pitch: ${brief.senderName}${brief.senderTitle ? `, ${brief.senderTitle}` : ""}`);
+  lines.push("");
+  // The signature is assembled here, not left to the model: a missing field
+  // becomes a visible [placeholder] instead of an invented name or email.
+  lines.push(`SIGNATURE (copy these lines exactly at the end of the body)`);
+  lines.push(brief.senderName?.trim() || "[Your full name]");
+  lines.push(`${brief.senderTitle?.trim() || "[Your title]"}, ${brief.companyName}`);
+  if (brief.companyWebsite) lines.push(brief.companyWebsite);
+  lines.push(brief.senderEmail?.trim() || "[Your email]");
+  lines.push(brief.senderLinkedIn?.trim() || "[Your LinkedIn URL]");
   lines.push("");
   if (brief.assetTitle) {
     lines.push(`THE ASSET BEING OFFERED`);
