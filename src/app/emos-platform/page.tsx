@@ -35,7 +35,10 @@ import { FAQ } from "@/components/emos-platform/landing/content";
  * this file (rendered from the "EMOS OG Card" artboard).
  */
 
-const META_TITLE = "EMOS Platform: the earned media operating system";
+// 2026-09-11: brief title (Irfan). Renders as "... · Syed Irfan Ajmal": the
+// /emos-platform layout's "%s — EMOS Platform" template does not apply to a
+// page in its own segment, so the root layout's template wins.
+const META_TITLE = "EMOS Platform: earned media software for founders";
 const META_DESC =
   "Five connected earned media tools for founders: find the story, plan the asset, pick the journalists, score the pitch, log the coverage. Everything saved under one login. $149/month, cancel any time.";
 
