@@ -1,8 +1,8 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import type { Metadata } from "next";
-import { RadarCallout } from "@/components/bureau/RadarCallout";
+import { PlatformLanding } from "@/components/emos-platform/landing/PlatformLanding";
+import { FAQ } from "@/components/emos-platform/landing/content";
 
 /**
  * /emos-platform — EMOS PLATFORM landing (public).
@@ -26,6 +26,13 @@ import { RadarCallout } from "@/components/bureau/RadarCallout";
  * as the platform's naming/pricing settles.
  * 2026-09-10: quick-fix pass (indexing, stale copy, radar moved below the
  * pipeline). A full rebuild is specced separately; see WORKLOG.
+ * 2026-09-11: FULL REBUILD from the Claude Design handoff (FINAL) and the locked
+ * copy deck in EMOS-Platform-Page-Rebuild-Brief-2026-09-10.md. The page body now
+ * lives in components/emos-platform/landing/ (PlatformLanding + content.ts);
+ * this file keeps the metadata, the auth branching and the FAQPage JSON-LD.
+ * Metadata, canonical and the sitemap entry are deliberately unchanged. The
+ * OG/Twitter card is the static opengraph-image.png / twitter-image.png beside
+ * this file (rendered from the "EMOS OG Card" artboard).
  */
 
 const META_TITLE = "EMOS Platform: the earned media operating system";
@@ -58,31 +65,18 @@ export const metadata: Metadata = {
   },
 };
 
-// ── design tokens (match the dashboard / bureau system) ──────────────────────
-const PAPER  = "#f1ebde";
-const PAPER2 = "#e8e0cc";
-const INK    = "#1a1410";
-const INK70  = "rgba(26,20,16,.70)";
-const INK55  = "rgba(26,20,16,.55)";
-const INK15  = "rgba(26,20,16,.15)";
-const CREAM  = "#fafafa";
-const CREAM70 = "rgba(250,250,250,.70)";
-const YEL    = "#f5b81f";
-const GROT   = "var(--font-grot)";
-const SERIF  = "var(--font-serif)";
-const MONO   = "var(--font-mono)";
-
-// The connected pipeline. Order mirrors lib/emos-stage-config STAGE_META; the
-// descriptions here are buyer-facing and deliberately differ from STAGE_META
-// (2026-09-10: no CRM claim for JournoCollabIQ, CoverageIQ = proof of what the
-// work produced, per EMOS-Architecture-Decisions-2026-09-09.md).
-const PIPELINE: Array<{ n: string; label: string; tool: string; desc: string }> = [
-  { n: "01", label: "SignalIQ",       tool: "Story Detection",       desc: "Scan open data for stories rising in your beat and save the strongest as an asset pack." },
-  { n: "02", label: "AssetIQ",        tool: "Linkable Asset Builder", desc: "Turn a saved signal into a brief for a linkable asset: a report, calculator or quiz a journalist would cite." },
-  { n: "03", label: "JournoCollabIQ", tool: "Journalist List",        desc: "Find journalists by beat and save the ones who fit, with a note on why, so every pitch starts from context." },
-  { n: "04", label: "PressIQ",        tool: "Pitch Scoring",         desc: "Draft pitches aimed at a saved journalist, then score each one on seven dimensions and a 32-point checklist before you send." },
-  { n: "05", label: "CoverageIQ",     tool: "Pitch Tracking",        desc: "Log your pitches and placements in one place, with each outlet's authority, so you can show what the work produced." },
-];
+// FAQPage structured data, built from the same array the accordion renders, so
+// the two can never disagree (pattern: emos-academy/layout.tsx). Lives on the
+// page, not the /emos-platform layout, which also wraps the dashboard.
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
 
 export default async function EmostoolLandingPage() {
   // Members skip the pitch — send them straight to the product. Everyone else,
@@ -101,156 +95,12 @@ export default async function EmostoolLandingPage() {
   }
 
   return (
-    <div style={{ background: PAPER, color: INK, fontFamily: SERIF, minHeight: "100vh" }}>
-
-      {/* ── Masthead ─────────────────────────────────────────────────────── */}
-      <header style={{ background: INK, color: CREAM, padding: "0 clamp(20px,4vw,56px)" }}>
-        <div style={{ maxWidth: 1120, marginInline: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 56, flexWrap: "wrap", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-            <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".22em", textTransform: "uppercase" }}>
-              EMOS
-            </span>
-            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", color: CREAM70 }}>
-              Earned Media Operating System
-            </span>
-          </div>
-          <Link href="/emos-platform/signin" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none" }}>
-            Sign in →
-          </Link>
-        </div>
-      </header>
-
-      {/* ── Signed in, no subscription yet ───────────────────────────────── */}
-      {userId && (
-        <div style={{ background: PAPER2, borderBottom: `1px solid ${INK15}` }}>
-          <div style={{ maxWidth: 1120, marginInline: "auto", padding: "14px clamp(20px,4vw,56px)", display: "flex", flexWrap: "wrap", gap: 12, alignItems: "baseline", justifyContent: "space-between" }}>
-            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.5 }}>
-              You&apos;re signed in{signedInEmail ? ` as ${signedInEmail}` : ""}. Your account doesn&apos;t have an active
-              EMOS subscription yet.
-            </p>
-            <Link href="/emos-platform/subscribe" style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: INK, textDecoration: "underline", textDecorationColor: INK15 }}>
-              Activate for $149/month →
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <section style={{ maxWidth: 1120, marginInline: "auto", padding: "clamp(40px,7vw,88px) clamp(20px,4vw,56px) clamp(28px,4vw,44px)" }}>
-        <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: INK55 }}>
-          The platform
-        </span>
-        <h1 style={{ margin: "16px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px,5.5vw,58px)", lineHeight: 1.02, letterSpacing: "-0.02em", maxWidth: 900 }}>
-          Your whole earned-media engine,{" "}
-          <span style={{ fontStyle: "italic", fontWeight: 600, background: YEL, color: INK, padding: "0 .12em", boxDecorationBreak: "clone", WebkitBoxDecorationBreak: "clone" }}>
-            in one system.
-          </span>
-        </h1>
-        <p style={{ margin: "22px 0 0", maxWidth: 660, fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(16px,1.9vw,21px)", color: INK70, lineHeight: 1.5 }}>
-          Five tools, one workflow: find the story, plan the asset, pick the journalists, score the
-          pitch, log the coverage. Your company profile, your journalist list and every draft stay
-          saved under one login, so each step starts where the last one stopped.
-        </p>
-        <div style={{ marginTop: "clamp(24px,3vw,34px)", display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center" }}>
-          {/* P4: the purchase path. Checkout is the primary CTA — sign-up is
-              Restricted in Clerk (verified 2026-07-26), so paying first and then
-              accepting the emailed invitation is the only way in for a new
-              customer. The old "Request access →" link beside these pointed at
-              /not-invited and was removed with that page: on a page that sells a
-              $149/month product, inviting people to apply instead of buy was the
-              clearest expression of the invite-only/self-serve split. */}
-          <Link href="/emos-platform/subscribe" style={{ padding: "14px 34px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-            Get EMOS · $149/month
-          </Link>
-          <Link href="/emos-platform/signin" style={{ padding: "14px 30px", background: "transparent", color: INK, border: `1px solid ${INK}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-            Sign in
-          </Link>
-        </div>
-        <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-          $149/month · cancel any time · secure payment via Stripe
-        </p>
-        <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-          After checkout we email you an invite to set your password. That becomes your login.
-        </p>
-      </section>
-
-      {/* ── The connected pipeline ───────────────────────────────────────── */}
-      <section style={{ maxWidth: 1120, marginInline: "auto", padding: "clamp(20px,3vw,32px) clamp(20px,4vw,56px) clamp(48px,7vw,88px)" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 22, flexWrap: "wrap" }}>
-          <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".20em", textTransform: "uppercase", color: INK }}>
-            One pipeline, five stages
-          </span>
-          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55 }}>
-            each tool hands off to the next
-          </span>
-        </div>
-        <div style={{ border: `1px solid ${INK}` }}>
-          {PIPELINE.map((s, i) => (
-            <div
-              key={s.label}
-              style={{
-                display: "flex",
-                gap: "clamp(14px,3vw,32px)",
-                alignItems: "baseline",
-                padding: "clamp(16px,2.4vw,22px) clamp(16px,3vw,28px)",
-                borderBottom: i < PIPELINE.length - 1 ? `1px solid ${INK15}` : "none",
-                background: i % 2 === 1 ? PAPER2 : "transparent",
-              }}
-            >
-              <span style={{ flexShrink: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.6vw,28px)", lineHeight: 1, color: INK15, letterSpacing: "-0.02em", width: 44 }}>
-                {s.n}
-              </span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-                  <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: "clamp(15px,1.8vw,19px)", letterSpacing: ".01em", color: INK }}>
-                    {s.label}
-                  </span>
-                  <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: INK55 }}>
-                    {s.tool}
-                  </span>
-                </div>
-                <p style={{ margin: "6px 0 0", fontFamily: SERIF, fontSize: "clamp(13.5px,1.5vw,15.5px)", color: INK70, lineHeight: 1.5 }}>
-                  {s.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Free radar sits after the pipeline, not under the buy button (2026-09-10). */}
-      <RadarCallout />
-
-      {/* ── CTA band ─────────────────────────────────────────────────────── */}
-      <section style={{ background: INK, color: CREAM }}>
-        <div style={{ maxWidth: 1120, marginInline: "auto", padding: "clamp(40px,6vw,72px) clamp(20px,4vw,56px)", display: "flex", flexWrap: "wrap", gap: "clamp(20px,4vw,48px)", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ maxWidth: 560 }}>
-            <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px,3.4vw,38px)", lineHeight: 1.08, letterSpacing: "-0.02em" }}>
-              Run the whole play in-house.
-            </h2>
-            <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: "clamp(14px,1.7vw,18px)", color: CREAM70, lineHeight: 1.5 }}>
-              The free tools on this site each answer one question. EMOS keeps the answers: your
-              company profile, saved asset packs, your journalist list with the reason each one is on
-              it, and every pitch you have drafted or scored.
-            </p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, minWidth: 220 }}>
-            <Link href="/emos-platform/subscribe" style={{ textAlign: "center", padding: "15px 30px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 900, fontSize: 13, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-              Get EMOS · $149/month
-            </Link>
-            <Link href="/emos-platform/signin" style={{ textAlign: "center", padding: "14px 30px", background: "transparent", color: CREAM, border: `1px solid ${CREAM70}`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}>
-              Sign in
-            </Link>
-            <Link href="/tools" style={{ textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: CREAM70, textDecoration: "underline", textDecorationColor: "rgba(250,250,250,.25)", marginTop: 2 }}>
-              Try the free tools first
-            </Link>
-            <Link href="/emos-academy" style={{ textAlign: "center", fontFamily: MONO, fontWeight: 700, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "underline", textDecorationColor: "rgba(245,184,31,.35)" }}>
-              Rather have it set up with you? EMOS Academy
-            </Link>
-          </div>
-        </div>
-      </section>
-
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <PlatformLanding signedIn={Boolean(userId)} signedInEmail={signedInEmail} />
+    </>
   );
 }
