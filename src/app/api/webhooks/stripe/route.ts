@@ -11,7 +11,8 @@
  *   → update status to 'canceled', revoke Clerk access + any pending invite
  *
  * invoice.payment_failed
- *   → update status to 'past_due'
+ *   → update status to 'past_due' (still ALLOWED: grace period while Stripe
+ *     retries; see subscriptionAccess in emos-guard.ts)
  *
  * invoice.payment_succeeded  (recovers past_due back to active)
  *   → update status to 'active'
@@ -89,6 +90,22 @@ function verifyStripeWebhook(
     if (sigBuf.length !== expectedBuf.length) return false;
     return timingSafeEqual(sigBuf, expectedBuf);
   });
+}
+
+// ─── Invoice → subscription id ────────────────────────────────────────────────
+// Stripe API 2025-03-31.basil REMOVED invoice.subscription and moved it to
+// invoice.parent.subscription_details.subscription. Reading only the old field
+// meant that on a basil-or-newer endpoint every failed payment was silently
+// ignored (past_due never recorded). Read both so this works on either version.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function invoiceSubscriptionId(invoice: any): string | null {
+  const raw =
+    invoice?.subscription ??
+    invoice?.parent?.subscription_details?.subscription ??
+    null;
+  if (typeof raw === "string") return raw || null;
+  if (raw && typeof raw.id === "string") return raw.id;
+  return null;
 }
 
 // ─── Route handler ────────────────────────────────────────────────────────────
@@ -229,7 +246,7 @@ export async function POST(req: NextRequest) {
 
     case "invoice.payment_failed": {
       const invoice = event.data.object;
-      const subId   = invoice.subscription as string;
+      const subId   = invoiceSubscriptionId(invoice);
       if (subId) {
         const { error } = await db
           .from("stripe_subscriptions")
@@ -244,7 +261,7 @@ export async function POST(req: NextRequest) {
 
     case "invoice.payment_succeeded": {
       const invoice = event.data.object;
-      const subId   = invoice.subscription as string;
+      const subId   = invoiceSubscriptionId(invoice);
       // Restore active if it was past_due
       if (subId) {
         await db

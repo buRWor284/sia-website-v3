@@ -38,9 +38,10 @@ function deny(status: number, error: string): EmosGuardResult {
 
 /**
  * Subscription status for a person. Returns:
- *  - "active"  → paying (or recovered) subscriber
- *  - "none"    → no subscription row (admin-invited beta user) — ALLOWED
- *  - anything else ("canceled", "past_due", …) → blocked
+ *  - "active"   → paying (or recovered) subscriber
+ *  - "none"     → no subscription row (admin-invited beta user) — ALLOWED
+ *  - "past_due" → card failed, Stripe retrying — ALLOWED (grace, 2026-09-11)
+ *  - anything else ("canceled", …) → blocked
  *
  * ★ "none" means ALLOWED and must stay that way. Admin-invited beta accounts
  *   and the admin logins have no Stripe row at all; treating a missing row as
@@ -106,24 +107,43 @@ export async function getSubscriptionStatus(
 /**
  * THE subscription rule, in one place. true = let this person in.
  *
- * Every gate calls this and nothing else: requireEmosAccess (API routes), the
- * dashboard layout (every tool page) and the dashboard home page. Until
- * 2026-09-10 the home page carried its own inline copy that read "no row" as
- * "hasn't paid" and used .maybeSingle() on this non-unique table, so an
- * admin-invited beta account could call every API but was bounced from
- * /emos-platform/dashboard to the sales page. Do not re-inline this anywhere.
+ * Every gate calls this (or subscriptionAccess, which it wraps) and nothing
+ * else: requireEmosAccess (API routes), the dashboard layout (every tool page)
+ * and the dashboard home page. Until 2026-09-10 the home page carried its own
+ * inline copy that read "no row" as "hasn't paid" and used .maybeSingle() on
+ * this non-unique table, so an admin-invited beta account could call every API
+ * but was bounced from /emos-platform/dashboard to the sales page. Do not
+ * re-inline this anywhere.
  *
- * Admins skip the lookup. "active" and "none" pass; anything else
- * ("canceled", "past_due", …) does not. An empty email passes, as it always
- * has in the guard: the emos_access flag is the primary gate.
+ * Admins skip the lookup. "active", "none" and "past_due" pass; anything else
+ * ("canceled", …) does not. An empty email passes, as it always has in the
+ * guard: the emos_access flag is the primary gate.
+ *
+ * ★ past_due passes ON PURPOSE (Irfan, 2026-09-11): a grace period while
+ *   Stripe retries a failed card, with a warning bar in the dashboard layout.
+ *   Access ends when Stripe gives up and cancels the subscription, which sends
+ *   customer.subscription.deleted and revokes emos_access. That relies on the
+ *   Stripe setting "if all retries fail: cancel the subscription". Before this,
+ *   the first failed payment locked the customer out and showed them the Buy
+ *   page, inviting a second subscription while Stripe was still retrying the first.
  */
+export async function subscriptionAccess(
+  email: string,
+  clerkUserId?: string | null,
+): Promise<{ allowed: boolean; pastDue: boolean }> {
+  if (!email || isEmosAdminEmail(email)) return { allowed: true, pastDue: false };
+  const status = await getSubscriptionStatus(email, clerkUserId);
+  return {
+    allowed: status === "active" || status === "none" || status === "past_due",
+    pastDue: status === "past_due",
+  };
+}
+
 export async function subscriptionAllowsAccess(
   email: string,
   clerkUserId?: string | null,
 ): Promise<boolean> {
-  if (!email || isEmosAdminEmail(email)) return true;
-  const status = await getSubscriptionStatus(email, clerkUserId);
-  return status === "active" || status === "none";
+  return (await subscriptionAccess(email, clerkUserId)).allowed;
 }
 
 export async function requireEmosAccess(opts?: {

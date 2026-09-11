@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { subscriptionAllowsAccess } from "@/lib/emos-guard";
+import { subscriptionAccess } from "@/lib/emos-guard";
 import CompanyProvider from "@/components/emos-platform/CompanyProvider";
 import { listCompanies, getActiveCompanyId } from "@/app/emos-platform/actions/companies";
 import type { Company } from "@/lib/company-types";
@@ -22,6 +22,7 @@ export default async function EmosDashboardLayout({
   children: React.ReactNode;
 }) {
   const { userId } = await auth();
+  let pastDue = false;
   if (userId) {
     const user = await currentUser();
     const email =
@@ -31,9 +32,14 @@ export default async function EmosDashboardLayout({
 
     // D4: pass the Clerk user id so a subscription bought under a different
     // payment address still resolves to this account.
-    if (!(await subscriptionAllowsAccess(email, userId))) {
+    const access = await subscriptionAccess(email, userId);
+    if (!access.allowed) {
       redirect("/emos-platform/subscribe");
     }
+    // Grace period (2026-09-11): a failed card keeps access while Stripe
+    // retries, but the customer must be told, or they only find out when
+    // Stripe gives up and access disappears.
+    pastDue = access.pastDue;
   }
 
   // The floating account chip (EmosUserButton) is fixed at bottom-right, and
@@ -57,7 +63,52 @@ export default async function EmosDashboardLayout({
 
   return (
     <CompanyProvider initialCompanies={companies} initialActiveCompanyId={activeCompanyId}>
+      {pastDue && <PastDueBar />}
       <div style={{ paddingBottom: 140 }}>{children}</div>
     </CompanyProvider>
+  );
+}
+
+/** Shown on every dashboard page while the subscription is past_due. */
+function PastDueBar() {
+  return (
+    <div
+      role="alert"
+      style={{
+        background: "#f5b81f",
+        color: "#1a1410",
+        borderBottom: "1px solid #1a1410",
+        padding: "10px 24px",
+        display: "flex",
+        alignItems: "center",
+        gap: 16,
+        flexWrap: "wrap",
+        fontFamily: "Arial, 'Helvetica Neue', sans-serif",
+        fontSize: 13,
+      }}
+    >
+      <span style={{ flex: "1 1 320px", lineHeight: 1.4 }}>
+        <strong>Your last payment didn&apos;t go through.</strong> Stripe will try your card again, but please update it so you don&apos;t lose access.
+      </span>
+      <form action="/api/emos-platform/billing-portal" method="POST" style={{ margin: 0 }}>
+        <button
+          type="submit"
+          style={{
+            background: "#1a1410",
+            color: "#f1ebde",
+            fontFamily: "Arial, 'Helvetica Neue', sans-serif",
+            fontWeight: 800,
+            fontSize: 11,
+            letterSpacing: ".12em",
+            textTransform: "uppercase",
+            border: "none",
+            padding: "9px 16px",
+            cursor: "pointer",
+          }}
+        >
+          Update card
+        </button>
+      </form>
+    </div>
   );
 }
