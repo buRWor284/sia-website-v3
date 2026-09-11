@@ -22,7 +22,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { auth } from "@clerk/nextjs/server";
-import { reconcileCheckoutSession, type GrantOutcome } from "@/lib/emos-billing";
+import { EMOS_PLATFORM_ONBOARDING_URL, reconcileCheckoutSession, type GrantOutcome } from "@/lib/emos-billing";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 
 // 2026-07-26 follow-up to the self-serve change: ?resend=1 makes this GET send
@@ -271,6 +271,15 @@ export default async function SubscribeSuccessPage({
               and we&rsquo;ll attach this subscription to it.
             </p>
           )}
+
+          {/* 2026-09-10: every Platform buyer gets a 1:1 onboarding call. */}
+          <p style={{ fontFamily: SERIF, fontSize: 15, color: "rgba(241,235,222,.92)", margin: "0 0 26px", lineHeight: 1.6 }}>
+            Then book your{" "}
+            <a href={EMOS_PLATFORM_ONBOARDING_URL} target="_blank" rel="noopener noreferrer" style={{ color: YEL, textDecoration: "underline", fontWeight: 700 }}>
+              EMOS Platform onboarding call
+            </a>{" "}
+            with me. We set up your first company brief together.
+          </p>
 
           <div style={{ borderTop: "1px solid rgba(241,235,222,.18)", paddingTop: 24 }}>
             <p style={{ fontFamily: GROT, fontSize: 11, letterSpacing: ".06em", textTransform: "uppercase", color: "rgba(241,235,222,.72)", margin: "0 0 18px", lineHeight: 1.7 }}>

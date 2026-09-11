@@ -293,6 +293,16 @@ export async function revokeClerkInvitations(email: string): Promise<"revoked" |
 
 // ─── Welcome email ────────────────────────────────────────────────────────────
 
+/**
+ * Every EMOS Platform buyer gets a 1:1 onboarding call with Irfan (decided
+ * 2026-09-10). Its own Cal.com event, deliberately NOT /strategy-call: EMOS
+ * Platform and EMOS Academy are separate offerings, and these calls must not mix
+ * with consulting leads. Used by the welcome email and the subscribe success
+ * page; the rebuilt /emos-platform page promises this call, so both must carry it.
+ */
+export const EMOS_PLATFORM_ONBOARDING_URL =
+  "https://cal.com/syed-irfan-ajmal-cjjebv/emos-platform-onboarding";
+
 export function buildWelcomeEmail(inviteUrl: string): string {
   const tools: Array<[string, string, string]> = [
     ["◎", "SignalIQ", "spot breaking signals, pitch at the right moment."],
@@ -343,6 +353,7 @@ export function buildWelcomeEmail(inviteUrl: string): string {
             "Click <strong style=\"color:#1a1410;\">Create your account</strong> above.",
             "Set your password. Takes about a minute.",
             "Land in your dashboard and start the pipeline.",
+            `Book your <a href="${EMOS_PLATFORM_ONBOARDING_URL}" style="color:#1a1410;font-weight:700;text-decoration:underline;">EMOS Platform onboarding call</a> with me. We set up your first company brief together.`,
           ].map((step, i) => `
           <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:14px;"><tr>
             <td width="30" valign="top" style="font-family:Georgia,serif;font-weight:700;font-size:18px;color:#1a1410;">${i + 1}</td>
@@ -482,6 +493,11 @@ export async function recordSubscription(args: {
  * rows — and cancelling either one used to strip emos_access outright, locking
  * out a customer who was still paying on the other.
  */
+// past_due still holds access (grace while Stripe retries, 2026-09-11), so it
+// must also count as "still paying" here, or cancelling a second subscription
+// would revoke someone who is inside their grace period on this one.
+const LIVE_STATUSES = ["active", "past_due"];
+
 export async function hasActiveSubscription(clerkUserId: string): Promise<boolean> {
   const db = createSupabaseServiceClient();
 
@@ -490,7 +506,7 @@ export async function hasActiveSubscription(clerkUserId: string): Promise<boolea
     .from("stripe_subscriptions")
     .select("id")
     .eq("clerk_user_id", clerkUserId)
-    .eq("status", "active")
+    .in("status", LIVE_STATUSES)
     .limit(1);
   if (byId.error) {
     // Fail SAFE for the customer: if we cannot tell, do not revoke. A missed
@@ -515,7 +531,7 @@ export async function hasActiveSubscription(clerkUserId: string): Promise<boolea
     .from("stripe_subscriptions")
     .select("id")
     .in("email", emails)
-    .eq("status", "active")
+    .in("status", LIVE_STATUSES)
     .limit(1);
   if (byEmail.error) {
     console.error("[emos-billing] active-subscription check by email failed:", byEmail.error);
