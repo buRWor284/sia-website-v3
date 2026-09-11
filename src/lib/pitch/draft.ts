@@ -20,7 +20,7 @@ import { briefPromptBlock } from "@/lib/company-brief-prompt";
  * to stay trivially cheap.
  */
 
-import { DRAFT_MODEL } from "./config";
+import { DRAFT_MODEL, DRAFT_RETRY_MODEL } from "./config";
 import { recordAiUsage } from "@/lib/ai-usage";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
@@ -215,6 +215,8 @@ async function callDraft(
   tooLong: { words: number; previous: string } | null,
 ): Promise<{ subject: string; body: string; error?: string }> {
   const base = { subject: "", body: "" };
+  // The retry only has to cut an existing draft, so it runs on the cheaper model.
+  const model = tooLong ? DRAFT_RETRY_MODEL : DRAFT_MODEL;
   const userText = buildPrompt(brief, target) + (tooLong
     ? `\n\nYOUR LAST DRAFT WAS ${tooLong.words} WORDS ABOVE THE SIGNATURE. The limit is 135. Rewrite it at 100 words or fewer above the signature (you tend to run long, so aim low). Keep the hook, the one authority sentence and the question. Cut in this order until it fits: lists longer than three items, source and method details, a second statistic, any sentence that repeats the hook. Last draft for reference:\n${tooLong.previous}`
     : "");
@@ -227,7 +229,7 @@ async function callDraft(
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: DRAFT_MODEL,
+        model,
         max_tokens: 1500,
         temperature: 0.7,
         system: SYSTEM_PROMPT,
@@ -248,7 +250,7 @@ async function callDraft(
       stop_reason?: string;
     };
     // Cost log (stage 3). Before the truncation check: a cut-off draft is billed too.
-    await recordAiUsage("pitch-draft", DRAFT_MODEL, json);
+    await recordAiUsage("pitch-draft", model, json);
 
     // Same lesson as the scoring truncation bug found earlier today: a cut-off
     // response must never be presented as a finished one.

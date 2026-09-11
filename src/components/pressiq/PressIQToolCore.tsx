@@ -291,7 +291,7 @@ function PostScorePanel({
           {authenticityRisk?.flagged && (
             <div style={{ padding: "13px 16px", marginBottom: 18, border: `1px solid ${RED}`, background: "rgba(193,74,50,.04)" }}>
               <span style={{ display: "inline-block", padding: "3px 8px", background: RED, color: "#fff", fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 6 }}>READS TEMPLATED</span>
-              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.65) }}>{authenticityRisk.note || "This reads like a template anyone could send. Add a first-hand detail or a number only you have: 53% of journalists distrust generic, AI-sounding pitches."}</div>
+              <div style={{ fontFamily: SERIF, fontSize: 13.5, color: ra(INK, 0.65) }}>{authenticityRisk.note || "This reads like a template anyone could send. Add a first-hand detail or a number only you have. Generic pitches read as promotional, and 53% of journalists reject pitches that are too promotional (Cision 2026)."}</div>
             </div>
           )}
 

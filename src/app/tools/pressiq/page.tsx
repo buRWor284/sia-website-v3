@@ -45,14 +45,16 @@ function loadJsPDF(): Promise<new (opts: object) => object> {
 
 // ── Ticker data ───────────────────────────────────────────────────────────────
 const TICKER = [
-  { stat: "82%",   text: "of journalists delete off-beat pitches",        src: "Cision 2026"           },
-  { stat: "88%",   text: "immediately delete pitches outside their beat", src: "Muck Rack 2026"        },
-  { stat: "3.03%", text: "response for 51-150 word pitches",              src: "Propel, 425k+ pitches" },
+  // Re-verified against the primary reports 2026-09-11 (see EVIDENCE in lib/pitch/config.ts).
+  { stat: "82%",   text: "reject pitches not relevant to their beat",     src: "Cision 2026"           },
+  { stat: "88%",   text: "immediately disregard pitches outside their beat", src: "Muck Rack 2026"     },
+  { stat: "7.51%", text: "response for 51-150 word pitches (avg 3.43%)",  src: "Propel, 405k+ pitches" },
+  { stat: "69%",   text: "prefer pitches under 200 words",                src: "Muck Rack 2026"        },
   { stat: "+36%",  text: "responses at 3rd-grade reading level",          src: "Boomerang, 40M emails" },
   { stat: "+50%",  text: "reply likelihood with 1-3 questions",           src: "Boomerang"             },
   { stat: "47%",   text: "want more data / research (#1 want)",           src: "Cision 2026"           },
   { stat: "58%",   text: "want source access for interviews",             src: "Muck Rack 2026"        },
-  { stat: "53%",   text: "distrust generic, AI-sounding pitches",         src: "Cision 2026"           },
+  { stat: "53%",   text: "reject pitches that are too promotional",       src: "Cision 2026"           },
 ];
 
 // Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered and

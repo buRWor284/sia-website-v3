@@ -17,6 +17,11 @@ export const PITCH_MODEL = process.env.PITCH_SCORE_MODEL || "claude-sonnet-4-6";
  * question can be settled in one place later. */
 export const DRAFT_MODEL = process.env.PITCH_DRAFT_MODEL || "claude-sonnet-4-6";
 
+/** The one "make it shorter" retry (2026-09-11, Irfan). Cutting an existing
+ * draft to a word count is an easy job, so it runs on Haiku: about $0.005 per
+ * retry instead of $0.021 on Sonnet. The first draft stays on DRAFT_MODEL. */
+export const DRAFT_RETRY_MODEL = process.env.PITCH_DRAFT_RETRY_MODEL || "claude-haiku-4-5";
+
 /** D-12: launch name + EMOS links (mirrors other tools in this repo). */
 export const PRODUCT_NAME = "PressIQ";
 export const EMOS_URL = "/emos-academy";
@@ -193,17 +198,21 @@ export interface Evidence {
 
 export const EVIDENCE: Record<string, Evidence> = {
   // — Mechanics / Layer-1 — (A1/A2 corrected to the primary Propel report, 2026-06)
-  A1: { claim: "Pitch body length", figure: "51-150 words = top-responding band (3.03% response); overall response 3.15%", source: "Propel Media Barometer, Q1 2024 (425k+ pitches, Q4'23 data)", url: "https://propel-ai.com/research/the-propel-media-barometer---q1-2024" },
-  A2: { claim: "Subject-line length", figure: "Short wins: 1-5 words gives the highest response (3.88%); 6-9 words is the most-sent band (34.99%)", source: "Propel Media Barometer, Q1 2024", url: "https://propel-ai.com/research/the-propel-media-barometer---q1-2024" },
-  A3: { claim: "Pitch length preference", figure: "65% of journalists want pitches under 200 words", source: "Muck Rack State of Journalism (2025-2026)", url: "https://muckrack.com/resources/research/state-of-journalism" },
-  A4: { claim: "Pitch length preference", figure: "58% want 100-200 words", source: "Fractl journalist survey (500+)", url: "https://www.frac.tl/work/marketing-research/earned-media-content-types/" },
+  // Re-verified against primary sources 2026-09-11. A1 moved to the Q2 2024
+  // edition: the Q1 2024 page's 3.03% "top band" sits below its own 3.15% average.
+  A1: { claim: "Pitch body length", figure: "51-150 words got the highest response (7.51%) vs a 3.43% average", source: "Propel Media Barometer, Q2 2024 report (405k+ pitches sent in Q1 2024)", url: "https://8352821.fs1.hubspotusercontent-na1.net/hubfs/8352821/Q2%202024%20Media%20Barometer.pdf" },
+  A2: { claim: "Subject-line length", figure: "Short wins: 1-5 words gives the highest response (3.88%); 6-9 words is the most-sent band (34.99%)", source: "Propel Media Barometer, Q1 2024 (425k+ pitches, Q4'23 data)", url: "https://www.propelmypr.com/research/the-propel-media-barometer---q1-2024" },
+  A3: { claim: "Pitch length preference", figure: "69% of journalists prefer pitches under 200 words", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf" },
+  A4: { claim: "Pitch length preference", figure: "58% prefer a pitch of 100-200 words (22% want under 100)", source: "Fractl pitching survey, 2019 (500+ journalists)", url: "https://www.frac.tl/work/marketing-research/2019-pitching-media-survey/" },
   A5: { claim: "Email length / response", figure: "50-125 words optimal", source: "Boomerang study (40M emails)", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/" },
   A6: { claim: "Reading level", figure: "3rd-grade level gives +36% response vs college (53% vs 39%)", source: "Boomerang study (40M emails)", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/" },
   A7: { claim: "Question count", figure: "1-3 questions gives +50% likelihood of a reply", source: "Boomerang study", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/" },
-  A9: { claim: "Relevance is #1", figure: "82% delete on irrelevance alone; 72% say <25% of pitches are relevant", source: "Cision State of the Media 2026 (n≈1,800)", url: "https://www.cision.com/resources/guides-and-reports/sotm/" },
-  A10: { claim: "Off-beat = deleted", figure: "88% immediately delete off-beat pitches; 70% rank beat-alignment #1", source: "Muck Rack State of Journalism 2026 (n≈900)", url: "https://muckrack.com/resources/research/state-of-journalism" },
+  A9: { claim: "Relevance is #1", figure: "82% reject pitches that are not relevant to their audience or beat; 72% say 25% or fewer of the pitches they get are relevant", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf" },
+  A10: { claim: "Off-beat = deleted", figure: "88% immediately disregard pitches outside their coverage area; clear relevance to their beat is the top thing they want (70%)", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf" },
   A11: { claim: "Personalization lift", figure: "+30.5% (subject), +32.7% (body)", source: "Backlinko, 12M emails (SEO/sales-outreach proxy, not journalist-specific)", url: "https://backlinko.com/email-outreach-study" },
-  A12: { claim: "Realistic base rate", figure: "~3.15-3.43% response; ~46% open; a short pitch earns ~4× the response of a long one", source: "Propel Media Barometer (Q1'24-Q3'25)", url: "https://propel-ai.com/q3-2025-propel-media-barometer" },
+  // The old "a short pitch earns ~4x" line was dropped: it appears only in a
+  // second-hand write-up (EPR/5W 2026), in no Propel report we could find.
+  A12: { claim: "Realistic base rate", figure: "About 3.4% of pitches get a reply; about 46% get opened", source: "Propel Media Barometer, Q2 2024 report (405k+ pitches)", url: "https://8352821.fs1.hubspotusercontent-na1.net/hubfs/8352821/Q2%202024%20Media%20Barometer.pdf" },
 
   // — Storytelling pillar (why it matters) —
   S1: { claim: "Story to trust (oxytocin)", figure: "A character-driven narrative with tension releases oxytocin, raising trust, empathy and action", source: "Paul Zak, HBR / Claremont Graduate University", url: "https://hbr.org/2014/10/why-your-brain-loves-good-storytelling" },
@@ -216,12 +225,12 @@ export const EVIDENCE: Record<string, Evidence> = {
 
   // — Personal Brand pillar (why it matters) —
   P1: { claim: "Authority is conferred, not claimed", figure: "Authoritativeness comes from third parties (press, bylines, citations); Google E-E-A-T", source: "Google Search, People-First Content guidance", url: "https://developers.google.com/search/docs/fundamentals/creating-helpful-content" },
-  P2: { claim: "Journalists check LinkedIn", figure: "62% of journalists use LinkedIn professionally; 33% rank it their single most valuable platform", source: "Cision State of the Media 2026", url: "https://www.cision.com/resources/guides-and-reports/sotm/" },
+  P2: { claim: "Journalists check LinkedIn", figure: "62% of journalists use LinkedIn most often for work; 33% rank it their #1 platform", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf" },
 
   // — Newsroom-Ready (the new category) —
-  NR1: { claim: "Data is the top want", figure: "47% of journalists want more data/research from PR, the #1 single request", source: "Cision State of the Media 2026", url: "https://www.cision.com/resources/guides-and-reports/sotm/" },
-  NR2: { claim: "Original data + source access", figure: "40% value original data; 58% want access to credible sources/interviews", source: "Muck Rack State of Journalism 2026", url: "https://muckrack.com/resources/research/state-of-journalism" },
-  NR3: { claim: "Exclusivity", figure: "39% say the ideal pitch contains exclusive research", source: "Fractl publisher survey (500+)", url: "https://www.frac.tl/work/marketing-research/earned-media-content-types/" },
+  NR1: { claim: "Data is the top want", figure: "47% of journalists want more data/research from PR, the #1 single request", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf" },
+  NR2: { claim: "Original data + source access", figure: "40% value original data; 58% want access to credible sources/interviews", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf" },
+  NR3: { claim: "Exclusivity", figure: "39% of publishers name exclusive research as the most valuable content to receive", source: "Fractl survey of 500+ publishers (about 2014), via MarTech", url: "https://martech.org/500-publishers-weighed-content-marketing-best-practices-research/" },
   NR4: { claim: "Visuals + timeliness", figure: "Journalists want strong visuals/ready-to-use assets; ideal pitch is <200 words, sent before noon, one timely follow-up", source: "Muck Rack 2026; Cision 2026", url: "https://muckrack.com/resources/research/state-of-journalism" },
 };
 
