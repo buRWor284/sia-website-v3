@@ -167,7 +167,7 @@ export default function EmosApplyPage() {
                     marginBottom: 36,
                   }}
                 >
-                  An in-house earned media engine, not another agency
+                  An in-house earned media system, not another agency
                   retainer.
                 </h2>
 

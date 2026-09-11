@@ -56,7 +56,7 @@ const WORLD_BANK_POST = "https://blogs.worldbank.org/en/endpovertyinsouthasia/wh
 
 const OG_TITLE = "EMOS Academy · Build the Media Presence Investors Check";
 const OG_DESC =
-  "A guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.";
+  "An earned media system your team owns, not an agency you rent. For founders 3 to 12 months from a Series A.";
 
 // Open Graph + Twitter set here on the deepest route segment so every scraper
 // (LinkedIn, Twitter/X, WhatsApp, Facebook) renders the EMOS-specific card
@@ -66,7 +66,7 @@ const OG_DESC =
 export const metadata: Metadata = {
   title: "EMOS Academy · Earned Media OS for Founders",
   description:
-    "EMOS Academy is a guided implementation system for founders 3 to 12 months from a Series A. One-time investment, capability you keep forever.",
+    "An earned media system your team owns, not an agency you rent. Five founder seats, live weekly calls, capability you keep forever.",
   alternates: { canonical: "/emos-academy" },
   openGraph: {
     type: "website",
@@ -152,6 +152,8 @@ export default function EmosPage() {
                 </div>
               </div>
 
+              <p className="emos-hero-promise">An earned media system your team owns, not an agency you rent.</p>
+
               <div className="emos-anti-pills">
                 <span className="emos-anti-pill">Not a course</span>
                 <span className="emos-anti-pill">No agency retainers</span>
@@ -160,8 +162,9 @@ export default function EmosPage() {
               </div>
 
               <p className="emos-hero-sub">
-                <strong>EMOS Academy</strong>, built on EMOS, the Earned Media Operating System, is a
-                Guided Implementation System for founders <strong>3 to 12 months from a Series A</strong>.
+                <strong>EMOS Academy</strong> takes the earned media system I run on client accounts through
+                DMR.agency and installs it inside your own team. Five founders in one cohort, 4 to 8 weeks,
+                one live call a week, and the system stays with you when it ends.
               </p>
 
               <div className="emos-hero-cta-row">
