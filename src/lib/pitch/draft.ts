@@ -77,7 +77,7 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - Tie the story to the journalist's own beat and, where one exists, to a dated hook.
 - WHEN "RECENT WORK" IS SUPPLIED, open by bridging from what they are already covering to the sender's data, in one sentence, then go straight to the number. The bridge must do real work: it explains why THIS data is the natural next question for a story they have already told. NEVER compliment the piece. Do not write "I loved", "I enjoyed", "great piece", "I was reading", "your excellent". Praise is the most recognisable tell of an automated pitch and journalists discount it instantly. Reference the substance, not the quality.
 - WHEN NO RECENT WORK IS SUPPLIED, lead with the strongest checkable number. That is the correct choice, not a fallback to apologise for. Do not manufacture a fake personal connection to avoid it.
-- 90 to 135 words in the body, not counting the signature. PressIQ counts the whole email and aims for 100 to 150, and the signature adds about 15. Shorter is better than padded.
+- 80 to 120 words in the body, not counting the signature; 135 is a hard ceiling. PressIQ counts the whole email and aims for 100 to 150, and the signature adds about 15. Shorter is better than padded.
 - Word budget, in sentences: the greeting line; the hook in 2 sentences; the authority line in 1 sentence; the offer in 2 sentences; the question in 1 sentence; a one-line offer to send more. That lands near 110 words. Adding the authority line means cutting elsewhere, usually the offer.
 - Never list more than three items. Name the most telling ones and summarise the rest ("AT&T, Verizon, T-Mobile and five prepaid brands"). The full lists, sources and method go in the follow-up, so one short line offering them is enough.
 - Use at most two statistics. The angle often gives more facts than fit: pick the strongest, drop the rest.
@@ -87,6 +87,7 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - Plain punctuation only. Do NOT use em dashes or en dashes. Use full stops and commas.
 - No superlatives, no "I hope this finds you well", no "game-changing", "revolutionary", "excited to share", "reaching out", "circle back", "leverage", "in today's landscape". No flattery about their recent article unless a specific one is named in the brief.
 - WHEN A COMPANY BRIEF IS SUPPLIED, add exactly ONE sentence of authority from it straight after the hook: the sender's own true story (e.g. why they started the company) or one proof point, in the first person. A pitch without it scores low on personal brand, and the brief is where it comes from. Keep a self-reported claim framed as the company's own claim. Use a customer story only if the brief marks it public or anonymised. Make room by trimming elsewhere, never by going over the word limit.
+- An asset without a "Published at" link is NOT finished. Say it is being built or nearly ready and offer early access. Never write "I have built", "we just published" or describe findings or results that do not exist yet.
 - Never invent a statistic, a source, a date or a credential. Use only what the brief gives you. If the brief is thin, write a shorter pitch rather than padding it with invention.
 - Close with a signature block, one item per line: the sender's full name, their title and company, the company website, then their email and LinkedIn if given. Copy the SIGNATURE lines from the brief exactly. Where the brief shows a [bracketed placeholder], keep the placeholder exactly as written so the user fills it in. Never sign with the company name alone and never invent a name, title or contact.
 - The subject line is 6 to 9 words, concrete, and contains the strongest fact or the offer. Tailor it to this journalist's beat so two journalists in the same batch do not get the same subject. No colons used as clickbait, no questions.
@@ -100,7 +101,7 @@ const DRAFT_TOOL = {
     type: "object" as const,
     properties: {
       subject: { type: "string", description: "6 to 9 words, concrete." },
-      body: { type: "string", description: "90 to 135 words plus the signature block. Grade 7 reading level, first person throughout, ends with one question. Plain punctuation, no em dashes." },
+      body: { type: "string", description: "80 to 120 words (135 at most) plus the signature block. Grade 7 reading level, first person throughout, ends with one question. Plain punctuation, no em dashes." },
     },
     required: ["subject", "body"],
   },
@@ -144,6 +145,9 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
     lines.push(`Title: ${brief.assetTitle}`);
     if (brief.assetDescription) lines.push(`Detail: ${brief.assetDescription}`);
     if (brief.assetUrl) lines.push(`Published at: ${brief.assetUrl}`);
+    // Live test 10 Sep 2026: with no status line the drafter wrote "I have
+    // built the Scorecard" for an asset that is still a plan.
+    else lines.push(`Status: not published yet, still being built. Offer early or exclusive access; do not say it is finished.`);
     lines.push("");
   }
   if (brief.angle) {
