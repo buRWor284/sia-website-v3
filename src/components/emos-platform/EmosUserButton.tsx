@@ -55,7 +55,23 @@ export function EmosUserButton() {
             },
           },
         }}
-      />
+      >
+        {/* D2 (2026-09-10): a link, not a direct POST to the portal route.
+            This chip also renders on /emos-platform/subscribe for lapsed
+            accounts, and /api/emos-platform/* answers them with raw JSON from
+            proxy.ts. The settings page holds the real button and the dashboard
+            layout redirects anyone without access, so this path never shows
+            an error page. */}
+        <UserButton.MenuItems>
+          <UserButton.Action label="manageAccount" />
+          <UserButton.Link
+            label="Manage billing"
+            labelIcon={<CardIcon />}
+            href="/emos-platform/dashboard/settings"
+          />
+          <UserButton.Action label="signOut" />
+        </UserButton.MenuItems>
+      </UserButton>
       <span
         aria-hidden={true}
         style={{ color: "rgba(241,235,222,.7)", fontSize: 12, lineHeight: 1, pointerEvents: "none" }}
@@ -63,5 +79,14 @@ export function EmosUserButton() {
         &#9662;
       </span>
     </div>
+  );
+}
+
+function CardIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" />
+      <path d="M1.5 6.5h13" stroke="currentColor" />
+    </svg>
   );
 }

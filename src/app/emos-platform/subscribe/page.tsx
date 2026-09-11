@@ -192,7 +192,7 @@ export default function SubscribePage() {
               {loading ? "Redirecting to Stripe…" : "Subscribe — $149 / month →"}
             </button>
             <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: "rgba(241,235,222,.3)", textAlign: "center" as const, marginTop: 12, marginBottom: 0, lineHeight: 1.5 }}>
-              Secure payment via Stripe. Cancel from your Stripe billing portal at any time.
+              Secure payment via Stripe. Cancel any time from Manage billing in your dashboard, or the link in your Stripe receipt.
             </p>
           </div>
         </div>
