@@ -13,6 +13,7 @@
 
 import {
   PLATFORM_MONTHLY_LIMITS as PAID,
+  PREVIEW_REVEAL,
   QUOTA_LIMITS as FREE,
   type PlatformAction,
 } from "@/lib/gate/quota-limits";
@@ -54,10 +55,18 @@ const INCLUDED_ANSWER = `${ALL_ALLOWANCES.join(", ")} and ${n("company-research"
 const freeLine = (tool: "signaliq-scan" | "jciq-preview" | "pressiq-score") =>
   `${FREE[tool].anonymous} a month, ${FREE[tool].email} with a verified email`;
 
+// Journalist search, free tier (changed 2026-09-11, Irfan): every search finds
+// the same set of journalists on free and paid; what differs is how many the
+// free user SEES. Without an email: the top few (PREVIEW_REVEAL). With a
+// verified email: all of them. The old "top results only" read as if the
+// verified tier were capped too, which it is not.
+const reveal = (n: number) => (Number.isFinite(n) ? `top ${n} results` : "all results");
+const JCIQ_FREE = `${FREE["jciq-preview"].anonymous} a month (${reveal(PREVIEW_REVEAL["jciq-preview"].anonymous)}), ${FREE["jciq-preview"].email} with a verified email (${reveal(PREVIEW_REVEAL["jciq-preview"].email)})`;
+
 /** § 2 comparison table. The first three rows are metered; the rest are features. */
 export const COMPARISON: Array<{ label: string; free: string; paid: string }> = [
   { label: "Story scans",           free: freeLine("signaliq-scan"),                         paid: `${PAID.scan.limit} a month` },
-  { label: "Journalist searches",   free: `${freeLine("jciq-preview")}, top results only`,  paid: `${PAID["journalist-search"].limit} a month, full results` },
+  { label: "Journalist searches",   free: JCIQ_FREE,                                         paid: `${PAID["journalist-search"].limit} a month, saved to your journalist list` },
   { label: "Pitch scores",          free: freeLine("pressiq-score"),                         paid: `${PAID.score.limit} a month` },
   { label: "Company brief",         free: "Retyped in every tool",                           paid: "Written once, read by every tool" },
   { label: "Asset packs",           free: "Not saved",                                       paid: "Kept in your pack library" },
@@ -66,6 +75,43 @@ export const COMPARISON: Array<{ label: string; free: string; paid: string }> = 
   { label: "Repeat-pitch warning",  free: "No",                                              paid: "Warns before you pitch someone twice" },
   { label: "Score history",         free: "No",                                              paid: "Every score reopens exactly as it came back" },
   { label: "More than one company", free: "No",                                              paid: "Switch companies inside one account" },
+];
+
+/**
+ * Strip under the hero (added 2026-09-11, Irfan): why earned media matters,
+ * each line traced to the original study. Replaces the old "Built by ..." strip,
+ * which read as if EMOS itself had been featured in HBR.
+ */
+export const EARNED_MEDIA_STATS: Array<{ text: string; src: string; href: string }> = [
+  {
+    text: "Earned media is 84% of the links AI assistants cite",
+    src: "Muck Rack, 25M+ links from ChatGPT, Claude and Gemini, May 2026",
+    href: "https://muckrack.com/blog/what-is-ai-reading-may-2026",
+  },
+  {
+    text: "88% of journalists delete pitches that miss their beat",
+    src: "Muck Rack State of Journalism 2026, 897 journalists",
+    href: "https://www.globenewswire.com/news-release/2026/03/19/3259178/0/en/muck-rack-s-2026-state-of-journalism-report-finds-82-of-journalists-use-ai.html",
+  },
+  {
+    text: "86% of journalists say PR pitches inspire at least some of their stories",
+    src: "Muck Rack State of Journalism 2026",
+    href: "https://www.globenewswire.com/news-release/2026/03/19/3259178/0/en/muck-rack-s-2026-state-of-journalism-report-finds-82-of-journalists-use-ai.html",
+  },
+  {
+    text: "Brand mentions track AI Overview visibility at 0.66, backlinks at 0.22",
+    src: "Ahrefs, 75,000 brands, May 2025",
+    href: "https://ahrefs.com/blog/ai-overview-brand-correlation/",
+  },
+];
+
+/** § 3 strip: the builder's credentials, labelled so they read as his, not EMOS's. */
+export const BUILDER_CREDS: string[] = [
+  "Syed Irfan Ajmal",
+  "Featured as a case study in HBR",
+  "Quoted in Forbes (USA)",
+  "Bylines in Forbes Middle East, HuffPost, TNW",
+  "300+ clients through DMR.agency since 2013",
 ];
 
 export interface FaqItem {

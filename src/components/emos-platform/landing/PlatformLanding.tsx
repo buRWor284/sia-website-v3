@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
 import { ZoomShot } from "./ZoomShot";
-import { COMPARISON, EMOS_PLATFORM_ONBOARDING_URL, FAQ, PRICE_BOX_ALLOWANCES, type FaqItem } from "./content";
+import { BUILDER_CREDS, COMPARISON, EARNED_MEDIA_STATS, EMOS_PLATFORM_ONBOARDING_URL, FAQ, PRICE_BOX_ALLOWANCES, type FaqItem } from "./content";
 
 /**
  * /emos-platform sales page body (rebuild, 2026-09-11).
@@ -17,6 +17,13 @@ import { COMPARISON, EMOS_PLATFORM_ONBOARDING_URL, FAQ, PRICE_BOX_ALLOWANCES, ty
  * Motion: the two crossfade cards (hero S1a -> S1c, PressIQ S5a -> S5b) use the
  * handoff's own xfA/xfB keyframes on an 11s loop, copied as-is. Under
  * prefers-reduced-motion both cards pin their final frame.
+ *
+ * 2026-09-11 (Irfan): two scrolling strips added, same pattern as the home
+ * page tickers: "Why earned media" under the hero (replacing the "Built by"
+ * line, which read as if EMOS itself had been in HBR) and "About the builder"
+ * under § 03. Four moving pieces in total, by Irfan's decision. Both strips
+ * pause on hover and, under prefers-reduced-motion, stop and wrap to static
+ * text so nothing is cut off.
  */
 
 // ── tokens (Bureau system, identical to /emos-academy) ──────────────────────
@@ -62,6 +69,32 @@ const CSS = `
   .xf-a { animation: none; opacity: 0; }
   .xf-b { animation: none; opacity: 1; }
 }
+@keyframes empStrip { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.emp-strip { display: flex; align-items: stretch; overflow: hidden; }
+.emp-strip-label { flex: none; display: flex; align-items: center; padding: 0 14px; font-family: var(--font-grot); font-weight: 800; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; background: #f5b81f; color: #1a1410; border-right: 1px solid #1a1410; }
+.emp-strip-view { flex: 1; min-width: 0; overflow: hidden; }
+.emp-strip-track { display: inline-flex; width: max-content; animation: empStrip 60s linear infinite; will-change: transform; }
+/* inline animationDuration per strip; the reduced-motion rule below still wins because it removes the animation */
+.emp-strip-set { display: inline-flex; align-items: center; white-space: nowrap; padding: 12px 0; }
+.emp-strip-item { display: inline-flex; align-items: baseline; gap: 10px; }
+.emp-strip-sep { padding: 0 22px; opacity: .35; }
+.emp-strip:hover .emp-strip-track { animation-play-state: paused; }
+.emp-strip-src { opacity: .6; text-decoration: underline; text-underline-offset: 3px; color: inherit; }
+.emp-strip-src:hover { opacity: 1; }
+@media (max-width: 640px) {
+  .emp-strip { flex-direction: column; }
+  .emp-strip-label { padding: 6px 16px; border-right: none; border-bottom: 1px solid #1a1410; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .emp-strip { flex-direction: column; }
+  .emp-strip-label { padding: 6px 16px; border-right: none; border-bottom: 1px solid #1a1410; }
+  .emp-strip-track { animation: none; width: auto; display: block; }
+  .emp-strip-set { display: flex; flex-wrap: wrap; white-space: normal; gap: 10px 32px; padding: 12px 16px; }
+  .emp-strip-set[aria-hidden="true"] { display: none; }
+  .emp-strip-item { display: block; line-height: 1.6; }
+  .emp-strip-sep { display: none; }
+  .emp-strip-src { display: block; }
+}
 .emp a:focus-visible, .emp button:focus-visible, .emp summary:focus-visible { outline: 2px solid #1a1410; outline-offset: 3px; }
 .emp-btn-y:hover { background: #ffc83a !important; }
 .emp-btn-o:hover { background: #e8e0cc !important; }
@@ -90,6 +123,50 @@ const li: CSSProperties = { display: "flex", gap: 10, alignItems: "flex-start", 
 
 function Mark({ children }: { children: ReactNode }) {
   return <span style={mark}>{children}</span>;
+}
+
+/**
+ * Scrolling strip (home-page ticker pattern). The content is rendered twice
+ * and the track slides left by exactly one copy, so the loop is seamless. The
+ * second copy is hidden from screen readers and its links are taken out of the
+ * tab order, so assistive tech reads everything once.
+ */
+type StripItem = { text: string; src?: string; href?: string };
+
+// `seconds` is one full loop. Both strips are tuned to roughly 55px a second,
+// so the long stats strip and the short builder strip scroll at the same pace.
+function Strip({ label, dark, items, seconds }: { label: string; dark: boolean; items: StripItem[]; seconds: number }) {
+  const set = (hidden: boolean) => (
+    <span className="emp-strip-set" aria-hidden={hidden ? true : undefined}>
+      {items.map((it) => (
+        <span key={it.text} className="emp-strip-item">
+          <span>{it.text}</span>
+          {it.src && it.href && (
+            <a href={it.href} target="_blank" rel="noopener noreferrer" className="emp-strip-src" tabIndex={hidden ? -1 : undefined}>
+              {it.src}
+            </a>
+          )}
+          <span className="emp-strip-sep" aria-hidden="true">{"////"}</span>
+        </span>
+      ))}
+    </span>
+  );
+  return (
+    <div
+      className="emp-strip"
+      role="region"
+      aria-label={label}
+      style={{ background: dark ? DARK : PAPER2, color: dark ? PAPER : INK, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}`, fontFamily: MONO, fontSize: 11, letterSpacing: ".14em", textTransform: "uppercase" }}
+    >
+      <span className="emp-strip-label">{label}</span>
+      <div className="emp-strip-view">
+        <div className="emp-strip-track" style={{ animationDuration: `${seconds}s` }}>
+          {set(false)}
+          {set(true)}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 /** Full-width black § bar: number left, mono tag right. */
@@ -295,10 +372,8 @@ export function PlatformLanding({ signedIn, signedInEmail }: { signedIn: boolean
         </div>
       </section>
 
-      {/* ── Credibility strip ────────────────────────────────────────────── */}
-      <div style={{ background: DARK, color: PAPER, padding: `14px ${GUTTER}`, fontFamily: MONO, fontSize: 11, letterSpacing: ".16em", textTransform: "uppercase", lineHeight: 1.9, textAlign: "center" }}>
-        Built by Syed Irfan Ajmal · Featured as a case study in HBR · Quoted in Forbes (USA) · 300+ clients through DMR.agency since 2013
-      </div>
+      {/* ── Why earned media (scrolling, sourced) ─────────────────────────── */}
+      <Strip label="Why earned media" dark items={EARNED_MEDIA_STATS} seconds={72} />
 
       {/* ── § 01 How it works ────────────────────────────────────────────── */}
       <SectionBar n="01" tag="Six steps · one login" id="how" ruleTop />
@@ -351,15 +426,18 @@ export function PlatformLanding({ signedIn, signedInEmail }: { signedIn: boolean
       {/* ── § 02 Free tools vs Platform ──────────────────────────────────── */}
       <SectionBar n="02" tag="The difference" />
       <section style={{ maxWidth: 1100, margin: "0 auto", padding: `clamp(36px,4vw,56px) ${GUTTER}` }}>
-        <h2 style={{ ...h2, margin: "0 0 28px", maxWidth: "22ch", textWrap: "pretty" }}>
-          The free tools answer one question. <Mark>The Platform remembers the answers.</Mark>
+        <h2 style={{ ...h2, margin: "0 0 16px", maxWidth: "24ch", textWrap: "pretty" }}>
+          Try each EMOS tool free. <Mark>Run them together on the Platform.</Mark>
         </h2>
+        <p style={{ fontFamily: SERIF, fontSize: 17.5, lineHeight: 1.55, color: INK70, margin: "0 0 28px", maxWidth: "62ch", textWrap: "pretty" }}>
+          SignalIQ, JournoCollabIQ, PressIQ and CoverageIQ each have a free version on this site. Each one answers one question at a time and saves nothing. The Platform connects all six steps and keeps everything you save.
+        </p>
 
         <table className="cmp-table" style={{ width: "100%", borderCollapse: "collapse", border: `1px solid ${INK}`, fontFamily: GROT, fontSize: 14.5 }}>
           <thead>
             <tr style={{ background: DARK, color: PAPER }}>
               <th scope="col" style={{ textAlign: "left", padding: "12px 14px", ...monoSmall, fontWeight: 400, width: "26%" }}><span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>Feature</span></th>
-              <th scope="col" style={{ textAlign: "left", padding: "12px 14px", ...monoSmall, fontWeight: 400 }}>Free tools on this site</th>
+              <th scope="col" style={{ textAlign: "left", padding: "12px 14px", ...monoSmall, fontWeight: 400 }}>Free EMOS tools</th>
               <th scope="col" style={{ textAlign: "left", padding: "12px 14px", ...monoSmall, fontWeight: 400 }}>EMOS Platform</th>
             </tr>
           </thead>
@@ -389,12 +467,13 @@ export function PlatformLanding({ signedIn, signedInEmail }: { signedIn: boolean
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 14, marginTop: 16 }}>
           <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK70, margin: 0 }}>The free tools stay free. Try them first if you like:</p>
-          <Link href="/tools" className="emp-btn-o" style={{ ...btnOut, padding: "9px 14px", fontSize: 10.5 }}>Try the free tools →</Link>
+          <Link href="/tools" className="emp-btn-o" style={{ ...btnOut, padding: "9px 14px", fontSize: 10.5 }}>Try the free EMOS tools →</Link>
         </div>
       </section>
 
       {/* ── § 03 Built by ────────────────────────────────────────────────── */}
       <SectionBar n="03" tag="The method behind it" />
+      <Strip label="About the builder" dark={false} items={BUILDER_CREDS.map((text) => ({ text }))} seconds={32} />
       <section style={{ maxWidth: 1280, margin: "0 auto", padding: `clamp(36px,4vw,56px) ${GUTTER}` }}>
         <h2 style={{ ...h2, margin: "0 0 32px", maxWidth: "26ch", textWrap: "pretty" }}>Software built from 13 years of client work, not a template.</h2>
 
