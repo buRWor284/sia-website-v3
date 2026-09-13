@@ -35,6 +35,7 @@ import PriorContact from "@/components/emos-platform/PriorContact";
 import type { JournalistHistory } from "@/lib/journalist-history-types";
 import type { DbPitchDraft } from "@/lib/pitch-draft-types";
 import ScoreTargets from "@/components/pressiq/ScoreTargets";
+import ResearchTicker from "@/components/pressiq/ResearchTicker";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
@@ -594,6 +595,7 @@ export default function PressIQPlatformClient({
           quotaLine={<>Score a pitch · no rate limit · auto-saves to your history</>}
           pdfAction={handleDownloadPdf}
           splitResetActions
+          preFormSlot={<ResearchTicker compact />}
           onScored={(scored, ctx) => {
             setScoreSubject(ctx.subject);
             setNewScoreCount(c => c + 1);

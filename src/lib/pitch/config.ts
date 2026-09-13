@@ -194,25 +194,46 @@ export interface Evidence {
   figure: string;
   source: string;
   url: string;
+  /** A general email study (Boomerang, Backlinko), not a survey of journalists.
+   *  Every surface that shows the figure labels it as such. */
+  emailStudy?: boolean;
+  /** Short display copy for the rotating research ticker (TICKER_KEYS below).
+   *  Wording only: every number in `stat` and `line` must also appear in
+   *  `figure`, and every number in `sourceShort` in `source`. researchFacts()
+   *  drops any fact that breaks this, so a number edited in one place can never
+   *  show a stale copy in the other. */
+  ticker?: { stat: string; line: string; sourceShort: string };
 }
 
 export const EVIDENCE: Record<string, Evidence> = {
   // — Mechanics / Layer-1 — (A1/A2 corrected to the primary Propel report, 2026-06)
   // Re-verified against primary sources 2026-09-11. A1 moved to the Q2 2024
   // edition: the Q1 2024 page's 3.03% "top band" sits below its own 3.15% average.
-  A1: { claim: "Pitch body length", figure: "51-150 words got the highest response (7.51%) vs a 3.43% average", source: "Propel Media Barometer, Q2 2024 report (405k+ pitches sent in Q1 2024)", url: "https://8352821.fs1.hubspotusercontent-na1.net/hubfs/8352821/Q2%202024%20Media%20Barometer.pdf" },
-  A2: { claim: "Subject-line length", figure: "Short wins: 1-5 words gives the highest response (3.88%); 6-9 words is the most-sent band (34.99%)", source: "Propel Media Barometer, Q1 2024 (425k+ pitches, Q4'23 data)", url: "https://www.propelmypr.com/research/the-propel-media-barometer---q1-2024" },
-  A3: { claim: "Pitch length preference", figure: "69% of journalists prefer pitches under 200 words", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf" },
+  A1: { claim: "Pitch body length", figure: "51-150 words got the highest response (7.51%) vs a 3.43% average", source: "Propel Media Barometer, Q2 2024 report (405k+ pitches sent in Q1 2024)", url: "https://8352821.fs1.hubspotusercontent-na1.net/hubfs/8352821/Q2%202024%20Media%20Barometer.pdf",
+    ticker: { stat: "7.51%", line: "response rate for pitches of 51-150 words, against a 3.43% average", sourceShort: "Propel Media Barometer, 405k+ pitches" } },
+  A2: { claim: "Subject-line length", figure: "Short wins: 1-5 words gives the highest response (3.88%); 6-9 words is the most-sent band (34.99%)", source: "Propel Media Barometer, Q1 2024 (425k+ pitches, Q4'23 data)", url: "https://www.propelmypr.com/research/the-propel-media-barometer---q1-2024",
+    ticker: { stat: "3.88%", line: "response rate for subject lines of 1-5 words, the best of any length", sourceShort: "Propel Media Barometer, 425k+ pitches" } },
+  A3: { claim: "Pitch length preference", figure: "69% of journalists prefer pitches under 200 words", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf",
+    ticker: { stat: "69%", line: "of journalists prefer pitches under 200 words", sourceShort: "Muck Rack State of Journalism 2026, n=897" } },
   A4: { claim: "Pitch length preference", figure: "58% prefer a pitch of 100-200 words (22% want under 100)", source: "Fractl pitching survey, 2019 (500+ journalists)", url: "https://www.frac.tl/work/marketing-research/2019-pitching-media-survey/" },
-  A5: { claim: "Email length / response", figure: "50-125 words optimal", source: "Boomerang study (40M emails)", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/" },
-  A6: { claim: "Reading level", figure: "3rd-grade level gives +36% response vs college (53% vs 39%)", source: "Boomerang study (40M emails)", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/" },
-  A7: { claim: "Question count", figure: "1-3 questions gives +50% likelihood of a reply", source: "Boomerang study", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/" },
-  A9: { claim: "Relevance is #1", figure: "82% reject pitches that are not relevant to their audience or beat; 72% say 25% or fewer of the pitches they get are relevant", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf" },
-  A10: { claim: "Off-beat = deleted", figure: "88% immediately disregard pitches outside their coverage area; clear relevance to their beat is the top thing they want (70%)", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf" },
-  A11: { claim: "Personalization lift", figure: "+30.5% (subject), +32.7% (body)", source: "Backlinko, 12M emails (SEO/sales-outreach proxy, not journalist-specific)", url: "https://backlinko.com/email-outreach-study" },
+  A5: { emailStudy: true, claim: "Email length / response", figure: "50-125 words optimal", source: "Boomerang study (40M emails)", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/" },
+  A6: { emailStudy: true, claim: "Reading level", figure: "3rd-grade level gives +36% response vs college (53% vs 39%)", source: "Boomerang study (40M emails)", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/",
+    ticker: { stat: "+36%", line: "more replies to emails written at a 3rd-grade reading level than at college level", sourceShort: "Boomerang, 40M emails" } },
+  A7: { emailStudy: true, claim: "Question count", figure: "1-3 questions gives +50% likelihood of a reply", source: "Boomerang study (40M emails)", url: "https://blog.boomerangapp.com/2016/02/7-tips-for-getting-more-responses-to-your-emails-with-data/",
+    ticker: { stat: "+50%", line: "more likely to get a reply when an email asks 1 to 3 questions than when it asks none", sourceShort: "Boomerang, 40M emails" } },
+  A9: { claim: "Relevance is #1", figure: "82% reject pitches that are not relevant to their audience or beat; 72% say 25% or fewer of the pitches they get are relevant", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf",
+    ticker: { stat: "82%", line: "of journalists reject pitches that are not relevant to their audience or beat", sourceShort: "Cision State of the Media 2026, n=1,899" } },
+  A10: { claim: "Off-beat = deleted", figure: "88% immediately disregard pitches outside their coverage area; clear relevance to their beat is the top thing they want (70%)", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf",
+    ticker: { stat: "88%", line: "of journalists immediately disregard pitches outside their coverage area", sourceShort: "Muck Rack State of Journalism 2026, n=897" } },
+  A11: { emailStudy: true, claim: "Personalization lift", figure: "+30.5% (subject), +32.7% (body)", source: "Backlinko, 12M outreach emails (SEO and sales outreach)", url: "https://backlinko.com/email-outreach-study" },
   // The old "a short pitch earns ~4x" line was dropped: it appears only in a
   // second-hand write-up (EPR/5W 2026), in no Propel report we could find.
   A12: { claim: "Realistic base rate", figure: "About 3.4% of pitches get a reply; about 46% get opened", source: "Propel Media Barometer, Q2 2024 report (405k+ pitches)", url: "https://8352821.fs1.hubspotusercontent-na1.net/hubfs/8352821/Q2%202024%20Media%20Barometer.pdf" },
+  // Added 2026-09-11 for the research ticker. Page 18 of the Cision PDF: "What are
+  // the most common reasons for rejecting pitches?" (multi-select). Replaces the
+  // old "53% distrust generic, AI-sounding pitches" line, which misread it.
+  A13: { claim: "Promotional = rejected", figure: "53% name \"too promotional or sales-focused\" as a common reason to reject a pitch, second only to not being relevant (82%)", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf",
+    ticker: { stat: "53%", line: "of journalists reject pitches for being too promotional or sales-focused", sourceShort: "Cision State of the Media 2026, n=1,899" } },
 
   // — Storytelling pillar (why it matters) —
   S1: { claim: "Story to trust (oxytocin)", figure: "A character-driven narrative with tension releases oxytocin, raising trust, empathy and action", source: "Paul Zak, HBR / Claremont Graduate University", url: "https://hbr.org/2014/10/why-your-brain-loves-good-storytelling" },
@@ -228,11 +249,64 @@ export const EVIDENCE: Record<string, Evidence> = {
   P2: { claim: "Journalists check LinkedIn", figure: "62% of journalists use LinkedIn most often for work; 33% rank it their #1 platform", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf" },
 
   // — Newsroom-Ready (the new category) —
-  NR1: { claim: "Data is the top want", figure: "47% of journalists want more data/research from PR, the #1 single request", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf" },
-  NR2: { claim: "Original data + source access", figure: "40% value original data; 58% want access to credible sources/interviews", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf" },
+  NR1: { claim: "Data is the top want", figure: "47% of journalists want more data/research from PR, the #1 single request", source: "Cision State of the Media 2026 (n=1,899)", url: "https://www.prnewswire.com/content/dam/prnewswire/resources/white-papers/Cision_2026_State_of_the_Media_Report.pdf",
+    ticker: { stat: "47%", line: "of journalists want more data and research from PR, their top request", sourceShort: "Cision State of the Media 2026, n=1,899" } },
+  NR2: { claim: "Original data + source access", figure: "Asked what a PR pro should ideally offer with a pitch: 58% want interview access to relevant sources; 40% want original data or research", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf",
+    ticker: { stat: "58%", line: "of journalists want PR pros to offer interview access to relevant sources", sourceShort: "Muck Rack State of Journalism 2026, n=897" } },
   NR3: { claim: "Exclusivity", figure: "39% of publishers name exclusive research as the most valuable content to receive", source: "Fractl survey of 500+ publishers (about 2014), via MarTech", url: "https://martech.org/500-publishers-weighed-content-marketing-best-practices-research/" },
   NR4: { claim: "Visuals + timeliness", figure: "Journalists want strong visuals/ready-to-use assets; ideal pitch is <200 words, sent before noon, one timely follow-up", source: "Muck Rack 2026; Cision 2026", url: "https://muckrack.com/resources/research/state-of-journalism" },
+
+  // Why a placement is worth more in 2026 (Evidence tab + ticker). Added and
+  //   checked against the publishers' own pages 2026-09-11. Replaces the unverified
+  //   "~82% of AI citations come from earned coverage" and "Ahrefs ~3x" lines.
+  //   Muck Rack counts journalism, academic, government, encyclopedic and
+  //   third-party sites as "earned media", so never shorten this to "press
+  //   coverage": the journalism share alone is 27%.
+  AI1: { claim: "AI engines cite earned media", figure: "Earned media accounts for 84% of AI citations, and journalism alone for 27% of cited sources (25M+ links from ChatGPT, Claude and Gemini)", source: "Muck Rack Generative Pulse, May 2026 (25M+ links, 17 industries)", url: "https://muckrack.com/blog/what-is-ai-reading-may-2026",
+    ticker: { stat: "84%", line: "of AI citations are earned media, and journalism alone is 27% of the sources AI cites", sourceShort: "Muck Rack Generative Pulse, May 2026" } },
+  // Spearman correlations. Do not turn these into "~3x": a ratio of two
+  // correlation coefficients is not a measure of how much better one predicts.
+  AI2: { claim: "Mentions beat links for AI Overviews", figure: "Branded web mentions correlate with AI Overview visibility at 0.664, far above backlinks at 0.218", source: "Ahrefs study of 75,000 brands (May 2025, updated April 2026)", url: "https://ahrefs.com/blog/ai-overview-brand-correlation/" },
 };
+
+/** The rotating "what the research says" ticker: public intro, the scoring
+ *  wait screen and the dashboard pitch form all read this one list. Order is
+ *  the rotation order (email studies spread out so they never run back to back). */
+export const TICKER_KEYS = ["A9", "A1", "NR1", "A10", "A6", "A3", "AI1", "NR2", "A2", "A13", "A7"] as const;
+
+export interface ResearchFact {
+  key: string;
+  stat: string;
+  line: string;
+  sourceShort: string;
+  url: string;
+  emailStudy: boolean;
+}
+
+/** Numbers in a string: 82%, 7.51%, 1,899, 405k+, 40M, 3rd. */
+const NUM = /\d+(?:[.,]\d+)*(?:%|k\+?|M\+?)?/g;
+const traces = (text: string, into: string) => (text.match(NUM) ?? []).every((n) => into.includes(n));
+
+/** TICKER_KEYS resolved against EVIDENCE. A fact whose short copy carries a
+ *  number that is not in its own figure (or source) is dropped, never shown. */
+export function researchFacts(): ResearchFact[] {
+  const out: ResearchFact[] = [];
+  for (const key of TICKER_KEYS) {
+    const ev = EVIDENCE[key];
+    const t = ev?.ticker;
+    if (!ev || !t) continue;
+    const ok = traces(t.stat, ev.figure) && traces(t.line, ev.figure) && traces(t.sourceShort, ev.source);
+    if (!ok) {
+      if (process.env.NODE_ENV !== "production") console.warn(`[PressIQ ticker] ${key} dropped: a number in its ticker copy is not in its EVIDENCE figure/source`);
+      continue;
+    }
+    out.push({ key, stat: t.stat, line: t.line, sourceShort: t.sourceShort, url: ev.url, emailStudy: !!ev.emailStudy });
+  }
+  return out;
+}
+
+/** The label every email-study figure carries. */
+export const EMAIL_STUDY_LABEL = "Email study, not journalist-specific";
 
 /** Which evidence key backs each Layer-1 signal (for the "why?" affordance).
  *  Kept for back-compat; superseded by DIMENSION_EVIDENCE below (step 3 will migrate callers). */

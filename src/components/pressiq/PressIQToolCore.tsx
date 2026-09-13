@@ -36,6 +36,7 @@ import {
   type DimKey,
   DimBarChart,
   DimBlock,
+  EvidCard,
   FixCard,
   Gauge,
   LiveMechanics,
@@ -133,6 +134,10 @@ export interface PressIQCoreProps {
   turnstileSlot?: React.ReactNode;
   /** Public gates the Analyze button on the Turnstile token; dashboard leaves it enabled. */
   submitDisabled?: boolean;
+  /** Rendered at the top of the form column while the user is writing (both
+   *  form steps, never during scoring or on results). Dashboard puts the compact
+   *  research ticker here; the public tool leaves it empty. */
+  preFormSlot?: React.ReactNode;
   /** Fired when the internal step changes (public keys its Turnstile mount off this). */
   onStepChange?: (step: number) => void;
   /** PDF: public → gated modal→jsPDF; dashboard → ungated jsPDF. undefined hides the button. */
@@ -360,8 +365,16 @@ function PostScorePanel({
             Scored against published journalist research: Cision &amp; Muck Rack 2026, Propel, Backlinko, Fractl, Boomerang. Open any dimension in the Breakdown tab to see the exact figures and sources.
           </div>
           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 10 }}>WHY THIS IS WORTH MORE IN 2026</div>
-          <div style={{ fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 24 }}>
-            In an AI-answer world you don&rsquo;t just rank: you get cited. AI engines lean on earned media (Muck Rack: ~82% of AI citations come from earned coverage), and brand mentions out-predict backlinks for AI-Overview visibility ~3× (Ahrefs, 75k brands). The placement this pitch is aiming for is exactly that kind of citation, so a stronger pitch compounds.
+          {/* Rebuilt 2026-09-11. The old line said "~82% of AI citations come from
+              earned coverage" and "~3x (Ahrefs)"; both were checked against the
+              publishers' own pages and replaced. The figures now render from
+              EVIDENCE (AI1, AI2), so this paragraph carries no numbers of its own. */}
+          <div style={{ fontFamily: SERIF, fontSize: 14.5, color: ra(INK, 0.6), lineHeight: 1.6, marginBottom: 12 }}>
+            In an AI-answer world you don&rsquo;t just rank: you get cited. AI engines lean heavily on earned media, and brand mentions track AI Overview visibility far more closely than backlinks do. The placement this pitch is aiming for is exactly that kind of citation, so a stronger pitch compounds.
+          </div>
+          <div style={{ marginBottom: 24 }}>
+            <EvidCard figKey="AI1" />
+            <EvidCard figKey="AI2" />
           </div>
 
           {/* PDF report download */}
@@ -390,7 +403,7 @@ function PostScorePanel({
 export default function PressIQToolCore({
   api, initial, persistKey, hideMasthead, showStoreToggle = true,
   quotaLine, turnstileSlot, submitDisabled, onStepChange,
-  pdfAction, onScored, emailUnlockNode, scoreTabCta, splitResetActions,
+  pdfAction, onScored, emailUnlockNode, scoreTabCta, splitResetActions, preFormSlot,
 }: PressIQCoreProps) {
   const [pitch,    setPitch]    = useState(initial?.pitch ?? "");
   const [query,    setQuery]    = useState(initial?.query ?? "");
@@ -528,6 +541,8 @@ export default function PressIQToolCore({
       </nav>
 
       <main className="piq-col">
+        {view === "pre" && preFormSlot}
+
         {/* ── Step 1: pitch context ─────────────────────────────────── */}
         {view === "pre" && formStep === 1 && (
           <section className="piq-form-card">

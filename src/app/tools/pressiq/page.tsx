@@ -26,6 +26,7 @@ import type { ScoreResponse } from "@/lib/pitch/types";
 import PressIQToolCore from "@/components/pressiq/PressIQToolCore";
 import { PIQ_CSS } from "@/components/pressiq/core-css";
 import { GREEN, ra } from "@/components/pressiq/cards";
+import ResearchTicker from "@/components/pressiq/ResearchTicker";
 import { buildPressIqReport } from "@/lib/pdf/pressiq-report";
 import { GROT, INK, MONO, PAPER, SERIF, YEL } from "@/lib/tokens";
 
@@ -43,40 +44,12 @@ function loadJsPDF(): Promise<new (opts: object) => object> {
   });
 }
 
-// ── Ticker data ───────────────────────────────────────────────────────────────
-const TICKER = [
-  // Re-verified against the primary reports 2026-09-11 (see EVIDENCE in lib/pitch/config.ts).
-  { stat: "82%",   text: "reject pitches not relevant to their beat",     src: "Cision 2026"           },
-  { stat: "88%",   text: "immediately disregard pitches outside their beat", src: "Muck Rack 2026"     },
-  { stat: "7.51%", text: "response for 51-150 word pitches (avg 3.43%)",  src: "Propel, 405k+ pitches" },
-  { stat: "69%",   text: "prefer pitches under 200 words",                src: "Muck Rack 2026"        },
-  { stat: "+36%",  text: "responses at 3rd-grade reading level",          src: "Boomerang, 40M emails" },
-  { stat: "+50%",  text: "reply likelihood with 1-3 questions",           src: "Boomerang"             },
-  { stat: "47%",   text: "want more data / research (#1 want)",           src: "Cision 2026"           },
-  { stat: "58%",   text: "want source access for interviews",             src: "Muck Rack 2026"        },
-  { stat: "53%",   text: "reject pitches that are too promotional",       src: "Cision 2026"           },
-];
-
 // Cloudflare Turnstile site key (public). When unset, the widget is NOT rendered and
 // scoring works exactly as before.
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 // ── Intro panel (step 0 — sells the tool before asking for input) ────────────
 function IntroPanel({ onStart }: { onStart: () => void }) {
-  const [tickIdx, setTickIdx] = useState(0);
-  const [tickOp, setTickOp]   = useState(1);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const id = setInterval(() => {
-      setTickOp(0);
-      setTimeout(() => { setTickIdx(i => (i + 1) % TICKER.length); setTickOp(1); }, 200);
-    }, 3500);
-    return () => clearInterval(id);
-  }, []);
-
-  const t = TICKER[tickIdx];
-
   return (
     <div style={{ background: "#fff", border: `1px solid ${ra(INK, 0.1)}`, borderRadius: 6, overflow: "hidden" }}>
       {/* Hero */}
@@ -109,16 +82,11 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
         </div>
       </div>
 
-      {/* WHAT JOURNALISTS SAY — rotating ticker */}
+      {/* WHAT THE RESEARCH SAYS: the shared ticker (2026-09-11). Same list as
+          the wait screen and the dashboard, built from EVIDENCE in
+          lib/pitch/config.ts, each fact linked to its primary source. */}
       <div style={{ padding: "24px 32px 0" }}>
-        <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".22em", textTransform: "uppercase", color: ra(INK, 0.62), marginBottom: 16 }}>
-          WHAT JOURNALISTS SAY
-        </div>
-        <div style={{ opacity: tickOp, transition: "opacity .2s ease", minHeight: 78 }}>
-          <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 32, color: INK, letterSpacing: "-.02em", lineHeight: 1, marginBottom: 6 }}>{t.stat}</div>
-          <div style={{ fontFamily: SERIF, fontSize: 15, color: ra(INK, 0.62), lineHeight: 1.4, marginBottom: 4 }}>{t.text}</div>
-          <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.6) }}>{t.src}</div>
-        </div>
+        <ResearchTicker />
       </div>
 
       {/* SCORED AGAINST — source pills */}
@@ -130,8 +98,8 @@ function IntroPanel({ onStart }: { onStart: () => void }) {
           {[
             "Cision State of the Media 2026",
             "Muck Rack State of Journalism 2026",
-            "Propel Media Barometer Q1 2024",
-            "Backlinko Journalist Outreach Study",
+            "Propel Media Barometer 2024",
+            "Backlinko Email Outreach Study (12M)",
             "Fractl Journalist Survey (n≈500)",
             "Boomerang Email Response Study (40M)",
           ].map(s => (

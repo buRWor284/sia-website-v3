@@ -7,11 +7,12 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { DIMENSION_EVIDENCE, EVIDENCE, tierFor } from "@/lib/pitch/config";
+import { DIMENSION_EVIDENCE, EMAIL_STUDY_LABEL, EVIDENCE, tierFor } from "@/lib/pitch/config";
 import { emosFrame } from "@/lib/pitch/feedback";
 import { scoreLayer1 } from "@/lib/pitch/metrics";
 import type { ScoreResponse } from "@/lib/pitch/types";
 import { GROT, INK, MONO, PAPER, SERIF, YEL } from "@/lib/tokens";
+import ResearchTicker from "./ResearchTicker";
 
 // ── Tool-specific colours (not in shared tokens) ───────────────────────────────
 export const GREEN = "#3e6b45";
@@ -111,6 +112,9 @@ export function EvidCard({ figKey }: { figKey: string }) {
       <div>
         <div style={{ fontFamily: SERIF, fontSize: 13, fontWeight: 600, color: INK, lineHeight: 1.4 }}>{ev.figure}</div>
         <div style={{ fontFamily: MONO, fontSize: 8, color: ra(INK, 0.75), marginTop: 2 }}>{ev.source}</div>
+        {ev.emailStudy && (
+          <div style={{ fontFamily: MONO, fontSize: 7.5, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: ra(INK, 0.6), marginTop: 3 }}>{EMAIL_STUDY_LABEL}</div>
+        )}
       </div>
     </a>
   );
@@ -248,12 +252,9 @@ export function LoadingPanel() {
       <div style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ra(INK, 0.45), marginBottom: 24, textAlign: "center" }}>
         {secs}s elapsed · a full analysis typically takes 30-60 seconds
       </div>
-      <div style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ra(INK, 0.5), textAlign: "center", lineHeight: 1.9, marginBottom: 24 }}>
-        Cision State of the Media 2026 (n≈1,800)<br />
-        Muck Rack State of Journalism 2026 (n≈900)<br />
-        Propel Media Barometer Q1 2024 (425k+ pitches)<br />
-        Backlinko · Fractl · Boomerang (40M emails)
-      </div>
+      {/* One research fact at a time while the score runs (2026-09-11).
+          Replaces the static list of study names. */}
+      <ResearchTicker style={{ width: "100%", maxWidth: 540, marginBottom: 28 }} />
       <div style={{ display: "flex", gap: 6 }}>
         {[0, 0.2, 0.4].map((delay, i) => (
           <span key={i} className="piq-dot" style={{ animationDelay: `${delay}s` }} />
