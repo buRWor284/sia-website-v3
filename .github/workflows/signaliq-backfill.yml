@@ -119,6 +119,7 @@ jobs:
         if: steps.drain.outputs.remaining != '0' && steps.drain.outputs.remaining != '?'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           LIMIT: ${{ github.event.inputs.chain_limit }}
         run: |
           set -euo pipefail
