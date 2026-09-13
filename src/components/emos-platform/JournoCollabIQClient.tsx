@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useTransition, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
 import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
@@ -18,9 +19,12 @@ import {
   createJournalist,
   updateJournalist,
   deleteJournalist,
+  refreshDomainRatings,
 } from "@/app/emos-platform/actions/coverageiq";
+import { DrAttribution } from "@/components/coverageiq/primitives";
 import type { DbJournalist, CreateJournalistInput } from "@/lib/coverageiq/types";
 import { clipWords } from "@/lib/clip-words";
+import { beatToTags } from "@/lib/journo/beat-tags";
 import Markdown from "@/components/emos-platform/Markdown";
 
 /** Journalist names are matched across two sources that share no id: an AI
@@ -251,10 +255,10 @@ function JournalistCard({
 
   function handleSave() {
     startSave(async () => {
-      // Parse the outlet authority score out of seoNote ("DA 94 · national
-      // business desk · …") so AI saves stop landing with domain_rating null —
-      // which left the CRM's DR column showing "—" and silently excluded every
-      // AI-saved journalist from the dashboard's avg-DR stat.
+      // 2026-09-13: the real DR now comes from Ahrefs on the server
+      // (createJournalist → getDomainRating). The prompt no longer asks the
+      // model for a number, so this parse is only a fallback for older
+      // seoNote strings that still carry a "DA 94".
       const drMatch = /\b(?:DA|DR)\s*:?\s*(\d{1,3})\b/i.exec(j.seoNote ?? "");
       const parsedDr = drMatch ? Math.min(100, parseInt(drMatch[1], 10)) : null;
       const input: CreateJournalistInput = {
@@ -299,7 +303,7 @@ function JournalistCard({
           pitches_sent:   0,
           placements:     0,
           notes:          input.notes ?? null,
-          tags:           input.tags ?? [],
+          tags:           beatToTags(input.beat),
         });
       }
     });
@@ -425,7 +429,13 @@ function JournalistCard({
 
 // ── Journalist list ───────────────────────────────────────────────────────────────────
 
-function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDelete: (id: string) => void }) {
+function CRMList({ journalists, onDelete, onRefreshDr, refreshingDr, refreshNote }: {
+  journalists: DbJournalist[];
+  onDelete: (id: string) => void;
+  onRefreshDr: () => void;
+  refreshingDr: boolean;
+  refreshNote: string | null;
+}) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleting, startDelete] = useTransition();
 
@@ -449,6 +459,11 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
   // now; filtering BY topic needs beats stored as tags, which is a data-model
   // change that belongs with the company-scoping migration.
   const [query, setQuery] = useState("");
+  // 2026-09-13 (beats as tags): filter BY topic. Tags are derived from the
+  // beat at save time (lib/journo/beat-tags.ts) and were backfilled, so every
+  // row has them. The chip row shows the topics present in the current
+  // company scope, most common first, so it never offers an empty filter.
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<"name" | "outlet" | "dr" | "sent" | "won" | "last">("last");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -460,12 +475,20 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
   }
 
   const q = query.trim().toLowerCase();
-  const visible = journalists
-    .filter(j =>
-      companyFilter === "all" ? true
-      : companyFilter === "__none__" ? !j.company_name
-      : j.company_name === companyFilter,
-    )
+  const inCompany = journalists.filter(j =>
+    companyFilter === "all" ? true
+    : companyFilter === "__none__" ? !j.company_name
+    : j.company_name === companyFilter,
+  );
+  const tagCounts = new Map<string, number>();
+  for (const j of inCompany) for (const t of j.tags ?? []) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+  const topTags = [...tagCounts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, 14);
+  const activeTag = tagFilter && tagCounts.has(tagFilter) ? tagFilter : null;
+
+  const visible = inCompany
+    .filter(j => !activeTag || (j.tags ?? []).includes(activeTag))
     .filter(j => {
       if (!q) return true;
       return [j.name, j.outlet, j.beat].some(v => (v ?? "").toLowerCase().includes(q));
@@ -544,15 +567,59 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
         placeholder="Search name, outlet or beat…"
         style={{ flex: 1, minWidth: 220, maxWidth: 380, background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 13.5, padding: "7px 11px", outline: "none" }}
       />
-      {q && (
+      {(q || activeTag) && (
         <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
-          {visible.length} of {journalists.length}
+          {visible.length} of {inCompany.length}
         </span>
       )}
       <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
         Click any column heading to sort.
       </span>
+      <span style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10 }}>
+        {refreshNote && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>{refreshNote}</span>}
+        <button
+          onClick={onRefreshDr}
+          disabled={refreshingDr}
+          title="Fetch the current Domain Rating for every saved outlet from Ahrefs"
+          style={{ background: "none", border: `1px solid ${INK15}`, padding: "4px 9px", cursor: refreshingDr ? "wait" : "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55 }}
+        >
+          {refreshingDr ? "Refreshing…" : "Refresh DR"}
+        </button>
+        <DrAttribution />
+      </span>
     </div>
+
+    {/* Topic chips: one click filters to journalists whose beat carries that
+        topic. Only shows topics that exist in the current company scope. */}
+    {topTags.length > 1 && (
+      <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginRight: 4 }}>
+          Topic
+        </span>
+        {topTags.map(([tag, n]) => {
+          const on = activeTag === tag;
+          return (
+            <button
+              key={tag}
+              onClick={() => setTagFilter(on ? null : tag)}
+              aria-pressed={on}
+              style={{
+                background: on ? INK : "transparent", color: on ? PAPER : INK,
+                border: `1px solid ${on ? INK : INK15}`, padding: "3px 9px", cursor: "pointer",
+                fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".06em",
+              }}
+            >
+              {tag} <span style={{ opacity: .55 }}>{n}</span>
+            </button>
+          );
+        })}
+        {activeTag && (
+          <button onClick={() => setTagFilter(null)} style={{ background: "none", border: "none", padding: "3px 6px", cursor: "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".08em", textTransform: "uppercase", color: INK55, textDecoration: "underline" }}>
+            clear
+          </button>
+        )}
+      </div>
+    )}
 
     <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 60px 52px 52px 90px", background: INK, color: PAPER }}>
@@ -696,6 +763,18 @@ export default function JournoCollabIQClient({
   const [companyContext] = useCompanyContext();
   const companyCtx = useCompanyOptional();
   const [journalists, setJournalists] = useState<DbJournalist[]>(initialJournalists);
+  const [refreshingDr, startRefreshDr] = useTransition();
+  const [refreshNote, setRefreshNote] = useState<string | null>(null);
+  const router = useRouter();
+  function handleRefreshDr() {
+    setRefreshNote(null);
+    startRefreshDr(async () => {
+      const r = await refreshDomainRatings();
+      if (!r.configured) { setRefreshNote("Ahrefs key not set on the server yet."); return; }
+      setRefreshNote(`${r.journalists} journalist${r.journalists === 1 ? "" : "s"} updated.`);
+      router.refresh();
+    });
+  }
   const [results, setResults] = useState<AIJournalist[] | null>(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
@@ -910,6 +989,9 @@ export default function JournoCollabIQClient({
         <CRMList
           journalists={journalists}
           onDelete={id => setJournalists(prev => prev.filter(j => j.id !== id))}
+          onRefreshDr={handleRefreshDr}
+          refreshingDr={refreshingDr}
+          refreshNote={refreshNote}
         />
       </div>
 
