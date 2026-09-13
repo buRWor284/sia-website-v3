@@ -120,8 +120,9 @@ function TrackCTA({
         // 2026-09-13: same bug class as journalist_id above — createPitch has
         // always accepted `client`, PressIQ just never sent it, so every pitch
         // handed over from here landed in CoverageIQ with a blank client while
-        // manually-logged rows showed theirs. `client` is free text today; it
-        // becomes a real company FK with the CoverageIQ migration (1b).
+        // manually-logged rows showed theirs. Now carries the real company FK
+        // (1b) with the name kept as the free-text label.
+        company_id: companyCtx?.company?.id ?? null,
         client: companyCtx?.company?.name ?? null,
         notes,
       });
@@ -538,10 +539,30 @@ export default function PressIQPlatformClient({
                   style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 240 }}
                 >
                   <option value="">No particular asset</option>
-                  {/* NOT scoped by company yet, unlike the journalist list
-                      above: the assets table carries org_id only, with no
-                      company column to filter on. Needs the migration (1c). */}
-                  {initialAssets.map(a => <option key={a.id} value={a.id}>{a.title}</option>)}
+                  {/* 2026-09-13 (1c): scoped like the journalist list above —
+                      this company's assets first, other companies' grouped and
+                      labelled, untagged ones in the first group. */}
+                  {(() => {
+                    const active = companyCtx?.company?.id ?? null;
+                    const label  = companyCtx?.company?.name ?? "This company";
+                    const mine   = active
+                      ? initialAssets.filter(a => !a.company_id || a.company_id === active)
+                      : initialAssets;
+                    const others = active
+                      ? initialAssets.filter(a => a.company_id && a.company_id !== active)
+                      : [];
+                    const opt = (a: typeof initialAssets[number]) => <option key={a.id} value={a.id}>{a.title}</option>;
+                    return (
+                      <>
+                        {active && others.length > 0
+                          ? <optgroup label={label}>{mine.map(opt)}</optgroup>
+                          : mine.map(opt)}
+                        {others.length > 0 && (
+                          <optgroup label="Other companies">{others.map(opt)}</optgroup>
+                        )}
+                      </>
+                    );
+                  })()}
                 </select>
               </>
             )}

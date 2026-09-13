@@ -34,6 +34,8 @@ const COMPANY_PATHS = [
   "/emos-platform/dashboard/signaliq",
   "/emos-platform/dashboard/assetiq",
   "/emos-platform/dashboard/journocollabiq",
+  "/emos-platform/dashboard/pressiq",
+  "/emos-platform/dashboard/coverageiq",
 ];
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────

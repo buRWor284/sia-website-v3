@@ -16,6 +16,8 @@ import type {
   DbPitch, DbJournalist, DbAlert, CreatePitchInput, CreateJournalistInput,
 } from "@/lib/coverageiq/types";
 import type { JournalistHistory } from "@/lib/journalist-history-types";
+import { beatToTags } from "@/lib/journo/beat-tags";
+import { getDomainRating, getDomainRatings, ahrefsConfigured, domainFromInput } from "@/lib/ahrefs-dr";
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
 
@@ -34,10 +36,11 @@ export async function getPitches(): Promise<DbPitch[]> {
   const { data, error } = await db
     .from("coverageiq_pitches")
     .select(`
-      id, subject, client, team, stage, peso_type, data_source, notes,
+      id, subject, client, company_id, team, stage, peso_type, data_source, notes,
       sent_date, placed_date, follow_up_due, placement_url, anchor_text,
       domain_rating, link_type, content_type, points, journalist_id,
-      journalists ( name, outlet, domain_rating, email )
+      journalists ( name, outlet, domain_rating, email ),
+      companies ( name )
     `)
     .order("created_at", { ascending: false });
 
@@ -51,6 +54,8 @@ export async function getPitches(): Promise<DbPitch[]> {
     id: row.id,
     subject: row.subject,
     client: row.client,
+    company_id: row.company_id ?? null,
+    company_name: row.companies?.name ?? null,
     team: row.team,
     stage: row.stage as Stage,
     peso_type: row.peso_type as PesoType,
@@ -186,6 +191,10 @@ export async function createPitch(input: CreatePitchInput): Promise<{ id: string
       org_id: org.id,
       subject: input.subject,
       journalist_id: input.journalist_id ?? null,
+      // 2026-09-13: the company this pitch is for, from the picker. RLS on
+      // companies means a foreign id here fails the FK rather than crossing
+      // tenants, but the callers only ever pass the active company.
+      company_id: input.company_id ?? null,
       client: input.client ?? null,
       team: input.team ?? null,
       peso_type: input.peso_type ?? "Earned",
@@ -208,6 +217,21 @@ export async function createPitch(input: CreatePitchInput): Promise<{ id: string
   // feedback-fire-and-forget-persistence).
   await recordStageEvent("pitch_logged");
   return data as { id: string };
+}
+
+/** Tag every untagged pitch in this org with one company. One-shot migration
+ * helper for rows that predate company scoping (2026-09-13); exposed from the
+ * "Unassigned" view in CoverageIQ. Returns the number of rows tagged. */
+export async function assignUnassignedPitches(companyId: string): Promise<number> {
+  const db = await getAuthenticatedClient();
+  const { data, error } = await db
+    .from("coverageiq_pitches")
+    .update({ company_id: companyId, updated_at: new Date().toISOString() })
+    .is("company_id", null)
+    .select("id");
+  if (error) { console.error("assignUnassignedPitches error:", error.message); return 0; }
+  revalidatePath("/emos-platform/dashboard/coverageiq");
+  return data?.length ?? 0;
 }
 
 export async function updatePitchStage(pitchId: string, stage: Stage): Promise<boolean> {
@@ -249,6 +273,11 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
   const { data: org, error: orgError } = await db.from("organizations").select("id").single();
   if (orgError || !org) { console.error("createJournalist: no org", orgError?.message); return null; }
 
+  // 2026-09-13 (Ahrefs DR): the real Domain Rating of the outlet, cached per
+  // domain. A caller-supplied value (the Contacts form, or a DA parsed out of
+  // an AI note) is only a fallback for when Ahrefs has nothing.
+  const outletDr = await getDomainRating(input.outlet);
+
   const { data, error } = await db
     .from("journalists")
     .insert({
@@ -258,9 +287,12 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
       beat:           input.beat ?? null,
       email:          input.email ?? null,
       twitter_handle: input.twitter_handle ?? null,
-      domain_rating:  input.domain_rating ?? null,
+      domain_rating:  outletDr ?? input.domain_rating ?? null,
       notes:          input.notes ?? null,
-      tags:           input.tags ?? [],
+      // 2026-09-13 (beats as tags): derive filterable tags from the beat
+      // sentence unless the caller supplied its own. Done here so every save
+      // path (JournoCollabIQ, the Contacts form, a headless caller) gets them.
+      tags:           input.tags?.length ? input.tags : beatToTags(input.beat),
       data_source:    input.data_source ?? "manual",
     })
     .select("id")
@@ -299,9 +331,12 @@ export async function updateJournalist(
   input: Partial<CreateJournalistInput>,
 ): Promise<boolean> {
   const db = await getAuthenticatedClient();
+  // An edited beat re-derives its tags unless tags were passed explicitly.
+  const patch: Record<string, unknown> = { ...input, updated_at: new Date().toISOString() };
+  if (input.beat !== undefined && !input.tags?.length) patch.tags = beatToTags(input.beat);
   const { data, error } = await db
     .from("journalists")
-    .update({ ...input, updated_at: new Date().toISOString() })
+    .update(patch)
     .eq("id", journalistId)
     .select("id");
   if (error) { console.error("updateJournalist error:", error.message); return false; }
@@ -309,6 +344,46 @@ export async function updateJournalist(
   revalidatePath("/emos-platform/dashboard/coverageiq");
   revalidatePath("/emos-platform/dashboard/journocollabiq");
   return true;
+}
+
+/**
+ * Refresh Domain Rating for this org's journalists (outlet domain) and for
+ * pitches that carry a placement URL. 2026-09-13. Returns counts, plus
+ * `configured: false` when AHREFS_API_KEY is not set so the UI can say why
+ * nothing changed. Sequential and capped; the free endpoint has unpublished
+ * limits and this is a button, not a cron.
+ */
+export async function refreshDomainRatings(): Promise<{ configured: boolean; journalists: number; pitches: number }> {
+  const db = await getAuthenticatedClient();
+  if (!ahrefsConfigured()) return { configured: false, journalists: 0, pitches: 0 };
+
+  const [{ data: js }, { data: ps }] = await Promise.all([
+    db.from("journalists").select("id, outlet, domain_rating").not("outlet", "is", null).limit(60),
+    db.from("coverageiq_pitches").select("id, placement_url, domain_rating").not("placement_url", "is", null).limit(60),
+  ]);
+
+  const ratings = await getDomainRatings([
+    ...((js ?? []) as { outlet: string | null }[]).map(j => j.outlet),
+    ...((ps ?? []) as { placement_url: string | null }[]).map(p => p.placement_url),
+  ]);
+  let jn = 0, pn = 0;
+  for (const j of (js ?? []) as { id: string; outlet: string | null; domain_rating: number | null }[]) {
+    const d = domainFromInput(j.outlet); const dr = d ? ratings.get(d) ?? null : null;
+    if (dr != null && dr !== j.domain_rating) {
+      const { data } = await db.from("journalists").update({ domain_rating: dr, updated_at: new Date().toISOString() }).eq("id", j.id).select("id");
+      if (data?.length) jn++;
+    }
+  }
+  for (const p of (ps ?? []) as { id: string; placement_url: string | null; domain_rating: number | null }[]) {
+    const d = domainFromInput(p.placement_url); const dr = d ? ratings.get(d) ?? null : null;
+    if (dr != null && dr !== p.domain_rating) {
+      const { data } = await db.from("coverageiq_pitches").update({ domain_rating: dr, updated_at: new Date().toISOString() }).eq("id", p.id).select("id");
+      if (data?.length) pn++;
+    }
+  }
+  revalidatePath("/emos-platform/dashboard/coverageiq");
+  revalidatePath("/emos-platform/dashboard/journocollabiq");
+  return { configured: true, journalists: jn, pitches: pn };
 }
 
 export async function deleteJournalist(journalistId: string): Promise<boolean> {

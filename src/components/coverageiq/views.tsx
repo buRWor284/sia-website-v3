@@ -162,7 +162,7 @@ export function PipelineView({
                   <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 3, overflow: "hidden", minWidth: 0 }}>
                     <span style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, lineHeight: 1.3, color: INK }}>{pitch.subject}</span>
                     <span style={{ fontFamily: GROT, fontSize: 10, color: INK55, letterSpacing: "0.08em" }}>
-                      {pitch.client ?? "—"}{pitch.sentDate ? ` · ${fmt(pitch.sentDate)}` : pitch.stage === "drafted" ? " · Not sent" : ""}
+                      {pitch.companyName ?? pitch.client ?? "—"}{pitch.sentDate ? ` · ${fmt(pitch.sentDate)}` : pitch.stage === "drafted" ? " · Not sent" : ""}
                     </span>
                   </div>
                   <div style={{ padding: "14px 12px", borderLeft: `1px solid ${INK15}`, display: "flex", flexDirection: "column", justifyContent: "center", gap: 2, overflow: "hidden", minWidth: 0 }}>
@@ -371,7 +371,7 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
             }}>
               <div style={{ padding: "14px 16px", overflow: "hidden", minWidth: 0 }}>
                 <div style={{ fontFamily: SERIF, fontSize: 15, fontWeight: 600, color: INK, lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{pitch.subject}</div>
-                <div style={{ fontFamily: GROT, fontSize: 10, color: INK55, letterSpacing: "0.06em", marginTop: 3 }}>{pitch.client ?? "—"}</div>
+                <div style={{ fontFamily: GROT, fontSize: 10, color: INK55, letterSpacing: "0.06em", marginTop: 3 }}>{pitch.companyName ?? pitch.client ?? "—"}</div>
               </div>
               <div style={{ padding: "14px 16px", borderLeft: `1px solid ${INK15}`, overflow: "hidden", minWidth: 0 }}>
                 {pitch.journalistName
@@ -1133,6 +1133,7 @@ interface PitchForm {
 export function NewPitchModal({
   journalists,
   prefillSubject,
+  prefillClient,
   teams,
   dataSources,
   defaultDataSource,
@@ -1144,6 +1145,9 @@ export function NewPitchModal({
 }: {
   journalists: VmJournalist[];
   prefillSubject?: string;
+  /** The company in the picker, so the dashboard's Client field starts filled
+   * instead of blank (2026-09-13). The public tool passes nothing. */
+  prefillClient?: string;
   teams: string[];
   dataSources: DataSource[];
   defaultDataSource: DataSource;
@@ -1154,7 +1158,7 @@ export function NewPitchModal({
   onSubmit: (draft: NewPitchDraft) => Promise<void> | void;
 }) {
   const [form, setForm] = useState<PitchForm>({
-    subject: prefillSubject ?? "", journalistId: "", client: "", peso: "Earned",
+    subject: prefillSubject ?? "", journalistId: "", client: prefillClient ?? "", peso: "Earned",
     stage: "drafted", team: "", dataSource: defaultDataSource, notes: "",
   });
   const [saving, setSaving] = useState(false);

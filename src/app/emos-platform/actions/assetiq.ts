@@ -31,6 +31,9 @@ export interface DbAsset {
   links_earned: number;
   signal_id: string | null;       // FK → signaliq_signals.id
   signal_headline: string | null; // denormalized headline for display
+  // 2026-09-13 (company scoping 1c): the company this asset is FOR. Null on
+  // rows that predate tagging.
+  company_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -42,6 +45,7 @@ export interface CreateAssetInput {
   target_keyword?: string | null;
   signal_id?: string | null;
   signal_headline?: string | null;
+  company_id?: string | null;
 }
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -50,7 +54,7 @@ export async function getAssets(): Promise<DbAsset[]> {
   const db = await getAuthenticatedClient();
   const { data, error } = await db
     .from("linkable_assets")
-    .select("id, asset_type, title, description, target_keyword, status, published_url, links_earned, signal_id, signal_headline, created_at, updated_at")
+    .select("id, asset_type, title, description, target_keyword, status, published_url, links_earned, signal_id, signal_headline, company_id, created_at, updated_at")
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -67,6 +71,7 @@ export async function getAssets(): Promise<DbAsset[]> {
     links_earned: number;
     signal_id: string | null;
     signal_headline: string | null;
+    company_id: string | null;
     created_at: string;
     updated_at: string;
   }) => ({
@@ -97,6 +102,7 @@ export async function createAsset(input: CreateAssetInput): Promise<{ id: string
       target_keyword:  input.target_keyword ?? null,
       signal_id:       input.signal_id ?? null,
       signal_headline: input.signal_headline?.substring(0, 200) ?? null,
+      company_id:      input.company_id ?? null,
       status:          "draft",
     })
     .select("id")
@@ -104,9 +110,26 @@ export async function createAsset(input: CreateAssetInput): Promise<{ id: string
 
   if (error) { console.error("createAsset error:", error.message); return null; }
 
-  void recordStageEvent("asset_created");
+  // Awaited, not fire-and-forget: a void call is dropped when the serverless
+  // function freezes after the response (feedback-fire-and-forget-persistence).
+  await recordStageEvent("asset_created");
   revalidatePath("/emos-platform/dashboard/assetiq");
   return data as { id: string };
+}
+
+/** Tag every untagged asset in this org with one company. One-shot helper for
+ * rows that predate company scoping (2026-09-13); exposed from the
+ * "Unassigned" view in AssetIQ. Returns the number of rows tagged. */
+export async function assignUnassignedAssets(companyId: string): Promise<number> {
+  const db = await getAuthenticatedClient();
+  const { data, error } = await db
+    .from("linkable_assets")
+    .update({ company_id: companyId, updated_at: new Date().toISOString() })
+    .is("company_id", null)
+    .select("id");
+  if (error) { console.error("assignUnassignedAssets error:", error.message); return 0; }
+  revalidatePath("/emos-platform/dashboard/assetiq");
+  return data?.length ?? 0;
 }
 
 export async function updateAsset(

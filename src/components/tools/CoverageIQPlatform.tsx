@@ -15,15 +15,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PAPER, INK, INK55, INK35, INK15, YEL, SERIF, GROT, MONO } from "@/lib/tokens";
 import { ToolHeader } from "@/components/tools/ToolHeader";
+import CompanyPicker from "@/components/emos-platform/CompanyPicker";
+import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
+import { CompanyScopeSelect, matchesScope, type CompanyScope } from "@/components/emos-platform/CompanyScope";
 import {
   createPitch,
+  assignUnassignedPitches,
   updatePitchStage,
   updateAlertStatus,
   createJournalist,
   updateJournalist,
   deleteJournalist,
 } from "@/app/emos-platform/actions/coverageiq";
-import { SectionMast, DataSourceNote } from "@/components/coverageiq/primitives";
+import { SectionMast, DataSourceNote, DrAttribution } from "@/components/coverageiq/primitives";
 import { CIQ_CSS } from "@/components/coverageiq/core-css";
 import {
   PipelineView, FollowUpsView, CoverageLogView, ContactsView, PESODashboard, NewPitchModal,
@@ -56,7 +60,26 @@ export default function CoverageIQPlatform({
   const [showModal, setShowModal] = useState(!!prefillSubject);
   const [isPending, startTransition] = useTransition();
 
-  const vmPitches = useMemo(() => initialPitches.map(pitchFromDb), [initialPitches]);
+  // 2026-09-13 (company scoping 1b): every list on this screen is filtered to
+  // the company in the picker by default. This is the client-reporting
+  // surface, so a screen-share with one client must not show another's
+  // pitch subjects, stages and journalists. "All companies" and "Unassigned"
+  // are one select away, never hidden.
+  const companyCtx = useCompanyOptional();
+  const activeCompanyId = companyCtx?.company?.id ?? null;
+  const activeCompanyName = companyCtx?.company?.name ?? null;
+  const [scope, setScope] = useState<CompanyScope>("active");
+
+  const allPitches = useMemo(() => initialPitches.map(pitchFromDb), [initialPitches]);
+  const scopeCounts = useMemo(() => ({
+    active:     allPitches.filter(p => matchesScope("active", activeCompanyId, p.companyId)).length,
+    all:        allPitches.length,
+    unassigned: allPitches.filter(p => p.companyId === null).length,
+  }), [allPitches, activeCompanyId]);
+  const vmPitches = useMemo(
+    () => allPitches.filter(p => matchesScope(scope, activeCompanyId, p.companyId)),
+    [allPitches, scope, activeCompanyId],
+  );
   const vmJournalists = useMemo(() => initialJournalists.map(journalistFromDb), [initialJournalists]);
   const vmAlerts = useMemo(() => initialAlerts.map(alertFromDb), [initialAlerts]);
 
@@ -64,6 +87,15 @@ export default function CoverageIQPlatform({
     await createPitch(input);
     startTransition(() => { router.refresh(); });
   }, [router]);
+
+  const handleAssignUnassigned = useCallback(() => {
+    if (!activeCompanyId) return;
+    startTransition(async () => {
+      await assignUnassignedPitches(activeCompanyId);
+      setScope("active");
+      router.refresh();
+    });
+  }, [router, activeCompanyId]);
 
   const handleStageChange = useCallback((id: string, stage: Stage) => {
     startTransition(async () => {
@@ -138,6 +170,38 @@ export default function CoverageIQPlatform({
           </>
         }
       />
+
+      {/* Which company this screen reports on + which rows it shows */}
+      {companyCtx && (
+        <div style={{ maxWidth: 1240, marginInline: "auto", paddingInline: "clamp(20px,4vw,56px)", paddingTop: 14 }}>
+          <CompanyPicker
+            note="Used by every EMOS tool"
+            extra={
+              <CompanyScopeSelect
+                scope={scope}
+                onChange={setScope}
+                activeName={activeCompanyName}
+                counts={scopeCounts}
+                noun="pitches"
+              />
+            }
+            detail={scope === "unassigned" && activeCompanyId && scopeCounts.unassigned > 0 ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+                  These {scopeCounts.unassigned} pitches were logged before company tagging. Tag them all as {activeCompanyName}?
+                </span>
+                <button
+                  onClick={handleAssignUnassigned}
+                  disabled={isPending}
+                  style={{ background: "none", border: `1px solid ${INK}`, padding: "4px 10px", cursor: "pointer", fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: INK }}
+                >
+                  Tag all as {activeCompanyName}
+                </button>
+              </div>
+            ) : null}
+          />
+        </div>
+      )}
 
       {/* Action row: New Pitch + follow-up alert */}
       <div style={{ borderBottom: `1px solid ${INK35}`, background: PAPER }}>
@@ -222,6 +286,8 @@ export default function CoverageIQPlatform({
 
         {/* Data-source transparency (Camper-demo fix). */}
         <DataSourceNote variant="dashboard" />
+        {/* Licence requirement for the DR figures on this screen. */}
+        <div style={{ marginTop: 10, textAlign: "right" }}><DrAttribution /></div>
       </main>
 
       {/* Modal */}
@@ -229,6 +295,7 @@ export default function CoverageIQPlatform({
         <NewPitchModal
           journalists={vmJournalists}
           prefillSubject={prefillSubject}
+          prefillClient={activeCompanyName ?? undefined}
           teams={DASHBOARD_TEAMS}
           dataSources={DASHBOARD_SOURCES}
           defaultDataSource="PressIQ"
@@ -238,6 +305,11 @@ export default function CoverageIQPlatform({
             await handleCreatePitch({
               subject: draft.subject,
               journalist_id: draft.journalistId,
+              // The pitch is FOR the company in the picker. If the typed
+              // Client text was changed to something else, keep the text as
+              // the label but still file it under the active company: there
+              // is no other company row it could mean.
+              company_id: activeCompanyId,
               client: draft.client,
               team: draft.team,
               peso_type: draft.peso,

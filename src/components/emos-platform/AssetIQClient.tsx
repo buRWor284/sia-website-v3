@@ -12,8 +12,11 @@ import React, { useState, useTransition } from "react";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
+import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
+import { CompanyScopeSelect, matchesScope, type CompanyScope } from "@/components/emos-platform/CompanyScope";
 import {
   createAsset,
+  assignUnassignedAssets,
   updateAsset,
   deleteAsset,
   type DbAsset,
@@ -133,12 +136,15 @@ function CreateForm({
   initialTitle,
   signalId,
   signalHeadline,
+  companyId,
   onCreated,
   onCancel,
 }: {
   initialTitle: string;
   signalId: string | null;
   signalHeadline: string | null;
+  /** The company in the picker; the new asset is filed under it (1c). */
+  companyId: string | null;
   onCreated: (asset: DbAsset) => void;
   onCancel: () => void;
 }) {
@@ -160,6 +166,7 @@ function CreateForm({
         target_keyword: keyword.trim() || null,
         signal_id: signalId,
         signal_headline: signalHeadline,
+        company_id: companyId,
       };
       const result = await createAsset(input);
       if (result?.id) {
@@ -174,6 +181,7 @@ function CreateForm({
           links_earned: 0,
           signal_id: signalId ?? null,
           signal_headline: signalHeadline ?? null,
+          company_id: companyId,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
@@ -279,11 +287,14 @@ function AssetRow({
   onStatusChange,
   onDelete,
   companyContext,
+  companyLabel,
 }: {
   asset: DbAsset;
   onStatusChange: (id: string, status: AssetStatus) => void;
   onDelete: (id: string) => void;
   companyContext?: string;
+  /** Shown when the list spans companies, so each row says whose it is. */
+  companyLabel?: string | null;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -344,7 +355,10 @@ function AssetRow({
         {/* Title + type */}
         <div style={{ padding: "13px 14px" }}>
           <div style={{ fontFamily: SERIF, fontWeight: 600, fontSize: 14, lineHeight: 1.3, color: INK }}>{asset.title}</div>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".08em", textTransform: "uppercase", color: INK55, marginTop: 3 }}>{typeLabel}</div>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".08em", textTransform: "uppercase", color: INK55, marginTop: 3 }}>
+            {typeLabel}
+            {companyLabel && <span style={{ marginLeft: 8, border: `1px solid ${INK15}`, padding: "1px 6px", letterSpacing: ".06em" }}>{companyLabel}</span>}
+          </div>
           {asset.signal_id && (
             <div style={{ fontFamily: MONO, fontSize: 9, color: INK35, marginTop: 3 }} title={asset.signal_headline ?? undefined}>
               ↳ from signal{asset.signal_headline ? `: ${asset.signal_headline.substring(0, 60)}…` : ""}
@@ -495,6 +509,32 @@ export default function AssetIQClient({
   const [showForm, setShowForm] = useState(prefillTitle !== "" || signalId !== null);
 
   const [companyContext, setCompanyContext] = useCompanyContext();
+
+  // 2026-09-13 (company scoping 1c): the list shows the picker's company by
+  // default; "All companies" and "Unassigned" are one select away.
+  const companyCtx = useCompanyOptional();
+  const activeCompanyId = companyCtx?.company?.id ?? null;
+  const activeCompanyName = companyCtx?.company?.name ?? null;
+  const [scope, setScope] = useState<CompanyScope>("active");
+  const [assigning, startAssign] = useTransition();
+  const companyNameById = new Map((companyCtx?.companies ?? []).map(c => [c.id, c.name]));
+  const scopeCounts = {
+    active:     assets.filter(a => matchesScope("active", activeCompanyId, a.company_id)).length,
+    all:        assets.length,
+    unassigned: assets.filter(a => a.company_id === null).length,
+  };
+  const visibleAssets = assets.filter(a => matchesScope(scope, activeCompanyId, a.company_id));
+
+  function handleAssignUnassigned() {
+    if (!activeCompanyId) return;
+    startAssign(async () => {
+      const n = await assignUnassignedAssets(activeCompanyId);
+      if (n > 0) {
+        setAssets(prev => prev.map(a => a.company_id === null ? { ...a, company_id: activeCompanyId } : a));
+        setScope("active");
+      }
+    });
+  }
   const [creationPlan, setCreationPlan] = useState<string | null>(null);
   const [planLoading, setPlanLoading] = useState(false);
   const [planError, setPlanError] = useState<string | null>(null);
@@ -531,9 +571,9 @@ export default function AssetIQClient({
     }
   }
 
-  const draftCount     = assets.filter(a => a.status === "draft").length;
-  const publishedCount = assets.filter(a => a.status === "published").length;
-  const linksTotal     = assets.reduce((s, a) => s + a.links_earned, 0);
+  const draftCount     = visibleAssets.filter(a => a.status === "draft").length;
+  const publishedCount = visibleAssets.filter(a => a.status === "published").length;
+  const linksTotal     = visibleAssets.reduce((s, a) => s + a.links_earned, 0);
 
   function handleCreated(asset: DbAsset) {
     setAssets(prev => [asset, ...prev]);
@@ -553,7 +593,32 @@ export default function AssetIQClient({
 
       {/* ── Which company these assets belong to (shared with SignalIQ and
              JournoCollabIQ; stored on the org, not in this browser) ─────── */}
-      <CompanyPicker note="Used by every EMOS tool" />
+      <CompanyPicker
+        note="Used by every EMOS tool"
+        extra={
+          <CompanyScopeSelect
+            scope={scope}
+            onChange={setScope}
+            activeName={activeCompanyName}
+            counts={scopeCounts}
+            noun="assets"
+          />
+        }
+        detail={scope === "unassigned" && activeCompanyId && scopeCounts.unassigned > 0 ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+              These {scopeCounts.unassigned} assets were created before company tagging. Tag them all as {activeCompanyName}?
+            </span>
+            <button
+              onClick={handleAssignUnassigned}
+              disabled={assigning}
+              style={{ background: "none", border: `1px solid ${INK}`, padding: "4px 10px", cursor: "pointer", fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".12em", textTransform: "uppercase", color: INK }}
+            >
+              Tag all as {activeCompanyName}
+            </button>
+          </div>
+        ) : null}
+      />
 
       {/* ── Signal / Asset Pack Context ──────────────────────────────────── */}
       {hasPackContext && (
@@ -695,16 +760,21 @@ export default function AssetIQClient({
           initialTitle={prefillTitle}
           signalId={signalId}
           signalHeadline={signalHeadline}
+          companyId={activeCompanyId}
           onCreated={handleCreated}
           onCancel={() => setShowForm(false)}
         />
       )}
 
       {/* Asset list */}
-      {assets.length === 0 ? (
+      {visibleAssets.length === 0 ? (
         <div style={{ padding: "40px 24px", textAlign: "center", border: `1px solid ${INK15}`, background: PAPER2 }}>
           <p style={{ margin: "0 0 8px", fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK55 }}>
-            No assets yet.
+            {assets.length === 0
+              ? "No assets yet."
+              : scope === "active"
+              ? `No assets for ${activeCompanyName ?? "this company"} yet.`
+              : "Nothing here."}
           </p>
           <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13, color: INK55, lineHeight: 1.6 }}>
             A linkable asset is a piece of content worth linking to — a data study, calculator, or quiz built around a signal you spotted in SignalIQ.
@@ -719,21 +789,24 @@ export default function AssetIQClient({
               </div>
             ))}
           </div>
-          {assets.map(asset => (
+          {visibleAssets.map(asset => (
             <AssetRow
               key={asset.id}
               asset={asset}
               onStatusChange={handleStatusChange}
               onDelete={handleDelete}
               companyContext={companyContext}
+              companyLabel={scope === "all"
+                ? (asset.company_id ? companyNameById.get(asset.company_id) ?? null : "Unassigned")
+                : null}
             />
           ))}
         </div>
       )}
 
-      {assets.length > 0 && (
+      {visibleAssets.length > 0 && (
         <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-          {assets.length} asset{assets.length !== 1 ? "s" : ""} · Click any row to manage status or find journalists
+          {visibleAssets.length} asset{visibleAssets.length !== 1 ? "s" : ""} · Click any row to manage status or find journalists
         </div>
       )}
     </div>

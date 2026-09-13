@@ -25,6 +25,10 @@ export interface DbPitch {
   id: string;
   subject: string;
   client: string | null;
+  // 2026-09-13 (company scoping 1b): the company this pitch is FOR. Null on
+  // rows that predate tagging; `client` stays as the free-text label.
+  company_id: string | null;
+  company_name: string | null;
   team: string | null;
   stage: Stage;
   peso_type: PesoType;
@@ -101,6 +105,7 @@ export interface DbAlert {
 export interface CreatePitchInput {
   subject: string;
   journalist_id?: string | null;
+  company_id?: string | null;
   client?: string | null;
   team?: string | null;
   peso_type?: PesoType;
@@ -173,6 +178,8 @@ export interface VmPitch {
   id: string;
   subject: string;
   client: string | null;
+  companyId: string | null;
+  companyName: string | null;
   team: string | null;
   stage: Stage;
   peso: PesoType;
@@ -252,6 +259,8 @@ export function pitchFromDb(row: DbPitch): VmPitch {
     id: row.id,
     subject: row.subject,
     client: row.client,
+    companyId: row.company_id ?? null,
+    companyName: row.company_name ?? null,
     team: row.team,
     stage: row.stage,
     peso: row.peso_type,
@@ -262,7 +271,10 @@ export function pitchFromDb(row: DbPitch): VmPitch {
     followUpDue: row.follow_up_due,
     url: row.placement_url,
     anchorText: row.anchor_text,
-    dr: row.domain_rating,
+    // 2026-09-13: a pitch's own DR is the placement's; until it is placed the
+    // outlet's DR (from the journalist row) is the honest stand-in, which is
+    // what left the DR column blank on every unplaced row.
+    dr: row.domain_rating ?? row.journalist_dr ?? null,
     linkType: row.link_type,
     contentType: row.content_type,
     points: row.points,
@@ -310,6 +322,8 @@ export function pitchFromMock(p: MockPitch, journalists: MockJournalist[]): VmPi
     id: p.id,
     subject: p.subject,
     client: p.client,
+    companyId: null,
+    companyName: null,
     team: p.team,
     stage: p.stage,
     peso: p.peso,
