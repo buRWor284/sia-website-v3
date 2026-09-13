@@ -23,6 +23,23 @@ import type { DbJournalist, CreateJournalistInput } from "@/lib/coverageiq/types
 import { clipWords } from "@/lib/clip-words";
 import Markdown from "@/components/emos-platform/Markdown";
 
+/** Journalist names are matched across two sources that share no id: an AI
+ *  suggestion and a stored CRM row. Case and stray whitespace differ often
+ *  enough to cause false "not saved yet" reads, so compare on this. */
+/** Compare two possibly-null numbers, always sorting null to the bottom
+ *  regardless of direction. An unknown value is not a small value. */
+function nullsLast(a: number | null, b: number | null, dir: number): number {
+  if (a == null && b == null) return 0;
+  if (a == null) return 1;
+  if (b == null) return -1;
+  return dir * (a - b);
+}
+
+function normaliseName(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -194,7 +211,7 @@ function JournalistCard({
   const [angle, setAngle] = useState<string | null>(null);
   const [loadingAngle, setLoadingAngle] = useState(false);
   const [angleError, setAngleError] = useState<string | null>(null);
-  const alreadySaved = savedNames.has(j.name);
+  const alreadySaved = savedNames.has(normaliseName(j.name));
   const tc = TIER_COLOR[j.tier] ?? INK55;
 
   // Per-card fit self-check. Compact + collapsed by default; expanding it lets
@@ -420,11 +437,56 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
     new Set(journalists.map(j => j.company_name).filter(Boolean) as string[]),
   ).sort();
   const uncategorised = journalists.filter(j => !j.company_name).length;
-  const visible = journalists.filter(j =>
-    companyFilter === "all" ? true
-    : companyFilter === "__none__" ? !j.company_name
-    : j.company_name === companyFilter,
-  );
+
+  // 2026-09-13 (Irfan): search + sort. The list was company-filtered only and
+  // fixed to last-contact order, so finding one person meant scanning every
+  // row — fine at 8 saved, unusable at 80, and "find the right journalist
+  // fast" is the daily job of this tool.
+  //
+  // Search covers name, outlet and beat together rather than as separate
+  // fields, because `beat` is a free-text sentence ("Cybersecurity, SIM swap
+  // fraud, mobile carrier security"), not tags. That makes topic SEARCHABLE
+  // now; filtering BY topic needs beats stored as tags, which is a data-model
+  // change that belongs with the company-scoping migration.
+  const [query, setQuery] = useState("");
+  const [sortKey, setSortKey] = useState<"name" | "outlet" | "dr" | "sent" | "won" | "last">("last");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  function toggleSort(key: typeof sortKey) {
+    if (key === sortKey) { setSortDir(d => (d === "asc" ? "desc" : "asc")); return; }
+    setSortKey(key);
+    // Text reads best A-Z; numbers and dates read best biggest/newest first.
+    setSortDir(key === "name" || key === "outlet" ? "asc" : "desc");
+  }
+
+  const q = query.trim().toLowerCase();
+  const visible = journalists
+    .filter(j =>
+      companyFilter === "all" ? true
+      : companyFilter === "__none__" ? !j.company_name
+      : j.company_name === companyFilter,
+    )
+    .filter(j => {
+      if (!q) return true;
+      return [j.name, j.outlet, j.beat].some(v => (v ?? "").toLowerCase().includes(q));
+    })
+    .sort((a, b) => {
+      const dir = sortDir === "asc" ? 1 : -1;
+      switch (sortKey) {
+        case "name":   return dir * a.name.localeCompare(b.name);
+        case "outlet": return dir * (a.outlet ?? "").localeCompare(b.outlet ?? "");
+        // Nulls sort last in both directions: an unknown DR is not a low DR,
+        // and burying it under the real values is the honest placement.
+        case "dr":     return nullsLast(a.domain_rating, b.domain_rating, dir);
+        case "sent":   return dir * ((a.pitches_sent ?? 0) - (b.pitches_sent ?? 0));
+        case "won":    return dir * ((a.placements ?? 0) - (b.placements ?? 0));
+        default:       return nullsLast(
+          a.last_contact ? Date.parse(a.last_contact) : null,
+          b.last_contact ? Date.parse(b.last_contact) : null,
+          dir,
+        );
+      }
+    });
 
   function fmt(iso: string | null): string {
     if (!iso) return "—";
@@ -471,16 +533,62 @@ function CRMList({ journalists, onDelete }: { journalists: DbJournalist[]; onDel
       </div>
     )}
 
+    {/* Search across name, outlet and beat. Always rendered, even at two saved
+        journalists, so the control does not appear only once the list is
+        already too long to scan. */}
+    <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
+      <input
+        type="search"
+        value={query}
+        onChange={e => setQuery(e.target.value)}
+        placeholder="Search name, outlet or beat…"
+        style={{ flex: 1, minWidth: 220, maxWidth: 380, background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 13.5, padding: "7px 11px", outline: "none" }}
+      />
+      {q && (
+        <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK55 }}>
+          {visible.length} of {journalists.length}
+        </span>
+      )}
+      <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+        Click any column heading to sort.
+      </span>
+    </div>
+
     <div style={{ border: `1px solid ${INK}`, overflow: "hidden" }}>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 110px 60px 52px 52px 90px", background: INK, color: PAPER }}>
-        {["Journalist", "Outlet / Beat", "DR", "Sent", "Won", "Last contact"].map((h, i) => (
-          <div key={h} style={{ padding: "10px 12px", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", borderRight: i < 5 ? "1px solid rgba(241,235,222,.12)" : "none" }}>{h}</div>
+        {([
+          ["Journalist",   "name"],
+          ["Outlet / Beat","outlet"],
+          ["DR",           "dr"],
+          ["Sent",         "sent"],
+          ["Won",          "won"],
+          ["Last contact", "last"],
+        ] as [string, typeof sortKey][]).map(([h, key], i) => (
+          <button
+            key={h}
+            type="button"
+            onClick={() => toggleSort(key)}
+            title={`Sort by ${h}`}
+            style={{
+              padding: "10px 12px", textAlign: "left",
+              background: "transparent", border: "none",
+              borderRight: i < 5 ? "1px solid rgba(241,235,222,.12)" : "none",
+              fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em",
+              textTransform: "uppercase", color: PAPER, cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 4,
+            }}
+          >
+            {h}
+            <span style={{ opacity: sortKey === key ? 1 : 0.25 }}>
+              {sortKey === key ? (sortDir === "asc" ? "\u2191" : "\u2193") : "\u2195"}
+            </span>
+          </button>
         ))}
       </div>
 
       {visible.length === 0 && (
         <div style={{ padding: "20px", textAlign: "center", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-          Nothing matches this filter.
+          {q ? `No saved journalist matches "${query.trim()}".` : "Nothing matches this filter."}
         </div>
       )}
 
@@ -591,7 +699,15 @@ export default function JournoCollabIQClient({
   const [results, setResults] = useState<AIJournalist[] | null>(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
-  const [savedNames, setSavedNames] = useState<Set<string>>(new Set());
+  // 2026-09-13: seeded from the journalists already in the list. This used to
+  // start empty, so it only knew about saves made in the CURRENT session — a
+  // journalist saved yesterday came back from a new search with a live "Save to
+  // list" button and no sign they were already there, which is how you end up
+  // with duplicate rows. Matched on a normalised name because that is the only
+  // identifier an AI suggestion and a stored CRM row share.
+  const [savedNames, setSavedNames] = useState<Set<string>>(
+    () => new Set(initialJournalists.map(j => normaliseName(j.name))),
+  );
   const [brief, setBrief] = useState<string | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
   const [briefError, setBriefError] = useState<string | null>(null);
@@ -649,7 +765,16 @@ export default function JournoCollabIQClient({
       // Strip markdown fences if present
       const json = raw.startsWith("```") ? raw.replace(/^```[a-z]*\n?/i, "").replace(/```$/, "").trim() : raw;
       const parsed = JSON.parse(json) as AIJournalist[];
-      setResults(parsed);
+      // 2026-09-13: sort by tier before display. The header says "ranked by
+      // fit", but the list was rendered in whatever order the model emitted,
+      // so a Tier A could sit below two Tier Bs and the ranking claim read as
+      // false. Sort is stable, so the model's own ordering is preserved inside
+      // each tier — that within-tier order IS its fit ranking, and this only
+      // fixes the tier grouping around it.
+      const TIER_RANK: Record<string, number> = { A: 0, B: 1, C: 2 };
+      setResults([...parsed].sort(
+        (a, b) => (TIER_RANK[a.tier] ?? 9) - (TIER_RANK[b.tier] ?? 9),
+      ));
     } catch (e) {
       console.error("journo search error:", e);
       setSearchError("Could not parse journalist results. Please try again.");
@@ -753,7 +878,7 @@ export default function JournoCollabIQClient({
               formData={lastForm ?? {}}
               savedNames={savedNames}
               onSaved={(name, nj) => {
-                setSavedNames(prev => new Set([...prev, name]));
+                setSavedNames(prev => new Set([...prev, normaliseName(name)]));
                 setJournalists(prev => [nj, ...prev]);
               }}
               prefillAssetTitle={prefillAssetTitle}

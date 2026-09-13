@@ -329,11 +329,13 @@ export default async function EmosDashboardPage() {
                     <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".10em", textTransform: "uppercase", color: isActive ? "rgba(241,235,222,.5)" : INK55 }}>
                       {meta.tool}
                     </span>
-                    {isDone && (
-                      <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", background: "rgba(62,107,69,.15)", color: GREEN, border: `1px solid ${GREEN}`, padding: "2px 7px" }}>
-                        ✓ DONE
-                      </span>
-                    )}
+                    {/* 2026-09-13 (Irfan): the "✓ DONE" badge was removed. You
+                        never finish SignalIQ or PressIQ — you use them every
+                        week — so a completion badge implied a finality that
+                        does not exist. The card already shows the real count
+                        ("3 SIGNALS SAVED"), which says the same thing honestly.
+                        ACTIVE stays: it marks where you are now, which is true.
+                        isDone still drives the muted colours below. */}
                     {isActive && (
                       <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 7.5, letterSpacing: ".14em", textTransform: "uppercase", background: YEL, color: INK, padding: "2px 7px" }}>
                         ACTIVE

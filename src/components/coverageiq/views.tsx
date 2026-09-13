@@ -25,6 +25,25 @@ import {
   type Urgency, type NewPitchDraft, type CreateJournalistInput,
 } from "@/lib/coverageiq/types";
 
+/**
+ * Points — hidden from display 2026-09-13 (Irfan), data deliberately KEPT.
+ *
+ * `points` was an internal formula used to decide team commission, and it was
+ * rendering on the client-facing coverage screens. Two problems: internal
+ * commission maths does not belong on a screen you share with a client, and
+ * the formula keyed off Domain Rating alone, which is a poor measure of what a
+ * placement is actually worth.
+ *
+ * Nothing is deleted: coverageiq_pitches.points still stores every value, and
+ * flipping this to true brings the whole display back.
+ *
+ * Rebuilding it properly is its own piece of work, not a UI tweak. A real
+ * version needs topical relevance, audience fit and traffic alongside
+ * authority — decide the model first, then re-enable.
+ */
+const SHOW_POINTS = false;
+
+
 // ─── Pipeline View ─────────────────────────────────────────────────────────────
 
 export function PipelineView({
@@ -105,15 +124,18 @@ export function PipelineView({
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           {/* Header */}
           <div style={{
-            display: "grid", gridTemplateColumns: "minmax(200px,1fr) 150px 96px 80px 64px 72px",
+            display: "grid", gridTemplateColumns: SHOW_POINTS ? "minmax(200px,1fr) 150px 96px 80px 64px 72px" : "minmax(200px,1fr) 150px 96px 80px 64px",
             background: INK, color: PAPER,
             fontFamily: GROT, fontWeight: 700, fontSize: 9,
             letterSpacing: "0.18em", textTransform: "uppercase",
           }}>
-            {["Pitch", "Journalist", "Stage", "DR", "PESO", "Points"].map((h, i) => (
+            {(SHOW_POINTS
+              ? ["Pitch", "Journalist", "Stage", "DR", "PESO", "Points"]
+              : ["Pitch", "Journalist", "Stage", "DR", "PESO"]
+            ).map((h, i) => (
               <div key={h} title={h === "DR" ? METRIC_TIPS.dr : h === "Points" ? METRIC_TIPS.points : undefined} style={{
                 padding: "12px 16px",
-                borderRight: i < 5 ? "1px solid rgba(241,235,222,.15)" : "none",
+                borderRight: i < (SHOW_POINTS ? 5 : 4) ? "1px solid rgba(241,235,222,.15)" : "none",
               }}>
                 {h}
               </div>
@@ -131,7 +153,7 @@ export function PipelineView({
                 <div
                   onClick={() => setExpandedId(isExpanded ? null : pitch.id)}
                   style={{
-                    display: "grid", gridTemplateColumns: "minmax(200px,1fr) 150px 96px 80px 64px 72px",
+                    display: "grid", gridTemplateColumns: SHOW_POINTS ? "minmax(200px,1fr) 150px 96px 80px 64px 72px" : "minmax(200px,1fr) 150px 96px 80px 64px",
                     borderBottom: `1px solid ${INK15}`, cursor: "pointer",
                     background: isExpanded ? PAPER2 : "transparent",
                     transition: "background 0.12s",
@@ -253,9 +275,11 @@ export function PipelineView({
         <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55 }}>
           {filtered.length} pitch{filtered.length !== 1 ? "es" : ""}{stageFilter !== "all" ? ` in ${stageFilter}` : " total"}
         </span>
-        <span title={METRIC_TIPS.points} style={{ fontFamily: MONO, fontSize: 12, color: INK55 }}>
-          Total points: {totalPoints}
-        </span>
+        {SHOW_POINTS && (
+          <span title={METRIC_TIPS.points} style={{ fontFamily: MONO, fontSize: 12, color: INK55 }}>
+            Total points: {totalPoints}
+          </span>
+        )}
       </div>
     </div>
   );
@@ -457,14 +481,14 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", border: `1px solid ${INK}`, marginBottom: 24 }}>
-        {[
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHOW_POINTS ? 4 : 3}, 1fr)`, border: `1px solid ${INK}`, marginBottom: 24 }}>
+        {([
           { num: coverageLog.length, label: "TOTAL PLACEMENTS", tip: undefined as string | undefined },
-          { num: totalPoints,        label: "TOTAL POINTS",      tip: METRIC_TIPS.points },
-          { num: avgDR,              label: "AVG DOMAIN RATING", tip: METRIC_TIPS.dr },
-          { num: doFollow,           label: "DO-FOLLOW LINKS",   tip: "Do-follow links pass SEO authority from the publishing site to yours; no-follow links do not." },
-        ].map((item, i) => (
-          <div key={i} title={item.tip} style={{ padding: "20px 16px", borderRight: i < 3 ? `1px solid ${INK}` : "none" }}>
+          ...(SHOW_POINTS ? [{ num: totalPoints, label: "TOTAL POINTS", tip: METRIC_TIPS.points as string | undefined }] : []),
+          { num: avgDR,              label: "AVG DOMAIN RATING", tip: METRIC_TIPS.dr as string | undefined },
+          { num: doFollow,           label: "DO-FOLLOW LINKS",   tip: "Do-follow links pass SEO authority from the publishing site to yours; no-follow links do not." as string | undefined },
+        ]).map((item, i, arr) => (
+          <div key={i} title={item.tip} style={{ padding: "20px 16px", borderRight: i < arr.length - 1 ? `1px solid ${INK}` : "none" }}>
             <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 28, lineHeight: 1, color: INK, letterSpacing: "-0.02em" }}>{item.num}</div>
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, marginTop: 6 }}>{item.label}</div>
           </div>
@@ -951,7 +975,7 @@ export function PESODashboard({
                 {descriptions[p.type]}
               </div>
               <div style={{ borderTop: earned ? "1px solid rgba(241,235,222,.2)" : `1px solid ${INK15}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-                {([["Pitches", p.total], ["Placed", p.placed], ["Points", p.points], ["Avg DR", p.avgDR || "—"]] as [string, number | string][]).map(([label, value]) => (
+                {(([["Pitches", p.total], ["Placed", p.placed], ...(SHOW_POINTS ? [["Points", p.points]] : []), ["Avg DR", p.avgDR || "—"]]) as [string, number | string][]).map(([label, value]) => (
                   <div key={label} title={label === "Avg DR" ? METRIC_TIPS.dr : label === "Points" ? METRIC_TIPS.points : undefined} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                     <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: earned ? "rgba(241,235,222,.5)" : INK55 }}>{label}</span>
                     <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, color: earned ? PAPER : INK }}>{value}</span>

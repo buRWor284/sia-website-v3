@@ -98,6 +98,7 @@ function TrackCTA({
 }) {
   const [tracking, startTrack] = useTransition();
   const [tracked, setTracked] = useState<string | null>(null);
+  const companyCtx = useCompanyOptional();
 
   function handleTrack() {
     startTrack(async () => {
@@ -116,6 +117,12 @@ function TrackCTA({
         data_source: "PressIQ",
         stage: "drafted",
         journalist_id: journalist?.id ?? null,
+        // 2026-09-13: same bug class as journalist_id above — createPitch has
+        // always accepted `client`, PressIQ just never sent it, so every pitch
+        // handed over from here landed in CoverageIQ with a blank client while
+        // manually-logged rows showed theirs. `client` is free text today; it
+        // becomes a real company FK with the CoverageIQ migration (1b).
+        client: companyCtx?.company?.name ?? null,
         notes,
       });
       if (draft?.id) setTracked(draft.id);
@@ -483,11 +490,40 @@ export default function PressIQPlatformClient({
                 style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 260 }}
               >
                 <option value="">Nobody in particular</option>
-                {initialJournalists.map(j => (
-                  <option key={j.id} value={j.id}>
-                    {j.name}{j.outlet ? ` · ${j.outlet}` : ""}{j.beat ? ` · ${j.beat}` : ""}
-                  </option>
-                ))}
+                {/* 2026-09-13: scoped to the company you are working for. It
+                    used to be one flat list, so pitching for Efani offered you
+                    another client's journalists with nothing to tell them
+                    apart. Journalists for other companies are still reachable —
+                    grouped and labelled, not hidden — because this is a picker,
+                    not a report, and hiding a row you need is its own bug.
+                    Unassigned journalists stay in the first group: they predate
+                    company tagging and belong to whoever is looking.
+                    (Same filter PitchDrafter already uses for its batch pool.) */}
+                {(() => {
+                  const active = companyCtx?.company?.id ?? null;
+                  const label  = companyCtx?.company?.name ?? "This company";
+                  const mine   = active
+                    ? initialJournalists.filter(j => !j.company_id || j.company_id === active)
+                    : initialJournalists;
+                  const others = active
+                    ? initialJournalists.filter(j => j.company_id && j.company_id !== active)
+                    : [];
+                  const opt = (j: typeof initialJournalists[number]) => (
+                    <option key={j.id} value={j.id}>
+                      {j.name}{j.outlet ? ` · ${j.outlet}` : ""}{j.beat ? ` · ${j.beat}` : ""}
+                    </option>
+                  );
+                  return (
+                    <>
+                      {active && others.length > 0
+                        ? <optgroup label={label}>{mine.map(opt)}</optgroup>
+                        : mine.map(opt)}
+                      {others.length > 0 && (
+                        <optgroup label="Other companies">{others.map(opt)}</optgroup>
+                      )}
+                    </>
+                  );
+                })()}
               </select>
             )}
 
@@ -502,6 +538,9 @@ export default function PressIQPlatformClient({
                   style={{ background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".06em", padding: "6px 11px", outline: "none", cursor: "pointer", maxWidth: 240 }}
                 >
                   <option value="">No particular asset</option>
+                  {/* NOT scoped by company yet, unlike the journalist list
+                      above: the assets table carries org_id only, with no
+                      company column to filter on. Needs the migration (1c). */}
                   {initialAssets.map(a => <option key={a.id} value={a.id}>{a.title}</option>)}
                 </select>
               </>

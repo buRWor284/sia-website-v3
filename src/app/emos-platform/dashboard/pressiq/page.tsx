@@ -179,14 +179,14 @@ export default async function PressIQPlatformPage({
           initialDrafts={drafts}
         />
 
-        <PipelineNav
-          current="press"
-          nextHref={
-            rows[0]?.journalist_query
-              ? `/emos-platform/dashboard/coverageiq?pitch=${encodeURIComponent(rows[0].journalist_query.slice(0, 200))}`
-              : undefined
-          }
-        />
+        {/* 2026-09-13: this used to pass `?pitch=` built from
+            rows[0].journalist_query — the newest row in score history, not the
+            journalist currently selected, and a journalist BEAT passed into a
+            field CoverageIQ uses as the pitch SUBJECT. On a multi-company org it
+            surfaced another client's journalist. The context-carrying route into
+            CoverageIQ is the scored-pitch "Track this pitch in CoverageIQ"
+            button, which creates the row attached to the right journalist. */}
+        <PipelineNav current="press" />
       </div>
     </div>
   );

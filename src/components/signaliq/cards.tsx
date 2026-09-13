@@ -498,11 +498,14 @@ export function OppCard({
   onGenerate,
   onSelect,
   save,
+  rank,
 }: {
   opp: Opportunity;
   onGenerate: () => void;
   onSelect?: () => void;
   save?: OppCardSave;
+  /** 1-based position in the ranked list. See the rank chip below. */
+  rank?: number;
 }) {
   const [showSources, setShowSources] = useState(false);
   const signalBySource = Object.fromEntries(opp.signals.map(s => [s.source, s]));
@@ -511,6 +514,20 @@ export function OppCard({
       {/* INK header strip — one verdict: band label + score, read as a single rating */}
       <div className="siq-card-head">
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          {/* 2026-09-13: the rank position, added because the list is ordered by
+              score × fit while the number shown is the honest strength score
+              alone (see rankOpportunities in lib/signaliq/score.ts). That is a
+              deliberate choice, but without a visible position a 66 sitting
+              above a 73 just reads as a broken sort. The number asserts the
+              order; the legend above the list says why fit can move things. */}
+          {rank != null && (
+            <span style={{
+              fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em",
+              color: "rgba(241,235,222,.55)",
+            }}>
+              {String(rank).padStart(2, "0")}
+            </span>
+          )}
           <span style={{
             fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em",
             textTransform: "uppercase",

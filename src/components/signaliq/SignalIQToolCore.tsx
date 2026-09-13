@@ -768,6 +768,17 @@ export default function SignalIQToolCore({
                     <span><strong style={{ color: INK }}>Coverage gap</strong> = how little press exists yet (Wide = your best pitch window)</span>
                     <span style={{ color: INK35 }}>|</span>
                     <span>Wide gap means under-covered, not well-substantiated — check signal count before pitching</span>
+                    {/* 2026-09-13: the missing half of the explanation. The list
+                        is ordered by score × fit but shows the strength score on
+                        its own, so a lower number can sit above a higher one and
+                        look like a bug. Say so, but only when fit is actually in
+                        play (a scan with no company context ranks on score). */}
+                    {usedContext && (
+                      <>
+                        <span style={{ color: INK35 }}>|</span>
+                        <span><strong style={{ color: INK }}>Order</strong> = score × fit to you, so a strong fit can rank a lower-scoring signal above a higher one</span>
+                      </>
+                    )}
                     <Link href="/tools/signaliq/about" style={{ fontWeight: 700, color: INK70, textDecoration: "underline", textDecorationColor: INK15 }}>Full methodology →</Link>
                   </div>
                   <p style={{ margin: "0 0 14px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
@@ -778,9 +789,10 @@ export default function SignalIQToolCore({
                 <div className="siq-results-wrap">
                   <div className="siq-cards-col">
                     <div className="siq-cards">
-                      {rankedOpps.map((opp) => (
+                      {rankedOpps.map((opp, i) => (
                         <OppCard
                           key={opp.id}
+                          rank={i + 1}
                           opp={opp}
                           onSelect={() => pickForAngle(opp)}
                           onGenerate={() => pickForPack(opp)}
