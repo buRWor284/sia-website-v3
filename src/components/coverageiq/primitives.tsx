@@ -7,7 +7,7 @@
 // EMOS dashboard via the shared views. No data-source coupling here.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import {
   PAPER, PAPER2, INK, INK70, INK55, INK35, INK15,
   YEL, SERIF, GROT, MONO,
@@ -87,7 +87,7 @@ export function PESOBadge({ type }: { type: PesoType }) {
 // One canonical place for what DR and Points mean. Used as hover tooltips on
 // badges + column headers, and rendered visibly in MetricsLegend below.
 export const METRIC_TIPS = {
-  dr: "DR (Domain Rating): how strong the publishing website's reputation is, on a 0-100 scale (an SEO measure, similar to Ahrefs Domain Rating). Major outlets like TechCrunch sit in the 90s; a niche blog might be 20-40. Higher means a mention there carries more weight.",
+  dr: "DR (Domain Rating by Ahrefs): how strong the website's backlink profile is, on a 0-100 logarithmic scale. Major outlets like TechCrunch sit in the 90s; a niche blog might be 20-40. Higher means a link there carries more weight.",
   points: "Points: a simple win score for coverage you have logged. Points are awarded only once a pitch reaches Placed or Amplified. Bigger placements on higher-DR sites earn more.",
 } as const;
 
@@ -329,6 +329,18 @@ export function DataSourceNote({ variant }: { variant: "public" | "dashboard" })
         {body}
       </p>
     </div>
+  );
+}
+
+/** Required by the Ahrefs Domain Rating licence wherever a DR is shown:
+ * the exact text "Domain Rating by Ahrefs", linked, never hidden. */
+export function DrAttribution({ style }: { style?: CSSProperties }) {
+  return (
+    <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: ".08em", color: INK55, ...style }}>
+      <a href="https://ahrefs.com/" target="_blank" rel="noopener noreferrer" style={{ color: "inherit", textDecoration: "underline" }}>
+        Domain Rating by Ahrefs
+      </a>
+    </span>
   );
 }
 
