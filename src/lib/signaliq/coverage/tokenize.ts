@@ -83,6 +83,13 @@ export const LANGS: Record<string, string> = {
  * sampled row (…一方面，拼 | 多 | 多长期坚持的…). Korean is deliberately NOT here:
  * it spaces its words.
  */
+// ★ SEED RULE for these languages (audit 2026-09-15): the matcher uses
+// STARTS_WITH with no word boundary, so a seed that is the START of a longer
+// common word matches that word too. Thai "\u0e2d\u0e38\u0e15\u0e2a\u0e32\u0e2b\u0e01\u0e23\u0e23\u0e21\u0e22\u0e32" (pharma industry) matched
+// "\u0e2d\u0e38\u0e15\u0e2a\u0e32\u0e2b\u0e01\u0e23\u0e23\u0e21\u0e22\u0e32\u0e19\u0e22\u0e19\u0e15\u0e4c" (automotive industry) 64 times out of 64. There is no safe code
+// fix (these scripts have no word boundaries), so prefer the LONGER, unambiguous
+// form of a phrase, and run the collocation check (audits/seed-audit-2026-09-15/
+// gen-seed-audit-sql.ts) on any new seed before it reaches a public card.
 const CHAR_TOKENISED = new Set(["zh", "zh-tw", "ja", "th"]);
 
 /** Minimum characters for a seed in a character-tokenised language. A 1- or
