@@ -62,6 +62,7 @@ import {
   setStoredCoverageBulk,
   getCoverageFreshness,
 } from "@/lib/signaliq/coverage-store";
+import { refreshTopicHistory } from "@/lib/signaliq/history";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -271,9 +272,22 @@ export async function GET(req: NextRequest) {
       ? await deriveAndMaybeWrite(today)
       : { skipped: true };
 
+    // 2026-09-15 history layer: rebuild the weekly rollup + per-topic profile
+    // (signaliq_topic_history) whenever a new day landed. ~17 s in Postgres,
+    // best-effort — a failure here must never turn a successful scan red.
+    let history: Record<string, unknown> = { skipped: true };
+    if (scanned.length > 0) {
+      try {
+        history = { ...(await refreshTopicHistory()) };
+      } catch (e) {
+        history = { error: e instanceof Error ? e.message : String(e) };
+      }
+    }
+
     return NextResponse.json({
       mode: "daily",
       pendingDays: pending,
+      history,
       // Days still missing after this run — the Actions health check warns when
       // this stops shrinking, which is what a stuck cursor actually looks like.
       daysBehind: missing.length - scanned.length,
