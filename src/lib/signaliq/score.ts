@@ -2,7 +2,9 @@
  * SignalIQ — opportunity scoring. Pure, deterministic, unit-testable.
  *
  *   score (shown) = Σ weighted(magnitude, velocity, coverageGap, fit, credibility, corroboration) × 100
- *                   — honest signal STRENGTH; relevance never lowers it.
+ *                   — honest signal STRENGTH; relevance never lowers it, except that a
+ *                   LOW-fit topic is capped at 79 so it can never read "Hot lead" (15 Sep 2026).
+ *   magnitude     = shown as "Volume"; damped per source when below that source's baseline.
  *   fit           = how well the opportunity matches the company profile, surfaced as a
  *                   High/Med/Low badge and used to RANK + filter (not to scale the score).
  *
@@ -27,6 +29,35 @@ const COOLING_TREND_EPS = 0.05;
 // Residual credit given to the coverage gap when the topic is cooling — not zeroed
 // entirely (data is noisy / short windows), but heavily discounted vs. real whitespace.
 const COOLING_GAP_DISCOUNT = 0.15;
+
+// D3, decided by Irfan 15 Sep 2026: a LOW-fit topic can never be labelled "Hot lead".
+// Same mechanism as the thin-evidence cap: the score stops at the top of Worth a look.
+// Bands describe the signal and fit describes you, so fit still never LOWERS a
+// score below this line; it only stops a poor fit being sold as a hot lead.
+const LOW_FIT_MAX_SCORE = 79;
+// |trend| below this reads as "near its norm" rather than above/below.
+const VOLUME_DIRECTION_EPS = 0.1;
+
+/**
+ * Direction of the signal that supplied the Volume (magnitude) component. Returns
+ * undefined when that signal has no baseline (`trend` unset) or is a sample too
+ * small to call a trend, so the card never claims a direction it cannot back.
+ */
+export function volumeDirection(signals: Signal[]): Opportunity["volumeDirection"] {
+  if (!signals.length) return undefined;
+  const top = signals.reduce((a, b) => (b.magnitude > a.magnitude ? b : a), signals[0]);
+  if (top.trend == null || top.lowSample) return undefined;
+  return { source: top.source, trend: top.trend };
+}
+
+/** Plain-English direction for the Volume row, e.g. "below its 12-month norm". */
+export function volumeDirectionLabel(dir: Opportunity["volumeDirection"]): string | null {
+  if (!dir) return null;
+  const norm = dir.source === "sec" ? "12-month norm" : dir.source === "arxiv" ? "previous two months" : "norm";
+  if (dir.trend <= -VOLUME_DIRECTION_EPS) return `below its ${norm}`;
+  if (dir.trend >= VOLUME_DIRECTION_EPS) return `above its ${norm}`;
+  return `near its ${norm}`;
+}
 
 /**
  * True when press coverage is trending down AND no signal source shows real upward
@@ -168,7 +199,12 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
   // Cap it inside the Early band so the label cannot oversell a handful of data.
   const thinEvidence = signals.length > 0 && signals.every((s) => s.lowSample === true);
   const rawScore = Math.round(clamp01(base) * 100);
-  const score = thinEvidence ? Math.min(rawScore, THIN_EVIDENCE_MAX_SCORE) : rawScore;
+  const lowFitCapped = fitTier === "low" && !thinEvidence && rawScore > LOW_FIT_MAX_SCORE;
+  const score = thinEvidence
+    ? Math.min(rawScore, THIN_EVIDENCE_MAX_SCORE)
+    : lowFitCapped
+      ? LOW_FIT_MAX_SCORE
+      : rawScore;
   const band = bandFor(score);
 
   const headline = signals[0]?.title?.trim() || topic;
@@ -188,6 +224,8 @@ export function scoreOpportunity(inp: ScoreInputs): Opportunity {
     fit: fitTier,
     cooling,
     thinEvidence,
+    lowFitCapped,
+    volumeDirection: volumeDirection(signals),
     coverage,
     signals,
     sensitive,

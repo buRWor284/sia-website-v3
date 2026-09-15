@@ -7,7 +7,7 @@
  */
 
 import React, { useState, useEffect, useRef, useId } from "react";
-import { coverageState } from "@/lib/signaliq/score";
+import { coverageState, volumeDirectionLabel } from "@/lib/signaliq/score";
 import {
   GROT,
   INK,
@@ -385,7 +385,7 @@ export function GapBar({ opp }: { opp: Opportunity }) {
   );
 }
 
-export function CompBar({ label, value }: { label: string; value: number }) {
+export function CompBar({ label, value, note }: { label: string; value: number; note?: string | null }) {
   const pct = Math.round(value * 100);
   const c = pct >= 70 ? GREEN : pct >= 40 ? AMBER : RED;
   return (
@@ -397,6 +397,9 @@ export function CompBar({ label, value }: { label: string; value: number }) {
       <div style={{ height: 5, background: PAPER2, border: `1px solid ${INK15}` }}>
         <div style={{ height: "100%", width: `${pct}%`, background: c, transition: "width .5s ease" }} />
       </div>
+      {note && (
+        <div style={{ marginTop: 3, fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK70 }}>{note}</div>
+      )}
     </div>
   );
 }
@@ -558,6 +561,11 @@ export function OppCard({
             Thin evidence: every signal here is a very small sample, so the score is capped at 59. Check the counts before you pitch it.
           </p>
         )}
+        {opp.lowFitCapped && (
+          <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK70 }}>
+            Low fit to your company: the signal is strong, but the score is capped at 79 so it is never labelled a hot lead for you.
+          </p>
+        )}
         {/* Why now — market-timing driver (coverage gap) */}
         <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
           <span style={{ flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
@@ -707,7 +715,7 @@ export function ScorePanel({ opp }: { opp: Opportunity }) {
     <div style={{ border: `1px solid ${INK15}`, background: PAPER2, padding: "16px 18px" }}>
       <SCaps size={10} ls="0.16em" color={INK}>Score breakdown</SCaps>
       <div style={{ marginTop: 12 }}>
-        <CompBar label="Magnitude" value={opp.components.magnitude} />
+        <CompBar label="Volume" value={opp.components.magnitude} note={volumeDirectionLabel(opp.volumeDirection)} />
         <CompBar label="Velocity" value={opp.components.velocity} />
         <CompBar label="Coverage gap" value={opp.components.coverageGap} />
         <CoverageNote opp={opp} />

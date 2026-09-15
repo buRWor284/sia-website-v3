@@ -44,7 +44,7 @@ export interface Signal {
   title: string;        // human-readable headline for the signal
   url: string;          // primary-source link (the receipt)
   observedAt: string;   // ISO timestamp
-  magnitude: number;    // 0..1 — how large/unusual vs the source's own baseline
+  magnitude: number;    // 0..1 — volume vs a per-source cap, damped when below the source's own baseline (shown as "Volume")
   velocity: number;     // 0..1 — how fast it's accelerating (floored at 0; a real decline
                          // looks identical to "flat" here — use `trend` for direction)
   /** Signed direction when the source can compute it: -1 (falling) .. 0 (flat) .. 1 (rising).
@@ -111,6 +111,13 @@ export interface Opportunity {
   /** Every signal behind this topic is a sample too small to call a trend, so
    *  the score is capped inside the Early band (score.ts, 2026-09-10). */
   thinEvidence?: boolean;
+  /** Fit to the company is LOW, so the score is capped at 79: a strong signal that
+   *  does not fit you can never read as a "Hot lead" (score.ts, D3, 15 Sep 2026). */
+  lowFitCapped?: boolean;
+  /** Direction of the signal that supplied the Volume component, vs that source's
+   *  own baseline. Absent when the source has no baseline or the sample is too
+   *  small to call a trend. Drives the "below its norm" note next to Volume. */
+  volumeDirection?: { source: SourceId; trend: number };
   coverage: Coverage | null;
   signals: Signal[];       // the receipts
   sensitive: boolean;      // tasteful-newsjacking flag (RFP §11.4)

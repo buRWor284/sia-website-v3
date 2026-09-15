@@ -148,7 +148,7 @@ export function buildSignalIqReport(doc: PdfDoc, d: SignalIqReportData): void {
   const selGapState = coverageState(sel);
   const comps: [string, number][] = [
     ["Coverage gap", sel.components.coverageGap],
-    ["Magnitude", sel.components.magnitude],
+    ["Volume", sel.components.magnitude],
     ["Velocity", sel.components.velocity],
     ["Credibility", sel.components.credibility],
     ["Corroboration", sel.components.corroboration],

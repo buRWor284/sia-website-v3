@@ -2,6 +2,9 @@
  * Hacker News via the Algolia API (no key). Tech/SaaS/AI attention surges.
  * magnitude — cumulative points across recent matching stories
  * velocity  — share of those points earned in the last 7 days
+ * No baseline: the 30-day query has no prior window to compare against, so HN
+ * sets no `trend` and its magnitude is NOT damped for declines (15 Sep 2026).
+ * Adding a prior-window query would be the way to change that.
  */
 import type { Signal } from "../types";
 import { SOURCE_CREDIBILITY } from "../config";

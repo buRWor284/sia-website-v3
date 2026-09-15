@@ -39,6 +39,19 @@ export const clamp01 = (n: number): number =>
 export const clamp = (n: number, lo: number, hi: number): number =>
   Math.max(lo, Math.min(hi, n));
 
+/**
+ * Baseline-aware volume (decided by Irfan 15 Sep 2026, D1 = 0.6; see
+ * SignalIQ-Magnitude-and-Points-Decision-2026-09-13.md). A raw count against a
+ * fixed cap said "149 SEC filings = 100/100" even though 149 was well BELOW the
+ * topic's ~262/month norm, while the pack warned "do not frame this as a surge".
+ * Only declines are damped: a topic at half its norm (trend -0.5) keeps 70% of
+ * its volume. Rising topics are untouched, because velocity already rewards them.
+ * `trend` is undefined when a source has no honest baseline, and then nothing is damped.
+ */
+export const DECLINE_WEIGHT = 0.6;
+export const dampForDecline = (rawMagnitude: number, trend: number | undefined): number =>
+  clamp01(rawMagnitude * (1 + DECLINE_WEIGHT * Math.min(trend ?? 0, 0)));
+
 export const avg = (xs: number[]): number =>
   xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0;
 

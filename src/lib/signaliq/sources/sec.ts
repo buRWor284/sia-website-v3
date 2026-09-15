@@ -6,7 +6,7 @@
  */
 import type { Signal } from "../types";
 import { SOURCE_CREDIBILITY } from "../config";
-import { clamp, clamp01, getJson, isoDaysAgo } from "./http";
+import { clamp, clamp01, dampForDecline, getJson, isoDaysAgo } from "./http";
 import { createLimiter } from "./throttle";
 
 const FTS = "https://efts.sec.gov/LATEST/search-index?q=";
@@ -90,7 +90,6 @@ export async function secSignal(seed: string): Promise<Signal | null> {
     const prior = baselineRes.total;
     const priorMonthly = prior / BASELINE_MONTHS;
 
-    const magnitude = clamp01(recent / FILINGS_CAP);
     const rawVelocity =
       priorMonthly > 0 ? (recent - priorMonthly) / Math.max(priorMonthly, 1) : recent > 3 ? 1 : 0.5;
     const velocity = clamp01(rawVelocity);
@@ -98,6 +97,9 @@ export async function secSignal(seed: string): Promise<Signal | null> {
     // magnitudes. `trend` keeps the sign so a genuine decline isn't lost — see
     // SignalIQ-Notes-and-TODOs.md, "Scoring logic gap" (2026-07-08).
     const trend = priorMonthly > 0 ? clamp(rawVelocity, -1, 1) : velocity;
+    // Volume against the fixed cap, damped when the count sits below its own
+    // trailing 12-month norm (15 Sep 2026). 149 vs ~262/mo: 1.0 -> 0.74.
+    const magnitude = dampForDecline(clamp01(recent / FILINGS_CAP), trend);
 
     // Baseline sanity checks v1 (2026-07-08): don't let a tiny sample or a
     // one-filer baseline pass as a market-wide trend without saying so.

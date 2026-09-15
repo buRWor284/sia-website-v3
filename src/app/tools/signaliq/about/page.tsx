@@ -15,7 +15,7 @@ import {
 import { DoubleRule, HRule, SCaps } from "@/components/bureau/primitives";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { visibleBeats } from "@/lib/signaliq/config";
-import { MAX_SEEDS_PER_SCAN } from "@/lib/signaliq/config";
+import { MAX_SEEDS_PER_SCAN, WEIGHTS } from "@/lib/signaliq/config";
 
 const HDR_BG = "#0e0d0a";
 const HDR_BORDER = "#2a2318";
@@ -75,13 +75,16 @@ const SOURCES = [
   },
 ];
 
+// Weights are read from WEIGHTS in config.ts, never typed here (15 Sep 2026: the
+// hand-typed list said 30/25/22/13/10/15 while the scorer used 28/22/20/6/10/14).
+const pct = (w: number) => `${Math.round(w * 100)}%`;
 const SCORE_COMPONENTS = [
-  { label: "Coverage gap", weight: "30%", description: "How thin is press coverage relative to signal volume? The bigger the gap, the bigger the opportunity window. This is the heaviest component." },
-  { label: "Signal magnitude", weight: "25%", description: "Raw volume of signals: filing counts, paper counts, view counts. More signal = more real activity." },
-  { label: "Signal velocity", weight: "22%", description: "How fast is signal volume growing? A topic with 10 filings this month vs. 1 last month scores higher than one steady at 50." },
-  { label: "Beat fit", weight: "13%", description: "How closely does this topic match the selected beat? Prevents off-topic results from surfacing high." },
-  { label: "Source credibility", weight: "10%", description: "Weighted average credibility of the sources that returned data. An SEC-only signal scores higher than a Hacker News-only signal." },
-  { label: "Corroboration bonus", weight: "+15% max", description: "A bonus added when multiple independent sources confirm the same topic. One source is a hint. Three is a story." },
+  { label: "Coverage gap", weight: pct(WEIGHTS.coverageGap), description: "How thin is press coverage relative to signal volume? The bigger the gap, the bigger the opportunity window. This is the heaviest component." },
+  { label: "Volume", weight: pct(WEIGHTS.magnitude), description: "How much signal there is: filing counts, paper counts, view counts. Marked down when a topic sits below its own usual level, so a big but shrinking topic is never scored like a surge." },
+  { label: "Signal velocity", weight: pct(WEIGHTS.velocity), description: "How fast is signal volume growing against its own baseline? A topic with 10 filings this month vs. 1 last month scores higher than one steady at 50." },
+  { label: "Source credibility", weight: pct(WEIGHTS.credibility), description: "The credibility tier of the strongest source that returned data. An SEC filing counts for more than a Hacker News thread." },
+  { label: "Beat fit", weight: pct(WEIGHTS.fit), description: "How closely does this topic match the selected beat? Prevents off-topic results from surfacing high." },
+  { label: "Corroboration bonus", weight: `+${pct(WEIGHTS.corroborationBonus)} max`, description: "A bonus added when multiple independent sources confirm the same topic. One source is a hint. Three is a story." },
 ];
 
 export default function SignalIQAboutPage() {
@@ -203,6 +206,7 @@ export default function SignalIQAboutPage() {
           <div style={{ marginTop: 20, padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
             <p style={{ margin: 0, fontFamily: MONO, fontSize: 9.5, letterSpacing: ".06em", color: INK55, lineHeight: 1.6 }}>
               BAND THRESHOLDS: Hot lead ≥ 80 · Worth a look 60-79 · Early 40-59 · Noise / late &lt; 40
+              <br />CAPS: every signal a tiny sample → max 59 · low fit to your company → max 79, never a hot lead
             </p>
           </div>
         </section>

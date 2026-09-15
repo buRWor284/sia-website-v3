@@ -54,7 +54,7 @@ const STEPS: Step[] = [
   { name: "Pull five open sources", icon: "⬢", desc: "GDELT, Hacker News, SEC EDGAR, Wikipedia, and arXiv are scanned for fresh movement on the beat.", chips: [] },
   { name: "Filter the junk", icon: "▽", desc: "Whole-word matching, per-source rate limits, and de-duplication strip the noise before anything is scored.", chips: [] },
   { name: "Correlate into topics", icon: "◇", desc: "Signals about the same topic are clustered, so one story is one opportunity, not five fragments.", chips: [] },
-  { name: "Measure magnitude and velocity", icon: "▲", desc: "How big is the movement, and how fast is it growing against its own baseline.", chips: ["MAGNITUDE · 22%", "VELOCITY · 20%"] },
+  { name: "Measure volume and velocity", icon: "▲", desc: "How big is the movement, and how fast is it growing against its own baseline. Volume is marked down when a topic sits below its usual level, so a big but shrinking topic never reads as a surge.", chips: ["VOLUME · 22%", "VELOCITY · 20%"] },
   { name: "The coverage denominator", icon: "◐", desc: "GDELT measures how much press coverage already exists. Opportunity is signal strength divided by existing coverage: big signal, little coverage, big opportunity.", chips: ["COVERAGE GAP · 28%"] },
   { name: "Credibility and corroboration", icon: "◆", desc: "Source quality is weighed, and independent sources agreeing makes noise less likely.", chips: ["CREDIBILITY · 10%", "CORROBORATION · 14%"] },
   { name: "Rank, guard, band", icon: "★", desc: "Company relevance ranks the list, sensitive topics (human tragedy) are demoted and never framed as opportunities, and the final score lands in one of four bands.", chips: ["BEAT FIT · 6%"] },
@@ -72,7 +72,7 @@ const BEATS = ["SaaS & startups", "Fintech", "Health & wellness", "Climate & ene
 const SELECTED_BEAT = "SaaS & startups";
 
 const BREAKDOWN = [
-  { name: "Magnitude", val: "35", w: "35%" },
+  { name: "Volume", val: "35", w: "35%" },
   { name: "Velocity", val: "87", w: "87%" },
   { name: "Coverage gap", val: "50", w: "50%" },
   { name: "Beat fit", val: "100", w: "100%" },
@@ -98,7 +98,7 @@ const BANDS = [
 
 const FACTORS = [
   { name: "Coverage gap", weight: "28%", desc: "how much press coverage already exists; less coverage, more opportunity." },
-  { name: "Magnitude", weight: "22%", desc: "the raw size of the movement in the source data." },
+  { name: "Volume", weight: "22%", desc: "the size of the movement in the source data, marked down when it is below its usual level." },
   { name: "Velocity", weight: "20%", desc: "how fast the movement is growing against its own baseline." },
   { name: "Corroboration", weight: "14%", desc: "independent sources agreeing; noise rarely shows up twice." },
   { name: "Credibility", weight: "10%", desc: "the reliability tier of the sources carrying the signal." },

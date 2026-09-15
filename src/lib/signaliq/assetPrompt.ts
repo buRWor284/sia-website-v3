@@ -151,7 +151,7 @@ export function buildSignalChart(opp: Opportunity): ChartSpec {
     xLabel: "Signal component",
     yLabel: "Strength (0–100)",
     points: [
-      { x: "Magnitude", y: Math.round(c.magnitude * 100) },
+      { x: "Volume", y: Math.round(c.magnitude * 100) },
       { x: "Velocity", y: Math.round(c.velocity * 100) },
       { x: "Coverage gap", y: Math.round(c.coverageGap * 100) },
       { x: "Beat fit", y: Math.round(c.fit * 100) },
