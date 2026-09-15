@@ -90,6 +90,11 @@ const CHAR_TOKENISED = new Set(["zh", "zh-tw", "ja", "th"]);
  *  the CJK equivalent of seeding the English word "noon". */
 export const MIN_CJK_CHARS = 3;
 
+/** Thai grapheme cluster: any Thai code point followed by its combining marks
+ *  (U+0E31, U+0E34-0E3A, U+0E47-0E4E). Leading vowels (\u0e40 \u0e41 \u0e42 \u0e44 \u0e43) are their own cluster,
+ *  matching how GDELT stores them. */
+const THAI_CLUSTER = /[\u0E00-\u0E7F][\u0E31\u0E34-\u0E3A\u0E47-\u0E4E]*/g;
+
 /** Default language for a seed with no prefix. */
 export const DEFAULT_LANG = "en";
 
@@ -138,10 +143,20 @@ export interface TopicMatcher {
  */
 export function tokenizeWords(phrase: string, langCode: string = DEFAULT_LANG): string[] {
   const lowered = phrase.toLowerCase().trim();
+  if (langCode === "th") {
+    // Thai: one token per GRAPHEME CLUSTER (base letter + the vowel/tone marks
+    // stacked on it), not per code point. Proven 2026-09-15: GDELT's Thai ngram
+    // rows are clusters, so a bare combining mark can never be the anchor.
+    // Splitting by code point left 33 of 105 Thai seeds dead for three years
+    // (e.g. \u0e1b\u0e31\u0e0d\u0e0d\u0e32\u0e1b\u0e23\u0e30\u0e14\u0e34\u0e29\u0e10\u0e4c "AI" = 0 matches; 100 in two days once clustered).
+    // The joined key is byte-identical either way, so topic keys are unchanged.
+    return (lowered.match(THAI_CLUSTER) ?? []).filter((c) => !/\s/.test(c));
+  }
   if (CHAR_TOKENISED.has(langCode)) {
     // One token per character, whitespace dropped: webngrams indexes these
     // languages character by character. [...str] splits by code point, so
-    // surrogate pairs are not torn in half.
+    // surrogate pairs are not torn in half. (Chinese/Japanese are precomposed,
+    // so code point == cluster there; Thai is handled above.)
     return [...lowered].filter((c) => !/\s/.test(c));
   }
   return lowered.split(/\s+/).filter(Boolean);

@@ -428,7 +428,7 @@ export const BEATS: Beat[] = [
       //   tokenize.ts (per-seed language, zero extra cost). Their DB keys become
       //   "ar:<phrase>". VERIFY the lang literal (tokenize.ts LANGS) with the
       //   one-day probe before reading anything into these counts.
-      "ar:\u0646\u064a\u0648\u0645", "ar:\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0644\u0627", "ar:\u0627\u0644\u062f\u0631\u0639\u064a\u0629", "ar:\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0645\u0631\u0629",
+      "ar:\u0645\u0634\u0631\u0648\u0639 \u0646\u064a\u0648\u0645", "ar:\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0645\u062d\u0627\u0641\u0638\u0629 \u0627\u0644\u0639\u0644\u0627", "ar:\u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u062f\u0631\u0639\u064a\u0629", "ar:\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0645\u0631\u0629",
       // - Arabic seeds 2026-09-09 (tourism radar). Lifted from the `ar` labels already
       //   curated on every signal card in the radar content.ts files, so the
       //   wording is Irfan-reviewed, not machine-translated. Enabled by the
@@ -554,20 +554,16 @@ export const BEATS: Beat[] = [
       "ar:\u0645\u0643\u062a\u0628\u0629 \u062c\u0631\u064a\u0631", // Jarir Bookstore
       "ar:\u0633\u064a\u0646\u0648\u0645\u064a", // Cenomi (Centers + Retail)
       "ar:\u0645\u062c\u0645\u0648\u0639\u0629 \u0635\u0627\u0641\u0648\u0644\u0627", // Savola Group
-      "ar:\u0627\u0644\u0645\u0631\u0627\u0639\u064a", // Almarai
+      "ar:\u0634\u0631\u0643\u0629 \u0627\u0644\u0645\u0631\u0627\u0639\u064a", // Almarai
       "ar:\u0644\u0648\u0644\u0648 \u0647\u0627\u064a\u0628\u0631\u0645\u0627\u0631\u0643\u062a", // Lulu Retail
       "ar:\u0635\u064a\u062f\u0644\u064a\u0627\u062a \u0627\u0644\u0646\u0647\u062f\u064a", // Nahdi Medical
       "ar:\u0627\u0644\u0623\u0632\u064a\u0627\u0621 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi fashion
       "ar:\u0623\u0633\u0628\u0648\u0639 \u0627\u0644\u0645\u0648\u0636\u0629 \u0641\u064a \u0627\u0644\u0631\u064a\u0627\u0636", // Riyadh Fashion Week
-      "ar:\u0627\u0644\u0642\u0647\u0648\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi coffee
-      "ar:\u0627\u0644\u062c\u0645\u0627\u0644 \u0648\u0627\u0644\u0639\u0637\u0648\u0631 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi beauty
-      "ar:\u0645\u062c\u0645\u0648\u0639\u0629 \u0633\u0627\u0641\u064a \u0644\u0644\u0623\u0644\u0639\u0627\u0628", // Savvy Games
-      "ar:\u0642\u0637\u0627\u0639 \u0627\u0644\u0623\u0644\u0639\u0627\u0628 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi gaming
-      "ar:\u0645\u0631\u0627\u0643\u0632 \u0627\u0644\u062a\u0633\u0648\u0642 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi malls
+      "ar:\u0627\u0644\u0642\u0647\u0648\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a\u0629", // Saudi coffee // Saudi beauty
+      "ar:\u0645\u062c\u0645\u0648\u0639\u0629 \u0633\u0627\u0641\u064a \u0644\u0644\u0623\u0644\u0639\u0627\u0628", // Savvy Games // Saudi gaming // Saudi malls
       "ar:\u0642\u0637\u0627\u0639 \u0627\u0644\u062a\u062c\u0632\u0626\u0629 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi retail
       "ar:\u0627\u0644\u0645\u0633\u062a\u0647\u0644\u0643 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi consumer
-      "ar:\u0627\u0644\u0625\u0646\u0641\u0627\u0642 \u0627\u0644\u0627\u0633\u062a\u0647\u0644\u0627\u0643\u064a \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi consumer spending
-      "ar:\u0633\u0648\u0642 \u0627\u0644\u0625\u0639\u0644\u0627\u0646 \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi advertising
+      "ar:\u0627\u0644\u0625\u0646\u0641\u0627\u0642 \u0627\u0644\u0627\u0633\u062a\u0647\u0644\u0627\u0643\u064a \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi consumer spending // Saudi advertising
     ],
     blurb: "Saudi retail, e-commerce, consumer brands, and lifestyle-economy coverage.",
   },
@@ -616,8 +612,8 @@ export const BEATS: Beat[] = [
       "de:k\u00fcnstliche Intelligenz", "de:gro\u00dfes Sprachmodell", "de:Rechenzentrum", "de:Halbleiter",
       "de:Cloud-Computing", "de:Cyberangriff", "de:Datenleck", "de:Erpressungssoftware",
       "de:Identit\u00e4tsdiebstahl", "de:biometrische Authentifizierung", "de:Wagniskapital", "de:Finanzierungsrunde",
-      "de:B\u00f6rsengang", "de:Fusionen und \u00dcbernahmen", "de:Einhorn-Startup", "de:Startup-Accelerator",
-      "de:Unternehmensbewertung", "de:ausl\u00e4ndische Investitionen", "de:Staatsfonds", "de:Stellenabbau in der Tech-Branche",
+      "de:B\u00f6rsengang", "de:Fusionen und \u00dcbernahmen", "de:Startup-Accelerator",
+      "de:Unternehmensbewertung", "de:ausl\u00e4ndische Investitionen", "de:Staatsfonds",
       "de:elektronischer Handel", "de:Einzelhandel", "de:Lieferkette", "de:letzte Meile",
       "de:Eigenmarke", "de:Einkaufszentrum", "de:privater Konsum", "de:Logistik",
       "de:automatisiertes Lager", "de:grenz\u00fcberschreitender Handel", "de:digitales Banking", "de:Echtzeitzahlung",
@@ -636,7 +632,7 @@ export const BEATS: Beat[] = [
       "de:Homeoffice", "de:Arbeitsmarkt", "de:Fachkr\u00e4ftemangel", "de:Lohnl\u00fccke",
       "de:Gewerkschaften", "de:berufliche Weiterbildung", "de:Hochschulbildung", "de:staatliche Universit\u00e4t",
       "de:Arbeitssicherheit", "de:Arbeitsproduktivit\u00e4t", "de:Handelspolitik", "de:Einfuhrz\u00f6lle",
-      "de:Digitalregulierung", "de:Datenschutz", "de:Wettbewerbsrecht", "de:Klimawandel",
+      "de:Digitalregulierung", "de:Datenschutzversto\u00df", "de:Wettbewerbsrecht", "de:Klimawandel",
       "de:Ern\u00e4hrungssicherheit", "de:Inflation", "de:Staatsverschuldung", "de:bezahlbarer Wohnraum",
     ],
     blurb: "German-language coverage for future radars. Not offered in the beat picker.",
@@ -728,7 +724,7 @@ export const BEATS: Beat[] = [
       "ko:\uc8fc\ud0dd \ub2f4\ubcf4 \ub300\ucd9c", "ko:\uae30\uc900 \uae08\ub9ac", "ko:\uc790\uae08 \uc138\ud0c1", "ko:\ud574\uc678 \uc1a1\uae08",
       "ko:\uc5d0\ub108\uc9c0 \uc804\ud658", "ko:\uc7ac\uc0dd \uc5d0\ub108\uc9c0", "ko:\ud0dc\uc591\uad11 \ubc1c\uc804", "ko:\uc6d0\uc790\ub825 \ubc1c\uc804",
       "ko:\uc5d0\ub108\uc9c0 \uc800\uc7a5", "ko:\uc804\ub825\ub9dd", "ko:\uadf8\ub9b0 \uc218\uc18c", "ko:\uc804\uae30 \uc694\uae08",
-      "ko:\ud0c4\uc18c \ud3ec\uc9d1", "ko:\ubb3c \ubd80\uc871", "ko:\uc804\uae30\ucc28", "ko:\ubc30\ud130\ub9ac \uc0b0\uc5c5",
+      "ko:\ud0c4\uc18c \ud3ec\uc9d1", "ko:\ubb3c \ubd80\uc871", "ko:\uc804\uae30\ucc28 \uc2dc\uc7a5", "ko:\ubc30\ud130\ub9ac \uc0b0\uc5c5",
       "ko:\uc790\uc728 \uc8fc\ud589", "ko:\ub300\uc911 \uad50\ud1b5", "ko:\uace0\uc18d \ucca0\ub3c4", "ko:\ub3c4\uc2dc \uad50\ud1b5",
       "ko:\ud56d\uacf5\uc0ac", "ko:\uc9c0\uc18d \uac00\ub2a5\ud55c \uad00\uad11", "ko:\ud638\ud154 \uc0b0\uc5c5", "ko:\ud56d\uacf5\uad8c \uc608\uc57d",
       "ko:\ub514\uc9c0\ud138 \ud5ec\uc2a4\ucf00\uc5b4", "ko:\uc6d0\uaca9 \uc758\ub8cc", "ko:\uc784\uc0c1 \uc2dc\ud5d8", "ko:\uc720\uc804\uc790 \uce58\ub8cc",
@@ -984,7 +980,7 @@ export const BEATS: Beat[] = [
     // return zero once the first scans land, per the founders-beat pattern.
     seeds: [
       "es:inteligencia artificial", "es:capital de riesgo", "es:ronda de financiaci\u00f3n",  // AI, venture capital, funding round
-      "es:ciberseguridad", "es:fuga de datos", "es:protecci\u00f3n de datos",  // cybersecurity, data leak, data protection
+      "es:ciberseguridad", "es:fuga de datos", "es:aepd",  // cybersecurity, data leak, data protection
       "es:comercio electr\u00f3nico", "es:transformaci\u00f3n digital", "es:econom\u00eda digital",  // e-commerce, digital transformation, digital economy
       "es:banca digital", "es:criptomonedas", "es:veh\u00edculo el\u00e9ctrico",  // digital banking, cryptocurrencies, electric vehicle
       "es:energ\u00edas renovables", "es:cambio clim\u00e1tico", "es:salud digital",  // renewable energy, climate change, digital health
@@ -1029,7 +1025,7 @@ export const BEATS: Beat[] = [
     // return zero once the first scans land, per the founders-beat pattern.
     seeds: [
       "fr:intelligence artificielle", "fr:capital-risque", "fr:lev\u00e9e de fonds",  // AI, venture capital, funding round
-      "fr:cybers\u00e9curit\u00e9", "fr:fuite de donn\u00e9es", "fr:protection des donn\u00e9es",  // cybersecurity, data leak, data protection
+      "fr:cybers\u00e9curit\u00e9", "fr:fuite de donn\u00e9es", "fr:cnil",  // cybersecurity, data leak, data protection
       "fr:commerce \u00e9lectronique", "fr:transformation num\u00e9rique", "fr:\u00e9conomie num\u00e9rique",  // e-commerce, digital transformation, digital economy
       "fr:souverainet\u00e9 num\u00e9rique", "fr:cryptomonnaie", "fr:voiture \u00e9lectrique",  // digital sovereignty, cryptocurrency, electric car
       "fr:\u00e9nergies renouvelables", "fr:changement climatique", "fr:sant\u00e9 num\u00e9rique",  // renewable energy, climate change, digital health
@@ -1129,8 +1125,8 @@ export const BEATS: Beat[] = [
       "zh:\u6570\u636e\u4e2d\u5fc3", "zh:\u4e91\u8ba1\u7b97", "zh:\u8eab\u4efd\u76d7\u7a83", "zh:\u751f\u7269\u8bc6\u522b",
       "zh:\u878d\u8d44\u8f6e\u6b21", "zh:\u9996\u6b21\u516c\u5f00\u52df\u80a1", "zh:\u5e76\u8d2d\u4ea4\u6613", "zh:\u72ec\u89d2\u517d\u4f01\u4e1a",
       "zh:\u521b\u4e1a\u5b75\u5316\u5668", "zh:\u4f01\u4e1a\u4f30\u503c", "zh:\u5916\u5546\u6295\u8d44", "zh:\u4e3b\u6743\u57fa\u91d1",
-      "zh:\u79d1\u6280\u88c1\u5458", "zh:\u96f6\u552e\u4e1a", "zh:\u4f9b\u5e94\u94fe", "zh:\u6700\u540e\u4e00\u516c\u91cc",
-      "zh:\u81ea\u6709\u54c1\u724c", "zh:\u8d2d\u7269\u4e2d\u5fc3", "zh:\u5c45\u6c11\u6d88\u8d39", "zh:\u7269\u6d41\u884c\u4e1a",
+      "zh:\u79d1\u6280\u88c1\u5458", "zh:\u96f6\u552e\u4e1a", "zh:\u4f9b\u5e94\u94fe", "zh:\u672b\u7aef\u914d\u9001",
+      "zh:\u81ea\u6709\u54c1\u724c", "zh:\u8d2d\u7269\u4e2d\u5fc3", "zh:\u5c45\u6c11\u6d88\u8d39\u652f\u51fa", "zh:\u7269\u6d41\u884c\u4e1a",
       "zh:\u81ea\u52a8\u5316\u4ed3\u5e93", "zh:\u6570\u5b57\u94f6\u884c", "zh:\u5373\u65f6\u652f\u4ed8", "zh:\u52a0\u5bc6\u8d27\u5e01",
       "zh:\u6570\u5b57\u8d27\u5e01", "zh:\u666e\u60e0\u91d1\u878d", "zh:\u4e92\u8054\u7f51\u4fdd\u9669", "zh:\u4f4f\u623f\u8d37\u6b3e",
       "zh:\u5229\u7387\u51b3\u8bae", "zh:\u53cd\u6d17\u94b1", "zh:\u8de8\u5883\u6c47\u6b3e", "zh:\u80fd\u6e90\u8f6c\u578b",
@@ -1183,10 +1179,9 @@ export const BEATS: Beat[] = [
       "th:\u0e23\u0e30\u0e1a\u0e1a\u0e02\u0e19\u0e2a\u0e48\u0e07\u0e2a\u0e32\u0e18\u0e32\u0e23\u0e13\u0e30", "th:\u0e23\u0e16\u0e44\u0e1f\u0e04\u0e27\u0e32\u0e21\u0e40\u0e23\u0e47\u0e27\u0e2a\u0e39\u0e07", "th:\u0e01\u0e32\u0e23\u0e08\u0e23\u0e32\u0e08\u0e23\u0e43\u0e19\u0e40\u0e21\u0e37\u0e2d\u0e07", "th:\u0e2a\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1a\u0e34\u0e19",
       "th:\u0e01\u0e32\u0e23\u0e17\u0e48\u0e2d\u0e07\u0e40\u0e17\u0e35\u0e48\u0e22\u0e27\u0e22\u0e31\u0e48\u0e07\u0e22\u0e37\u0e19", "th:\u0e18\u0e38\u0e23\u0e01\u0e34\u0e08\u0e42\u0e23\u0e07\u0e41\u0e23\u0e21", "th:\u0e01\u0e32\u0e23\u0e08\u0e2d\u0e07\u0e15\u0e31\u0e4b\u0e27\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e1a\u0e34\u0e19", "th:\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e14\u0e34\u0e08\u0e34\u0e17\u0e31\u0e25",
       "th:\u0e01\u0e32\u0e23\u0e41\u0e1e\u0e17\u0e22\u0e4c\u0e17\u0e32\u0e07\u0e44\u0e01\u0e25", "th:\u0e01\u0e32\u0e23\u0e17\u0e14\u0e25\u0e2d\u0e07\u0e17\u0e32\u0e07\u0e04\u0e25\u0e34\u0e19\u0e34\u0e01", "th:\u0e22\u0e35\u0e19\u0e1a\u0e33\u0e1a\u0e31\u0e14", "th:\u0e01\u0e32\u0e23\u0e41\u0e1e\u0e17\u0e22\u0e4c\u0e41\u0e21\u0e48\u0e19\u0e22\u0e33",
-      "th:\u0e01\u0e32\u0e23\u0e2a\u0e39\u0e07\u0e27\u0e31\u0e22\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e21\u0e35\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e", "th:\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e08\u0e34\u0e15", "th:\u0e2d\u0e38\u0e15\u0e2a\u0e32\u0e2b\u0e01\u0e23\u0e23\u0e21\u0e22\u0e32", "th:\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e1e\u0e17\u0e22\u0e4c",
+      "th:\u0e01\u0e32\u0e23\u0e2a\u0e39\u0e07\u0e27\u0e31\u0e22\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e21\u0e35\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e", "th:\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e08\u0e34\u0e15", "th:\u0e2d\u0e38\u0e15\u0e2a\u0e32\u0e2b\u0e01\u0e23\u0e23\u0e21\u0e40\u0e20\u0e2a\u0e31\u0e0a\u0e01\u0e23\u0e23\u0e21", "th:\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e1e\u0e17\u0e22\u0e4c",
       "th:\u0e1c\u0e34\u0e27\u0e2b\u0e19\u0e31\u0e07", "th:\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e0a\u0e32\u0e2a\u0e31\u0e21\u0e1e\u0e31\u0e19\u0e18\u0e4c", "th:\u0e42\u0e06\u0e29\u0e13\u0e32\u0e14\u0e34\u0e08\u0e34\u0e17\u0e31\u0e25", "th:\u0e2a\u0e37\u0e48\u0e2d\u0e21\u0e27\u0e25\u0e0a\u0e19",
-      "th:\u0e40\u0e28\u0e23\u0e29\u0e10\u0e01\u0e34\u0e08\u0e04\u0e23\u0e35\u0e40\u0e2d\u0e40\u0e15\u0e2d\u0e23\u0e4c", "th:\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1a\u0e34\u0e14\u0e40\u0e1a\u0e37\u0e2d\u0e19", "th:\u0e27\u0e32\u0e23\u0e2a\u0e32\u0e23\u0e28\u0e32\u0e2a\u0e15\u0e23\u0e4c\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25", "th:\u0e0a\u0e37\u0e48\u0e2d\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e41\u0e1a\u0e23\u0e19\u0e14\u0e4c",
-      "th:\u0e01\u0e32\u0e23\u0e17\u0e33\u0e40\u0e2d\u0e2a\u0e2d\u0e35\u0e42\u0e2d", "th:\u0e40\u0e19\u0e37\u0e49\u0e2d\u0e2b\u0e32\u0e17\u0e35\u0e48\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e14\u0e49\u0e27\u0e22\u0e40\u0e2d\u0e44\u0e2d", "th:\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e17\u0e32\u0e07\u0e44\u0e01\u0e25", "th:\u0e15\u0e25\u0e32\u0e14\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19",
+      "th:\u0e40\u0e28\u0e23\u0e29\u0e10\u0e01\u0e34\u0e08\u0e04\u0e23\u0e35\u0e40\u0e2d\u0e40\u0e15\u0e2d\u0e23\u0e4c", "th:\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1a\u0e34\u0e14\u0e40\u0e1a\u0e37\u0e2d\u0e19", "th:\u0e0a\u0e37\u0e48\u0e2d\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e41\u0e1a\u0e23\u0e19\u0e14\u0e4c", "th:\u0e40\u0e19\u0e37\u0e49\u0e2d\u0e2b\u0e32\u0e17\u0e35\u0e48\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e14\u0e49\u0e27\u0e22\u0e40\u0e2d\u0e44\u0e2d", "th:\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e17\u0e32\u0e07\u0e44\u0e01\u0e25", "th:\u0e15\u0e25\u0e32\u0e14\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19",
       "th:\u0e01\u0e32\u0e23\u0e02\u0e32\u0e14\u0e41\u0e04\u0e25\u0e19\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19", "th:\u0e04\u0e27\u0e32\u0e21\u0e40\u0e2b\u0e25\u0e37\u0e48\u0e2d\u0e21\u0e25\u0e49\u0e33\u0e04\u0e48\u0e32\u0e08\u0e49\u0e32\u0e07", "th:\u0e2a\u0e2b\u0e20\u0e32\u0e1e\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19", "th:\u0e2d\u0e32\u0e0a\u0e35\u0e27\u0e28\u0e36\u0e01\u0e29\u0e32",
       "th:\u0e01\u0e32\u0e23\u0e2d\u0e38\u0e14\u0e21\u0e28\u0e36\u0e01\u0e29\u0e32", "th:\u0e21\u0e2b\u0e32\u0e27\u0e34\u0e17\u0e22\u0e32\u0e25\u0e31\u0e22\u0e23\u0e31\u0e10", "th:\u0e04\u0e27\u0e32\u0e21\u0e1b\u0e25\u0e2d\u0e14\u0e20\u0e31\u0e22\u0e43\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19", "th:\u0e1c\u0e25\u0e34\u0e15\u0e20\u0e32\u0e1e\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19",
       "th:\u0e19\u0e42\u0e22\u0e1a\u0e32\u0e22\u0e01\u0e32\u0e23\u0e04\u0e49\u0e32", "th:\u0e20\u0e32\u0e29\u0e35\u0e19\u0e33\u0e40\u0e02\u0e49\u0e32", "th:\u0e01\u0e32\u0e23\u0e01\u0e33\u0e01\u0e31\u0e1a\u0e14\u0e39\u0e41\u0e25\u0e41\u0e1e\u0e25\u0e15\u0e1f\u0e2d\u0e23\u0e4c\u0e21", "th:\u0e01\u0e32\u0e23\u0e04\u0e38\u0e49\u0e21\u0e04\u0e23\u0e2d\u0e07\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e2a\u0e48\u0e27\u0e19\u0e1a\u0e38\u0e04\u0e04\u0e25",
