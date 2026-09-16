@@ -10,6 +10,7 @@ import HistoryStrip from "./HistoryStrip";
 
 import React, { useState, useEffect, useRef, useId } from "react";
 import { coverageState, volumeDirectionLabel } from "@/lib/signaliq/score";
+import { GLOSSARY } from "@/lib/signaliq/glossary";
 import {
   GROT,
   INK,
@@ -372,7 +373,10 @@ export function GapBar({ opp }: { opp: Opportunity }) {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-        <SCaps size={9} ls="0.12em" color={INK}>Coverage gap</SCaps>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <SCaps size={9} ls="0.12em" color={INK}>Coverage gap</SCaps>
+          <InfoTooltip text={GLOSSARY.coverageGap.plain} />
+        </span>
         <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: ".08em", textTransform: "uppercase", color: c }}>
           {label}
         </span>
@@ -387,13 +391,16 @@ export function GapBar({ opp }: { opp: Opportunity }) {
   );
 }
 
-export function CompBar({ label, value, note }: { label: string; value: number; note?: string | null }) {
+export function CompBar({ label, value, note, tip }: { label: string; value: number; note?: string | null; tip?: string }) {
   const pct = Math.round(value * 100);
   const c = pct >= 70 ? GREEN : pct >= 40 ? AMBER : RED;
   return (
     <div style={{ marginBottom: 9 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-        <SCaps size={9} ls="0.10em" color={INK}>{label}</SCaps>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <SCaps size={9} ls="0.10em" color={INK}>{label}</SCaps>
+          {tip && <InfoTooltip text={tip} />}
+        </span>
         <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 13, color: c }}>{pct}</span>
       </div>
       <div style={{ height: 5, background: PAPER2, border: `1px solid ${INK15}` }}>
@@ -593,6 +600,7 @@ export function OppCard({
                 {opp.fit === "high" ? "High" : opp.fit === "medium" ? "Medium" : "Low"}
               </span>
             </span>
+            <InfoTooltip text={GLOSSARY.startupFit.plain} />
           </div>
         )}
         {/* History: three years of weekly press volume (seasonality step 2, 2026-09-15) */}
@@ -728,15 +736,15 @@ export function ScorePanel({ opp }: { opp: Opportunity }) {
     <div style={{ border: `1px solid ${INK15}`, background: PAPER2, padding: "16px 18px" }}>
       <SCaps size={10} ls="0.16em" color={INK}>Score breakdown</SCaps>
       <div style={{ marginTop: 12 }}>
-        <CompBar label="Volume" value={opp.components.magnitude} note={volumeDirectionLabel(opp.volumeDirection)} />
-        <CompBar label="Velocity" value={opp.components.velocity} />
-        <CompBar label="Coverage gap" value={opp.components.coverageGap} />
+        <CompBar label="Volume" value={opp.components.magnitude} note={volumeDirectionLabel(opp.volumeDirection)} tip={GLOSSARY.volume.plain} />
+        <CompBar label="Velocity" value={opp.components.velocity} tip={GLOSSARY.velocity.plain} />
+        <CompBar label="Coverage gap" value={opp.components.coverageGap} tip={GLOSSARY.coverageGap.plain} />
         <CoverageNote opp={opp} />
         {opp.relevanceMultiplier != null && opp.relevanceMultiplier < 0.999 && (
-          <CompBar label="Startup fit" value={opp.components.relevance} />
+          <CompBar label="Startup fit" value={opp.components.relevance} tip={GLOSSARY.startupFit.plain} />
         )}
-        <CompBar label="Beat fit" value={opp.components.fit} />
-        <CompBar label="Corroboration" value={opp.components.corroboration} />
+        <CompBar label="Beat fit" value={opp.components.fit} tip={GLOSSARY.beatFit.plain} />
+        <CompBar label="Corroboration" value={opp.components.corroboration} tip={GLOSSARY.corroboration.plain} />
       </div>
     </div>
   );

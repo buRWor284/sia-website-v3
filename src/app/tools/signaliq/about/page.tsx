@@ -16,6 +16,7 @@ import { DoubleRule, HRule, SCaps } from "@/components/bureau/primitives";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { visibleBeats } from "@/lib/signaliq/config";
 import { MAX_SEEDS_PER_SCAN, WEIGHTS } from "@/lib/signaliq/config";
+import { GLOSSARY } from "@/lib/signaliq/glossary";
 
 const HDR_BG = "#0e0d0a";
 const HDR_BORDER = "#2a2318";
@@ -79,12 +80,12 @@ const SOURCES = [
 // hand-typed list said 30/25/22/13/10/15 while the scorer used 28/22/20/6/10/14).
 const pct = (w: number) => `${Math.round(w * 100)}%`;
 const SCORE_COMPONENTS = [
-  { label: "Coverage gap", weight: pct(WEIGHTS.coverageGap), description: "How thin is press coverage relative to signal volume? The bigger the gap, the bigger the opportunity window. This is the heaviest component." },
-  { label: "Volume", weight: pct(WEIGHTS.magnitude), description: "How much signal there is: filing counts, paper counts, view counts. Marked down when a topic sits below its own usual level, so a big but shrinking topic is never scored like a surge." },
-  { label: "Signal velocity", weight: pct(WEIGHTS.velocity), description: "How fast is signal volume growing against its own baseline? A topic with 10 filings this month vs. 1 last month scores higher than one steady at 50." },
-  { label: "Source credibility", weight: pct(WEIGHTS.credibility), description: "The credibility tier of the strongest source that returned data. An SEC filing counts for more than a Hacker News thread." },
-  { label: "Beat fit", weight: pct(WEIGHTS.fit), description: "How closely does this topic match the selected beat? Prevents off-topic results from surfacing high." },
-  { label: "Corroboration bonus", weight: `+${pct(WEIGHTS.corroborationBonus)} max`, description: "A bonus added when multiple independent sources confirm the same topic. One source is a hint. Three is a story." },
+  { label: GLOSSARY.coverageGap.label, weight: pct(WEIGHTS.coverageGap), description: `${GLOSSARY.coverageGap.plain} This is the heaviest component.` },
+  { label: GLOSSARY.volume.label, weight: pct(WEIGHTS.magnitude), description: GLOSSARY.volume.plain },
+  { label: GLOSSARY.velocity.label, weight: pct(WEIGHTS.velocity), description: GLOSSARY.velocity.plain },
+  { label: GLOSSARY.credibility.label, weight: pct(WEIGHTS.credibility), description: GLOSSARY.credibility.plain },
+  { label: GLOSSARY.beatFit.label, weight: pct(WEIGHTS.fit), description: GLOSSARY.beatFit.plain },
+  { label: "Corroboration bonus", weight: `+${pct(WEIGHTS.corroborationBonus)} max`, description: GLOSSARY.corroboration.plain },
 ];
 
 export default function SignalIQAboutPage() {
