@@ -157,6 +157,17 @@ export async function runPackRequest(
     return { ok: false, error: "Could not generate a pack. Please try again.", status: 502 };
   }
 
+  // Direction lint (16 Sep 2026), log only: flags hype or "up" words in the titles
+  // when a baseline signal is below its norm, so Vercel logs show if the prompt
+  // rule is still being broken. No retry: packs take ~30s against a 60s limit.
+  const falling = opp.signals.some((s) => (s.source === "sec" || s.source === "arxiv") && !s.lowSample && (s.trend ?? 0) <= -0.1);
+  if (falling) {
+    const firstBriefLine = (ai.brief ?? "").split("\n").find((l) => l.trim()) ?? "";
+    const titles = `${ai.headline ?? ""} | ${ai.subjectLine ?? ""} | ${firstBriefLine}`;
+    const hit = titles.match(/\b(uptick|surg\w*|spik\w*|soar\w*|skyrocket\w*)\b/gi);
+    if (hit) console.warn(`[signaliq pack] direction words in titles while a signal is below norm (${opp.topic}): ${hit.join(", ")} :: ${titles}`);
+  }
+
   const pack: PackCore = {
     ...ai,
     opportunityId: opp.id,

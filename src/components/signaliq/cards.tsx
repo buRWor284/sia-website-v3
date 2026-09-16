@@ -563,7 +563,7 @@ export function OppCard({
         )}
         {opp.lowFitCapped && (
           <p style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: INK70 }}>
-            Low fit to your company: the signal is strong, but the score is capped at 79 so it is never labelled a hot lead for you.
+            Low fit to your company: the signal itself may be strong, but the score is capped at 59 because it does not fit what you do.
           </p>
         )}
         {/* Why now — market-timing driver (coverage gap) */}

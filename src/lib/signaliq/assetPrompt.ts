@@ -19,6 +19,9 @@ Rules you MUST follow:
 - Never put SignalIQ's own measures in the pitch angle or its subject line: no opportunity score, no "% of saturation", no coverage-gap or trend %. They are internal readings, not facts a journalist can check or cite. The pitch may cite the underlying receipts (e.g. "18 SEC filings in 30 days"), never our metrics about them. The data brief may mention them.
 - In the pitch angle and subject line, use commas, colons or full stops instead of em dashes.
 - The headline, subject line and brief title must agree with the numbers and with your own cautions. Words like "surge", "spike", "rising", "record" or "back on the radar" are only allowed when the data shows the number ABOVE its usual level. If a figure is below its baseline (e.g. 160 filings in 30 days against about 262 a month), describe it plainly or lead with a different signal that is actually rising. Never write a caution that contradicts the headline.
+- The SIGNAL DIRECTION block is computed from the numbers and is final. Every sentence and every title (headline, subject line, the brief's own title and sub-headings, the pitch angle) must match it, signal by signal. For a signal marked BELOW, never use up, uptick, increase, rise, rising, growth, growing, climb, jump, more, heightened, accelerating, surge or spike about that signal, not even softened ("quiet uptick", "steady rise"). Say "still high in absolute terms", "below its usual level" or leave it out.
+- Signals can point in different directions. Never blend them into one direction in a title (for example, falling SEC filings plus rising Wikipedia views is NOT "disclosure uptick" or "identity theft surges"). Name the signal that is actually rising.
+- Hype words (surge, surges, spike, soar, skyrocket, explode, boom) are only allowed when the SIGNAL DIRECTION block marks a signal as at least DOUBLE its usual level, and only about that signal. A smaller rise is described plainly with its number ("Wikipedia views up 73%").
 - Write in the founder's first-person voice: direct, specific, no hype, no corporate fluff.
 - If the data is thin or ambiguous, say so plainly in "cautions".
 - The pitch must give a journalist a reason to care now AND offer something only this founder can add (original data, a customer example, or a distinctive point of view).`;
@@ -70,6 +73,36 @@ export const PACK_TOOL = {
   },
 } as const;
 
+/**
+ * Plain-English direction for each signal, computed from the numbers so the model
+ * never has to infer it from a detail string (16 Sep 2026: an Efani pack titled its
+ * brief "Quiet Corporate Disclosure Uptick" while SEC filings were 47% BELOW norm).
+ */
+export function directionFacts(opp: Opportunity): string {
+  const lines = opp.signals.map((s) => {
+    const label = `[${s.source}] ${s.title}`;
+    if (s.lowSample) return `- ${label}: sample too small to call any direction. Do not describe it as up or down.`;
+    // SEC and arXiv carry a signed trend against their own baseline.
+    if (s.trend != null && (s.source === "sec" || s.source === "arxiv")) {
+      const pct = Math.round(s.trend * 100);
+      const base = s.source === "sec" ? "its trailing 12-month monthly average" : "its previous two months";
+      if (pct <= -10) return `- ${label}: BELOW ${base} (down ${Math.abs(pct)}%). Do not call this up, rising or a surge.`;
+      if (pct >= 100) return `- ${label}: at least DOUBLE ${base} (up ${pct}%).`;
+      if (pct >= 10) return `- ${label}: ABOVE ${base} (up ${pct}%). Rising, but not a surge.`;
+      return `- ${label}: about the same as ${base}. Flat, not rising.`;
+    }
+    // Wikipedia: velocity = recent 14-day views vs the prior 30 days, minus 1 (floored at 0, capped at +100%).
+    if (s.source === "wikipedia") {
+      const pct = Math.round(s.velocity * 100);
+      if (pct >= 100) return `- ${label}: at least DOUBLE its prior 30-day level.`;
+      if (pct >= 15) return `- ${label}: ABOVE its prior 30-day level (up ${pct}%). Rising, but not a surge.`;
+      return `- ${label}: about its usual level. Flat, not rising.`;
+    }
+    return `- ${label}: no baseline for this source. Say nothing about its direction.`;
+  });
+  return lines.length ? lines.join("\n") : "- (no signals)";
+}
+
 export function buildPackPrompt(opp: Opportunity, companyContext?: string, companyBrief?: string | null): string {
   const signalLines =
     opp.signals.map((s) => `- [${s.source}] ${s.title}${s.detail ? ` (${s.detail})` : ""} — ${s.url}`).join("\n") ||
@@ -103,6 +136,9 @@ Opportunity score: ${opp.score}/100 (${opp.bandLabel}) — a lead/whitespace mea
 ${contextBlock}${briefBlock}
 SIGNAL DATA (the receipts — ground everything here):
 ${signalLines}
+
+SIGNAL DIRECTION (computed from the numbers; your wording must match it):
+${directionFacts(opp)}
 
 ${cov}
 

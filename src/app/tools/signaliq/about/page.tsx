@@ -206,7 +206,7 @@ export default function SignalIQAboutPage() {
           <div style={{ marginTop: 20, padding: "14px 18px", border: `1px solid ${INK15}`, background: PAPER2 }}>
             <p style={{ margin: 0, fontFamily: MONO, fontSize: 9.5, letterSpacing: ".06em", color: INK55, lineHeight: 1.6 }}>
               BAND THRESHOLDS: Hot lead ≥ 80 · Worth a look 60-79 · Early 40-59 · Noise / late &lt; 40
-              <br />CAPS: every signal a tiny sample → max 59 · low fit to your company → max 79, never a hot lead
+              <br />CAPS: every signal a tiny sample → max 59 · low fit to your company → max 59
             </p>
           </div>
         </section>

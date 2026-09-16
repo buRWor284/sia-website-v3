@@ -3,7 +3,7 @@
  *
  *   score (shown) = Σ weighted(magnitude, velocity, coverageGap, fit, credibility, corroboration) × 100
  *                   — honest signal STRENGTH; relevance never lowers it, except that a
- *                   LOW-fit topic is capped at 79 so it can never read "Hot lead" (15 Sep 2026).
+ *                   LOW-fit topic is capped at 59, like thin evidence (16 Sep 2026).
  *   magnitude     = shown as "Volume"; damped per source when below that source's baseline.
  *   fit           = how well the opportunity matches the company profile, surfaced as a
  *                   High/Med/Low badge and used to RANK + filter (not to scale the score).
@@ -30,11 +30,11 @@ const COOLING_TREND_EPS = 0.05;
 // entirely (data is noisy / short windows), but heavily discounted vs. real whitespace.
 const COOLING_GAP_DISCOUNT = 0.15;
 
-// D3, decided by Irfan 15 Sep 2026: a LOW-fit topic can never be labelled "Hot lead".
-// Same mechanism as the thin-evidence cap: the score stops at the top of Worth a look.
-// Bands describe the signal and fit describes you, so fit still never LOWERS a
-// score below this line; it only stops a poor fit being sold as a hot lead.
-const LOW_FIT_MAX_SCORE = 79;
+// D3, decided by Irfan 15 Sep 2026, tightened 16 Sep: a LOW-fit topic is capped at 59,
+// the same cap as thin evidence, so it can never read "Hot lead" or "Worth a look".
+// (79 was shipped first; Irfan: "79 is high for such a low fit".) Fit still never
+// lowers a score below this line; it only stops a poor fit being sold as strong.
+const LOW_FIT_MAX_SCORE = 59;
 // |trend| below this reads as "near its norm" rather than above/below.
 const VOLUME_DIRECTION_EPS = 0.1;
 

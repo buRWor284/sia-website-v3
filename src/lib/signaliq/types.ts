@@ -111,8 +111,8 @@ export interface Opportunity {
   /** Every signal behind this topic is a sample too small to call a trend, so
    *  the score is capped inside the Early band (score.ts, 2026-09-10). */
   thinEvidence?: boolean;
-  /** Fit to the company is LOW, so the score is capped at 79: a strong signal that
-   *  does not fit you can never read as a "Hot lead" (score.ts, D3, 15 Sep 2026). */
+  /** Fit to the company is LOW, so the score is capped at 59 (same as thin evidence):
+   *  a strong signal that does not fit you never reads as strong (score.ts, D3, 16 Sep 2026). */
   lowFitCapped?: boolean;
   /** Direction of the signal that supplied the Volume component, vs that source's
    *  own baseline. Absent when the source has no baseline or the sample is too
