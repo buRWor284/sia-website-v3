@@ -29,7 +29,7 @@ import { KPI_AR, SIGNAL_AR, TALK_AR, UI } from "./content.ar";
 import { ArabicFooter, ArabicHeader, DraftBanner } from "../_components/chrome";
 import HistoryStrip from "@/components/signaliq/HistoryStrip";
 import SeasonCalendar from "@/components/signaliq/SeasonCalendar";
-import { isUnusuallyQuiet } from "@/lib/signaliq/radar-season";
+import { isUnusuallyQuiet, loudPeakWeeks } from "@/lib/signaliq/radar-season";
 import "../radar-ar.css";
 
 const amiri = Amiri({ variable: "--font-ar-serif", subsets: ["arabic"], weight: ["400", "700"], display: "swap" });
@@ -155,6 +155,7 @@ function SignalFile({ sig, live, median }: { sig: (typeof SIGNALS)[number]; live
 
       {hist ? <HistoryStrip h={hist} locale="ar" className="ar-hist" /> : null}
       {unusual ? <p className="ar-quiet">{UI.unusuallyQuiet}</p> : null}
+      {loudPeakWeeks(verdict, hist) !== null ? <p className="ar-quiet">{UI.loudPeakIn(loudPeakWeeks(verdict, hist) as number)}</p> : null}
 
       <div className="ar-chips">
         {(ar?.demand ?? sig.demand) ? <span className="ar-chip">الطلب: {ar?.demand ?? sig.demand}</span> : null}

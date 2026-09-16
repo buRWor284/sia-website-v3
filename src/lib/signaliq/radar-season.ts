@@ -41,6 +41,22 @@ export function isPreSeason(baseVerdict: string, h: HistorySummary | null | unde
   return p.weeksSinceLast > 2 && p.weeksUntil <= PRESEASON_WEEKS && p.ratio >= PRESEASON_MIN_RATIO;
 }
 
+/** The verdicts a crowded signal can hold. */
+const LOUD_VERDICTS = new Set(["late", "newsjack"]);
+
+/**
+ * Weeks until the usual peak, for a CROWDED signal (LATE or NEWSJACK) whose own
+ * season is 8 weeks away or less. A loud signal can never read PRE-SEASON, but
+ * "wait for the next catalyst" is more useful when the card says the catalyst is
+ * 8 weeks out (Irfan, 16 Sep 2026). Null otherwise.
+ */
+export function loudPeakWeeks(verdict: string, h: HistorySummary | null | undefined): number | null {
+  const p = h?.peak;
+  if (!p || !LOUD_VERDICTS.has(verdict)) return null;
+  if (p.weeksSinceLast <= 2 || p.weeksUntil > PRESEASON_WEEKS || p.ratio < PRESEASON_MIN_RATIO) return null;
+  return p.weeksUntil;
+}
+
 /** True when a quiet, not-rising signal is quiet beyond its usual level for the
  *  time of year. A rising topic is never called unusually quiet, even when it is
  *  still below earlier years: the card already says it is climbing. */

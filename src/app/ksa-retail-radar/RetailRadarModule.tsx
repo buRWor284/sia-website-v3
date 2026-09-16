@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { RETAIL_LENSES, RETAIL_LENS_LABEL, retailDelta7, type RetailLens, type RetailLiveTopic, type RetailRadarData } from "@/lib/ksa-retail/types";
 import HistoryStrip from "@/components/signaliq/HistoryStrip";
 import SeasonCalendar from "@/components/signaliq/SeasonCalendar";
-import { LEAN_COPY, SHOW_AR_COUNTS, isUnusuallyQuiet, langRelative, langSplit } from "@/lib/signaliq/radar-season";
+import { LEAN_COPY, SHOW_AR_COUNTS, isUnusuallyQuiet, langRelative, langSplit, loudPeakWeeks } from "@/lib/signaliq/radar-season";
 import { LOW_SAMPLE_N, RING_LABEL, SIGNALS, SIGNAL_BY_TOPIC, STATUS_META, VERDICT_META, verdictFor, type RetailSignal } from "./content";
 
 type LensFilter = RetailLens | "all";
@@ -128,6 +128,7 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
   const hist = useMemo(() => live.history ?? {}, [live.history]);
   const selectedHist = hist[selected.id] ?? null;
   const selectedVerdict = verdictFor(selectedLive?.n ?? null, selectedLive?.tr ?? null, medianN, selected.demand, selected.catalyst, selected.status, selectedHist);
+  const selectedPeakWks = loudPeakWeeks(selectedVerdict, selectedHist);
   const selectedQuiet = selectedLive
     ? isUnusuallyQuiet(selectedLive.n >= Math.max(medianN, 1), selectedHist, selectedLive.tr >= 0.1 && selectedLive.n >= LOW_SAMPLE_N)
     : false;
@@ -450,7 +451,7 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
               <span className="row"><b>EN / AR</b>{`EN ${selectedSplit.en.toLocaleString()} · AR ${selectedSplit.ar.toLocaleString()} (60d) · ${LEAN_COPY.en[selectedSplit.lean]}`}</span>
             ) : null}
             <span className={"krr-verdict v-" + VERDICT_META[selectedVerdict].tone}>{VERDICT_META[selectedVerdict].label}</span>
-            <span className="vnote">{VERDICT_META[selectedVerdict].note}{selectedQuiet ? " · unusually quiet for the time of year" : ""}{selectedLive ? ` · SignalIQ × GDELT, as of ${live.asOf}` : ""}</span>
+            <span className="vnote">{VERDICT_META[selectedVerdict].note}{selectedQuiet ? " · unusually quiet for the time of year" : ""}{selectedPeakWks !== null ? ` · usual peak in ${selectedPeakWks} ${selectedPeakWks === 1 ? "wk" : "wks"}` : ""}{selectedLive ? ` · SignalIQ × GDELT, as of ${live.asOf}` : ""}</span>
           </div>
           {selectedHist ? (
             <div className="krr-file-hist">
