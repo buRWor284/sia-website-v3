@@ -4,6 +4,8 @@
  * component can import this. Forked from src/lib/ksa-radar/types.ts
  * (the tourism radar) on 2026-08-10.
  */
+import type { HistorySummary } from "@/lib/signaliq/seasonality";
+
 export type RetailLens = "ecom" | "brands" | "lifestyle" | "macro";
 
 export const RETAIL_LENSES: RetailLens[] = ["ecom", "brands", "lifestyle", "macro"];
@@ -36,6 +38,10 @@ export interface RetailRadarData {
   heating: number; // topics with tr > 0
   risers: RetailLiveTopic[]; // tr > 0, sorted desc
   quiet: RetailLiveTopic[]; // lowest article_count first (quiet, ownable)
+  /** Seasonality (2026-09-15): summary per signal id, plus `<id>:ar` for the Arabic twin. */
+  history?: Record<string, HistorySummary>;
+  /** Monday (YYYY-MM-DD) of the week the page was rendered, for the season calendar. */
+  thisMonday?: string;
 }
 
 /** 7-day-vs-prior-7-day percentage change of a daily series. */

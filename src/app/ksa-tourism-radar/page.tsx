@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getKsaRadarData } from "@/lib/ksa-radar/data";
 import { Colophon } from "@/components/bureau";
 import KsaRadarModule from "./KsaRadarModule";
-import { GAPS, KPIS, SPARK_SERIES, SRC_GROUPS, TALKS, VERDICT_META } from "./content";
+import { GAPS, KPIS, SPARK_SERIES, SRC_GROUPS, TALKS, VERDICT_META, SIGNALS } from "./content";
 import type { KsaRadarData } from "@/lib/ksa-radar/types";
 import "./ksa-radar.css";
 
@@ -129,7 +129,7 @@ function TheWindow({ live }: { live: KsaRadarData }) {
         profit from, not a verdict on the company.
       </p>
       <div className="ksr-verdict-legend">
-        {(["early", "whitespace", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
+        {(["early", "whitespace", "preseason", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
           <span key={k}>
             <span className={"ksr-verdict v-" + VERDICT_META[k].tone}>{VERDICT_META[k].label}</span> {VERDICT_META[k].note}
           </span>
@@ -146,7 +146,7 @@ function TheWindow({ live }: { live: KsaRadarData }) {
 }
 
 export default async function KsaRadarPage() {
-  const live = await getKsaRadarData();
+  const live = await getKsaRadarData(SIGNALS);
 
   const jsonLd = {
     "@context": "https://schema.org",

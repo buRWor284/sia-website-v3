@@ -14,6 +14,8 @@
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { ACTIVE_COVERAGE_VERSION } from "@/lib/signaliq/coverage-store";
+import { getHistorySummaries, radarHistoryGroups, type RadarHistorySource } from "@/lib/signaliq/history";
+import { mondayOf } from "@/lib/signaliq/seasonality";
 import { KSA_LENSES, type KsaLens, type KsaLiveTopic, type KsaRadarData } from "./types";
 
 /**
@@ -102,14 +104,14 @@ const emptyData = (): KsaRadarData => ({
  * returns a safe empty shape (hasData=false) if Supabase is unavailable or the
  * ksa-tourism seeds have not been scanned yet.
  */
-export async function getKsaRadarData(): Promise<KsaRadarData> {
+export async function getKsaRadarData(signals: RadarHistorySource[] = []): Promise<KsaRadarData> {
   const topics = KSA_FOCUS.map((f) => f.topic);
   const lensOf = new Map<string, KsaLens>(KSA_FOCUS.map((f) => [f.topic, f.lens]));
 
   try {
     const db = createSupabaseServiceClient();
 
-    const [covRes, dailyRes] = await Promise.all([
+    const [covRes, dailyRes, history] = await Promise.all([
       db
         .from("signaliq_coverage_cache")
         .select("topic, volume, trend, article_count")
@@ -125,6 +127,8 @@ export async function getKsaRadarData(): Promise<KsaRadarData> {
         .in("topic", topics)
         .order("day", { ascending: true })
         .limit(2000),
+      // Seasonality: one summary per signal (EN) and per Arabic twin; never throws.
+      getHistorySummaries(radarHistoryGroups(signals)),
     ]);
 
     const cov = (covRes.data ?? []) as CovRow[];
@@ -171,6 +175,8 @@ export async function getKsaRadarData(): Promise<KsaRadarData> {
       heating: risers.length,
       risers,
       quiet,
+      history,
+      thisMonday: mondayOf(new Date()),
     };
   } catch {
     return emptyData();

@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RETAIL_LENSES, RETAIL_LENS_LABEL, retailDelta7, type RetailLens, type RetailLiveTopic, type RetailRadarData } from "@/lib/ksa-retail/types";
+import HistoryStrip from "@/components/signaliq/HistoryStrip";
+import SeasonCalendar from "@/components/signaliq/SeasonCalendar";
+import { LEAN_COPY, SHOW_AR_COUNTS, isUnusuallyQuiet, langRelative, langSplit } from "@/lib/signaliq/radar-season";
 import { LOW_SAMPLE_N, RING_LABEL, SIGNALS, SIGNAL_BY_TOPIC, STATUS_META, VERDICT_META, verdictFor, type RetailSignal } from "./content";
 
 type LensFilter = RetailLens | "all";
@@ -121,7 +124,25 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
 
   const selected = SIGNALS.find((s) => s.id === selectedId) ?? SIGNALS[0];
   const selectedLive = liveFor(selected);
-  const selectedVerdict = verdictFor(selectedLive?.n ?? null, selectedLive?.tr ?? null, medianN, selected.demand, selected.catalyst, selected.status);
+  // ---- seasonality (2026-09-15): history strip, PRE-SEASON, unusually quiet, EN vs AR ----
+  const hist = useMemo(() => live.history ?? {}, [live.history]);
+  const selectedHist = hist[selected.id] ?? null;
+  const selectedVerdict = verdictFor(selectedLive?.n ?? null, selectedLive?.tr ?? null, medianN, selected.demand, selected.catalyst, selected.status, selectedHist);
+  const selectedQuiet = selectedLive
+    ? isUnusuallyQuiet(selectedLive.n >= Math.max(medianN, 1), selectedHist, selectedLive.tr >= 0.1 && selectedLive.n >= LOW_SAMPLE_N)
+    : false;
+  /** Median corpus-scaled AR/EN ratio across this radar's signals: the yardstick for the lean. */
+  const radarRelative = useMemo(() => {
+    const rs = SIGNALS.map((s) => langRelative(hist[s.id]?.last60d ?? 0, hist[s.id + ":ar"]?.last60d ?? 0)).filter((r): r is number => r !== null).sort((a, b) => a - b);
+    if (rs.length === 0) return null;
+    const m = Math.floor(rs.length / 2);
+    return rs.length % 2 ? rs[m] : (rs[m - 1] + rs[m]) / 2;
+  }, [hist]);
+  const selectedSplit = SHOW_AR_COUNTS && hist[selected.id + ":ar"] ? langSplit(selectedHist?.last60d ?? 0, hist[selected.id + ":ar"].last60d, radarRelative) : null;
+  const seasonItems = SIGNALS.flatMap((s) => {
+    const p = hist[s.id]?.peak;
+    return p ? [{ id: s.id, name: s.name, peak: p }] : [];
+  });
 
   // ---- radar canvas (all helpers are arrow fns to preserve cv/ctx null-narrowing) ----
   useEffect(() => {
@@ -425,9 +446,18 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
             <span className="row"><b>Press</b>{selectedLive ? `${selectedLive.n.toLocaleString()} articles · ${selectedLive.n < LOW_SAMPLE_N ? "sample too small for a trend" : selectedLive.tr >= 0.1 ? "rising" : selectedLive.tr <= -0.1 ? "falling" : "flat"}` : selected.topics.length === 0 ? "context only, untracked by design" : "wire pending"}</span>
             <span className="row"><b>Reality</b>{selected.demand || "none on file"}</span>
             <span className="row"><b>Next</b>{selected.catalyst || "none scheduled"}</span>
+            {selectedSplit ? (
+              <span className="row"><b>EN / AR</b>{`EN ${selectedSplit.en.toLocaleString()} · AR ${selectedSplit.ar.toLocaleString()} (60d) · ${LEAN_COPY.en[selectedSplit.lean]}`}</span>
+            ) : null}
             <span className={"krr-verdict v-" + VERDICT_META[selectedVerdict].tone}>{VERDICT_META[selectedVerdict].label}</span>
-            <span className="vnote">{VERDICT_META[selectedVerdict].note}{selectedLive ? ` · SignalIQ × GDELT, as of ${live.asOf}` : ""}</span>
+            <span className="vnote">{VERDICT_META[selectedVerdict].note}{selectedQuiet ? " · unusually quiet for the time of year" : ""}{selectedLive ? ` · SignalIQ × GDELT, as of ${live.asOf}` : ""}</span>
           </div>
+          {selectedHist ? (
+            <div className="krr-file-hist">
+              <span className="krr-file-lbl">Three years of press</span>
+              <HistoryStrip h={selectedHist} />
+            </div>
+          ) : null}
           <p className="krr-file-talk">
             <b>Talk angle:</b> {selected.talk}
           </p>
@@ -484,6 +514,24 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
           </div>
         ))}
       </div>
+
+      {/* ---- season calendar (2026-09-15): derived from three years of weekly counts ---- */}
+      {live.hasData && live.thisMonday && seasonItems.length > 0 ? (
+        <>
+          <div className="krr-mast" style={{ marginTop: 46 }}>
+            <span className="krr-pill">Season calendar</span>
+            <span className="krr-scaps">Usual peaks in the next 8 weeks · found in three years of weekly press counts</span>
+          </div>
+          <div className="krr-season">
+            <SeasonCalendar items={seasonItems} thisMonday={live.thisMonday} onSelect={setSelectedId} selectedId={selectedId} />
+            <p className="krr-season-note">
+              A signal lands here only when the same stretch of the calendar spiked in each of the last three years. Hajj and Ramadan move about 11
+              days earlier every year, so their dates are projected from that shift, not copied from last year. Quiet signals inside this window read
+              PRE-SEASON.
+            </p>
+          </div>
+        </>
+      ) : null}
 
       {/* ---- live wire band ---- */}
       <div className="krr-mast" style={{ marginTop: 46 }}>
@@ -565,7 +613,9 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
               <div className="krr-panel-body">
                 {live.quiet.map((t) => {
                   const sig = SIGNAL_BY_TOPIC.get(t.topic);
-                  const v = verdictFor(t.n, t.tr, medianN, sig?.demand, sig?.catalyst, sig?.status ?? "steady");
+                  const th = sig ? hist[sig.id] ?? null : null;
+                  const v = verdictFor(t.n, t.tr, medianN, sig?.demand, sig?.catalyst, sig?.status ?? "steady", th);
+                  const unusual = isUnusuallyQuiet(t.n >= Math.max(medianN, 1), th, t.tr >= 0.1 && t.n >= LOW_SAMPLE_N);
                   return (
                     <div className={"krr-list-row cat-" + t.lens} key={t.topic}>
                       <div className="krr-row-main">
@@ -575,6 +625,7 @@ export default function RetailRadarModule({ live }: { live: RetailRadarData }) {
                           <span className={"krr-verdict sm v-" + VERDICT_META[v].tone}>{VERDICT_META[v].label}</span>
                         </div>
                         {sig ? <div className="krr-quiet-demand">vs {sig.demand}</div> : null}
+                        {unusual ? <div className="krr-quiet-unusual">unusually quiet for the time of year</div> : null}
                       </div>
                       <span className="krr-gapval">
                         {t.n.toLocaleString()} articles · {t.n < LOW_SAMPLE_N ? "low sample" : pct(t.tr)}

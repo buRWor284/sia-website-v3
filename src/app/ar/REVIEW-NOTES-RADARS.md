@@ -111,3 +111,15 @@ travel page's checklist.
   If that ships, the Arabic pages could show Arabic press volume rather than English,
   which would make them substantially more useful to a Saudi reader than the English
   originals are.
+
+## Seasonality strings (added 2026-09-15)
+
+The history strip, the season calendar and the PRE-SEASON verdict added Arabic copy OUTSIDE the two
+content.ar.ts files, because the components are shared with the English pages. A reviewer should also read:
+
+- `src/lib/signaliq/seasonality.ts`, `historyCopy()` and `monthPhrase()`: the year-on-year line, the peak line, "new keyword", month names and early/mid/late.
+- `src/components/signaliq/SeasonCalendar.tsx`, the `T.ar` block: "this week", "in season", the empty and "next after that" lines.
+- `src/lib/signaliq/radar-season.ts`, `LEAN_COPY.ar`: the EN vs AR read (hidden behind SHOW_AR_COUNTS).
+- In both content.ar.ts files: `verdicts.preseason`, `unusuallyQuiet`, `seasonTitle`, `seasonNote`.
+
+Every number in those lines is computed; only the words are for review.

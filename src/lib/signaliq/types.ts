@@ -8,6 +8,8 @@
  * will break. Every signal carries its primary-source `url` (receipts).
  */
 
+import type { HistorySummary } from "./seasonality";
+
 export type BeatId =
   | "saas" | "fintech" | "health" | "climate" | "ai" | "cybersecurity" | "agency" | "founders"
   | "travel" | "longevity" | "beauty" | "commerce"
@@ -118,6 +120,9 @@ export interface Opportunity {
    *  own baseline. Absent when the source has no baseline or the sample is too
    *  small to call a trend. Drives the "below its norm" note next to Volume. */
   volumeDirection?: { source: SourceId; trend: number };
+  /** Three years of weekly press volume for this topic (seasonality step 2,
+   *  2026-09-15). Absent for tailored seeds and topics with no history row. */
+  history?: HistorySummary;
   coverage: Coverage | null;
   signals: Signal[];       // the receipts
   sensitive: boolean;      // tasteful-newsjacking flag (RFP §11.4)

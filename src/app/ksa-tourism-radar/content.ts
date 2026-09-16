@@ -8,6 +8,8 @@
  * recalibrations (NEOM, Mukaab, 2026 F1/EWC) shown honestly.
  */
 import type { KsaLens } from "@/lib/ksa-radar/types";
+import type { HistorySummary } from "@/lib/signaliq/seasonality";
+import { isPreSeason } from "@/lib/signaliq/radar-season";
 
 export interface SourceLink {
   t: string;
@@ -34,6 +36,8 @@ export interface KsaSignal {
   size: 1 | 2 | 3;
   /** Lowercase canonical topics feeding this signal's live line (may be empty). */
   topics: string[];
+  /** Arabic seed keys ("ar:" prefix) for the same signal; additive, read only for the EN vs AR split. */
+  topicsAr?: string[];
   /** Demand-side reality (capital, targets, traffic) — the third ingredient the press does not control. */
   demand: string;
   /** Next dated catalyst likely to move coverage. */
@@ -52,6 +56,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "neom", name: "NEOM / The Line", ar: "نيوم", lens: "giga", ring: 3, status: "watch", size: 3,
     topics: ["neom"],
+    topicsAr: ["ar:مشروع نيوم"],
     demand: "PIF flagship; OXAGON prioritised under new leadership",
     catalyst: "re-sequencing decisions through 2026",
     stat: "SAR 60B (~$16B) reportedly budgeted 2026-2030 to unwind contractor agreements; The Line and TROJENA paused to post-2030; Sindalah closed since its 2024 launch.",
@@ -63,6 +68,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "rsg", name: "Red Sea Global", ar: "مشروع البحر الأحمر", lens: "giga", ring: 1, status: "hot", size: 3,
     topics: ["red sea global"],
+    topicsAr: ["ar:مشروع البحر الأحمر"],
     demand: "50 hotels / 8,000 keys committed by 2030",
     catalyst: "8 more resorts opening in 2026",
     stat: "About 9 of 50 planned hotels open (target: 50 hotels / 8,000 keys across 22 islands + 6 inland sites by 2030); 8 more resorts slated for 2026.",
@@ -74,6 +80,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "alula", name: "AlUla", ar: "العلا", lens: "giga", ring: 2, status: "steady", size: 2,
     topics: ["alula"],
+    topicsAr: ["ar:محافظة العلا"],
     demand: "2M visitors/yr target by 2035; 8,500 keys planned",
     catalyst: "PPP investor round (from Jul 2026)",
     stat: "286,259 visits in 2024 against a 2M-a-year target by 2035; ~730 hotel keys today, 8,500 planned.",
@@ -85,6 +92,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "diriyah", name: "Diriyah", ar: "الدرعية", lens: "giga", ring: 2, status: "hot", size: 3,
     topics: ["diriyah"],
+    topicsAr: ["ar:بوابة الدرعية"],
     demand: "$63.2B project; $29B+ contracts already awarded",
     catalyst: "next contract awards",
     stat: "$63.2B giga-project; $29B+ in construction contracts awarded; 3.6M visits to At-Turaif and Bujairi Terrace to date.",
@@ -96,6 +104,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "qiddiya", name: "Qiddiya", ar: "القدية", lens: "giga", ring: 1, status: "hot", size: 2,
     topics: ["qiddiya"],
+    topicsAr: ["ar:القدية"],
     demand: "Six Flags + Aquarabia open; record-breaking hardware",
     catalyst: "summer season 2026",
     stat: "Six Flags Qiddiya City open since 31 Dec 2025: Falcons Flight is the world's tallest, fastest, longest coaster; Aquarabia water park opened Apr 2026.",
@@ -107,6 +116,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "murabba", name: "New Murabba / Mukaab", ar: "المربع الجديد", lens: "giga", ring: 3, status: "watch", size: 2,
     topics: ["new murabba", "mukaab"],
+    topicsAr: ["ar:المربع الجديد"],
     demand: "19 km² downtown anchored by the 400m Mukaab",
     catalyst: "retender targets a 2027 restart",
     stat: "19 km² downtown anchored by the 400m Mukaab; construction beyond piling reported suspended Jan 2026 amid Vision 2030 reprioritisation.",
@@ -118,6 +128,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "soudah", name: "Soudah Peaks", ar: "قمم السودة", lens: "giga", ring: 3, status: "early", size: 1,
     topics: ["soudah peaks"],
+    topicsAr: ["ar:قمم السودة"],
     demand: "$7.7B plan; 2M visitors/yr by 2033",
     catalyst: "main packages tender Q3 2026",
     stat: "SAR ~29B ($7.7B) plan: 2,700 keys and 2M visitors a year by 2033 in Aseer's highlands; no resorts confirmed open yet.",
@@ -130,6 +141,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "riyadhseason", name: "Riyadh Season", ar: "موسم الرياض", lens: "events", ring: 1, status: "steady", size: 3,
     topics: ["riyadh season"],
+    topicsAr: ["ar:موسم الرياض"],
     demand: "11M+ visitors last season; 18M+ the season before",
     catalyst: "2026-27 lineup announcement",
     stat: "11M+ visitors by late December in the 2025-26 season; the 2024-25 season drew 18M+.",
@@ -141,6 +153,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "expo2030", name: "Expo 2030 Riyadh", ar: "إكسبو 2030 الرياض", lens: "events", ring: 2, status: "hot", size: 3,
     topics: ["expo 2030"],
+    topicsAr: ["ar:إكسبو 2030 الرياض"],
     demand: "$7.8B budget; 40M+ visits expected; 197 nations",
     catalyst: "main works start Q3 2026",
     stat: "$7.8B budget; 40M+ visits expected; 197 nations; 6M m² site with ~25% leveled.",
@@ -152,6 +165,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "wc2034", name: "FIFA World Cup 2034", ar: "كأس العالم 2034", lens: "events", ring: 3, status: "hot", size: 3,
     topics: ["2034 world cup"],
+    topicsAr: ["ar:كأس العالم 2034"],
     demand: "15 stadiums; SR10.1B upgrade program",
     catalyst: "King Salman Stadium due 2029",
     stat: "15 stadiums across 5 cities; the 92,000-seat King Salman International Stadium is due 2029; SR10.1B stadium-upgrade program under way.",
@@ -163,6 +177,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "saudigp", name: "Saudi Arabian GP", ar: "جائزة السعودية الكبرى", lens: "events", ring: 1, status: "watch", size: 1,
     topics: ["saudi grand prix", "saudi arabian grand prix"],
+    topicsAr: ["ar:جائزة السعودية الكبرى"],
     demand: "Jeddah hosts until the Qiddiya circuit is ready",
     catalyst: "2027 circuit decision",
     stat: "2026 Jeddah race cancelled (alongside Bahrain) amid the regional situation; Jeddah is slated to host until the Qiddiya circuit is ready (~2027).",
@@ -174,6 +189,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "ewc", name: "Esports World Cup", ar: "كأس العالم للرياضات الإلكترونية", lens: "events", ring: 1, status: "watch", size: 2,
     topics: ["esports world cup"],
+    topicsAr: ["ar:كأس العالم للرياضات الإلكترونية"],
     demand: "$75M prize pool; 2,000+ players; Riyadh-owned franchise",
     catalyst: "finals 23 Aug 2026",
     stat: "$75M prize pool, 25 events, 2,000+ players, but the 2026 edition relocated Riyadh to Paris, framed as a rotation with Riyadh as EWC's home.",
@@ -185,6 +201,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "soundstorm", name: "Soundstorm (MDLBEAST)", ar: "ساوندستورم", lens: "events", ring: 1, status: "steady", size: 1,
     topics: ["soundstorm"],
+    topicsAr: ["ar:ساوندستورم"],
     demand: "~500K visitors per edition",
     catalyst: "December 2026 edition",
     stat: "Soundstorm 2024 drew almost half a million visitors plus a Guinness record; the 2025 edition ran 14 stages and 250+ artists.",
@@ -196,6 +213,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "jeddahseason", name: "Jeddah Season", ar: "موسم جدة", lens: "events", ring: 1, status: "steady", size: 1,
     topics: ["jeddah season"],
+    topicsAr: ["ar:موسم جدة"],
     demand: "1.7M+ visitors in 2024; 6M at peak (2022)",
     catalyst: "2026 dates announcement",
     stat: "1.7M+ visitors over 52 days in 2024; the 2022 edition reached 6M.",
@@ -208,6 +226,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "riyadhair", name: "Riyadh Air", ar: "طيران الرياض", lens: "hosp", ring: 1, status: "hot", size: 3,
     topics: ["riyadh air"],
+    topicsAr: ["ar:طيران الرياض"],
     demand: "orders + options up to 182 aircraft; 100+ routes by 2030",
     catalyst: "Farnborough-window 787 order decision",
     stat: "Airborne: first revenue flight 10 Jun 2026 (Riyadh-London); ~8 aircraft by end-Jul 2026; orders plus options up to 182 aircraft; 100+ destinations targeted by 2030.",
@@ -219,6 +238,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "saudia", name: "Saudia", ar: "الخطوط السعودية", lens: "hosp", ring: 1, status: "steady", size: 2,
     topics: ["saudia"],
+    topicsAr: ["ar:الخطوط السعودية"],
     demand: "12 Airbus arriving through 2026; ~150-jet order weighed",
     catalyst: "fleet-order announcement",
     stat: "12 new Airbus aircraft arriving through 2026 (first A321XLR received); a ~150-jet order reported under consideration.",
@@ -230,6 +250,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "aroya", name: "AROYA Cruises / Cruise Saudi", ar: "أرويا", lens: "hosp", ring: 1, status: "steady", size: 2,
     topics: ["aroya cruises", "cruise saudi"],
+    topicsAr: ["ar:أرويا"],
     demand: "140K+ guests in year one; 1.3M/yr target by 2035",
     catalyst: "new Red Sea itineraries",
     stat: "140,000+ guests in year one; Red Sea sailings ex-Jeddah resumed May 2026; Cruise Saudi targets 1.3M passengers a year by 2035.",
@@ -241,6 +262,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "hotels", name: "Hotel pipeline", ar: "التوسع الفندقي", lens: "hosp", ring: 2, status: "hot", size: 3,
     topics: ["saudi hotels", "saudi hotel"],
+    topicsAr: ["ar:التوسع الفندقي"],
     demand: "94,500 rooms in the active pipeline; 358K long-term",
     catalyst: "management-deal flow (3 signed in one July week)",
     stat: "171,650 keys (Sep 2025) plus 94,500 rooms in the active pipeline (358,000 in long-term plans); ~75% of new supply luxury/upscale; ADR SAR 746, occupancy 61% (Jan-Aug 2025).",
@@ -252,6 +274,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "ksia", name: "King Salman Intl Airport", ar: "مطار الملك سلمان الدولي", lens: "hosp", ring: 2, status: "steady", size: 2,
     topics: ["king salman international airport"],
+    topicsAr: ["ar:مطار الملك سلمان الدولي"],
     demand: "six-runway masterplan under construction",
     catalyst: "runway-3 milestones",
     stat: "Third-runway construction under way since Jan 2026 on Riyadh's six-runway mega-airport.",
@@ -263,6 +286,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "mice", name: "MICE & business events", ar: "قطاع فعاليات الأعمال", lens: "hosp", ring: 2, status: "steady", size: 2,
     topics: [],
+    topicsAr: ["ar:قطاع فعاليات الأعمال"],
     demand: "$3.22B market heading to $5.65B by 2031",
     catalyst: "Saudi Event Show 9-10 Sep 2026",
     stat: "Saudi MICE market estimated at $3.22B (2025), heading for $5.65B by 2031; Saudi business-travel spending grew +55% in 2025 (WTTC).",
@@ -274,6 +298,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "invest", name: "Tourism investment", ar: "الاستثمار السياحي", lens: "hosp", ring: 2, status: "hot", size: 2,
     topics: ["saudi tourism"],
+    topicsAr: ["ar:الاستثمار السياحي"],
     demand: "$400M Madinah fund + private capital moving in",
     catalyst: "next fund announcements",
     stat: "Private capital is moving into Saudi tourism, with bets that look very different from the giga-funds (Skift, Jul 2026).",
@@ -286,6 +311,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "hajj", name: "Hajj operations", ar: "الحج", lens: "faith", ring: 1, status: "steady", size: 3,
     topics: ["hajj"],
+    topicsAr: ["ar:الحج"],
     demand: "1.71M pilgrims operated at +2% YoY",
     catalyst: "Hajj 1448H season build-up",
     stat: "1,707,301 pilgrims performed Hajj 1447H/2026 (+2% YoY; ~1.55M international, from 165 countries).",
@@ -297,6 +323,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "umrah", name: "Umrah growth", ar: "العمرة", lens: "faith", ring: 2, status: "hot", size: 3,
     topics: ["umrah"],
+    topicsAr: ["ar:العمرة"],
     demand: "30M pilgrims/yr capacity target by 2030",
     catalyst: "GASTAT quarterly releases",
     stat: "20.7M Umrah performers in H1 2025; 11.29M in Q4 2025 alone; national capacity target: 30M pilgrims a year by 2030.",
@@ -308,6 +335,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "makkah", name: "Makkah hospitality", ar: "مكة المكرمة", lens: "faith", ring: 1, status: "hot", size: 2,
     topics: ["makkah"],
+    topicsAr: ["ar:مكة المكرمة"],
     demand: "218K+ rooms planned across the holy cities; ADR $209",
     catalyst: "capacity announcements",
     stat: "KSA's strongest hotel market in early 2026 (ADR $209, RevPAR +4.7%), with 218,000+ rooms planned across the holy cities.",
@@ -319,6 +347,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "madinah", name: "Madinah hospitality", ar: "المدينة المنورة", lens: "faith", ring: 1, status: "steady", size: 2,
     topics: ["madinah"],
+    topicsAr: ["ar:المدينة المنورة"],
     demand: "Rua Al Madinah mega-development reshaping supply",
     catalyst: "$400M fund deployments",
     stat: "76% hotel occupancy in early 2026 (rates +2.7%); Rua Al Madinah among the mega-developments reshaping supply.",
@@ -330,6 +359,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "mft", name: "Muslim-friendly travel", ar: "السفر الصديق للمسلمين", lens: "faith", ring: 1, status: "hot", size: 2,
     topics: ["halal travel", "muslim travelers"],
+    topicsAr: ["ar:السفر الصديق للمسلمين"],
     demand: "Muslim travel spend $249B heading to $424B by 2029",
     catalyst: "GMTI 2027 cycle",
     stat: "GMTI 2026: KSA tied #2 globally (score 79, with Indonesia and Türkiye; Malaysia #1). Muslim outbound travel spend: $249B in 2024, forecast $424B by 2029 (SGIE 2025/26, DinarStandard).",
@@ -352,6 +382,7 @@ export const SIGNALS: KsaSignal[] = [
   {
     id: "haramain", name: "Haramain high-speed rail", ar: "قطار الحرمين", lens: "faith", ring: 1, status: "steady", size: 1,
     topics: ["haramain"],
+    topicsAr: ["ar:قطار الحرمين"],
     demand: "2.21M seats prepared for one Hajj season",
     catalyst: "next season capacity plan",
     stat: "1.16M+ passengers moved during the Hajj 2026 season; 2.21M seats prepared for the season.",
@@ -550,7 +581,7 @@ export const SRC_GROUPS: { h: string; links: SourceLink[] }[] = [
    signal files, and The Window quadrant so the page never disagrees with
    itself. Loud = above the tracked set's median press volume; rising = 30v30
    momentum >= +10%. Demand/catalysts come from the curated layer. ---- */
-export type KsaVerdict = "whitespace" | "early" | "newsjack" | "late" | "dormant" | "recal";
+export type KsaVerdict = "whitespace" | "early" | "newsjack" | "late" | "dormant" | "recal" | "preseason";
 
 export const VERDICT_META: Record<KsaVerdict, { label: string; note: string; tone: "gold" | "ink" | "quiet" | "warn" }> = {
   early: { label: "EARLY WINDOW", note: "quiet and rising: own it now", tone: "gold" },
@@ -559,6 +590,9 @@ export const VERDICT_META: Record<KsaVerdict, { label: string; note: string; ton
   late: { label: "LATE", note: "crowded and flat: wait for the next catalyst", tone: "quiet" },
   dormant: { label: "DORMANT", note: "quiet with no demand signal on file", tone: "quiet" },
   recal: { label: "RECALIBRATING", note: "story in flux: watch, do not call it", tone: "warn" },
+  // Additive (2026-09-15): a quiet signal whose own usual peak, found in three years of
+  // weekly counts, is 8 weeks away or less. See src/lib/signaliq/radar-season.ts.
+  preseason: { label: "PRE-SEASON", note: "its usual peak is close: the pitch window is opening", tone: "gold" },
 };
 
 /** Below this many articles, a 30v30 percentage is statistical noise (2 vs 4
@@ -567,6 +601,21 @@ export const VERDICT_META: Record<KsaVerdict, { label: string; note: string; ton
 export const LOW_SAMPLE_N = 12;
 
 export function verdictFor(
+  n: number | null,
+  tr: number | null,
+  medianN: number,
+  demand: string | undefined,
+  catalyst: string | undefined,
+  status: KsaStatus,
+  /** Optional three-year history; turns a quiet verdict into PRE-SEASON when its peak is near. */
+  history?: HistorySummary | null,
+): KsaVerdict {
+  const base = verdictBase(n, tr, medianN, demand, catalyst, status);
+  return isPreSeason(base, history) ? "preseason" : base;
+}
+
+/** The original five-verdict engine, unchanged. */
+function verdictBase(
   n: number | null,
   tr: number | null,
   medianN: number,

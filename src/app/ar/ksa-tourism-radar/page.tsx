@@ -34,6 +34,9 @@ import {
 } from "../../ksa-tourism-radar/content";
 import { GAP_AR, KPI_AR, SIGNAL_AR, TALK_AR, UI } from "./content.ar";
 import { ArabicFooter, ArabicHeader, DraftBanner } from "../_components/chrome";
+import HistoryStrip from "@/components/signaliq/HistoryStrip";
+import SeasonCalendar from "@/components/signaliq/SeasonCalendar";
+import { isUnusuallyQuiet } from "@/lib/signaliq/radar-season";
 import "../radar-ar.css";
 
 const amiri = Amiri({ variable: "--font-ar-serif", subsets: ["arabic"], weight: ["400", "700"], display: "swap" });
@@ -114,7 +117,7 @@ function TheWindow({ live }: { live: KsaRadarData }) {
       </div>
       <p className="ar-window-rules">{UI.windowRules}</p>
       <div className="ar-legend">
-        {(["early", "whitespace", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
+        {(["early", "whitespace", "preseason", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
           <span key={k}>
             <span className={"ar-verdict v-" + VERDICT_META[k].tone}>{UI.verdicts[k].label}</span>
             {UI.verdicts[k].note}
@@ -140,7 +143,9 @@ function SignalFile({ sig, live, median }: { sig: (typeof SIGNALS)[number]; live
   }
   const n = best ? best.n : null;
   const tr = best ? best.tr : null;
-  const verdict = verdictFor(n, tr, median, sig.demand, sig.catalyst, sig.status);
+  const hist = live.history?.[sig.id] ?? null;
+  const verdict = verdictFor(n, tr, median, sig.demand, sig.catalyst, sig.status, hist);
+  const unusual = isUnusuallyQuiet(n !== null && n >= Math.max(median, 1), hist, tr !== null && tr >= 0.1 && n !== null && n >= LOW_SAMPLE_N);
   const v = UI.verdicts[verdict];
   const lowSample = n !== null && n < LOW_SAMPLE_N;
 
@@ -167,6 +172,9 @@ function SignalFile({ sig, live, median }: { sig: (typeof SIGNALS)[number]; live
           <span>{UI.wirePending}</span>
         )}
       </div>
+
+      {hist ? <HistoryStrip h={hist} locale="ar" className="ar-hist" /> : null}
+      {unusual ? <p className="ar-quiet">{UI.unusuallyQuiet}</p> : null}
 
       <div className="ar-chips">
         {(ar?.demand ?? sig.demand) ? <span className="ar-chip">الطلب: {ar?.demand ?? sig.demand}</span> : null}
@@ -195,7 +203,7 @@ function SignalFile({ sig, live, median }: { sig: (typeof SIGNALS)[number]; live
 /* ── Page ────────────────────────────────────────────────────────────────── */
 
 export default async function ArabicKsaTourismRadarPage() {
-  const live = await getKsaRadarData();
+  const live = await getKsaRadarData(SIGNALS);
 
   const ns = live.topics.map((t) => t.n).sort((a, b) => a - b);
   const mid = Math.floor(ns.length / 2);
@@ -239,6 +247,21 @@ export default async function ArabicKsaTourismRadarPage() {
               </div>
             ),
           )}
+
+          {live.thisMonday && SIGNALS.some((s) => live.history?.[s.id]?.peak) ? (
+            <div className="ar-season">
+              <span className="ar-ring">{UI.seasonTitle}</span>
+              <SeasonCalendar
+                locale="ar"
+                thisMonday={live.thisMonday}
+                items={SIGNALS.flatMap((s) => {
+                  const p = live.history?.[s.id]?.peak;
+                  return p ? [{ id: s.id, name: s.ar || s.name, peak: p }] : [];
+                })}
+              />
+              <p className="ar-micro">{UI.seasonNote}</p>
+            </div>
+          ) : null}
 
           <div className="ar-metastrip" style={{ marginTop: 26 }}>
             <span>

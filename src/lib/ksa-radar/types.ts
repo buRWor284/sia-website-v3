@@ -3,6 +3,8 @@
  * No server imports here, so both the server data layer and the client
  * component can import this. Mirrors src/lib/radar/types.ts conventions.
  */
+import type { HistorySummary } from "@/lib/signaliq/seasonality";
+
 export type KsaLens = "giga" | "events" | "hosp" | "faith";
 
 export const KSA_LENSES: KsaLens[] = ["giga", "events", "hosp", "faith"];
@@ -35,6 +37,10 @@ export interface KsaRadarData {
   heating: number; // topics with tr > 0
   risers: KsaLiveTopic[]; // tr > 0, sorted desc
   quiet: KsaLiveTopic[]; // lowest article_count first (quiet, ownable)
+  /** Seasonality (2026-09-15): summary per signal id, plus `<id>:ar` for the Arabic twin. */
+  history?: Record<string, HistorySummary>;
+  /** Monday (YYYY-MM-DD) of the week the page was rendered, for the season calendar. */
+  thisMonday?: string;
 }
 
 /** 7-day-vs-prior-7-day percentage change of a daily series. */

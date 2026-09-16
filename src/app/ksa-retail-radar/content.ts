@@ -11,6 +11,8 @@
  * and that fact is the finding, not a flaw).
  */
 import type { RetailLens } from "@/lib/ksa-retail/types";
+import type { HistorySummary } from "@/lib/signaliq/seasonality";
+import { isPreSeason } from "@/lib/signaliq/radar-season";
 
 export interface SourceLink {
   t: string;
@@ -37,6 +39,8 @@ export interface RetailSignal {
   size: 1 | 2 | 3;
   /** Lowercase canonical topics feeding this signal's live line (may be empty). */
   topics: string[];
+  /** Arabic seed keys ("ar:" prefix) for the same signal; additive, read only for the EN vs AR split. */
+  topicsAr?: string[];
   /** Demand-side reality (revenue, transactions, users) — the third ingredient the press does not control. */
   demand: string;
   /** Next dated catalyst likely to move coverage. */
@@ -55,6 +59,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-ecommerce", name: "Saudi e-commerce", ar: "التجارة الإلكترونية السعودية", lens: "ecom", ring: 1, status: "steady", size: 3,
     topics: ["saudi e-commerce"],
+    topicsAr: ["ar:التجارة الإلكترونية السعودية"],
     demand: "mada online sales SAR 69.3B in Q1 2025, up 56%",
     catalyst: "monthly SAMA bulletins; White Friday spike 28 Nov 2026",
     stat: "Official SAMA data shows e-commerce sales via mada cards hit a record SAR 69.3 billion in Q1 2025, up 56 percent year on year across 370 million plus transactions, then a record SAR 30.7 billion ($8.18 billion) in the single month of October 2025, up 68 percent.",
@@ -77,6 +82,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "hungerstation", name: "HungerStation", ar: "هنقرستيشن", lens: "ecom", ring: 1, status: "hot", size: 3,
     topics: ["hungerstation"],
+    topicsAr: ["ar:هنقرستيشن"],
     demand: "largest Saudi aggregator; 60%+ key order value from subscribers",
     catalyst: "Uber to Delivery Hero deal close, expected H2 2027",
     stat: "Saudi Arabia is Delivery Hero's standout market: over 60 percent of order value in key segments comes from subscribers, the highest subscription penetration across all Delivery Hero markets, making HungerStation the Kingdom's largest food delivery aggregator. Delivery Hero took sole ownership in July 2023 for $297 million.",
@@ -99,6 +105,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "white-friday", name: "White Friday", ar: "الجمعة البيضاء", lens: "ecom", ring: 1, status: "steady", size: 2,
     topics: ["white friday"],
+    topicsAr: ["ar:الجمعة البيضاء"],
     demand: "November mada e-commerce hit SAR 29.1B, up 67%",
     catalyst: "White Friday, 28 Nov 2026; Amazon deals 20 to 30 Nov",
     stat: "In November 2025, the White Friday month, Saudi e-commerce sales via mada reached SAR 29.1 billion across 166.7 million transactions, up 67 percent year on year, within total consumer spending of SAR 129.1 billion, per SAMA data. The event, coined by Souq.com in 2014, falls on 28 November in 2026.",
@@ -121,6 +128,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-food-delivery", name: "Saudi food delivery", ar: "توصيل الطعام في السعودية", lens: "ecom", ring: 1, status: "hot", size: 3,
     topics: ["saudi food delivery"],
+    topicsAr: ["ar:توصيل الطعام في السعودية"],
     demand: "$8.33B market in 2025, heading to $19.45B by 2031",
     catalyst: "Uber to Delivery Hero close, H2 2027; Aug 2026 earnings",
     stat: "The Saudi delivery market was worth $8.33 billion in 2025, is projected at $9.59 billion in 2026 and $19.45 billion by 2031 at a 15.18 percent CAGR, contested by HungerStation, Jahez and Meituan's Keeta, which grabbed 10 percent order share within four months of its October 2024 launch.",
@@ -133,6 +141,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "alshaya", name: "Alshaya Group", ar: "مجموعة الشايع", lens: "brands", ring: 2, status: "hot", size: 3,
     topics: ["alshaya"],
+    topicsAr: ["ar:مجموعة الشايع"],
     demand: "50 brands, 3,500 stores, nearly 40 years in KSA",
     catalyst: "Chipotle Saudi debut at Westfield Jeddah, late 2026",
     stat: "Alshaya operates around 50 brands, 3,500 stores and 50,000 employees across 19 markets, and in February 2026 unveiled a three year Saudi expansion plan including The Avenues Riyadh and Khobar plus new brands such as Chipotle and Ulta Beauty. Its CEO called Saudi Arabia, a retail market exceeding $133 billion a year, one of the group's most important strategic growth regions.",
@@ -144,6 +153,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "jarir", name: "Jarir Bookstore", ar: "مكتبة جرير", lens: "brands", ring: 1, status: "steady", size: 2,
     topics: ["jarir"],
+    topicsAr: ["ar:مكتبة جرير"],
     demand: "SAR 5.8B H1 2026 revenue; 5 new showrooms",
     catalyst: "Q3 2026 results, October 2026",
     stat: "Jarir posted H1 2026 revenue of SAR 5,812.5 million, up 10.8 percent, with net profit up 18 percent to SAR 489 million, opening five new showrooms in the period. Q2 2026 net profit rose 19.5 percent year on year to SAR 235.6 million, driven by smartphone sales and GCC subsidiaries.",
@@ -155,6 +165,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "cenomi", name: "Cenomi (Centers + Retail)", ar: "سينومي", lens: "brands", ring: 2, status: "hot", size: 3,
     topics: ["cenomi"],
+    topicsAr: ["ar:سينومي"],
     demand: "20 malls, 1.3M sqm GLA, 126.8M annual visitors",
     catalyst: "Westfield Riyadh opening, September 2026",
     stat: "Cenomi Centers closed FY25 with net profit up 4.2 percent to SAR 1,276.2 million on revenue of SAR 2,288.3 million, 94.2 percent like for like occupancy and 126.8 million visitors across 20 malls. Sister company Cenomi Retail, now under Al-Futtaim ownership, swung to a SAR 47.3 million loss in Q1 2026 on higher finance costs.",
@@ -166,6 +177,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "savola", name: "Savola Group", ar: "مجموعة صافولا", lens: "brands", ring: 1, status: "hot", size: 3,
     topics: ["savola"],
+    topicsAr: ["ar:مجموعة صافولا"],
     demand: "SAR 13.6B H1 revenue across foods and Panda retail",
     catalyst: "Q3 2026 results, November 2026",
     stat: "Savola's H1 2026 net profit rose 36 percent to SAR 401 million on revenue of SAR 13.6 billion, up 3.9 percent. Panda Retail contributed SAR 5.9 billion in H1 revenue with EBITDA up 4.5 percent and online revenue growing roughly 2.5x year on year.",
@@ -177,6 +189,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "almarai", name: "Almarai", ar: "المراعي", lens: "brands", ring: 1, status: "steady", size: 3,
     topics: ["almarai"],
+    topicsAr: ["ar:شركة المراعي"],
     demand: "SAR 12B H1 2026 revenue, up 9 percent",
     catalyst: "Q3 2026 results, October 2026",
     stat: "Almarai grew H1 2026 revenue 9 percent to SAR 12.03 billion, but net income slipped 1 percent to SAR 1.368 billion as energy, logistics and protein ramp-up costs squeezed margins. Q2 revenue rose 11 percent to SAR 5.87 billion with dairy and juice still 63 percent of sales.",
@@ -188,6 +201,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "lulu", name: "Lulu Retail", ar: "لولو هايبرماركت", lens: "brands", ring: 2, status: "steady", size: 3,
     topics: ["lulu hypermarket"],
+    topicsAr: ["ar:لولو هايبرماركت"],
     demand: "277 GCC stores, 67 in Saudi Arabia",
     catalyst: "H1 2026 results due, mid August 2026",
     stat: "Lulu Retail hit record FY2025 revenue of $7.9 billion, up 4.1 percent, with $205 million net profit and plans for 50 new GCC stores over 2026 to 2028. By Q1 2026 it operated 277 stores including 67 in Saudi Arabia, with e-commerce up 61 percent year on year.",
@@ -199,6 +213,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "nahdi", name: "Nahdi Medical", ar: "صيدليات النهدي", lens: "brands", ring: 1, status: "watch", size: 2,
     topics: ["nahdi"],
+    topicsAr: ["ar:صيدليات النهدي"],
     demand: "1,200+ pharmacies; SAR 9.4B 2024 revenue",
     catalyst: "Q3 2026 results, late October 2026",
     stat: "Nahdi is Saudi Arabia's pharmacy retail leader with 1,207 pharmacies as of mid 2025, including 1,173 in the Kingdom and 34 in the UAE, plus 12 clinics. It generated SAR 9.45 billion revenue in 2024, with private label reaching 16 percent of sales and clinics revenue surging 82 percent.",
@@ -211,6 +226,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-fashion", name: "Saudi fashion", ar: "الأزياء السعودية", lens: "lifestyle", ring: 1, status: "steady", size: 2,
     topics: ["saudi fashion"],
+    topicsAr: ["ar:الأزياء السعودية"],
     demand: "fashion is 2.5% of GDP and 320,000 jobs",
     catalyst: "Saudi 100 Brands at Riyadh Fashion Week, October 2026",
     stat: "The Fashion Commission's State of Fashion report values the Saudi fashion market at about $30 billion in 2023, heading to $42 billion by 2028, with the sector contributing 2.5 percent of GDP and employing 320,000 people, 52 percent of them women.",
@@ -222,6 +238,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "riyadh-fashion-week", name: "Riyadh Fashion Week", ar: "أسبوع الموضة في الرياض", lens: "lifestyle", ring: 1, status: "watch", size: 1,
     topics: ["riyadh fashion week"],
+    topicsAr: ["ar:أسبوع الموضة في الرياض"],
     demand: "30+ shows in 2025, thin English coverage in monitored sources (SignalIQ x GDELT)",
     catalyst: "fourth Riyadh Fashion Week, October 2026",
     stat: "The third edition, 16 to 21 October 2025, staged more than 30 shows and presentations across couture, ready-to-wear and menswear at JAX district, with Cenomi Centers and Saudia as partners.",
@@ -233,6 +250,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-coffee", name: "Saudi coffee", ar: "القهوة السعودية", lens: "lifestyle", ring: 1, status: "steady", size: 1,
     topics: ["saudi coffee"],
+    topicsAr: ["ar:القهوة السعودية"],
     demand: "5,130 branded cafes, the region's largest coffee market",
     catalyst: "Riyadh International Coffee Exhibition, 2 to 6 Dec 2026",
     stat: "Saudi Arabia is the Middle East's largest branded coffee shop market with 5,130 outlets, 46 percent of the regional total, projected to pass 5,350 by 2027; PIF's Saudi Coffee Company is investing $319 million over ten years to grow five million coffee trees by 2030.",
@@ -255,6 +273,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "savvy-games", name: "Savvy Games", ar: "مجموعة سافي للألعاب", lens: "lifestyle", ring: 2, status: "hot", size: 3,
     topics: ["savvy games"],
+    topicsAr: ["ar:مجموعة سافي للألعاب"],
     demand: "owns Scopely, ESL FACEIT; Moonton adds 110M monthly players",
     catalyst: "Esports Nations Cup, Riyadh, 2 to 29 Nov 2026",
     stat: "PIF's Savvy Games Group, backed by a $38 billion gaming investment program, bought Scopely for $4.9 billion in 2023 and agreed in March 2026 to acquire Moonton Games from ByteDance for $6 billion, adding Mobile Legends: Bang Bang and its 110 million monthly active users.",
@@ -289,6 +308,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-retail", name: "Saudi retail", ar: "قطاع التجزئة السعودي", lens: "macro", ring: 1, status: "steady", size: 3,
     topics: ["saudi retail"],
+    topicsAr: ["ar:قطاع التجزئة السعودي"],
     demand: "a near $294B retail market, few global desks assigned",
     catalyst: "White Friday sales season, late November 2026",
     stat: "The Saudi retail market was valued at $293.6 billion in 2025 and is forecast to reach $411.7 billion by 2034; total consumer spending through official payment channels hit SAR 1.57 trillion in 2025.",
@@ -300,6 +320,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-consumer", name: "Saudi consumer", ar: "المستهلك السعودي", lens: "macro", ring: 1, status: "steady", size: 3,
     topics: ["saudi consumer"],
+    topicsAr: ["ar:المستهلك السعودي"],
     demand: "71% of Saudis under 35, median age 23.5",
     catalyst: "GASTAT Q2 2026 national accounts, September 2026",
     stat: "GASTAT data shows 71 percent of the Saudi population is under 35, with a median age of 23.5 years, one of the youngest large consumer markets anywhere.",
@@ -311,6 +332,7 @@ export const SIGNALS: RetailSignal[] = [
   {
     id: "saudi-consumer-spending", name: "Saudi consumer spending", ar: "الإنفاق الاستهلاكي السعودي", lens: "macro", ring: 1, status: "hot", size: 2,
     topics: ["saudi consumer spending"],
+    topicsAr: ["ar:الإنفاق الاستهلاكي السعودي"],
     demand: "SAR 16.3B card spend in one week, published weekly",
     catalyst: "SAMA weekly POS bulletin, every Wednesday",
     stat: "SAMA point-of-sale spending reached SAR 189.7 billion in Q1 2026, up 4.4 percent year on year, and e-payments now account for 85 percent of all retail payments in the Kingdom (2025).",
@@ -482,7 +504,7 @@ export const SRC_GROUPS: { h: string; links: SourceLink[] }[] = [
    signal files, and The Window quadrant so the page never disagrees with
    itself. Loud = above the tracked set's median press volume; rising = 30v30
    momentum >= +10%. Demand/catalysts come from the curated layer. ---- */
-export type RetailVerdict = "whitespace" | "early" | "newsjack" | "late" | "dormant" | "recal";
+export type RetailVerdict = "whitespace" | "early" | "newsjack" | "late" | "dormant" | "recal" | "preseason";
 
 export const VERDICT_META: Record<RetailVerdict, { label: string; note: string; tone: "gold" | "ink" | "quiet" | "warn" }> = {
   early: { label: "EARLY WINDOW", note: "quiet and rising: own it now", tone: "gold" },
@@ -491,6 +513,9 @@ export const VERDICT_META: Record<RetailVerdict, { label: string; note: string; 
   late: { label: "LATE", note: "crowded and flat: wait for the next catalyst", tone: "quiet" },
   dormant: { label: "DORMANT", note: "quiet with no demand signal on file", tone: "quiet" },
   recal: { label: "RECALIBRATING", note: "story in flux: watch, do not call it", tone: "warn" },
+  // Additive (2026-09-15): a quiet signal whose own usual peak, found in three years of
+  // weekly counts, is 8 weeks away or less. See src/lib/signaliq/radar-season.ts.
+  preseason: { label: "PRE-SEASON", note: "its usual peak is close: the pitch window is opening", tone: "gold" },
 };
 
 /** Below this many articles, a 30v30 percentage is statistical noise (2 vs 4
@@ -499,6 +524,21 @@ export const VERDICT_META: Record<RetailVerdict, { label: string; note: string; 
 export const LOW_SAMPLE_N = 12;
 
 export function verdictFor(
+  n: number | null,
+  tr: number | null,
+  medianN: number,
+  demand: string | undefined,
+  catalyst: string | undefined,
+  status: RetailStatus,
+  /** Optional three-year history; turns a quiet verdict into PRE-SEASON when its peak is near. */
+  history?: HistorySummary | null,
+): RetailVerdict {
+  const base = verdictBase(n, tr, medianN, demand, catalyst, status);
+  return isPreSeason(base, history) ? "preseason" : base;
+}
+
+/** The original five-verdict engine, unchanged. */
+function verdictBase(
   n: number | null,
   tr: number | null,
   medianN: number,

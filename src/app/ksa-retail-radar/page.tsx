@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getRetailRadarData } from "@/lib/ksa-retail/data";
 import { Colophon } from "@/components/bureau";
 import RetailRadarModule from "./RetailRadarModule";
-import { KPIS, SRC_GROUPS, TALKS, VERDICT_META } from "./content";
+import { KPIS, SRC_GROUPS, TALKS, VERDICT_META, SIGNALS } from "./content";
 import type { RetailRadarData } from "@/lib/ksa-retail/types";
 import "./ksa-retail-radar.css";
 
@@ -108,7 +108,7 @@ function TheWindow({ live }: { live: RetailRadarData }) {
         every day while the English press file in monitored sources (SignalIQ x GDELT) stays thin, and each quiet dot with a demand line is a story someone gets to own first.
       </p>
       <div className="krr-verdict-legend">
-        {(["early", "whitespace", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
+        {(["early", "whitespace", "preseason", "newsjack", "late", "dormant", "recal"] as const).map((k) => (
           <span key={k}>
             <span className={"krr-verdict v-" + VERDICT_META[k].tone}>{VERDICT_META[k].label}</span> {VERDICT_META[k].note}
           </span>
@@ -125,7 +125,7 @@ function TheWindow({ live }: { live: RetailRadarData }) {
 }
 
 export default async function RetailRadarPage() {
-  const live = await getRetailRadarData();
+  const live = await getRetailRadarData(SIGNALS);
 
   const jsonLd = {
     "@context": "https://schema.org",

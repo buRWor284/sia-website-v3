@@ -1,5 +1,7 @@
 "use client";
 
+import HistoryStrip from "./HistoryStrip";
+
 /**
  * SignalIQ — shared presentational atoms + opportunity cards (Phase P6).
  * Moved verbatim from app/tools/signaliq/page.tsx so the public tool and the
@@ -591,6 +593,17 @@ export function OppCard({
                 {opp.fit === "high" ? "High" : opp.fit === "medium" ? "Medium" : "Low"}
               </span>
             </span>
+          </div>
+        )}
+        {/* History: three years of weekly press volume (seasonality step 2, 2026-09-15) */}
+        {opp.history && (
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+            <span style={{ flexShrink: 0, width: 48, paddingTop: 4, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
+              History
+            </span>
+            <div style={{ flex: 1, minWidth: 0, color: INK }}>
+              <HistoryStrip h={opp.history} />
+            </div>
           </div>
         )}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>

@@ -177,3 +177,85 @@ grant execute on function signaliq_refresh_history() to service_role;
 --   select topic, last_60d, prior_year_60d, yoy_ratio, norm_ratio, peak_weeks, next_peak_week, weeks_available
 --     from signaliq_topic_history where topic in ('hajj','ramadan','black friday','ar:الحج') ;
 -- ─────────────────────────────────────────────────────────────────────────────
+
+-- ============================================================================
+-- STEP 2 ADDITION (2026-09-15): per-LANGUAGE weekly volume.
+-- Applied via the Supabase MCP as migration `signaliq_lang_history`.
+--
+-- WHY. Two things a card cannot know from one topic's row:
+--   1. Corpus gaps. GDELT returned no rows for 2025-06-15 → 2025-07-01 (17 days,
+--      every topic in every language reads 0). A week where the whole language
+--      collapses is "no data", not "no articles".
+--   2. Drift. The 15 Sep check of "norm_ratio reads 0.5-0.7": tracked English
+--      volume's last week was 0.911 of its 3-year median, Arabic 0.894,
+--      Indonesian 0.570. Across ALL topics the median norm_ratio was 0.85 (en)
+--      and 0.80 (ar), so the corpus explains roughly 10-15 points and the KSA
+--      topics' own post-season lull explains the rest. Cards therefore divide
+--      any "quiet vs usual" ratio by the same ratio for the whole language
+--      (seasonality.ts) before calling a topic unusually quiet.
+-- Called from refreshTopicHistory() right after signaliq_refresh_history(),
+-- because it reads the weekly rollup that function just rebuilt. ~1 s.
+-- ============================================================================
+create table if not exists signaliq_lang_history (
+  lang              text primary key,
+  topics            integer  not null default 0,
+  weekly_median_3y  numeric(12,2) not null default 0,
+  last_week         integer  not null default 0,
+  norm_ratio        numeric(8,3),
+  series_156        integer[] not null default '{}',
+  weeks_available   smallint not null default 0,
+  last_week_start   date,
+  updated_at        timestamptz not null default now()
+);
+alter table signaliq_lang_history enable row level security;
+grant all on table signaliq_lang_history to service_role;
+
+create or replace function signaliq_refresh_lang_history()
+returns table (langs integer, ms integer)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  t0 timestamptz := clock_timestamp();
+  v_langs integer;
+begin
+  truncate signaliq_lang_history;
+  insert into signaliq_lang_history (lang, topics, weekly_median_3y, last_week, norm_ratio, series_156, weeks_available, last_week_start, updated_at)
+  with lw as (
+    select case when topic ~ '^[a-z]{2}:' then split_part(topic, ':', 1) else 'en' end as lang,
+           week_start,
+           sum(article_count)::integer as total,
+           count(*) as topics
+    from signaliq_weekly_counts
+    where days = 7
+    group by 1, 2
+  ),
+  ranked as (
+    select lang, week_start, total, topics,
+           row_number() over (partition by lang order by week_start desc) as rn
+    from lw
+  ),
+  agg as (
+    select lang,
+      (percentile_cont(0.5) within group (order by total))::numeric as med,
+      count(*) as weeks,
+      array_agg(total order by week_start) filter (where rn <= 156) as arr,
+      max(week_start) as last_start
+    from ranked group by lang
+  ),
+  latest as (select lang, total as last_total, topics from ranked where rn = 1)
+  select a.lang, l.topics, round(a.med, 2), l.last_total,
+         case when a.med > 0 then round(l.last_total / a.med, 3) end,
+         coalesce(a.arr, '{}'), least(a.weeks, 32767)::smallint, a.last_start, now()
+  from agg a join latest l using (lang);
+  get diagnostics v_langs = row_count;
+  return query select v_langs, (extract(epoch from clock_timestamp() - t0) * 1000)::integer;
+end;
+$$;
+revoke all on function signaliq_refresh_lang_history() from public;
+grant execute on function signaliq_refresh_lang_history() to service_role;
+
+-- DIAGNOSTIC:
+--   select * from signaliq_refresh_lang_history();
+--   select lang, topics, last_week, weekly_median_3y, norm_ratio, last_week_start from signaliq_lang_history order by lang;

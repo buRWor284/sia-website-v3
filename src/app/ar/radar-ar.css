@@ -415,3 +415,9 @@
 @media (prefers-reduced-motion: reduce) {
   .ar-radar * { animation: none !important; transition: none !important; }
 }
+
+/* ---- seasonality (2026-09-15) ---- */
+.ar-hist { margin: 10px 0 6px; color: var(--ink, #1a1410); }
+.ar-quiet { margin: 2px 0 8px; font-size: 13px; color: var(--ink70, rgba(26,20,16,.7)); }
+.ar-season { margin-top: 28px; color: var(--ink, #1a1410); }
+.ar-season .ar-ring { display: inline-block; margin-bottom: 10px; }

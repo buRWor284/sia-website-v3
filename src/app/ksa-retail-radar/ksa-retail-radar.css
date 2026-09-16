@@ -239,3 +239,10 @@
   .krr-talks{grid-template-columns:minmax(0,1fr)}
 }
 @media(max-width:560px){.krr-kpis{grid-template-columns:minmax(0,1fr)}.krr-cols{grid-template-columns:minmax(0,1fr)}.krr-col{border-right:0}}
+
+/* ---- seasonality (2026-09-15): history strip, unusually-quiet note, season calendar ---- */
+.krr-file-hist{margin:0 0 12px;padding:10px 12px 11px;border:1px solid var(--color-ink);background:var(--color-paper-2);color:var(--color-ink)}
+.krr-file-hist .krr-file-lbl{margin-bottom:7px}
+.krr-quiet-unusual{font-family:var(--font-serif);font-style:italic;font-size:12px;color:var(--color-ink-70);margin-top:2px}
+.krr-season{margin-top:14px;color:var(--color-ink);--hs-paper:var(--color-paper)}
+.krr-season-note{font-family:var(--font-serif);font-style:italic;font-size:12.5px;line-height:1.55;color:var(--color-ink-70);margin:10px 0 0;max-width:780px}

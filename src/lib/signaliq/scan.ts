@@ -16,6 +16,7 @@ import { SIGNAL_SOURCES } from "./sources";
 import { getStoredCoverage } from "./coverage-store";
 import { expandCompanyProfile } from "./profile";
 import { rankOpportunities, scoreOpportunity } from "./score";
+import { getHistorySummaries } from "./history";
 
 export interface ScanResult {
   opportunities: Opportunity[];
@@ -171,6 +172,12 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
   }
 
   const opportunities = ranked.slice(0, MAX_OPPORTUNITIES);
+
+  // Seasonality step 2 (2026-09-15): attach three years of weekly history to each
+  // card. Two small queries for all cards together (topics, then languages);
+  // tailored seeds have no history row and simply get no strip. Never throws.
+  const histories = await getHistorySummaries(opportunities.map((o) => ({ id: o.id, topics: [o.topic.toLowerCase()] })));
+  for (const o of opportunities) if (histories[o.id]) o.history = histories[o.id];
 
   const notes: string[] = [];
   const partial = failures > 0;
