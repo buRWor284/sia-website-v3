@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import { Colophon } from "@/components/bureau";
-import { SIGNALS, SRC_GROUPS, type DecodingSignal } from "./content";
+import { ANCHOR_STAT, ATHAR_CALLOUT, SIGNALS, SIGNAL_LEGS, SIGNAL_LEGS_NOT_USED, SRC_GROUPS, type DecodingSignal } from "./content";
 import "./decoding-saudi.css";
 
 // Hidden 2026-09-17: not in nav, not on home page, not in sitemap.ts. Same
 // "hidden data cut" convention as the ksa-culture beat it reads from
 // (src/lib/signaliq/config.ts) and as ksa-tourism-radar/ksa-retail-radar
 // used before they went public. Direct-URL only, for Megha S Anthony
-// (Content Head, Athar Festival) to support a moderator-seat ask on a
-// "Decoding Saudi" conference stream. Rebuilt 2026-09-17 (v2) at Irfan's
+// (Content Head, Athar Festival) to support an ask for Irfan's own talk on
+// the "Decoding Saudi" conference stream. Reframed 2026-09-17 (v3): the
+// angle is "where Saudi attention actually is, versus where brands assume
+// it is", with an anchor stat, an Athar callout and a sources-of-signal box
+// (see content.ts header). Rebuilt 2026-09-17 (v2) at Irfan's
 // request to match the ksa-retail-radar / ksa-tourism-radar house style:
 // sourced signal files with a demand-side fact and a talk angle per topic,
 // not just a raw count table. Deliberately smaller than those two radars
@@ -17,9 +20,9 @@ import "./decoding-saudi.css";
 // that machinery honestly. Press-volume counts are a one-time snapshot (see
 // content.ts header); there is no history yet to wire live.
 export const metadata: Metadata = {
-  title: "Decoding Saudi: Sport & Entertainment Press Signal",
+  title: "Decoding Saudi: Where the Attention Actually Is",
   description:
-    "Ten sourced signals on Saudi sport and entertainment: real press-volume counts via SignalIQ, paired with a cited demand-side fact and a moderator talk angle for each, built for the Decoding Saudi conference stream.",
+    "Ten Saudi sport and entertainment topics, each with a real press-volume count via SignalIQ, a cited demand-side number, and what a brand marketing into Saudi should do with the gap between them. Built for the Decoding Saudi conference stream.",
   robots: { index: false, follow: false },
 };
 
@@ -138,7 +141,7 @@ function SignalCard({ s }: { s: DecodingSignal }) {
         ))}
       </div>
       <p className="dsg-card-talk">
-        <b>Talk angle.</b> {s.talk}
+        <b>For brands.</b> {s.forBrands}
       </p>
     </div>
   );
@@ -156,14 +159,44 @@ export default function DecodingSaudiPage() {
         {/* HERO */}
         <section className="dsg-hero">
           <div className="dsg-scaps">SignalIQ · Decoding Saudi · فك رموز السعودية</div>
-          <h1 className="dsg-h1">Decoding Saudi: Sport &amp; Entertainment Press Signal</h1>
+          <h1 className="dsg-h1">Decoding Saudi: where the attention actually is, versus where brands assume it is</h1>
           <p className="dsg-hero-sub">
-            Ten Saudi sport and entertainment topics, each read two ways: how much the English (and, where it
-            matters, Arabic) press actually files, via <mark className="dsg-mark">SignalIQ</mark>, and what the real
-            demand-side numbers behind the story are, each one sourced and linked. This is the surviving,
-            real-volume half of a wider &quot;Saudi culture&quot; test cut; the honest note on the rest is below.
+            Most brand plans for Saudi are written from the English press. This page checks that against two
+            other things: what the English and Arabic press actually files on ten sport and entertainment topics,
+            via <mark className="dsg-mark">SignalIQ</mark>, and the real audience numbers behind each one, sourced
+            and linked. Where the two disagree is where a marketer&rsquo;s money is either late or wasted. Every
+            topic ends with one concrete line on what a brand should do with the gap.
           </p>
         </section>
+
+        <div className="dsg-double" />
+
+        {/* § 00 — SCALE + ATHAR */}
+        <div className="dsg-anchor-row">
+          <div className="dsg-anchor">
+            <div className="dsg-stat-label">{ANCHOR_STAT.label}</div>
+            <div className="dsg-stat-val">{ANCHOR_STAT.val}</div>
+            <p className="dsg-anchor-sub">{ANCHOR_STAT.sub}</p>
+            <div className="dsg-card-srcs">
+              {ANCHOR_STAT.src.map((src) => (
+                <a key={src.u} href={src.u} target="_blank" rel="noopener noreferrer">
+                  {src.t} ↗
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="dsg-callout">
+            <div className="dsg-scaps">{ATHAR_CALLOUT.label}</div>
+            <p>{ATHAR_CALLOUT.text}</p>
+            <div className="dsg-card-srcs">
+              {ATHAR_CALLOUT.src.map((src) => (
+                <a key={src.u} href={src.u} target="_blank" rel="noopener noreferrer">
+                  {src.t} ↗
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
 
         <div className="dsg-double" />
 
@@ -220,20 +253,22 @@ export default function DecodingSaudiPage() {
         </div>
         <div className="dsg-honesty">
           <p>
-            <b>Read this first.</b> <mark className="dsg-mark">Saudi Pro League</mark> carries the most English
-            press volume by a wide margin, and it sits under a real 230 million-viewer global broadcast footprint,
-            so the volume and the demand agree. <mark className="dsg-mark">Riyadh Season</mark> and Saudi National
-            Day are the widest gaps on this cut: a 20-million-visitor annual event and a nationally coordinated
-            multi-city celebration, each drawing barely 23 English articles in 14 days. Saudi Grand Prix and Saudi
-            film industry show only a handful of English articles in 14 days but a meaningfully larger
-            Arabic-language count over 60 days: Arabic press notably outweighs English on both. Saudi esports,
-            Saudi motorsport and Saudi cinema are kept here as low-priority context: real activity, weak dedicated
-            coverage, one grounding fact each rather than a full signal file.
+            <b>Read this first.</b> On one topic, <mark className="dsg-mark">Saudi Pro League</mark>, the press
+            and the audience agree: 385 English articles in 14 days under a 230 million-viewer broadcast footprint.
+            Everywhere else the audience is ahead of the coverage. <mark className="dsg-mark">Riyadh Season</mark>{" "}
+            (20 million visitors) and Saudi National Day (a nationwide, multi-city programme) each drew 23 English
+            articles in 14 days. The Esports World Cup, with a $75 million prize pool, drew 44. On Saudi Grand Prix
+            and Saudi film industry, the conversation that exists is mostly in Arabic. If a plan is built from
+            English coverage, it will overweight the league and underweight almost everything else.
           </p>
           <p>
-            Broader &quot;Saudi culture&quot; topics (streaming, youth culture, festivals beyond the ones named
-            above, and similar) were tested in the same scan and did not show meaningful English press volume in
-            this window. This cut only shows where real signal exists, not where it was expected to.
+            What did not work: the wider &quot;Saudi culture&quot; topics this cut started with (streaming, youth
+            culture, festivals beyond the ones named, and similar) tested at near-zero English press volume in the
+            same scan, so they are not on this page. Saudi esports, Saudi motorsport and Saudi cinema are kept as
+            low-priority context with one grounding fact each. And the third data leg, search interest from Google
+            Trends, could not be fetched for this pass, so the attention side here rests on official visitor and
+            broadcast numbers rather than on search data. The page shows where signal exists, not where it was
+            expected to.
           </p>
           <p className="dsg-note-live">
             Counts are a one-time snapshot from a BigQuery test scan of the ksa-culture beat, taken 2026-09-17, the
@@ -243,11 +278,29 @@ export default function DecodingSaudiPage() {
           </p>
         </div>
 
-        {/* § 04 — SOURCES */}
+        {/* § 04 — SOURCES OF SIGNAL */}
+        <div className="dsg-mast" style={{ marginTop: 48 }}>
+          <span className="dsg-pill">§ 04</span>
+          <span className="dsg-scaps">Sources of signal: how to read this</span>
+        </div>
+        <div className="dsg-legs">
+          {SIGNAL_LEGS.map((leg) => (
+            <div className="dsg-leg" key={leg.name}>
+              <div className="dsg-leg-head">
+                <span className="dsg-leg-name">{leg.name}</span>
+                <span className={"dsg-chip" + (leg.used ? "" : " weak")}>{leg.used ? "used here" : "not used"}</span>
+              </div>
+              <p>{leg.note}</p>
+            </div>
+          ))}
+          <p className="dsg-legs-foot">{SIGNAL_LEGS_NOT_USED}</p>
+        </div>
+
+        {/* § 05 — SOURCES */}
         <div className="dsg-sources">
           <details className="dsg-src-details">
             <summary>
-              <span className="dsg-pill">§ 04</span>
+              <span className="dsg-pill">§ 05</span>
               <span className="dsg-scaps">Every source, in one place</span>
             </summary>
             <div className="dsg-src-grid">

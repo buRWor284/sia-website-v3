@@ -118,3 +118,23 @@
 .dsg-src-grid h5 { font-family: var(--font-grot); font-weight: 700; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-55); margin: 0 0 8px; }
 .dsg-src-grid a { display: block; font-size: 12.5px; color: var(--color-ink-70); text-decoration: none; padding: 3px 0; }
 .dsg-src-grid a:hover { color: var(--color-ink); background: var(--color-paper-2); }
+
+/* anchor stat + Athar callout row (above § 01), same boxed-stat vocabulary
+   as .dsg-stats: ink border, big serif number, yellow underline */
+.dsg-anchor-row { display: grid; grid-template-columns: 1fr 1.4fr; border: 1px solid var(--color-ink); margin: 26px 0 30px; }
+.dsg-anchor { padding: 20px 22px; border-right: 1px solid var(--color-ink-15); }
+.dsg-anchor-sub { font-size: 13px; line-height: 1.55; color: var(--color-ink-70); margin: 0 0 10px; }
+.dsg-callout { padding: 20px 22px; background: var(--color-paper-2); }
+.dsg-callout p { font-size: 14px; line-height: 1.6; color: var(--color-ink); margin: 8px 0 10px; }
+@media (max-width: 720px) {
+  .dsg-anchor-row { grid-template-columns: 1fr; }
+  .dsg-anchor { border-right: 0; border-bottom: 1px solid var(--color-ink-15); }
+}
+
+/* § 04 sources of signal: three legs, used / not used chips */
+.dsg-legs { border: 1px solid var(--color-ink); background: var(--color-paper); padding: 4px 22px 16px; }
+.dsg-leg { padding: 14px 0; border-bottom: 1px solid var(--color-ink-15); }
+.dsg-leg p { font-size: 13.5px; line-height: 1.55; color: var(--color-ink-70); margin: 6px 0 0; }
+.dsg-leg-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.dsg-leg-name { font-family: var(--font-serif); font-weight: 700; font-size: 17px; }
+.dsg-legs-foot { font-family: var(--font-mono); font-size: 11.5px; line-height: 1.7; color: var(--color-ink-55); margin: 14px 0 0; }
