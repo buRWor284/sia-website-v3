@@ -10,7 +10,7 @@ import HistoryStrip from "./HistoryStrip";
 
 import React, { useState, useEffect, useRef, useId } from "react";
 import { coverageState, volumeDirectionLabel } from "@/lib/signaliq/score";
-import { GLOSSARY } from "@/lib/signaliq/glossary";
+import { GLOSSARY, GLOSSARY_GROUPS, type GlossaryGroup } from "@/lib/signaliq/glossary";
 import {
   GROT,
   INK,
@@ -731,15 +731,30 @@ export function OppCard({
 
 // ── detail score panels ───────────────────────────────────────────────────────
 
+function GroupHead({ group, first = false }: { group: GlossaryGroup; first?: boolean }) {
+  const g = GLOSSARY_GROUPS[group];
+  return (
+    <div style={{ margin: first ? "0 0 8px" : "14px 0 8px", paddingBottom: 4, borderBottom: `1px solid ${INK15}` }}>
+      <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK55 }}>
+        {g.label}
+      </span>
+      <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55 }}> · {g.plain}</span>
+    </div>
+  );
+}
+
 export function ScorePanel({ opp }: { opp: Opportunity }) {
   return (
     <div style={{ border: `1px solid ${INK15}`, background: PAPER2, padding: "16px 18px" }}>
       <SCaps size={10} ls="0.16em" color={INK}>Score breakdown</SCaps>
       <div style={{ marginTop: 12 }}>
+        <GroupHead group="activity" first />
         <CompBar label="Volume" value={opp.components.magnitude} note={volumeDirectionLabel(opp.volumeDirection)} tip={GLOSSARY.volume.plain} />
         <CompBar label="Velocity" value={opp.components.velocity} tip={GLOSSARY.velocity.plain} />
+        <GroupHead group="press" />
         <CompBar label="Coverage gap" value={opp.components.coverageGap} tip={GLOSSARY.coverageGap.plain} />
         <CoverageNote opp={opp} />
+        <GroupHead group="you" />
         {opp.relevanceMultiplier != null && opp.relevanceMultiplier < 0.999 && (
           <CompBar label="Startup fit" value={opp.components.relevance} tip={GLOSSARY.startupFit.plain} />
         )}

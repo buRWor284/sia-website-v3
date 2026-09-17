@@ -14,7 +14,7 @@ export type BeatId =
   | "saas" | "fintech" | "health" | "climate" | "ai" | "cybersecurity" | "agency" | "founders"
   | "travel" | "longevity" | "beauty" | "commerce"
   // Radar/data-collection beats — hidden from the public beat picker (see Beat.hidden).
-  | "ksa-tourism" | "ksa-giga" | "ksa-banking" | "ksa-retail"
+  | "ksa-tourism" | "ksa-giga" | "ksa-banking" | "ksa-retail" | "ksa-culture"
   | "intl-es" | "intl-fr" | "intl-id" | "intl-zh" | "intl-th" | "intl-vi"
   | "intl-pt" | "intl-de" | "intl-tr" | "intl-ja" | "intl-ko" | "intl-ar"
   | "energy" | "mobility" | "property" | "work" | "media" | "industry"
@@ -153,6 +153,9 @@ export interface ProfileExpansion {
   negatives: string[];
   /** One-line normalised positioning (for display/debug). */
   summary?: string;
+  /** How well the picked beat(s) fit the company (16 Sep 2026). "weak" adds a
+   *  note to the scan suggesting betterBeats, instead of stretching fit ratings. */
+  beatMatch?: { level: "strong" | "partial" | "weak"; reason: string; betterBeats: BeatId[] };
 }
 
 export interface ScanInput {

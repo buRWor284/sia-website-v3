@@ -21,7 +21,7 @@
  */
 import type { BeatId, ProfileExpansion } from "./types";
 import { recordAiUsage } from "@/lib/ai-usage";
-import { SIGNALIQ_MODEL, beatById } from "./config";
+import { SIGNALIQ_MODEL, beatById, visibleBeats } from "./config";
 import { briefPromptBlock, fitBrief } from "@/lib/company-brief-prompt";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
@@ -40,7 +40,15 @@ Return, via the emit_profile tool:
 
 4. negatives — 6–12 lowercase candidate/industry terms that are NOT this company's focus.
 
-Fit ratings: high = central to what the company does and can credibly lead on; medium = relevant or adjacent; low = tangential (usually skip it). Be honest — most companies have only a few genuinely "high" topics.`;
+5. beatMatch — how well the beat(s) the founder picked match what this company actually does: "strong", "partial" or "weak", a one-sentence plain reason, and up to 2 better beats from the AVAILABLE BEATS list (ids only) when the match is not strong.
+
+Fit ratings: high = central to what the company does and can credibly lead on; medium = relevant or adjacent; low = tangential (usually skip it). Be honest — most companies have only a few genuinely "high" topics.
+
+Honesty rules for fit (added 16 Sep 2026 after a SIM-swap security company was rated HIGH on "B2B SaaS"):
+- Rate every topic against what THIS company sells and who it serves, never against the beat the founder picked. Picking a beat does not make its topics fit.
+- If the chosen beat is not this company's industry, most candidates are low: leave them out. Returning only 2 or 3 topics is fine and better than stretching. Set beatMatch to "weak" and suggest better beats.
+- Business-model, funding and growth terms (for example B2B SaaS, vertical SaaS, venture capital, seed funding, customer retention) are high or medium ONLY when they are the company's own subject matter: a VC firm on venture capital, a retention product on customer retention, a SaaS-infrastructure vendor on B2B SaaS. Being a startup, having raised money, having customers or charging a subscription does not count.
+- When the candidates miss the company's real subject, use extraTopics for real market terms that cover it.`;
 
 export const EXPAND_TOOL = {
   name: "emit_profile",
@@ -92,8 +100,18 @@ export const EXPAND_TOOL = {
         type: "string",
         description: "One-line neutral positioning of the company (max ~20 words).",
       },
+      beatMatch: {
+        type: "object",
+        description: "How well the picked beat(s) match this company.",
+        properties: {
+          level: { type: "string", enum: ["strong", "partial", "weak"] },
+          reason: { type: "string", description: "One plain sentence, max ~25 words." },
+          betterBeats: { type: "array", maxItems: 2, items: { type: "string" }, description: "Ids from AVAILABLE BEATS, only when level is not strong." },
+        },
+        required: ["level", "reason"],
+      },
     },
-    required: ["selectedTopics", "extraTopics", "themes", "negatives"],
+    required: ["selectedTopics", "extraTopics", "themes", "negatives", "beatMatch"],
   },
 } as const;
 
@@ -112,14 +130,17 @@ export function buildExpandPrompt(description: string, beats: BeatId[], companyB
   // The brief is capped harder here than elsewhere: topic choice needs the
   // gist, goals and off-limits list, not every proof point.
   const briefBlock = companyBrief ? briefPromptBlock(fitBrief(companyBrief, 4000)) : "";
+  const available = visibleBeats().map((b) => `${b.id} = ${b.label}`).join("; ");
   return `COMPANY DESCRIPTION (from the founder):
 ${description.trim()}
 ${briefBlock}
+AVAILABLE BEATS (for beatMatch.betterBeats, ids only): ${available}
+
 The founder chose ${list.length > 1 ? `these beats: ${beatLabels}` : `the ${beatLabels} beat`}. Select the candidate topics — from ANY group below — that genuinely fit this company and rate each (copy each topic verbatim). At most 12, best fits first:
 
 ${groups}
 
-Produce the topics and relevance lexicon via the emit_profile tool. Selecting the relevant candidates matters most — they reliably return signals. Add new topics only if they are real market/research terms (not product features). Rate fit honestly.`;
+Produce the topics and relevance lexicon via the emit_profile tool. Selecting the relevant candidates matters most — they reliably return signals. Add new topics only if they are real market/research terms (not product features). Rate fit honestly against what this company does, not against the beat that was picked, and fill beatMatch.`;
 }
 
 interface ToolUseBlock {
@@ -190,9 +211,25 @@ export function parseExpansion(content: ToolUseBlock[]): ProfileExpansion | null
   }
   if (seeds.length === 0) return null; // nothing usable → caller falls back
 
+  const bm = (raw.beatMatch ?? null) as Record<string, unknown> | null;
+  const visibleIds = new Set<string>(visibleBeats().map((b) => b.id));
+  const level = String(bm?.level ?? "").toLowerCase();
+  const beatMatch =
+    bm && (level === "strong" || level === "partial" || level === "weak")
+      ? {
+          level: level as "strong" | "partial" | "weak",
+          reason: String(bm.reason ?? "").trim().slice(0, 200),
+          betterBeats: (Array.isArray(bm.betterBeats) ? bm.betterBeats : [])
+            .map((x) => String(x).trim())
+            .filter((x): x is BeatId => visibleIds.has(x))
+            .slice(0, 2),
+        }
+      : undefined;
+
   return {
     seeds,
     fits,
+    beatMatch,
     themes: cleanList(raw.themes, 24, true),
     negatives: cleanList(raw.negatives, 14, true),
     summary: typeof raw.summary === "string" ? raw.summary.trim().slice(0, 160) : undefined,

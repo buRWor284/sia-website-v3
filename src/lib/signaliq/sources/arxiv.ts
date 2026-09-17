@@ -13,6 +13,7 @@ import { createLimiter } from "./throttle";
 
 const PAPERS_CAP = 20; // new papers/month on a niche topic = strong
 const MAX_RESULTS = 50; // must match max_results in the query below
+const MIN_PAPERS = 3; // fewer new papers in 30 days than this is too thin to call a trend (16 Sep 2026)
 
 // arXiv asks clients to go easy; cap concurrent queries to avoid 429s/timeouts.
 const arxivLimit = createLimiter({ concurrency: 4 });
@@ -64,7 +65,8 @@ export async function arxivSignal(seed: string): Promise<Signal | null> {
       velocity,
       trend,
       credibility: SOURCE_CREDIBILITY.arxiv,
-      detail: firstTitle ? `latest: ${firstTitle.slice(0, 90)}` : undefined,
+      detail: `${firstTitle ? `latest: ${firstTitle.slice(0, 90)}` : `${recent30} papers`}${recent30 < MIN_PAPERS ? "; too few papers to call a trend" : ""}`,
+      lowSample: recent30 < MIN_PAPERS,
     };
   } catch {
     return null;

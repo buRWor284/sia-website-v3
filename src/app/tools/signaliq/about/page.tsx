@@ -16,7 +16,7 @@ import { DoubleRule, HRule, SCaps } from "@/components/bureau/primitives";
 import { ToolPipelineFooter } from "@/components/tools/ToolPipelineFooter";
 import { visibleBeats } from "@/lib/signaliq/config";
 import { MAX_SEEDS_PER_SCAN, WEIGHTS } from "@/lib/signaliq/config";
-import { GLOSSARY } from "@/lib/signaliq/glossary";
+import { GLOSSARY, GLOSSARY_GROUPS } from "@/lib/signaliq/glossary";
 
 const HDR_BG = "#0e0d0a";
 const HDR_BORDER = "#2a2318";
@@ -80,12 +80,12 @@ const SOURCES = [
 // hand-typed list said 30/25/22/13/10/15 while the scorer used 28/22/20/6/10/14).
 const pct = (w: number) => `${Math.round(w * 100)}%`;
 const SCORE_COMPONENTS = [
-  { label: GLOSSARY.coverageGap.label, weight: pct(WEIGHTS.coverageGap), description: `${GLOSSARY.coverageGap.plain} This is the heaviest component.` },
-  { label: GLOSSARY.volume.label, weight: pct(WEIGHTS.magnitude), description: GLOSSARY.volume.plain },
-  { label: GLOSSARY.velocity.label, weight: pct(WEIGHTS.velocity), description: GLOSSARY.velocity.plain },
-  { label: GLOSSARY.credibility.label, weight: pct(WEIGHTS.credibility), description: GLOSSARY.credibility.plain },
-  { label: GLOSSARY.beatFit.label, weight: pct(WEIGHTS.fit), description: GLOSSARY.beatFit.plain },
-  { label: "Corroboration bonus", weight: `+${pct(WEIGHTS.corroborationBonus)} max`, description: GLOSSARY.corroboration.plain },
+  { group: GLOSSARY_GROUPS[GLOSSARY.coverageGap.group].label, label: GLOSSARY.coverageGap.label, weight: pct(WEIGHTS.coverageGap), description: `${GLOSSARY.coverageGap.plain} This is the heaviest component.` },
+  { group: GLOSSARY_GROUPS[GLOSSARY.volume.group].label, label: GLOSSARY.volume.label, weight: pct(WEIGHTS.magnitude), description: GLOSSARY.volume.plain },
+  { group: GLOSSARY_GROUPS[GLOSSARY.velocity.group].label, label: GLOSSARY.velocity.label, weight: pct(WEIGHTS.velocity), description: GLOSSARY.velocity.plain },
+  { group: GLOSSARY_GROUPS[GLOSSARY.credibility.group].label, label: GLOSSARY.credibility.label, weight: pct(WEIGHTS.credibility), description: GLOSSARY.credibility.plain },
+  { group: GLOSSARY_GROUPS[GLOSSARY.beatFit.group].label, label: GLOSSARY.beatFit.label, weight: pct(WEIGHTS.fit), description: GLOSSARY.beatFit.plain },
+  { group: GLOSSARY_GROUPS[GLOSSARY.corroboration.group].label, label: "Corroboration bonus", weight: `+${pct(WEIGHTS.corroborationBonus)} max`, description: GLOSSARY.corroboration.plain },
 ];
 
 export default function SignalIQAboutPage() {
@@ -195,10 +195,18 @@ export default function SignalIQAboutPage() {
             added on top. Coverage gap carries the most weight: the whole premise of SignalIQ is that the
             gap between signal and press coverage is the opportunity.
           </p>
+          <p style={{ margin: "0 0 20px", fontFamily: SERIF, fontSize: 15, lineHeight: 1.6, color: INK70 }}>
+            Two sides are measured separately. <strong>What is happening</strong> (Volume, Velocity) is about companies filing,
+            researchers publishing and people reading. <strong>What journalists have written</strong> (Coverage gap) is about the press.
+            The opportunity is a lot happening that few journalists have written about yet.
+          </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 0, border: `1px solid ${INK15}` }}>
             {SCORE_COMPONENTS.map((c, i) => (
               <div key={c.label} style={{ display: "flex", gap: 16, padding: "14px 18px", borderTop: i > 0 ? `1px solid ${INK15}` : "none", background: i % 2 === 0 ? PAPER : PAPER2, alignItems: "baseline", flexWrap: "wrap" }}>
-                <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: INK, minWidth: 140 }}>{c.label}</span>
+                <span style={{ display: "inline-flex", flexDirection: "column", gap: 3, minWidth: 140 }}>
+                  <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: INK }}>{c.label}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 8, letterSpacing: ".08em", textTransform: "uppercase", color: INK55 }}>{c.group}</span>
+                </span>
                 <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: YEL, minWidth: 50 }}>{c.weight}</span>
                 <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55, lineHeight: 1.5, flex: 1 }}>{c.description}</span>
               </div>

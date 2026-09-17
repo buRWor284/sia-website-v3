@@ -12,6 +12,11 @@ import { clamp01, getJson } from "./http";
 
 const BASE = "https://hn.algolia.com/api/v1/search";
 const POINTS_CAP = 600; // cumulative points (30d) that count as a strong signal
+// Thin sample (16 Sep 2026): one or two quiet stories are not evidence. Without this
+// flag a "2 SEC filings" card escaped the thin-evidence cap just because one HN story
+// also matched. A single story with real traction (100+ points) still counts.
+const MIN_STORIES = 3;
+const MIN_POINTS = 100;
 
 interface HnResp {
   hits?: {
@@ -80,7 +85,8 @@ export async function hnSignal(seed: string): Promise<Signal | null> {
       magnitude,
       velocity,
       credibility: SOURCE_CREDIBILITY.hackernews,
-      detail: `${hits.length} HN stories · ${totalPoints} pts in 30d`,
+      detail: `${hits.length} HN stories · ${totalPoints} pts in 30d${hits.length < MIN_STORIES && totalPoints < MIN_POINTS ? "; too few stories to call a trend" : ""}`,
+      lowSample: hits.length < MIN_STORIES && totalPoints < MIN_POINTS,
     };
   } catch {
     return null;

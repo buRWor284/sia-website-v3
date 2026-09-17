@@ -187,6 +187,13 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
   } else if (ctx) {
     notes.push("Couldn't tailor topics this time — showing the standard beat. Try again in a moment.");
   }
+  // Beat mismatch (16 Sep 2026): say it plainly instead of stretching fit ratings.
+  if (expansion?.beatMatch?.level === "weak") {
+    const better = expansion.beatMatch.betterBeats.map((b) => beatById(b).label);
+    notes.push(
+      `This beat is a weak match for your company${expansion.beatMatch.reason ? `: ${expansion.beatMatch.reason.replace(/\.$/, "")}` : ""}.${better.length ? ` Try ${better.join(" or ")} for sharper results.` : ""}`,
+    );
+  }
   if (partial) notes.push("Some sources were unavailable; this scan may be incomplete.");
   const beatLabels = beatList.map((b) => beatById(b).label).join(" + ");
   if (opportunities.length === 0) {
