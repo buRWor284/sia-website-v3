@@ -1,24 +1,120 @@
-/* Decoding Saudi (/decoding-saudi) - hidden, self-contained one-page press
-   signal cut. Uses the global SIA design tokens (defined in globals.css).
-   Local class prefix "dsg-" to avoid clashing with other routes' CSS. */
+/* Decoding Saudi (/decoding-saudi) — hidden, self-contained press signal
+   cut. Uses the global SIA design tokens (globals.css) and the same § box /
+   chip / black-bar visual system as /ksa-retail-radar and /ksa-tourism-radar
+   (see Bureau-Design-System.md at the workspace root). Local class prefix
+   "dsg-" to avoid clashing with other routes' CSS. Zero radius, ink borders,
+   cream paper background: no rounded corners, no shadows, per the SIA
+   design system. Rebuilt 2026-09-17 (v2) to match the retail/tourism radar
+   quality bar; deliberately smaller (10 signals, 2 groups, no live-wire
+   scatterplot or lens filtering) because that apparatus doesn't fit a
+   10-topic sport-and-entertainment cut. */
 
-.dsg-wrap { max-width: 900px; margin: 0 auto; padding: 64px 32px 80px; color: var(--color-ink); font-family: var(--font-serif); }
-.dsg-scaps { font-family: var(--font-grot); font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; font-size: 11px; color: var(--color-ink-55); }
-.dsg-h1 { font-family: var(--font-serif); font-weight: 700; font-size: clamp(30px, 4.4vw, 48px); line-height: 1.06; letter-spacing: -0.01em; margin: 14px 0 20px; }
+.dsg-wrap { max-width: 1040px; margin: 0 auto; padding: 0 32px 72px; color: var(--color-ink); }
+@media (max-width: 640px) { .dsg-wrap { padding: 0 18px 56px; } }
+
+/* type + basics (shared with the retail/tourism radar scale) */
+.dsg-scaps { font-family: var(--font-grot); font-weight: 700; text-transform: uppercase; letter-spacing: 0.18em; font-size: 11px; color: var(--color-ink-55); }
+.dsg-h1 { font-family: var(--font-serif); font-weight: 700; font-size: clamp(28px, 3.8vw, 44px); line-height: 1.06; letter-spacing: -0.01em; margin: 10px 0 0; }
+.dsg-h3 { font-family: var(--font-serif); font-weight: 700; font-size: 22px; line-height: 1.22; margin: 0; }
 .dsg-body { font-size: 16px; line-height: 1.65; color: var(--color-ink-70); }
-.dsg-body-lg { font-size: clamp(17px, 1.6vw, 19px); line-height: 1.6; color: var(--color-ink-70); }
-.dsg-section { padding: 44px 0 8px; }
-.dsg-h2 { font-family: var(--font-serif); font-weight: 700; font-size: clamp(22px, 2.8vw, 30px); line-height: 1.15; margin: 0 0 16px; }
+.dsg-micro { font-family: var(--font-mono); font-size: 11.5px; color: var(--color-ink-55); margin-top: 30px; }
 
-.dsg-table-wrap { border: 1px solid var(--color-ink); background: var(--color-paper); overflow-x: auto; }
-.dsg-table { width: 100%; border-collapse: collapse; font-family: var(--font-grot); }
-.dsg-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--color-ink-55); font-weight: 600; padding: 12px 14px; border-bottom: 1px solid var(--color-ink); white-space: nowrap; }
-.dsg-table td { padding: 12px 14px; border-bottom: 1px solid var(--color-ink-15); font-size: 15px; vertical-align: top; }
-.dsg-table tr:last-child td { border-bottom: 0; }
-.dsg-topic { font-family: var(--font-serif); font-weight: 600; }
-.dsg-count { font-family: var(--font-mono); font-weight: 600; white-space: nowrap; }
-.dsg-lang { font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-55); white-space: nowrap; }
-.dsg-window { font-family: var(--font-mono); font-size: 11.5px; color: var(--color-ink-55); white-space: nowrap; }
+/* hero */
+.dsg-hero { padding: 24px 0 16px; }
+.dsg-hero-sub { font-size: clamp(15px, 1.6vw, 18px); line-height: 1.6; color: var(--color-ink-70); max-width: 760px; margin: 14px 0 0; }
+.dsg-double { border-top: 3px solid var(--color-ink); border-bottom: 1px solid var(--color-ink); height: 5px; margin-top: 18px; }
 
-.dsg-note { border-left: 3px solid var(--color-yellow); padding: 4px 0 4px 18px; margin: 24px 0; }
-.dsg-micro { font-family: var(--font-mono); font-size: 11.5px; color: var(--color-ink-55); margin-top: 28px; }
+/* § mast + pill (identical vocabulary to the retail/tourism radars) */
+.dsg-mast { display: flex; align-items: center; gap: 12px; padding: 10px 0 20px; flex-wrap: wrap; }
+.dsg-pill { display: inline-block; font-family: var(--font-grot); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; font-size: 10.5px; background: var(--color-yellow); color: var(--color-ink); padding: 5px 11px; }
+.dsg-freshness { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-55); }
+
+.dsg-metastrip { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--color-ink-15); border-bottom: 1px solid var(--color-ink-15); padding: 12px 2px; margin-bottom: 26px; font-family: var(--font-mono); font-size: 11.5px; color: var(--color-ink-70); }
+.dsg-metastrip b { color: var(--color-ink); }
+
+/* boxed stat cells (§ 01), same idea as ksa-retail-radar's krr-kpi band:
+   ink-bordered cells, big serif number, yellow underline accent */
+.dsg-stats { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--color-ink); margin-bottom: 30px; }
+.dsg-stat-cell { padding: 20px 22px; border-right: 1px solid var(--color-ink-15); }
+.dsg-stat-cell:last-child { border-right: 0; }
+.dsg-stat-label { font-family: var(--font-grot); font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; font-size: 10.5px; color: var(--color-ink-55); }
+.dsg-stat-val { font-family: var(--font-serif); font-weight: 700; font-size: clamp(30px, 3.6vw, 42px); line-height: 1; margin: 9px 0 6px; letter-spacing: -0.02em; display: inline-block; border-bottom: 3px solid var(--color-yellow); padding-bottom: 3px; }
+.dsg-stat-of { font-size: 18px; color: var(--color-ink-55); font-weight: 400; border: 0; }
+.dsg-stat-sub { font-size: 12px; line-height: 1.5; color: var(--color-ink-70); max-width: 26ch; }
+@media (max-width: 720px) {
+  .dsg-stats { grid-template-columns: 1fr; }
+  .dsg-stat-cell { border-right: 0; border-bottom: 1px solid var(--color-ink-15); }
+  .dsg-stat-cell:last-child { border-bottom: 0; }
+}
+
+/* yellow highlight mark, per Bureau-Design-System.md */
+.dsg-mark { background: var(--color-yellow); color: var(--color-ink); padding: 0 3px; font-weight: 600; }
+
+.dsg-group-h { font-family: var(--font-grot); font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; font-size: 12.5px; color: var(--color-ink-55); margin: 30px 2px 12px; }
+.dsg-group-h:first-of-type { margin-top: 6px; }
+
+/* signal grid + cards */
+.dsg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--color-ink); }
+.dsg-card { padding: 22px 24px; border-right: 1px solid var(--color-ink-15); border-bottom: 1px solid var(--color-ink-15); background: var(--color-paper); }
+.dsg-card:nth-child(2n) { border-right: 0; }
+.dsg-card:nth-last-child(-n+2) { border-bottom: 0; }
+.dsg-card.weak { background: var(--color-paper-2); }
+@media (max-width: 720px) {
+  .dsg-grid { grid-template-columns: 1fr; }
+  .dsg-card { border-right: 0 !important; border-bottom: 1px solid var(--color-ink-15) !important; }
+  .dsg-card:last-child { border-bottom: 0 !important; }
+}
+
+.dsg-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.dsg-card-name { font-family: var(--font-serif); font-weight: 700; font-size: 20px; line-height: 1.15; }
+.dsg-card-ar { font-size: 13px; color: var(--color-ink-55); margin-top: 2px; }
+
+.dsg-counts { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.dsg-chip { font-family: var(--font-mono); font-weight: 700; font-size: 10.5px; letter-spacing: 0.02em; padding: 3px 8px; border: 1px solid var(--color-ink); color: var(--color-ink); white-space: nowrap; background: var(--color-yellow); }
+.dsg-chip.ar { background: transparent; }
+.dsg-chip.weak { background: transparent; color: var(--color-ink-55); border-color: var(--color-ink-55); }
+.dsg-chip.ar-flag { background: var(--color-ink); color: var(--color-paper); }
+
+/* AR > EN split bar, shown inside the two signal cards that need it */
+.dsg-split { margin: 4px 0 14px; }
+.dsg-split-bar { display: flex; height: 12px; border: 1px solid var(--color-ink); overflow: hidden; }
+.dsg-split-en { display: block; height: 100%; background: var(--color-yellow); }
+.dsg-split-ar { display: block; height: 100%; background: var(--color-ink); }
+.dsg-split-legend { display: flex; gap: 16px; margin-top: 6px; font-family: var(--font-mono); font-size: 10.5px; color: var(--color-ink-70); }
+.dsg-sw { display: inline-block; width: 8px; height: 8px; margin-right: 5px; border: 1px solid var(--color-ink); vertical-align: middle; }
+.dsg-sw.en { background: var(--color-yellow); }
+.dsg-sw.ar { background: var(--color-ink); }
+
+.dsg-card-demand { font-size: 14.5px; line-height: 1.6; color: var(--color-ink); margin: 0 0 10px; }
+.dsg-card-srcs { display: flex; gap: 14px; flex-wrap: wrap; margin: 0 0 14px; }
+.dsg-card-srcs a { font-family: var(--font-mono); font-size: 10.5px; color: var(--color-ink-55); text-decoration: none; border-bottom: 1px dotted var(--color-ink-55); }
+.dsg-card-srcs a:hover { color: var(--color-ink); }
+.dsg-card-talk { font-size: 13.5px; line-height: 1.55; background: var(--color-paper-2); border: 1px solid var(--color-ink-15); padding: 10px 12px; margin: 0; color: var(--color-ink-70); }
+.dsg-card.weak .dsg-card-talk { background: var(--color-paper); }
+.dsg-card-talk b { color: var(--color-ink); }
+
+/* § 02 volume chart: hand-rolled inline SVG, same convention as
+   ksa-retail-radar's "The Window" (.krr-window) — no chart library. */
+.dsg-chart { border: 1px solid var(--color-ink); padding: 18px 18px 16px; background: var(--color-paper); }
+.dsg-chart svg { display: block; width: 100%; height: auto; }
+.dsg-chart-label { font-family: var(--font-grot); font-size: 12px; font-weight: 600; fill: var(--color-ink); }
+.dsg-chart-val { font-family: var(--font-mono); font-size: 12px; font-weight: 700; fill: var(--color-ink); }
+.dsg-chart-note { font-size: 13px; line-height: 1.55; color: var(--color-ink-70); max-width: 760px; margin: 14px 0 0; }
+
+/* honesty box */
+.dsg-honesty { border: 1px solid var(--color-ink); background: var(--color-paper-2); padding: 22px 24px; font-size: 14px; line-height: 1.65; color: var(--color-ink-70); }
+.dsg-honesty p { margin: 0 0 14px; }
+.dsg-honesty p:last-child { margin-bottom: 0; }
+.dsg-honesty b { color: var(--color-ink); }
+.dsg-note-live { font-family: var(--font-mono); font-size: 11.5px; color: var(--color-ink-55); line-height: 1.7; }
+
+/* sources (compact expandable, matches the retail/tourism radar colophon) */
+.dsg-sources { margin-top: 48px; border-top: 1px solid var(--color-ink); padding-top: 24px; }
+.dsg-src-details summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dsg-src-details summary::-webkit-details-marker { display: none; }
+.dsg-src-details summary::after { content: "+"; font-family: var(--font-mono); color: var(--color-ink-55); font-size: 15px; margin-left: 2px; }
+.dsg-src-details[open] summary::after { content: "\2212"; }
+.dsg-src-grid { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.dsg-src-grid h5 { font-family: var(--font-grot); font-weight: 700; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-ink-55); margin: 0 0 8px; }
+.dsg-src-grid a { display: block; font-size: 12.5px; color: var(--color-ink-70); text-decoration: none; padding: 3px 0; }
+.dsg-src-grid a:hover { color: var(--color-ink); background: var(--color-paper-2); }
