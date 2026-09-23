@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Colophon } from "@/components/bureau";
 import {
   ANCHOR_STAT,
@@ -392,19 +393,16 @@ export default function DecodingSaudiPage() {
       <main className="dsg-wrap">
         {/* HERO */}
         <section className="dsg-hero">
-          <div className="dsg-scaps">SignalIQ · Decoding Saudi · فك رموز السعودية</div>
-          <h1 className="dsg-h1">Decoding Saudi: where the attention actually is, versus where brands assume it is</h1>
+          <div className="dsg-scaps">Decoding Saudi · Sport and entertainment · Press and search, both languages · فك رموز السعودية</div>
+          <h1 className="dsg-h1">The Saudi story the world reads is in English. The story Saudis live is in Arabic.</h1>
           <p className="dsg-hero-sub">
-            Most brand plans for Saudi are written from the English press. This page checks that against what the
-            English and the Arabic press actually filed on ten sport and entertainment topics over the same 60 days,
-            via <mark className="dsg-mark">SignalIQ</mark>, and the real audience numbers behind each one. Where
-            press attention and audience attention disagree is where a marketer&rsquo;s money is either late or
-            wasted, and every topic ends with one line on what a brand should do about it. The AFC Asian Cup and
-            the 2034 World Cup will pull more of the home story into English, so the gap on this page is a window,
-            not a permanent state.
+            Ten topics, the same 60 days, both languages: 2,411 English articles against 5,800 Arabic. National Day
+            ran eleven to one. That Arabic half is the story Athar wants the world to read next. This page shows where it is already being written.
           </p>
-          <p className="dsg-pull">
-            What Saudi wants the world to see is told in English. What Saudis care about is told in Arabic.
+          <p className="dsg-hero-line">Every topic below ends with one line on what a brand should do about the gap.</p>
+          <p className="dsg-hero-tool">
+            Press counts via <Link href="/tools/signaliq/about">SignalIQ</Link>, Irfan&rsquo;s press-monitoring tool:
+            1,100 days of global news, 13 languages
           </p>
         </section>
 
@@ -526,7 +524,8 @@ export default function DecodingSaudiPage() {
             gets told in Arabic. A brand that only reads the English press sees the{" "}
             <mark className="dsg-mark">export story</mark> and misses the{" "}
             <mark className="dsg-mark">home story</mark>. A brand planning from English coverage is planning from the
-            export story.
+            export story. The AFC Asian Cup and the 2034 World Cup will pull more of the home story into English,
+            so the gap on this page is a window, not a permanent state.
           </p>
           <div className="dsg-notworked">
             <b>What did not work.</b>
