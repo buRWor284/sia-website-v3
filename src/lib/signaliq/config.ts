@@ -5,6 +5,7 @@
  */
 import type { Beat, BeatId, OppBand, SourceId } from "./types";
 import { QUOTA_LIMITS } from "@/lib/gate/quota-limits";
+import { canonicalTopic } from "./coverage/tokenize";
 
 /** Working product name — rename in ONE place (RFP D-1). */
 export const PRODUCT = "SignalIQ";
@@ -134,6 +135,63 @@ export function isSensitive(text: string): boolean {
  * a hidden beat and must still render.
  */
 export const visibleBeats = (): Beat[] => BEATS.filter((b) => !b.hidden);
+
+/**
+ * SEED GATE (habit 1). A seed listed here is still scanned every night (it stays
+ * in BEATS, so history builds up), but no card, radar strip, mover row or scan
+ * result may show it until a human has read its collocation check. A keyword can
+ * be DEAD (matches nothing) or WRONG (matches the wrong thing and looks healthy);
+ * only reading the words either side of each match catches wrong.
+ *
+ * The loop (details in scripts/SEED-AUDIT.md):
+ *   1. add the seed to BEATS AND to PROBE_SEEDS (write it exactly as in BEATS)
+ *   2. npx tsx scripts/seed-audit-sql.mts --only-probe --days YYYY-MM-DD > probe.sql
+ *   3. paste into the BigQuery console (~$0.26 per day scanned), save CSV
+ *   4. npx tsx scripts/seed-audit-verdicts.mts probe.csv  -> read the flagged ones
+ *   5. passed: delete the line here. Failed: rephrase (stays here) or drop.
+ *
+ * Every entry carries the date it went in; the monthly health report flags any
+ * older than 30 days. Enforced through isProbeTopic() / withoutProbeTopics().
+ */
+export const PROBE_SEEDS: ReadonlyArray<{ seed: string; since: string }> = [
+  // The 11 rephrases from the 15 Sep audit, never collocation-checked yet.
+  { seed: "ar:\u0645\u0634\u0631\u0648\u0639 \u0646\u064a\u0648\u0645", since: "2026-09-15" }, // NEOM project (was: NEOM SC football club)
+  { seed: "ar:\u0645\u062d\u0627\u0641\u0638\u0629 \u0627\u0644\u0639\u0644\u0627", since: "2026-09-15" }, // AlUla governorate (was: surname Abu al-Ala)
+  { seed: "ar:\u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u062f\u0631\u0639\u064a\u0629", since: "2026-09-15" }, // Diriyah Gate (was: Al-Diriyah FC)
+  { seed: "ar:\u0634\u0631\u0643\u0629 \u0627\u0644\u0645\u0631\u0627\u0639\u064a", since: "2026-09-15" }, // Almarai company (was: pastures)
+  { seed: "de:Datenschutzversto\u00df", since: "2026-09-15" }, // GDPR breach (was: privacy-policy footers)
+  { seed: "ko:\uc804\uae30\ucc28 \uc2dc\uc7a5", since: "2026-09-15" }, // EV market (was: used-car classifieds)
+  { seed: "es:aepd", since: "2026-09-15" }, // Spanish data regulator
+  { seed: "fr:cnil", since: "2026-09-15" }, // French data regulator
+  { seed: "zh:\u672b\u7aef\u914d\u9001", since: "2026-09-15" }, // last-mile delivery (was: policy idiom)
+  { seed: "zh:\u5c45\u6c11\u6d88\u8d39\u652f\u51fa", since: "2026-09-15" }, // household consumption spending (was: CPI)
+  { seed: "th:\u0e2d\u0e38\u0e15\u0e2a\u0e32\u0e2b\u0e01\u0e23\u0e23\u0e21\u0e40\u0e20\u0e2a\u0e31\u0e0a\u0e01\u0e23\u0e23\u0e21", since: "2026-09-15" }, // pharmaceutical industry (was: automotive industry)
+  // KSA business events, added 2026-09-17 (ksa-business-events beat). Check SQL:
+  // SIA.com Rebrand/audits/business-events-collocation.sql (LEAP 2026 ran 31 Aug-3 Sep).
+  { seed: "LEAP 2026", since: "2026-09-17" },
+  { seed: "LEAP 2027", since: "2026-09-17" },
+  { seed: "LEAP tech", since: "2026-09-17" },
+  { seed: "LEAP conference", since: "2026-09-17" },
+  { seed: "ar:ليب 2026", since: "2026-09-17" },
+  { seed: "ar:ليب 2027", since: "2026-09-17" },
+  { seed: "Seamless Saudi Arabia", since: "2026-09-17" },
+  { seed: "Seamless Saudi", since: "2026-09-17" },
+  { seed: "Seamless KSA", since: "2026-09-17" },
+  { seed: "ar:سيملس السعودية", since: "2026-09-17" },
+  { seed: "ar:معرض سيملس", since: "2026-09-17" },
+];
+
+const PROBE_KEYS: ReadonlySet<string> = new Set(PROBE_SEEDS.map((p) => canonicalTopic(p.seed)));
+
+/** True if this topic (raw seed or canonical key, any case) is still on probation. */
+export function isProbeTopic(topic: string): boolean {
+  return PROBE_KEYS.size > 0 && PROBE_KEYS.has(canonicalTopic(topic));
+}
+
+/** Drop probation topics from a list before it reaches any public surface. */
+export function withoutProbeTopics<T extends string>(topics: readonly T[]): T[] {
+  return PROBE_KEYS.size === 0 ? [...topics] : topics.filter((t) => !isProbeTopic(t));
+}
 
 export const BEATS: Beat[] = [
   {
@@ -462,6 +520,29 @@ export const BEATS: Beat[] = [
     ],
     blurb: "Saudi giga-projects, mega-events, hospitality, aviation, and faith-travel coverage.",
   },
+  // KSA business events (2026-09-17, Irfan approved: forward-only, no backfill).
+  // LEAP (tech, Riyadh, April) and Seamless Saudi Arabia (payments/e-commerce,
+  // Riyadh, November). Saudi Pro League + Saudi National Day already live in the
+  // ksa-culture beat (EN + AR), so they are not repeated here.
+  // Both names are ordinary words ("leap", "seamless"), so every seed is a
+  // phrase, never the bare word, and LEAP carries its year ("LEAP 2027").
+  // Arabic: "ar:مؤتمر ليب" is deliberately NOT used, the 2-word matcher does a
+  // prefix match on the 2nd word and "ليب" would catch "ليبيا" (Libya).
+  // On probation in PROBE_SEEDS (Seed Gate) until audits/business-events-collocation.sql
+  // is read; drop whichever seed fails. Year seeds need a
+  // new line each year (add "LEAP 2028" after LEAP 2027 ends).
+  {
+    id: "ksa-business-events",
+    label: "KSA Business Events",
+    hidden: true, // radar data set, not a beat a user would pick
+    seeds: [
+      "LEAP 2026", "LEAP 2027", "LEAP tech", "LEAP conference",
+      "ar:ليب 2026", "ar:ليب 2027",
+      "Seamless Saudi Arabia", "Seamless Saudi", "Seamless KSA",
+      "ar:سيملس السعودية", "ar:معرض سيملس",
+    ],
+    blurb: "Saudi business events press signals (LEAP, Seamless Saudi Arabia). Forward-only, probe-pending.",
+  },
   // ─── KSA category-radar probe beats (2026-08-09) ─────────────────────────
   // Three candidate categories for radar #2 (Riyadh workshop Nov 2026, Seamless /
   // Shop Arabia thread, Athar). ~30 candidate seeds each, committed together so
@@ -566,6 +647,60 @@ export const BEATS: Beat[] = [
       "ar:\u0627\u0644\u0625\u0646\u0641\u0627\u0642 \u0627\u0644\u0627\u0633\u062a\u0647\u0644\u0627\u0643\u064a \u0627\u0644\u0633\u0639\u0648\u062f\u064a", // Saudi consumer spending // Saudi advertising
     ],
     blurb: "Saudi retail, e-commerce, consumer brands, and lifestyle-economy coverage.",
+  },
+  // Decoding Saudi (Athar Festival cut) - PIVOTED 2026-09-17 evening after test-scan
+  // data. Original 25-topic "culture & market opportunity" set mostly returned
+  // ZERO English press over 14 days; a 60-day EN+AR retest on the 15 dead
+  // topics still left 21 of 29 matchers at zero (see WORKLOG 2026-09-17). Real
+  // press volume exists only for sport/entertainment. Narrowed to that, per
+  // Irfan's call. Two seeds carry a PROVEN Arabic pair (collocation not yet
+  // checked, but volume is real: Grand Prix ar 15/60d vs en 4/60d, film
+  // industry ar 13/60d vs en 2/60d) - Arabic culture stories genuinely
+  // outweigh English ones where they exist, just not at scale across the
+  // wider category. Place/brand/giga-project name collision risk still
+  // applies if seeds are widened later - see signaliq-seed-audit-2026-09-15.
+  {
+    id: "ksa-culture",
+    label: "KSA Entertainment & Sport",
+    hidden: true, // radar data set, not a beat a user would pick
+    seeds: [
+      // proven real volume (14d test, English)
+      "Saudi Pro League", "Esports World Cup", "Saudi football",
+      "Saudi National Day", "Riyadh Season",
+      // proven real volume (60d retest, English + Arabic pair)
+      "Saudi Grand Prix", "ar:جائزة السعودية الكبرى",
+      "Saudi film industry", "ar:صناعة السينما السعودية",
+      // weak but thematically adjacent (kept as low-priority context, PROBE-PENDING)
+      "Saudi esports", "Saudi motorsport", "Saudi cinema",
+      // Arabic pairs added 2026-09-17 so the page can show the EN vs AR press split.
+      // Collocation probe run same day (audits/culture-arabic-collocation.sql, 2 days):
+      // PROBE-PASSED: الدوري السعودي (78 hits, 40% followed by "للمحترفين", all football,
+      // chosen over the sponsor form "دوري روشن السعودي" which was also clean but
+      // overlaps it and would double count), اليوم الوطني السعودي (39, "احتفالات",
+      // lifestyle and retail press), كرة القدم السعودية (36, heritage features).
+      // NO MATCHES in the 2-day window (not a collision, just thin): esports,
+      // motorsport, cinema. 60-day EN+AR scan run 2026-09-22 (2026-07-19 to
+      // 2026-09-16, audits/culture-scan-60d-en-ar.csv): الرياضات الإلكترونية السعودية 3,
+      // السينما السعودية 80, رياضة السيارات السعودية 0 -> DROPPED 2026-09-22.
+      // PROBE-PASSED with caveat, 2026-09-23 (audits/culture-cinema-collocation.csv,
+      // 22 hits over 2 days): السينما السعودية is 21/22 preceded by "دور", i.e. it
+      // matches "دور السينما السعودية" = Saudi cinemas / movie theatres, not the
+      // industry, and the URLs are mostly Egyptian outlets (Al-Masry Al-Youm, Veto,
+      // Shorouk, Asharq Al-Awsat) reporting Egyptian films' Saudi box office. Kept
+      // as a theatre / box-office signal; the page labels it that way.
+      // Riyadh Season (ar:موسم الرياض) and Esports World Cup
+      // (ar:كأس العالم للرياضات الإلكترونية) are already live + checked in ksa-tourism.
+      "ar:الدوري السعودي", "ar:كرة القدم السعودية", "ar:اليوم الوطني السعودي",
+      "ar:الرياضات الإلكترونية السعودية", // PROBE-PENDING (thin / unchecked)
+      "ar:السينما السعودية", // PROBE-PASSED 23 Sep, theatre / box-office caveat above
+      // Saudi-MADE film (not theatres), added 2026-09-23 after the cinema probe showed
+      // the seed above measures venues. Probe 23 Sep (audits/culture-film-collocation.csv,
+      // 2 days): الأفلام السعودية 5 hits, all film context (festival screenings, new films,
+      // Hia and Al Bilad), CLEAN but thin; هيئة الأفلام 1 hit, the Commission, CLEAN, thin;
+      // الفيلم السعودي 0 hits in the window, PROBE-PENDING. All three ride the nightly scan.
+      "ar:الأفلام السعودية", "ar:الفيلم السعودي", "ar:هيئة الأفلام",
+    ],
+    blurb: "Saudi sport and entertainment press signals - the surviving, real-volume half of the Decoding Saudi cut.",
   },
   {
     id: "intl-pt",

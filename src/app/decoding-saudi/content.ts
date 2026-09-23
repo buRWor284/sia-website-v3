@@ -15,13 +15,43 @@
  * Reframe pass 2026-09-17: hero, honesty box and the per-topic line were
  * rewritten in the attention-versus-assumption voice; added a sourced
  * scale anchor (GEA 2025 annual report via SPA), an Athar Sports Campaign
- * award callout (Zawya) and a sources-of-signal box. Google Trends was
- * attempted as a third data leg (pytrends, geo SA, 12 months) and could not
- * be fetched from the build environment (network blocked), so the page says
- * so instead of showing anything invented. Every existing number and
- * citation from the prior passes is unchanged.
+ * award callout (Zawya) and a sources-of-signal box. Google Trends could
+ * not be fetched from the build environment in that pass, so the page said
+ * so instead of showing anything invented.
  *
- * Press-volume counts are a snapshot from a BigQuery test scan of the
+ * Trends pass 2026-09-17: Irfan exported Google Trends by hand (region
+ * Saudi Arabia, "Search term" not Topic, custom range 1 Sep 2023 to 17 Sep
+ * 2026, exported 17 Sep 2026) into audits/trends-en.csv and
+ * audits/trends-ar.csv (monthly, Aug 2023 to Sep 2026, 38 rows, five terms
+ * each), plus the related-queries exports for Saudi Pro League (EN) and
+ * Riyadh Season (AR). The two monthly series are transcribed below as
+ * TRENDS, numbers exact, no runtime file reads. Each batch is a relative
+ * 0 to 100 index scaled to that batch's top term, so shapes and peaks
+ * compare within a language, never magnitudes across languages. Every
+ * existing press count, demand fact and citation is unchanged.
+ *
+ * 60-day EN vs AR pass 2026-09-22: Irfan ran the full ksa-culture beat,
+ * both languages, over a 60-day window (2026-07-19 to 2026-09-16, SignalIQ
+ * on GDELT Web News NGrams, run 22 Sep 2026) into
+ * audits/culture-scan-60d-en-ar.csv. Each signal now carries `press60`
+ * ({en, ar, arChecked}) so every card shows the EN vs AR split on ONE
+ * window, and the ratio finally compares like for like. The 14-day English
+ * counts in `counts` are kept as the original snapshot. Arabic seeds are
+ * marked arChecked only where the collocation audit passed: الدوري السعودي,
+ * اليوم الوطني السعودي and كرة القدم السعودية (17 Sep,
+ * audits/bq-results-20260917-114749-1789645714127.csv); موسم الرياض, كأس
+ * العالم للرياضات الإلكترونية and جائزة السعودية الكبرى (15 Sep seed audit).
+ * صناعة السينما السعودية and الرياضات الإلكترونية السعودية are thin and
+ * unchecked. السينما السعودية (80 hits) was collocation-checked on 23 Sep
+ * 2026 (audits/culture-cinema-collocation.csv, 22 hits over 2 days): 21 of
+ * 22 hits read دور السينما السعودية, "Saudi cinemas" (movie theatres), and
+ * the URLs are mostly Egyptian outlets (Al-Masry Al-Youm, Veto, Shorouk,
+ * plus Asharq Al-Awsat) reporting Egyptian films' Saudi box office. So the
+ * seed is marked checked, but as a theatre / box-office signal, not the
+ * industry, and the card says so. رياضة السيارات السعودية returned zero
+ * over 60 days and is dropped from the page and from the beat.
+ *
+ * Press-volume counts in `counts` are a snapshot from a BigQuery test scan of the
  * ksa-culture beat (src/lib/signaliq/config.ts) on 2026-09-17, the same day
  * the beat itself went live. There is no backfill history yet for a live
  * query to show anything meaningful, so this page states the known counts
@@ -46,6 +76,19 @@ export interface PressCount {
   window: "14d" | "60d";
 }
 
+/** 60-day press volume, both languages, same window (2026-07-19 to
+ *  2026-09-16), SignalIQ on GDELT, run 22 Sep 2026. `ar` is omitted where
+ *  the Arabic pair was dropped (zero hits). `arChecked` is true only when
+ *  the Arabic seed passed a collocation audit; unchecked seeds are shown
+ *  with a "phrase check pending" chip and are never presented as verified. */
+export interface Press60 {
+  en: number;
+  ar?: number;
+  arChecked: boolean;
+  /** Which audit cleared the Arabic seed, or why it is still pending. */
+  arNote: string;
+}
+
 export interface DecodingSignal {
   id: string;
   name: string;
@@ -55,7 +98,9 @@ export interface DecodingSignal {
   weak?: boolean;
   /** Press volume, from the ksa-culture beat (SignalIQ on GDELT). */
   counts: PressCount[];
-  /** Note when Arabic coverage outweighs English for this topic. */
+  /** 60-day EN vs AR press volume, one window for both languages. */
+  press60: Press60;
+  /** Note when Arabic coverage outweighs English for this topic (14d/60d era flag, kept). */
   arOutweighs?: boolean;
   /** The demand-side reality: a real, cited fact the press count alone doesn't show. */
   demand: string;
@@ -71,66 +116,72 @@ export const SIGNALS: DecodingSignal[] = [
     name: "Saudi Pro League",
     ar: "دوري روشن السعودي",
     group: "sport",
+    press60: { en: 1495, ar: 4389, arChecked: true, arNote: "الدوري السعودي, collocation checked clean 17 Sep 2026 (78 hits sampled, all football)" },
     counts: [{ n: 385, lang: "EN", window: "14d" }],
     demand:
       "The Saudi Pro League opened the 2025/26 season with a record 37 broadcasters carrying it into more than 180 territories, including six-season Fox Sports coverage across the Americas and four-year deals with Movistar+ (Spain), Sport TV (Portugal), SPOTV (Asia) and Fancode (India). Last season the league drew more than 230 million viewers worldwide, and international rights revenue rose 20 percent over the past two seasons.",
     demandS: [S("Inside World Football, 25 Sep 2025", "https://www.insideworldfootball.com/2025/09/25/saudi-pro-league-extends-global-appeal-international-broadcast-deal/")],
     forBrands:
-      "385 English articles in 14 days and a 230 million viewer footprint is the one Saudi property where press attention and audience attention already agree. Budget it as an always-on channel with a weekly content rhythm, not a single shirt or perimeter buy, because the coverage arrives every week whether you are in it or not.",
+      "Over 60 days the Arabic press filed 4,389 articles on the league against 1,495 in English, three to one, and a 230 million viewer footprint sits under both. This is the one Saudi property where press attention and audience attention already agree, and even here three quarters of the conversation is in Arabic. Budget it as an always-on channel with a weekly content rhythm, not a single shirt or perimeter buy, because the coverage arrives every week whether you are in it or not. Search intent is club-first: the top related queries are standings, fixtures, Al Nassr and Al Hilal, so plan around club fandom and the weekly table, not the league brand alone.",
   },
   {
     id: "esports-world-cup",
     name: "Esports World Cup",
     ar: "كأس العالم للرياضات الإلكترونية",
     group: "entertainment",
+    press60: { en: 649, ar: 627, arChecked: true, arNote: "كأس العالم للرياضات الإلكترونية, checked in the 15 Sep 2026 seed audit (live in ksa-tourism)" },
     counts: [{ n: 44, lang: "EN", window: "14d" }],
     demand:
       "The 2026 Esports World Cup, running 6 July to 23 August in Riyadh, carries a record $75 million prize pool ($30 million club championship, $39 million-plus in game tournaments, a $7 million overall club award), with more than 2,000 professional players from over 200 clubs and about 100 countries confirmed.",
     demandS: [S("Saudi Press Agency, 2026", "https://www.spa.gov.sa/en/N2494768")],
     forBrands:
-      "A $75 million prize pool and a 100-country field with only 44 English articles in 14 days, a few weeks after it closed, means the audience is far bigger than the coverage. Plan the seven-week window in Riyadh as a content season with club and player tie-ins, rather than one booth in a hall, and expect the press to lag the audience.",
+      "Over 60 days the English and Arabic press covered the Esports World Cup almost equally (649 EN, 627 AR): this is a Saudi story told to the world in English by design, the only sport property on this page where that is true. Plan the seven-week window in Riyadh as a content season with club and player tie-ins, rather than one booth in a hall, and write it bilingually from day one because neither language owns the audience.",
   },
   {
     id: "saudi-football",
     name: "Saudi football",
     ar: "كرة القدم السعودية",
     group: "sport",
+    press60: { en: 76, ar: 246, arChecked: true, arNote: "كرة القدم السعودية, collocation checked clean 17 Sep 2026 (heritage and feature pieces)" },
     counts: [{ n: 34, lang: "EN", window: "14d" }],
     demand:
       "The story English press still tells is the 2023 transfer-spending boom; the current one is the opposite. By late July 2026, Al-Ittihad's transfer spend had dropped from SAR 374 million (same period, 2024) to SAR 68 million, Al-Nassr had made zero signings while carrying SAR 800 million (about $213 million) in debt, and PIF's 2026-30 strategy no longer names sports investment as a priority. Privately owned Al-Hilal is the exception, having signed Crysencio Summerville for $91 million.",
     demandS: [S("Semafor, 30 Jul 2026", "https://www.semafor.com/article/07/30/2026/saudi-soccer-enters-an-era-of-prudent-spending")],
     forBrands:
-      "With transfer spend at Al-Ittihad down from SAR 374 million to SAR 68 million and PIF no longer naming sport as a priority, the price of club partnerships is heading down while the audience is not. This is a buyer's window: negotiate multi-season club and league deals now, and build the plan around the league story rather than a single imported name.",
+      "The Arabic press writes about Saudi football three times as often as the English press (246 AR to 76 EN in 60 days), and it writes the heritage and club story, not the transfer-spend story. With transfer spend at Al-Ittihad down from SAR 374 million to SAR 68 million and PIF no longer naming sport as a priority, the price of club partnerships is heading down while the audience is not. This is a buyer's window: negotiate multi-season club and league deals now, and build the plan around the league story rather than a single imported name.",
   },
   {
     id: "saudi-national-day",
     name: "Saudi National Day",
     ar: "اليوم الوطني السعودي",
     group: "entertainment",
+    press60: { en: 26, ar: 292, arChecked: true, arNote: "اليوم الوطني السعودي, collocation checked clean 17 Sep 2026 (lifestyle and retail press)" },
     counts: [{ n: 23, lang: "EN", window: "14d" }],
     demand:
       "The 95th Saudi National Day (23 September) was marked with more than 40 cultural and heritage events at Ithra alone, plus a nationwide Diriyah program, part of a state-coordinated calendar of celebrations that runs across every major city.",
     demandS: [S("Saudi Press Agency, 2025", "https://spa.gov.sa/en/N2404431"), S("Saudi Press Agency, 2025", "https://spa.gov.sa/en/N2405344")],
     forBrands:
-      "23 English articles for a nationwide, multi-city, state-coordinated celebration (40-plus events at Ithra alone) says the English press is not where this moment lives. Treat 23 September as a two-week Arabic-first season with local partners and venues, and stop measuring it by a one-day logo swap and English clippings.",
+      "292 Arabic articles to 26 English over the same 60 days, eleven to one, is the widest language gap on this page, and the Arabic coverage is lifestyle and retail press, which is exactly the press a consumer brand wants. Treat 23 September as a two-week Arabic-first season with local partners and venues, and stop measuring it by a one-day logo swap and English clippings.",
   },
   {
     id: "riyadh-season",
     name: "Riyadh Season",
     ar: "موسم الرياض",
     group: "entertainment",
+    press60: { en: 143, ar: 135, arChecked: true, arNote: "موسم الرياض, checked in the 15 Sep 2026 seed audit (live in ksa-tourism)" },
     counts: [{ n: 23, lang: "EN", window: "14d" }],
     demand:
       "Riyadh Season's fifth edition surpassed 20 million visitors, a record for the event, according to the Saudi Press Agency.",
     demandS: [S("Saudi Press Agency, 18 Feb 2026", "https://www.spa.gov.sa/en/N2265408")],
     forBrands:
-      "20 million visitors against 23 English articles in 14 days is the widest attention gap on this page. A brand that builds a season-long on-site and content presence gets a recurring audience most markets cannot offer at any price, and gets it before the English press has told anyone it is there.",
+      "20 million visitors against 143 English and 135 Arabic articles in 60 days is the widest attention gap on this page, and the near-even split says Riyadh Season, like the Esports World Cup, is sold to the world in English on purpose. A brand that builds a season-long on-site and content presence gets a recurring audience most markets cannot offer at any price, and gets it before the English press has told anyone it is there. Arabic search intent is almost entirely tickets, booking and \"when does it open\", so the season-opening window and the ticket funnel are where a brand should be visible first.",
   },
   {
     id: "saudi-grand-prix",
     name: "Saudi Grand Prix",
     ar: "جائزة السعودية الكبرى",
     group: "sport",
+    press60: { en: 4, ar: 15, arChecked: true, arNote: "جائزة السعودية الكبرى, checked in the 15 Sep 2026 seed audit" },
     counts: [
       { n: 4, lang: "EN", window: "14d" },
       { n: 15, lang: "AR", window: "60d" },
@@ -140,13 +191,14 @@ export const SIGNALS: DecodingSignal[] = [
       "Formula 1's Saudi Arabian Grand Prix is contracted to remain at the Jeddah Corniche Circuit until at least 2027, keeping the Kingdom on the calendar as it builds toward the future Qiddiya circuit.",
     demandS: [S("Motorsport.com, 2026", "https://www.motorsport.com/f1/news/saudi-arabia-f1-race-set-to-remain-in-jeddah-until-at-least-2027/10422657/")],
     forBrands:
-      "Off-season, the Grand Prix conversation is roughly four to one Arabic over English (15 AR articles in 60 days versus 4 EN in 14). If your race-week plan is written and measured in English only, most of the audience talking about a fixture locked in through 2027 will never see it. Write the plan in Arabic first.",
+      "Off-season, the Grand Prix conversation is nearly four to one Arabic over English (15 AR to 4 EN articles in the same 60 days), thin on both sides. If your race-week plan is written and measured in English only, most of the audience talking about a fixture locked in through 2027 will never see it. Write the plan in Arabic first.",
   },
   {
     id: "saudi-film-industry",
     name: "Saudi film industry",
     ar: "صناعة السينما السعودية",
     group: "entertainment",
+    press60: { en: 2, ar: 13, arChecked: false, arNote: "صناعة السينما السعودية, thin and not yet collocation checked" },
     counts: [
       { n: 2, lang: "EN", window: "14d" },
       { n: 13, lang: "AR", window: "60d" },
@@ -156,7 +208,7 @@ export const SIGNALS: DecodingSignal[] = [
       "Saudi productions took 13 percent of the Kingdom's 2025 box office revenue from just 11 of 538 total film releases (about 3 percent of titles), with three Saudi films landing in the year's top ten highest-grossing releases, on a total 2025 Saudi box office of $245 million, per the Saudi Film Commission.",
     demandS: [S("Broadcast Pro Middle East, 2026", "https://www.broadcastprome.com/news/analyst-reports/saudi-film-commission-reports-245m-box-office-as-local-films-surge-in-2025/")],
     forBrands:
-      "Eleven local titles took 13 percent of a $245 million box office, four times their share of releases, with three in the year's top ten. Brand integration and co-promotion with Saudi productions is cheap relative to that pull, and the two English articles in 14 days mean almost nobody outside the Arabic press is competing for it yet.",
+      "Eleven local titles took 13 percent of a $245 million box office, four times their share of releases, with three in the year's top ten. Brand integration and co-promotion with Saudi productions is cheap relative to that pull, and two English articles in 60 days (against 13 Arabic, phrase still unchecked) mean almost nobody outside the Arabic press is competing for it yet.",
   },
   {
     id: "saudi-esports",
@@ -164,12 +216,13 @@ export const SIGNALS: DecodingSignal[] = [
     ar: "الرياضات الإلكترونية السعودية",
     group: "entertainment",
     weak: true,
+    press60: { en: 8, ar: 3, arChecked: false, arNote: "الرياضات الإلكترونية السعودية, thin and not yet collocation checked" },
     counts: [{ n: 3, lang: "EN", window: "14d" }],
     demand:
       "The Saudi Esports Federation held its 2025 SEF Awards recognising the sector's rapid growth across competitive gaming, content and events.",
     demandS: [S("Arab News, 2025", "https://www.arabnews.com/node/2629584/sport")],
     forBrands:
-      "Low-priority context, not a headline signal: three English articles in 14 days. Outside the Esports World Cup window, do not fund a standalone Saudi esports line yet; watch it and fold it into the World Cup plan above.",
+      "Low-priority context, not a headline signal: eight English and three Arabic articles in 60 days, against 649 and 627 for the World Cup itself. Outside the Esports World Cup window, do not fund a standalone Saudi esports line yet; watch it and fold it into the World Cup plan above.",
   },
   {
     id: "saudi-motorsport",
@@ -177,28 +230,143 @@ export const SIGNALS: DecodingSignal[] = [
     ar: "رياضة المحركات السعودية",
     group: "sport",
     weak: true,
+    press60: { en: 5, arChecked: false, arNote: "Arabic pair رياضة السيارات السعودية returned zero hits over 60 days and was dropped" },
     counts: [{ n: 1, lang: "EN", window: "14d" }],
     demand: "The FIA Extreme H World Cup confirmed its return to Qiddiya City for 2026, part of the Kingdom's build-out of motorsport beyond Formula 1.",
     demandS: [S("DestinationKSA, 2026", "https://destinationksa.com/en/fia-extreme-h-world-cup-2026/")],
     forBrands:
-      "Low-priority context: one English article in 14 days. The Qiddiya build-out (Extreme H and beyond) is an early-mover watch list, not a channel to budget against this year.",
+      "Low-priority context: five English articles in 60 days and an Arabic seed that returned nothing at all, so the pair was dropped. The Qiddiya build-out (Extreme H and beyond) is an early-mover watch list, not a channel to budget against this year.",
   },
   {
     id: "saudi-cinema",
     name: "Saudi cinema",
-    ar: "دور السينما في السعودية",
+    ar: "دور السينما السعودية",
     group: "entertainment",
     weak: true,
+    press60: { en: 3, ar: 80, arChecked: true, arNote: "Arabic seed matches 'Saudi cinemas' (movie theatres), not the industry: 21 of 22 probe hits read دور السينما السعودية (23 Sep 2026, audits/culture-cinema-collocation.csv), and the sources are mostly Egyptian outlets reporting Egyptian films' Saudi box office" },
     counts: [{ n: 2, lang: "EN", window: "14d" }],
     demand:
       "Saudi Arabia now operates an estimated 580-plus cinema screens, up from zero when the decades-long cinema ban lifted in 2017, with the market projected to reach roughly 2,500 screens and over $1 billion in box office by 2030.",
     demandS: [S("Screen Daily, 2026", "https://www.screendaily.com/features/how-saudi-cinema-going-has-transformed-since-covid-for-the-better/5177121.article")],
     forBrands:
-      "Low-priority context: two English articles in 14 days, but 580-plus screens today from zero in 2017 is real venue inventory. Worth a line for in-cinema advertising and premiere tie-ins, priced against the film-industry signal above rather than on its own.",
+      "Low-priority context, with one honest twist: three English articles in 60 days against 80 Arabic, but the phrase check shows the Arabic count is about Saudi cinemas as venues, not Saudi cinema as an industry. Twenty-one of 22 probe hits read دور السينما السعودية, and the outlets are mostly Egyptian (Al-Masry Al-Youm, Veto, Shorouk) reporting Egyptian films' box office in Saudi theatres. So Saudi screens, 580-plus today from zero in 2017, are an export market for Egyptian film, and that story is told in Egypt's press, not Saudi's and not the English press. Worth a line for in-cinema advertising and premiere tie-ins around Egyptian releases, priced against the film-industry signal above rather than on its own.",
   },
 ];
 
 export const SIGNAL_BY_ID: Map<string, DecodingSignal> = new Map(SIGNALS.map((s) => [s.id, s]));
+
+/* ---- audience attention: Google Trends, exported by hand on 17 Sep 2026.
+   Region Saudi Arabia, "Search term" (not Topic), custom range 1 Sep 2023 to
+   17 Sep 2026, monthly resolution (Google returns Aug 2023 to Sep 2026, 38
+   rows). Two batches of five terms, one English and one Arabic. Each batch
+   is a relative 0 to 100 index scaled to that batch's top term (English:
+   Saudi National Day, Sep 2024; Arabic: الدوري السعودي, Sep 2023), so a
+   value compares across months and across terms within one language, and
+   never across languages. Only five of the ten topics were exported;
+   the other five have no trend line. Numbers transcribed exactly from
+   audits/trends-en.csv and audits/trends-ar.csv. ---- */
+export interface TrendSeries {
+  enTerm: string;
+  en: number[];
+  arTerm: string;
+  ar: number[];
+}
+export const TRENDS_MONTHS: string[] = [
+  "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09",
+];
+
+export const TRENDS: Record<string, TrendSeries> = {
+  "saudi-pro-league": {
+    enTerm: "Saudi Pro League",
+    en: [31, 34, 25, 25, 31, 5, 16, 18, 20, 25, 1, 2, 14, 22, 20, 20, 8, 26, 32, 19, 32, 33, 1, 2, 9, 18, 16, 19, 11, 39, 41, 19, 26, 41, 2, 3, 19, 34],
+    arTerm: "الدوري السعودي",
+    ar: [88, 100, 85, 85, 92, 10, 44, 47, 46, 54, 4, 4, 25, 38, 39, 45, 20, 60, 78, 50, 71, 85, 4, 4, 22, 41, 36, 39, 22, 94, 89, 41, 54, 76, 4, 5, 40, 75],
+  },
+  "esports-world-cup": {
+    enTerm: "Esports World Cup",
+    en: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 5, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0],
+    arTerm: "كأس العالم للرياضات الإلكترونية",
+    ar: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  },
+  "riyadh-season": {
+    enTerm: "Riyadh Season",
+    en: [3, 4, 8, 13, 9, 6, 5, 2, 3, 2, 1, 2, 5, 4, 8, 6, 4, 3, 2, 2, 1, 1, 1, 1, 3, 3, 7, 7, 5, 3, 3, 2, 2, 2, 1, 1, 3, 2],
+    arTerm: "موسم الرياض",
+    ar: [1, 2, 4, 8, 4, 6, 6, 7, 2, 1, 1, 1, 1, 2, 3, 3, 2, 2, 1, 1, 1, 0, 0, 1, 1, 1, 3, 2, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+  },
+  "saudi-grand-prix": {
+    enTerm: "Saudi Grand Prix",
+    en: [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0],
+    arTerm: "جائزة السعودية الكبرى",
+    ar: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  },
+  "saudi-national-day": {
+    enTerm: "Saudi National Day",
+    en: [9, 90, 2, 2, 2, 2, 5, 1, 1, 1, 2, 3, 13, 100, 2, 2, 9, 2, 5, 1, 1, 1, 2, 3, 11, 64, 2, 4, 3, 2, 4, 1, 1, 2, 3, 3, 10, 33],
+    arTerm: "اليوم الوطني السعودي",
+    ar: [8, 30, 1, 1, 1, 1, 1, 0, 1, 1, 1, 2, 9, 21, 1, 1, 1, 1, 1, 0, 1, 1, 1, 2, 8, 17, 1, 1, 1, 1, 1, 0, 1, 1, 1, 2, 6, 13],
+  },
+};
+
+/** Peak month for a series: the first month at the series maximum. */
+export function trendPeak(vals: number[]): { month: string; val: number } {
+  let best = 0;
+  for (let i = 1; i < vals.length; i++) if (vals[i] > vals[best]) best = i;
+  return { month: TRENDS_MONTHS[best], val: vals[best] };
+}
+export function trendAvg(vals: number[]): number {
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+/** "2024-09" to "Sep 2024". */
+export function fmtMonth(ym: string): string {
+  const [y, m] = ym.split("-");
+  return `${MONTH_NAMES[Number(m) - 1]} ${y}`;
+}
+
+/* ---- what people actually search: top related queries from the Trends
+   export, same region and range. EN batch for Saudi Pro League, AR batch
+   for Riyadh Season; quoted verbatim with their relative interest score
+   (100 = the top related query). ---- */
+export interface TrendQuery {
+  q: string;
+  n: number;
+}
+export const TREND_SEARCHES: Record<string, { lang: "EN" | "AR"; lead: string; queries: TrendQuery[] }> = {
+  "saudi-pro-league": {
+    lang: "EN",
+    lead: "Standings, fixtures and two clubs: ",
+    queries: [
+      { q: "saudi pro league standings", n: 100 },
+      { q: "saudi pro league games", n: 45 },
+      { q: "al-nassr", n: 32 },
+      { q: "saudi pro league table", n: 30 },
+      { q: "al hilal", n: 21 },
+    ],
+  },
+  "riyadh-season": {
+    lang: "AR",
+    lead: "Tickets, booking and when it opens: ",
+    queries: [
+      { q: "موسم الرياض تذاكر", n: 75 },
+      { q: "تذاكر موسم الرياض", n: 68 },
+      { q: "متى موسم الرياض", n: 45 },
+      { q: "حجز موسم الرياض", n: 40 },
+    ],
+  },
+};
+
+/* ---- the attention callout: four findings from the two series, in plain
+   prose, plus the scaling rule and the Arabic phrasing caveat. ---- */
+export const ATTENTION_CALLOUT = {
+  label: "Attention, not just coverage",
+  paras: [
+    "The press counts above say what gets written. Google Trends says what Saudi audiences actually look up. Four things stand out across the 38 months from Aug 2023 to Sep 2026. First, Saudi National Day spikes every September in both languages, and the English spike is the single biggest reading in the whole export (100 in Sep 2024, 90 in Sep 2023, 64 in Sep 2025), against a near-flat 1 to 5 the rest of the year. Second, the Arabic phrase for the league, الدوري السعودي, dominates Arabic search: it averages 48 out of 100 across the period with no zero months, while English \"Saudi Pro League\" averages 20, with the same summer dips in June and July when there are no fixtures. Third, Riyadh Season peaks in November and December (English high of 13 in Nov 2023) and its Arabic related queries are almost all tickets, booking and \"when\", not the entertainment itself. Fourth, Esports World Cup and Saudi Grand Prix barely register as search terms in either language.",
+    "How to read the lines. Google Trends indexes each batch of five terms to that batch's own top term, so every value is relative to one peak per language: Saudi National Day in Sep 2024 for English, الدوري السعودي in Sep 2023 for Arabic. Shapes and peak months compare within a language. Heights never compare across the two languages, and a 13 on the English side is not smaller or larger than a 13 on the Arabic side; it is simply a different ruler.",
+    "One honest caveat. The Arabic terms for Esports World Cup (كأس العالم للرياضات الإلكترونية) and Saudi Grand Prix (جائزة السعودية الكبرى) return zero in all 38 months, and the English versions are near zero too (English Grand Prix has 31 zero months out of 38). For the Grand Prix that is most likely a phrasing miss, because people search the race by other names, and for the Esports World Cup the formal Arabic name is probably not what fans type. Treat those two lines as unknown, not as no interest.",
+  ],
+  src: [S("Google Trends, region Saudi Arabia, Search term, 1 Sep 2023 to 17 Sep 2026, exported 17 Sep 2026", "https://trends.google.com/trends/explore?geo=SA&date=2023-09-01%202026-09-17&q=Saudi%20Pro%20League,Esports%20World%20Cup,Riyadh%20Season,Saudi%20Grand%20Prix,Saudi%20National%20Day")],
+};
 
 /* ---- anchor stat: scale context before the topic-level data. Verified at
    the primary source: the Saudi Press Agency's report of the General
@@ -235,12 +403,12 @@ export const SIGNAL_LEGS: SignalLeg[] = [
   {
     name: "Press coverage",
     used: true,
-    note: "SignalIQ on GDELT, English and Arabic article counts per topic. This is what the chips, the chart and the AR/EN split bars show.",
+    note: "SignalIQ on GDELT Web News NGrams, a 60-day English plus Arabic scan of all ten topics, 19 Jul to 16 Sep 2026, run 22 Sep 2026 (audits/culture-scan-60d-en-ar.csv). Both languages share one window, so the split bars, the chart and the ratios compare like for like. Six Arabic seeds are collocation-checked (الدوري السعودي, اليوم الوطني السعودي, كرة القدم السعودية on 17 Sep; موسم الرياض, كأس العالم للرياضات الإلكترونية, جائزة السعودية الكبرى in the 15 Sep seed audit). A seventh, السينما السعودية (80 hits), was checked on 23 Sep (audits/culture-cinema-collocation.csv) and passed with a caveat: 21 of 22 hits read دور السينما السعودية, Saudi cinemas as venues, mostly in Egyptian outlets reporting Egyptian films' Saudi box office, so it counts as a theatre and box-office signal, not the industry. Two seeds are thin and unchecked (صناعة السينما السعودية at 13, الرياضات الإلكترونية السعودية at 3) and carry a phrase check pending chip. The Saudi motorsport Arabic pair returned zero and is dropped. The original 14-day English-only snapshot of 17 Sep 2026 is kept as the secondary chip on each card.",
   },
   {
     name: "Audience attention",
-    used: false,
-    note: "Google Trends (KSA, 12 months) was attempted for the main topics and could not be fetched from the build environment on 17 Sep. Not shown rather than estimated. Would sharpen the Riyadh Season and National Day gaps most.",
+    used: true,
+    note: "Google Trends, region Saudi Arabia, Search term (not Topic), custom range 1 Sep 2023 to 17 Sep 2026, exported by hand on 17 Sep 2026 as two batches of five terms (English and Arabic) plus the top related queries for Saudi Pro League and Riyadh Season. This is what the sparklines, the peak chips and the \"what people search\" lines on five of the ten cards show. Each batch is indexed to its own top term, so heights compare within a language only.",
   },
   {
     name: "Official scale and spend",
@@ -249,7 +417,7 @@ export const SIGNAL_LEGS: SignalLeg[] = [
   },
 ];
 export const SIGNAL_LEGS_NOT_USED =
-  "For a fuller read, the sources this page does not use: Nielsen Sports and YouGov Sport (fan and sponsorship tracking), the Ministry of Sport annual report (participation and federation data), and Google Trends once fetchable.";
+  "For a fuller read, the sources this page does not use: Nielsen Sports and YouGov Sport (fan and sponsorship tracking), the Ministry of Sport annual report (participation and federation data), and Google Trends for the five topics not exported in this pass (Saudi football, Saudi film industry, Saudi esports, Saudi motorsport, Saudi cinema).";
 
 /* ---- sources footer ---- */
 export const SRC_GROUPS: { h: string; links: SourceLink[] }[] = [
@@ -280,6 +448,8 @@ export const SRC_GROUPS: { h: string; links: SourceLink[] }[] = [
   {
     h: "Method & the live wire",
     links: [
+      S("Google Trends · SA, Search term, 1 Sep 2023 to 17 Sep 2026, exported 17 Sep 2026", "https://trends.google.com/trends/explore?geo=SA&date=2023-09-01%202026-09-17&q=Saudi%20Pro%20League,Esports%20World%20Cup,Riyadh%20Season,Saudi%20Grand%20Prix,Saudi%20National%20Day"),
+      S("SignalIQ · ksa-culture beat, 60-day EN + AR scan, 19 Jul to 16 Sep 2026, run 22 Sep 2026", "https://www.syedirfanajmal.com/tools/signaliq"),
       S("GDELT · Web News NGrams 3.0 (65-language corpus)", "https://blog.gdeltproject.org/announcing-the-new-web-news-ngrams-3-0-dataset/"),
       S("SignalIQ · the tool behind the wire", "https://www.syedirfanajmal.com/tools/signaliq"),
       S("KSA Retail & Consumer Radar · the sibling instrument", "https://www.syedirfanajmal.com/ksa-retail-radar"),
