@@ -6,7 +6,26 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["pdfkit"],
   async redirects() {
     const p = true; // permanent: true shorthand
+
+    // emoshq.com — short printed domain for EMOS (business cards, slides).
+    // TEMPORARY (307) on purpose: EMOS will move to its own site later, and a
+    // 301 would be cached by browsers forever and keep sending people here.
+    // Host-matched, so these only fire on emoshq.com / www.emoshq.com, and
+    // they sit first so no other rule catches those requests. The domain must
+    // also be added to this Vercel project for any of this to run.
+    const EMOS_HOST = [{ type: "host" as const, value: "(www\\.)?emoshq\\.com" }];
+    const SIA = "https://www.syedirfanajmal.com";
+    const emoshq = [
+      { source: "/platform",        destination: `${SIA}/emos-platform`,        permanent: false, has: EMOS_HOST },
+      { source: "/platform/:path*", destination: `${SIA}/emos-platform/:path*`, permanent: false, has: EMOS_HOST },
+      { source: "/academy",         destination: `${SIA}/emos-academy`,         permanent: false, has: EMOS_HOST },
+      { source: "/academy/:path*",  destination: `${SIA}/emos-academy/:path*`,  permanent: false, has: EMOS_HOST },
+      // Anything else on emoshq.com (including the bare domain) → the platform page.
+      { source: "/:path*",          destination: `${SIA}/emos-platform`,        permanent: false, has: EMOS_HOST },
+    ];
+
     return [
+      ...emoshq,
       // /writing → /resources (slug change)
       { source: "/writing",        destination: "/resources",        permanent: p },
       { source: "/writing/:path*", destination: "/resources/:path*", permanent: p },

@@ -71,6 +71,10 @@ export function whatsappUrl(lang: Lang, event: CardEvent | null): string {
   return `https://wa.me/${PHONE_E164.replace("+", "")}?text=${encodeURIComponent(text)}`;
 }
 
+/** Years since 2004, computed so the page never goes stale (22 in 2026). */
+const YEARS = new Date().getFullYear() - 2004;
+const toArabicDigits = (n: number) => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[Number(d)]);
+
 export const COPY = {
   en: {
     dir: "ltr" as const,
@@ -94,7 +98,7 @@ export const COPY = {
     academy: "Prefer to learn it yourself? EMOS Academy trains teams to run it.",
     academyCta: "EMOS Academy",
     sec3: "Background",
-    cred: "22 years in business, tech and marketing. Running DMR.agency, an SEO and earned media agency, since 2013. 300+ clients across the US, Europe and the Gulf.",
+    cred: `${YEARS} years in business, tech and marketing. Running DMR.agency, an SEO and earned media agency, since 2013. 300+ clients across the US, Europe and the Gulf.`,
     proof: [
       "Featured as a case study in Harvard Business Review",
       "Quoted in Forbes (USA)",
@@ -127,7 +131,7 @@ export const COPY = {
     academy: "تفضّل التعلّم بنفسك؟ أكاديمية EMOS تدرّب الفرق على تطبيق المنهجية.",
     academyCta: "أكاديمية EMOS",
     sec3: "نبذة",
-    cred: "٢٢ عاماً في الأعمال والتقنية والتسويق. أدير DMR.agency، وهي وكالة متخصصة في تحسين محركات البحث والتغطية الإعلامية، منذ ٢٠١٣. أكثر من ٣٠٠ عميل في الولايات المتحدة وأوروبا والخليج.",
+    cred: `${toArabicDigits(YEARS)} عاماً في الأعمال والتقنية والتسويق. أدير DMR.agency، وهي وكالة متخصصة في تحسين محركات البحث والتغطية الإعلامية، منذ ٢٠١٣. أكثر من ٣٠٠ عميل في الولايات المتحدة وأوروبا والخليج.`,
     proof: [
       "دراسة حالة في Harvard Business Review",
       "اقتباس في Forbes (الولايات المتحدة)",
