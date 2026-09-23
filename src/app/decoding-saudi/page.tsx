@@ -4,6 +4,9 @@ import {
   ANCHOR_STAT,
   ATHAR_CALLOUT,
   ATTENTION_CALLOUT,
+  CLOSING,
+  METHOD_NOTES,
+  NOT_WORKED,
   SIGNALS,
   SIGNAL_LEGS,
   SIGNAL_LEGS_NOT_USED,
@@ -30,18 +33,16 @@ import "./decoding-saudi.css";
 // as a typed constant: a two-line sparkline (EN yellow, AR black, same
 // colours as SplitBar) with peak chips on five cards, "what people search"
 // lines on Pro League and Riyadh Season, and a § 03 "Attention, not just
-// coverage" callout; later sections renumbered. Rebuilt 2026-09-17 (v2) at Irfan's
-// request to match the ksa-retail-radar / ksa-tourism-radar house style:
-// sourced signal files with a demand-side fact and a talk angle per topic,
-// not just a raw count table. Deliberately smaller than those two radars
-// (10 signals, not 25): no lens/ring/lifecycle apparatus, no live-wire
-// scatterplot, because a 10-topic sport-and-entertainment cut doesn't carry
-// that machinery honestly. Press-volume counts are a one-time snapshot (see
-// content.ts header); there is no history yet to wire live. 60-day EN vs
-// AR pass 2026-09-22 (v5): every card now carries a SplitBar on ONE 60-day
-// window for both languages (press60 in content.ts), the VolumeChart is
-// paired EN/AR bars on a log scale, and the § 01 stat strip is the 60-day
-// totals. Unchecked Arabic seeds carry a "phrase check pending" chip.
+// coverage" callout. 60-day EN vs AR pass 2026-09-22 (v5): every card
+// carries a SplitBar on ONE 60-day window for both languages (press60 in
+// content.ts), the VolumeChart is paired EN/AR bars on a log scale, and the
+// § 01 stat strip is the 60-day totals.
+// Editorial pass 2026-09-23 (v6), for a busy reader: seven full cards led
+// by the "For brands" line (demand fact as supporting text), three thin
+// topics in a compact watch list, one status chip per card, no 14-day
+// chips, § 04 cut to the export/home read plus three "what did not work"
+// lines, every methodology sentence collapsed under "How this was measured"
+// in § 05, and a closing inverted box (§ 06) on what a talk would cover.
 export const metadata: Metadata = {
   title: "Decoding Saudi: Where the Attention Actually Is",
   description:
@@ -132,9 +133,9 @@ function VolumeChart({ signals }: { signals: DecodingSignal[] }) {
       </svg>
       <p className="dsg-chart-note">
         English (yellow) and Arabic (black) articles per topic over the same 60 days, 19 Jul to 16 Sep 2026, via
-        SignalIQ on GDELT, run 22 Sep 2026. Log scale so the single-digit topics stay visible next to the league&rsquo;s
-        4,389 Arabic articles; every real count is printed. A dashed, unfilled Arabic bar is a seed whose phrase has
-        not yet been collocation-checked, so read it as a candidate, not a verified count.
+        SignalIQ on GDELT. Log scale so the single-digit topics stay visible next to the league&rsquo;s 4,389 Arabic
+        articles; every real count is printed. A dashed, unfilled Arabic bar is a seed whose phrase check is still
+        pending, so read it as a candidate, not a verified count.
       </p>
     </div>
   );
@@ -147,12 +148,15 @@ function ratioLabel(en: number, ar: number): string {
   return ar === 0 ? "EN only" : `EN ${(en / ar).toFixed(1)}x`;
 }
 
+function isNearParity(en: number, ar: number): boolean {
+  return en > 0 && ar > 0 && Math.max(en, ar) / Math.min(en, ar) < 1.15;
+}
+
 /** Two-segment EN vs AR bar on every card, both counts from the SAME 60-day
  *  window (19 Jul to 16 Sep 2026), so the two segments really do compare.
  *  Yellow = English, black = Arabic. Prints both counts and the ratio; an
- *  Arabic seed that has not passed a collocation check gets a "phrase check
- *  pending" chip and a hatched segment. A topic with no Arabic pair (the
- *  motorsport seed returned zero and was dropped) says so instead. */
+ *  Arabic seed that has not passed its phrase check gets a hatched segment
+ *  (the chip sits in the card head). */
 function SplitBar({ s }: { s: DecodingSignal }) {
   const { en, ar, arChecked } = s.press60;
   if (ar === undefined) {
@@ -172,7 +176,6 @@ function SplitBar({ s }: { s: DecodingSignal }) {
   }
   const total = en + ar;
   const enPct = total === 0 ? 50 : Math.round((en / total) * 100);
-  const near = en > 0 && ar > 0 && Math.max(en, ar) / Math.min(en, ar) < 1.15;
   return (
     <div className="dsg-split">
       <div className="dsg-split-bar">
@@ -186,11 +189,7 @@ function SplitBar({ s }: { s: DecodingSignal }) {
         <span>
           <i className={"dsg-sw " + (arChecked ? "ar" : "pending")} /> {ar.toLocaleString("en-US")} AR / 60d
         </span>
-        <span className="dsg-split-ratio">
-          {ratioLabel(en, ar)}
-          {near ? " · near parity" : ""}
-        </span>
-        {arChecked ? null : <span className="dsg-chip pending">phrase check pending</span>}
+        <span className="dsg-split-ratio">{ratioLabel(en, ar)}</span>
       </div>
     </div>
   );
@@ -244,7 +243,9 @@ function Sparkline({ id }: { id: string }) {
 
 /** The audience-attention block inside a card: sparkline, one peak chip per
  *  language, and (where exported) the top related queries. Only the five
- *  topics with a Trends export render this. */
+ *  topics with a Trends export render this. A zero Arabic series is
+ *  labelled as a likely naming miss (the formal Arabic name is not what
+ *  fans type), so it never reads as contradicting the Arabic press count. */
 function TrendBlock({ id }: { id: string }) {
   const t = TRENDS[id];
   if (!t) return null;
@@ -260,11 +261,11 @@ function TrendBlock({ id }: { id: string }) {
       <div className="dsg-trend-chips">
         <span className="dsg-chip">
           <i className="dsg-sw en" />
-          {enPk.val === 0 ? "EN: zero all 38 months" : `EN peaks ${fmtMonth(enPk.month)} · ${enPk.val}`}
+          {enPk.val === 0 ? "EN search: 0, likely a naming miss" : `EN peaks ${fmtMonth(enPk.month)} · ${enPk.val}`}
         </span>
         <span className="dsg-chip ar">
           <i className="dsg-sw ar" />
-          {arPk.val === 0 ? "AR: zero all 38 months" : `AR peaks ${fmtMonth(arPk.month)} · ${arPk.val}`}
+          {arPk.val === 0 ? "AR search: 0, likely a naming miss" : `AR peaks ${fmtMonth(arPk.month)} · ${arPk.val}`}
         </span>
       </div>
       {q ? (
@@ -286,52 +287,99 @@ function TrendBlock({ id }: { id: string }) {
   );
 }
 
-function Counts({ s }: { s: DecodingSignal }) {
+/** At most one status chip per card: "phrase check pending" (unverified
+ *  Arabic seed), "near parity" (within 15 percent), or "AR > EN". The
+ *  ratio itself is printed on the split bar, so it is not repeated here. */
+function StatusChip({ s }: { s: DecodingSignal }) {
+  const { en, ar, arChecked } = s.press60;
+  if (ar === undefined) return null;
+  if (!arChecked) return <span className="dsg-chip pending">phrase check pending</span>;
+  if (isNearParity(en, ar)) return <span className="dsg-chip">near parity</span>;
+  if (ar > en) return <span className="dsg-chip ar-flag">AR &gt; EN</span>;
+  return null;
+}
+
+function SourceLinks({ links }: { links: { t: string; u: string }[] }) {
   return (
-    <div className="dsg-counts">
-      {s.counts.map((c) => (
-        <span className={"dsg-chip" + (c.lang === "AR" ? " ar" : "")} key={`${c.lang}-${c.window}`}>
-          {c.n} {c.lang} / {c.window}
-        </span>
+    <div className="dsg-card-srcs">
+      {links.map((src) => (
+        <a key={src.u} href={src.u} target="_blank" rel="noopener noreferrer">
+          {src.t} ↗
+        </a>
       ))}
-      {s.weak ? <span className="dsg-chip weak">low priority</span> : null}
-      {s.press60.ar !== undefined && s.press60.ar > s.press60.en ? (
-        <span className="dsg-chip ar-flag">{s.press60.arChecked ? "AR > EN / 60d" : "AR > EN? pending"}</span>
-      ) : null}
     </div>
   );
 }
 
+/** Full card: name, one status chip, the 60-day split bar, then the "For
+ *  brands" line as the bold lead and the sourced demand fact under it. */
 function SignalCard({ s }: { s: DecodingSignal }) {
   return (
-    <div className={"dsg-card" + (s.weak ? " weak" : "")}>
+    <div className="dsg-card">
       <div className="dsg-card-head">
         <div>
           <div className="dsg-card-name">{s.name}</div>
           <div className="dsg-card-ar">{s.ar}</div>
         </div>
-        <Counts s={s} />
+        <div className="dsg-counts">
+          <StatusChip s={s} />
+        </div>
       </div>
       <SplitBar s={s} />
-      <p className="dsg-card-demand">{s.demand}</p>
-      <TrendBlock id={s.id} />
-      <div className="dsg-card-srcs">
-        {s.demandS.map((src) => (
-          <a key={src.u} href={src.u} target="_blank" rel="noopener noreferrer">
-            {src.t} ↗
-          </a>
-        ))}
-      </div>
-      <p className="dsg-card-talk">
-        <b>For brands.</b> {s.forBrands}
+      <p className="dsg-card-lead">
+        <span className="dsg-scaps">For brands</span>
+        {s.forBrands}
       </p>
+      <p className="dsg-card-demand">{s.demand}</p>
+      <SourceLinks links={s.demandS} />
+      <TrendBlock id={s.id} />
+    </div>
+  );
+}
+
+/** Compact watch-list strip for the three thin topics: name, the 60-day
+ *  counts, one line, the source, and the pending chip where relevant. */
+function WatchList({ items }: { items: DecodingSignal[] }) {
+  return (
+    <div className="dsg-watch">
+      <div className="dsg-watch-head">
+        <span className="dsg-scaps">Watch list</span>
+        <span className="dsg-watch-note">thin coverage on both sides: one line each, not a channel to budget against yet</span>
+      </div>
+      {items.map((s) => {
+        const { en, ar } = s.press60;
+        return (
+          <div className="dsg-watch-row" key={s.id}>
+            <div className="dsg-watch-name">
+              <div className="dsg-card-name">{s.name}</div>
+              <div className="dsg-card-ar">{s.ar}</div>
+            </div>
+            <div className="dsg-watch-counts">
+              <span>
+                <i className="dsg-sw en" /> {en} EN / 60d
+              </span>
+              <span>
+                <i className={"dsg-sw " + (ar === undefined ? "" : s.press60.arChecked ? "ar" : "pending")} />{" "}
+                {ar === undefined ? "0 AR / 60d, seed dropped" : `${ar} AR / 60d`}
+              </span>
+              <StatusChip s={s} />
+            </div>
+            <div className="dsg-watch-body">
+              <p>{s.watchLine ?? s.forBrands}</p>
+              <SourceLinks links={s.demandS} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 export default function DecodingSaudiPage() {
-  const sport = SIGNALS.filter((s) => s.group === "sport");
-  const entertainment = SIGNALS.filter((s) => s.group === "entertainment");
+  const cards = SIGNALS.filter((s) => !s.weak);
+  const watch = SIGNALS.filter((s) => s.weak);
+  const sport = cards.filter((s) => s.group === "sport");
+  const entertainment = cards.filter((s) => s.group === "entertainment");
   const totalEn60 = SIGNALS.reduce((sum, s) => sum + s.press60.en, 0);
   const totalAr60 = SIGNALS.reduce((sum, s) => sum + (s.press60.ar ?? 0), 0);
   const totalArUnchecked = SIGNALS.filter((s) => !s.press60.arChecked).reduce((sum, s) => sum + (s.press60.ar ?? 0), 0);
@@ -347,16 +395,11 @@ export default function DecodingSaudiPage() {
           <div className="dsg-scaps">SignalIQ · Decoding Saudi · فك رموز السعودية</div>
           <h1 className="dsg-h1">Decoding Saudi: where the attention actually is, versus where brands assume it is</h1>
           <p className="dsg-hero-sub">
-            Most brand plans for Saudi are written from the English press. This page checks that against two
-            other things: what the English and the Arabic press actually filed on ten sport and entertainment
-            topics over the same 60 days, via <mark className="dsg-mark">SignalIQ</mark>, and the real audience
-            numbers behind each one, sourced and linked. The short version: on the{" "}
-            <mark className="dsg-mark">Saudi Pro League, Saudi National Day and Saudi football</mark> the Arabic
-            press outwrites the English press three, eleven and three to one, while the Esports World Cup and
-            Riyadh Season are covered almost equally in both languages, because those two are told to the world in
-            English by design. Where press attention and audience attention disagree is where a marketer&rsquo;s
-            money is either late or wasted. Every topic ends with one concrete line on what a brand should do with
-            the gap.
+            Most brand plans for Saudi are written from the English press. This page checks that against what the
+            English and the Arabic press actually filed on ten sport and entertainment topics over the same 60 days,
+            via <mark className="dsg-mark">SignalIQ</mark>, and the real audience numbers behind each one. Where
+            press attention and audience attention disagree is where a marketer&rsquo;s money is either late or
+            wasted. Every topic ends with one concrete line on what a brand should do about it.
           </p>
           <p className="dsg-pull">
             What Saudi wants the world to see is told in English. What Saudis care about is told in Arabic.
@@ -371,24 +414,12 @@ export default function DecodingSaudiPage() {
             <div className="dsg-stat-label">{ANCHOR_STAT.label}</div>
             <div className="dsg-stat-val">{ANCHOR_STAT.val}</div>
             <p className="dsg-anchor-sub">{ANCHOR_STAT.sub}</p>
-            <div className="dsg-card-srcs">
-              {ANCHOR_STAT.src.map((src) => (
-                <a key={src.u} href={src.u} target="_blank" rel="noopener noreferrer">
-                  {src.t} ↗
-                </a>
-              ))}
-            </div>
+            <SourceLinks links={ANCHOR_STAT.src} />
           </div>
           <div className="dsg-callout">
             <div className="dsg-scaps">{ATHAR_CALLOUT.label}</div>
             <p>{ATHAR_CALLOUT.text}</p>
-            <div className="dsg-card-srcs">
-              {ATHAR_CALLOUT.src.map((src) => (
-                <a key={src.u} href={src.u} target="_blank" rel="noopener noreferrer">
-                  {src.t} ↗
-                </a>
-              ))}
-            </div>
+            <SourceLinks links={ATHAR_CALLOUT.src} />
           </div>
         </div>
 
@@ -397,8 +428,8 @@ export default function DecodingSaudiPage() {
         {/* § 01 — THE CUT */}
         <div className="dsg-mast">
           <span className="dsg-pill">§ 01</span>
-          <h2 className="dsg-h3">The cut · 10 signals, 2 groups</h2>
-          <span className="dsg-freshness">60-day scan, 19 Jul to 16 Sep 2026, run 22 Sep 2026</span>
+          <h2 className="dsg-h3">The cut · 7 signals and a watch list</h2>
+          <span className="dsg-freshness">60-day scan, 19 Jul to 16 Sep 2026</span>
         </div>
 
         <div className="dsg-stats four">
@@ -445,6 +476,8 @@ export default function DecodingSaudiPage() {
           ))}
         </div>
 
+        <WatchList items={watch} />
+
         {/* § 02 — THE CHART */}
         <div className="dsg-mast" style={{ marginTop: 48 }}>
           <span className="dsg-pill">§ 02</span>
@@ -467,18 +500,12 @@ export default function DecodingSaudiPage() {
             <span>
               <i className="dsg-sw ar" /> Arabic term
             </span>
-            <span className="dsg-attention-legend-note">Monthly, Aug 2023 to Sep 2026, region Saudi Arabia. Lines and peak chips sit on five of the ten cards above.</span>
+            <span className="dsg-attention-legend-note">Monthly, Aug 2023 to Sep 2026, region Saudi Arabia. Lines and peak chips sit on five of the cards above.</span>
           </div>
           {ATTENTION_CALLOUT.paras.map((para, i) => (
             <p key={i}>{i === 0 ? <><b>Four findings.</b> {para}</> : i === 1 ? <><b>The scaling rule.</b> {para}</> : <><b>Caveat.</b> {para}</>}</p>
           ))}
-          <div className="dsg-card-srcs">
-            {ATTENTION_CALLOUT.src.map((src) => (
-              <a key={src.u} href={src.u} target="_blank" rel="noopener noreferrer">
-                {src.t} ↗
-              </a>
-            ))}
-          </div>
+          <SourceLinks links={ATTENTION_CALLOUT.src} />
         </div>
 
         {/* § 04 — THE READ */}
@@ -499,47 +526,17 @@ export default function DecodingSaudiPage() {
             <mark className="dsg-mark">home story</mark>. A brand planning from English coverage is planning from the
             export story.
           </p>
-          <p>
-            <b>Read this first.</b> Over the same 60 days (19 Jul to 16 Sep 2026) the Arabic press filed{" "}
-            {fmt(totalAr60)} articles on these ten topics and the English press {fmt(totalEn60)}. On{" "}
-            <mark className="dsg-mark">Saudi Pro League</mark> (4,389 AR to 1,495 EN), Saudi National Day (292 to
-            26) and Saudi football (246 to 76), Arabic outwrites English roughly three, eleven and three to one. On{" "}
-            <mark className="dsg-mark">Esports World Cup</mark> (649 EN to 627 AR) and Riyadh Season (143 to 135) the
-            two languages are almost level: those two are told to the world in English by design, and a plan
-            written from the English press will find them but will not find the rest. The league is the one
-            property where press and audience already agree (a 230 million-viewer footprint under the largest count
-            on the page), and even there three quarters of the coverage is in Arabic. Riyadh Season (20 million
-            visitors) and National Day (a nationwide, multi-city programme) still sit far below the audience they
-            actually draw. If a plan is built from English coverage, it will overweight the league and the World
-            Cup and underweight almost everything else.
-          </p>
-          <p>
-            What did not work: the wider &quot;Saudi culture&quot; topics this cut started with (streaming, youth
-            culture, festivals beyond the ones named, and similar) tested at near-zero English press volume in the
-            earlier scan, so they are not on this page. Saudi esports, Saudi motorsport and Saudi cinema are kept as
-            low-priority context with one grounding fact each. The Saudi cinema Arabic seed (السينما السعودية, 80)
-            passed its phrase check on 23 Sep with a caveat worth knowing: 21 of 22 probe hits read دور السينما
-            السعودية, Saudi cinemas as theatres rather than an industry, and the outlets are mostly Egyptian
-            (Al-Masry Al-Youm, Veto, Shorouk) reporting Egyptian films&rsquo; Saudi box office, so it now counts in
-            the &quot;Arabic outwrites English&quot; cell as a box-office story told in Egypt&rsquo;s press. Two thin
-            Arabic seeds are still not collocation-checked and are shown with a &quot;phrase check pending&quot; chip
-            rather than as verified counts: صناعة السينما السعودية (13) and الرياضات الإلكترونية السعودية (3). The
-            Saudi motorsport Arabic seed (رياضة السيارات السعودية) returned zero over 60 days and
-            has been dropped from the page and the beat. The third data leg, search interest from Google Trends, is
-            on the page for five of the ten topics (§ 03 and the sparklines on those cards), exported by hand on 17
-            Sep 2026; the other five topics still rest on official visitor and broadcast numbers only. The page
-            shows where signal exists, not where it was expected to.
-          </p>
-          <p className="dsg-note-live">
-            Press counts are from one BigQuery scan of the ksa-culture beat, both languages, 2026-07-19 to
-            2026-09-16, run 2026-09-22 (audits/culture-scan-60d-en-ar.csv). The 14-day English-only chips on each
-            card are the earlier snapshot of 2026-09-17, the day the beat went live, kept for continuity. There is
-            no backfill history yet for a live query to show anything meaningful, so this page states the known
-            numbers directly instead of wiring a live feed that would have nothing behind it.
-          </p>
+          <div className="dsg-notworked">
+            <b>What did not work.</b>
+            <ul>
+              {NOT_WORKED.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* § 05 — SOURCES OF SIGNAL */}
+        {/* § 05 — SOURCES OF SIGNAL + METHOD */}
         <div className="dsg-mast" style={{ marginTop: 48 }}>
           <span className="dsg-pill">§ 05</span>
           <span className="dsg-scaps">Sources of signal: how to read this</span>
@@ -555,13 +552,39 @@ export default function DecodingSaudiPage() {
             </div>
           ))}
           <p className="dsg-legs-foot">{SIGNAL_LEGS_NOT_USED}</p>
+          <details className="dsg-src-details dsg-method">
+            <summary>
+              <span className="dsg-scaps">How this was measured</span>
+            </summary>
+            <div className="dsg-method-body">
+              {METHOD_NOTES.map((m) => (
+                <p key={m.h}>
+                  <b>{m.h}.</b> {m.t}
+                </p>
+              ))}
+            </div>
+          </details>
         </div>
 
-        {/* § 06 — SOURCES */}
+        {/* § 06 — CLOSING */}
+        <div className="dsg-mast" style={{ marginTop: 48 }}>
+          <span className="dsg-pill">§ 06</span>
+          <span className="dsg-scaps">{CLOSING.label}</span>
+        </div>
+        <div className="dsg-close">
+          <ul>
+            {CLOSING.points.map((pt) => (
+              <li key={pt}>{pt}</li>
+            ))}
+          </ul>
+          <p className="dsg-close-line">{CLOSING.line}</p>
+        </div>
+
+        {/* § 07 — SOURCES */}
         <div className="dsg-sources">
           <details className="dsg-src-details">
             <summary>
-              <span className="dsg-pill">§ 06</span>
+              <span className="dsg-pill">§ 07</span>
               <span className="dsg-scaps">Every source, in one place</span>
             </summary>
             <div className="dsg-src-grid">
@@ -579,7 +602,7 @@ export default function DecodingSaudiPage() {
           </details>
         </div>
 
-        <p className="dsg-micro">Press data: SignalIQ 60-day EN + AR scan, 19 Jul to 16 Sep 2026, run 22 Sep 2026. Search data: Google Trends, exported 17 Sep 2026.</p>
+        <p className="dsg-micro">Press data: SignalIQ 60-day EN + AR scan, 19 Jul to 16 Sep 2026. Search data: Google Trends, exported 17 Sep 2026.</p>
       </main>
 
       <Colophon />
