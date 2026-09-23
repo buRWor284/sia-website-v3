@@ -24,7 +24,7 @@ export function GET() {
     "N:Ajmal;Syed Irfan;;;",
     "FN:Syed Irfan Ajmal",
     "ORG:DMR.agency",
-    "TITLE:Founder",
+    "TITLE:CEO",
     `TEL;TYPE=CELL,VOICE:${PHONE_E164}`,
     `EMAIL;TYPE=INTERNET,WORK:${EMAIL}`,
     `URL:${SITE}`,
