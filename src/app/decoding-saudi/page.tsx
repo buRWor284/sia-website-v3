@@ -399,7 +399,9 @@ export default function DecodingSaudiPage() {
             English and the Arabic press actually filed on ten sport and entertainment topics over the same 60 days,
             via <mark className="dsg-mark">SignalIQ</mark>, and the real audience numbers behind each one. Where
             press attention and audience attention disagree is where a marketer&rsquo;s money is either late or
-            wasted. Every topic ends with one concrete line on what a brand should do about it.
+            wasted, and every topic ends with one line on what a brand should do about it. The AFC Asian Cup and
+            the 2034 World Cup will pull more of the home story into English, so the gap on this page is a window,
+            not a permanent state.
           </p>
           <p className="dsg-pull">
             What Saudi wants the world to see is told in English. What Saudis care about is told in Arabic.

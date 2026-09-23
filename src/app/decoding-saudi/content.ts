@@ -130,8 +130,11 @@ export const SIGNALS: DecodingSignal[] = [
     press60: { en: 1495, ar: 4389, arChecked: true, arNote: "الدوري السعودي, collocation checked clean 17 Sep 2026 (78 hits sampled, all football)" },
     counts: [{ n: 385, lang: "EN", window: "14d" }],
     demand:
-      "The Saudi Pro League opened the 2025/26 season with a record 37 broadcasters carrying it into more than 180 territories, including six-season Fox Sports coverage across the Americas and four-year deals with Movistar+ (Spain), Sport TV (Portugal), SPOTV (Asia) and Fancode (India). Last season the league drew more than 230 million viewers worldwide, and international rights revenue rose 20 percent over the past two seasons.",
-    demandS: [S("Inside World Football, 25 Sep 2025", "https://www.insideworldfootball.com/2025/09/25/saudi-pro-league-extends-global-appeal-international-broadcast-deal/")],
+      "The Saudi Pro League opened the 2025/26 season with a record 37 broadcasters carrying it into more than 180 territories, including six-season Fox Sports coverage across the Americas and four-year deals with Movistar+ (Spain), Sport TV (Portugal), SPOTV (Asia) and Fancode (India). Last season the league drew more than 230 million viewers worldwide, and international rights revenue rose 20 percent over the past two seasons. ROSHN is the working model: four seasons as title sponsor, 306 matches in 2025-26, more than 30 fan activations and FANZONE matchday experiences, a presence built around the fixtures rather than a single shirt.",
+    demandS: [
+      S("Inside World Football, 25 Sep 2025", "https://www.insideworldfootball.com/2025/09/25/saudi-pro-league-extends-global-appeal-international-broadcast-deal/"),
+      S("ROSHN Group press release, 21 May 2026", "https://www.roshn.sa/news-and-events/press-releases/article-10"),
+    ],
     forBrands:
       "This is the one Saudi property where press attention and audience attention already agree, and even here three quarters of the conversation is in Arabic. Budget it as an always-on channel with a weekly content rhythm built around club fandom and the table, not a single shirt or perimeter buy.",
   },
@@ -169,8 +172,12 @@ export const SIGNALS: DecodingSignal[] = [
     press60: { en: 26, ar: 292, arChecked: true, arNote: "اليوم الوطني السعودي, collocation checked clean 17 Sep 2026 (lifestyle and retail press)" },
     counts: [{ n: 23, lang: "EN", window: "14d" }],
     demand:
-      "The 95th Saudi National Day (23 September) was marked with more than 40 cultural and heritage events at Ithra alone, plus a nationwide Diriyah program, part of a state-coordinated calendar of celebrations that runs across every major city.",
-    demandS: [S("Saudi Press Agency, 2025", "https://spa.gov.sa/en/N2404431"), S("Saudi Press Agency, 2025", "https://spa.gov.sa/en/N2405344")],
+      "The 95th Saudi National Day (23 September) was marked with more than 40 cultural and heritage events at Ithra alone, plus a nationwide Diriyah program, part of a state-coordinated calendar of celebrations that runs across every major city. Al-Baik showed the home-story version of the day by re-releasing its 1980s National Day ad, original family scene recreated, a piece that needs no English press to work.",
+    demandS: [
+      S("Saudi Press Agency, 2025", "https://spa.gov.sa/en/N2404431"),
+      S("Saudi Press Agency, 2025", "https://spa.gov.sa/en/N2405344"),
+      S("Campaign Middle East, Brands weave nostalgia into Saudi National Day campaigns", "https://campaignme.com/brands-weave-nostalgia-into-saudi-national-day-campaigns/"),
+    ],
     forBrands:
       "Eleven to one is the widest language gap on this page, and the Arabic coverage is lifestyle and retail press, exactly the press a consumer brand wants. Treat 23 September as a two-week Arabic-first season with local partners and venues, not a one-day logo swap measured in English clippings.",
   },
@@ -405,8 +412,11 @@ export const ANCHOR_STAT = {
    Athar itself just prioritized this year. ---- */
 export const ATHAR_CALLOUT = {
   label: "Athar already moved this way",
-  text: "Athar Awards added a Sports Campaign category for 2026, for creative marketing campaigns that use sport to support Vision 2030, strengthen national pride and build the Kingdom's global sporting profile ahead of the AFC Asian Cup and the FIFA World Cup 2034. The festival's own jury now treats sport as a marketing discipline, which is the bet this page is testing with data.",
-  src: [S("Zawya, 6 Aug 2026", "https://www.zawya.com/en/press-release/events-conferences/athar-awards-expands-to-include-new-sports-campaign-category-and-80-industry-veterans-on-the-2026-jury-panel-423491")],
+  text: "Athar Awards added a Sports Campaign category for 2026, for creative marketing campaigns that use sport to support Vision 2030, strengthen national pride and build the Kingdom's global sporting profile ahead of the AFC Asian Cup and the FIFA World Cup 2034. The festival's own jury now treats sport as a marketing discipline, which is the bet this page is testing with data. Mohamed Al-Ayed of TRACCS, co-presenter of the festival, has framed the 2026 edition as positioning Saudi creative identity \"as a regional export rather than simply a destination for international expertise\", with \"homegrown creativity and authentic local storytelling as commercial drivers\". The data on this page shows where that home story is already being written, and in which language.",
+  src: [
+    S("Zawya, 6 Aug 2026", "https://www.zawya.com/en/press-release/events-conferences/athar-awards-expands-to-include-new-sports-campaign-category-and-80-industry-veterans-on-the-2026-jury-panel-423491"),
+    S("Arab News, Athar Festival expands program to drive Saudi creative industry growth", "https://www.arabnews.com/saudi-arabia/athar-festival-expands-program-to-drive-saudi-creative-industry-growth-3002333"),
+  ],
 };
 
 /* ---- sources of signal: the three data legs a full read would use, and
