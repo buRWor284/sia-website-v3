@@ -20,11 +20,14 @@
 import { usePathname } from "next/navigation";
 import { SiteHeader, CredibilityTicker } from "@/components/bureau";
 
-const HIDDEN_PREFIXES = ["/emos-platform", "/clients/resourcex", "/emos-academy/apply", "/emos-academy/pay", "/ar/"];
+const HIDDEN_PREFIXES = ["/emos-platform", "/clients/resourcex", "/emos-academy/apply", "/emos-academy/pay", "/ar/", "/card/"];
+// Exact matches: /card (the business-card QR landing) is a one-job page with
+// no site chrome. Exact, so it can't swallow a future /cards or /card-x route.
+const HIDDEN_EXACT = ["/card"];
 
 export function SiteHeaderConditional() {
   const pathname = usePathname();
-  const hide = HIDDEN_PREFIXES.some(prefix => pathname.startsWith(prefix));
+  const hide = HIDDEN_EXACT.includes(pathname) || HIDDEN_PREFIXES.some(prefix => pathname.startsWith(prefix));
   if (hide) return null;
   return (
     <>
