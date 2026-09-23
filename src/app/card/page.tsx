@@ -204,7 +204,8 @@ export default async function CardPage({
         {/* § 02 EMOS: mirrors the amber band on the card. Ink on amber only (a11y rule 1). */}
         {label(isAr ? "٠٢" : "02", t.sec2)}
         <div style={{ background: YEL, color: INK, padding: "20px 20px 22px" }}>
-          <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.18em" }} dir="ltr">
+          <div style={{ fontSize: 12, fontWeight: 700 }}>{t.emosKicker}</div>
+          <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.18em", marginTop: 4 }} dir="ltr">
             {t.emosTag}
           </div>
           <div style={{ fontFamily: head, fontWeight: 700, fontSize: 24, lineHeight: 1.15, marginTop: 8 }}>{t.emosHead}</div>
@@ -218,12 +219,24 @@ export default async function CardPage({
             {t.emosCta} {isAr ? "←" : "→"}
           </TrackedLink>
         </div>
-        <p style={{ fontSize: 14, lineHeight: 1.5, color: CREAM70, margin: "12px 0 0" }}>
-          {t.academy}{" "}
-          <TrackedLink href="/emos-academy" track="emos_academy" source={s} style={{ color: PAPER }}>
-            {t.academyCta}
-          </TrackedLink>
-        </p>
+        <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
+          {t.ways.map(w => (
+            <TrackedLink
+              key={w.track}
+              href={w.href}
+              track={w.track}
+              source={s}
+              external={w.href.startsWith("http")}
+              style={{ display: "block", border: `1px solid ${LINE}`, padding: "14px 16px", color: PAPER, textDecoration: "none" }}
+            >
+              <div style={{ fontSize: 12, color: YEL, fontWeight: 700 }}>{w.kicker}</div>
+              <div style={{ fontFamily: head, fontWeight: 700, fontSize: 19, marginTop: 3 }}>
+                {w.name} <span aria-hidden>{isAr ? "←" : "→"}</span>
+              </div>
+              <div style={{ fontSize: 14, lineHeight: 1.45, color: CREAM70, marginTop: 4 }}>{w.body}</div>
+            </TrackedLink>
+          ))}
+        </div>
 
         {/* § 03 Background */}
         {label(isAr ? "٠٣" : "03", t.sec3)}

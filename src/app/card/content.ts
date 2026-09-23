@@ -89,14 +89,18 @@ export const COPY = {
     save: "Save my contact",
     saveNote: "Adds me to your phone's contacts",
     book: "Book a 30-minute call",
-    sec2: "What I'm building",
+    sec2: "How to work with me",
+    emosKicker: "Do it yourself",
     emosTag: "EMOS PLATFORM",
     emosHead: "The Earned Media Operating System",
     emosBody:
       "Find the stories journalists are chasing, pitch them well, and turn the coverage into visibility in search and AI answers.",
     emosCta: "See the platform",
-    academy: "Prefer to learn it yourself? EMOS Academy trains teams to run it.",
-    academyCta: "EMOS Academy",
+    ways: [
+      { kicker: "Learn to do it", name: "EMOS Academy", body: "Training for teams that want to run earned media in-house.", href: "/emos-academy", track: "emos_academy" },
+      { kicker: "Done for you", name: "DMR.agency", body: "My agency runs SEO and digital PR for you.", href: "https://dmr.agency/?s=card", track: "dmr" },
+      { kicker: "Senior guidance", name: "Fractional CMO", body: "Part-time marketing leadership, without a full-time hire.", href: "/fractional-cmo", track: "fractional_cmo" },
+    ],
     sec3: "Background",
     cred: `${YEARS} years in business, tech and marketing. Running DMR.agency, an SEO and earned media agency, since 2013. 300+ clients across the US, Europe and the Gulf.`,
     proof: [
@@ -122,14 +126,18 @@ export const COPY = {
     save: "احفظ جهة الاتصال",
     saveNote: "تُضاف بياناتي إلى جهات الاتصال في هاتفك",
     book: "احجز مكالمة مدتها ٣٠ دقيقة",
-    sec2: "ما أعمل عليه",
+    sec2: "كيف نعمل معاً",
+    emosKicker: "افعلها بنفسك",
     emosTag: "EMOS PLATFORM",
     emosHead: "منصة EMOS",
     emosBody:
       "اكتشف القصص التي يبحث عنها الصحفيون، وقدّم لهم عرضاً مقنعاً، ثم حوّل التغطية الإعلامية إلى ظهور في نتائج البحث وإجابات الذكاء الاصطناعي.",
     emosCta: "تعرّف على المنصة (بالإنجليزية)",
-    academy: "تفضّل التعلّم بنفسك؟ أكاديمية EMOS تدرّب الفرق على تطبيق المنهجية.",
-    academyCta: "أكاديمية EMOS",
+    ways: [
+      { kicker: "تعلّم كيف تفعلها", name: "أكاديمية EMOS", body: "تدريب للفرق التي تريد إدارة التغطية الإعلامية داخلياً.", href: "/emos-academy", track: "emos_academy" },
+      { kicker: "ننفّذها لك", name: "DMR.agency", body: "وكالتي تتولى تحسين محركات البحث والعلاقات العامة الرقمية نيابةً عنك.", href: "https://dmr.agency/?s=card", track: "dmr" },
+      { kicker: "إشراف تسويقي رفيع", name: "مدير تسويق بدوام جزئي", body: "قيادة تسويقية بدوام جزئي، دون الحاجة إلى تعيين بدوام كامل.", href: "/fractional-cmo", track: "fractional_cmo" },
+    ],
     sec3: "نبذة",
     cred: `${toArabicDigits(YEARS)} عاماً في الأعمال والتقنية والتسويق. أدير DMR.agency، وهي وكالة متخصصة في تحسين محركات البحث والتغطية الإعلامية، منذ ٢٠١٣. أكثر من ٣٠٠ عميل في الولايات المتحدة وأوروبا والخليج.`,
     proof: [
