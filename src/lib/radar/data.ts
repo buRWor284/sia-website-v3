@@ -12,6 +12,7 @@
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { ACTIVE_COVERAGE_VERSION } from "@/lib/signaliq/coverage-store";
+import { withoutProbeTopics } from "@/lib/signaliq/config";
 import { LENSES, type Lens, type RadarData, type RadarTopic } from "./types";
 import { displayTopic } from "@/lib/topics/display";
 
@@ -83,7 +84,7 @@ const emptySeries = (): Record<Lens, number[]> => ({ pr: [], earned: [], seo: []
  * returns a safe empty-ish shape if Supabase is unavailable.
  */
 export async function getRadarData(): Promise<RadarData> {
-  const topics = FOCUS.map((f) => f.topic);
+  const topics = withoutProbeTopics(FOCUS.map((f) => f.topic)); // seed gate
   const lensOf = new Map<string, Lens>(FOCUS.map((f) => [f.topic, f.lens]));
 
   try {

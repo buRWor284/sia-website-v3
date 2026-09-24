@@ -89,9 +89,10 @@ export default function HistoryStrip({
         </svg>
       </div>
       <span style={{ display: "flex", flexDirection: "column", gap: 1, fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, lineHeight: 1.4 }}>
+        {c.week && <span style={{ opacity: 0.95, fontWeight: 600 }}>{c.week}</span>}
         {c.yoy && <span style={{ opacity: 0.85 }}>{c.yoy}</span>}
         {c.season && <span style={{ opacity: 0.85 }}>{c.season}</span>}
-        {!c.yoy && !c.season && <span style={{ opacity: 0.6 }}>{locale === "ar" ? "لا يوجد موسم متكرر" : "No repeating season"}</span>}
+        {!c.week && !c.yoy && !c.season && <span style={{ opacity: 0.6 }}>{locale === "ar" ? "لا يوجد موسم متكرر" : "No repeating season"}</span>}
       </span>
     </div>
   );

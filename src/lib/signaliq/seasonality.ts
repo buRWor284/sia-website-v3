@@ -37,6 +37,10 @@ export const HISTORY_LOW_SAMPLE = 12;
 export const MIN_TYPICAL_WEEK = 8;
 /** A repeating peak must average at least this many articles to count as a season. */
 export const MIN_PEAK_ARTICLES = 25;
+/** "Last week vs a normal week" needs a normal week of at least this many articles. */
+export const MIN_NORMAL_WEEK = 4;
+/** Between these two ratios the weekly line reads "about normal" instead of a number. */
+export const WEEK_NORMAL_BAND: [number, number] = [0.8, 1.25];
 
 export interface SeasonPeak {
   /** Monday (YYYY-MM-DD) of the week the next peak is expected. */
@@ -82,6 +86,12 @@ export interface HistorySummary {
   langDrift: number | null;
   /** Number of gap weeks inside the sparkline window. */
   gapWeeks: number;
+  /** Last complete week ÷ this signal's normal week (median of every non-gap week
+   *  since it started counting), divided by the same ratio for the whole language.
+   *  1.6 = "1.6× a normal week". Null when too thin, new, or last week was a gap. */
+  weekRatio: number | null;
+  /** Articles in the last complete week (null when it was a gap). */
+  lastWeekCount: number | null;
 }
 
 /* ─────────────────────────── date helpers (UTC) ─────────────────────────── */
@@ -336,6 +346,32 @@ export function summarizeHistory(
     }
   }
 
+  // Last week vs a normal week. "Normal" is the median of every non-gap week the
+  // signal has counted (the same idea as norm_ratio in SQL), and the result is
+  // divided by the same ratio for the whole language, because tracked English
+  // and Arabic volume drift (15 Sep check: en ~9%, ar ~11% under their medians).
+  let weekRatio: number | null = null;
+  const lastVal = values[L - 1];
+  const lastWeekCount = lastVal === null || lastVal === undefined ? null : lastVal;
+  if (!isNew && lastWeekCount !== null) {
+    const counted = values.slice(stepUp ? firstIdx : 0).filter((x): x is number => x !== null);
+    const normal = median(counted);
+    if (normal >= MIN_NORMAL_WEEK && lastWeekCount + normal >= HISTORY_LOW_SAMPLE) {
+      let drift = 1;
+      if (lang && lang.series.length > 0 && lang.lastWeekStart) {
+        const shift = weeksBetween(end, lang.lastWeekStart);
+        const idx = lang.series.length - 1 - shift;
+        const lVals = lang.series.filter((_, i) =>
+          !gaps.has(addDays(lang.lastWeekStart as string, -7 * (lang.series.length - 1 - i))),
+        );
+        const lMed = median(lVals);
+        const lNow = idx >= 0 && idx < lang.series.length ? lang.series[idx] : null;
+        if (lMed > 0 && lNow !== null && lNow > 0) drift = lNow / lMed;
+      }
+      weekRatio = Math.round((lastWeekCount / normal / drift) * 100) / 100;
+    }
+  }
+
   const sparkStart = Math.max(0, L - 156);
   const spark = values.slice(sparkStart);
   return {
@@ -352,6 +388,8 @@ export function summarizeHistory(
     seasonalNorm,
     langDrift: langDrift === null ? null : Math.round(langDrift * 1000) / 1000,
     gapWeeks: spark.filter((x) => x === null).length,
+    weekRatio,
+    lastWeekCount,
   };
 }
 
@@ -388,7 +426,14 @@ export function shortDate(iso: string, locale: HistoryLocale = "en"): string {
   return `${d.getUTCDate()} ${MONTHS_SHORT_EN[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
+/** "1.6×" (one decimal under 10, whole number above). */
+export function timesText(r: number): string {
+  return (r >= 10 ? String(Math.round(r)) : (Math.round(r * 10) / 10).toFixed(1)) + "×";
+}
+
 export interface HistoryCopy {
+  /** e.g. "Last week: 1.6× a normal week" */
+  week: string | null;
   /** e.g. "−31% vs the same 60 days last year" */
   yoy: string | null;
   /** e.g. "Usually peaks mid November · next in 9 wks" */
@@ -412,6 +457,7 @@ export function historyCopy(h: HistorySummary, locale: HistoryLocale = "en"): Hi
   if (h.isNew || !h.sparkEnd) {
     const from = h.countingFrom ? shortDate(h.countingFrom, locale) : null;
     return {
+      week: null,
       yoy: null,
       season: null,
       fresh: ar
@@ -420,6 +466,22 @@ export function historyCopy(h: HistorySummary, locale: HistoryLocale = "en"): Hi
       span,
       aria: ar ? "لا يوجد سجل كافٍ بعد" : "Not enough history yet",
     };
+  }
+
+  let week: string | null = null;
+  if (h.weekRatio !== null) {
+    const r = h.weekRatio;
+    const normal = r >= WEEK_NORMAL_BAND[0] && r <= WEEK_NORMAL_BAND[1];
+    // A quiet week in a topic's off-season is not news (Riyadh Season in
+    // September): when the same weeks in earlier years were just as quiet, say so.
+    const offSeason = r < WEEK_NORMAL_BAND[0] && h.seasonalNorm !== null && h.seasonalNorm >= WEEK_NORMAL_BAND[0];
+    week = ar
+      ? normal
+        ? "الأسبوع الماضي: قريب من الأسبوع المعتاد"
+        : `الأسبوع الماضي: ${ltr(timesText(r))} الأسبوع المعتاد${offSeason ? "، وهذا معتاد في هذا الوقت من العام" : ""}`
+      : normal
+        ? "Last week: about a normal week"
+        : `Last week: ${timesText(r)} a normal week${offSeason ? ", usual for this time of year" : ""}`;
   }
 
   const yoy =
@@ -448,9 +510,9 @@ export function historyCopy(h: HistorySummary, locale: HistoryLocale = "en"): Hi
   }
 
   const aria = ar
-    ? `عدد المقالات الأسبوعي على مدى ${span}${yoy ? `، ${yoy}` : ""}${season ? `، ${season}` : ""}`
-    : `Weekly article counts over ${years} years${yoy ? `, ${yoy}` : ""}${season ? `, ${season}` : ""}`;
-  return { yoy, season, fresh: null, span, aria };
+    ? `عدد المقالات الأسبوعي على مدى ${span}${week ? `، ${week}` : ""}${yoy ? `، ${yoy}` : ""}${season ? `، ${season}` : ""}`
+    : `Weekly article counts over ${years} years${week ? `, ${week}` : ""}${yoy ? `, ${yoy}` : ""}${season ? `, ${season}` : ""}`;
+  return { week, yoy, season, fresh: null, span, aria };
 }
 
 /** SVG polyline point strings for the sparkline, split at gaps. */

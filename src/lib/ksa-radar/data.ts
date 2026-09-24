@@ -14,6 +14,7 @@
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { ACTIVE_COVERAGE_VERSION } from "@/lib/signaliq/coverage-store";
+import { withoutProbeTopics } from "@/lib/signaliq/config";
 import { getHistorySummaries, radarHistoryGroups, type RadarHistorySource } from "@/lib/signaliq/history";
 import { mondayOf } from "@/lib/signaliq/seasonality";
 import { KSA_LENSES, type KsaLens, type KsaLiveTopic, type KsaRadarData } from "./types";
@@ -105,7 +106,7 @@ const emptyData = (): KsaRadarData => ({
  * ksa-tourism seeds have not been scanned yet.
  */
 export async function getKsaRadarData(signals: RadarHistorySource[] = []): Promise<KsaRadarData> {
-  const topics = KSA_FOCUS.map((f) => f.topic);
+  const topics = withoutProbeTopics(KSA_FOCUS.map((f) => f.topic)); // seed gate
   const lensOf = new Map<string, KsaLens>(KSA_FOCUS.map((f) => [f.topic, f.lens]));
 
   try {

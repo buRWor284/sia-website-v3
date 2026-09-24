@@ -154,18 +154,12 @@ export const visibleBeats = (): Beat[] => BEATS.filter((b) => !b.hidden);
  * older than 30 days. Enforced through isProbeTopic() / withoutProbeTopics().
  */
 export const PROBE_SEEDS: ReadonlyArray<{ seed: string; since: string }> = [
-  // The 11 rephrases from the 15 Sep audit, never collocation-checked yet.
-  { seed: "ar:\u0645\u0634\u0631\u0648\u0639 \u0646\u064a\u0648\u0645", since: "2026-09-15" }, // NEOM project (was: NEOM SC football club)
-  { seed: "ar:\u0645\u062d\u0627\u0641\u0638\u0629 \u0627\u0644\u0639\u0644\u0627", since: "2026-09-15" }, // AlUla governorate (was: surname Abu al-Ala)
-  { seed: "ar:\u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u062f\u0631\u0639\u064a\u0629", since: "2026-09-15" }, // Diriyah Gate (was: Al-Diriyah FC)
+  // 15 Sep rephrases: 7 released 24 Sep (probe day 2026-09-22 + 9 nightly days); 3 dead ones swapped; Almarai still thin.
+  { seed: "ar:\u0645\u062f\u064a\u0646\u0629 \u0646\u064a\u0648\u0645", since: "2026-09-24" }, // NEOM city (مشروع نيوم dead 9 days)
+  { seed: "ar:\u0630\u0627 \u0644\u0627\u064a\u0646", since: "2026-09-24" }, // The Line
   { seed: "ar:\u0634\u0631\u0643\u0629 \u0627\u0644\u0645\u0631\u0627\u0639\u064a", since: "2026-09-15" }, // Almarai company (was: pastures)
-  { seed: "de:Datenschutzversto\u00df", since: "2026-09-15" }, // GDPR breach (was: privacy-policy footers)
-  { seed: "ko:\uc804\uae30\ucc28 \uc2dc\uc7a5", since: "2026-09-15" }, // EV market (was: used-car classifieds)
-  { seed: "es:aepd", since: "2026-09-15" }, // Spanish data regulator
-  { seed: "fr:cnil", since: "2026-09-15" }, // French data regulator
-  { seed: "zh:\u672b\u7aef\u914d\u9001", since: "2026-09-15" }, // last-mile delivery (was: policy idiom)
-  { seed: "zh:\u5c45\u6c11\u6d88\u8d39\u652f\u51fa", since: "2026-09-15" }, // household consumption spending (was: CPI)
-  { seed: "th:\u0e2d\u0e38\u0e15\u0e2a\u0e32\u0e2b\u0e01\u0e23\u0e23\u0e21\u0e40\u0e20\u0e2a\u0e31\u0e0a\u0e01\u0e23\u0e23\u0e21", since: "2026-09-15" }, // pharmaceutical industry (was: automotive industry)
+  { seed: "de:DSGVO", since: "2026-09-24" }, // GDPR (Datenschutzverstoß dead 9 days)
+  { seed: "th:\u0e40\u0e20\u0e2a\u0e31\u0e0a\u0e01\u0e23\u0e23\u0e21", since: "2026-09-24" }, // pharmaceutical (อุตสาหกรรมเภสัชกรรม dead 9 days)
   // KSA business events, added 2026-09-17 (ksa-business-events beat). Check SQL:
   // SIA.com Rebrand/audits/business-events-collocation.sql (LEAP 2026 ran 31 Aug-3 Sep).
   { seed: "LEAP 2026", since: "2026-09-17" },
@@ -486,7 +480,7 @@ export const BEATS: Beat[] = [
       //   tokenize.ts (per-seed language, zero extra cost). Their DB keys become
       //   "ar:<phrase>". VERIFY the lang literal (tokenize.ts LANGS) with the
       //   one-day probe before reading anything into these counts.
-      "ar:\u0645\u0634\u0631\u0648\u0639 \u0646\u064a\u0648\u0645", "ar:\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0645\u062d\u0627\u0641\u0638\u0629 \u0627\u0644\u0639\u0644\u0627", "ar:\u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u062f\u0631\u0639\u064a\u0629", "ar:\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0645\u0631\u0629",
+      "ar:\u0645\u062f\u064a\u0646\u0629 \u0646\u064a\u0648\u0645", "ar:\u0630\u0627 \u0644\u0627\u064a\u0646", "ar:\u0645\u0648\u0633\u0645 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0645\u062d\u0627\u0641\u0638\u0629 \u0627\u0644\u0639\u0644\u0627", "ar:\u0628\u0648\u0627\u0628\u0629 \u0627\u0644\u062f\u0631\u0639\u064a\u0629", "ar:\u0637\u064a\u0631\u0627\u0646 \u0627\u0644\u0631\u064a\u0627\u0636", "ar:\u0627\u0644\u0639\u0645\u0631\u0629",
       // - Arabic seeds 2026-09-09 (tourism radar). Lifted from the `ar` labels already
       //   curated on every signal card in the radar content.ts files, so the
       //   wording is Irfan-reviewed, not machine-translated. Enabled by the
@@ -767,7 +761,7 @@ export const BEATS: Beat[] = [
       "de:Homeoffice", "de:Arbeitsmarkt", "de:Fachkr\u00e4ftemangel", "de:Lohnl\u00fccke",
       "de:Gewerkschaften", "de:berufliche Weiterbildung", "de:Hochschulbildung", "de:staatliche Universit\u00e4t",
       "de:Arbeitssicherheit", "de:Arbeitsproduktivit\u00e4t", "de:Handelspolitik", "de:Einfuhrz\u00f6lle",
-      "de:Digitalregulierung", "de:Datenschutzversto\u00df", "de:Wettbewerbsrecht", "de:Klimawandel",
+      "de:Digitalregulierung", "de:DSGVO", "de:Wettbewerbsrecht", "de:Klimawandel",
       "de:Ern\u00e4hrungssicherheit", "de:Inflation", "de:Staatsverschuldung", "de:bezahlbarer Wohnraum",
     ],
     blurb: "German-language coverage for future radars. Not offered in the beat picker.",
@@ -1314,7 +1308,7 @@ export const BEATS: Beat[] = [
       "th:\u0e23\u0e30\u0e1a\u0e1a\u0e02\u0e19\u0e2a\u0e48\u0e07\u0e2a\u0e32\u0e18\u0e32\u0e23\u0e13\u0e30", "th:\u0e23\u0e16\u0e44\u0e1f\u0e04\u0e27\u0e32\u0e21\u0e40\u0e23\u0e47\u0e27\u0e2a\u0e39\u0e07", "th:\u0e01\u0e32\u0e23\u0e08\u0e23\u0e32\u0e08\u0e23\u0e43\u0e19\u0e40\u0e21\u0e37\u0e2d\u0e07", "th:\u0e2a\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1a\u0e34\u0e19",
       "th:\u0e01\u0e32\u0e23\u0e17\u0e48\u0e2d\u0e07\u0e40\u0e17\u0e35\u0e48\u0e22\u0e27\u0e22\u0e31\u0e48\u0e07\u0e22\u0e37\u0e19", "th:\u0e18\u0e38\u0e23\u0e01\u0e34\u0e08\u0e42\u0e23\u0e07\u0e41\u0e23\u0e21", "th:\u0e01\u0e32\u0e23\u0e08\u0e2d\u0e07\u0e15\u0e31\u0e4b\u0e27\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e1a\u0e34\u0e19", "th:\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e14\u0e34\u0e08\u0e34\u0e17\u0e31\u0e25",
       "th:\u0e01\u0e32\u0e23\u0e41\u0e1e\u0e17\u0e22\u0e4c\u0e17\u0e32\u0e07\u0e44\u0e01\u0e25", "th:\u0e01\u0e32\u0e23\u0e17\u0e14\u0e25\u0e2d\u0e07\u0e17\u0e32\u0e07\u0e04\u0e25\u0e34\u0e19\u0e34\u0e01", "th:\u0e22\u0e35\u0e19\u0e1a\u0e33\u0e1a\u0e31\u0e14", "th:\u0e01\u0e32\u0e23\u0e41\u0e1e\u0e17\u0e22\u0e4c\u0e41\u0e21\u0e48\u0e19\u0e22\u0e33",
-      "th:\u0e01\u0e32\u0e23\u0e2a\u0e39\u0e07\u0e27\u0e31\u0e22\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e21\u0e35\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e", "th:\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e08\u0e34\u0e15", "th:\u0e2d\u0e38\u0e15\u0e2a\u0e32\u0e2b\u0e01\u0e23\u0e23\u0e21\u0e40\u0e20\u0e2a\u0e31\u0e0a\u0e01\u0e23\u0e23\u0e21", "th:\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e1e\u0e17\u0e22\u0e4c",
+      "th:\u0e01\u0e32\u0e23\u0e2a\u0e39\u0e07\u0e27\u0e31\u0e22\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e21\u0e35\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e", "th:\u0e2a\u0e38\u0e02\u0e20\u0e32\u0e1e\u0e08\u0e34\u0e15", "th:\u0e40\u0e20\u0e2a\u0e31\u0e0a\u0e01\u0e23\u0e23\u0e21", "th:\u0e40\u0e04\u0e23\u0e37\u0e48\u0e2d\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e1e\u0e17\u0e22\u0e4c",
       "th:\u0e1c\u0e34\u0e27\u0e2b\u0e19\u0e31\u0e07", "th:\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e0a\u0e32\u0e2a\u0e31\u0e21\u0e1e\u0e31\u0e19\u0e18\u0e4c", "th:\u0e42\u0e06\u0e29\u0e13\u0e32\u0e14\u0e34\u0e08\u0e34\u0e17\u0e31\u0e25", "th:\u0e2a\u0e37\u0e48\u0e2d\u0e21\u0e27\u0e25\u0e0a\u0e19",
       "th:\u0e40\u0e28\u0e23\u0e29\u0e10\u0e01\u0e34\u0e08\u0e04\u0e23\u0e35\u0e40\u0e2d\u0e40\u0e15\u0e2d\u0e23\u0e4c", "th:\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1a\u0e34\u0e14\u0e40\u0e1a\u0e37\u0e2d\u0e19", "th:\u0e0a\u0e37\u0e48\u0e2d\u0e40\u0e2a\u0e35\u0e22\u0e07\u0e41\u0e1a\u0e23\u0e19\u0e14\u0e4c", "th:\u0e40\u0e19\u0e37\u0e49\u0e2d\u0e2b\u0e32\u0e17\u0e35\u0e48\u0e2a\u0e23\u0e49\u0e32\u0e07\u0e14\u0e49\u0e27\u0e22\u0e40\u0e2d\u0e44\u0e2d", "th:\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e17\u0e32\u0e07\u0e44\u0e01\u0e25", "th:\u0e15\u0e25\u0e32\u0e14\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19",
       "th:\u0e01\u0e32\u0e23\u0e02\u0e32\u0e14\u0e41\u0e04\u0e25\u0e19\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19", "th:\u0e04\u0e27\u0e32\u0e21\u0e40\u0e2b\u0e25\u0e37\u0e48\u0e2d\u0e21\u0e25\u0e49\u0e33\u0e04\u0e48\u0e32\u0e08\u0e49\u0e32\u0e07", "th:\u0e2a\u0e2b\u0e20\u0e32\u0e1e\u0e41\u0e23\u0e07\u0e07\u0e32\u0e19", "th:\u0e2d\u0e32\u0e0a\u0e35\u0e27\u0e28\u0e36\u0e01\u0e29\u0e32",

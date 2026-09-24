@@ -15,6 +15,7 @@
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { ACTIVE_COVERAGE_VERSION } from "@/lib/signaliq/coverage-store";
+import { withoutProbeTopics } from "@/lib/signaliq/config";
 import { getHistorySummaries, radarHistoryGroups, type RadarHistorySource } from "@/lib/signaliq/history";
 import { mondayOf } from "@/lib/signaliq/seasonality";
 import { RETAIL_LENSES, type RetailLens, type RetailLiveTopic, type RetailRadarData } from "./types";
@@ -107,7 +108,7 @@ const emptyData = (): RetailRadarData => ({
  * ksa-retail seeds have not been scanned yet.
  */
 export async function getRetailRadarData(signals: RadarHistorySource[] = []): Promise<RetailRadarData> {
-  const topics = RETAIL_FOCUS.map((f) => f.topic);
+  const topics = withoutProbeTopics(RETAIL_FOCUS.map((f) => f.topic)); // seed gate
   const lensOf = new Map<string, RetailLens>(RETAIL_FOCUS.map((f) => [f.topic, f.lens]));
 
   try {

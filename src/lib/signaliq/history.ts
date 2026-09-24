@@ -24,6 +24,7 @@
  */
 import { createSupabaseServiceClient } from "@/lib/supabase";
 import { langOfTopic, summarizeHistory, type HistorySummary } from "./seasonality";
+import { withoutProbeTopics } from "./config";
 
 const HISTORY_TABLE = "signaliq_topic_history";
 const LANG_TABLE = "signaliq_lang_history";
@@ -205,6 +206,8 @@ export async function getHistorySummaries(
   now: Date = new Date(),
 ): Promise<Record<string, HistorySummary>> {
   const out: Record<string, HistorySummary> = {};
+  // Seed gate: a topic still on probation never feeds a history strip.
+  groups = groups.map((g) => ({ ...g, topics: withoutProbeTopics(g.topics) })).filter((g) => g.topics.length > 0);
   const all = groups.flatMap((g) => g.topics);
   if (all.length === 0) return out;
   try {

@@ -12,7 +12,7 @@
  */
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase";
-import { beatById } from "@/lib/signaliq/config";
+import { beatById, withoutProbeTopics } from "@/lib/signaliq/config";
 import { buildTopicMatchers } from "@/lib/signaliq/coverage/tokenize";
 import type { MoversData, MoverTopic } from "./types";
 
@@ -26,7 +26,7 @@ const MAX_ROWS = 8;
 const MAX_SPIKES = 6;
 
 /** Canonical, de-duped founder topics from the Founders / Series-A beat. */
-const FOUNDER_TOPICS: string[] = buildTopicMatchers(beatById("founders").seeds).map((m) => m.topic);
+const FOUNDER_TOPICS: string[] = withoutProbeTopics(buildTopicMatchers(beatById("founders").seeds).map((m) => m.topic)); // seed gate
 
 interface DailyRow {
   topic: string;
