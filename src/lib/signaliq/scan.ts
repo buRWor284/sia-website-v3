@@ -11,7 +11,7 @@
  * THAT company — so results are genuinely personalised, not just re-ordered.
  */
 import type { BeatId, Opportunity, ProfileExpansion, Signal } from "./types";
-import { BEAT_SLOTS, MAX_OPPORTUNITIES, MAX_SEEDS_PER_SCAN, beatById } from "./config";
+import { BEAT_SLOTS, MAX_OPPORTUNITIES, MAX_SEEDS_PER_SCAN, beatById, isProbeTopic } from "./config";
 import { SIGNAL_SOURCES } from "./sources";
 import { getStoredCoverage } from "./coverage-store";
 import { expandCompanyProfile } from "./profile";
@@ -98,7 +98,7 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
   for (const s of expansion?.seeds ?? []) {
     if (seedList.length >= 16) break;
     const k = s.toLowerCase();
-    if (seen.has(k)) continue;
+    if (seen.has(k) || isProbeTopic(s)) continue; // seed gate: unchecked seeds never become cards
     seen.add(k);
     seedList.push({ seed: s, tailored: true, beat: seedBeatOf.get(k) ?? primary });
   }
@@ -110,7 +110,7 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
     for (const s of beatById(b).seeds) {
       if (seedList.length >= MAX_SEEDS || taken >= quota) break;
       const k = s.toLowerCase();
-      if (seen.has(k)) continue;
+      if (seen.has(k) || isProbeTopic(s)) continue; // seed gate
       seen.add(k);
       seedList.push({ seed: s, tailored: false, beat: b });
       taken++;
@@ -183,7 +183,15 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
   const partial = failures > 0;
   if (expansion) {
     const n = seedList.filter((s) => s.tailored).length;
-    notes.push(`Personalised to your company — scored ${opportunities.length} relevant ${opportunities.length === 1 ? "topic" : "topics"} from ${n} tailored to you.`);
+    // Say how many actually fit (16 Sep 2026): with honest fit ratings a weak beat can
+    // return mostly low-fit topics, and "7 relevant topics" next to six LOW badges read false.
+    const good = opportunities.filter((o) => o.fit !== "low").length;
+    const count = `${opportunities.length} ${opportunities.length === 1 ? "topic" : "topics"}`;
+    notes.push(
+      good === opportunities.length
+        ? `Personalised to your company — scored ${count} from ${n} tailored to you.`
+        : `Personalised to your company — scored ${count} from ${n} tailored to you; ${good === 0 ? "none" : good} ${good === 1 ? "fits" : "fit"} you well.`,
+    );
   } else if (ctx) {
     notes.push("Couldn't tailor topics this time — showing the standard beat. Try again in a moment.");
   }
