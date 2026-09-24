@@ -64,8 +64,9 @@ export const WEIGHTS_V2 = {
 /** Layer-1 evidence-backed target bands (Appendix A). */
 export const L1_BANDS = {
   wordCount: { ideal: [100, 150] as [number, number], ok: [80, 200] as [number, number], hardMax: 250, warnMin: 60 },
-  // NOTE: `ideal` 6–9 is tuned for OPEN rate. Propel Q1'24 shows 1–5 words best for RESPONSE
-  // (3.88%); 6–9 is merely the most-sent band. Revisit if optimizing for replies (roadmap).
+  // NOTE: `ideal` 6-9 is tuned for OPEN rate. Propel shows 1-5 words best for RESPONSE
+  // (4.73%, Q2 2024 report; 3.88% in the Q1 2024 edition), and 6-9 was only the most-sent
+  // band in Q1 2024 (Q2 2024: 10-15 words). Revisit if optimizing for replies (roadmap).
   subjectWords: { ideal: [6, 9] as [number, number], ok: [4, 12] as [number, number] },
   readingGrade: { ideal: [0, 7] as [number, number], ok: [0, 9] as [number, number], penaltyAbove: 12 },
   questions: { ideal: 1, ok: [1, 3] as [number, number] },
@@ -211,8 +212,11 @@ export const EVIDENCE: Record<string, Evidence> = {
   // edition: the Q1 2024 page's 3.03% "top band" sits below its own 3.15% average.
   A1: { claim: "Pitch body length", figure: "51-150 words got the highest response (7.51%) vs a 3.43% average", source: "Propel Media Barometer, Q2 2024 report (405k+ pitches sent in Q1 2024)", url: "https://8352821.fs1.hubspotusercontent-na1.net/hubfs/8352821/Q2%202024%20Media%20Barometer.pdf",
     ticker: { stat: "7.51%", line: "response rate for pitches of 51-150 words, against a 3.43% average", sourceShort: "Propel Media Barometer, 405k+ pitches" } },
-  A2: { claim: "Subject-line length", figure: "Short wins: 1-5 words gives the highest response (3.88%); 6-9 words is the most-sent band (34.99%)", source: "Propel Media Barometer, Q1 2024 (425k+ pitches, Q4'23 data)", url: "https://www.propelmypr.com/research/the-propel-media-barometer---q1-2024",
-    ticker: { stat: "3.88%", line: "response rate for subject lines of 1-5 words, the best of any length", sourceShort: "Propel Media Barometer, 425k+ pitches" } },
+  // Moved to the Q2 2024 report 2026-09-24 (Irfan): same edition as A1, and the
+  // newer of the two. Q1 2024 said 3.88% / 6-9 most sent; Q2 2024 says 4.73% and
+  // 10-15 words most sent. Both are primary; we quote the newer one.
+  A2: { claim: "Subject-line length", figure: "Short wins: 1-5 words gives the highest response (4.73%); 10-15 words is the most-sent band (36.54%)", source: "Propel Media Barometer, Q2 2024 report (405k+ pitches sent in Q1 2024)", url: "https://8352821.fs1.hubspotusercontent-na1.net/hubfs/8352821/Q2%202024%20Media%20Barometer.pdf",
+    ticker: { stat: "4.73%", line: "response rate for subject lines of 1-5 words, the best of any length", sourceShort: "Propel Media Barometer, 405k+ pitches" } },
   A3: { claim: "Pitch length preference", figure: "69% of journalists prefer pitches under 200 words", source: "Muck Rack State of Journalism 2026 (n=897)", url: "https://media.muckrack.com/documents/State_of_Journalism_2026_1.pdf",
     ticker: { stat: "69%", line: "of journalists prefer pitches under 200 words", sourceShort: "Muck Rack State of Journalism 2026, n=897" } },
   A4: { claim: "Pitch length preference", figure: "58% prefer a pitch of 100-200 words (22% want under 100)", source: "Fractl pitching survey, 2019 (500+ journalists)", url: "https://www.frac.tl/work/marketing-research/2019-pitching-media-survey/" },
