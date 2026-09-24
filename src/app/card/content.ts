@@ -117,7 +117,7 @@ export const COPY = {
     dir: "rtl" as const,
     est: "منذ ٢٠٠٤، عالميًا",
     name: "سيد عرفان أجمل",
-    role: "الرئيس التنفيذي لـ DMR.agency",
+    role: "الرئيس التنفيذي لشركة DMR.agency",
     greetEvent: (n: string) => `سعدت بلقائك في ${n}.`,
     greet: "سعدت بلقائك.",
     promise: "حضور أقوى. وصول أوسع. كن الخيار.",
