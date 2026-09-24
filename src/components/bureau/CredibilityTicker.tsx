@@ -20,7 +20,7 @@ export const CredibilityTicker = () => {
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>GLOBAL CLIENTS · 4 CONTINENTS</span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
-        <span>$160K → $1.2M REVENUE · ORGANIC ONLY</span>
+        <span>$160K → $1.2M MONTHLY ORGANIC REVENUE</span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span className="sia-ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
       </span>
