@@ -15,7 +15,7 @@
  *   the WhatsApp prefill switch on automatically inside the date window and
  *   fall back to the generic line outside it.
  *
- * ★ ARABIC COPY: every string in the `ar` blocks needs a read by a Gulf
+ * ★ ARABIC COPY (tagline, role and est line reviewed by Aya Saleh, native Arabic marketer, 24 Sep 2026): every string in the `ar` blocks needs a read by a Gulf
  *   marketer before the cards are handed out. "Earned media" is deliberately
  *   NOT translated as a phrase (الإعلام المكتسب is a calque); the EMOS line
  *   describes what the platform does in plain words instead.
@@ -117,10 +117,10 @@ export const COPY = {
     dir: "rtl" as const,
     est: "منذ ٢٠٠٤، عالميًا",
     name: "سيد عرفان أجمل",
-    role: "الرئيس التنفيذي، DMR.agency",
+    role: "الرئيس التنفيذي لـ DMR.agency",
     greetEvent: (n: string) => `سعدت بلقائك في ${n}.`,
     greet: "سعدت بلقائك.",
-    promise: "احصل على التغطية. كن مرئيًا. كن الخيار الأول.",
+    promise: "حضور أقوى. وصول أوسع. كن الخيار.",
     sec1: "للتواصل",
     whatsapp: "راسلني على واتساب",
     save: "احفظ جهة الاتصال",
