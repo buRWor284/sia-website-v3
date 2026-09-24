@@ -232,9 +232,38 @@ export function ScanLoader() {
 }
 
 // ── info tooltip (click + hover + keyboard focus, works on mobile) ────────────
+// Only one is open at a time (Irfan, 24 Sep 2026: clicking a second (i) used to leave
+// the first open and the two overlapped). Opening one announces itself on the window;
+// every other tooltip hears that and closes. No context/provider needed, and a tooltip
+// rendered on any surface (cards, score panel, radar) joins in automatically.
+const TOOLTIP_OPEN_EVENT = "siq:tooltip-open";
+
 export function InfoTooltip({ text, dark = false, width = 270 }: { text: React.ReactNode; dark?: boolean; width?: number }) {
   const [open, setOpen] = useState(false);
   const tooltipId = `siq-tooltip-${useId()}`;
+
+  useEffect(() => {
+    if (!open) return;
+    const onOther = (e: Event) => {
+      if ((e as CustomEvent<string>).detail !== tooltipId) setOpen(false);
+    };
+    const onEscape = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener(TOOLTIP_OPEN_EVENT, onOther);
+    window.addEventListener("keydown", onEscape);
+    return () => {
+      window.removeEventListener(TOOLTIP_OPEN_EVENT, onOther);
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [open, tooltipId]);
+
+  /** Single entry point so every open path (click, hover, focus) closes the others. */
+  const show = (next: boolean) => {
+    setOpen(next);
+    if (next && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(TOOLTIP_OPEN_EVENT, { detail: tooltipId }));
+    }
+  };
+
   return (
     <span style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}>
       <span
@@ -242,14 +271,14 @@ export function InfoTooltip({ text, dark = false, width = 270 }: { text: React.R
         tabIndex={0}
         aria-describedby={open ? tooltipId : undefined}
         aria-label="More information"
-        onClick={(e) => { e.stopPropagation(); setOpen(v => !v); }}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={() => setOpen(false)}
+        onClick={(e) => { e.stopPropagation(); show(!open); }}
+        onMouseEnter={() => show(true)}
+        onMouseLeave={() => show(false)}
+        onFocus={() => show(true)}
+        onBlur={() => show(false)}
         onKeyDown={(e) => {
-          if (e.key === "Escape") { setOpen(false); (e.currentTarget as HTMLElement).blur(); }
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setOpen(v => !v); }
+          if (e.key === "Escape") { show(false); (e.currentTarget as HTMLElement).blur(); }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(!open); }
         }}
         style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
