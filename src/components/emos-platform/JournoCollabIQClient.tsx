@@ -25,6 +25,13 @@ import { DrAttribution } from "@/components/coverageiq/primitives";
 import type { DbJournalist, CreateJournalistInput } from "@/lib/coverageiq/types";
 import { beatToTags } from "@/lib/journo/beat-tags";
 import Markdown from "@/components/emos-platform/Markdown";
+import {
+  applyVerification,
+  formatBylineDate,
+  normaliseDomain,
+  verificationRank,
+  type JournalistVerification,
+} from "@/lib/journo/verification-shared";
 
 /** Journalist names are matched across two sources that share no id: an AI
  *  suggestion and a stored CRM row. Case and stray whitespace differ often
@@ -92,7 +99,29 @@ interface AIJournalist {
   contact: string;
   contactLinkedIn: string;
   seoNote: string;
-  tier: "A" | "B" | "C";
+  /** "A" | "B" | "C" when verified; "unverified" when no recent byline was
+   *  found (P1-01, 2026-09-25). A tier letter is only ever shown with a byline. */
+  tier: string;
+  aiTier?: string;
+  /** The outlet domain the AI gave, when the byline showed the real one. */
+  statedOutlet?: string;
+  verification?: JournalistVerification;
+}
+
+/** Ask the server to check one journalist. `force` = the free Re-verify. */
+async function requestVerification(j: AIJournalist, force: boolean): Promise<JournalistVerification | { error: string }> {
+  try {
+    const res = await fetch("/api/emos-platform/journo-verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: j.name, outlet: j.statedOutlet ?? j.url, beat: j.beat ?? null, force }),
+    });
+    const data = (await res.json().catch(() => ({}))) as { verification?: JournalistVerification; error?: string };
+    if (!res.ok || !data.verification) return { error: data.error ?? "The check could not run just now." };
+    return data.verification;
+  } catch {
+    return { error: "Network error. Please try again." };
+  }
 }
 
 // ── Story form ─────────────────────────────────────────────────────────────────
@@ -253,6 +282,7 @@ function JournalistCard({
   companyId,
   companyName,
   assetId,
+  onVerification,
 }: {
   j: AIJournalist;
   formData: Record<string, string>;
@@ -265,8 +295,30 @@ function JournalistCard({
   companyId?: string | null;
   companyName?: string | null;
   assetId?: string | null;
+  /** A fresh check came back (Re-verify). The parent folds it into the list. */
+  onVerification: (v: JournalistVerification) => void;
 }) {
   const [saving, startSave] = useTransition();
+  const v = j.verification;
+  // No verification at all only happens for a response from before the
+  // check existed: treat it as not checked, never as verified.
+  const status = v?.status ?? "check_failed";
+  const isVerified = status === "verified";
+  const [reverifying, setReverifying] = useState(false);
+  const [reverifyError, setReverifyError] = useState<string | null>(null);
+  const outletDomain = normaliseDomain(j.url);
+  const outletHref = outletDomain ? `https://${outletDomain}` : null;
+
+  async function reverify() {
+    setReverifyError(null);
+    setReverifying(true);
+    const r = await requestVerification(j, true);
+    setReverifying(false);
+    if ("error" in r) { setReverifyError(r.error); return; }
+    // A technical failure must not wipe a good earlier result.
+    if (r.status === "check_failed") { setReverifyError(r.note ?? "The check could not run just now. Try again in a minute."); return; }
+    onVerification(r);
+  }
   const [angle, setAngle] = useState<string | null>(null);
   const [loadingAngle, setLoadingAngle] = useState(false);
   const [angleError, setAngleError] = useState<string | null>(null);
@@ -326,7 +378,10 @@ function JournalistCard({
         email: null,
         twitter_handle: j.contact?.startsWith("@") ? j.contact : null,
         domain_rating: parsedDr,
-        notes: j.why,
+        // 2026-09-25 (P1-01): the list records what the byline check found.
+        notes: isVerified
+          ? [j.why, v?.bylineUrl ? `Byline: ${v.bylineUrl}${v.bylineDate ? ` (${v.bylineDate})` : ""}` : ""].filter(Boolean).join("\n\n")
+          : `Unverified: no recent byline found under this name at ${j.url}${v?.checkedAt ? ` (checked ${formatBylineDate(v.checkedAt)})` : ""}. Confirm on the outlet's site before pitching.`,
         data_source: "JournoCollabIQ",
         // 2026-09-09 (state layer phase 5): record WHY this journalist is being
         // saved. Without this a journalist found for the KSA retail radar is
@@ -378,14 +433,108 @@ function JournalistCard({
       <div style={{ background: INK, padding: "10px 16px", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <span style={{ fontFamily: GROT, fontWeight: 900, fontSize: 11, letterSpacing: ".08em", color: PAPER }}>{j.name}</span>
         <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".08em", color: "rgba(241,235,222,.55)" }}>{j.url}</span>
-        <span style={{ marginLeft: "auto", fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: tc, border: `1px solid ${tc}`, padding: "2px 7px" }}>
-          TIER {j.tier}
+        <span style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+          {isVerified && (
+            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: PAPER, background: GREEN, padding: "3px 7px" }}>
+              ✓ Verified{v?.bylineDate ? ` · byline ${formatBylineDate(v.bylineDate)}` : ""}
+            </span>
+          )}
+          {status === "unverified" && (
+            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: INK, background: AMBER, padding: "3px 7px" }}>
+              Name not confirmed
+            </span>
+          )}
+          {status === "pending" && (
+            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: "rgba(241,235,222,.7)", border: "1px solid rgba(241,235,222,.35)", padding: "2px 7px" }}>
+              Checking byline…
+            </span>
+          )}
+          {status === "check_failed" && (
+            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: AMBER, border: `1px solid ${AMBER}`, padding: "2px 7px" }}>
+              Not checked
+            </span>
+          )}
+          {/* A tier letter only ever appears next to a byline. */}
+          {isVerified && (
+            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: ".16em", textTransform: "uppercase", color: tc, border: `1px solid ${tc}`, padding: "2px 7px" }}>
+              TIER {j.tier}
+            </span>
+          )}
         </span>
       </div>
 
       {/* Body */}
       <div style={{ padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.55 }}>{j.why}</p>
+        {isVerified && j.why && (
+          <p style={{ margin: 0, fontFamily: SERIF, fontSize: 14, color: INK70, lineHeight: 1.55 }}>{j.why}</p>
+        )}
+
+        {/* Byline check (P1-01, 2026-09-25) */}
+        {isVerified && v && (
+          <div style={{ borderLeft: `2px solid ${GREEN}`, paddingLeft: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontFamily: MONO, fontSize: 9.5, color: INK70, lineHeight: 1.5 }}>
+              Last byline seen {formatBylineDate(v.bylineDate) || "date unknown"}
+              {v.bylineTitle ? <> · <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12 }}>&ldquo;{v.bylineTitle}&rdquo;</span></> : null}
+              {v.roleAsOf ? <> · {v.roleAsOf}</> : null}
+            </div>
+            {j.statedOutlet && (
+              <div style={{ fontFamily: MONO, fontSize: 9, color: INK55 }}>
+                Outlet corrected: the list said {j.statedOutlet}; the byline is on {j.url}.
+              </div>
+            )}
+            <div style={{ fontFamily: MONO, fontSize: 9, color: INK55, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <span>{v.cached ? "Verified earlier (cached)" : "Checked just now"}{v.checkedAt ? ` · ${formatBylineDate(v.checkedAt)}` : ""}</span>
+              <button onClick={reverify} disabled={reverifying}
+                style={{ background: "none", border: "none", padding: 0, fontFamily: MONO, fontSize: 9, fontWeight: 700, color: BLUE, cursor: reverifying ? "wait" : "pointer" }}>
+                {reverifying ? "Re-verifying… a few seconds" : "↻ Re-verify (free)"}
+              </button>
+            </div>
+            {v.cached && (
+              <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55, lineHeight: 1.45 }}>
+                A cached check is instant and free but can be up to 30 days old. If the byline date looks stale, Re-verify: it is free and catches a recent move.
+              </div>
+            )}
+          </div>
+        )}
+
+        {status === "unverified" && (
+          <div style={{ border: `1px solid ${AMBER}`, background: "rgba(217,146,17,.07)", padding: "10px 12px", display: "flex", flexDirection: "column", gap: 6 }}>
+            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.55 }}>
+              No recent byline found under this name at {j.url}. Best route: find the right reporter yourself on{" "}
+              {outletHref
+                ? <a href={outletHref} target="_blank" rel="noopener noreferrer" style={{ color: BLUE }}>{outletDomain} ↗</a>
+                : "the outlet's site"}
+              , since pitches to a named person get better responses. If you can&apos;t, pitching the desk is the fallback and typically gets fewer replies.
+            </p>
+            {v?.note && (
+              <div style={{ fontFamily: MONO, fontSize: 9, color: INK55, lineHeight: 1.5 }}>What the check found: {v.note}</div>
+            )}
+            <div style={{ fontFamily: MONO, fontSize: 9, color: INK55, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <span>{v?.cached ? "Checked earlier (cached)" : "Checked just now"}{v?.checkedAt ? ` · ${formatBylineDate(v.checkedAt)}` : ""}</span>
+              <button onClick={reverify} disabled={reverifying}
+                style={{ background: "none", border: "none", padding: 0, fontFamily: MONO, fontSize: 9, fontWeight: 700, color: BLUE, cursor: reverifying ? "wait" : "pointer" }}>
+                {reverifying ? "Re-verifying… a few seconds" : "↻ Re-verify (free)"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {status === "pending" && (
+          <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
+            Checking for a byline at {j.url} in the last 12 months. This takes a few seconds.
+          </div>
+        )}
+
+        {status === "check_failed" && (
+          <div style={{ fontFamily: SERIF, fontSize: 13, color: INK70, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "baseline" }}>
+            <span>The byline check could not run just now, so this name is not confirmed yet.</span>
+            <button onClick={reverify} disabled={reverifying}
+              style={{ background: "none", border: "none", padding: 0, fontFamily: MONO, fontSize: 9, fontWeight: 700, color: BLUE, cursor: reverifying ? "wait" : "pointer" }}>
+              {reverifying ? "Checking… a few seconds" : "↻ Check again (free)"}
+            </button>
+          </div>
+        )}
+        {reverifyError && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: RED }}>{reverifyError}</div>}
 
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
           {j.seoNote && (
@@ -396,8 +545,8 @@ function JournalistCard({
               Contact: {j.contact} · <a href={j.contactLinkedIn ? `https://${j.contactLinkedIn.replace(/^https?:\/\//, "")}` : `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(j.name)}`} target="_blank" rel="noopener noreferrer" style={{ color: BLUE, textDecoration: "none" }}>{j.contactLinkedIn ? "LinkedIn ↗" : "Find on LinkedIn ↗"}</a>
             </span>
           )}
-          {j.linkPage && j.linkPage !== "" && (
-            <a href={j.linkPage} target="_blank" rel="noopener noreferrer"
+          {isVerified && j.linkPage && j.linkPage !== "" && (
+            <a href={j.linkPage} target="_blank" rel="noopener noreferrer" title={v?.bylineTitle ?? undefined}
               style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}>
               Recent coverage ↗
             </a>
@@ -482,7 +631,8 @@ function JournalistCard({
 
         {/* Actions */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {!angle && (
+          {/* The angle names the journalist, so it is offered for verified people only. */}
+          {!angle && isVerified && (
             <button onClick={getAngle} disabled={loadingAngle}
               style={{ padding: "8px 16px", border: `1px solid ${INK15}`, background: PAPER2, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", cursor: loadingAngle ? "wait" : "pointer" }}>
               {loadingAngle ? "Generating…" : "Get pitch angle →"}
@@ -490,7 +640,7 @@ function JournalistCard({
           )}
           <button onClick={handleSave} disabled={saving || alreadySaved}
             style={{ padding: "8px 16px", border: "none", background: alreadySaved ? PAPER2 : YEL, color: alreadySaved ? INK55 : INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", cursor: alreadySaved ? "default" : saving ? "wait" : "pointer" }}>
-            {saving ? "Saving…" : alreadySaved ? "✓ Saved to list" : "Save to list →"}
+            {saving ? "Saving…" : alreadySaved ? "✓ Saved to list" : isVerified ? "Save to list →" : "Save as unverified →"}
           </button>
         </div>
       </div>
@@ -789,7 +939,7 @@ function CRMList({ journalists, onDelete, onRefreshDr, refreshingDr, refreshNote
 const LOADING_LINES = [
   { h: "Scanning coverage on your beat…",    s: "Finding who's writing about this topic now." },
   { h: "Matching reporters to your story…",  s: "Ranking by beat fit and recent coverage." },
-  { h: "Checking outlet authority & reach…", s: "Only surfacing journalists worth your time." },
+  { h: "Checking each name for a recent byline…", s: "Anyone without one in the last 12 months is flagged, not ranked." },
   { h: "Profiling how to reach them…",       s: "Handles and section desks — verify before pitching." },
   { h: "Almost there.",                      s: "Compiling a media list that would take an agency a week." },
 ];
@@ -862,6 +1012,11 @@ export default function JournoCollabIQClient({
   const [savedNames, setSavedNames] = useState<Set<string>>(
     () => new Set(initialJournalists.map(j => normaliseName(j.name))),
   );
+  const counts = {
+    verified:   results?.filter((j) => j.verification?.status === "verified").length ?? 0,
+    unverified: results?.filter((j) => j.verification?.status === "unverified").length ?? 0,
+    checking:   results?.filter((j) => j.verification?.status === "pending").length ?? 0,
+  };
   const [brief, setBrief] = useState<string | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
   const [briefError, setBriefError] = useState<string | null>(null);
@@ -918,6 +1073,8 @@ export default function JournoCollabIQClient({
       const data = await res.json() as { result?: string; error?: string };
       if (!res.ok || data.error) { setSearchError(data.error ?? "Search failed."); return; }
 
+      // The server now returns clean JSON (parse hardened there, 2026-09-25);
+      // this strip stays as a harmless fallback.
       const raw = data.result?.trim() ?? "";
       // Strip markdown fences if present
       const json = raw.startsWith("```") ? raw.replace(/^```[a-z]*\n?/i, "").replace(/```$/, "").trim() : raw;
@@ -928,16 +1085,33 @@ export default function JournoCollabIQClient({
       // false. Sort is stable, so the model's own ordering is preserved inside
       // each tier — that within-tier order IS its fit ranking, and this only
       // fixes the tier grouping around it.
-      const TIER_RANK: Record<string, number> = { A: 0, B: 1, C: 2 };
-      setResults([...parsed].sort(
-        (a, b) => (TIER_RANK[a.tier] ?? 9) - (TIER_RANK[b.tier] ?? 9),
-      ));
+      // 2026-09-25 (P1-01): verified people first by tier, then names still
+      // being checked, then names not confirmed.
+      const sorted = [...parsed].sort((a, b) => verificationRank(a) - verificationRank(b));
+      setResults(sorted);
+      // Checks that did not land inside the search route come back "pending";
+      // fill them in one call each (cache first on the server, so free if the
+      // route's late check already landed).
+      sorted.forEach((j) => {
+        if (j.verification?.status !== "pending") return;
+        void requestVerification(j, false).then((r) => {
+          const v: JournalistVerification = "error" in r
+            ? { ...j.verification!, status: "check_failed", note: r.error }
+            : r;
+          updateVerification(j.name, v);
+        });
+      });
     } catch (e) {
       console.error("journo search error:", e);
       setSearchError("Could not parse journalist results. Please try again.");
     } finally {
       setSearching(false);
     }
+  }
+
+  /** Fold a fresh check into the result list, matched by name. */
+  function updateVerification(name: string, v: JournalistVerification) {
+    setResults((prev) => prev?.map((c) => (c.name === name ? applyVerification(c, v) : c)) ?? prev);
   }
 
   async function generateBrief() {
@@ -1001,16 +1175,37 @@ export default function JournoCollabIQClient({
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase" }}>
-                {results.length} journalists found
+                {counts.verified} verified · {counts.unverified} name not confirmed{counts.checking > 0 ? ` · ${counts.checking} checking` : ""}
               </span>
               <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-                Ranked by fit · verify before pitching
+                Verified = a byline at the outlet in the last 12 months · ranked by fit
               </span>
             </div>
             <button onClick={generateBrief} disabled={loadingBrief}
               style={{ padding: "8px 16px", border: `1px solid ${INK15}`, background: PAPER2, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", cursor: loadingBrief ? "wait" : "pointer" }}>
               {loadingBrief ? "Generating…" : "Generate media brief →"}
             </button>
+          </div>
+
+          {/* How the names were checked: the three routes, plainly (decision 5, 25 Sep). */}
+          <div style={{ border: `1px solid ${INK}`, background: PAPER, marginBottom: 16 }}>
+            <div style={{ background: INK, padding: "6px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".16em", textTransform: "uppercase", color: PAPER }}>How these names were checked</span>
+              <span style={{ fontFamily: MONO, fontSize: 8.5, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>byline · last 12 months</span>
+            </div>
+            <p style={{ margin: 0, padding: "10px 12px 8px", fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.55 }}>
+              Every name was searched for a byline at the outlet in the last 12 months. Names with one are marked Verified and link to that article. Names without one are marked Name not confirmed and get no tier.
+            </p>
+            {([
+              ["Verified earlier (cached)", "Instant, free and stable from one search to the next. The check can be up to 30 days old, and a journalist may have changed beat or outlet since, so look at the last byline seen date."],
+              ["↻ Re-verify", "A fresh check on one person, right now. Free, takes a few seconds, catches a recent move. Nothing else on the list changes."],
+              ["New search", "Finds new people. Uses one search from your monthly allowance, takes 30 to 60 seconds, and the list can differ from the last run."],
+            ] as [string, string][]).map(([label, text]) => (
+              <div key={label} style={{ display: "flex", gap: 12, padding: "8px 12px", borderTop: `1px solid ${INK15}`, alignItems: "baseline", flexWrap: "wrap" }}>
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK, minWidth: 170 }}>{label}</span>
+                <span style={{ flex: 1, minWidth: 220, fontFamily: SERIF, fontSize: 12.5, color: INK70, lineHeight: 1.5 }}>{text}</span>
+              </div>
+            ))}
           </div>
 
           <div style={{ display: "flex", gap: 9, alignItems: "flex-start", background: "rgba(245,184,31,.07)", border: `1px solid rgba(245,184,31,.3)`, padding: "10px 13px", marginBottom: 16 }}>
@@ -1044,6 +1239,7 @@ export default function JournoCollabIQClient({
               companyId={companyCtx?.company?.id ?? null}
               companyName={companyCtx?.company?.name ?? null}
               assetId={prefillAssetId ?? null}
+              onVerification={(v) => updateVerification(j.name, v)}
             />
           ))}
 
@@ -1054,6 +1250,10 @@ export default function JournoCollabIQClient({
                 <span style={{ fontFamily: MONO, fontSize: 9, color: INK55 }}>{l}</span>
               </span>
             ))}
+            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ color: INK, background: AMBER, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", padding: "2px 7px" }}>Name not confirmed</span>
+              <span style={{ fontFamily: MONO, fontSize: 9, color: INK55 }}>No byline found in the last 12 months · no tier</span>
+            </span>
           </div>
         </div>
       )}
