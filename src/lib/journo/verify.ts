@@ -48,6 +48,24 @@ const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 export const JOURNO_VERIFY_MODEL = process.env.JOURNO_VERIFY_MODEL ?? "claude-haiku-4-5";
 const WEB_SEARCH_TOOL = process.env.JOURNO_VERIFY_SEARCH_TOOL ?? "web_search_20250305";
 const MAX_SEARCHES = 2;
+/**
+ * One page read allowed (added after eval run 1, 25 Sep): searches for a
+ * byline mostly return the journalist's AUTHOR PAGE, whose search snippet
+ * carries no date, so real people (Austyn Allison, editor of Campaign ME)
+ * failed the 12-month rule. Reading that page once shows the latest dated
+ * article. No per-use fee (token cost only). JOURNO_VERIFY_FETCH_TOOL=off
+ * disables it; an API rejection of the tool falls back to search-only.
+ */
+const WEB_FETCH_TOOL = process.env.JOURNO_VERIFY_FETCH_TOOL ?? "web_fetch_20250910";
+const WEB_FETCH_BETA = "web-fetch-2025-09-10";
+const MAX_FETCHES = 1;
+/**
+ * Stored in the row's `model` column and required on cache reads, so a
+ * change to how checks are made retires older answers without deleting them.
+ * v1 = search only (25 Sep, eval run 1: real people missed). v2 = + one page read.
+ * Bump the suffix whenever the prompt, tools or rules change.
+ */
+export const CHECKER_ID = `${JOURNO_VERIFY_MODEL}|v2${WEB_FETCH_TOOL === "off" ? "-nofetch" : ""}`;
 /** Per-candidate ceiling. The search route runs these in parallel after Opus. */
 const DEFAULT_TIMEOUT_MS = 25_000;
 
@@ -119,6 +137,7 @@ export async function readCachedVerification(name: string, outlet: string): Prom
       .select("name, outlet, byline_domain, verified, byline_url, byline_title, byline_date, role_as_of, note, checked_at, searches_used")
       .eq("name_key", key)
       .eq("outlet_domain", domain)
+      .eq("model", CHECKER_ID)
       .gt("checked_at", since)
       .order("checked_at", { ascending: false })
       .limit(1)
@@ -141,9 +160,10 @@ Outlet (the domain may be approximate or wrong): ${input.outlet}
 Beat: ${input.beat || "not given"}
 
 Use web search to find ONE article with this person's byline at this outlet, published on or after ${iso(earliest)}. Search for the person's name together with the outlet's name.
+If the search only finds their author or profile page on the outlet and you have a page-fetch tool, fetch that page once and take their most recent dated article from it.
 
 Rules:
-- Only report an article that appeared in your search results. Copy its URL exactly. Never build or guess a URL.
+- Only report an article that appeared in your search results or on a page you fetched. Copy its URL exactly. Never build or guess a URL. If the fetched author page shows a recent dated article but no link to it, report the author page URL and that article's title and date.
 - The byline must be this person. An article that only quotes or mentions them does not count.
 - If the byline is at a DIFFERENT publication, set same_outlet to false and say in "note" where you found them.
 - If you cannot confirm a publish date on or after ${iso(earliest)}, set verified to false.
@@ -223,19 +243,37 @@ export async function verifyJournalist(
 
   const today = new Date();
   let json: SearchResponse;
-  try {
-    const res = await fetch(ANTHROPIC_API, {
+  const useFetch = WEB_FETCH_TOOL !== "off";
+  const call = (withFetch: boolean) =>
+    fetch(ANTHROPIC_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        ...(withFetch ? { "anthropic-beta": WEB_FETCH_BETA } : {}),
+      },
       body: JSON.stringify({
         model: JOURNO_VERIFY_MODEL,
         max_tokens: 700,
-        tools: [{ type: WEB_SEARCH_TOOL, name: "web_search", max_uses: MAX_SEARCHES }],
+        tools: [
+          { type: WEB_SEARCH_TOOL, name: "web_search", max_uses: MAX_SEARCHES },
+          ...(withFetch ? [{ type: WEB_FETCH_TOOL, name: "web_fetch", max_uses: MAX_FETCHES, max_content_tokens: 12000 }] : []),
+        ],
         messages: [{ role: "user", content: buildPrompt({ ...input, name, outlet: outletDomain }, today) }],
       }),
       signal: AbortSignal.timeout(opts?.timeoutMs ?? DEFAULT_TIMEOUT_MS),
     });
+  try {
+    let res = await call(useFetch);
     json = (await res.json().catch(() => ({}))) as SearchResponse;
+    if (!res.ok && useFetch && res.status === 400) {
+      // The fetch tool was refused (model/version support): search-only.
+      const msg = (json as { error?: { message?: string } })?.error?.message ?? "";
+      console.warn(`[journo-verify] fetch tool refused, retrying search-only: ${msg}`);
+      res = await call(false);
+      json = (await res.json().catch(() => ({}))) as SearchResponse;
+    }
     if (!res.ok) {
       const msg = (json as { error?: { message?: string } })?.error?.message ?? `HTTP ${res.status}`;
       console.error(`[journo-verify] API error for "${name}" @ ${outletDomain}: ${msg}`);
@@ -250,15 +288,27 @@ export async function verifyJournalist(
   await recordAiUsage("journo-verify", JOURNO_VERIFY_MODEL, json);
   const searchesUsed = json.usage?.server_tool_use?.web_search_requests ?? 0;
 
-  // Every URL the search really returned. A byline must be one of these.
+  // Every URL the tools really returned: search results, any fetched page,
+  // and links written inside a fetched page. A byline must be one of these.
   const seen = new Set<string>();
+  let fetchedText = "";
   let searchOk = 0;
   for (const b of json.content ?? []) {
-    if (b.type !== "web_search_tool_result") continue;
-    if (Array.isArray(b.content)) {
+    if (b.type === "web_search_tool_result" && Array.isArray(b.content)) {
       searchOk++;
       for (const r of b.content as Array<{ url?: string }>) if (r?.url) seen.add(urlKey(r.url));
     }
+    if (b.type === "web_fetch_tool_result") {
+      const c = b.content as { type?: string; url?: string; content?: { source?: { data?: unknown } } } | undefined;
+      if (c?.type === "web_fetch_result") {
+        if (c.url) seen.add(urlKey(c.url));
+        const data = c.content?.source?.data;
+        if (typeof data === "string") fetchedText += data;
+      }
+    }
+  }
+  if (fetchedText) {
+    for (const m of fetchedText.matchAll(/https?:\/\/[^\s)\]"'<>]+/g)) seen.add(urlKey(m[0]));
   }
   if (searchOk === 0) return failed(input, "The web search did not run, so nothing was checked.", searchesUsed);
 
@@ -297,7 +347,7 @@ export async function verifyJournalist(
     role_as_of: str(ans.role_as_of) || null,
     note: note ? note.slice(0, 500) : null,
     searches_used: searchesUsed,
-    model: JOURNO_VERIFY_MODEL,
+    model: CHECKER_ID,
   };
 
   let checkedAt = new Date().toISOString();

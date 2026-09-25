@@ -407,8 +407,19 @@ export function verifyCandidates(
       !!x && typeof x === "object" && typeof (x as { name?: unknown }).name === "string",
   );
 
+  // The list may name a desk instead of a person ("Rapid TV News / Arab Media
+  // Forum desk"). There is no byline to find, so no search is spent: it comes
+  // back not confirmed, with the find-the-reporter fallback.
+  const isDesk = (n: string) => /\bdesk\b|\/|\bnewsroom\b|\beditorial team\b/i.test(n);
   const checks = candidates.map((c) =>
-    verifyJournalist({ name: c.name, outlet: String(c.url ?? ""), beat: (c as { beat?: string }).beat ?? opts.beat ?? null }),
+    isDesk(c.name)
+      ? Promise.resolve<JournalistVerification>({
+          ...pendingVerification(c.name, String(c.url ?? "")),
+          status: "unverified",
+          note: "This entry is a desk, not a named person.",
+          checkedAt: new Date().toISOString(),
+        })
+      : verifyJournalist({ name: c.name, outlet: String(c.url ?? ""), beat: (c as { beat?: string }).beat ?? opts.beat ?? null }),
   );
   const inFlight = Promise.allSettled(checks);
 
