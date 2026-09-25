@@ -18,6 +18,13 @@
 
 import { recordAiUsage } from "@/lib/ai-usage";
 import { briefPromptBlock } from "@/lib/company-brief-prompt";
+import { verifyJournalist } from "@/lib/journo/verify";
+import {
+  applyVerification,
+  pendingVerification,
+  type JournalistVerification,
+  type VerifiableCandidate,
+} from "@/lib/journo/verification-shared";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -164,6 +171,29 @@ export function stripFences(s: string): string {
 }
 
 /**
+ * The journalist list as an array, or null. Hardened 2026-09-25 after a live
+ * "Could not parse journalist results": fences stripped first, then, if the
+ * model added a sentence before or after the array, the outermost [...] is
+ * tried. Returns null only when no array can be read at all.
+ */
+export function parseCandidateArray(raw: string): unknown[] | null {
+  const tryParse = (t: string): unknown[] | null => {
+    try {
+      const v = JSON.parse(t);
+      return Array.isArray(v) ? v : null;
+    } catch {
+      return null;
+    }
+  };
+  const clean = stripFences(raw.trim());
+  const direct = tryParse(clean);
+  if (direct) return direct;
+  const a = clean.indexOf("[");
+  const b = clean.lastIndexOf("]");
+  return a >= 0 && b > a ? tryParse(clean.slice(a, b + 1)) : null;
+}
+
+/**
  * Clamp the model's JSON array of journalist matches to `limit` rows for the
  * caller's tier. The withheld rows never leave the server, so there is nothing
  * to scrape from the payload and no fake scarcity — the matches are real, just
@@ -171,9 +201,8 @@ export function stripFences(s: string): string {
  * unknown) so a formatting hiccup never blanks a genuine result.
  */
 export function clampResults(raw: string, limit: number): { text: string; total: number; revealed: number } {
-  let arr: unknown;
-  try { arr = JSON.parse(stripFences(raw)); } catch { return { text: raw, total: -1, revealed: -1 }; }
-  if (!Array.isArray(arr)) return { text: raw, total: -1, revealed: -1 };
+  const arr = parseCandidateArray(raw);
+  if (!arr) return { text: raw, total: -1, revealed: -1 };
   const total = arr.length;
   if (!Number.isFinite(limit) || total <= limit) {
     return { text: JSON.stringify(arr), total, revealed: total };
@@ -245,9 +274,8 @@ export function handleMatchesName(name: string, handleOrSlug: string): boolean {
  * their name is lost too; that is the cheaper mistake. Fails open on bad JSON.
  */
 export function scrubContacts(raw: string): string {
-  let arr: unknown;
-  try { arr = JSON.parse(stripFences(raw)); } catch { return raw; }
-  if (!Array.isArray(arr)) return raw;
+  const arr = parseCandidateArray(raw);
+  if (!arr) return raw;
   const cleaned = arr.map((item) => {
     if (!item || typeof item !== "object") return item;
     const j = { ...(item as Record<string, unknown>) };
@@ -323,7 +351,9 @@ export async function runJournoAI(
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: type === "partner-suggestions" ? 3000 : 1500,
+        // 3000 -> 4000 (2026-09-25): eight long entries can run past 3000,
+        // and a truncated array is one of the ways the list failed to parse.
+        max_tokens: type === "partner-suggestions" ? 4000 : 1500,
         messages: [{ role: "user", content: prompt }],
       }),
     });
@@ -333,8 +363,9 @@ export async function runJournoAI(
       return { ok: false, status: res.status, error: err?.error?.message || `Anthropic API error ${res.status}` };
     }
 
-    const json = (await res.json()) as { content?: Array<{ type: string; text: string }> };
+    const json = (await res.json()) as { content?: Array<{ type: string; text: string }>; stop_reason?: string };
     await recordAiUsage("journo-ai", MODEL, json); // cost log (stage 3)
+    if (json.stop_reason === "max_tokens") console.warn(`[journo-ai] ${type}: output hit max_tokens (truncated)`);
     const result = (json.content ?? [])
       .filter((b) => b.type === "text")
       .map((b) => b.text)
@@ -347,4 +378,60 @@ export async function runJournoAI(
     console.error("[journo-ai] runJournoAI error:", e);
     return { ok: false, status: 500, error: "Internal server error." };
   }
+}
+
+/**
+ * Journalist verification (bug P1-01, 2026-09-25). DASHBOARD ONLY: the public
+ * /tools lead magnet is feature-frozen and does not call this.
+ *
+ * Every candidate from the Opus list is checked in parallel by
+ * verifyJournalist (cache first, else a fast model with web_search, max 2
+ * searches). A candidate whose check has not landed by `deadlineMs` goes back
+ * as "pending" and the card fills it in through /api/emos-platform/journo-verify,
+ * so the route never runs into its 60s cap. A check that failed technically
+ * also goes back as pending, so the card retries it once.
+ *
+ * Returns null when the list cannot be read at all (the route then releases
+ * the search from the allowance). `inFlight` settles when every check has
+ * finished; the route hands it to after() so late checks still land in the
+ * cache for the card's follow-up call to find.
+ */
+export function verifyCandidates(
+  raw: string,
+  opts: { deadlineMs: number; beat?: string | null },
+): Promise<{ result: string; inFlight: Promise<unknown>; stats: { verified: number; unverified: number; pending: number; cached: number } } | null> {
+  const arr = parseCandidateArray(raw);
+  if (!arr) return Promise.resolve(null);
+  const candidates = arr.filter(
+    (x): x is VerifiableCandidate & Record<string, unknown> =>
+      !!x && typeof x === "object" && typeof (x as { name?: unknown }).name === "string",
+  );
+
+  const checks = candidates.map((c) =>
+    verifyJournalist({ name: c.name, outlet: String(c.url ?? ""), beat: (c as { beat?: string }).beat ?? opts.beat ?? null }),
+  );
+  const inFlight = Promise.allSettled(checks);
+
+  const wait = Math.max(0, opts.deadlineMs - Date.now());
+  const PENDING = Symbol("pending");
+  let handle: ReturnType<typeof setTimeout> | undefined;
+  const timer = new Promise<typeof PENDING>((r) => { handle = setTimeout(() => r(PENDING), wait); });
+
+  return Promise.all(checks.map((p) => Promise.race([p, timer]))).then((outcomes) => {
+    clearTimeout(handle);
+    const stats = { verified: 0, unverified: 0, pending: 0, cached: 0 };
+    const out = candidates.map((c, i) => {
+      const o = outcomes[i];
+      let v: JournalistVerification;
+      if (o === PENDING) v = pendingVerification(c.name, String(c.url ?? ""));
+      else if (o.status === "check_failed") v = { ...o, status: "pending" };
+      else v = o;
+      if (v.status === "verified") stats.verified++;
+      else if (v.status === "unverified") stats.unverified++;
+      else stats.pending++;
+      if (v.cached) stats.cached++;
+      return applyVerification({ ...c, aiTier: c.tier }, v);
+    });
+    return { result: JSON.stringify(out), inFlight, stats };
+  });
 }

@@ -10,9 +10,9 @@
  * Same request shape as /api/journo-ai (minus the preview-gate response fields).
  * POST body: { type: "partner-suggestions" | "email-writer" | "campaign-brief", data: {...} }
  */
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
-import { runJournoAI } from "@/lib/journo/route-core";
+import { runJournoAI, verifyCandidates } from "@/lib/journo/route-core";
 import { withAiUsage } from "@/lib/ai-usage";
 import { getApprovedBrief } from "@/lib/company-brief";
 import { reserveUsage } from "@/lib/usage-limits";
@@ -23,7 +23,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
+/** Stop waiting for byline checks this long after the request started, and
+ * send the rest as "pending" for the card to fill in (P1-01, 2026-09-25).
+ * Keeps a clear margin under maxDuration; raising maxDuration is NOT the fix. */
+const VERIFY_DEADLINE_MS = 48_000;
+
 export async function POST(request: NextRequest) {
+  const startedAt = Date.now();
   const guard = await requireEmosAccess({ rateLimitKey: "journo-ai" });
   if (!guard.ok) return guard.res;
 
@@ -52,6 +58,32 @@ export async function POST(request: NextRequest) {
   if (!run.ok) {
     await seat.release();
     return NextResponse.json({ error: run.error }, { status: run.status });
+  }
+
+  if (type === "partner-suggestions") {
+    // Every name is checked for a recent byline before the card shows it as a
+    // person (P1-01). Checks run in parallel; late ones come back "pending".
+    const checked = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
+      verifyCandidates(run.result, {
+        deadlineMs: startedAt + VERIFY_DEADLINE_MS,
+        beat: typeof data.industry === "string" ? data.industry : null,
+      }),
+    );
+    if (!checked) {
+      // Unreadable list: not the user's fault, so the search is not counted.
+      await seat.release();
+      return NextResponse.json(
+        { error: "The journalist list came back unreadable. This search was not counted; please retry." },
+        { status: 502 },
+      );
+    }
+    // Late checks keep running after the response so they still reach the
+    // cache (awaited inside after(), never fire-and-forget).
+    after(() => checked.inFlight);
+    console.log(
+      `[journo-ai] verified=${checked.stats.verified} unverified=${checked.stats.unverified} pending=${checked.stats.pending} cached=${checked.stats.cached} ms=${Date.now() - startedAt}`,
+    );
+    return NextResponse.json({ result: checked.result, verifyStats: checked.stats, ms: Date.now() - startedAt });
   }
 
   return NextResponse.json({ result: run.result });
