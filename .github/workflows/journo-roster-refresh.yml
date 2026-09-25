@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
     inputs:
       market:
-        description: 'Market (ksa)'
-        default: 'ksa'
+        description: 'Market: ksa, usa, or all'
+        default: 'all'
         required: true
       force:
         description: 'Re-read every outlet (1) or only stale ones (0)'
@@ -22,15 +22,21 @@ on:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 14
     steps:
       - name: Refresh rosters
         run: |
-          MARKET="${{ github.event.inputs.market || 'ksa' }}"
+          MARKET="${{ github.event.inputs.market || 'all' }}"
           FORCE="${{ github.event.inputs.force || '0' }}"
-          RESPONSE=$(curl -s --max-time 330 -w "\nHTTP_STATUS:%{http_code}" -X GET \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            "https://www.syedirfanajmal.com/api/emos-platform/journo-roster/refresh?market=${MARKET}&force=${FORCE}")
-          echo "$RESPONSE"
-          STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d: -f2)
-          if [ "$STATUS" != "200" ]; then echo "::error::Roster refresh returned $STATUS"; exit 1; fi
+          if [ "$MARKET" = "all" ]; then MARKETS="ksa usa"; else MARKETS="$MARKET"; fi
+          FAILED=0
+          for M in $MARKETS; do
+            echo "== market $M =="
+            RESPONSE=$(curl -s --max-time 330 -w "\nHTTP_STATUS:%{http_code}" -X GET \
+              -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+              "https://www.syedirfanajmal.com/api/emos-platform/journo-roster/refresh?market=${M}&force=${FORCE}")
+            echo "$RESPONSE"
+            STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d: -f2)
+            if [ "$STATUS" != "200" ]; then echo "::error::Roster refresh ($M) returned $STATUS"; FAILED=1; fi
+          done
+          exit $FAILED

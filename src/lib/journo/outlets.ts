@@ -48,6 +48,7 @@ export interface BeatList {
 }
 
 const CHECKED = "2026-09-25";
+const USA_CHECKED = "2026-09-25";
 
 export const OUTLET_LISTS: BeatList[] = [
   {
@@ -193,6 +194,162 @@ export const OUTLET_LISTS: BeatList[] = [
         name: "Al Eqtisadiah (Arabic)", domain: "aleqt.com", lang: "ar",
         pages: ["https://www.aleqt.com/"],
         evidence: "https://www.aleqt.com/", checked: CHECKED, status: "active", confirmPages: true,
+      },
+    ],
+  },
+
+  // ── USA (built 25 Sep 2026; pages checked the same day by fetching each one) ──
+  // Industry Dive sites (Marketing, Payments, Banking, Hotel Dive) show no
+  // bylines on their home pages; their /topic/ pages show names and dates.
+  {
+    market: "usa",
+    beat: "marketing-pr-media",
+    matches: ["marketing", "advertising", "pr", "public relations", "media", "agency", "agencies", "brand", "communications"],
+    outlets: [
+      {
+        name: "Adweek", domain: "adweek.com", lang: "en",
+        pages: ["https://www.adweek.com/agencies/"],
+        evidence: "https://www.adweek.com/agencies/coca-colas-top-marketer-reveals-what-hes-looking-for-in-his-next-agency/",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "Digiday", domain: "digiday.com", lang: "en",
+        pages: ["https://digiday.com/marketing/"],
+        evidence: "https://digiday.com/marketing/why-instacart-is-focused-on-reducing-item-markups-to-grow-its-delivery-platform/",
+        checked: USA_CHECKED, status: "active",
+        note: "Listing shows dates but not authors; /sponsored/ items appear in it (dropped by code).",
+      },
+      {
+        name: "Marketing Dive", domain: "marketingdive.com", lang: "en",
+        pages: ["https://www.marketingdive.com/topic/brand-strategy/"],
+        evidence: "https://www.marketingdive.com/news/how-jeep-is-charting-a-new-course-for-its-marketing/831335/",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "MediaPost (Marketing Daily)", domain: "mediapost.com", lang: "en",
+        pages: ["https://www.mediapost.com/publications/marketing-daily/"],
+        evidence: "https://www.mediapost.com/publications/article/418285/brands-working-9-to-5-for-dolly-day.html",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "PR Daily", domain: "prdaily.com", lang: "en",
+        pages: ["https://www.prdaily.com/category/media-relations/"],
+        evidence: "https://www.prdaily.com/the-scoop-doordash-bluntly-admits-we-screwed-up-in-131-5-million-settlement/",
+        checked: USA_CHECKED, status: "active",
+        note: "Mix of staff and outside contributors; no dates on the listing.",
+      },
+      {
+        name: "PRWeek US", domain: "prweek.com", lang: "en",
+        pages: ["https://www.prweek.com/us"],
+        evidence: "https://www.prweek.com/article/1970891/new-pr-council-guidance-helps-firms-navigate-rfps",
+        checked: USA_CHECKED, status: "active",
+        note: "Registration wall; the listing shows no bylines or dates, so the reader must open articles.",
+      },
+      {
+        name: "Ad Age", domain: "adage.com", lang: "en",
+        pages: ["https://adage.com/agencies/"],
+        evidence: "https://adage.com/agencies/", checked: USA_CHECKED, status: "active",
+        blocksReading: true,
+        note: "Articles return 403 to the fetcher; listing is script-built (25 Sep).",
+      },
+    ],
+  },
+  {
+    market: "usa",
+    beat: "business-fintech-smb",
+    matches: ["business", "economy", "finance", "fintech", "lending", "loans", "banking", "bank", "payments", "small business", "smb", "smbs", "startup", "startups", "investment", "credit", "markets"],
+    outlets: [
+      {
+        name: "TechCrunch (fintech)", domain: "techcrunch.com", lang: "en",
+        pages: ["https://techcrunch.com/category/fintech/"],
+        evidence: "https://techcrunch.com/2026/09/15/india-ends-free-ride-for-larger-transactions-on-its-ubiquitous-digital-payments-network/",
+        checked: USA_CHECKED, status: "active",
+        note: "Much of the fintech section is non-US; the ranking picks by fit.",
+      },
+      {
+        name: "Payments Dive", domain: "paymentsdive.com", lang: "en",
+        pages: ["https://www.paymentsdive.com/topic/b2b/"],
+        evidence: "https://www.paymentsdive.com/news/ach-use-rises-for-b2b-payments/831270/",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "Banking Dive", domain: "bankingdive.com", lang: "en",
+        pages: ["https://www.bankingdive.com/topic/fintech/"],
+        evidence: "https://www.bankingdive.com/news/fintech-avant-applies-occ-charter/831172/",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "American Banker (payments)", domain: "americanbanker.com", lang: "en",
+        pages: ["https://www.americanbanker.com/payments"],
+        evidence: "https://www.americanbanker.com/payments/news/are-banks-falling-behind-on-agentic-commerce-standards",
+        checked: USA_CHECKED, status: "active",
+        note: "Paywall; listing mixes in video and research items.",
+      },
+      {
+        name: "Fortune (finance)", domain: "fortune.com", lang: "en",
+        pages: ["https://fortune.com/section/finance/"],
+        evidence: "https://fortune.com/2026/09/24/over-50-federal-prosecutors-trump-100000-month-insider-trading/",
+        checked: USA_CHECKED, status: "active",
+        note: "Mixes in AP wire copy and affiliate personal-finance pages.",
+      },
+      {
+        name: "Inc.", domain: "inc.com", lang: "en",
+        pages: ["https://www.inc.com/"],
+        evidence: "https://www.inc.com/lucia-auerbach/hoplark-rasied-25-million-dollars-just-filed-for-bankruptcy/91410111",
+        checked: USA_CHECKED, status: "active",
+        note: "Many outside columnists; the outside-writer rule keeps staff writers only.",
+      },
+      {
+        name: "Entrepreneur (business news)", domain: "entrepreneur.com", lang: "en",
+        pages: ["https://www.entrepreneur.com/business-news"],
+        evidence: "https://www.entrepreneur.com/business-news/how-airbnb-ceo-brian-chesky-created-ai-brain-cut-meetings-in-half",
+        checked: USA_CHECKED, status: "active",
+        note: "The news desk is staff; the wider site is contributor-heavy.",
+      },
+      {
+        name: "CNBC (small business)", domain: "cnbc.com", lang: "en",
+        pages: ["https://www.cnbc.com/small-business/"],
+        evidence: "https://www.cnbc.com/small-business/", checked: USA_CHECKED, status: "active",
+        blocksReading: true,
+        note: "403 to the fetcher on every page tried (25 Sep).",
+      },
+    ],
+  },
+  {
+    market: "usa",
+    beat: "tourism-hospitality",
+    matches: ["tourism", "travel", "hospitality", "hotel", "hotels", "destination", "airline", "airlines", "cruise"],
+    outlets: [
+      {
+        name: "Skift (news)", domain: "skift.com", lang: "en",
+        pages: ["https://skift.com/news/"],
+        evidence: "https://skift.com/2026/09/25/chinas-golden-week-travelers-are-going-farther-and-spending-less-on-hotels/",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "Travel Weekly", domain: "travelweekly.com", lang: "en",
+        pages: ["https://www.travelweekly.com/Travel-News"],
+        evidence: "https://www.travelweekly.com/Travel-News/Airline-News/Delta-says-it-will-launch-NDC-content-before-end-of-year",
+        checked: USA_CHECKED, status: "active",
+        note: "Listing has no bylines or dates; the reader opens articles.",
+      },
+      {
+        name: "PhocusWire", domain: "phocuswire.com", lang: "en",
+        pages: ["https://www.phocuswire.com/news"],
+        evidence: "https://www.phocuswire.com/news/technology/openai-chairman-bret-taylor-tells-travel-industry-do-not-restrain-ai-agents",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "TravelPulse", domain: "travelpulse.com", lang: "en",
+        pages: ["https://www.travelpulse.com/news"],
+        evidence: "https://www.travelpulse.com/news/lgbtq/lgbtq-travelers-face-restrictions-on-meta-tiktok-how-advisors-and-suppliers-are-impacted",
+        checked: USA_CHECKED, status: "active",
+      },
+      {
+        name: "Hotel Dive", domain: "hoteldive.com", lang: "en",
+        pages: ["https://www.hoteldive.com/topic/operations/"],
+        evidence: "https://www.hoteldive.com/news/ai-hospitality-group-operating-company-launch/830995/",
+        checked: USA_CHECKED, status: "active",
       },
     ],
   },

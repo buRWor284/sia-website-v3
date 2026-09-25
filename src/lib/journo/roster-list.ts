@@ -22,6 +22,9 @@ const MAX_PEOPLE_IN_PROMPT = 40;
 
 const MARKET_WORDS: Array<[string, RegExp]> = [
   ["ksa", /\b(saudi|ksa|riyadh|jeddah|dammam|khobar|neom|mecca|makkah|medina|madinah|alula)\b/i],
+  // USA (25 Sep): "US"/"USA" only in capitals, so the word "us" never matches.
+  ["usa", /\b(US|USA|U\.S\.(A\.)?)(?![A-Za-z])/],
+  ["usa", /\b(united states|(?<!(latin|south|central) )american?|new york|california|texas|florida|chicago|san francisco|los angeles|silicon valley)\b/i],
 ];
 
 export function marketFor(d: Record<string, unknown>): string | null {
@@ -44,7 +47,10 @@ export async function buildRosterList(
   const outlets = new Map<string, Outlet>();
   for (const l of lists) for (const o of l.outlets) if (o.status === "active") outlets.set(o.domain, o);
 
-  const people = await readRoster([...outlets.keys()]);
+  // Only the listing pages of the matched beat lists: a site in several lists
+  // (arabnews.com) must not pour every section's writers into every beat.
+  const pages = lists.flatMap((l) => l.outlets.filter((o) => o.status === "active").map((o) => o.pages[0]).filter(Boolean));
+  const people = await readRoster({ domains: [...outlets.keys()], pages });
   if (people.length === 0) return null;
   const pool = people.slice(0, MAX_PEOPLE_IN_PROMPT);
 
@@ -53,7 +59,7 @@ export async function buildRosterList(
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (apiKey) {
     const lines = pool.map((p, i) =>
-      `${i}. ${p.name} | ${p.outletDomain} | latest: "${p.articleTitle ?? "untitled"}" (${p.articleDate}) | ${p.articles} article(s) seen${p.current ? "" : " | LAST SEEN, may have moved"}`,
+      `${i}. ${p.name} | ${p.outletDomain} | latest: "${p.articleTitle ?? "untitled"}" (${p.articleDate}) | ${p.articles} article(s) seen${p.role ? ` | role: ${p.role}` : ""}${p.current ? "" : " | LAST SEEN, may have moved"}`,
     );
     let prompt = `You are a media-relations strategist. Pick up to 8 journalists from the numbered list who best fit this story, best first.
 

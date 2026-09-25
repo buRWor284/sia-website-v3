@@ -1228,7 +1228,7 @@ export default function JournoCollabIQClient({
             {([
               ["Verified earlier (cached)", "Instant, free and stable from one search to the next. The check can be up to 30 days old, and a journalist may have changed beat or outlet since, so look at the last byline seen date."],
               ["↻ Re-verify", "A fresh check on one person, right now. Free, takes a few seconds, catches a recent move. Nothing else on the list changes."],
-              ["New search", "Finds new people. Uses one search from your monthly allowance, takes 30 to 60 seconds, and the list can differ from the last run."],
+              ["New search", "Finds new people. Uses one search from your monthly allowance, takes about 10 to 60 seconds, and the list can differ from the last run."],
             ] as [string, string][]).map(([label, text]) => (
               <div key={label} style={{ display: "flex", gap: 12, padding: "8px 12px", borderTop: `1px solid ${INK15}`, alignItems: "baseline", flexWrap: "wrap" }}>
                 <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK, minWidth: 170 }}>{label}</span>

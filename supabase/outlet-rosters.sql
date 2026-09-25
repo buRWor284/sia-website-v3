@@ -47,3 +47,9 @@ create policy "outlet_reads read" on public.outlet_reads for select to authentic
 grant select, insert, update, delete on public.outlet_bylines, public.outlet_reads to service_role;
 grant select on public.outlet_bylines, public.outlet_reads to authenticated;
 grant usage on sequence public.outlet_bylines_id_seq, public.outlet_reads_id_seq to service_role;
+
+-- 2026-09-25 (commit 10): what kind of piece, and the role printed with the
+-- byline, so op-eds by company executives and sponsored posts can be dropped.
+-- Applied live as migration outlet_bylines_kind_role.
+alter table public.outlet_bylines add column if not exists kind text, add column if not exists author_role text;
+create index if not exists outlet_bylines_page_model_idx on public.outlet_bylines (page_url, model);

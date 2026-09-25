@@ -28,11 +28,27 @@ import type { Outlet } from "@/lib/journo/outlets";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 export const ROSTER_MODEL = process.env.JOURNO_ROSTER_MODEL ?? "claude-haiku-4-5";
+/**
+ * Reader version, written to outlet_bylines.model. Only rows from these
+ * readers are used, so a reader fix retires older rows without deletes
+ * (same pattern as CHECKER_ID in verify.ts). r2 (25 Sep, commit 10) asks for
+ * the kind of piece and the author's role, to drop op-eds by company
+ * executives (Saudi Gazette's top business names were an Amazon manager's
+ * pieces) and sponsored posts. r1 rows carry neither, so they are retired.
+ */
+export const ROSTER_READER_ID = `${ROSTER_MODEL}|r2`;
+const ACCEPTED_READERS = [ROSTER_READER_ID];
+/**
+ * Days a name stays "current" after the outlet read that saw it; older =
+ * "last seen, may have moved". Default 30 (Irfan, 25 Sep). Env-tunable so the
+ * last-seen state can be tested live with 1 day, then set back.
+ */
+export const ROSTER_CURRENT_DAYS = Math.max(1, Number(process.env.JOURNO_ROSTER_CURRENT_DAYS) || VERIFY_TTL_DAYS);
 const FETCH_TOOL = process.env.JOURNO_ROSTER_FETCH_TOOL ?? "web_fetch_20250910";
 const FETCH_BETA = "web-fetch-2025-09-10";
 const SEARCH_TOOL = "web_search_20250305";
 /** Listing page(s) plus up to 4 articles opened for bylines and dates. */
-const MAX_FETCHES = 6;
+const MAX_FETCHES = 8;
 const READ_TIMEOUT_MS = 120_000;
 /**
  * Page cap per read. 8k -> 20k (25 Sep, first read): Campaign ME's tag page
@@ -53,6 +69,27 @@ export function isPersonByline(author: string, outletName: string): boolean {
   if (bare(a) && bare(outletName).includes(bare(a))) return false; // "Argaam", "Arab News"
   if (!/\s/.test(a)) return false; // one word: a brand, not a person
   return true;
+}
+
+/** URL paths for paid or non-editorial posts. */
+const NOT_EDITORIAL_URL = /\/(sponsored|partner-content|partner|advertorial|brand-?voice|press-?releases?|corporate-news|pr-news|promoted)(\/|-|$)/i;
+const NOT_EDITORIAL_KIND = new Set(["sponsored", "press_release", "advertorial"]);
+
+/**
+ * Why a byline is not a journalist to pitch, or null if it is. Code decides
+ * from what the reader reported: the kind of piece, whether the author works
+ * for another organisation (a guest op-ed by an executive, official or
+ * consultant), and the URL path.
+ */
+export function notJournalistReason(item: { kind?: unknown; outside_writer?: unknown; author_role?: unknown }, url: string): string | null {
+  const kind = typeof item.kind === "string" ? item.kind.toLowerCase().replace(/[\s-]+/g, "_") : "";
+  if (NOT_EDITORIAL_KIND.has(kind)) return "sponsored or press release";
+  if (NOT_EDITORIAL_URL.test(url)) return "sponsored or press release";
+  if (item.outside_writer === true || item.outside_writer === "true") return "outside writer";
+  const role = typeof item.author_role === "string" ? item.author_role : "";
+  if (/\b(ceo|cfo|coo|cmo|founder|co-founder|managing director|country manager|general manager|chairman|president|vice president|vp|head of|partner at|director at|minister|ambassador)\b/i.test(role)
+    && !/\b(editor|reporter|journalist|correspondent|writer|columnist)\b/i.test(role)) return "outside writer";
+  return null;
 }
 
 function sameSite(url: string, domain: string): boolean {
@@ -105,12 +142,14 @@ export function parseBylines(text: string): Array<Record<string, unknown>> | nul
   return out.length ? out : null;
 }
 
+const MARKET_NAMES: Record<string, string> = { ksa: "Saudi Arabia", usa: "the United States" };
+
 function buildReadPrompt(o: Outlet, market: string, beat: string, today: Date): string {
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const earliest = new Date(today.getTime() - BYLINE_MAX_AGE_DAYS * 86_400_000);
   return `Today is ${iso(today)}. Read these pages from ${o.name} (${o.domain}) with the page-fetch tool:
 ${o.pages.map((p) => `- ${p}`).join("\n")}
-${o.confirmPages ? `\nIf these pages show few articles, you may search once for recent ${o.name} articles about Saudi Arabia.\n` : ""}
+${o.confirmPages ? `\nIf these pages show few articles, you may search once for recent ${o.name} articles about ${MARKET_NAMES[market] ?? market.toUpperCase()}.\n` : ""}
 Goal: find the named JOURNALISTS who wrote recent articles here (market: ${market.toUpperCase()}, beat: ${beat.replace(/-/g, " ")}).
 
 Steps:
@@ -118,13 +157,17 @@ Steps:
 2. Take the most recent articles (published on or after ${iso(earliest)}).
 3. The listing may not show the author or date. Open up to 4 of the most recent articles that still lack one, to read the byline and date.
 4. Report only PERSONAL bylines. Skip "Staff", desks, the outlet's own name, and wire agencies (AFP, Reuters, SPA, WAM, AP, Bloomberg).
+5. We want JOURNALISTS to pitch, not guest writers. If an author might be an outside writer (an opinion piece by a company executive, official, consultant or founder), open the article and read the author line or bio.
 
 Rules:
 - article_url must be copied exactly from a page you fetched or a link on it. Never build or guess a URL.
 - date is YYYY-MM-DD; leave it empty if you did not see it.
+- kind: news, feature, interview, opinion, sponsored or press_release (sponsored = paid, partner or "corporate news" content).
+- author_role: the role printed with the byline or bio (e.g. "Senior Reporter", "Country Manager, Amazon.sa"); empty if none shown.
+- outside_writer: true if the author works for a company or organisation other than ${o.name} (a guest op-ed); false for staff, freelance journalists and columnists.
 
 Do not describe your steps. Your final message must be ONLY this JSON array, nothing before or after it:
-[{"author":"Full name","article_url":"","title":"","date":"YYYY-MM-DD or empty"}]`;
+[{"author":"Full name","article_url":"","title":"","date":"YYYY-MM-DD or empty","kind":"news","author_role":"","outside_writer":false}]`;
 }
 
 export interface OutletReadResult {
@@ -165,7 +208,7 @@ export async function readOutlet(o: Outlet, market: string, beat: string): Promi
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-beta": FETCH_BETA },
       body: JSON.stringify({
         model: ROSTER_MODEL,
-        max_tokens: 1500,
+        max_tokens: 2500, // r2 asks for kind, role and outside_writer per byline
         tools: [
           { type: FETCH_TOOL, name: "web_fetch", max_uses: MAX_FETCHES, max_content_tokens: PAGE_TOKENS },
           ...(o.confirmPages ? [{ type: SEARCH_TOOL, name: "web_search", max_uses: 1 }] : []),
@@ -207,6 +250,8 @@ export async function readOutlet(o: Outlet, market: string, beat: string): Promi
     const date = parseDate(typeof item?.date === "string" ? item.date : "") ?? dateFromUrl(url);
     if (!author || !url) { drop("missing"); continue; }
     if (!isPersonByline(author, o.name)) { drop("not a person"); continue; }
+    const notJournalist = notJournalistReason(item, url);
+    if (notJournalist) { drop(notJournalist); continue; }
     if (!sameSite(url, domain)) { drop("other site"); continue; }
     if (!seen.has(urlKey(url))) { drop("url not seen"); continue; }
     if (!date) { drop("no date"); continue; }
@@ -223,7 +268,9 @@ export async function readOutlet(o: Outlet, market: string, beat: string): Promi
       article_url: url,
       article_title: typeof item.title === "string" ? item.title.slice(0, 300) : null,
       article_date: date.toISOString().slice(0, 10),
-      model: ROSTER_MODEL,
+      kind: typeof item.kind === "string" ? item.kind.slice(0, 40) : null,
+      author_role: typeof item.author_role === "string" && item.author_role.trim() ? item.author_role.trim().slice(0, 200) : null,
+      model: ROSTER_READER_ID,
     });
   }
 
@@ -247,13 +294,27 @@ export interface RosterPerson {
   articleDate: string;
   /** Last time the outlet read saw this person. */
   readAt: string;
-  /** Outlet read within 30 days. False = "last seen, may have moved". */
+  /** Seen in a read within ROSTER_CURRENT_DAYS. False = "last seen, may have moved". */
   current: boolean;
   articles: number;
+  /** Role printed with the byline, when the reader saw one. */
+  role: string | null;
+}
+
+/** Where to look: a domain, and optionally only the listing pages of the chosen beat lists. */
+export interface RosterScope {
+  domains: string[];
+  /**
+   * outlet_bylines.page_url values to keep. Needed because one site can sit in
+   * several beat lists (arabnews.com is in media, tourism and business): without
+   * it, every section's writers showed up in every beat (tourism test, 25 Sep).
+   */
+  pages?: string[];
 }
 
 /** Everyone seen writing for these outlets in the last 12 months, newest first. */
-export async function readRoster(domains: string[]): Promise<RosterPerson[]> {
+export async function readRoster(scope: string[] | RosterScope): Promise<RosterPerson[]> {
+  const { domains, pages } = Array.isArray(scope) ? { domains: scope, pages: undefined } : scope;
   const list = Array.from(new Set(domains.map(normaliseDomain).filter(Boolean)));
   if (!list.length) return [];
   try {
@@ -261,25 +322,29 @@ export async function readRoster(domains: string[]): Promise<RosterPerson[]> {
     const since = new Date(Date.now() - BYLINE_MAX_AGE_DAYS * 86_400_000).toISOString().slice(0, 10);
     const { data, error } = await db
       .from("outlet_bylines")
-      .select("outlet_domain, author_name, author_key, article_url, article_title, article_date, read_at")
+      .select("outlet_domain, page_url, author_name, author_key, article_url, article_title, article_date, read_at, author_role")
       .in("outlet_domain", list)
+      .in("model", ACCEPTED_READERS)
       .gte("article_date", since)
       .order("article_date", { ascending: false })
       .limit(1000);
     if (error || !data) { if (error) console.warn("[journo-roster] read failed:", error.message); return []; }
-    const cutoff = Date.now() - VERIFY_TTL_DAYS * 86_400_000;
+    const cutoff = Date.now() - ROSTER_CURRENT_DAYS * 86_400_000;
+    const keepPages = pages?.length ? new Set(pages) : null;
     const byPerson = new Map<string, RosterPerson>();
     for (const r of data as Array<Record<string, string>>) {
+      if (keepPages && !keepPages.has(r.page_url)) continue;
       const k = `${r.author_key}|${r.outlet_domain}`;
       const cur = byPerson.get(k);
       if (!cur) {
         byPerson.set(k, {
           name: r.author_name, outletDomain: r.outlet_domain, articleUrl: r.article_url,
           articleTitle: r.article_title ?? null, articleDate: r.article_date, readAt: r.read_at,
-          current: Date.parse(r.read_at) >= cutoff, articles: 1,
+          current: Date.parse(r.read_at) >= cutoff, articles: 1, role: r.author_role ?? null,
         });
       } else {
         cur.articles++;
+        if (!cur.role && r.author_role) cur.role = r.author_role;
         if (Date.parse(r.read_at) > Date.parse(cur.readAt)) {
           cur.readAt = r.read_at;
           cur.current = Date.parse(r.read_at) >= cutoff;
