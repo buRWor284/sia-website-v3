@@ -29,7 +29,7 @@ export const JOURNO_DISCOVER_MODEL = process.env.JOURNO_DISCOVER_MODEL ?? "claud
 const SEARCH_TOOL = process.env.JOURNO_DISCOVER_SEARCH_TOOL ?? "web_search_20250305";
 const MAX_SEARCHES = 5;
 /** The route caps at 60s and still has to check leftovers. */
-const TIMEOUT_MS = 40_000;
+const TIMEOUT_MS = 44_000;
 
 function buildDiscoverPrompt(d: Record<string, unknown>, today: Date): string {
   const iso = (x: Date) => x.toISOString().slice(0, 10);
@@ -122,7 +122,9 @@ export async function discoverJournalists(
   const text = (json.content ?? []).filter((b) => b.type === "text").map((b) => b.text ?? "").join("");
   const parsed = parseCandidateArray(text);
   if (!parsed || searchOk === 0) {
-    console.error(`[journo-discover] unusable answer (searchOk=${searchOk}, parsed=${!!parsed})`);
+    console.error(
+      `[journo-discover] unusable answer (searchOk=${searchOk}, parsed=${!!parsed}, textLen=${text.length}) head=${JSON.stringify(text.slice(0, 300))} tail=${JSON.stringify(text.slice(-300))}`,
+    );
     return { ok: false, candidates: [], error: "unreadable list", searchesUsed };
   }
   // Same handle / LinkedIn scrub as the memory path.

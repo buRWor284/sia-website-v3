@@ -180,7 +180,10 @@ export function parseCandidateArray(raw: string): unknown[] | null {
   const tryParse = (t: string): unknown[] | null => {
     try {
       const v = JSON.parse(t);
-      return Array.isArray(v) ? v : null;
+      // A list of journalists, not any array ("[1]" from a footnote).
+      return Array.isArray(v) && v.some((o) => o && typeof o === "object" && typeof (o as { name?: unknown }).name === "string")
+        ? v
+        : null;
     } catch {
       return null;
     }
@@ -190,7 +193,36 @@ export function parseCandidateArray(raw: string): unknown[] | null {
   if (direct) return direct;
   const a = clean.indexOf("[");
   const b = clean.lastIndexOf("]");
-  return a >= 0 && b > a ? tryParse(clean.slice(a, b + 1)) : null;
+  const outer = a >= 0 && b > a ? tryParse(clean.slice(a, b + 1)) : null;
+  if (outer) return outer;
+  // Any "[{" start, latest first (a model that searched first often writes
+  // notes with brackets before the list: "[Campaign ME]").
+  for (let i = clean.lastIndexOf("["); i >= 0; i = clean.lastIndexOf("[", i - 1)) {
+    if (!/^\[\s*\{/.test(clean.slice(i, i + 20))) continue;
+    const got = tryParse(clean.slice(i, b + 1));
+    if (got) return got;
+  }
+  // Last resort: salvage each complete {...} object that has a name. A list
+  // cut short or wrapped in prose still yields its whole entries.
+  const objs: unknown[] = [];
+  let depth = 0, start = -1, inStr = false, esc = false;
+  for (let i = 0; i < clean.length; i++) {
+    const ch = clean[i];
+    if (inStr) { if (esc) esc = false; else if (ch === "\\") esc = true; else if (ch === '"') inStr = false; continue; }
+    if (ch === '"') { inStr = true; continue; }
+    if (ch === "{") { if (depth === 0) start = i; depth++; }
+    else if (ch === "}" && depth > 0) {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        try {
+          const o = JSON.parse(clean.slice(start, i + 1));
+          if (o && typeof o === "object" && typeof (o as { name?: unknown }).name === "string") objs.push(o);
+        } catch { /* skip a broken entry */ }
+        start = -1;
+      }
+    }
+  }
+  return objs.length ? objs : null;
 }
 
 /**
