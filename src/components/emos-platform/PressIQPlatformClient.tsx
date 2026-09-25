@@ -25,7 +25,7 @@ import { getJsPDF } from "@/lib/pdf/house-style";
 import { buildPressIqReport } from "@/lib/pdf/pressiq-report";
 import PressIQToolCore from "@/components/pressiq/PressIQToolCore";
 import { PIQ_CSS } from "@/components/pressiq/core-css";
-import type { ScoreResponse } from "@/lib/pitch/types";
+import type { ScoreResponse, BrandSignals, Platform } from "@/lib/pitch/types";
 import type { DbJournalist } from "@/lib/coverageiq/types";
 import type { DbAsset } from "@/app/emos-platform/actions/assetiq";
 import { useCompanyOptional } from "@/components/emos-platform/CompanyProvider";
@@ -45,6 +45,7 @@ const INK55  = "rgba(26,20,16,.55)";
 const INK35  = "rgba(26,20,16,.32)";
 const INK15  = "rgba(26,20,16,.15)";
 const YEL    = "#f5b81f";
+const RED    = "#c14a32";
 const GREEN  = "#3e6b45";
 const GROT   = "var(--font-grot)";
 const SERIF  = "var(--font-serif)";
@@ -72,7 +73,16 @@ interface DbScore {
   asset_id: string | null;
   asset_title: string | null;
   score_response: unknown | null;
+  /** 2026-09-25: subject, brandSignals, pitchMode, platform as submitted. */
+  input_snapshot: unknown | null;
 }
+
+type InputSnapshot = {
+  subject?: string;
+  brandSignals?: BrandSignals;
+  pitchMode?: "standalone" | "query";
+  platform?: Platform;
+};
 
 function fmt(iso: string): string {
   const d = new Date(iso);
@@ -80,9 +90,36 @@ function fmt(iso: string): string {
   return `${d.getDate()} ${months[d.getMonth()]} '${String(d.getFullYear()).slice(-2)}`;
 }
 
+/**
+ * 2026-09-25 (P3-02): the first name in the greeting line ("Hi Emily," /
+ * "Dear Ruth" / "Hello Tarek —") — null when there is no recognisable greeting.
+ */
+function greetingName(pitch: string): string | null {
+  const first = pitch.trimStart().split("\n")[0] ?? "";
+  const m = first.match(/^(?:hi|hello|hey|dear|salaam|salam|assalamu alaikum)\s+([A-Za-z][A-Za-z'’-]*)/i);
+  return m ? m[1] : null;
+}
+
+function GreetingMismatch({ pitch, journalist }: { pitch: string; journalist: DbJournalist | null }) {
+  if (!journalist) return null;
+  const greeted = greetingName(pitch);
+  const expected = journalist.name.trim().split(/\s+/)[0] ?? "";
+  if (!greeted || !expected) return null;
+  if (greeted.toLowerCase() === expected.toLowerCase()) return null;
+  return (
+    <div style={{ marginTop: 8, padding: "8px 12px", border: `1px solid ${RED}`, background: "rgba(193,74,50,.06)", fontFamily: SERIF, fontSize: 12.5, color: INK, lineHeight: 1.5 }}>
+      <strong>Wrong name?</strong> The pitch opens with “{greeted}” but it is being scored for <strong>{journalist.name}</strong>{journalist.outlet ? ` (${journalist.outlet})` : ""}. A pitch addressed to the wrong person is deleted before it is read.
+    </div>
+  );
+}
+
 function daysAgo(iso: string): string {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-  if (diff === 0) return "Today";
+  // 2026-09-25 (P3-01): count CALENDAR days in the viewer's timezone. The old
+  // 24-hour arithmetic called a 24 Sep 16:22 UTC score "Today" at 08:24 PKT
+  // on the 25th, and was one day short for everything older.
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diff = Math.round((startOfDay(new Date()) - startOfDay(new Date(iso))) / 86400000);
+  if (diff <= 0) return "Today";
   if (diff === 1) return "Yesterday";
   return `${diff}d ago`;
 }
@@ -279,7 +316,7 @@ function ScoreHistory({
               ))}
               <div style={{ padding: "12px 10px", borderLeft: `1px solid ${INK15}`, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                 <span style={{ fontFamily: MONO, fontSize: 11 }}>{fmt(row.scored_at)}</span>
-                <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 10, color: INK55, marginTop: 1 }}>{daysAgo(row.scored_at)}</span>
+                <span suppressHydrationWarning style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 10, color: INK55, marginTop: 1 }}>{daysAgo(row.scored_at)}</span>
               </div>
             </div>
           );
@@ -378,6 +415,7 @@ export default function PressIQPlatformClient({
   // Reopening remounts the tool core with a stored result, so the whole result
   // view comes back exactly as scored rather than being rebuilt from parts.
   const [reopened, setReopened] = useState<DbScore | null>(null);
+  const snapshot = (reopened?.input_snapshot ?? null) as InputSnapshot | null;
   const [draft, setDraft] = useState<{ pitch: string; subject: string } | null>(null);
   const [coreKey, setCoreKey] = useState(0);
   const [tab, setTab] = useState<Tab>("score");
@@ -644,10 +682,14 @@ export default function PressIQPlatformClient({
             journalistBeat: reopened
               ? (reopened.journalist_query ?? "")
               : (initialQuery || journalist?.beat || ""),
-            pitchMode: (initialQuery || journalist?.beat) ? "standalone" : undefined,
+            pitchMode: snapshot?.pitchMode ?? ((initialQuery || journalist?.beat) ? "standalone" : undefined),
             result: (reopened?.score_response as ScoreResponse | undefined) ?? undefined,
             pitch: draft?.pitch ?? reopened?.pitch_text ?? undefined,
-            subject: draft?.subject ?? undefined,
+            // 2026-09-25 (P2-04): a reopened score restores EVERY input that
+            // produced it, so Edit → Analyze with no changes scores the same.
+            subject: draft?.subject ?? snapshot?.subject ?? undefined,
+            brandSignals: snapshot?.brandSignals ?? undefined,
+            platform: snapshot?.platform ?? undefined,
             step: draft ? 2 : undefined,
           }}
           hideMasthead
@@ -656,6 +698,7 @@ export default function PressIQPlatformClient({
           pdfAction={handleDownloadPdf}
           splitResetActions
           preFormSlot={<ResearchTicker compact />}
+          pitchWarning={p => <GreetingMismatch pitch={p} journalist={journalist} />}
           onScored={(scored, ctx) => {
             setScoreSubject(ctx.subject);
             setNewScoreCount(c => c + 1);

@@ -21,7 +21,7 @@
  *     SignalIQ → PressIQ → JournoCollabIQ → CoverageIQ flow)
  */
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
@@ -36,10 +36,9 @@ import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import SignalIQToolCore, { type SiqPdfContext } from "@/components/signaliq/SignalIQToolCore";
 import { SIQ_CSS } from "@/components/signaliq/core-css";
 import { saveSignalFromScan, updateSignalStatus, deleteSignal } from "@/app/emos-platform/actions/signaliq";
-import type { BeatId, Opportunity, AssetPack } from "@/lib/signaliq/types";
+import type { BeatId, Opportunity } from "@/lib/signaliq/types";
 import type { DbSignal } from "@/app/emos-platform/actions/signaliq";
 import type { DbAssetPack } from "@/lib/asset-pack-types";
-import { clipWords } from "@/lib/clip-words";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
 const PAPER   = "#f1ebde";
@@ -299,12 +298,56 @@ export default function SignalIQPlatformClient({
   initialPacks: DbAssetPack[];
 }) {
   // Ordered beat selection (primary first), length 1–3.
-  const [beats, setBeats] = useState<BeatId[]>(["saas"]);
+  const [beats, setBeatsState] = useState<BeatId[]>(["saas"]);
   const companyCtx = useCompanyOptional();
+  const activeCompanyId = companyCtx?.company?.id ?? null;
+  const activeCompanyName = companyCtx?.company?.name ?? null;
+  const beatKey = `siq:beats:${activeCompanyId ?? "no-company"}`;
+
+  // 2026-09-25 (P3-08): remember the beat per company. It reset to "SaaS &
+  // Startups" on every visit. Order of precedence: this browser's last choice
+  // for the company, else the beat of the company's most recent saved signal
+  // (works on a new browser), else the default. Runs after mount so the
+  // server-rendered default never mismatches.
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    const valid = new Set(BEATS.map(b => b.id as string));
+    let remembered: BeatId[] | null = null;
+    try {
+      const raw = localStorage.getItem(beatKey);
+      const parsed = raw ? (JSON.parse(raw) as unknown) : null;
+      if (Array.isArray(parsed) && parsed.length && parsed.every(b => typeof b === "string" && valid.has(b))) {
+        remembered = parsed as BeatId[];
+      }
+    } catch { /* noop */ }
+    if (!remembered && activeCompanyName) {
+      const last = initialSignals
+        .filter(sg => sg.company_name === activeCompanyName && sg.beat_id && valid.has(sg.beat_id))
+        .sort((a, b) => b.detected_at.localeCompare(a.detected_at))[0];
+      if (last?.beat_id) remembered = [last.beat_id as BeatId];
+    }
+    if (remembered) setBeatsState(remembered);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [beatKey]);
+
+  const setBeats = (b: BeatId[]) => {
+    setBeatsState(b);
+    try { localStorage.setItem(beatKey, JSON.stringify(b)); } catch { /* noop */ }
+  };
   const [companyContext, setCompanyContext] = useCompanyContext();
   const [companyName, setCompanyName] = useCompanyName();
   const [refreshKey, setRefreshKey] = useState(0);
   const router = useRouter();
+  /**
+   * The id of the pack row most recently saved by the pack route, with the
+   * opportunity it belongs to. Held in a ref rather than state on purpose: it
+   * is read at click time by buildAssetHref and must never trigger a re-render
+   * of the pack view while the user is reading it. The opportunity id is stored
+   * alongside so a stale id from a previous opportunity can never be handed to
+   * AssetIQ — better to fall back to the headline than to open the wrong pack.
+   */
+  const lastPackIdRef = useRef<{ opportunityId: string; packId: string } | null>(null);
 
   // ── transport: Clerk-guarded platform routes (no Turnstile, no quota) ──────
   const api = {
@@ -336,7 +379,14 @@ export default function SignalIQPlatformClient({
       // below kept showing the old list until a manual reload (found in the
       // 10 Sep Efani test run). router.refresh() re-reads initialPacks while
       // keeping this component's state, so the pack on screen stays put.
-      if (res.ok && (data as { savedPackId?: string | null })?.savedPackId) router.refresh();
+      const savedPackId = (data as { savedPackId?: string | null })?.savedPackId ?? null;
+      // 2026-09-15: remember it. The route has always returned this id and it
+      // was only ever used as a refresh trigger; "Build the asset" now hands
+      // AssetIQ the id instead of the pack body (see buildAssetHref below).
+      if (res.ok && savedPackId) {
+        lastPackIdRef.current = { opportunityId: body.opportunity.id, packId: savedPackId };
+        router.refresh();
+      }
       return { ok: res.ok, data };
     },
   };
@@ -398,8 +448,22 @@ export default function SignalIQPlatformClient({
         packActions={{
           onDownloadPDF: handleDownloadPDF,
           pressIqHref: "/emos-platform/dashboard/pressiq",
-          buildAssetHref: (opp: Opportunity, pack: AssetPack) =>
-            `/emos-platform/dashboard/assetiq?headline=${encodeURIComponent(opp.headline)}&assetIdea=${encodeURIComponent(pack.linkableAssetIdea ?? "")}&dataBrief=${encodeURIComponent(clipWords(pack.brief ?? "", 400))}&pitchAngle=${encodeURIComponent(clipWords(pack.angle ?? "", 300))}`,
+          // 2026-09-15: hand over the pack id, never the pack body. The old
+          // href carried the headline, the asset idea, a 400-word data brief
+          // and a 300-word pitch angle in the query string, so a client's
+          // unpublished pitch content reached browser history and Google
+          // Analytics (which logs the full URL as its `dl` parameter).
+          // The pack row is written by /api/emos-platform/signaliq/pack before
+          // this link is ever clicked, so the id is always available; the
+          // headline-only fallback covers the case where the save failed, and
+          // carries no client content.
+          buildAssetHref: (opp: Opportunity) => {
+            const remembered = lastPackIdRef.current;
+            if (remembered && remembered.opportunityId === opp.id) {
+              return `/emos-platform/dashboard/assetiq?pack=${encodeURIComponent(remembered.packId)}`;
+            }
+            return `/emos-platform/dashboard/assetiq?headline=${encodeURIComponent(opp.headline)}`;
+          },
         }}
         // No onExit: the dashboard has no landing screen, so the stage-1 back
         // button is hidden. The dashboard header's "← EMOS" covers leaving.

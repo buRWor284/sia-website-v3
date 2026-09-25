@@ -15,7 +15,6 @@
 import React, { useState } from "react";
 import { deleteAssetPack } from "@/app/emos-platform/actions/asset-packs";
 import type { DbAssetPack } from "@/lib/asset-pack-types";
-import { clipWords } from "@/lib/clip-words";
 
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -93,12 +92,12 @@ function PackDetail({ pack }: { pack: DbAssetPack }) {
     }
   }
 
-  const buildHref =
-    `/emos-platform/dashboard/assetiq?headline=${encodeURIComponent(pack.headline ?? "")}` +
-    `&assetIdea=${encodeURIComponent(pack.linkable_asset_idea ?? "")}` +
-    `&dataBrief=${encodeURIComponent(clipWords(pack.story_brief ?? "", 400))}` +
-    `&pitchAngle=${encodeURIComponent(clipWords(pack.pitch_angle ?? "", 300))}` +
-    (pack.signal_id ? `&signal=${pack.signal_id}` : "");
+  // 2026-09-15: the id, not the payload. This used to put the headline, the
+  // linkable asset idea, a 400-word data brief and a 300-word pitch angle into
+  // the query string — a client's unpublished pitch content in the address bar,
+  // in browser history, and copied to Google Analytics, which reports the full
+  // URL as its `dl` page_view parameter. AssetIQ reads the pack server-side.
+  const buildHref = `/emos-platform/dashboard/assetiq?pack=${encodeURIComponent(pack.id)}`;
 
   return (
     <div style={{ padding: "16px 18px", background: PAPER2, borderTop: `1px solid ${INK15}` }}>

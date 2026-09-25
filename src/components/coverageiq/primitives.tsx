@@ -33,8 +33,10 @@ export function fmt(iso: string | null): string {
 }
 
 export function daysAgoLabel(iso: string): string {
-  const diff = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-  if (diff === 0) return "Today";
+  // Calendar days in the viewer's timezone (2026-09-25, same fix as PressIQ P3-01).
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diff = Math.round((startOfDay(new Date()) - startOfDay(new Date(iso))) / 86400000);
+  if (diff <= 0) return "Today";
   if (diff === 1) return "1 day ago";
   return `${diff} days ago`;
 }

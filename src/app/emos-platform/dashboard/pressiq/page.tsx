@@ -43,20 +43,32 @@ interface DbScore {
   asset_id: string | null;
   asset_title: string | null;
   score_response: unknown | null;
+  input_snapshot: unknown | null;
 }
 
 export default async function PressIQPlatformPage({
   searchParams,
 }: {
-  searchParams: Promise<{ beat?: string; journalist?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
+  searchParams: Promise<{ beat?: string; journalist?: string; asset?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
 }) {
   const { userId, getToken } = await auth();
   if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
-  const assetTitle = params.assetTitle ? params.assetTitle : null;
-  const assetType  = params.assetType  ? params.assetType  : null;
-  const assetIdea  = params.assetIdea  ? params.assetIdea  : null;
+
+  /**
+   * 2026-09-15 — `?asset=<id>` replaces the asset's text in the URL.
+   * JournoCollabIQ used to append a 300-word `assetIdea` here, so the client's
+   * linkable-asset concept sat in the address bar, in browser history, and in
+   * Google Analytics (which logs the full URL as its `dl` parameter). The text
+   * parameters are still read so older links keep working; nothing writes them.
+   */
+  const assetRow = params.asset
+    ? (await getAssets()).find(a => a.id === params.asset) ?? null
+    : null;
+  const assetTitle = assetRow?.title      ?? (params.assetTitle ? params.assetTitle : null);
+  const assetType  = assetRow?.asset_type ?? (params.assetType  ? params.assetType  : null);
+  const assetIdea  = assetRow?.description ?? (params.assetIdea  ? params.assetIdea  : null);
 
   // Build query pre-fill: beat + journalist + asset context combined
   const beatPart      = params.beat       ? params.beat       : "";
@@ -77,7 +89,7 @@ export default async function PressIQPlatformPage({
       .select(
         "id, pitch_text, journalist_query, platform, composite_score, tier, " +
         "layer1_score, layer2_score, layer3_score, authenticity_risk, outcome, " +
-        "scored_at, journalist_id, asset_id, score_response",
+        "scored_at, journalist_id, asset_id, score_response, input_snapshot",
       )
       .order("scored_at", { ascending: false })
       .limit(50),
@@ -116,6 +128,7 @@ export default async function PressIQPlatformPage({
       asset_id:          aid,
       asset_title:       a?.title ?? null,
       score_response:    r.score_response ?? null,
+      input_snapshot:    r.input_snapshot ?? null,
     };
   });
 

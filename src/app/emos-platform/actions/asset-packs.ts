@@ -75,6 +75,63 @@ export async function getAssetPacks(): Promise<DbAssetPack[]> {
   }));
 }
 
+/**
+ * One saved pack by id — the server side of the "pass an id, not the payload"
+ * handoff (2026-09-15).
+ *
+ * SignalIQ used to hand AssetIQ the whole pack through the query string:
+ * headline + linkable asset idea + a 400-word data brief + a 300-word pitch
+ * angle, URL-encoded. That put a client's unpublished pitch content into the
+ * address bar, into browser history, into server access logs, and — because
+ * Google Analytics reports the full URL as its `dl` page_view parameter — into
+ * Google. The pack row already existed at that point, so the id was always
+ * enough. Read it here instead, under the same RLS scoping as every other read.
+ */
+export async function getAssetPackById(packId: string): Promise<DbAssetPack | null> {
+  const db = await getAuthenticatedClient();
+
+  const { data, error } = await db
+    .from("signaliq_asset_packs")
+    .select(COLUMNS)
+    .eq("id", packId)
+    .maybeSingle();
+
+  if (error) { console.error("getAssetPackById error:", error.message); return null; }
+  if (!data) return null;
+
+  const r = data as unknown as Record<string, unknown>;
+
+  // company_name is resolved separately for the same reason as in
+  // getAssetPacks: PostgREST embedding would need a declared relationship.
+  let companyName: string | null = null;
+  if (r.company_id) {
+    const { data: company } = await db
+      .from("companies")
+      .select("name")
+      .eq("id", r.company_id as string)
+      .maybeSingle();
+    companyName = (company as { name: string } | null)?.name ?? null;
+  }
+
+  return {
+    id:                  r.id as string,
+    company_id:          (r.company_id as string | null) ?? null,
+    company_name:        companyName,
+    signal_id:           (r.signal_id as string | null) ?? null,
+    headline:            (r.headline as string | null) ?? null,
+    beat_label:          (r.beat_label as string | null) ?? null,
+    pitch_angle:         (r.pitch_angle as string | null) ?? null,
+    story_brief:         (r.story_brief as string | null) ?? null,
+    subject_line:        (r.subject_line as string | null) ?? null,
+    linkable_asset_idea: (r.linkable_asset_idea as string | null) ?? null,
+    journalist_recs:     (r.journalist_recs as JournalistLead[] | null) ?? null,
+    cautions:            (r.cautions as string[] | null) ?? null,
+    sources:             (r.sources as { label: string; url: string }[] | null) ?? null,
+    chart_data:          (r.chart_data as ChartSpec | null) ?? null,
+    created_at:          r.created_at as string,
+  };
+}
+
 export async function deleteAssetPack(packId: string): Promise<boolean> {
   const db = await getAuthenticatedClient();
 

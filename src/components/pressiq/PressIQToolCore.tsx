@@ -115,6 +115,8 @@ export interface PressIQCoreProps {
     result?: ScoreResponse;
     pitch?: string;
     subject?: string;
+    /** 2026-09-25: the authority signals a reopened score was given. */
+    brandSignals?: BrandSignals;
     /** Which form step to open on. A loaded draft passes 2, otherwise the user
      * lands on step 1 and their pitch looks like it never arrived — it is on
      * step 2, just off screen (found in the 9 Sep drafting test). */
@@ -159,6 +161,10 @@ export interface PressIQCoreProps {
    * pitch first). OPT-IN so the public /tools/pressiq surface is unchanged
    * until that copy change is made deliberately. */
   splitResetActions?: boolean;
+  /** 2026-09-25 (P3-02): rendered under the pitch box with the live pitch text,
+   *  so the wrapper can warn about things only it knows — e.g. the dashboard
+   *  compares the greeting name to the selected journalist. */
+  pitchWarning?: (pitch: string) => React.ReactNode;
 }
 
 // ── Post-score panel (the 4 result views) ─────────────────────────────────────
@@ -403,13 +409,13 @@ function PostScorePanel({
 export default function PressIQToolCore({
   api, initial, persistKey, hideMasthead, showStoreToggle = true,
   quotaLine, turnstileSlot, submitDisabled, onStepChange,
-  pdfAction, onScored, emailUnlockNode, scoreTabCta, splitResetActions, preFormSlot,
+  pdfAction, onScored, emailUnlockNode, scoreTabCta, splitResetActions, preFormSlot, pitchWarning,
 }: PressIQCoreProps) {
   const [pitch,    setPitch]    = useState(initial?.pitch ?? "");
   const [query,    setQuery]    = useState(initial?.query ?? "");
   const [subject,  setSubject]  = useState(initial?.subject ?? "");
   const [platform, setPlatform] = useState<Platform>(initial?.platform ?? "haro");
-  const [brand,    setBrand]    = useState<BrandSignals>(EMPTY_BRAND);
+  const [brand,    setBrand]    = useState<BrandSignals>(initial?.brandSignals ?? EMPTY_BRAND);
   const [store,    setStore]    = useState(initial?.store ?? false);
   const [pitchMode, setPitchMode] = useState<"standalone" | "query">(initial?.pitchMode ?? "standalone");
   const [journalistBeat, setJournalistBeat] = useState(initial?.journalistBeat ?? "");
@@ -605,6 +611,7 @@ export default function PressIQToolCore({
                   <button onClick={clearPitch} style={CLEAR_BTN}>Clear</button>
                 </div>
                 <textarea value={pitch} onChange={e => setPitch(e.target.value)} placeholder="Paste your full pitch here…" className="piq-field" style={{ ...LP_TEXTAREA, minHeight: 140 }} />
+                {pitchWarning?.(pitch)}
               </div>
 
               <div style={LSEC}>

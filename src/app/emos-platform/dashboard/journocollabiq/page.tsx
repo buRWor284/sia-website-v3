@@ -1,6 +1,8 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getJournalists } from "@/app/emos-platform/actions/coverageiq";
+import { getAssets } from "@/app/emos-platform/actions/assetiq";
+import { getAssetPackById } from "@/app/emos-platform/actions/asset-packs";
 import JournoCollabIQClient from "@/components/emos-platform/JournoCollabIQClient";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
@@ -23,19 +25,41 @@ const MONO   = "var(--font-mono)";
 export default async function JournoCollabIQPage({
   searchParams,
 }: {
-  searchParams: Promise<{ asset?: string; topic?: string; beat?: string; story?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
+  searchParams: Promise<{ asset?: string; pack?: string; topic?: string; beat?: string; story?: string; assetTitle?: string; assetType?: string; assetIdea?: string }>;
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/emos-platform/signin");
 
   const params = await searchParams;
 
+  /**
+   * 2026-09-15 — context arrives as an ID (?asset= or ?pack=) and the body is
+   * read here, server-side.
+   *
+   * AssetIQ used to link across with the asset description and the pack's pitch
+   * angle in the query string (200 and 300 words), so a client's unpublished
+   * pitch material sat in the address bar and in browser history, and Google
+   * Analytics copied the whole URL to Google as its `dl` page_view parameter.
+   *
+   * The old text parameters are still READ so links already in someone's
+   * history keep working; nothing generates them any more.
+   */
+  const assetRow = params.asset
+    ? (await getAssets()).find(a => a.id === params.asset) ?? null
+    : null;
+  const pack = params.pack ? await getAssetPackById(params.pack) : null;
+
   // Pre-fill from AssetIQ or SignalIQ context
-  const prefillBeat      = params.topic     ? params.topic     : params.beat      ? params.beat      : "";
-  const prefillStory     = params.story     ? stripMd(params.story)     : "";
-  const prefillAssetTitle = params.assetTitle ? params.assetTitle : undefined;
-  const prefillAssetType  = params.assetType  ? params.assetType  : undefined;
-  const prefillAssetIdea  = params.assetIdea  ? stripMd(params.assetIdea)  : undefined;
+  const prefillBeat      = assetRow?.target_keyword ?? assetRow?.title
+                        ?? pack?.beat_label ?? pack?.headline
+                        ?? (params.topic ? params.topic : params.beat ? params.beat : "");
+  const prefillStory     = pack?.pitch_angle ? stripMd(pack.pitch_angle)
+                        : params.story       ? stripMd(params.story)     : "";
+  const prefillAssetTitle = assetRow?.title ?? (params.assetTitle ? params.assetTitle : undefined);
+  const prefillAssetType  = assetRow?.asset_type ?? (params.assetType  ? params.assetType  : undefined);
+  const prefillAssetIdea  = assetRow?.description ? stripMd(assetRow.description)
+                        : pack?.linkable_asset_idea ? stripMd(pack.linkable_asset_idea)
+                        : params.assetIdea  ? stripMd(params.assetIdea)  : undefined;
 
   const journalists = await getJournalists();
 
@@ -123,6 +147,7 @@ export default async function JournoCollabIQPage({
           prefillAssetTitle={prefillAssetTitle}
           prefillAssetType={prefillAssetType}
           prefillAssetIdea={prefillAssetIdea}
+          prefillAssetId={assetRow?.id ?? null}
         />
 
         <PipelineNav current="collab" />

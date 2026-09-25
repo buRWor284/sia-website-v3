@@ -10,7 +10,7 @@
  *   ④ Saved journalist CRM list below
  */
 
-import React, { useState, useTransition, useEffect } from "react";
+import React, { useState, useTransition, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
@@ -23,7 +23,6 @@ import {
 } from "@/app/emos-platform/actions/coverageiq";
 import { DrAttribution } from "@/components/coverageiq/primitives";
 import type { DbJournalist, CreateJournalistInput } from "@/lib/coverageiq/types";
-import { clipWords } from "@/lib/clip-words";
 import { beatToTags } from "@/lib/journo/beat-tags";
 import Markdown from "@/components/emos-platform/Markdown";
 
@@ -98,10 +97,17 @@ interface AIJournalist {
 
 // ── Story form ─────────────────────────────────────────────────────────────────
 
+/** First N sentences of a block of prose, trimmed. */
+function firstSentences(text: string, n: number): string {
+  const parts = text.replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) ?? [];
+  return parts.slice(0, n).join("").trim();
+}
+
 function StoryForm({
   initial,
   onSearch,
   searching,
+  rememberKey,
 }: {
   initial: {
     biz: string; domain: string; desc: string; industry: string;
@@ -109,6 +115,10 @@ function StoryForm({
   };
   onSearch: (form: typeof initial) => void;
   searching: boolean;
+  /** localStorage key for this company's last search (website, geography,
+   *  beat, story). Empty seeds are filled from it on mount; every search
+   *  writes it. Per-browser convenience only, never the source of truth. */
+  rememberKey: string;
 }) {
   // Seeded once. Switching company in the picker remounts this form via the
   // `key` at the call site, which re-seeds brand / website / description from
@@ -116,6 +126,51 @@ function StoryForm({
   // through an effect.
   const [form, setForm] = useState(initial);
   const set = (k: keyof typeof form, v: string) => setForm(p => ({ ...p, [k]: v }));
+
+  // 2026-09-25 (bug P2-06): keep what was typed BEFORE React hydrated.
+  // These are controlled inputs. React leaves the DOM alone while it hydrates,
+  // so a user who starts typing within the first second sees their text — and
+  // then loses it on the first post-hydration keystroke, when React restores
+  // the controlled value (the seeded state). On a slow connection that was
+  // every field the tester filled. Once mounted, read what is actually in the
+  // boxes and adopt anything that differs from the seed.
+  const bizRef = useRef<HTMLInputElement>(null);
+  const domainRef = useRef<HTMLInputElement>(null);
+  const geoRef = useRef<HTMLInputElement>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
+  const industryRef = useRef<HTMLInputElement>(null);
+  const audDescRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    const typed: Partial<typeof form> = {};
+    const fields = { biz: bizRef, domain: domainRef, geo: geoRef, desc: descRef, industry: industryRef, audDesc: audDescRef } as const;
+    (Object.keys(fields) as (keyof typeof fields)[]).forEach(k => {
+      const v = fields[k].current?.value;
+      if (v !== undefined && v !== initial[k]) typed[k] = v;
+    });
+    // Last search for this company (P3 "form doesn't remember"): only fills
+    // boxes that are still empty, so a prefill from AssetIQ or a pre-hydration
+    // keystroke always wins.
+    let remembered: Partial<typeof form> = {};
+    try { remembered = JSON.parse(localStorage.getItem(rememberKey) ?? "{}"); } catch { /* noop */ }
+    const fill: Partial<typeof form> = {};
+    (["domain", "geo", "industry", "audDesc"] as const).forEach(k => {
+      const r = remembered[k];
+      if (typeof r === "string" && r.trim() && !initial[k].trim() && typed[k] === undefined) fill[k] = r;
+    });
+    if (Object.keys(typed).length || Object.keys(fill).length) setForm(p => ({ ...p, ...fill, ...typed }));
+    /* eslint-enable react-hooks/set-state-in-effect */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function submit() {
+    try {
+      localStorage.setItem(rememberKey, JSON.stringify({
+        domain: form.domain, geo: form.geo, industry: form.industry, audDesc: form.audDesc,
+      }));
+    } catch { /* noop */ }
+    onSearch(form);
+  }
 
   return (
     <div style={{ background: PAPER2, border: `1px solid ${INK15}`, padding: "20px 24px", marginBottom: 28 }}>
@@ -126,31 +181,31 @@ function StoryForm({
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Brand / company name</label>
-          <input value={form.biz} onChange={e => set("biz", e.target.value)} placeholder="Acme Corp" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+          <input ref={bizRef} value={form.biz} onChange={e => set("biz", e.target.value)} placeholder="Acme Corp" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
         </div>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Website</label>
-          <input value={form.domain} onChange={e => set("domain", e.target.value)} placeholder="acme.com" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+          <input ref={domainRef} value={form.domain} onChange={e => set("domain", e.target.value)} placeholder="acme.com" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
         </div>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Geography</label>
-          <input value={form.geo} onChange={e => set("geo", e.target.value)} placeholder="UK, US, Global…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+          <input ref={geoRef} value={form.geo} onChange={e => set("geo", e.target.value)} placeholder="UK, US, Global…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
         </div>
       </div>
 
       <div style={{ marginBottom: 12 }}>
         <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>What you do <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none" }}>(1-2 sentences)</span></label>
-        <textarea value={form.desc} onChange={e => set("desc", e.target.value)} rows={2} placeholder="We help SMBs access working capital through AI-driven lending decisions…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.55, padding: "9px 12px", resize: "none", outline: "none" }} />
+        <textarea ref={descRef} value={form.desc} onChange={e => set("desc", e.target.value)} rows={2} placeholder="We help SMBs access working capital through AI-driven lending decisions…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.55, padding: "9px 12px", resize: "none", outline: "none" }} />
       </div>
 
       <div style={{ marginBottom: 12 }}>
         <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Beat / topic journalists should cover</label>
-        <input value={form.industry} onChange={e => set("industry", e.target.value)} placeholder="Fintech, SMB lending, alternative finance…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+        <input ref={industryRef} value={form.industry} onChange={e => set("industry", e.target.value)} placeholder="Fintech, SMB lending, alternative finance…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
       </div>
 
       <div style={{ marginBottom: 16 }}>
         <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>The story / angle you're pitching</label>
-        <textarea value={form.audDesc} onChange={e => set("audDesc", e.target.value)} rows={3} placeholder="We have proprietary data on 10,000+ lending decisions showing SMBs are being rejected at 3x the rate they were in 2022, despite lower default rates…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.6, padding: "9px 12px", resize: "vertical", outline: "none" }} />
+        <textarea ref={audDescRef} value={form.audDesc} onChange={e => set("audDesc", e.target.value)} rows={3} placeholder="We have proprietary data on 10,000+ lending decisions showing SMBs are being rejected at 3x the rate they were in 2022, despite lower default rates…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.6, padding: "9px 12px", resize: "vertical", outline: "none" }} />
       </div>
 
       <div style={{ marginBottom: 16 }}>
@@ -168,7 +223,7 @@ function StoryForm({
 
       <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
         <button
-          onClick={() => onSearch(form)}
+          onClick={submit}
           disabled={searching || !form.audDesc.trim() || !form.industry.trim()}
           style={{ padding: "12px 28px", border: "none", background: searching || !form.audDesc.trim() ? "rgba(26,20,16,.12)" : INK, color: searching || !form.audDesc.trim() ? INK55 : PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", cursor: searching || !form.audDesc.trim() ? "wait" : "pointer" }}
         >
@@ -195,7 +250,6 @@ function JournalistCard({
   onSaved,
   prefillAssetTitle,
   prefillAssetType,
-  prefillAssetIdea,
   companyId,
   assetId,
 }: {
@@ -205,7 +259,6 @@ function JournalistCard({
   onSaved: (name: string, journalist: DbJournalist) => void;
   prefillAssetTitle?: string;
   prefillAssetType?: string;
-  prefillAssetIdea?: string;
   /** The company and asset this search was run for, saved alongside the
    * journalist so the CRM knows why they are in it (2026-09-09). */
   companyId?: string | null;
@@ -401,7 +454,15 @@ function JournalistCard({
             <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: ".14em", textTransform: "uppercase", color: INK55, marginBottom: 8 }}>Tailored pitch angle</div>
             <pre style={{ margin: 0, fontFamily: SERIF, fontSize: 13, color: INK, lineHeight: 1.6, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{angle}</pre>
             <a
-              href={`/emos-platform/dashboard/pressiq?beat=${encodeURIComponent(formData.industry ?? "")}&journalist=${encodeURIComponent(j.name)}${prefillAssetTitle ? `&assetTitle=${encodeURIComponent(prefillAssetTitle)}` : ""}${prefillAssetType ? `&assetType=${encodeURIComponent(prefillAssetType)}` : ""}${prefillAssetIdea ? `&assetIdea=${encodeURIComponent(clipWords(prefillAssetIdea, 300))}` : ""}`}
+              /* 2026-09-15: the asset travels as an id. This used to append a
+                 300-word `assetIdea` — the client's linkable-asset concept —
+                 to the URL, which put it in browser history and in Google
+                 Analytics (it logs the full URL as its `dl` parameter).
+                 `beat` is the user's own typed search term and `journalist` is
+                 a public byline, so both stay. The title/type fallback is kept
+                 for the case where the search was not run from a saved asset,
+                 and neither carries pitch content. */
+              href={`/emos-platform/dashboard/pressiq?beat=${encodeURIComponent(formData.industry ?? "")}&journalist=${encodeURIComponent(j.name)}${assetId ? `&asset=${encodeURIComponent(assetId)}` : `${prefillAssetTitle ? `&assetTitle=${encodeURIComponent(prefillAssetTitle)}` : ""}${prefillAssetType ? `&assetType=${encodeURIComponent(prefillAssetType)}` : ""}`}`}
               style={{ display: "inline-block", marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}>
               Score this pitch in PressIQ →
             </a>
@@ -752,6 +813,7 @@ export default function JournoCollabIQClient({
   prefillAssetTitle,
   prefillAssetType,
   prefillAssetIdea,
+  prefillAssetId,
 }: {
   initialJournalists: DbJournalist[];
   prefillBeat: string;
@@ -759,6 +821,9 @@ export default function JournoCollabIQClient({
   prefillAssetTitle?: string;
   prefillAssetType?: string;
   prefillAssetIdea?: string;
+  /** Set when this search was opened from a saved asset (?asset=<id>). Lets the
+   *  PressIQ handoff pass the id instead of the asset's text. */
+  prefillAssetId?: string | null;
 }) {
   const [companyContext] = useCompanyContext();
   const companyCtx = useCompanyOptional();
@@ -805,10 +870,13 @@ export default function JournoCollabIQClient({
       ].filter(Boolean).join(" ")
     : prefillStory;
 
+  // "What you do (1-2 sentences)" was seeded with the whole company context
+  // (600 chars in the 24 Sep test). The full context still reaches the model
+  // through the company row; the box gets the first two sentences.
   const defaultForm = {
     biz: companyCtx?.company?.name ?? "",
     domain: companyCtx?.company?.website ?? "",
-    desc: companyContext,
+    desc: firstSentences(companyContext, 2),
     industry: prefillBeat,
     audDesc: enrichedStory,
     geo: "",
@@ -900,6 +968,7 @@ export default function JournoCollabIQClient({
         initial={defaultForm}
         onSearch={handleSearch}
         searching={searching}
+        rememberKey={`jciq:last-search:${companyCtx?.company?.id ?? "no-company"}`}
       />
 
       {searchError && (
@@ -962,9 +1031,8 @@ export default function JournoCollabIQClient({
               }}
               prefillAssetTitle={prefillAssetTitle}
               prefillAssetType={prefillAssetType}
-              prefillAssetIdea={prefillAssetIdea}
               companyId={companyCtx?.company?.id ?? null}
-              assetId={null}
+              assetId={prefillAssetId ?? null}
             />
           ))}
 

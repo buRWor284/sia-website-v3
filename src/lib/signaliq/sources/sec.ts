@@ -113,7 +113,7 @@ export async function secSignal(seed: string): Promise<Signal | null> {
     return {
       source: "sec",
       topic: seed,
-      title: `${recent} SEC filings mention "${seed}" in 30 days`,
+      title: `${recent} SEC filing${recent === 1 ? "" : "s"} mention${recent === 1 ? "s" : ""} "${seed}" in 30 days`,
       url: `${FTS}${encodeURIComponent(`"${seed}"`)}`,
       observedAt: new Date().toISOString(),
       magnitude,

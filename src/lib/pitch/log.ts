@@ -99,6 +99,16 @@ export async function logPitch(
       // note and the full tier object are not in it. Honours the same D-13
       // toggle as the other pitch-derived columns.
       score_response:       stored ? result : null,
+      // 2026-09-25 (P2-04): everything else the scorer was given, so a reopened
+      // score can be re-run unchanged and land on the same number. Without
+      // this, "Edit this pitch → Analyze" silently dropped the subject and the
+      // authority signals and scored 74 where the row said 78.
+      input_snapshot:       stored ? {
+        subject:      input.subject ?? "",
+        brandSignals: input.brandSignals,
+        pitchMode:    input.pitchMode ?? "standalone",
+        platform:     input.platform,
+      } : null,
       journalist_id:        journalistId,
       asset_id:             assetId,
       company_id:           companyId,

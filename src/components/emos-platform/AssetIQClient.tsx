@@ -6,6 +6,14 @@
  * Layout:
  *   ① Create form (pre-populated from ?signal= query param if present)
  *   ② Asset list — type, title, status, signal ref, "Find journalists →" CTA
+ *
+ * 2026-09-15 — every handoff out of this page passes an ID, never the content.
+ * These links used to carry the asset description and the pack's pitch angle
+ * (200 and 300 words) in the query string, so client pitch material sat in the
+ * address bar and in browser history, and Google Analytics copied it to Google
+ * as the `dl` page_view parameter. JournoCollabIQ resolves ?asset= and ?pack=
+ * server-side instead. `assetType` stays in the URL: it is one of five fixed
+ * enum values and carries nothing about the client.
  */
 
 import React, { useState, useTransition } from "react";
@@ -24,7 +32,6 @@ import {
   type AssetStatus,
   type CreateAssetInput,
 } from "@/app/emos-platform/actions/assetiq";
-import { clipWords } from "@/lib/clip-words";
 import Markdown from "@/components/emos-platform/Markdown";
 
 // ── design tokens ──────────────────────────────────────────────────────────────
@@ -395,7 +402,7 @@ function AssetRow({
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {/* Find journalists CTA */}
           <a
-            href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent(clipWords(asset.description ?? "", 200))}`}
+            href={`/emos-platform/dashboard/journocollabiq?asset=${encodeURIComponent(asset.id)}`}
             style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", textDecoration: "none" }}
           >
             Find journalists →
@@ -430,7 +437,7 @@ function AssetRow({
               </p>
               <div className="aiq-noprint" style={{ marginTop: 12, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
                 <a
-                  href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(asset.target_keyword ?? asset.title)}&assetTitle=${encodeURIComponent(asset.title)}&assetType=${encodeURIComponent(asset.asset_type)}&assetIdea=${encodeURIComponent(clipWords(asset.description ?? "", 200))}`}
+                  href={`/emos-platform/dashboard/journocollabiq?asset=${encodeURIComponent(asset.id)}`}
                   style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", color: INK, textDecoration: "none", borderBottom: `1px solid ${INK35}` }}
                 >
                   Find journalists for this asset →
@@ -496,6 +503,7 @@ export default function AssetIQClient({
   assetIdea,
   dataBrief,
   pitchAngle,
+  packId,
 }: {
   initialAssets: DbAsset[];
   prefillTitle: string;
@@ -504,6 +512,9 @@ export default function AssetIQClient({
   assetIdea?: string | null;
   dataBrief?: string | null;
   pitchAngle?: string | null;
+  /** Set when we arrived as ?pack=<id>. Passed on to JournoCollabIQ so the
+   *  pack body is fetched there too, rather than travelling in a URL. */
+  packId?: string | null;
 }) {
   const [assets, setAssets] = useState<DbAsset[]>(initialAssets);
   const [showForm, setShowForm] = useState(prefillTitle !== "" || signalId !== null);
@@ -717,7 +728,9 @@ export default function AssetIQClient({
                 </p>
                 <div className="aiq-noprint" style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "flex", gap: 10 }}>
                   <a
-                    href={`/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle || signalHeadline || "")}&story=${encodeURIComponent(clipWords(pitchAngle ?? assetIdea ?? "", 300))}&assetTitle=${encodeURIComponent(planTitle)}&assetType=${encodeURIComponent(planAssetType)}&assetIdea=${encodeURIComponent(clipWords(assetIdea ?? "", 200))}`}
+                    href={packId
+                      ? `/emos-platform/dashboard/journocollabiq?pack=${encodeURIComponent(packId)}&assetType=${encodeURIComponent(planAssetType)}`
+                      : `/emos-platform/dashboard/journocollabiq?beat=${encodeURIComponent(planTitle || signalHeadline || "")}&assetTitle=${encodeURIComponent(planTitle)}&assetType=${encodeURIComponent(planAssetType)}`}
                     style={{ padding: "8px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", textDecoration: "none" }}
                   >
                     Find journalists for this asset →

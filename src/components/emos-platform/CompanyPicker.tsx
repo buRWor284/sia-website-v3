@@ -31,6 +31,7 @@ const PAPER2 = "#e8e0cc";
 const INK    = "#1a1410";
 const INK55  = "rgba(26,20,16,.55)";
 const INK15  = "rgba(26,20,16,.15)";
+const INK35  = "rgba(26,20,16,.35)";
 const YEL    = "#f5b81f";
 const GREEN  = "#3e6b45";
 const RED    = "#c14a32";
@@ -284,8 +285,20 @@ export default function CompanyPicker({
             {panel === "add" ? "Cancel" : "+ Add company"}
           </button>
         ) : (
-          <button onClick={toggleManage} style={LINK}>
-            {manage ? "Done" : "Manage"}
+          // 2026-09-25 (bug P2-02): "Manage" always worked, but it opened a
+          // 12px-high row of underlined links that the tester read as
+          // "nothing happened" twice. It is now a real button that changes
+          // state visibly, and the row it opens is boxed and labelled.
+          <button
+            onClick={toggleManage}
+            aria-expanded={manage}
+            style={{
+              ...LINK, borderBottom: "none", padding: "4px 9px",
+              background: manage ? INK : "transparent", color: manage ? PAPER : INK,
+              border: `1px solid ${manage ? INK : INK35}`,
+            }}
+          >
+            {manage ? "Done ✕" : "Manage ▾"}
           </button>
         )}
 
@@ -331,8 +344,9 @@ export default function CompanyPicker({
       {manage && (
         <div style={{
           display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
-          padding: "9px 14px", borderTop: `1px solid ${INK15}`, background: PAPER,
+          padding: "10px 14px", borderTop: `1px solid ${INK}`, background: PAPER2,
         }}>
+          <span style={LABEL}>Manage companies</span>
           <button onClick={() => toggle("add")} style={LINK}>
             {panel === "add" ? "Cancel" : "+ Add company"}
           </button>

@@ -101,7 +101,12 @@ export const SCAN_STATS: Array<{ big: string; rest: string; src: string }> = [
   { big: "73%",        rest: "of pitches are rejected for being off-beat. A signal-backed angle isn't.", src: "Muck Rack 2024" },
   { big: "53%",        rest: "of journalists say a pitch should include original data. Your scan builds it.", src: "Muck Rack 2024" },
   { big: "Weeks ahead", rest: "academic preprints can lead mainstream coverage. SignalIQ reads them first.", src: "arXiv" },
-  { big: "92%",        rest: "of people trust earned media above every form of advertising.", src: "Nielsen" },
+  // 2026-09-25 (P3-07): the "92% trust earned media (Nielsen)" card was
+  // removed. It came from Nielsen's 2012 Global Trust in Advertising report,
+  // where "earned media" meant recommendations from people you know, not press
+  // coverage. Undated and off-definition, it failed the primary-source rule
+  // this product sells. Add a replacement only with a dated, press-specific
+  // figure traced to its report.
   { big: "$15-40k/yr", rest: "what enterprise media tools cost. The signal layer they skip is free here.", src: "Prowly · Vendr" },
 ];
 

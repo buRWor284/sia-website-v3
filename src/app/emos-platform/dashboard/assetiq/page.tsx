@@ -2,6 +2,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getAssets } from "@/app/emos-platform/actions/assetiq";
 import { getSignals } from "@/app/emos-platform/actions/signaliq";
+import { getAssetPackById } from "@/app/emos-platform/actions/asset-packs";
 import AssetIQClient from "@/components/emos-platform/AssetIQClient";
 import PipelineNav from "@/components/emos-platform/PipelineNav";
 import type { Metadata } from "next";
@@ -22,7 +23,7 @@ const SERIF  = "var(--font-serif)";
 export default async function AssetIQPage({
   searchParams,
 }: {
-  searchParams: Promise<{ signal?: string; headline?: string; assetIdea?: string; dataBrief?: string; pitchAngle?: string }>;
+  searchParams: Promise<{ pack?: string; signal?: string; headline?: string; assetIdea?: string; dataBrief?: string; pitchAngle?: string }>;
 }) {
   const { userId } = await auth();
   if (!userId) redirect("/emos-platform/signin");
@@ -30,12 +31,33 @@ export default async function AssetIQPage({
   // Next.js hands searchParams over already decoded. Decoding again threw on any
   // "%" in the text (e.g. "37% of saturation" in a pack brief) and crashed the page.
   const params = await searchParams;
-  const signalId    = params.signal ?? null;
+
+  /**
+   * 2026-09-15 — `?pack=<id>` is the handoff now; the pack body is read here,
+   * server-side, instead of being carried in the URL.
+   *
+   * SignalIQ used to pass headline + asset idea + a 400-word data brief + a
+   * 300-word pitch angle as query parameters. A client's unpublished pitch
+   * content therefore sat in the address bar and in browser history, and
+   * Google Analytics reports the full URL as its `dl` page_view parameter, so
+   * it was being copied to Google on every visit. Long packs also risked a 414.
+   *
+   * The old text parameters are still READ so links already sitting in someone's
+   * history keep working, but nothing generates them any more. Delete the
+   * fallback once it has been unused for a while.
+   */
+  const packId      = params.pack ?? null;
+  const pack        = packId ? await getAssetPackById(packId) : null;
+
+  const signalId    = pack?.signal_id ?? params.signal ?? null;
   // Pack text is light Markdown; these land in one-line slots, so flatten it.
-  const assetIdea   = params.assetIdea   ? stripMd(params.assetIdea)   : null;
-  const dataBrief   = params.dataBrief   ? stripMd(params.dataBrief)   : null;
-  const pitchAngle  = params.pitchAngle  ? stripMd(params.pitchAngle)  : null;
-  const signalHeadlineFromParam = params.headline ? params.headline : null;
+  const assetIdea   = pack?.linkable_asset_idea ? stripMd(pack.linkable_asset_idea)
+                    : params.assetIdea          ? stripMd(params.assetIdea)   : null;
+  const dataBrief   = pack?.story_brief         ? stripMd(pack.story_brief)
+                    : params.dataBrief          ? stripMd(params.dataBrief)   : null;
+  const pitchAngle  = pack?.pitch_angle         ? stripMd(pack.pitch_angle)
+                    : params.pitchAngle         ? stripMd(params.pitchAngle)  : null;
+  const signalHeadlineFromParam = pack?.headline ?? (params.headline ? params.headline : null);
 
   // If signal ID provided, fetch its headline from DB as backup
   let signalHeadline = signalHeadlineFromParam;
@@ -88,6 +110,7 @@ export default async function AssetIQPage({
           assetIdea={assetIdea}
           dataBrief={dataBrief}
           pitchAngle={pitchAngle}
+          packId={packId}
         />
 
         <PipelineNav current="asset" />
