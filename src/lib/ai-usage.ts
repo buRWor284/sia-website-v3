@@ -46,6 +46,7 @@ export type AiTool =
   | "signaliq-pack"
   | "signaliq-profile"
   | "journo-ai"
+  | "journo-verify"
   | "collab-ai"
   | "asset-brief"
   | "company-brief";
@@ -83,7 +84,7 @@ const PRICES: Record<string, ModelPrice> = {
   "claude-haiku-4-5":  { input: 1, output: 5,  cacheWrite: 1.25, cacheRead: 0.1 },
 };
 
-/** $10 per 1,000 web searches (same page). No EMOS call uses it today. */
+/** $10 per 1,000 web searches (same page). Used by journo-verify (2026-09-25). */
 const WEB_SEARCH_USD = 10 / 1000;
 
 /** Exact id, or the id plus an 8-digit date snapshot suffix. Nothing looser:
