@@ -34,6 +34,12 @@ const SEARCH_TOOL = "web_search_20250305";
 /** Listing page(s) plus up to 4 articles opened for bylines and dates. */
 const MAX_FETCHES = 6;
 const READ_TIMEOUT_MS = 120_000;
+/**
+ * Page cap per read. 8k -> 20k (25 Sep, first read): Campaign ME's tag page
+ * showed Anup Oommen's 23-24 Sep bylines further down the page, and the 8k
+ * cap cut them off (0 names found). Costs a little more per read.
+ */
+const PAGE_TOKENS = 20_000;
 
 /** Credits that are not a person: never a roster name. */
 const NOT_A_PERSON =
@@ -55,6 +61,50 @@ function sameSite(url: string, domain: string): boolean {
   return !!d && (d === o || d.endsWith("." + o) || o.endsWith("." + d));
 }
 
+/** "/2026/09/24/" or "/2026-09-24" in a URL. Month-only paths are not enough. */
+export function dateFromUrl(url: string): Date | null {
+  const m = /\/(20\d{2})[/-](0[1-9]|1[0-2])[/-](0[1-9]|[12]\d|3[01])(?:[/-]|$)/.exec(url);
+  return m ? parseDate(`${m[1]}-${m[2]}-${m[3]}`) : null;
+}
+
+/**
+ * The byline list from the reader's answer. The model sometimes narrates
+ * before the JSON ("I'll help you find..."), which broke the first read for
+ * Argaam and Arab News tourism, so every complete {...} object that has an
+ * "author" is salvaged on its own.
+ */
+export function parseBylines(text: string): Array<Record<string, unknown>> | null {
+  const a = text.lastIndexOf("[{");
+  const z = text.lastIndexOf("]");
+  if (a >= 0 && z > a) {
+    try {
+      const v = JSON.parse(text.slice(a, z + 1));
+      if (Array.isArray(v)) return v as Array<Record<string, unknown>>;
+    } catch { /* fall through to salvage */ }
+  }
+  const out: Array<Record<string, unknown>> = [];
+  let depth = 0, start = -1, inStr = false, esc = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inStr) { if (esc) esc = false; else if (ch === "\\") esc = true; else if (ch === '"') inStr = false; continue; }
+    if (ch === '"') { inStr = true; continue; }
+    if (ch === "{") { if (depth === 0) start = i; depth++; }
+    else if (ch === "}" && depth > 0) {
+      depth--;
+      if (depth === 0 && start >= 0) {
+        try {
+          const o = JSON.parse(text.slice(start, i + 1));
+          if (o && typeof o === "object" && typeof (o as { author?: unknown }).author === "string") out.push(o as Record<string, unknown>);
+        } catch { /* skip */ }
+        start = -1;
+      }
+    }
+  }
+  // An empty "[]" answer is a real answer (no named bylines), not a failure.
+  if (!out.length && /\[\s*\]/.test(text)) return [];
+  return out.length ? out : null;
+}
+
 function buildReadPrompt(o: Outlet, market: string, beat: string, today: Date): string {
   const iso = (d: Date) => d.toISOString().slice(0, 10);
   const earliest = new Date(today.getTime() - BYLINE_MAX_AGE_DAYS * 86_400_000);
@@ -64,15 +114,16 @@ ${o.confirmPages ? `\nIf these pages show few articles, you may search once for 
 Goal: find the named JOURNALISTS who wrote recent articles here (market: ${market.toUpperCase()}, beat: ${beat.replace(/-/g, " ")}).
 
 Steps:
-1. From the page(s), take the most recent articles (published on or after ${iso(earliest)}).
-2. The listing may not show the author or date. Open up to 4 of the most recent articles to read the byline and date.
-3. Report only PERSONAL bylines. Skip "Staff", desks, the outlet's own name, and wire agencies (AFP, Reuters, SPA, WAM, AP, Bloomberg).
+1. Read the WHOLE page: bylines and dates are often further down, or shown only on some items.
+2. Take the most recent articles (published on or after ${iso(earliest)}).
+3. The listing may not show the author or date. Open up to 4 of the most recent articles that still lack one, to read the byline and date.
+4. Report only PERSONAL bylines. Skip "Staff", desks, the outlet's own name, and wire agencies (AFP, Reuters, SPA, WAM, AP, Bloomberg).
 
 Rules:
 - article_url must be copied exactly from a page you fetched or a link on it. Never build or guess a URL.
 - date is YYYY-MM-DD; leave it empty if you did not see it.
 
-Reply with ONLY a JSON array, no other text:
+Do not describe your steps. Your final message must be ONLY this JSON array, nothing before or after it:
 [{"author":"Full name","article_url":"","title":"","date":"YYYY-MM-DD or empty"}]`;
 }
 
@@ -116,7 +167,7 @@ export async function readOutlet(o: Outlet, market: string, beat: string): Promi
         model: ROSTER_MODEL,
         max_tokens: 1500,
         tools: [
-          { type: FETCH_TOOL, name: "web_fetch", max_uses: MAX_FETCHES, max_content_tokens: 8000 },
+          { type: FETCH_TOOL, name: "web_fetch", max_uses: MAX_FETCHES, max_content_tokens: PAGE_TOKENS },
           ...(o.confirmPages ? [{ type: SEARCH_TOOL, name: "web_search", max_uses: 1 }] : []),
         ],
         messages: [{ role: "user", content: buildReadPrompt(o, market, beat, today) }],
@@ -140,11 +191,8 @@ export async function readOutlet(o: Outlet, market: string, beat: string): Promi
   ).length;
 
   const text = (json.content ?? []).filter((b) => b.type === "text").map((b) => b.text ?? "").join("");
-  let arr: unknown = null;
-  const a = text.indexOf("[");
-  const z = text.lastIndexOf("]");
-  if (a >= 0 && z > a) { try { arr = JSON.parse(text.slice(a, z + 1)); } catch { arr = null; } }
-  if (!Array.isArray(arr)) {
+  const arr = parseBylines(text);
+  if (!arr) {
     return logRead({ domain, ok: false, bylines: 0, newest: null, note: `unreadable answer (fetch errors: ${fetchErrors}) ${text.slice(0, 160)}` });
   }
 
@@ -155,7 +203,8 @@ export async function readOutlet(o: Outlet, market: string, beat: string): Promi
   for (const item of arr as Array<Record<string, unknown>>) {
     const author = typeof item?.author === "string" ? item.author.trim() : "";
     const url = typeof item?.article_url === "string" ? item.article_url.trim() : "";
-    const date = parseDate(typeof item?.date === "string" ? item.date : "");
+    // The model's date, else a date written in the article URL (/2026/09/24/).
+    const date = parseDate(typeof item?.date === "string" ? item.date : "") ?? dateFromUrl(url);
     if (!author || !url) { drop("missing"); continue; }
     if (!isPersonByline(author, o.name)) { drop("not a person"); continue; }
     if (!sameSite(url, domain)) { drop("other site"); continue; }
