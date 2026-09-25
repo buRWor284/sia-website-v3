@@ -47,6 +47,7 @@ export type AiTool =
   | "signaliq-profile"
   | "journo-ai"
   | "journo-verify"
+  | "journo-discover"
   | "collab-ai"
   | "asset-brief"
   | "company-brief";

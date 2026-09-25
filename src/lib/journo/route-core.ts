@@ -42,7 +42,7 @@ export const ANGLE_LABEL: Record<string, string> = {
 // prompt is byte-identical to before and the dashboard prompt gains exactly the
 // context it supplied (an absent field is omitted rather than rendered as
 // "Not provided" — the one intentional, harmless change from the old copies).
-function contextLines(d: Record<string, unknown>): string {
+export function contextLines(d: Record<string, unknown>): string {
   const lines: string[] = [];
   if (d.signalContext)  lines.push(`- Signal / news hook context: ${d.signalContext}`);
   if (d.assetContext)   lines.push(`- Asset being pitched (if applicable): ${d.assetContext}`);
@@ -412,7 +412,10 @@ export function verifyCandidates(
   // back not confirmed, with the find-the-reporter fallback.
   const isDesk = (n: string) => /\bdesk\b|\/|\bnewsroom\b|\beditorial team\b/i.test(n);
   const checks = candidates.map((c) =>
-    isDesk(c.name)
+    // Already proven by the search-first list: no second check.
+    c.verification?.status === "verified"
+      ? Promise.resolve<JournalistVerification>(c.verification)
+      : isDesk(c.name)
       ? Promise.resolve<JournalistVerification>({
           ...pendingVerification(c.name, String(c.url ?? "")),
           status: "unverified",
@@ -441,7 +444,7 @@ export function verifyCandidates(
       else if (v.status === "unverified") stats.unverified++;
       else stats.pending++;
       if (v.cached) stats.cached++;
-      return applyVerification({ ...c, aiTier: c.tier }, v);
+      return applyVerification({ ...c, aiTier: c.aiTier ?? c.tier }, v);
     });
     return { result: JSON.stringify(out), inFlight, stats };
   });

@@ -57,6 +57,7 @@ const TOOL_LABELS: Record<string, string> = {
   "signaliq-profile": "SignalIQ · company profile",
   "journo-ai": "JournoCollabIQ",
   "journo-verify": "JournoCollabIQ · byline check",
+  "journo-discover": "JournoCollabIQ · search-first list",
   "collab-ai": "PartnerCollabIQ",
   "asset-brief": "AssetIQ · brief",
   "company-brief": "Company brief · research / condense",

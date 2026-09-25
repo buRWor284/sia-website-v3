@@ -63,9 +63,10 @@ const MAX_FETCHES = 1;
  * Stored in the row's `model` column and required on cache reads, so a
  * change to how checks are made retires older answers without deleting them.
  * v1 = search only (25 Sep, eval run 1: real people missed). v2 = + one page read.
+ * v3 = + the search listing date counts for an undated article (25 Sep, eval 2).
  * Bump the suffix whenever the prompt, tools or rules change.
  */
-export const CHECKER_ID = `${JOURNO_VERIFY_MODEL}|v2${WEB_FETCH_TOOL === "off" ? "-nofetch" : ""}`;
+export const CHECKER_ID = `${JOURNO_VERIFY_MODEL}|v3${WEB_FETCH_TOOL === "off" ? "-nofetch" : ""}`;
 /** Per-candidate ceiling. The search route runs these in parallel after Opus. */
 const DEFAULT_TIMEOUT_MS = 25_000;
 
@@ -166,14 +167,16 @@ Rules:
 - Only report an article that appeared in your search results or on a page you fetched. Copy its URL exactly. Never build or guess a URL. If the fetched author page shows a recent dated article but no link to it, report the author page URL and that article's title and date.
 - The byline must be this person. An article that only quotes or mentions them does not count.
 - If the byline is at a DIFFERENT publication, set same_outlet to false and say in "note" where you found them.
-- If you cannot confirm a publish date on or after ${iso(earliest)}, set verified to false.
+- If you found an ARTICLE by them at this outlet but its date is not shown, still give its URL, leave byline_date empty and set is_their_byline to true: the date the search engine lists for that page will be checked.
+- Set verified to true only if you saw a publish date on or after ${iso(earliest)}.
 
 Reply with ONLY this JSON object, no other text:
-{"verified": true or false, "byline_url": "", "byline_title": "", "byline_date": "YYYY-MM-DD or empty", "outlet_name": "the publication's real name", "same_outlet": true or false, "role_as_of": "their role or beat as the article shows it, or empty", "note": "one short sentence"}`;
+{"verified": true or false, "is_their_byline": true or false, "byline_url": "", "byline_title": "", "byline_date": "YYYY-MM-DD or empty", "outlet_name": "the publication's real name", "same_outlet": true or false, "role_as_of": "their role or beat as the article shows it, or empty", "note": "one short sentence"}`;
 }
 
 interface VerifierAnswer {
   verified?: unknown;
+  is_their_byline?: unknown;
   byline_url?: unknown;
   byline_title?: unknown;
   byline_date?: unknown;
@@ -200,7 +203,7 @@ function parseAnswer(text: string): VerifierAnswer | null {
 
 /** URL identity for "did the search return this page?": host without www,
  *  path without trailing slash, no query or fragment. */
-function urlKey(u: string): string {
+export function urlKey(u: string): string {
   try {
     const p = new URL(u);
     return `${p.hostname.replace(/^www\d?\./, "").toLowerCase()}${p.pathname.replace(/\/+$/, "")}`;
@@ -211,11 +214,100 @@ function urlKey(u: string): string {
 
 const str = (v: unknown): string => (typeof v === "string" ? v.trim() : "");
 
-function parseDate(s: string): Date | null {
+export function parseDate(s: string): Date | null {
   const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
   if (!m) return null;
   const d = new Date(`${m[1]}-${m[2]}-${m[3]}T00:00:00Z`);
   return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/**
+ * The date the search engine lists for a result (`page_age`): "April 30,
+ * 2026", "2026-04-30", "3 weeks ago", "2 days ago". Null when unreadable.
+ * Added 25 Sep after the eval: some outlets (arabianbusiness.com) refuse page
+ * reads and print no date in the snippet, so a real, active journalist could
+ * never pass the 12-month rule.
+ */
+export function parsePageAge(s: unknown, now = new Date()): Date | null {
+  if (typeof s !== "string" || !s.trim()) return null;
+  const t = s.trim().toLowerCase();
+  const rel = /^(\d+)\s+(minute|hour|day|week|month|year)s?\s+ago$/.exec(t);
+  if (rel) {
+    const n = parseInt(rel[1], 10);
+    const days = { minute: 0, hour: 0, day: 1, week: 7, month: 30, year: 365 }[rel[2] as "day"] * n;
+    return new Date(now.getTime() - days * 86_400_000);
+  }
+  const iso = parseDate(t);
+  if (iso) return iso;
+  const d = new Date(s);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/** Author, tag and profile pages list many articles; their search date is the
+ *  page's, not an article's, so it never counts as a byline date. */
+export function isProfileUrl(u: string): boolean {
+  return /\/(author|authors|tag|tags|profile|profiles|people|writer|writers|contributor|contributors|staff|team|journalist)s?(\/|$)/i.test(
+    (() => { try { return new URL(u).pathname; } catch { return ""; } })(),
+  );
+}
+
+/** What the tools really returned: every URL (search results, fetched pages,
+ *  links inside fetched pages) and the search engine's date per URL. */
+export function collectEvidence(content: Array<{ type: string; content?: unknown }> | undefined): {
+  seen: Set<string>;
+  ages: Map<string, Date>;
+  searchOk: number;
+} {
+  const seen = new Set<string>();
+  const ages = new Map<string, Date>();
+  let fetchedText = "";
+  let searchOk = 0;
+  for (const b of content ?? []) {
+    if (b.type === "web_search_tool_result" && Array.isArray(b.content)) {
+      searchOk++;
+      for (const r of b.content as Array<{ url?: string; page_age?: unknown }>) {
+        if (!r?.url) continue;
+        const k = urlKey(r.url);
+        seen.add(k);
+        const d = parsePageAge(r.page_age);
+        if (d) ages.set(k, d);
+      }
+    }
+    if (b.type === "web_fetch_tool_result") {
+      const c = b.content as { type?: string; url?: string; content?: { source?: { data?: unknown } } } | undefined;
+      if (c?.type === "web_fetch_result") {
+        if (c.url) seen.add(urlKey(c.url));
+        const data = c.content?.source?.data;
+        if (typeof data === "string") fetchedText += data;
+      }
+    }
+  }
+  if (fetchedText) {
+    for (const m of fetchedText.matchAll(/https?:\/\/[^\s)\]"'<>]+/g)) seen.add(urlKey(m[0]));
+  }
+  return { seen, ages, searchOk };
+}
+
+/** One cache row, awaited. Returns the stored checked_at (or now). */
+export async function writeVerificationRow(row: {
+  name: string; outlet: string; outlet_domain: string; byline_domain: string | null; verified: boolean;
+  byline_url: string | null; byline_title: string | null; byline_date: string | null;
+  role_as_of: string | null; note: string | null; searches_used: number;
+}): Promise<string> {
+  let checkedAt = new Date().toISOString();
+  try {
+    const db = createSupabaseServiceClient();
+    const { data, error } = await db
+      .from("journalist_verifications")
+      .insert({ ...row, name_key: nameKey(row.name), model: CHECKER_ID })
+      .select("checked_at")
+      .single();
+    if (error) console.warn("[journo-verify] cache write failed:", error.message);
+    else if (data?.checked_at) checkedAt = data.checked_at as string;
+  } catch (e) {
+    console.warn("[journo-verify] cache write error (non-fatal):", e);
+  }
+  return checkedAt;
 }
 
 interface SearchResponse {
@@ -288,28 +380,8 @@ export async function verifyJournalist(
   await recordAiUsage("journo-verify", JOURNO_VERIFY_MODEL, json);
   const searchesUsed = json.usage?.server_tool_use?.web_search_requests ?? 0;
 
-  // Every URL the tools really returned: search results, any fetched page,
-  // and links written inside a fetched page. A byline must be one of these.
-  const seen = new Set<string>();
-  let fetchedText = "";
-  let searchOk = 0;
-  for (const b of json.content ?? []) {
-    if (b.type === "web_search_tool_result" && Array.isArray(b.content)) {
-      searchOk++;
-      for (const r of b.content as Array<{ url?: string }>) if (r?.url) seen.add(urlKey(r.url));
-    }
-    if (b.type === "web_fetch_tool_result") {
-      const c = b.content as { type?: string; url?: string; content?: { source?: { data?: unknown } } } | undefined;
-      if (c?.type === "web_fetch_result") {
-        if (c.url) seen.add(urlKey(c.url));
-        const data = c.content?.source?.data;
-        if (typeof data === "string") fetchedText += data;
-      }
-    }
-  }
-  if (fetchedText) {
-    for (const m of fetchedText.matchAll(/https?:\/\/[^\s)\]"'<>]+/g)) seen.add(urlKey(m[0]));
-  }
+  // Every URL the tools really returned. A byline must be one of these.
+  const { seen, ages, searchOk } = collectEvidence(json.content);
   if (searchOk === 0) return failed(input, "The web search did not run, so nothing was checked.", searchesUsed);
 
   const text = (json.content ?? []).filter((b) => b.type === "text").map((b) => b.text ?? "").join("");
@@ -318,12 +390,20 @@ export async function verifyJournalist(
 
   const bylineUrl = str(ans.byline_url);
   const bylineDomain = bylineUrl ? normaliseDomain(bylineUrl) : "";
-  const date = parseDate(str(ans.byline_date));
+  // The model's date first; else the search engine's date for that exact
+  // article (never for an author/tag page, whose date is the page's own).
+  let date = parseDate(str(ans.byline_date));
+  let dateFromSearch = false;
+  if (!date && bylineUrl && !isProfileUrl(bylineUrl)) {
+    const d = ages.get(urlKey(bylineUrl));
+    if (d) { date = d; dateFromSearch = true; }
+  }
   const ageDays = date ? (today.getTime() - date.getTime()) / 86_400_000 : Infinity;
   let note = str(ans.note) || null;
+  if (dateFromSearch) note = `Date taken from the search listing. ${note ?? ""}`.trim();
 
   // Code decides. Each failed rule says why in the note.
-  let verified = ans.verified === true;
+  let verified = ans.verified === true || (ans.is_their_byline === true && dateFromSearch);
   const refuse = (why: string) => { verified = false; note = note ? `${why} ${note}` : why; };
   if (verified && (!bylineUrl || !/^https?:\/\//i.test(bylineUrl))) refuse("No byline link was given.");
   else if (verified && !seen.has(urlKey(bylineUrl))) refuse("The byline link was not among the search results.");
@@ -334,7 +414,6 @@ export async function verifyJournalist(
 
   const row = {
     name,
-    name_key: nameKey(name),
     outlet: input.outlet.trim(),
     outlet_domain: outletDomain,
     byline_domain: bylineDomain || null,
@@ -347,18 +426,8 @@ export async function verifyJournalist(
     role_as_of: str(ans.role_as_of) || null,
     note: note ? note.slice(0, 500) : null,
     searches_used: searchesUsed,
-    model: CHECKER_ID,
   };
-
-  let checkedAt = new Date().toISOString();
-  try {
-    const db = createSupabaseServiceClient();
-    const { data, error } = await db.from("journalist_verifications").insert(row).select("checked_at").single();
-    if (error) console.warn("[journo-verify] cache write failed:", error.message);
-    else if (data?.checked_at) checkedAt = data.checked_at as string;
-  } catch (e) {
-    console.warn("[journo-verify] cache write error (non-fatal):", e);
-  }
+  const checkedAt = await writeVerificationRow(row);
 
   return fromRow({ ...row, checked_at: checkedAt }, false);
 }

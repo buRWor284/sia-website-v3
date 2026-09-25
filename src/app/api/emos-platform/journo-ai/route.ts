@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { runJournoAI, verifyCandidates } from "@/lib/journo/route-core";
+import { discoverJournalists } from "@/lib/journo/discover";
 import { withAiUsage } from "@/lib/ai-usage";
 import { getApprovedBrief } from "@/lib/company-brief";
 import { reserveUsage } from "@/lib/usage-limits";
@@ -52,19 +53,46 @@ export async function POST(request: NextRequest) {
   if (!seat.ok) return seat.res;
 
   const companyBrief = await getApprovedBrief(guard.userId); // active company, approved only
-  const run = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
-    runJournoAI(type, data, companyBrief),
-  );
-  if (!run.ok) {
-    await seat.release();
-    return NextResponse.json({ error: run.error }, { status: run.status });
+  const ctx = { surface: "platform" as const, clerkUserId: guard.userId };
+
+  // Search-first list (25 Sep, after the eval): the journalists come from
+  // real recent articles found by web search, not from the model's memory.
+  // If discovery fails FAST (an API error), fall back to the memory list +
+  // checks; if it failed slowly there is no time left, so say so and refund.
+  let listSource = "memory";
+  let listJson: string | null = null;
+  if (type === "partner-suggestions" && process.env.JOURNO_DISCOVERY !== "off") {
+    const found = await withAiUsage(ctx, () => discoverJournalists(data, companyBrief));
+    if (found.ok && found.candidates.length > 0) {
+      listJson = JSON.stringify(found.candidates);
+      listSource = "search";
+    } else if (Date.now() - startedAt > 15_000) {
+      await seat.release();
+      console.error(`[journo-ai] discovery failed slowly (${found.error}); search refunded`);
+      return NextResponse.json(
+        { error: "The live journalist search took too long. This search was not counted; please retry." },
+        { status: 504 },
+      );
+    } else {
+      console.warn(`[journo-ai] discovery failed (${found.error}); falling back to the memory list`);
+    }
+  }
+
+  let resultText = listJson;
+  if (!resultText) {
+    const run = await withAiUsage(ctx, () => runJournoAI(type, data, companyBrief));
+    if (!run.ok) {
+      await seat.release();
+      return NextResponse.json({ error: run.error }, { status: run.status });
+    }
+    resultText = run.result;
   }
 
   if (type === "partner-suggestions") {
     // Every name is checked for a recent byline before the card shows it as a
     // person (P1-01). Checks run in parallel; late ones come back "pending".
-    const checked = await withAiUsage({ surface: "platform", clerkUserId: guard.userId }, () =>
-      verifyCandidates(run.result, {
+    const checked = await withAiUsage(ctx, () =>
+      verifyCandidates(resultText, {
         deadlineMs: startedAt + VERIFY_DEADLINE_MS,
         beat: typeof data.industry === "string" ? data.industry : null,
       }),
@@ -81,10 +109,10 @@ export async function POST(request: NextRequest) {
     // cache (awaited inside after(), never fire-and-forget).
     after(() => checked.inFlight);
     console.log(
-      `[journo-ai] verified=${checked.stats.verified} unverified=${checked.stats.unverified} pending=${checked.stats.pending} cached=${checked.stats.cached} ms=${Date.now() - startedAt}`,
+      `[journo-ai] list=${listSource} verified=${checked.stats.verified} unverified=${checked.stats.unverified} pending=${checked.stats.pending} cached=${checked.stats.cached} ms=${Date.now() - startedAt}`,
     );
-    return NextResponse.json({ result: checked.result, verifyStats: checked.stats, ms: Date.now() - startedAt });
+    return NextResponse.json({ result: checked.result, verifyStats: checked.stats, listSource, ms: Date.now() - startedAt });
   }
 
-  return NextResponse.json({ result: run.result });
+  return NextResponse.json({ result: resultText });
 }
