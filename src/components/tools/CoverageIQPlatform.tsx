@@ -171,7 +171,7 @@ export default function CoverageIQPlatform({
   const sectionMastProps: Record<TabId, { number: string; label: string; vol: string }> = {
     pipeline:  { number: "§ 01", label: "Pitch Pipeline",      vol: "DRAFTED → AMPLIFIED" },
     followups: { number: "§ 02", label: "Follow-ups",          vol: "ACTIONS + REMINDERS" },
-    coverage:  { number: "§ 03", label: "Coverage Log",        vol: "PLACEMENTS + POINTS" },
+    coverage:  { number: "§ 03", label: "Coverage Log",        vol: "PLACEMENTS + LINKS" },
     contacts:  { number: "§ 04", label: "Journalist Contacts", vol: "RELATIONSHIP INDEX" },
     peso:      { number: "§ 05", label: "PESO Dashboard",      vol: "PAID · EARNED · SHARED · OWNED" },
   };

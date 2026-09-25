@@ -13,9 +13,10 @@
  * ALL COPY IS LOCKED — pulled verbatim from the shipped CoverageIQ engine.
  * Honesty constraints that must survive any future edit:
  *   1. CoverageIQ has NO composite score and NO band system. The output is a
- *      stage. Points appear only at Placed/Amplified; formula not finalized.
+ *      stage. (The old "Points" number was removed from the public tool on
+ *      2026-09-13 and from this page on 2026-09-25; never reintroduce it here.)
  *   2. The alerts feed is not live-connected — it keeps its COMING SOON banner.
- *   3. All DR / Points numbers are illustrative sample data (asterisk + caveat
+ *   3. All DR numbers are illustrative sample data (asterisk + caveat
  *      + "SAMPLE SCENARIO · FAIRGROUND (ILLUSTRATIVE)" badges).
  * Zero border-radius. Zero box-shadow (except the functional active-marker
  * glow ring). No gradients, no emoji — Unicode glyphs only.
@@ -74,7 +75,7 @@ type ViewKey = "pipeline" | "follow" | "log" | "contacts" | "peso";
 const VIEWS: { key: ViewKey; num: string; label: string; sub: string }[] = [
   { key: "pipeline", num: "§ 01", label: "Pitch Pipeline",      sub: "DRAFTED → AMPLIFIED" },
   { key: "follow",   num: "§ 02", label: "Follow-ups",          sub: "ACTIONS + REMINDERS" },
-  { key: "log",      num: "§ 03", label: "Coverage Log",        sub: "PLACEMENTS + POINTS" },
+  { key: "log",      num: "§ 03", label: "Coverage Log",        sub: "PLACEMENTS + LINKS" },
   { key: "contacts", num: "§ 04", label: "Journalist Contacts", sub: "RELATIONSHIP INDEX" },
   { key: "peso",     num: "§ 05", label: "PESO Dashboard",      sub: "PAID · EARNED · SHARED · OWNED" },
 ];
@@ -420,15 +421,6 @@ export default function CoverageIQHowItWorksPage() {
               </div>
             </div>
 
-            {/* points caveat — CoverageIQ has no composite score; points only at Placed/Amplified */}
-            <div style={{ border: `1px solid ${INK}`, borderTop: "none", background: PAPER2, padding: "16px 22px", display: "flex", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <span style={{ background: INK, color: YEL, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".12em", padding: "5px 10px", flexShrink: 0 }}>POINTS</span>
-              <div style={{ fontFamily: SERIF, fontSize: 14.5, lineHeight: 1.5, color: INK70, maxWidth: 820 }}>
-                A <span style={{ fontFamily: MONO, fontSize: 12.5 }}>points</span> number is awarded only once a pitch reaches Placed or Amplified,
-                currently driven by a Domain Rating (DR)-based mock formula, not yet finalized (per the product&rsquo;s own RFP).{" "}
-                <strong style={{ color: INK }}>Points formula: DR-based, not yet finalized.</strong>
-              </div>
-            </div>
           </div>
 
           <div style={{ textAlign: "center", color: INK35A, fontSize: 20, margin: "34px 0" }}>▼</div>
@@ -515,11 +507,10 @@ export default function CoverageIQHowItWorksPage() {
               {/* VIEW 3: COVERAGE LOG */}
               {view === "log" && (
                 <div>
-                  <div style={viewOverline}>COVERAGE LOG · PLACEMENTS + POINTS</div>
-                  <div className="ciq-cols4" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
+                  <div style={viewOverline}>COVERAGE LOG · PLACEMENTS + LINKS</div>
+                  <div className="ciq-cols4" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
                     {([
                       { stat: "1",   label: "TOTAL PLACEMENTS",  illus: false },
-                      { stat: "290", label: "TOTAL POINTS",      illus: true },
                       { stat: "93",  label: "AVG DOMAIN RATING", illus: true },
                       { stat: "1",   label: "DO-FOLLOW LINKS",   illus: false },
                     ]).map((s) => (
@@ -542,7 +533,6 @@ export default function CoverageIQHowItWorksPage() {
                           <th style={th}>PESO</th>
                           <th style={th}>LINK</th>
                           <th style={th}>TYPE</th>
-                          <th style={th}>POINTS</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -557,10 +547,6 @@ export default function CoverageIQHowItWorksPage() {
                           <td style={td}>Earned</td>
                           <td style={td}>Do Follow</td>
                           <td style={td}>Original</td>
-                          <td style={td}>
-                            <span style={{ background: YEL, padding: "2px 7px", fontFamily: GROT, fontWeight: 700, fontSize: 12 }}>290</span>
-                            <span style={{ color: INK40 }}>*</span>
-                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -570,7 +556,7 @@ export default function CoverageIQHowItWorksPage() {
                       techcrunch.com/[illustrative-slug] · ILLUSTRATIVE LINK, NOT REAL
                     </span>
                     <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK50 }}>
-                      * DR and Points illustrative, not live-verified. Points: DR-based mock formula, not yet finalized.
+                      * DR illustrative, not live-verified.
                     </span>
                   </div>
                 </div>
@@ -634,7 +620,6 @@ export default function CoverageIQHowItWorksPage() {
                         {([
                           { v: <>1</>, l: "PITCHES" },
                           { v: <>1</>, l: "PLACED" },
-                          { v: <>290<span style={{ fontSize: 11, color: INK40 }}>*</span></>, l: "POINTS" },
                           { v: <>93<span style={{ fontSize: 11, color: INK40 }}>*</span></>, l: "AVG DR" },
                           { v: <span style={{ color: AMBER }}>100%</span>, l: "CONVERSION" },
                         ]).map((s) => (
@@ -712,8 +697,7 @@ export default function CoverageIQHowItWorksPage() {
             {/* Honesty note — locked. There is no score, tier, or band in CoverageIQ. */}
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, lineHeight: 1.55, color: INK60, marginTop: 16, maxWidth: 900 }}>
               CoverageIQ has no composite score. This legend describes a tracking stage, not a rating.
-              Points are only awarded at Placed or Amplified, and the points formula is currently DR-based
-              mock data, not yet finalized. Never render a score or band that does not exist in the tool.
+              Never render a score or band that does not exist in the tool.
             </div>
           </div>
 
