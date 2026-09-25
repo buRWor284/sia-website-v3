@@ -25,11 +25,19 @@ import { collectEvidence, isProfileUrl, parseDate, urlKey, writeVerificationRow 
 import { BYLINE_MAX_AGE_DAYS, normaliseDomain, type JournalistVerification } from "@/lib/journo/verification-shared";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-export const JOURNO_DISCOVER_MODEL = process.env.JOURNO_DISCOVER_MODEL ?? "claude-sonnet-4-6";
+/**
+ * Haiku, not Sonnet (25 Sep, live): Sonnet + 5 searches took ~40s on the
+ * first run and passed 44s on the second (aborted, billed ~$0.30 with no
+ * usage row, since an aborted call returns no usage). Haiku writes about 3x
+ * faster and costs a third. Correctness does not rest on the model: every
+ * name still has to pass the code rules below.
+ */
+export const JOURNO_DISCOVER_MODEL = process.env.JOURNO_DISCOVER_MODEL ?? "claude-haiku-4-5";
 const SEARCH_TOOL = process.env.JOURNO_DISCOVER_SEARCH_TOOL ?? "web_search_20250305";
-const MAX_SEARCHES = 5;
-/** The route caps at 60s and still has to check leftovers. */
-const TIMEOUT_MS = 44_000;
+const MAX_SEARCHES = 4;
+/** The route caps at 60s; unproven names that miss the deadline are filled
+ *  in by the card afterwards, so discovery may use most of the window. */
+const TIMEOUT_MS = 50_000;
 
 function buildDiscoverPrompt(d: Record<string, unknown>, today: Date): string {
   const iso = (x: Date) => x.toISOString().slice(0, 10);

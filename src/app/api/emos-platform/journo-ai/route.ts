@@ -27,7 +27,7 @@ export const maxDuration = 60;
 /** Stop waiting for byline checks this long after the request started, and
  * send the rest as "pending" for the card to fill in (P1-01, 2026-09-25).
  * Keeps a clear margin under maxDuration; raising maxDuration is NOT the fix. */
-const VERIFY_DEADLINE_MS = 48_000;
+const VERIFY_DEADLINE_MS = 52_000;
 
 export async function POST(request: NextRequest) {
   const startedAt = Date.now();
