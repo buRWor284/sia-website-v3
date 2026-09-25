@@ -23,6 +23,7 @@ import {
   assignUnassignedPitches,
   updatePitchStage,
   updatePitchJournalist,
+  updatePitchRelevance,
   updateAlertStatus,
   createJournalist,
   updateJournalist,
@@ -32,6 +33,7 @@ import { SectionMast, DataSourceNote, DrAttribution } from "@/components/coverag
 import { CIQ_CSS } from "@/components/coverageiq/core-css";
 import {
   PipelineView, FollowUpsView, CoverageLogView, ContactsView, PESODashboard, NewPitchModal,
+  type PlacementValueCaps,
 } from "@/components/coverageiq/views";
 import {
   pitchFromDb, journalistFromDb, alertFromDb,
@@ -39,6 +41,7 @@ import {
   type Stage, type AlertStatus, type CreatePitchInput, type CreateJournalistInput,
   type NewPitchDraft, type TabId, type DataSource,
 } from "@/lib/coverageiq/types";
+import type { RelevanceOverride } from "@/lib/coverageiq/placement-value";
 
 const DASHBOARD_TEAMS = ["Firestarters", "Nirvana", "Wizards", "SIA"];
 const DASHBOARD_SOURCES: DataSource[] = ["manual", "PressIQ", "SignalIQ", "Google Alerts"];
@@ -48,6 +51,9 @@ interface CoverageIQPlatformProps {
   initialJournalists: DbJournalist[];
   initialAlerts: DbAlert[];
   prefillSubject?: string; // pre-seed "new pitch" modal subject from PressIQ handoff
+  /** 2026-09-25: true ONLY for EMOS admin accounts (server-checked). Unlocks
+   *  the internal Placement value column on the Coverage Log. */
+  isAdmin?: boolean;
 }
 
 export default function CoverageIQPlatform({
@@ -55,6 +61,7 @@ export default function CoverageIQPlatform({
   initialJournalists,
   initialAlerts,
   prefillSubject,
+  isAdmin = false,
 }: CoverageIQPlatformProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("pipeline");
@@ -111,6 +118,20 @@ export default function CoverageIQPlatform({
       router.refresh();
     });
   }, [router]);
+
+  const handleRelevanceChange = useCallback(async (id: string, override: RelevanceOverride | null) => {
+    await updatePitchRelevance(id, override);
+    router.refresh();
+  }, [router]);
+
+  // Placement value is the agency's internal margin view (P3, 25 Sep): built
+  // only for admins, so a customer's dashboard never even receives the caps.
+  const placementValueCaps = useMemo<PlacementValueCaps | undefined>(() => {
+    if (!isAdmin) return undefined;
+    const companyContexts: Record<string, string | null> = {};
+    for (const c of companyCtx?.companies ?? []) companyContexts[c.id] = c.context ?? null;
+    return { companyContexts, onRelevanceChange: handleRelevanceChange };
+  }, [isAdmin, companyCtx?.companies, handleRelevanceChange]);
 
   const handleAlertStatusChange = useCallback((id: string, status: AlertStatus) => {
     startTransition(async () => {
@@ -281,7 +302,7 @@ export default function CoverageIQPlatform({
         <SectionMast {...sectionMastProps[activeTab]} />
         {activeTab === "pipeline"  && <PipelineView pitches={vmPitches} onStageChange={handleStageChange} showStageLegend journalists={vmJournalists} onJournalistChange={handleJournalistChange} />}
         {activeTab === "followups" && <FollowUpsView pitches={vmPitches} />}
-        {activeTab === "coverage"  && <CoverageLogView pitches={vmPitches} />}
+        {activeTab === "coverage"  && <CoverageLogView pitches={vmPitches} placementValue={placementValueCaps} />}
         {activeTab === "contacts"  && (
           <ContactsView
             journalists={vmJournalists}

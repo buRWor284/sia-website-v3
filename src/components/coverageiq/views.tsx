@@ -13,7 +13,7 @@ import {
   YEL, SERIF, GROT, MONO,
 } from "@/lib/tokens";
 import {
-  PIPELINE_STAGES, StageBadge, PESOBadge, DRBar, PointsBadge, AlertTypeBadge,
+  PIPELINE_STAGES, StageBadge, PESOBadge, DRBar, PlacementValueBadge, AlertTypeBadge,
   FilterPill, SectionMast, EmptyState, DetailColHead, DetailRow, MField, StageLegend,
   MetricsLegend, METRIC_TIPS,
   fmt, daysAgoLabel, logCell, cc,
@@ -24,24 +24,20 @@ import {
   type Stage, type PesoType, type AlertStatus, type DataSource,
   type Urgency, type NewPitchDraft, type CreateJournalistInput,
 } from "@/lib/coverageiq/types";
+import { placementValue, type PlacementValueBreakdown, type RelevanceOverride } from "@/lib/coverageiq/placement-value";
 
 /**
- * Points — hidden from display 2026-09-13 (Irfan), data deliberately KEPT.
+ * Placement value (the rebuilt "Points") — 2026-09-25.
  *
- * `points` was an internal formula used to decide team commission, and it was
- * rendering on the client-facing coverage screens. Two problems: internal
- * commission maths does not belong on a screen you share with a client, and
- * the formula keyed off Domain Rating alone, which is a poor measure of what a
- * placement is actually worth.
- *
- * Nothing is deleted: coverageiq_pitches.points still stores every value, and
- * flipping this to true brings the whole display back.
- *
- * Rebuilding it properly is its own piece of work, not a UI tweak. A real
- * version needs topical relevance, audience fit and traffic alongside
- * authority — decide the model first, then re-enable.
+ * The old `points` column was hand-seeded commission maths keyed off DR alone,
+ * and it rendered on client-facing screens; hidden 13 Sep. It is now replaced
+ * by a COMPUTED figure (lib/coverageiq/placement-value.ts: DR 40 · relevance
+ * 30 · traffic 15 · link quality 15) that is INTERNAL ONLY: the Coverage Log
+ * shows it only when the caller passes `placementValue` (the dashboard does so
+ * for EMOS admin accounts, never for customers; the public tool never does).
+ * The pipeline and PESO views never show it. `points` stays on the row,
+ * unread.
  */
-const SHOW_POINTS = false;
 
 
 // ─── Pipeline View ─────────────────────────────────────────────────────────────
@@ -78,7 +74,6 @@ export function PipelineView({
     return list.sort((a, b) => order.indexOf(a.stage) - order.indexOf(b.stage));
   }, [stageFilter, pitches]);
 
-  const totalPoints = pitches.reduce((s, p) => s + (p.points ?? 0), 0);
 
   return (
     <div>
@@ -131,18 +126,15 @@ export function PipelineView({
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           {/* Header */}
           <div style={{
-            display: "grid", gridTemplateColumns: SHOW_POINTS ? "minmax(200px,1fr) 150px 96px 80px 64px 72px" : "minmax(200px,1fr) 150px 96px 80px 64px",
+            display: "grid", gridTemplateColumns: "minmax(200px,1fr) 150px 96px 80px 64px",
             background: INK, color: PAPER,
             fontFamily: GROT, fontWeight: 700, fontSize: 9,
             letterSpacing: "0.18em", textTransform: "uppercase",
           }}>
-            {(SHOW_POINTS
-              ? ["Pitch", "Journalist", "Stage", "DR", "PESO", "Points"]
-              : ["Pitch", "Journalist", "Stage", "DR", "PESO"]
-            ).map((h, i) => (
-              <div key={h} title={h === "DR" ? METRIC_TIPS.dr : h === "Points" ? METRIC_TIPS.points : undefined} style={{
+            {["Pitch", "Journalist", "Stage", "DR", "PESO"].map((h, i) => (
+              <div key={h} title={h === "DR" ? METRIC_TIPS.dr : undefined} style={{
                 padding: "12px 16px",
-                borderRight: i < (SHOW_POINTS ? 5 : 4) ? "1px solid rgba(241,235,222,.15)" : "none",
+                borderRight: i < 4 ? "1px solid rgba(241,235,222,.15)" : "none",
               }}>
                 {h}
               </div>
@@ -160,7 +152,7 @@ export function PipelineView({
                 <div
                   onClick={() => setExpandedId(isExpanded ? null : pitch.id)}
                   style={{
-                    display: "grid", gridTemplateColumns: SHOW_POINTS ? "minmax(200px,1fr) 150px 96px 80px 64px 72px" : "minmax(200px,1fr) 150px 96px 80px 64px",
+                    display: "grid", gridTemplateColumns: "minmax(200px,1fr) 150px 96px 80px 64px",
                     borderBottom: `1px solid ${INK15}`, cursor: "pointer",
                     background: isExpanded ? PAPER2 : "transparent",
                     transition: "background 0.12s",
@@ -190,9 +182,6 @@ export function PipelineView({
                   </div>
                   <div style={{ padding: "14px 10px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <PESOBadge type={pitch.peso} />
-                  </div>
-                  <div style={{ padding: "14px 16px", borderLeft: `1px solid ${INK15}`, display: "flex", alignItems: "center" }}>
-                    <PointsBadge points={pitch.points} />
                   </div>
                 </div>
 
@@ -309,11 +298,6 @@ export function PipelineView({
         <span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55 }}>
           {filtered.length} pitch{filtered.length !== 1 ? "es" : ""}{stageFilter !== "all" ? ` in ${stageFilter}` : " total"}
         </span>
-        {SHOW_POINTS && (
-          <span title={METRIC_TIPS.points} style={{ fontFamily: MONO, fontSize: 12, color: INK55 }}>
-            Total points: {totalPoints}
-          </span>
-        )}
       </div>
     </div>
   );
@@ -469,9 +453,19 @@ function FollowUpSection({ title, subtitle, items, urgency, today }: {
 
 // ─── Coverage Log View ─────────────────────────────────────────────────────────
 
-type CoverageLogKey = "placedDate" | "journalistOutlet" | "anchorText" | "dr" | "peso" | "linkType" | "contentType" | "points";
+type CoverageLogKey = "placedDate" | "journalistOutlet" | "anchorText" | "dr" | "peso" | "linkType" | "contentType" | "placementValue";
 
-export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
+/**
+ * Internal-only Placement value (2026-09-25). Pass this ONLY for EMOS admin
+ * accounts; it is the agency's margin view, not a client number.
+ * `companyContexts` = company id → brief text, for the relevance estimate.
+ */
+export interface PlacementValueCaps {
+  companyContexts: Record<string, string | null>;
+  onRelevanceChange?: (pitchId: string, override: RelevanceOverride | null) => Promise<void>;
+}
+
+export function CoverageLogView({ pitches, placementValue: pv }: { pitches: VmPitch[]; placementValue?: PlacementValueCaps }) {
   const [sortBy, setSortBy] = useState<CoverageLogKey>("placedDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
@@ -480,15 +474,33 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
     [pitches]
   );
 
+  // Computed at render, never stored; only when the caller opted in.
+  const values = useMemo(() => {
+    const out: Record<string, PlacementValueBreakdown> = {};
+    if (!pv) return out;
+    for (const p of coverageLog) {
+      out[p.id] = placementValue({
+        dr: p.dr,
+        journalistTags: p.journalistTags,
+        companyContext: p.companyId ? (pv.companyContexts[p.companyId] ?? null) : null,
+        relevanceOverride: p.relevanceOverride,
+        estMonthlyTraffic: p.estMonthlyTraffic,
+        linkType: p.linkType,
+        contentType: p.contentType,
+      });
+    }
+    return out;
+  }, [coverageLog, pv]);
+
   const sorted = useMemo(() => {
     return [...coverageLog].sort((a, b) => {
-      const va = (a as unknown as Record<string, unknown>)[sortBy] ?? "";
-      const vb = (b as unknown as Record<string, unknown>)[sortBy] ?? "";
+      const va = sortBy === "placementValue" ? (values[a.id]?.value ?? 0) : ((a as unknown as Record<string, unknown>)[sortBy] ?? "");
+      const vb = sortBy === "placementValue" ? (values[b.id]?.value ?? 0) : ((b as unknown as Record<string, unknown>)[sortBy] ?? "");
       if (va < vb) return sortDir === "asc" ? -1 : 1;
       if (va > vb) return sortDir === "asc" ? 1 : -1;
       return 0;
     });
-  }, [coverageLog, sortBy, sortDir]);
+  }, [coverageLog, sortBy, sortDir, values]);
 
   const handleSort = (col: CoverageLogKey) => {
     if (sortBy === col) setSortDir(d => d === "asc" ? "desc" : "asc");
@@ -496,7 +508,9 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
   };
   const arrow = (col: CoverageLogKey) => sortBy === col ? (sortDir === "asc" ? " ↑" : " ↓") : "";
 
-  const totalPoints = coverageLog.reduce((s, c) => s + (c.points ?? 0), 0);
+  const avgValue = pv && coverageLog.length
+    ? Math.round(coverageLog.reduce((s, c) => s + (values[c.id]?.value ?? 0), 0) / coverageLog.length)
+    : 0;
   const drItems = coverageLog.filter(c => c.dr);
   const avgDR = drItems.length ? Math.round(drItems.reduce((s, c) => s + (c.dr ?? 0), 0) / drItems.length) : 0;
   const doFollow = coverageLog.filter(c => c.linkType === "Do Follow").length;
@@ -509,16 +523,16 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
     { key: "peso",             label: "PESO",        w: "72px" },
     { key: "linkType",         label: "Link",        w: "82px" },
     { key: "contentType",      label: "Type",        w: "82px" },
-    { key: "points",           label: "Pts",         w: "64px" },
+    ...(pv ? [{ key: "placementValue" as CoverageLogKey, label: "Value", w: "150px" }] : []),
   ];
   const grid = cols.map(c => c.w).join(" ");
 
   return (
     <div>
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${SHOW_POINTS ? 4 : 3}, 1fr)`, border: `1px solid ${INK}`, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: `repeat(${pv ? 4 : 3}, 1fr)`, border: `1px solid ${INK}`, marginBottom: 24 }}>
         {([
           { num: coverageLog.length, label: "TOTAL PLACEMENTS", tip: undefined as string | undefined },
-          ...(SHOW_POINTS ? [{ num: totalPoints, label: "TOTAL POINTS", tip: METRIC_TIPS.points as string | undefined }] : []),
+          ...(pv ? [{ num: avgValue, label: "AVG PLACEMENT VALUE · INTERNAL", tip: METRIC_TIPS.placementValue as string | undefined }] : []),
           { num: avgDR,              label: "AVG DOMAIN RATING", tip: METRIC_TIPS.dr as string | undefined },
           { num: doFollow,           label: "DO-FOLLOW LINKS",   tip: "Do-follow links pass SEO authority from the publishing site to yours; no-follow links do not." as string | undefined },
         ]).map((item, i, arr) => (
@@ -529,7 +543,7 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
         ))}
       </div>
 
-      <MetricsLegend />
+      <MetricsLegend metrics={pv ? ["dr", "placementValue"] : ["dr"]} />
 
       {coverageLog.length === 0 ? (
         <EmptyState message="No placements yet. Pitches marked as Placed or Amplified will appear here." />
@@ -539,7 +553,7 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
         <div style={{ border: `1px solid ${INK}`, overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
           <div style={{ display: "grid", gridTemplateColumns: grid, background: INK, color: PAPER }}>
             {cols.map((col, i) => (
-              <div key={col.key} onClick={() => handleSort(col.key)} title={col.key === "dr" ? METRIC_TIPS.dr : col.key === "points" ? METRIC_TIPS.points : undefined} style={{
+              <div key={col.key} onClick={() => handleSort(col.key)} title={col.key === "dr" ? METRIC_TIPS.dr : col.key === "placementValue" ? METRIC_TIPS.placementValue : undefined} style={{
                 padding: "11px 14px", cursor: "pointer",
                 borderRight: i < cols.length - 1 ? "1px solid rgba(241,235,222,.15)" : "none",
                 fontFamily: GROT, fontWeight: 700, fontSize: 9,
@@ -573,7 +587,25 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
                     {entry.contentType ?? "—"}
                   </span>
                 </div>
-                <div style={logCell(true)}><PointsBadge points={entry.points} /></div>
+                {pv && (
+                  <div style={{ ...logCell(true), gap: 8 }}>
+                    <PlacementValueBadge breakdown={values[entry.id]} />
+                    {pv.onRelevanceChange && (
+                      <select
+                        aria-label="Relevance override"
+                        title="Relevance override: how on-topic this placement is for the company. Blank = estimated from the journalist's beat tags vs the company brief."
+                        value={entry.relevanceOverride ?? ""}
+                        onChange={e => { const v = e.target.value; void pv.onRelevanceChange!(entry.id, v === "" ? null : (Number(v) as RelevanceOverride)); }}
+                        style={{ fontFamily: MONO, fontSize: 11, padding: "3px 4px", border: `1px solid ${INK15}`, background: PAPER, color: INK, cursor: "pointer" }}
+                      >
+                        <option value="">auto</option>
+                        <option value="1">1 off</option>
+                        <option value="2">2 adj</option>
+                        <option value="3">3 on</option>
+                      </select>
+                    )}
+                  </div>
+                )}
               </div>
             );
           })}
@@ -582,7 +614,7 @@ export function CoverageLogView({ pitches }: { pitches: VmPitch[] }) {
       )}
 
       <div style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
-        {coverageLog.length} placements logged · Click column headers to sort
+        {coverageLog.length} placements logged · Click column headers to sort{pv ? " · Placement value is an internal figure and is not shown to clients" : ""}
       </div>
     </div>
   );
@@ -974,10 +1006,9 @@ export function PESODashboard({
   const pesoData = useMemo(() => PESO_TYPES.map(type => {
     const ps = pitches.filter(p => p.peso === type);
     const placed = ps.filter(p => p.stage === "placed" || p.stage === "amplified");
-    const points = placed.reduce((s, p) => s + (p.points ?? 0), 0);
     const drItems = placed.filter(p => p.dr);
     const avgDR = drItems.length ? Math.round(drItems.reduce((s, p) => s + (p.dr ?? 0), 0) / drItems.length) : 0;
-    return { type, total: ps.length, placed: placed.length, points, avgDR };
+    return { type, total: ps.length, placed: placed.length, avgDR };
   }), [pitches]);
 
   const totalPitches = pitches.length;
@@ -1009,8 +1040,8 @@ export function PESODashboard({
                 {descriptions[p.type]}
               </div>
               <div style={{ borderTop: earned ? "1px solid rgba(241,235,222,.2)" : `1px solid ${INK15}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
-                {(([["Pitches", p.total], ["Placed", p.placed], ...(SHOW_POINTS ? [["Points", p.points]] : []), ["Avg DR", p.avgDR || "—"]]) as [string, number | string][]).map(([label, value]) => (
-                  <div key={label} title={label === "Avg DR" ? METRIC_TIPS.dr : label === "Points" ? METRIC_TIPS.points : undefined} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                {(([["Pitches", p.total], ["Placed", p.placed], ["Avg DR", p.avgDR || "—"]]) as [string, number | string][]).map(([label, value]) => (
+                  <div key={label} title={label === "Avg DR" ? METRIC_TIPS.dr : undefined} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                     <span style={{ fontFamily: GROT, fontSize: 9, letterSpacing: "0.12em", textTransform: "uppercase", color: earned ? "rgba(241,235,222,.5)" : INK55 }}>{label}</span>
                     <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 14, color: earned ? PAPER : INK }}>{value}</span>
                   </div>

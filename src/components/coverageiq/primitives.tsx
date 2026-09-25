@@ -7,6 +7,7 @@
 // EMOS dashboard via the shared views. No data-source coupling here.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { explainPlacementValue, placementValueFormula, type PlacementValueBreakdown } from "@/lib/coverageiq/placement-value";
 import { useState, type CSSProperties } from "react";
 import {
   PAPER, PAPER2, INK, INK70, INK55, INK35, INK15,
@@ -90,7 +91,7 @@ export function PESOBadge({ type }: { type: PesoType }) {
 // badges + column headers, and rendered visibly in MetricsLegend below.
 export const METRIC_TIPS = {
   dr: "DR (Domain Rating by Ahrefs): how strong the website's backlink profile is, on a 0-100 logarithmic scale. Major outlets like TechCrunch sit in the 90s; a niche blog might be 20-40. Higher means a link there carries more weight.",
-  points: "Points: a simple win score for coverage you have logged. Points are awarded only once a pitch reaches Placed or Amplified. Bigger placements on higher-DR sites earn more.",
+  placementValue: "Placement value (internal, 0-100): what a logged placement is worth to the company. Authority (DR) 40% + relevance to the company brief 30% + estimated traffic 15% + link quality 15%. Computed from the row, never typed by hand; blanks count as neutral. Not shown to clients.",
 } as const;
 
 export function DRBar({ value }: { value: number | null }) {
@@ -106,14 +107,17 @@ export function DRBar({ value }: { value: number | null }) {
   );
 }
 
-export function PointsBadge({ points }: { points: number | null }) {
-  if (!points) return <span style={{ color: INK35, fontFamily: MONO, fontSize: 12 }}>—</span>;
+/** 2026-09-25: computed Placement value with the full breakdown on hover.
+ *  A dotted underline flags that one or more inputs were blank and assumed. */
+export function PlacementValueBadge({ breakdown }: { breakdown: PlacementValueBreakdown | undefined }) {
+  if (!breakdown) return <span style={{ color: INK35, fontFamily: MONO, fontSize: 12 }}>—</span>;
+  const assumed = breakdown.assumed.length > 0;
   return (
-    <span title={METRIC_TIPS.points} style={{
+    <span title={explainPlacementValue(breakdown)} style={{
       fontFamily: MONO, fontWeight: 700, fontSize: 14,
-      borderBottom: `2px solid ${YEL}`, paddingBottom: 2,
+      borderBottom: `2px ${assumed ? "dotted" : "solid"} ${YEL}`, paddingBottom: 2, cursor: "help",
     }}>
-      {points}
+      {breakdown.value}
     </span>
   );
 }
@@ -259,7 +263,7 @@ export const STAGE_DESCRIPTIONS: Record<Stage, { short: string; when: string }> 
 // Visible, collapsible plain-language explainer for DR and Points, mirroring
 // StageLegend. Hover tooltips alone fail on touch devices; this is the
 // no-hover path. Pass metrics to show a subset (Contacts tab has only DR).
-const METRIC_LEGEND_ITEMS: { id: "dr" | "points"; label: string; short: string; detail: string }[] = [
+const METRIC_LEGEND_ITEMS: { id: "dr" | "placementValue"; label: string; short: string; detail: string }[] = [
   {
     id: "dr",
     label: "DR (Domain Rating)",
@@ -267,19 +271,20 @@ const METRIC_LEGEND_ITEMS: { id: "dr" | "points"; label: string; short: string; 
     detail: "Major outlets like TechCrunch or Forbes sit in the 90s; a niche blog might be 20-40. Higher means a mention or link there carries more weight.",
   },
   {
-    id: "points",
-    label: "Points",
-    short: "A simple win score for the coverage you have logged. Awarded only once a pitch reaches Placed or Amplified.",
-    detail: "Bigger placements on higher-DR sites earn more points. The formula is DR-based and still being finalized; there is no composite score in CoverageIQ.",
+    id: "placementValue",
+    label: "Placement value (internal)",
+    short: "What a logged placement is worth to the company, 0-100. Visible to EMOS admins only; never on a client screen.",
+    detail: `${placementValueFormula()}. Relevance is estimated from the journalist's beat tags against the company brief, or set by hand (1 off-topic, 2 adjacent, 3 on-topic). Blank traffic or DR counts as neutral, shown with a dotted underline.`,
   },
 ];
 
-export function MetricsLegend({ metrics }: { metrics?: ("dr" | "points")[] }) {
+export function MetricsLegend({ metrics }: { metrics?: ("dr" | "placementValue")[] }) {
   const [open, setOpen] = useState(false);
-  const items = METRIC_LEGEND_ITEMS.filter(m => !metrics || metrics.includes(m.id));
+  // Default = DR only: Placement value is internal and must be asked for.
+  const items = METRIC_LEGEND_ITEMS.filter(m => (metrics ?? ["dr"]).includes(m.id));
   const title = items.length === 1
-    ? (items[0].id === "dr" ? "What does DR mean?" : "What do Points mean?")
-    : "What do DR and Points mean?";
+    ? (items[0].id === "dr" ? "What does DR mean?" : "What does Placement value mean?")
+    : "What do DR and Placement value mean?";
   return (
     <div style={{ marginBottom: 16 }}>
       <button

@@ -39,7 +39,8 @@ export async function getPitches(): Promise<DbPitch[]> {
       id, subject, client, company_id, team, stage, peso_type, data_source, notes, body,
       sent_date, placed_date, follow_up_due, placement_url, anchor_text,
       domain_rating, link_type, content_type, points, journalist_id,
-      journalists ( name, outlet, domain_rating, email ),
+      est_monthly_traffic, relevance_override,
+      journalists ( name, outlet, domain_rating, email, tags ),
       companies ( name )
     `)
     .order("created_at", { ascending: false });
@@ -75,6 +76,9 @@ export async function getPitches(): Promise<DbPitch[]> {
     journalist_outlet: row.journalists?.outlet ?? null,
     journalist_dr: row.journalists?.domain_rating ?? null,
     journalist_email: row.journalists?.email ?? null,
+    journalist_tags: row.journalists?.tags ?? null,
+    est_monthly_traffic: row.est_monthly_traffic ?? null,
+    relevance_override: row.relevance_override ?? null,
     body: row.body ?? null,
   }));
 }
@@ -272,6 +276,21 @@ export async function updatePitchJournalist(pitchId: string, journalistId: strin
     .select("id");
   if (error) { console.error("updatePitchJournalist error:", error.message); return false; }
   if (!data?.length) { console.warn(`updatePitchJournalist: no row matched ${pitchId}`); return false; }
+  revalidatePath("/emos-platform/dashboard/coverageiq");
+  return true;
+}
+
+/**
+ * 2026-09-25 Placement value (P2): manual relevance override, 1-3 or null to
+ * fall back to the beat-tag estimate. Admin-only in the UI; RLS scopes the row.
+ */
+export async function updatePitchRelevance(pitchId: string, override: 1 | 2 | 3 | null): Promise<boolean> {
+  const db = await getAuthenticatedClient();
+  const { error } = await db
+    .from("coverageiq_pitches")
+    .update({ relevance_override: override, updated_at: new Date().toISOString() })
+    .eq("id", pitchId);
+  if (error) { console.error("updatePitchRelevance error:", error.message); return false; }
   revalidatePath("/emos-platform/dashboard/coverageiq");
   return true;
 }

@@ -44,13 +44,18 @@ export interface DbPitch {
   domain_rating: number | null;
   link_type: LinkType | null;
   content_type: ContentType | null;
+  /** LEGACY hand-seeded score. Not displayed anywhere since 2026-09-25; see placement-value.ts. */
   points: number | null;
+  /** 2026-09-25 Placement value inputs. */
+  est_monthly_traffic: number | null;
+  relevance_override: 1 | 2 | 3 | null;
   journalist_id: string | null;
   // joined from journalists
   journalist_name: string | null;
   journalist_outlet: string | null;
   journalist_dr: number | null;
   journalist_email: string | null;
+  journalist_tags: string[] | null;
 }
 
 export interface DbJournalist {
@@ -197,11 +202,15 @@ export interface VmPitch {
   dr: number | null;
   linkType: LinkType | null;
   contentType: ContentType | null;
+  /** LEGACY hand-seeded score, kept on the row, never displayed. */
   points: number | null;
+  estMonthlyTraffic: number | null;
+  relevanceOverride: 1 | 2 | 3 | null;
   journalistId: string | null;
   journalistName: string | null;
   journalistOutlet: string | null;
   journalistEmail: string | null;
+  journalistTags: string[];
 }
 
 export interface VmJournalist {
@@ -283,10 +292,13 @@ export function pitchFromDb(row: DbPitch): VmPitch {
     linkType: row.link_type,
     contentType: row.content_type,
     points: row.points,
+    estMonthlyTraffic: row.est_monthly_traffic ?? null,
+    relevanceOverride: row.relevance_override ?? null,
     journalistId: row.journalist_id,
     journalistName: row.journalist_name,
     journalistOutlet: row.journalist_outlet,
     journalistEmail: row.journalist_email,
+    journalistTags: row.journalist_tags ?? [],
   };
 }
 
@@ -344,6 +356,8 @@ export function pitchFromMock(p: MockPitch, journalists: MockJournalist[]): VmPi
     linkType: p.linkType,
     contentType: p.contentType,
     points: p.points,
+    estMonthlyTraffic: null,
+    relevanceOverride: null,
     journalistId: p.journalist,
     journalistName: j ? j.name : null,
     // Coverage-log outlet fallback baked here so the shop window is identical:
@@ -352,7 +366,15 @@ export function pitchFromMock(p: MockPitch, journalists: MockJournalist[]): VmPi
     // outlet on journalistName, so this baked value never shows without a name.
     journalistOutlet: j ? j.outlet : p.peso === "Shared" ? null : "Fairground Blog",
     journalistEmail: j ? j.email : null,
+    journalistTags: j ? beatTagsForMock(j.beat) : [],
   };
+}
+
+// Mock journalists carry a free-text beat only; the same comma/slash split as
+// lib/journo/beat-tags.ts, inlined so this module stays dependency-free.
+function beatTagsForMock(beat: string | null | undefined): string[] {
+  if (!beat) return [];
+  return Array.from(new Set(beat.split(/\s*(?:,|\/|;|&|\band\b)\s*/i).map(t => t.trim().toLowerCase()).filter(Boolean))).slice(0, 8);
 }
 
 export function journalistFromMock(j: MockJournalist): VmJournalist {
