@@ -251,6 +251,7 @@ function JournalistCard({
   prefillAssetTitle,
   prefillAssetType,
   companyId,
+  companyName,
   assetId,
 }: {
   j: AIJournalist;
@@ -262,6 +263,7 @@ function JournalistCard({
   /** The company and asset this search was run for, saved alongside the
    * journalist so the CRM knows why they are in it (2026-09-09). */
   companyId?: string | null;
+  companyName?: string | null;
   assetId?: string | null;
 }) {
   const [saving, startSave] = useTransition();
@@ -351,12 +353,20 @@ function JournalistCard({
           beat:           input.beat ?? null,
           email:          input.email ?? null,
           twitter_handle: input.twitter_handle ?? null,
-          domain_rating:  input.domain_rating ?? null,
+          // 2026-09-25 (P3-09): the row used to show DR "—" and "saved before
+          // the company was tracked" until a reload, because the optimistic
+          // row carried neither. Both are known at save time.
+          domain_rating:  created.domain_rating ?? input.domain_rating ?? null,
           last_contact:   null,
           pitches_sent:   0,
           placements:     0,
           notes:          input.notes ?? null,
           tags:           beatToTags(input.beat),
+          company_id:     companyId ?? null,
+          company_name:   companyName ?? null,
+          asset_id:       assetId ?? null,
+          angle:          formData.audDesc || null,
+          strategy:       formData.strategy || null,
         });
       }
     });
@@ -1032,6 +1042,7 @@ export default function JournoCollabIQClient({
               prefillAssetTitle={prefillAssetTitle}
               prefillAssetType={prefillAssetType}
               companyId={companyCtx?.company?.id ?? null}
+              companyName={companyCtx?.company?.name ?? null}
               assetId={prefillAssetId ?? null}
             />
           ))}

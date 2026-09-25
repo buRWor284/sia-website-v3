@@ -126,10 +126,12 @@ function daysAgo(iso: string): string {
 
 // ── Track this pitch → CoverageIQ (docked inside the core's Score tab) ──────────
 function TrackCTA({
-  result, pitchSubject, journalist, asset,
+  result, pitchSubject, pitchBody, journalist, asset,
 }: {
   result: ScoreResponse;
   pitchSubject: string;
+  /** 2026-09-25 (P3-05): the pitch text goes to CoverageIQ too, not just the subject. */
+  pitchBody?: string;
   journalist: DbJournalist | null;
   asset: DbAsset | null;
 }) {
@@ -162,6 +164,7 @@ function TrackCTA({
         company_id: companyCtx?.company?.id ?? null,
         client: companyCtx?.company?.name ?? null,
         notes,
+        body: pitchBody?.trim() || null,
       });
       if (draft?.id) setTracked(draft.id);
     });
@@ -409,6 +412,7 @@ export default function PressIQPlatformClient({
   initialDrafts: DbPitchDraft[];
 }) {
   const [scoreSubject, setScoreSubject] = useState("");
+  const [scorePitch, setScorePitch] = useState("");
   const [newScoreCount, setNewScoreCount] = useState(0);
   const [journalistId, setJournalistId] = useState<string>("");
   const [assetId, setAssetId] = useState<string>("");
@@ -449,6 +453,10 @@ export default function PressIQPlatformClient({
   function handleReopen(score: DbScore) {
     setReopened(score);
     setDraft(null);
+    // So "Track this pitch" on a reopened score carries the right subject and body.
+    const snap = (score.input_snapshot ?? null) as InputSnapshot | null;
+    setScoreSubject(snap?.subject ?? "");
+    setScorePitch(score.pitch_text ?? "");
     setJournalistId(score.journalist_id ?? "");
     setAssetId(score.asset_id ?? "");
     setCoreKey(k => k + 1);
@@ -699,8 +707,10 @@ export default function PressIQPlatformClient({
           splitResetActions
           preFormSlot={<ResearchTicker compact />}
           pitchWarning={p => <GreetingMismatch pitch={p} journalist={journalist} />}
+          beatHint={journalist?.beat ?? ""}
           onScored={(scored, ctx) => {
             setScoreSubject(ctx.subject);
+            setScorePitch(ctx.pitch);
             setNewScoreCount(c => c + 1);
             // 2026-09-09 (gate-03 finding): the score is written by the API route
             // the moment it is produced, but Score History and the stat tiles are
@@ -714,7 +724,7 @@ export default function PressIQPlatformClient({
             void scored;
           }}
           scoreTabCta={(r) => (
-            <TrackCTA result={r} pitchSubject={scoreSubject} journalist={journalist} asset={asset} />
+            <TrackCTA result={r} pitchSubject={scoreSubject} pitchBody={scorePitch} journalist={journalist} asset={asset} />
           )}
         />
       </div>

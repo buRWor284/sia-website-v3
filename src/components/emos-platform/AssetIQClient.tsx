@@ -16,7 +16,7 @@
  * enum values and carries nothing about the client.
  */
 
-import React, { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { useCompanyContext } from "@/hooks/useCompanyContext";
 import CompanyPicker from "@/components/emos-platform/CompanyPicker";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
@@ -26,6 +26,7 @@ import {
   createAsset,
   assignUnassignedAssets,
   updateAsset,
+  saveAssetBrief,
   deleteAsset,
   type DbAsset,
   type AssetType,
@@ -179,6 +180,8 @@ function CreateForm({
       if (result?.id) {
         onCreated({
           id: result.id,
+          ai_brief: null,
+          ai_brief_generated_at: null,
           asset_type: assetType,
           title: title.trim(),
           description: description.trim() || null,
@@ -307,12 +310,25 @@ function AssetRow({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [updating, startUpdate] = useTransition();
   const [deleting, startDelete] = useTransition();
-  const [brief, setBrief] = useState<string | null>(null);
+  // 2026-09-25 (P2-05): seeded from the saved brief, so reopening the row
+  // shows it and costs nothing. "Regenerate" is the only way to spend a credit.
+  const [brief, setBrief] = useState<string | null>(asset.ai_brief ?? null);
   const [briefLoading, setBriefLoading] = useState(false);
   const [briefError, setBriefError] = useState<string | null>(null);
+  const [briefSecs, setBriefSecs] = useState(0);
+  const [briefSaveNote, setBriefSaveNote] = useState<string | null>(null);
+  useEffect(() => {
+    if (!briefLoading) return;
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setBriefSecs(0);
+    /* eslint-enable react-hooks/set-state-in-effect */
+    const t = setInterval(() => setBriefSecs(s => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [briefLoading]);
 
   async function generateBrief() {
     setBriefError(null);
+    setBriefSaveNote(null);
     setBrief(null);
     setBriefLoading(true);
     try {
@@ -330,6 +346,12 @@ function AssetRow({
       const data = await res.json() as { brief?: string; error?: string };
       if (!res.ok || data.error) { setBriefError(data.error ?? "Failed to generate brief."); return; }
       setBrief(data.brief ?? null);
+      // Persist before the user can navigate away. A failed save is reported,
+      // not hidden: the brief is still on screen to copy.
+      if (data.brief) {
+        const saved = await saveAssetBrief(asset.id, data.brief);
+        if (!saved) setBriefSaveNote("Shown but not saved: copy it before you leave this page.");
+      }
     } catch {
       setBriefError("Network error — please try again.");
     } finally {
@@ -411,24 +433,32 @@ function AssetRow({
           {/* AI brief */}
           {!brief && (
             <button
-              onClick={e => { e.stopPropagation(); generateBrief(); }}
+              onClick={e => { e.stopPropagation(); if (!briefLoading && asset.ai_brief) setBrief(asset.ai_brief); else generateBrief(); }}
               disabled={briefLoading}
               style={{ padding: "8px 16px", border: `1px solid ${INK15}`, background: PAPER, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: ".12em", textTransform: "uppercase", cursor: briefLoading ? "wait" : "pointer" }}
             >
-              {briefLoading ? "Generating brief…" : "Generate AI brief →"}
+              {briefLoading ? `Generating brief… ${briefSecs}s · typically 30–60s` : asset.ai_brief ? "Show saved brief →" : "Generate AI brief →"}
             </button>
           )}
           {briefError && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: RED }}>{briefError}</span>}
+          {briefSaveNote && <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: RED }}>{briefSaveNote}</span>}
           </div>
 
           {/* Brief output */}
           {brief && (
             <div className="aiq-print" style={{ background: PAPER, border: `1px solid ${INK15}`, padding: "14px 16px" }} onClick={e => e.stopPropagation()}>
               <div className="aiq-noprint" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, gap: 10, flexWrap: "wrap" }}>
-                <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>AI creation brief</span>
+                <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>
+                  AI creation brief
+                  {asset.ai_brief_generated_at && brief === asset.ai_brief && (
+                    <span style={{ fontWeight: 400, letterSpacing: ".06em", marginLeft: 8 }}>· saved {new Date(asset.ai_brief_generated_at).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</span>
+                  )}
+                </span>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <BriefActions text={brief} />
-                  <button onClick={() => setBrief(null)} style={{ background: "transparent", border: "none", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, color: INK35, cursor: "pointer", letterSpacing: ".10em", textTransform: "uppercase" }}>✕ Close</button>
+                  {/* Regenerate is the only action that spends a credit; Close just hides. */}
+                  <button onClick={() => generateBrief()} disabled={briefLoading} title="Uses one asset-plan credit" style={{ background: "transparent", border: "none", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, color: INK55, cursor: briefLoading ? "wait" : "pointer", letterSpacing: ".10em", textTransform: "uppercase" }}>{briefLoading ? `Regenerating… ${briefSecs}s` : "↻ Regenerate"}</button>
+                  <button onClick={() => setBrief(null)} style={{ background: "transparent", border: "none", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, color: INK35, cursor: "pointer", letterSpacing: ".10em", textTransform: "uppercase" }}>✕ Hide</button>
                 </div>
               </div>
               <Markdown text={brief} size={13.5} />

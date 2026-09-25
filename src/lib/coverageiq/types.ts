@@ -34,6 +34,8 @@ export interface DbPitch {
   peso_type: PesoType;
   data_source: DataSource;
   notes: string | null;
+  /** 2026-09-25 (P3-05): the pitch text, carried over from PressIQ. */
+  body: string | null;
   sent_date: string | null;
   placed_date: string | null;
   follow_up_due: string | null;
@@ -112,6 +114,7 @@ export interface CreatePitchInput {
   stage?: Stage;
   data_source?: DataSource;
   notes?: string | null;
+  body?: string | null;
 }
 
 export interface CreateJournalistInput {
@@ -185,6 +188,7 @@ export interface VmPitch {
   peso: PesoType;
   dataSource: DataSource;
   notes: string | null;
+  body: string | null;
   sentDate: string | null;
   placedDate: string | null;
   followUpDue: string | null;
@@ -266,6 +270,7 @@ export function pitchFromDb(row: DbPitch): VmPitch {
     peso: row.peso_type,
     dataSource: row.data_source,
     notes: row.notes,
+    body: row.body ?? null,
     sentDate: row.sent_date,
     placedDate: row.placed_date,
     followUpDue: row.follow_up_due,
@@ -329,6 +334,7 @@ export function pitchFromMock(p: MockPitch, journalists: MockJournalist[]): VmPi
     peso: p.peso,
     dataSource: coerceDataSource(p.dataSource),
     notes: null,
+    body: null,
     sentDate: p.sentDate,
     placedDate: p.placedDate,
     followUpDue: p.followUpDue,

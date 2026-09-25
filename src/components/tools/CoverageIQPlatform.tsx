@@ -22,6 +22,7 @@ import {
   createPitch,
   assignUnassignedPitches,
   updatePitchStage,
+  updatePitchJournalist,
   updateAlertStatus,
   createJournalist,
   updateJournalist,
@@ -100,6 +101,13 @@ export default function CoverageIQPlatform({
   const handleStageChange = useCallback((id: string, stage: Stage) => {
     startTransition(async () => {
       await updatePitchStage(id, stage);
+      router.refresh();
+    });
+  }, [router]);
+
+  const handleJournalistChange = useCallback((id: string, journalistId: string | null) => {
+    startTransition(async () => {
+      await updatePitchJournalist(id, journalistId);
       router.refresh();
     });
   }, [router]);
@@ -271,7 +279,7 @@ export default function CoverageIQPlatform({
       {/* Main content */}
       <main style={{ maxWidth: 1240, marginInline: "auto", padding: "24px clamp(20px,4vw,56px) 80px" }}>
         <SectionMast {...sectionMastProps[activeTab]} />
-        {activeTab === "pipeline"  && <PipelineView pitches={vmPitches} onStageChange={handleStageChange} showStageLegend />}
+        {activeTab === "pipeline"  && <PipelineView pitches={vmPitches} onStageChange={handleStageChange} showStageLegend journalists={vmJournalists} onJournalistChange={handleJournalistChange} />}
         {activeTab === "followups" && <FollowUpsView pitches={vmPitches} />}
         {activeTab === "coverage"  && <CoverageLogView pitches={vmPitches} />}
         {activeTab === "contacts"  && (

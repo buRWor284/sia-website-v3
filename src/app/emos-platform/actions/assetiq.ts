@@ -34,6 +34,10 @@ export interface DbAsset {
   // 2026-09-13 (company scoping 1c): the company this asset is FOR. Null on
   // rows that predate tagging.
   company_id: string | null;
+  // 2026-09-25 (P2-05): the last AI creation brief, persisted so reopening the
+  // row shows it without spending another asset-plan credit.
+  ai_brief: string | null;
+  ai_brief_generated_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -54,7 +58,7 @@ export async function getAssets(): Promise<DbAsset[]> {
   const db = await getAuthenticatedClient();
   const { data, error } = await db
     .from("linkable_assets")
-    .select("id, asset_type, title, description, target_keyword, status, published_url, links_earned, signal_id, signal_headline, company_id, created_at, updated_at")
+    .select("id, asset_type, title, description, target_keyword, status, published_url, links_earned, signal_id, signal_headline, company_id, ai_brief, ai_brief_generated_at, created_at, updated_at")
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -72,6 +76,8 @@ export async function getAssets(): Promise<DbAsset[]> {
     signal_id: string | null;
     signal_headline: string | null;
     company_id: string | null;
+    ai_brief: string | null;
+    ai_brief_generated_at: string | null;
     created_at: string;
     updated_at: string;
   }) => ({
@@ -153,6 +159,24 @@ export async function updateAsset(
     .select("id");
   if (error) { console.error("updateAsset error:", error.message); return false; }
   if (!data?.length) { console.warn(`updateAsset: no row matched ${assetId}`); return false; }
+  revalidatePath("/emos-platform/dashboard/assetiq");
+  return true;
+}
+
+/**
+ * 2026-09-25 (P2-05): persist the AI creation brief on the asset. Awaited by
+ * the caller (never fire-and-forget — see feedback-fire-and-forget-persistence).
+ */
+export async function saveAssetBrief(assetId: string, brief: string): Promise<boolean> {
+  const db = await getAuthenticatedClient();
+  const now = new Date().toISOString();
+  const { data, error } = await db
+    .from("linkable_assets")
+    .update({ ai_brief: brief, ai_brief_generated_at: now, updated_at: now })
+    .eq("id", assetId)
+    .select("id");
+  if (error) { console.error("saveAssetBrief error:", error.message); return false; }
+  if (!data?.length) { console.warn(`saveAssetBrief: no row matched ${assetId}`); return false; }
   revalidatePath("/emos-platform/dashboard/assetiq");
   return true;
 }

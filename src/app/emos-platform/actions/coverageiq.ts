@@ -36,7 +36,7 @@ export async function getPitches(): Promise<DbPitch[]> {
   const { data, error } = await db
     .from("coverageiq_pitches")
     .select(`
-      id, subject, client, company_id, team, stage, peso_type, data_source, notes,
+      id, subject, client, company_id, team, stage, peso_type, data_source, notes, body,
       sent_date, placed_date, follow_up_due, placement_url, anchor_text,
       domain_rating, link_type, content_type, points, journalist_id,
       journalists ( name, outlet, domain_rating, email ),
@@ -75,6 +75,7 @@ export async function getPitches(): Promise<DbPitch[]> {
     journalist_outlet: row.journalists?.outlet ?? null,
     journalist_dr: row.journalists?.domain_rating ?? null,
     journalist_email: row.journalists?.email ?? null,
+    body: row.body ?? null,
   }));
 }
 
@@ -201,6 +202,7 @@ export async function createPitch(input: CreatePitchInput): Promise<{ id: string
       stage: input.stage ?? "drafted",
       data_source: input.data_source ?? "manual",
       notes: input.notes ?? null,
+      body: input.body ?? null,
     })
     .select("id")
     .single();
@@ -256,6 +258,24 @@ export async function updatePitchStage(pitchId: string, stage: Stage): Promise<b
   return true;
 }
 
+/**
+ * 2026-09-25 (P3-05): attach (or detach) a journalist to an existing pitch.
+ * PressIQ hands over pitches with no journalist when none was picked there,
+ * and the row had no way to set one afterwards.
+ */
+export async function updatePitchJournalist(pitchId: string, journalistId: string | null): Promise<boolean> {
+  const db = await getAuthenticatedClient();
+  const { data, error } = await db
+    .from("coverageiq_pitches")
+    .update({ journalist_id: journalistId, updated_at: new Date().toISOString() })
+    .eq("id", pitchId)
+    .select("id");
+  if (error) { console.error("updatePitchJournalist error:", error.message); return false; }
+  if (!data?.length) { console.warn(`updatePitchJournalist: no row matched ${pitchId}`); return false; }
+  revalidatePath("/emos-platform/dashboard/coverageiq");
+  return true;
+}
+
 export async function updateAlertStatus(alertId: string, status: AlertStatus): Promise<boolean> {
   const db = await getAuthenticatedClient();
   const { data, error } = await db.from("coverageiq_alerts").update({ status }).eq("id", alertId).select("id");
@@ -267,7 +287,7 @@ export async function updateAlertStatus(alertId: string, status: AlertStatus): P
 
 // ─── Journalist management (Phase 4) ─────────────────────────────────────────
 
-export async function createJournalist(input: CreateJournalistInput): Promise<{ id: string } | null> {
+export async function createJournalist(input: CreateJournalistInput): Promise<{ id: string; domain_rating: number | null } | null> {
   const db = await getAuthenticatedClient();
 
   const { data: org, error: orgError } = await db.from("organizations").select("id").single();
@@ -295,7 +315,7 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
       tags:           input.tags?.length ? input.tags : beatToTags(input.beat),
       data_source:    input.data_source ?? "manual",
     })
-    .select("id")
+    .select("id, domain_rating")
     .single();
 
   if (error) { console.error("createJournalist error:", error.message); return null; }
@@ -323,7 +343,9 @@ export async function createJournalist(input: CreateJournalistInput): Promise<{ 
   revalidatePath("/emos-platform/dashboard/journocollabiq");
   // Awaited for the same fire-and-forget reason as pitch_logged above.
   await recordStageEvent("journalist_saved");
-  return data as { id: string };
+  // 2026-09-25 (P3-09): the Ahrefs DR is returned so the list shows it at
+  // once instead of "—" until the next reload.
+  return data as { id: string; domain_rating: number | null };
 }
 
 export async function updateJournalist(

@@ -165,6 +165,11 @@ export interface PressIQCoreProps {
    *  so the wrapper can warn about things only it knows — e.g. the dashboard
    *  compares the greeting name to the selected journalist. */
   pitchWarning?: (pitch: string) => React.ReactNode;
+  /** 2026-09-25: the selected journalist's beat, live. When it changes, the
+   *  beat box is filled IF it is empty or still holds the previous hint; typed
+   *  text is never overwritten. Fixes scoring with no beat right after picking
+   *  a journalist from the dashboard dropdown (relevance came back unassessed). */
+  beatHint?: string;
 }
 
 // ── Post-score panel (the 4 result views) ─────────────────────────────────────
@@ -409,7 +414,7 @@ function PostScorePanel({
 export default function PressIQToolCore({
   api, initial, persistKey, hideMasthead, showStoreToggle = true,
   quotaLine, turnstileSlot, submitDisabled, onStepChange,
-  pdfAction, onScored, emailUnlockNode, scoreTabCta, splitResetActions, preFormSlot, pitchWarning,
+  pdfAction, onScored, emailUnlockNode, scoreTabCta, splitResetActions, preFormSlot, pitchWarning, beatHint,
 }: PressIQCoreProps) {
   const [pitch,    setPitch]    = useState(initial?.pitch ?? "");
   const [query,    setQuery]    = useState(initial?.query ?? "");
@@ -427,6 +432,17 @@ export default function PressIQToolCore({
   // — render the EMOS platform CTA next to the error. Never set on the dashboard.
   const [errorUpgrade, setErrorUpgrade] = useState(false);
   const [tab,      setTab]      = useState<Tab>("score");
+
+  const prevBeatHintRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (beatHint === undefined) return;
+    const prev = prevBeatHintRef.current;
+    prevBeatHintRef.current = beatHint;
+    if (prev === undefined) return; // mount: `initial` already seeded the box
+    /* eslint-disable react-hooks/set-state-in-effect */
+    setJournalistBeat(cur => (cur.trim() === "" || cur === prev) ? beatHint : cur);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [beatHint]);
 
   // localStorage prefs (platform/pitchMode/store) — wrapper opts in via persistKey.
   // Pitch/query/subject/beat/brand are per-pitch and intentionally NOT persisted.

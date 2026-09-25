@@ -128,6 +128,8 @@ function EditCompanyForm({
   spokesperson: initialSp,
   busy,
   onSave,
+  previousContext,
+  contextChangedAt,
 }: {
   name: string;
   context: string;
@@ -135,6 +137,9 @@ function EditCompanyForm({
   spokesperson: SpokespersonDraft;
   busy: boolean;
   onSave: (patch: { name: string; context: string; website: string } & Spokesperson) => void;
+  /** The previous context, if the DB kept one, and when it changed. */
+  previousContext?: string | null;
+  contextChangedAt?: string | null;
 }) {
   const [name, setName] = useState(initialName);
   const [context, setContext] = useState(initialContext);
@@ -155,6 +160,22 @@ function EditCompanyForm({
           rows={3}
           style={{ ...FIELD, fontStyle: "italic", lineHeight: 1.55, resize: "vertical" }}
         />
+        {previousContext && previousContext !== context && (
+          <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={() => setContext(previousContext)}
+              style={{ ...LINK, color: INK, borderBottomColor: INK }}
+              title={previousContext}
+            >
+              ↶ Restore previous version
+            </button>
+            <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+              {contextChangedAt ? `changed ${new Date(contextChangedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })} · ` : ""}
+              “{previousContext.slice(0, 70)}{previousContext.length > 70 ? "…" : ""}” · then Save changes
+            </span>
+          </div>
+        )}
       </div>
       <div>
         <label style={FIELD_LABEL}>Website <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none", letterSpacing: 0 }}>(optional)</span></label>
@@ -426,6 +447,8 @@ export default function CompanyPicker({
           spokesperson={spFromCompany(company)}
           busy={busy}
           onSave={handleSaveEdit}
+          previousContext={company.context_previous ?? null}
+          contextChangedAt={company.context_changed_at ?? null}
         />
       )}
 

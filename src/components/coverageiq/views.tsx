@@ -50,10 +50,17 @@ export function PipelineView({
   pitches,
   onStageChange,
   showStageLegend,
+  journalists,
+  onJournalistChange,
 }: {
   pitches: VmPitch[];
   onStageChange?: (id: string, stage: Stage) => void;
   showStageLegend?: boolean;
+  /** 2026-09-25 (P3-05): the Contacts list, so a pitch that arrived from
+   *  PressIQ without a journalist can be given one here. Both optional: the
+   *  public tool passes neither and renders exactly as before. */
+  journalists?: VmJournalist[];
+  onJournalistChange?: (pitchId: string, journalistId: string | null) => void;
 }) {
   const [stageFilter, setStageFilter] = useState<Stage | "all">("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -199,6 +206,27 @@ export function PipelineView({
                     {/* Col 1 — pitch details */}
                     <div>
                       <DetailColHead>Pitch Details</DetailColHead>
+                      {journalists && onJournalistChange ? (
+                        <div style={{ marginBottom: 10 }}>
+                          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 6 }}>Journalist / outlet</div>
+                          <select
+                            value={pitch.journalistId ?? ""}
+                            onClick={e => e.stopPropagation()}
+                            onChange={e => { e.stopPropagation(); onJournalistChange(pitch.id, e.target.value || null); }}
+                            style={{ width: "100%", background: PAPER, border: `1px solid ${INK35}`, color: INK, fontFamily: SERIF, fontSize: 13, padding: "6px 8px", outline: "none" }}
+                          >
+                            <option value="">— Nobody yet —</option>
+                            {journalists.map(j => (
+                              <option key={j.id} value={j.id}>{j.name}{j.outlet ? ` · ${j.outlet}` : ""}</option>
+                            ))}
+                          </select>
+                          {journalists.length === 0 && (
+                            <div style={{ marginTop: 4, fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>No contacts yet. Save one in JournoCollabIQ or the Contacts tab.</div>
+                          )}
+                        </div>
+                      ) : (
+                        <DetailRow label="Journalist"  value={pitch.journalistName ? `${pitch.journalistName}${pitch.journalistOutlet ? ` · ${pitch.journalistOutlet}` : ""}` : "—"} />
+                      )}
                       <DetailRow label="Team"         value={pitch.team ?? "—"} />
                       <DetailRow label="Data Source"  value={fmtDataSource(pitch.dataSource)} />
                       <DetailRow label="Link Type"    value={pitch.linkType ?? "—"} />
@@ -248,6 +276,12 @@ export function PipelineView({
                           <DetailColHead>Notes</DetailColHead>
                           <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK70, lineHeight: 1.55, margin: 0 }}>{pitch.notes}</p>
                         </div>
+                      )}
+                      {pitch.body && (
+                        <details style={{ marginTop: 14 }} onClick={e => e.stopPropagation()}>
+                          <summary style={{ cursor: "pointer", fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55 }}>Pitch text</summary>
+                          <pre style={{ margin: "8px 0 0", fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.55, whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{pitch.body}</pre>
+                        </details>
                       )}
                     </div>
                     {/* Col 3 — placement */}

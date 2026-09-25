@@ -441,6 +441,9 @@ export default function SignalIQPlatformClient({
           onCompanyNameChange: setCompanyName,
           contextRequired: true,
           contextMaxLength: COMPANY_CONTEXT_MAX, // same number the save path and both routes use
+          contextNote: companyCtx?.company?.id
+            ? <>Editing here saves to the <strong>{companyCtx.company.name}</strong> profile, which every EMOS tool reads. The previous version can be restored under Manage → Edit.</>
+            : undefined,
         }}
         quotaUi={null}
         scanNote="Platform scan, tailored to your company"

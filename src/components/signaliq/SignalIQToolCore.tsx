@@ -114,6 +114,9 @@ export interface SignalIQCoreProps {
     onCompanyNameChange?: (v: string) => void;
     contextRequired?: boolean;
     contextMaxLength?: number;
+    /** 2026-09-25 (P2-03): shown under the context box. The dashboard uses it
+     *  to say that edits here change the company profile for every tool. */
+    contextNote?: React.ReactNode;
   };
   /** Public gate/quota display wiring. null/undefined = platform (no quota UI). */
   quotaUi?: { emailDone: boolean; onOpenGate: () => void } | null;
@@ -688,6 +691,11 @@ export default function SignalIQToolCore({
               {companyContext.trim() && (
                 <p style={{ margin: "4px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".06em" }}>
                   {companyContext.trim().length}/{contextMaxLength}
+                </p>
+              )}
+              {profile?.contextNote && (
+                <p style={{ margin: "8px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+                  {profile.contextNote}
                 </p>
               )}
               {contextRequired && (

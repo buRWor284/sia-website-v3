@@ -19,7 +19,7 @@ import { revalidatePath } from "next/cache";
 import type { Company, CreateCompanyInput, UpdateCompanyInput } from "@/lib/company-types";
 import { COMPANY_CONTEXT_MAX, SPOKESPERSON_FIELDS } from "@/lib/company-types";
 
-const COLUMNS = "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin, created_at, updated_at";
+const COLUMNS = "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin, context_previous, context_changed_at, created_at, updated_at";
 
 /** Trimmed, length-capped, empty → null. */
 function cleanOptional(v: string | null | undefined, max = 200): string | null {

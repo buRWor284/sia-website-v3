@@ -21,6 +21,10 @@ export interface Company extends Spokesperson {
   name: string;
   context: string;
   website: string | null;
+  /** 2026-09-25 (P2-03): the context before the last change, kept by a DB
+   *  trigger so an accidental overwrite from SignalIQ is one click to undo. */
+  context_previous?: string | null;
+  context_changed_at?: string | null;
   created_at: string;
   updated_at: string;
 }
