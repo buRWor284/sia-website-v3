@@ -1,0 +1,254 @@
+import "server-only";
+/**
+ * Outlet rosters: who is writing for each outlet right now, read from the
+ * outlet's OWN pages (JournoCollabIQ, 25 Sep 2026).
+ *
+ * Why: web search does not surface bylines for niche trade press (eval, 25
+ * Sep), and the model naming people from memory got 2 of 40 right. The
+ * hand-picked outlet lists (outlets.ts) are read on a schedule; each read
+ * stores (author, article URL, date) rows. Search time then only READS the
+ * stored rows, so it is fast and nearly free.
+ *
+ * Freshness (Irfan, 25 Sep): a name is "current" when the outlet was read in
+ * the last 30 days and the article is within 12 months. Older rows are kept
+ * and shown as "last seen at <outlet>, <month>, may have moved". Nothing is
+ * deleted; an outlet that keeps failing is visible in outlet_reads.
+ *
+ * Code decides, not the model: an article only counts if its URL is one the
+ * reader actually fetched or saw linked on a fetched page, it sits on the
+ * outlet's own domain, it has a date within 12 months, and the byline is a
+ * person (staff, desk and wire credits are dropped).
+ */
+
+import { recordAiUsage } from "@/lib/ai-usage";
+import { createSupabaseServiceClient } from "@/lib/supabase";
+import { collectEvidence, parseDate, urlKey } from "@/lib/journo/verify";
+import { BYLINE_MAX_AGE_DAYS, VERIFY_TTL_DAYS, nameKey, normaliseDomain } from "@/lib/journo/verification-shared";
+import type { Outlet } from "@/lib/journo/outlets";
+
+const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
+export const ROSTER_MODEL = process.env.JOURNO_ROSTER_MODEL ?? "claude-haiku-4-5";
+const FETCH_TOOL = process.env.JOURNO_ROSTER_FETCH_TOOL ?? "web_fetch_20250910";
+const FETCH_BETA = "web-fetch-2025-09-10";
+const SEARCH_TOOL = "web_search_20250305";
+/** Listing page(s) plus up to 4 articles opened for bylines and dates. */
+const MAX_FETCHES = 6;
+const READ_TIMEOUT_MS = 120_000;
+
+/** Credits that are not a person: never a roster name. */
+const NOT_A_PERSON =
+  /\b(staff|desk|team|editor(ial)? team|newsroom|correspondent|agenc(y|ies)|afp|reuters|ap|spa|wam|bloomberg|bna|kuna|wires?|press release|sponsored|partner content|contributor)\b/i;
+
+export function isPersonByline(author: string, outletName: string): boolean {
+  const a = author.trim();
+  if (a.length < 4 || a.length > 60) return false;
+  if (NOT_A_PERSON.test(a)) return false;
+  const bare = (s: string) => s.toLowerCase().replace(/[^a-z]/g, "");
+  if (bare(a) && bare(outletName).includes(bare(a))) return false; // "Argaam", "Arab News"
+  if (!/\s/.test(a)) return false; // one word: a brand, not a person
+  return true;
+}
+
+function sameSite(url: string, domain: string): boolean {
+  const d = normaliseDomain(url);
+  const o = normaliseDomain(domain);
+  return !!d && (d === o || d.endsWith("." + o) || o.endsWith("." + d));
+}
+
+function buildReadPrompt(o: Outlet, market: string, beat: string, today: Date): string {
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const earliest = new Date(today.getTime() - BYLINE_MAX_AGE_DAYS * 86_400_000);
+  return `Today is ${iso(today)}. Read these pages from ${o.name} (${o.domain}) with the page-fetch tool:
+${o.pages.map((p) => `- ${p}`).join("\n")}
+${o.confirmPages ? `\nIf these pages show few articles, you may search once for recent ${o.name} articles about Saudi Arabia.\n` : ""}
+Goal: find the named JOURNALISTS who wrote recent articles here (market: ${market.toUpperCase()}, beat: ${beat.replace(/-/g, " ")}).
+
+Steps:
+1. From the page(s), take the most recent articles (published on or after ${iso(earliest)}).
+2. The listing may not show the author or date. Open up to 4 of the most recent articles to read the byline and date.
+3. Report only PERSONAL bylines. Skip "Staff", desks, the outlet's own name, and wire agencies (AFP, Reuters, SPA, WAM, AP, Bloomberg).
+
+Rules:
+- article_url must be copied exactly from a page you fetched or a link on it. Never build or guess a URL.
+- date is YYYY-MM-DD; leave it empty if you did not see it.
+
+Reply with ONLY a JSON array, no other text:
+[{"author":"Full name","article_url":"","title":"","date":"YYYY-MM-DD or empty"}]`;
+}
+
+export interface OutletReadResult {
+  domain: string;
+  ok: boolean;
+  bylines: number;
+  newest: string | null;
+  note: string;
+}
+
+/** Read one outlet and store what was found. Never throws. */
+export async function readOutlet(o: Outlet, market: string, beat: string): Promise<OutletReadResult> {
+  const domain = normaliseDomain(o.domain);
+  const db = createSupabaseServiceClient();
+  const logRead = async (r: OutletReadResult) => {
+    try {
+      await db.from("outlet_reads").insert({
+        outlet_domain: domain, market, beat, ok: r.ok, bylines_found: r.bylines,
+        newest_article: r.newest, note: r.note.slice(0, 500),
+      });
+    } catch (e) {
+      console.warn("[journo-roster] read log failed:", e);
+    }
+    return r;
+  };
+
+  if (o.status !== "active") return logRead({ domain, ok: false, bylines: 0, newest: null, note: `skipped: status ${o.status}` });
+  if (o.blocksReading) return logRead({ domain, ok: false, bylines: 0, newest: null, note: "skipped: site blocks page reads" });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return logRead({ domain, ok: false, bylines: 0, newest: null, note: "no API key" });
+
+  const today = new Date();
+  let json: { content?: Array<{ type: string; text?: string; content?: unknown }>; stop_reason?: string };
+  try {
+    const res = await fetch(ANTHROPIC_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-beta": FETCH_BETA },
+      body: JSON.stringify({
+        model: ROSTER_MODEL,
+        max_tokens: 1500,
+        tools: [
+          { type: FETCH_TOOL, name: "web_fetch", max_uses: MAX_FETCHES, max_content_tokens: 8000 },
+          ...(o.confirmPages ? [{ type: SEARCH_TOOL, name: "web_search", max_uses: 1 }] : []),
+        ],
+        messages: [{ role: "user", content: buildReadPrompt(o, market, beat, today) }],
+      }),
+      signal: AbortSignal.timeout(READ_TIMEOUT_MS),
+    });
+    json = (await res.json().catch(() => ({}))) as typeof json;
+    if (!res.ok) {
+      const msg = (json as { error?: { message?: string } })?.error?.message ?? `HTTP ${res.status}`;
+      return logRead({ domain, ok: false, bylines: 0, newest: null, note: `API error: ${msg}` });
+    }
+  } catch (e) {
+    return logRead({ domain, ok: false, bylines: 0, newest: null, note: `call failed: ${String(e).slice(0, 200)}` });
+  }
+  await recordAiUsage("journo-roster", ROSTER_MODEL, json);
+
+  const { seen } = collectEvidence(json.content);
+  // Fetched pages count as seen even when only the fetch tool ran.
+  const fetchErrors = (json.content ?? []).filter(
+    (b) => b.type === "web_fetch_tool_result" && (b.content as { type?: string })?.type === "web_fetch_tool_error",
+  ).length;
+
+  const text = (json.content ?? []).filter((b) => b.type === "text").map((b) => b.text ?? "").join("");
+  let arr: unknown = null;
+  const a = text.indexOf("[");
+  const z = text.lastIndexOf("]");
+  if (a >= 0 && z > a) { try { arr = JSON.parse(text.slice(a, z + 1)); } catch { arr = null; } }
+  if (!Array.isArray(arr)) {
+    return logRead({ domain, ok: false, bylines: 0, newest: null, note: `unreadable answer (fetch errors: ${fetchErrors}) ${text.slice(0, 160)}` });
+  }
+
+  const rows: Array<Record<string, unknown>> = [];
+  const dropped: Record<string, number> = {};
+  const drop = (why: string) => { dropped[why] = (dropped[why] ?? 0) + 1; };
+  const keys = new Set<string>();
+  for (const item of arr as Array<Record<string, unknown>>) {
+    const author = typeof item?.author === "string" ? item.author.trim() : "";
+    const url = typeof item?.article_url === "string" ? item.article_url.trim() : "";
+    const date = parseDate(typeof item?.date === "string" ? item.date : "");
+    if (!author || !url) { drop("missing"); continue; }
+    if (!isPersonByline(author, o.name)) { drop("not a person"); continue; }
+    if (!sameSite(url, domain)) { drop("other site"); continue; }
+    if (!seen.has(urlKey(url))) { drop("url not seen"); continue; }
+    if (!date) { drop("no date"); continue; }
+    const age = (today.getTime() - date.getTime()) / 86_400_000;
+    if (age > BYLINE_MAX_AGE_DAYS || age < -2) { drop("too old"); continue; }
+    const k = `${nameKey(author)}|${urlKey(url)}`;
+    if (keys.has(k)) continue;
+    keys.add(k);
+    rows.push({
+      outlet_domain: domain,
+      page_url: o.pages[0] ?? null,
+      author_name: author,
+      author_key: nameKey(author),
+      article_url: url,
+      article_title: typeof item.title === "string" ? item.title.slice(0, 300) : null,
+      article_date: date.toISOString().slice(0, 10),
+      model: ROSTER_MODEL,
+    });
+  }
+
+  if (rows.length) {
+    const { error } = await db.from("outlet_bylines").insert(rows);
+    if (error) return logRead({ domain, ok: false, bylines: 0, newest: null, note: `write failed: ${error.message}` });
+  }
+  const newest = rows.map((r) => r.article_date as string).sort().pop() ?? null;
+  const droppedNote = Object.entries(dropped).map(([k, v]) => `${k} ${v}`).join(", ");
+  return logRead({
+    domain, ok: true, bylines: rows.length, newest,
+    note: `found ${rows.length} named bylines${droppedNote ? `; dropped: ${droppedNote}` : ""}; fetch errors: ${fetchErrors}`,
+  });
+}
+
+export interface RosterPerson {
+  name: string;
+  outletDomain: string;
+  articleUrl: string;
+  articleTitle: string | null;
+  articleDate: string;
+  /** Last time the outlet read saw this person. */
+  readAt: string;
+  /** Outlet read within 30 days. False = "last seen, may have moved". */
+  current: boolean;
+  articles: number;
+}
+
+/** Everyone seen writing for these outlets in the last 12 months, newest first. */
+export async function readRoster(domains: string[]): Promise<RosterPerson[]> {
+  const list = Array.from(new Set(domains.map(normaliseDomain).filter(Boolean)));
+  if (!list.length) return [];
+  try {
+    const db = createSupabaseServiceClient();
+    const since = new Date(Date.now() - BYLINE_MAX_AGE_DAYS * 86_400_000).toISOString().slice(0, 10);
+    const { data, error } = await db
+      .from("outlet_bylines")
+      .select("outlet_domain, author_name, author_key, article_url, article_title, article_date, read_at")
+      .in("outlet_domain", list)
+      .gte("article_date", since)
+      .order("article_date", { ascending: false })
+      .limit(1000);
+    if (error || !data) { if (error) console.warn("[journo-roster] read failed:", error.message); return []; }
+    const cutoff = Date.now() - VERIFY_TTL_DAYS * 86_400_000;
+    const byPerson = new Map<string, RosterPerson>();
+    for (const r of data as Array<Record<string, string>>) {
+      const k = `${r.author_key}|${r.outlet_domain}`;
+      const cur = byPerson.get(k);
+      if (!cur) {
+        byPerson.set(k, {
+          name: r.author_name, outletDomain: r.outlet_domain, articleUrl: r.article_url,
+          articleTitle: r.article_title ?? null, articleDate: r.article_date, readAt: r.read_at,
+          current: Date.parse(r.read_at) >= cutoff, articles: 1,
+        });
+      } else {
+        cur.articles++;
+        if (Date.parse(r.read_at) > Date.parse(cur.readAt)) {
+          cur.readAt = r.read_at;
+          cur.current = Date.parse(r.read_at) >= cutoff;
+        }
+      }
+    }
+    return [...byPerson.values()].sort((x, y) => Number(y.current) - Number(x.current) || y.articleDate.localeCompare(x.articleDate));
+  } catch (e) {
+    console.warn("[journo-roster] read error:", e);
+    return [];
+  }
+}
+
+/** The roster entry for this person at this outlet, if any (current or not). */
+export async function rosterLookup(name: string, outlet: string): Promise<RosterPerson | null> {
+  const key = nameKey(name);
+  const domain = normaliseDomain(outlet);
+  if (!key || !domain) return null;
+  const people = await readRoster([domain]);
+  return people.find((p) => nameKey(p.name) === key) ?? null;
+}

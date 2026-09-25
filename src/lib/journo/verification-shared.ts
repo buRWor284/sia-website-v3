@@ -16,8 +16,10 @@ export const BYLINE_MAX_AGE_DAYS = 365;
 export interface JournalistVerification {
   /** "verified" = byline found; "unverified" = looked, none found;
    *  "check_failed" = the check could not run (API error / timeout), not cached;
-   *  "pending" = not finished inside the search route, the card fills it in. */
-  status: "verified" | "unverified" | "check_failed" | "pending";
+   *  "pending" = not finished inside the search route, the card fills it in;
+   *  "stale" = seen on the outlet's pages more than 30 days ago ("last seen,
+   *  may have moved"): shown as a lead, never as verified. */
+  status: "verified" | "unverified" | "check_failed" | "pending" | "stale";
   name: string;
   /** The outlet domain the candidate list gave (may be wrong). */
   outlet: string;
@@ -137,6 +139,10 @@ export function applyVerification<T extends VerifiableCandidate>(c: T, v: Journa
       linkPage: v.bylineUrl ?? "",
     };
   }
+  if (v.status === "stale") {
+    // Keep the last article as the link; no tier (a tier needs a current byline).
+    return { ...c, verification: v, aiTier, tier: "stale", linkPage: v.bylineUrl ?? c.linkPage };
+  }
   if (v.status === "unverified") {
     return { ...c, verification: v, aiTier, tier: "unverified", url: statedOutlet, statedOutlet: undefined, why: "", linkPage: "" };
   }
@@ -147,8 +153,9 @@ export function applyVerification<T extends VerifiableCandidate>(c: T, v: Journa
 export function verificationRank(c: VerifiableCandidate): number {
   const s = c.verification?.status;
   if (!s || s === "verified") return ({ A: 0, B: 1, C: 2 } as Record<string, number>)[c.tier] ?? 3;
-  if (s === "pending" || s === "check_failed") return 4;
-  return 5;
+  if (s === "stale") return 4;
+  if (s === "pending" || s === "check_failed") return 5;
+  return 6;
 }
 
 /** A placeholder verification for a candidate whose check is still running. */

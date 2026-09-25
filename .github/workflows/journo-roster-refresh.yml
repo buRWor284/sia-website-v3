@@ -1,0 +1,36 @@
+# JournoCollabIQ outlet rosters (25 Sep 2026): reads the hand-picked outlets
+# (src/lib/journo/outlets.ts) and stores who is writing for them. Weekly; the
+# route skips outlets read in the last 21 days, so each outlet costs about one
+# read a month. Run by hand from the Actions tab (force=1 re-reads everything).
+# Required GitHub secret: CRON_SECRET (same value as the Vercel env var).
+name: JournoCollabIQ roster refresh
+
+on:
+  schedule:
+    - cron: '23 3 * * 1'   # Mondays 03:23 UTC, offset from peak :00 slots
+  workflow_dispatch:
+    inputs:
+      market:
+        description: 'Market (ksa)'
+        default: 'ksa'
+        required: true
+      force:
+        description: 'Re-read every outlet (1) or only stale ones (0)'
+        default: '0'
+        required: true
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Refresh rosters
+        run: |
+          MARKET="${{ github.event.inputs.market || 'ksa' }}"
+          FORCE="${{ github.event.inputs.force || '0' }}"
+          RESPONSE=$(curl -s --max-time 330 -w "\nHTTP_STATUS:%{http_code}" -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://www.syedirfanajmal.com/api/emos-platform/journo-roster/refresh?market=${MARKET}&force=${FORCE}")
+          echo "$RESPONSE"
+          STATUS=$(echo "$RESPONSE" | grep HTTP_STATUS | cut -d: -f2)
+          if [ "$STATUS" != "200" ]; then echo "::error::Roster refresh returned $STATUS"; exit 1; fi

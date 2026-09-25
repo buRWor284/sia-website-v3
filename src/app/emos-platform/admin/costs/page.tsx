@@ -58,6 +58,7 @@ const TOOL_LABELS: Record<string, string> = {
   "journo-ai": "JournoCollabIQ",
   "journo-verify": "JournoCollabIQ · byline check",
   "journo-discover": "JournoCollabIQ · search-first list",
+  "journo-roster": "JournoCollabIQ · outlet roster read",
   "collab-ai": "PartnerCollabIQ",
   "asset-brief": "AssetIQ · brief",
   "company-brief": "Company brief · research / condense",

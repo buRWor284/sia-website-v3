@@ -381,7 +381,9 @@ function JournalistCard({
         // 2026-09-25 (P1-01): the list records what the byline check found.
         notes: isVerified
           ? [j.why, v?.bylineUrl ? `Byline: ${v.bylineUrl}${v.bylineDate ? ` (${v.bylineDate})` : ""}` : ""].filter(Boolean).join("\n\n")
-          : `Unverified: no recent byline found under this name at ${j.url}${v?.checkedAt ? ` (checked ${formatBylineDate(v.checkedAt)})` : ""}. Confirm on the outlet's site before pitching.`,
+          : status === "stale"
+            ? `Last seen writing for ${j.url} on ${formatBylineDate(v?.bylineDate)}${v?.bylineUrl ? ` (${v.bylineUrl})` : ""}. May have moved; confirm before pitching.`
+            : `Unverified: no recent byline found under this name at ${j.url}${v?.checkedAt ? ` (checked ${formatBylineDate(v.checkedAt)})` : ""}. Confirm on the outlet's site before pitching.`,
         data_source: "JournoCollabIQ",
         // 2026-09-09 (state layer phase 5): record WHY this journalist is being
         // saved. Without this a journalist found for the KSA retail radar is
@@ -442,6 +444,11 @@ function JournalistCard({
           {status === "unverified" && (
             <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: INK, background: AMBER, padding: "3px 7px" }}>
               Name not confirmed
+            </span>
+          )}
+          {status === "stale" && (
+            <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 8, letterSpacing: ".10em", textTransform: "uppercase", color: PAPER, border: "1px solid rgba(241,235,222,.45)", padding: "2px 7px" }}>
+              Last seen {formatBylineDate(v?.bylineDate)}
             </span>
           )}
           {status === "pending" && (
@@ -511,6 +518,27 @@ function JournalistCard({
             )}
             <div style={{ fontFamily: MONO, fontSize: 9, color: INK55, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               <span>{v?.cached ? "Checked earlier (cached)" : "Checked just now"}{v?.checkedAt ? ` · ${formatBylineDate(v.checkedAt)}` : ""}</span>
+              <button onClick={reverify} disabled={reverifying}
+                style={{ background: "none", border: "none", padding: 0, fontFamily: MONO, fontSize: 9, fontWeight: 700, color: BLUE, cursor: reverifying ? "wait" : "pointer" }}>
+                {reverifying ? "Re-verifying… a few seconds" : "↻ Re-verify (free)"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {status === "stale" && v && (
+          <div style={{ border: `1px solid ${INK15}`, background: PAPER2, padding: "10px 12px", display: "flex", flexDirection: "column", gap: 6 }}>
+            <p style={{ margin: 0, fontFamily: SERIF, fontSize: 13.5, color: INK, lineHeight: 1.55 }}>
+              Last seen writing for {j.url} on {formatBylineDate(v.bylineDate)}. They may have moved beat or outlet since, so check before you pitch.
+            </p>
+            {v.bylineUrl && (
+              <a href={v.bylineUrl} target="_blank" rel="noopener noreferrer"
+                style={{ fontFamily: MONO, fontSize: 9.5, color: BLUE, textDecoration: "none" }}>
+                Last article{v.bylineTitle ? `: “${v.bylineTitle}”` : ""} ↗
+              </a>
+            )}
+            <div style={{ fontFamily: MONO, fontSize: 9, color: INK55, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <span>Outlet last read {formatBylineDate(v.checkedAt)}</span>
               <button onClick={reverify} disabled={reverifying}
                 style={{ background: "none", border: "none", padding: 0, fontFamily: MONO, fontSize: 9, fontWeight: 700, color: BLUE, cursor: reverifying ? "wait" : "pointer" }}>
                 {reverifying ? "Re-verifying… a few seconds" : "↻ Re-verify (free)"}
@@ -1016,6 +1044,7 @@ export default function JournoCollabIQClient({
     verified:   results?.filter((j) => j.verification?.status === "verified").length ?? 0,
     unverified: results?.filter((j) => j.verification?.status === "unverified").length ?? 0,
     checking:   results?.filter((j) => j.verification?.status === "pending").length ?? 0,
+    lastSeen:   results?.filter((j) => j.verification?.status === "stale").length ?? 0,
   };
   const [brief, setBrief] = useState<string | null>(null);
   const [loadingBrief, setLoadingBrief] = useState(false);
@@ -1175,7 +1204,7 @@ export default function JournoCollabIQClient({
           <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
               <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".18em", textTransform: "uppercase" }}>
-                {counts.verified} verified · {counts.unverified} name not confirmed{counts.checking > 0 ? ` · ${counts.checking} checking` : ""}
+                {counts.verified} verified{counts.lastSeen > 0 ? ` · ${counts.lastSeen} last seen` : ""} · {counts.unverified} name not confirmed{counts.checking > 0 ? ` · ${counts.checking} checking` : ""}
               </span>
               <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
                 Verified = a byline at the outlet in the last 12 months · ranked by fit
@@ -1194,7 +1223,7 @@ export default function JournoCollabIQClient({
               <span style={{ fontFamily: MONO, fontSize: 8.5, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>byline · last 12 months</span>
             </div>
             <p style={{ margin: 0, padding: "10px 12px 8px", fontFamily: SERIF, fontSize: 13, color: INK70, lineHeight: 1.55 }}>
-              Every name was searched for a byline at the outlet in the last 12 months. Names with one are marked Verified and link to that article. Names without one are marked Name not confirmed and get no tier.
+              Every name was checked for a byline at the outlet in the last 12 months, either on the outlet&apos;s own pages or by a web search. Names with one are marked Verified and link to that article. &ldquo;Last seen&rdquo; means we saw them there more than 30 days ago and they may have moved. Names without a byline are marked Name not confirmed and get no tier.
             </p>
             {([
               ["Verified earlier (cached)", "Instant, free and stable from one search to the next. The check can be up to 30 days old, and a journalist may have changed beat or outlet since, so look at the last byline seen date."],

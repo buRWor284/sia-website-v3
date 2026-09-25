@@ -14,6 +14,7 @@ import { NextRequest, NextResponse, after } from "next/server";
 import { requireEmosAccess } from "@/lib/emos-guard";
 import { runJournoAI, verifyCandidates } from "@/lib/journo/route-core";
 import { discoverJournalists } from "@/lib/journo/discover";
+import { buildRosterList } from "@/lib/journo/roster-list";
 import { withAiUsage } from "@/lib/ai-usage";
 import { getApprovedBrief } from "@/lib/company-brief";
 import { reserveUsage } from "@/lib/usage-limits";
@@ -61,7 +62,22 @@ export async function POST(request: NextRequest) {
   // checks; if it failed slowly there is no time left, so say so and refund.
   let listSource = "memory";
   let listJson: string | null = null;
-  if (type === "partner-suggestions" && process.env.JOURNO_DISCOVERY !== "off") {
+
+  // 1) Roster first (25 Sep): for markets with hand-picked outlets (KSA),
+  // the people come from the outlets' own pages, read on a schedule.
+  if (type === "partner-suggestions") {
+    const roster = await withAiUsage(ctx, () => buildRosterList(data, companyBrief)).catch((e) => {
+      console.warn("[journo-ai] roster list failed:", e);
+      return null;
+    });
+    if (roster && roster.candidates.length > 0) {
+      listJson = JSON.stringify(roster.candidates);
+      listSource = `roster:${roster.market}`;
+    }
+  }
+
+  // 2) Search-first list, 3) the memory list: only when no roster applies.
+  if (!listJson && type === "partner-suggestions" && process.env.JOURNO_DISCOVERY !== "off") {
     const found = await withAiUsage(ctx, () => discoverJournalists(data, companyBrief));
     if (found.ok && found.candidates.length > 0) {
       listJson = JSON.stringify(found.candidates);

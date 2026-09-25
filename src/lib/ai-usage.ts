@@ -48,6 +48,7 @@ export type AiTool =
   | "journo-ai"
   | "journo-verify"
   | "journo-discover"
+  | "journo-roster"
   | "collab-ai"
   | "asset-brief"
   | "company-brief";

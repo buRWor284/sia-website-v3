@@ -22,7 +22,11 @@ const isProtectedApiRoute = createRouteMatcher(["/api/emos-platform(.*)"]);
 // Caught via Vercel runtime logs: 100% 401 on every per-minute invocation
 // since the route shipped. Exempt by exact path, not prefix, so any future
 // /api/emos-platform/** route defaults back to the Clerk gate.
-const isEmosCronRoute = createRouteMatcher(["/api/emos-platform/factcheck/cron"]);
+// journo-roster/refresh (25 Sep 2026): CRON_SECRET bearer, fail closed, like factcheck/cron.
+const isEmosCronRoute = createRouteMatcher([
+  "/api/emos-platform/factcheck/cron",
+  "/api/emos-platform/journo-roster/refresh",
+]);
 
 // ─── Legacy Basic Auth clients ────────────────────────────────────────────────
 // PT and Resourcex stay on HTTP Basic Auth (shared username/password via Vercel

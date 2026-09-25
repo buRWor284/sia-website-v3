@@ -431,7 +431,7 @@ export async function runJournoAI(
 export function verifyCandidates(
   raw: string,
   opts: { deadlineMs: number; beat?: string | null },
-): Promise<{ result: string; inFlight: Promise<unknown>; stats: { verified: number; unverified: number; pending: number; cached: number } } | null> {
+): Promise<{ result: string; inFlight: Promise<unknown>; stats: { verified: number; unverified: number; pending: number; stale: number; cached: number } } | null> {
   const arr = parseCandidateArray(raw);
   if (!arr) return Promise.resolve(null);
   const candidates = arr.filter(
@@ -445,7 +445,7 @@ export function verifyCandidates(
   const isDesk = (n: string) => /\bdesk\b|\/|\bnewsroom\b|\beditorial team\b/i.test(n);
   const checks = candidates.map((c) =>
     // Already proven by the search-first list: no second check.
-    c.verification?.status === "verified"
+    c.verification?.status === "verified" || c.verification?.status === "stale"
       ? Promise.resolve<JournalistVerification>(c.verification)
       : isDesk(c.name)
       ? Promise.resolve<JournalistVerification>({
@@ -465,7 +465,7 @@ export function verifyCandidates(
 
   return Promise.all(checks.map((p) => Promise.race([p, timer]))).then((outcomes) => {
     clearTimeout(handle);
-    const stats = { verified: 0, unverified: 0, pending: 0, cached: 0 };
+    const stats = { verified: 0, unverified: 0, pending: 0, stale: 0, cached: 0 };
     const out = candidates.map((c, i) => {
       const o = outcomes[i];
       let v: JournalistVerification;
@@ -473,6 +473,7 @@ export function verifyCandidates(
       else if (o.status === "check_failed") v = { ...o, status: "pending" };
       else v = o;
       if (v.status === "verified") stats.verified++;
+      else if (v.status === "stale") stats.stale++;
       else if (v.status === "unverified") stats.unverified++;
       else stats.pending++;
       if (v.cached) stats.cached++;

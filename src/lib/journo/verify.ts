@@ -35,6 +35,7 @@ import "server-only";
 
 import { recordAiUsage } from "@/lib/ai-usage";
 import { createSupabaseServiceClient } from "@/lib/supabase";
+import { rosterLookup } from "@/lib/journo/roster";
 import {
   BYLINE_MAX_AGE_DAYS,
   VERIFY_TTL_DAYS,
@@ -328,6 +329,16 @@ export async function verifyJournalist(
   if (!opts?.force) {
     const hit = await readCachedVerification(name, outletDomain);
     if (hit) return hit;
+    // Seen on this outlet's own pages (roster read in the last 30 days):
+    // verified for free, no search.
+    const seenOn = await rosterLookup(name, outletDomain);
+    if (seenOn?.current) {
+      return {
+        status: "verified", name, outlet: input.outlet, bylineDomain: seenOn.outletDomain,
+        bylineUrl: seenOn.articleUrl, bylineTitle: seenOn.articleTitle, bylineDate: seenOn.articleDate,
+        roleAsOf: null, note: "Seen on the outlet's own pages.", checkedAt: seenOn.readAt, cached: true, searchesUsed: 0,
+      };
+    }
   }
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
