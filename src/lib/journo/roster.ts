@@ -37,7 +37,16 @@ export const ROSTER_MODEL = process.env.JOURNO_ROSTER_MODEL ?? "claude-haiku-4-5
  * pieces) and sponsored posts. r1 rows carry neither, so they are retired.
  */
 export const ROSTER_READER_ID = `${ROSTER_MODEL}|r2`;
-const ACCEPTED_READERS = [ROSTER_READER_ID];
+/**
+ * r1 rows (written before commit 10, model = the bare model name) are used
+ * ONLY for a listing page whose latest r2 rows are empty: the first r2 read
+ * (25 Sep) returned no names for Campaign ME, ArabAd and most of Gulf
+ * Business, and those outlets must not go blank. They still pass
+ * notJournalistReason on URL and kind (the Saudi Gazette guest rows are
+ * marked kind = outside_writer in the table).
+ */
+const LEGACY_READER = ROSTER_MODEL;
+const ACCEPTED_READERS = [ROSTER_READER_ID, LEGACY_READER];
 /**
  * Days a name stays "current" after the outlet read that saw it; older =
  * "last seen, may have moved". Default 30 (Irfan, 25 Sep). Env-tunable so the
@@ -73,7 +82,7 @@ export function isPersonByline(author: string, outletName: string): boolean {
 
 /** URL paths for paid or non-editorial posts. */
 const NOT_EDITORIAL_URL = /\/(sponsored|partner-content|partner|advertorial|brand-?voice|press-?releases?|corporate-news|pr-news|promoted)(\/|-|$)/i;
-const NOT_EDITORIAL_KIND = new Set(["sponsored", "press_release", "advertorial"]);
+const NOT_EDITORIAL_KIND = new Set(["sponsored", "press_release", "advertorial", "outside_writer"]);
 
 /**
  * Why a byline is not a journalist to pitch, or null if it is. Code decides
@@ -83,6 +92,7 @@ const NOT_EDITORIAL_KIND = new Set(["sponsored", "press_release", "advertorial"]
  */
 export function notJournalistReason(item: { kind?: unknown; outside_writer?: unknown; author_role?: unknown }, url: string): string | null {
   const kind = typeof item.kind === "string" ? item.kind.toLowerCase().replace(/[\s-]+/g, "_") : "";
+  if (kind === "outside_writer") return "outside writer";
   if (NOT_EDITORIAL_KIND.has(kind)) return "sponsored or press release";
   if (NOT_EDITORIAL_URL.test(url)) return "sponsored or press release";
   if (item.outside_writer === true || item.outside_writer === "true") return "outside writer";
@@ -157,7 +167,7 @@ Steps:
 2. Take the most recent articles (published on or after ${iso(earliest)}).
 3. The listing may not show the author or date. Open up to 4 of the most recent articles that still lack one, to read the byline and date.
 4. Report only PERSONAL bylines. Skip "Staff", desks, the outlet's own name, and wire agencies (AFP, Reuters, SPA, WAM, AP, Bloomberg).
-5. We want JOURNALISTS to pitch, not guest writers. If an author might be an outside writer (an opinion piece by a company executive, official, consultant or founder), open the article and read the author line or bio.
+5. Names come first: list every personal byline you see. Only if a byline itself shows a sign of an outside writer (a company job title next to the name, or an "Opinion", "Guest", "Partner" or "Sponsored" label) may you open that article to check; never spend page reads checking ordinary bylines. When unsure, include the byline with outside_writer false.
 
 Rules:
 - article_url must be copied exactly from a page you fetched or a link on it. Never build or guess a URL.
@@ -322,7 +332,7 @@ export async function readRoster(scope: string[] | RosterScope): Promise<RosterP
     const since = new Date(Date.now() - BYLINE_MAX_AGE_DAYS * 86_400_000).toISOString().slice(0, 10);
     const { data, error } = await db
       .from("outlet_bylines")
-      .select("outlet_domain, page_url, author_name, author_key, article_url, article_title, article_date, read_at, author_role")
+      .select("outlet_domain, page_url, author_name, author_key, article_url, article_title, article_date, read_at, author_role, kind, model")
       .in("outlet_domain", list)
       .in("model", ACCEPTED_READERS)
       .gte("article_date", since)
@@ -331,9 +341,14 @@ export async function readRoster(scope: string[] | RosterScope): Promise<RosterP
     if (error || !data) { if (error) console.warn("[journo-roster] read failed:", error.message); return []; }
     const cutoff = Date.now() - ROSTER_CURRENT_DAYS * 86_400_000;
     const keepPages = pages?.length ? new Set(pages) : null;
+    const rows = data as Array<Record<string, string>>;
+    // Listing pages that already have current-reader rows: legacy rows there are ignored.
+    const pagesWithR2 = new Set(rows.filter((r) => r.model === ROSTER_READER_ID).map((r) => `${r.outlet_domain}|${r.page_url}`));
     const byPerson = new Map<string, RosterPerson>();
-    for (const r of data as Array<Record<string, string>>) {
+    for (const r of rows) {
       if (keepPages && !keepPages.has(r.page_url)) continue;
+      if (r.model !== ROSTER_READER_ID && pagesWithR2.has(`${r.outlet_domain}|${r.page_url}`)) continue;
+      if (notJournalistReason({ kind: r.kind, author_role: r.author_role }, r.article_url)) continue;
       const k = `${r.author_key}|${r.outlet_domain}`;
       const cur = byPerson.get(k);
       if (!cur) {
