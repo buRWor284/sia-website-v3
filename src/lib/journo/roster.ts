@@ -38,12 +38,13 @@ export const ROSTER_MODEL = process.env.JOURNO_ROSTER_MODEL ?? "claude-haiku-4-5
  */
 export const ROSTER_READER_ID = `${ROSTER_MODEL}|r2`;
 /**
- * r1 rows (written before commit 10, model = the bare model name) are used
- * ONLY for a listing page whose latest r2 rows are empty: the first r2 read
- * (25 Sep) returned no names for Campaign ME, ArabAd and most of Gulf
- * Business, and those outlets must not go blank. They still pass
- * notJournalistReason on URL and kind (the Saudi Gazette guest rows are
- * marked kind = outside_writer in the table).
+ * r1 rows (written before commit 10, model = the bare model name) are still
+ * used alongside r2 rows: the r2 reads (25-26 Sep) found fewer names on the
+ * Gulf trade sites (ArabAd 6 -> 1, Campaign ME 1 -> 0). They pass
+ * notJournalistReason on URL and kind; the guest writers found by hand are
+ * marked kind = outside_writer in the table (Saudi Gazette: Abdo Chlala,
+ * Marc Domenech; Entrepreneur ME: Shadi Kandil, TikTok). r1 rows age out
+ * on their own: "last seen" after ROSTER_CURRENT_DAYS, gone after 12 months.
  */
 const LEGACY_READER = ROSTER_MODEL;
 const ACCEPTED_READERS = [ROSTER_READER_ID, LEGACY_READER];
@@ -342,12 +343,9 @@ export async function readRoster(scope: string[] | RosterScope): Promise<RosterP
     const cutoff = Date.now() - ROSTER_CURRENT_DAYS * 86_400_000;
     const keepPages = pages?.length ? new Set(pages) : null;
     const rows = data as Array<Record<string, string>>;
-    // Listing pages that already have current-reader rows: legacy rows there are ignored.
-    const pagesWithR2 = new Set(rows.filter((r) => r.model === ROSTER_READER_ID).map((r) => `${r.outlet_domain}|${r.page_url}`));
     const byPerson = new Map<string, RosterPerson>();
     for (const r of rows) {
       if (keepPages && !keepPages.has(r.page_url)) continue;
-      if (r.model !== ROSTER_READER_ID && pagesWithR2.has(`${r.outlet_domain}|${r.page_url}`)) continue;
       if (notJournalistReason({ kind: r.kind, author_role: r.author_role }, r.article_url)) continue;
       const k = `${r.author_key}|${r.outlet_domain}`;
       const cur = byPerson.get(k);
