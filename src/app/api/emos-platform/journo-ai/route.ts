@@ -45,6 +45,38 @@ export async function POST(request: NextRequest) {
   const { type, data } = body;
   if (!type || !data) return NextResponse.json({ error: "Missing type or data." }, { status: 400 });
 
+  // Names to leave out (26 Sep): the user's saved list, plus on "show more"
+  // the people already on screen. Capped so a huge list cannot bloat the call.
+  const exclude = Array.isArray(data.exclude)
+    ? (data.exclude as unknown[]).filter((x): x is string => typeof x === "string").slice(0, 500)
+    : [];
+
+  // "Show more" (26 Sep): the next people from the stored outlet rosters.
+  // Free to the user (no allowance used): it only re-ranks names already
+  // read, about 1 cent of AI. Roster markets only; never falls back to the
+  // paid search paths.
+  if (data.more === true) {
+    if (type !== "partner-suggestions") return NextResponse.json({ error: "Show more is for journalist searches." }, { status: 400 });
+    const companyBriefMore = await getApprovedBrief(guard.userId);
+    const ctxMore = { surface: "platform" as const, clerkUserId: guard.userId };
+    const roster = await withAiUsage(ctxMore, () => buildRosterList(data, companyBriefMore, { exclude, more: true })).catch(() => null);
+    if (!roster || roster.candidates.length === 0) {
+      return NextResponse.json({ result: "[]", listSource: roster ? `roster:${roster.market}` : "none", moreAvailable: 0, skipped: roster?.skipped ?? 0, ms: Date.now() - startedAt });
+    }
+    const checked = await withAiUsage(ctxMore, () =>
+      verifyCandidates(JSON.stringify(roster.candidates), {
+        deadlineMs: startedAt + VERIFY_DEADLINE_MS,
+        beat: typeof data.industry === "string" ? data.industry : null,
+      }),
+    );
+    if (!checked) return NextResponse.json({ error: "Could not load more names. Please retry." }, { status: 502 });
+    after(() => checked.inFlight);
+    return NextResponse.json({
+      result: checked.result, verifyStats: checked.stats, listSource: `roster:${roster.market}`,
+      moreAvailable: roster.remaining, skipped: roster.skipped, ms: Date.now() - startedAt,
+    });
+  }
+
   // Journalist searches and angles/briefs are separate monthly allowances.
   const action =
     type === "partner-suggestions" ? "journalist-search" :
@@ -62,17 +94,21 @@ export async function POST(request: NextRequest) {
   // checks; if it failed slowly there is no time left, so say so and refund.
   let listSource = "memory";
   let listJson: string | null = null;
+  let moreAvailable = 0;
+  let skipped = 0;
 
   // 1) Roster first (25 Sep): for markets with hand-picked outlets (KSA),
   // the people come from the outlets' own pages, read on a schedule.
   if (type === "partner-suggestions") {
-    const roster = await withAiUsage(ctx, () => buildRosterList(data, companyBrief)).catch((e) => {
+    const roster = await withAiUsage(ctx, () => buildRosterList(data, companyBrief, { exclude })).catch((e) => {
       console.warn("[journo-ai] roster list failed:", e);
       return null;
     });
     if (roster && roster.candidates.length > 0) {
       listJson = JSON.stringify(roster.candidates);
       listSource = `roster:${roster.market}`;
+      moreAvailable = roster.remaining;
+      skipped = roster.skipped;
     }
   }
 
@@ -127,7 +163,7 @@ export async function POST(request: NextRequest) {
     console.log(
       `[journo-ai] list=${listSource} verified=${checked.stats.verified} unverified=${checked.stats.unverified} pending=${checked.stats.pending} cached=${checked.stats.cached} ms=${Date.now() - startedAt}`,
     );
-    return NextResponse.json({ result: checked.result, verifyStats: checked.stats, listSource, ms: Date.now() - startedAt });
+    return NextResponse.json({ result: checked.result, verifyStats: checked.stats, listSource, moreAvailable, skipped, ms: Date.now() - startedAt });
   }
 
   return NextResponse.json({ result: resultText });

@@ -1050,6 +1050,14 @@ export default function JournoCollabIQClient({
   const [loadingBrief, setLoadingBrief] = useState(false);
   const [briefError, setBriefError] = useState<string | null>(null);
   const [lastForm, setLastForm] = useState<Record<string, string> | null>(null);
+  // "Show more" (26 Sep): the request body of the last search, how many more
+  // named people the stored rosters still hold, and how many saved people the
+  // search skipped.
+  const [lastRequest, setLastRequest] = useState<Record<string, unknown> | null>(null);
+  const [moreAvailable, setMoreAvailable] = useState(0);
+  const [skippedSaved, setSkippedSaved] = useState(0);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [moreNote, setMoreNote] = useState<string | null>(null);
   // Brand, website and description come from the selected company row, so a
   // user arriving here from SignalIQ or AssetIQ never retypes them. Before
   // 2026-09-09 this was a heuristic over one localStorage string, and the name
@@ -1083,23 +1091,27 @@ export default function JournoCollabIQClient({
     setBrief(null);
     setSearching(true);
     setLastForm(form);
+    setMoreAvailable(0);
+    setSkippedSaved(0);
+    setMoreNote(null);
+    const requestData: Record<string, unknown> = {
+      ...form,
+      signalContext: prefillStory,
+      assetContext: prefillAssetTitle
+        ? `Asset being built: ${prefillAssetType?.replace(/_/g, " ") ?? "linkable asset"} — "${prefillAssetTitle}". ${prefillAssetIdea ?? ""}`
+        : undefined,
+      companyContext: companyContext || undefined,
+    };
+    setLastRequest(requestData);
     try {
       const res = await fetch("/api/emos-platform/journo-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "partner-suggestions",
-          data: {
-            ...form,
-            signalContext: prefillStory,
-            assetContext: prefillAssetTitle
-              ? `Asset being built: ${prefillAssetType?.replace(/_/g, " ") ?? "linkable asset"} — "${prefillAssetTitle}". ${prefillAssetIdea ?? ""}`
-              : undefined,
-            companyContext: companyContext || undefined,
-          },
-        }),
+        // People already in the saved list are skipped (26 Sep), so a new
+        // search finds people you have not pitched yet.
+        body: JSON.stringify({ type: "partner-suggestions", data: { ...requestData, exclude: [...savedNames] } }),
       });
-      const data = await res.json() as { result?: string; error?: string };
+      const data = await res.json() as { result?: string; error?: string; moreAvailable?: number; skipped?: number };
       if (!res.ok || data.error) { setSearchError(data.error ?? "Search failed."); return; }
 
       // The server now returns clean JSON (parse hardened there, 2026-09-25);
@@ -1118,6 +1130,8 @@ export default function JournoCollabIQClient({
       // being checked, then names not confirmed.
       const sorted = [...parsed].sort((a, b) => verificationRank(a) - verificationRank(b));
       setResults(sorted);
+      setMoreAvailable(data.moreAvailable ?? 0);
+      setSkippedSaved(data.skipped ?? 0);
       // Checks that did not land inside the search route come back "pending";
       // fill them in one call each (cache first on the server, so free if the
       // route's late check already landed).
@@ -1135,6 +1149,39 @@ export default function JournoCollabIQClient({
       setSearchError("Could not parse journalist results. Please try again.");
     } finally {
       setSearching(false);
+    }
+  }
+
+  /**
+   * "Show more" (26 Sep): the next named people from the stored outlet
+   * rosters, leaving out everyone on screen and everyone saved. Uses no
+   * search from the allowance.
+   */
+  async function showMore() {
+    if (!lastRequest || !results) return;
+    setLoadingMore(true);
+    setMoreNote(null);
+    try {
+      const res = await fetch("/api/emos-platform/journo-ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "partner-suggestions",
+          data: { ...lastRequest, more: true, exclude: [...savedNames, ...results.map((r) => r.name)] },
+        }),
+      });
+      const data = await res.json() as { result?: string; error?: string; moreAvailable?: number };
+      if (!res.ok || data.error) { setMoreNote(data.error ?? "Could not load more names."); return; }
+      const extra = JSON.parse(data.result?.trim() || "[]") as AIJournalist[];
+      setMoreAvailable(data.moreAvailable ?? 0);
+      if (!extra.length) { setMoreNote("No more names on these outlets yet. The list grows each week as outlets are re-read."); return; }
+      const sorted = [...extra].sort((a, b) => verificationRank(a) - verificationRank(b));
+      setResults((prev) => [...(prev ?? []), ...sorted]);
+    } catch (e) {
+      console.error("journo show-more error:", e);
+      setMoreNote("Could not load more names. Please try again.");
+    } finally {
+      setLoadingMore(false);
     }
   }
 
@@ -1208,6 +1255,7 @@ export default function JournoCollabIQClient({
               </span>
               <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55 }}>
                 Verified = a byline at the outlet in the last 12 months · ranked by fit
+                {skippedSaved > 0 ? ` · ${skippedSaved} already in your list skipped` : ""}
               </span>
             </div>
             <button onClick={generateBrief} disabled={loadingBrief}
@@ -1271,6 +1319,20 @@ export default function JournoCollabIQClient({
               onVerification={(v) => updateVerification(j.name, v)}
             />
           ))}
+
+          {(moreAvailable > 0 || moreNote) && (
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", margin: "4px 0 18px" }}>
+              {moreAvailable > 0 && (
+                <button onClick={showMore} disabled={loadingMore}
+                  style={{ padding: "10px 18px", border: `1px solid ${INK}`, background: PAPER2, color: INK, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: ".10em", textTransform: "uppercase", cursor: loadingMore ? "wait" : "pointer" }}>
+                  {loadingMore ? "Loading…" : `Show ${Math.min(8, moreAvailable)} more (free) →`}
+                </button>
+              )}
+              <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 12.5, color: INK55 }}>
+                {moreNote ?? `${moreAvailable} more ${moreAvailable === 1 ? "person" : "people"} seen on these outlets. Does not use a search.`}
+              </span>
+            </div>
+          )}
 
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 8 }}>
             {([["A", "Highest priority", GREEN], ["B", "Strong candidate", BLUE], ["C", "Good to include", AMBER]] as [string, string, string][]).map(([t, l, c]) => (

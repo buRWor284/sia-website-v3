@@ -14,7 +14,7 @@ import { recordAiUsage } from "@/lib/ai-usage";
 import { briefPromptBlock } from "@/lib/company-brief-prompt";
 import { listsFor, type Outlet } from "@/lib/journo/outlets";
 import { readRoster, type RosterPerson } from "@/lib/journo/roster";
-import type { JournalistVerification } from "@/lib/journo/verification-shared";
+import { nameKey, type JournalistVerification } from "@/lib/journo/verification-shared";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const RANK_MODEL = process.env.JOURNO_RANK_MODEL ?? "claude-sonnet-4-6";
@@ -35,10 +35,21 @@ export function marketFor(d: Record<string, unknown>): string | null {
 
 interface Ranked { i?: unknown; why?: unknown; beat?: unknown; tier?: unknown }
 
+export interface RosterListOptions {
+  /**
+   * Names to leave out (26 Sep, "show more"): people already in the user's
+   * saved list, and on a "show more" call the people already on screen.
+   */
+  exclude?: string[];
+  /** A "show more" call: named people only, no newsroom rows. */
+  more?: boolean;
+}
+
 export async function buildRosterList(
   data: Record<string, unknown>,
   companyBrief?: string | null,
-): Promise<{ candidates: Array<Record<string, unknown>>; market: string; people: number } | null> {
+  opts: RosterListOptions = {},
+): Promise<{ candidates: Array<Record<string, unknown>>; market: string; people: number; skipped: number; remaining: number } | null> {
   const market = marketFor(data);
   if (!market) return null;
   const typed = `${data.industry ?? ""} ${data.audDesc ?? ""}`;
@@ -50,8 +61,12 @@ export async function buildRosterList(
   // Only the listing pages of the matched beat lists: a site in several lists
   // (arabnews.com) must not pour every section's writers into every beat.
   const pages = lists.flatMap((l) => l.outlets.filter((o) => o.status === "active").map((o) => o.pages[0]).filter(Boolean));
-  const people = await readRoster({ domains: [...outlets.keys()], pages });
-  if (people.length === 0) return null;
+  const everyone = await readRoster({ domains: [...outlets.keys()], pages });
+  if (everyone.length === 0) return null;
+  const skip = new Set((opts.exclude ?? []).map((n) => nameKey(n)).filter(Boolean));
+  const people = everyone.filter((p) => !skip.has(nameKey(p.name)));
+  const skipped = everyone.length - people.length;
+  if (people.length === 0) return { candidates: [], market, people: 0, skipped, remaining: 0 };
   const pool = people.slice(0, MAX_PEOPLE_IN_PROMPT);
 
   // Rank by index. A failed ranking still returns the newest people.
@@ -147,6 +162,8 @@ Return ONLY a JSON array: [{"i": 0, "why": "", "beat": "their beat in a few word
   // Room left: name the outlets with no named reporter as newsrooms, so the
   // user still gets the "find the reporter on the outlet's site" route.
   const named = new Set(ranked.map((r) => r.p.outletDomain));
+  const remaining = Math.max(0, people.length - ranked.length);
+  if (opts.more) return { candidates, market, people: people.length, skipped, remaining };
   for (const o of outlets.values()) {
     if (candidates.length >= 8) break;
     if (named.has(o.domain) || o.blocksReading) continue;
@@ -155,5 +172,5 @@ Return ONLY a JSON array: [{"i": 0, "why": "", "beat": "their beat in a few word
       contact: `Via ${o.domain}`, contactLinkedIn: "", seoNote: o.name, tier: "C",
     });
   }
-  return { candidates, market, people: people.length };
+  return { candidates, market, people: people.length, skipped, remaining };
 }
