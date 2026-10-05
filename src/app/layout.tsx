@@ -87,7 +87,17 @@ const siteJsonLd = {
         "Personal Branding",
         "Content Marketing",
         "Link Building",
+        "AI Visibility",
+        "Fractional CMO",
       ],
+      // Stated on /about ("Master's in International Business and
+      // Entrepreneurship from Malardalen University"). Keep in step with it.
+      alumniOf: {
+        "@type": "CollegeOrUniversity",
+        name: "Mälardalen University",
+      },
+      nationality: { "@type": "Country", name: "Pakistan" },
+      mainEntityOfPage: { "@id": "https://www.syedirfanajmal.com/about#webpage" },
     },
     {
       "@type": "Organization",

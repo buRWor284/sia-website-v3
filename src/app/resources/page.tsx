@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions } from "@/components/bureau";
 
 export const metadata: Metadata = {
@@ -60,6 +61,13 @@ const Hero = () => (
 export default function ResourcesPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <PageSchema
+        type="CollectionPage"
+        path="/resources"
+        name="Resources · Playbooks, Guides & Tools"
+        description={metadata.description as string}
+        crumbs={[{ name: "Resources", path: "/resources" }]}
+      />
       <Hero />
       <ResourcesClientShell episodeCount={getAllEpisodes().length} />
       <Subscriptions sectionNumber="07" />

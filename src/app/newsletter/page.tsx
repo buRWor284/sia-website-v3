@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
 import { DoubleRule, Pill, SCaps } from "@/components/bureau/primitives";
@@ -19,6 +20,12 @@ export const metadata: Metadata = {
 export default function NewsletterPage() {
   return (
     <>
+      <PageSchema
+        path="/newsletter"
+        name="Newsletter · Earned Media Lessons Twice a Month"
+        description={metadata.description as string}
+        crumbs={[{ name: "Newsletter", path: "/newsletter" }]}
+      />
       <section
         className="sx"
         style={{ background: PAPER, textAlign: "center", paddingTop: 60, paddingBottom: 20 }}

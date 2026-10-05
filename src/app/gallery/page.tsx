@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import GalleryClient from "./GalleryClient";
 import { ScrollButtons } from "@/components/ScrollButtons";
@@ -17,6 +18,13 @@ export const metadata: Metadata = {
 export default function GalleryPage() {
   return (
     <>
+      <PageSchema
+        type="CollectionPage"
+        path="/gallery"
+        name="Gallery · Speaking, Conferences & Travel"
+        description={metadata.description as string}
+        crumbs={[{ name: "Gallery", path: "/gallery" }]}
+      />
       <GalleryClient />
       <Subscriptions sectionNumber="04" />
       <Colophon />

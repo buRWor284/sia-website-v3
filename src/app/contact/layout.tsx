@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema } from "@/lib/seo/page-schema";
 
 export const metadata: Metadata = {
   title: "Contact · Get in Touch",
@@ -12,5 +13,16 @@ export const metadata: Metadata = {
 };
 
 export default function ContactLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <PageSchema
+        type="ContactPage"
+        path="/contact"
+        name={metadata.title as string}
+        description={metadata.description as string}
+        crumbs={[{ name: "Contact", path: "/contact" }]}
+      />
+      {children}
+    </>
+  );
 }

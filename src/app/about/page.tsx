@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
 
@@ -843,6 +844,14 @@ export default function AboutPage() {
   return (
     <div style={{ background: PAPER }}>
       <Hero />
+      <PageSchema
+        type="ProfilePage"
+        path="/about"
+        name="About Syed Irfan Ajmal"
+        description={metadata.description as string}
+        crumbs={[{ name: "About", path: "/about" }]}
+        page={{ mainEntity: { "@id": "https://www.syedirfanajmal.com/#person" } }}
+      />
       <StatsStrip />
       <PreAgency />
       <PressArchive />

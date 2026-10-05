@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema } from "@/lib/seo/page-schema";
 import Link from "next/link";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
@@ -121,6 +122,26 @@ const ADJACENT: AdjacentTool[] = [
 export default function ToolsIndexPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <PageSchema
+        type="CollectionPage"
+        path="/tools"
+        name={OG_TITLE}
+        description={OG_DESC}
+        crumbs={[{ name: "Tools", path: "/tools" }]}
+        extra={[
+          {
+            "@type": "ItemList",
+            name: "EMOS tools, in pipeline order",
+            // Derived from PIPELINE so the list can never drift from the page.
+            itemListElement: PIPELINE.filter((t) => t.status === "live").map((t, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              name: t.name,
+              url: `https://www.syedirfanajmal.com${t.href}`,
+            })),
+          },
+        ]}
+      />
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       {/* Compact single-bar masthead — matches /resources hero pattern. */}
       <section

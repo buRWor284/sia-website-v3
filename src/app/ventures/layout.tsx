@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema } from "@/lib/seo/page-schema";
 
 export const metadata: Metadata = {
   title: "Ventures · Portfolio & Side Projects",
@@ -12,5 +13,16 @@ export const metadata: Metadata = {
 };
 
 export default function VenturesLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <PageSchema
+        type="WebPage"
+        path="/ventures"
+        name={metadata.title as string}
+        description={metadata.description as string}
+        crumbs={[{ name: "Ventures", path: "/ventures" }]}
+      />
+      {children}
+    </>
+  );
 }
