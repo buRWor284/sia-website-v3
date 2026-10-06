@@ -38,7 +38,9 @@ export const metadata: Metadata = {
     template: "%s · Syed Irfan Ajmal",
   },
   description:
-    "Fractional CMO and founder of DMR.agency. Helping founders and marketing teams get found, get covered, and get customers through GEO, SEO-PR, and earned media.",
+    // Leads with the full name on purpose: for a search on the name, Google builds
+    // the snippet from text that contains it (it was picking the footer copyright line).
+    "Syed Irfan Ajmal is a fractional CMO and founder of DMR.agency. Helping founders and marketing teams get found, get covered, and get customers through GEO, SEO-PR, and earned media.",
   openGraph: {
     type: "website",
     siteName: "Syed Irfan Ajmal",

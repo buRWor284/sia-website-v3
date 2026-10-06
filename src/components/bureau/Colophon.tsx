@@ -200,8 +200,9 @@ export const Colophon = () => (
       ))}
     </div>
 
-    {/* Bottom bar */}
-    <div className="colophon-bottom" style={S.bottom}>
+    {/* Bottom bar. data-nosnippet keeps Google from using the copyright / CTA
+        line as the search snippet for the homepage. */}
+    <div className="colophon-bottom" style={S.bottom} data-nosnippet>
       <div style={S.mono}>
         <span style={{ whiteSpace: "nowrap" }}>© 2026 SYED IRFAN AJMAL</span>
         {" · "}
