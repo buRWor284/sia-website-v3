@@ -16,16 +16,24 @@ import "server-only";
  */
 
 import { createSupabaseServiceClient } from "@/lib/supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { AssetPack, Opportunity } from "@/lib/signaliq/types";
 
 export async function saveAssetPackForUser(
   clerkUserId: string,
   pack: AssetPack,
   opp: Opportunity,
-  options?: { companyId?: string | null; beatLabel?: string | null },
+  options?: {
+    companyId?: string | null;
+    beatLabel?: string | null;
+    /** MCP door (6 Oct 2026): the actor's RLS client, so this write is tenant-checked by the database. */
+    db?: SupabaseClient;
+    /** The saved signal this pack was built from, when the caller knows it. */
+    signalId?: string | null;
+  },
 ): Promise<string | null> {
   try {
-    const db = createSupabaseServiceClient();
+    const db = options?.db ?? createSupabaseServiceClient();
 
     const { data: user } = await db
       .from("users")
@@ -50,8 +58,8 @@ export async function saveAssetPackForUser(
     // If this opportunity was already saved as a signal, link them. Matching on
     // headline within the org is the only handle available — the radar's
     // opportunityId is generated per scan and is not stored on the signal.
-    let signalId: string | null = null;
-    if (opp.headline) {
+    let signalId: string | null = options?.signalId ?? null;
+    if (!signalId && opp.headline) {
       const { data: signal } = await db
         .from("signaliq_signals")
         .select("id")

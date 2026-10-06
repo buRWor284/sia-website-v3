@@ -21,14 +21,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { resolveMcpActor, bearerChallenge, type McpTier } from "@/lib/mcp/actor";
 import { dispatch, parseJsonRpc, rpcError, RPC, type JsonRpcResponse } from "@/lib/mcp/protocol";
 import { READ_TOOLS } from "@/lib/mcp/tools/read";
+import { RUN_TOOLS } from "@/lib/mcp/tools/run";
 import { MCP_DEFAULT_PROTOCOL_VERSION } from "@/lib/mcp/config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-// Session 2 (2026-10-06), chunk 1: the full read tier on RLS. The run tier is chunk 2; Tier W is Session 3.
-const TOOLS = [...READ_TOOLS];
+// Session 2 (2026-10-06): the full read tier, then the run tier, all on RLS. Tier W is Session 3.
+const TOOLS = [...READ_TOOLS, ...RUN_TOOLS];
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",

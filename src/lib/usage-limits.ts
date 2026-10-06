@@ -112,6 +112,96 @@ export async function reserveUsage(
   };
 }
 
+/**
+ * The same reservation for a caller whose org is already known (the MCP door,
+ * spec v1.3 §2.3). Differences from reserveUsage(), all deliberate:
+ *  - no org is an error, never "allow";
+ *  - a database error REFUSES (fail closed on the machine door);
+ *  - a run that would take more than a quarter of what is left for that action
+ *    is refused once with `confirmLargeRun`, and goes ahead when the caller
+ *    repeats it with `confirmLarge: true` (spec §3, Tier A);
+ *  - returns plain data (no NextResponse) plus a ready-made cost line.
+ */
+export type ActorSeat =
+  | { ok: true; remaining: number | null; costLine: string; release: (n?: number) => Promise<void> }
+  | { ok: false; error: string; confirmLargeRun?: boolean; remaining?: number };
+
+export async function reserveUsageForActor(
+  actor: { orgId: string; email: string; isAdmin?: boolean },
+  action: PlatformAction,
+  n = 1,
+  opts?: { confirmLarge?: boolean },
+): Promise<ActorSeat> {
+  if (!actor.orgId) return { ok: false, error: "No EMOS organisation on this account." };
+  const allowance = PLATFORM_MONTHLY_LIMITS[action];
+  const admin = actor.isAdmin ?? isEmosAdminEmail(actor.email);
+  const period = usagePeriod();
+  const reset = usageResetLabel();
+  const unit = (k: number) => (k === 1 ? allowance.one : allowance.many);
+  const db = createSupabaseServiceClient();
+
+  if (!admin) {
+    const usedBefore = await currentCount(actor.orgId, period, action);
+    const left = Math.max(allowance.limit - usedBefore, 0);
+    if (n > left) {
+      return {
+        ok: false,
+        remaining: left,
+        error:
+          left > 0
+            ? `Only ${left} ${unit(left)} left this month and this needs ${n}. Ask for ${left} or fewer, or wait until ${reset}.`
+            : `All ${allowance.limit} ${allowance.many} for this month are used. They reset on ${reset}.`,
+      };
+    }
+    if (n > left * 0.25 && !opts?.confirmLarge) {
+      return {
+        ok: false,
+        confirmLargeRun: true,
+        remaining: left,
+        error: `This would use ${n} of the ${left} ${unit(left)} left this month (more than a quarter). Check with the user, then call again with confirm_large_run: true.`,
+      };
+    }
+  }
+
+  const { data, error } = await db.rpc("reserve_usage", {
+    p_org: actor.orgId, p_period: period, p_action: action, p_n: n, p_limit: admin ? null : allowance.limit,
+  });
+  if (error) {
+    console.error(`[usage] reserve ${action} failed on the MCP door, refusing:`, error.message);
+    return { ok: false, error: "Could not check the monthly allowance. Nothing was run; please try again." };
+  }
+  const count = typeof data === "number" ? data : Number(data);
+  if (!(count >= 0)) {
+    return { ok: false, remaining: 0, error: `Not enough ${allowance.many} left this month. They reset on ${reset}.` };
+  }
+
+  const remaining = admin ? null : Math.max(allowance.limit - count, 0);
+  let released = 0;
+  return {
+    ok: true,
+    remaining,
+    costLine: admin
+      ? `Cost: used ${n} ${unit(n)} (admin account, counted but not capped; ${count} used this month).`
+      : `Cost: used ${n} ${unit(n)}, ${remaining} left this month (resets ${reset}).`,
+    release: async (k = n) => {
+      const give = Math.min(Math.max(k, 0), n - released);
+      if (give <= 0) return;
+      released += give;
+      const { error: relErr } = await db.rpc("release_usage", {
+        p_org: actor.orgId, p_period: period, p_action: action, p_n: give,
+      });
+      if (relErr) console.warn(`[usage] release ${action} failed:`, relErr.message);
+    },
+  };
+}
+
+/** Hand units back for a run that died without releasing them (get_run's stale-run sweep). */
+export async function releaseUsageForOrg(orgId: string, action: PlatformAction, n = 1): Promise<void> {
+  const db = createSupabaseServiceClient();
+  const { error } = await db.rpc("release_usage", { p_org: orgId, p_period: usagePeriod(), p_action: action, p_n: n });
+  if (error) console.warn(`[usage] release ${action} failed:`, error.message);
+}
+
 async function currentCount(orgId: string, period: string, action: PlatformAction): Promise<number> {
   const db = createSupabaseServiceClient();
   const { data } = await db

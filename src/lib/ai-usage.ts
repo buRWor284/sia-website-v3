@@ -31,12 +31,14 @@ import { createSupabaseServiceClient } from "@/lib/supabase";
  * separate session (10 Sep); org_id is the join key it can hang off.
  */
 
-export type AiSurface = "platform" | "public";
+export type AiSurface = "platform" | "public" | "mcp";
 
 export interface AiUsageContext {
   surface: AiSurface;
   /** Clerk user id when signed in. Resolved to org_id at write time. */
   clerkUserId?: string | null;
+  /** Already-resolved org (the MCP door knows it). Skips the lookup at write time. */
+  orgId?: string | null;
 }
 
 /** Which tool made the call. One value per call site. */
@@ -143,8 +145,8 @@ export async function recordAiUsage(
     const ctx = explicit ?? context.getStore();
     const db = createSupabaseServiceClient();
 
-    let orgId: string | null = null;
-    if (ctx?.clerkUserId) {
+    let orgId: string | null = ctx?.orgId ?? null;
+    if (!orgId && ctx?.clerkUserId) {
       const { data } = await db
         .from("users")
         .select("org_id")

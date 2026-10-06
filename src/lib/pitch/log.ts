@@ -15,6 +15,7 @@
 
 import { createHash } from "crypto";
 import { createSupabaseServiceClient } from "@/lib/supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { recordStageEventFor } from "@/lib/emos-stage-events";
 import type { PitchInput, ScoreResponse } from "./types";
 
@@ -27,10 +28,13 @@ export async function logPitch(
    * written — the service client bypasses RLS, so nothing here can be trusted
    * on its own. */
   context?: { journalistId?: string | null; assetId?: string | null; companyId?: string | null },
-): Promise<void> {
+  /** MCP door (6 Oct 2026): pass the actor's RLS client so the database checks
+   * the tenant on this write. Omitted = the service client, as before. */
+  opts?: { db?: SupabaseClient },
+): Promise<string | null> {
   try {
     const pitchHash = createHash("sha256").update(input.pitch).digest("hex").slice(0, 16);
-    const db = createSupabaseServiceClient();
+    const db = opts?.db ?? createSupabaseServiceClient();
 
     // Resolve internal user + org when a Clerk user ID is available
     let orgId: string | null = null;
@@ -78,7 +82,7 @@ export async function logPitch(
     const assetId      = await ownedId("linkable_assets", context?.assetId);
     const companyId    = await ownedId("companies", context?.companyId);
 
-    const { error } = await db.from("pressiq_scores").insert({
+    const { data: savedRow, error } = await db.from("pressiq_scores").insert({
       org_id:               orgId,
       user_id:              internalUserId,
       pitch_text:           stored ? input.pitch : null,
@@ -112,7 +116,7 @@ export async function logPitch(
       journalist_id:        journalistId,
       asset_id:             assetId,
       company_id:           companyId,
-    });
+    }).select("id").maybeSingle();
 
     if (error) {
       console.error("[pitch-score] DB insert failed:", error.message);
@@ -123,9 +127,12 @@ export async function logPitch(
       if (clerkUserId) {
         await recordStageEventFor(clerkUserId, "pitch_scored");
       }
+      return (savedRow?.id as string | undefined) ?? null;
     }
+    return null;
   } catch (err) {
     // Non-fatal: never break the scoring response
     console.error("[pitch-score] logPitch failed (non-fatal):", err);
+    return null;
   }
 }

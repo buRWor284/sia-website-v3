@@ -145,6 +145,9 @@ export async function saveSignalFromScan(
         company_context: companyContext?.trim()?.slice(0, 600) || null,
         scan_category:   beatLabel,
         fit:             opp.fit ?? null,
+        // 6 Oct 2026: keep the full scan data so a pack can be built from the
+        // saved signal later (EMOS MCP build_asset_pack).
+        opportunity:     opp,
       })
       .select("id")
       .single();
