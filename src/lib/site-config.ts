@@ -6,7 +6,7 @@
 export const SITE = {
   availability: {
     /** Current open quarter: "Q1" | "Q2" | "Q3" | "Q4" */
-    quarter: "Q3",
+    quarter: "Q4",
     year: 2026,
     /** Number of Fractional CMO seats open this quarter */
     seatsOpen: 2,
@@ -14,7 +14,7 @@ export const SITE = {
   },
 } as const;
 
-/** "Open for projects, Q3 2026" */
+/** "Open for projects, Q4 2026" */
 export const availabilityLabel =
   `Open for projects, ${SITE.availability.quarter} ${SITE.availability.year}`;
 
@@ -22,6 +22,6 @@ export const availabilityLabel =
 export const seatsLabel =
   `${SITE.availability.seatsOpen} seats open · ${SITE.availability.service}`;
 
-/** "2 FRACTIONAL CMO SPOTS · Q3 2026" — footer, CTA ticker, /fractional-cmo */
+/** "2 FRACTIONAL CMO SPOTS · Q4 2026" — footer, CTA ticker, /fractional-cmo */
 export const cmoSpotsLabel =
   `${SITE.availability.seatsOpen} FRACTIONAL CMO SPOTS · ${SITE.availability.quarter} ${SITE.availability.year}`;

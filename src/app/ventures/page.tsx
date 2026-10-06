@@ -752,7 +752,7 @@ function ClosingCTA() {
         SIA
       </div>
 
-      <SectionMast n="03" label="Working Together · Open for Projects, Q3 2026" dark />
+      <SectionMast n="03" label="Working Together · Open for Projects, Q4 2026" dark />
 
       <div
         style={{

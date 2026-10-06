@@ -368,7 +368,7 @@ export default async function RadarPage() {
             building companies since 2004, 13 of them running DMR.agency &mdash; the same team behind every result here.
           </p>
           <p style={{ marginTop: 20 }}>
-            <span className="emr-pill">2 CMO spots open &middot; Q3 2026</span>
+            <span className="emr-pill">2 CMO spots open &middot; Q4 2026</span>
           </p>
         </div>
       </div>
