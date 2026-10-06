@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema, personRef } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
 import PipelineFlowV2 from "../PipelineFlowV2";
@@ -33,15 +34,15 @@ import {
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "When Travelers Ask ChatGPT Where to Go · Earned Media for Saudi Tourism",
+  title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Saudi Tourism",
   description:
-    "80% of travelers now plan trips with AI (Global Muslim Travel Index 2026), and those answers are built from earned media: the coverage, reviews, and authority content the models trust. The travel edition of Earned Media in the Age of AI, tuned for Saudi tourism and Vision 2030, shows destinations, hotels, and travel brands how to win visibility across ChatGPT, Gemini, Perplexity and Google's AI Overviews, in English and Arabic.",
+    "80% of travelers now plan trips with AI (Global Muslim Travel Index 2026), and those answers are built from earned media: the coverage, reviews, and authority content the models trust. The travel edition of AI Visibility Through Earned Media, tuned for Saudi tourism and Vision 2030, shows destinations, hotels, and travel brands how to win visibility across ChatGPT, Gemini, Perplexity and Google's AI Overviews, in English and Arabic.",
   openGraph: {
-    title: "When Travelers Ask ChatGPT Where to Go · Earned Media for Saudi Tourism",
+    title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Saudi Tourism",
     description:
-      "The travel edition of Earned Media in the Age of AI: how destinations, hotels, and travel brands win visibility in AI travel answers. Keynote, workshop, or panel.",
+      "The travel edition of AI Visibility Through Earned Media: how destinations, hotels, and travel brands win visibility in AI travel answers. Keynote, workshop, or panel.",
   },
-  alternates: { canonical: "/speaking/earned-media-ai/travel" },
+  alternates: { canonical: "/speaking/ai-visibility/travel" },
 };
 
 // ─── Page-scoped layout CSS (same grid system as the flagship page) ───────────
@@ -224,7 +225,7 @@ const Hero = () => (
         </p>
         <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
           The travel edition of the flagship session{" "}
-          <a href="/speaking/earned-media-ai" style={{ color: INK, fontStyle: "italic" }}>Earned Media in the Age of AI</a>, tuned for Saudi tourism and the brands connecting the Kingdom with the world, using real data from the earned media OS I built and run.
+          <a href="/speaking/ai-visibility" style={{ color: INK, fontStyle: "italic" }}>AI Visibility Through Earned Media</a>, tuned for Saudi tourism and the brands connecting the Kingdom with the world, using real data from the earned media OS I built and run.
         </p>
         <div style={{ marginTop: 26, display: "flex", gap: 12, flexWrap: "wrap" }}>
           <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={btnInk}>Invite me to speak &rarr;</a>
@@ -799,6 +800,26 @@ const BottomCTA = () => (
 export default function EarnedMediaAITravelPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <PageSchema
+        path="/speaking/ai-visibility/travel"
+        name="When Travelers Ask ChatGPT Where to Go"
+        description={metadata.openGraph?.description as string}
+        crumbs={[
+          { name: "Speaking", path: "/speaking" },
+          { name: "AI Visibility Through Earned Media", path: "/speaking/ai-visibility" },
+          { name: "Travel edition", path: "/speaking/ai-visibility/travel" },
+        ]}
+        extra={[
+          {
+            "@type": "Service",
+            name: "AI Visibility Through Earned Media: travel edition",
+            serviceType: "Keynote, workshop, or panel",
+            description: metadata.openGraph?.description as string,
+            url: "https://www.syedirfanajmal.com/speaking/ai-visibility/travel",
+            provider: personRef,
+          },
+        ]}
+      />
       <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
       <Hero />
       <Flywheel />

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageSchema, personRef } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import CoverageFlywheel from "@/components/bureau/CoverageFlywheel";
 import PipelineFlow from "./PipelineFlow";
@@ -35,15 +36,15 @@ import {
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Earned Media in the Age of AI · Keynote & Interactive Session",
+  title: "AI Visibility Through Earned Media | Keynote and Workshop",
   description:
-    "A flagship, interactive session on how AI is remaking earned media from both sides: AI agents that now run a six stage PR pipeline, and the LLMs and AI search that decide which brands get seen. Mapped from inside a working earned media OS by Syed Irfan Ajmal. Also presented as 'When AI Agents Pitch Journalists: The New Earned Media Engine.'",
+    "A flagship session on AI visibility: how organisations get cited, recommended and found by ChatGPT, Claude and Gemini, and why earned media is what those assistants trust. Live audit in every keynote and workshop.",
   openGraph: {
-    title: "Earned Media in the Age of AI · Keynote & Interactive Session",
+    title: "AI Visibility Through Earned Media | Keynote and Workshop",
     description:
-      "How AI is changing earned media from both sides, mapped from the inside using real data from the earned media OS Syed Irfan Ajmal built. Keynote, workshop, or panel.",
+      "How organisations get cited, recommended and found by ChatGPT, Claude and Gemini, and why earned media is what those assistants trust. Live audit in every keynote and workshop. By Syed Irfan Ajmal.",
   },
-  alternates: { canonical: "/speaking/earned-media-ai" },
+  alternates: { canonical: "/speaking/ai-visibility" },
 };
 
 // ─── Page-scoped layout CSS (self-contained, no globals dependency) ───────────
@@ -53,6 +54,7 @@ const PAGE_CSS = `
 .emai-intro{display:grid;grid-template-columns:1fr 1fr;gap:42px;align-items:end;margin-bottom:34px;}
 .emai-split{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 .emai-cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.emai-cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
 .emai-returns{display:grid;grid-template-columns:1fr 1fr;margin-top:30px;border-top:1px solid ${INK35};}
 .emai-returns > div{border-bottom:1px solid ${INK35};padding:16px 22px 18px;}
 .emai-returns > div:nth-child(odd){border-right:1px solid ${INK35};}
@@ -60,11 +62,13 @@ const PAGE_CSS = `
 @media(max-width:980px){
   .emai-hero{grid-template-columns:1fr;gap:34px;}
   .emai-cards3{grid-template-columns:repeat(2,1fr);}
+  .emai-cards4{grid-template-columns:repeat(2,1fr);}
 }
 @media(max-width:760px){
   .emai-intro{grid-template-columns:1fr;gap:16px;}
   .emai-split{grid-template-columns:1fr;}
   .emai-cards3{grid-template-columns:1fr;}
+  .emai-cards4{grid-template-columns:1fr;}
   .emai-returns{grid-template-columns:1fr;}
   .emai-returns > div:nth-child(odd){border-right:none;}
   .emai-stats{grid-template-columns:repeat(2,1fr);}
@@ -74,24 +78,26 @@ const PAGE_CSS = `
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const SESSION_SPECS: ReadonlyArray<[string, string]> = [
-  ["Formats", "Keynote · Interactive workshop · Panel · Webinar"],
+  ["Formats", "Keynote · Interactive workshop · Audit session · Panel · Webinar"],
   ["Length", "45 min keynote to a half day workshop"],
+  ["Live audit", "Opens every keynote and workshop"],
   ["Room", "20 to ~500, in person or virtual"],
   ["Built for", "Founders, marketers, PR and comms teams"],
 ];
 
 type Activity = { n: string; title: string; body: string };
 const ACTIVITIES: ReadonlyArray<Activity> = [
-  { n: "01", title: "Idea sprint", body: "The room picks a topic. Together we generate authority asset ideas the press would actually want to cover." },
-  { n: "02", title: "Spot the slop", body: "We put an AI draft next to a human one. The room calls which is which, and we pull apart the tells that give AI away." },
-  { n: "03", title: "Pitch clinic", body: "We review attendees’ real pitches live, then rebuild the weak ones on the spot." },
+  { n: "01", title: "Live AI visibility audit", body: "Attendees ask ChatGPT, Claude and Gemini about their own organisation and a competitor, score each answer, and trace the citations back to the coverage they came from." },
+  { n: "02", title: "Idea sprint", body: "The room picks a topic. Together we generate authority asset ideas the press would actually want to cover." },
+  { n: "03", title: "Spot the slop", body: "We put an AI draft next to a human one. The room calls which is which, and we pull apart the tells that give AI away." },
+  { n: "04", title: "Pitch clinic", body: "We review attendees’ real pitches live, then rebuild the weak ones on the spot." },
 ];
 
 type Audience = { t: string; body: string; want: string };
 const AUDIENCES: ReadonlyArray<Audience> = [
   { t: "People", body: "Readers, buyers, and the journalists who cover them still trust editorial coverage far more than an ad.", want: "A credible, quotable source with a real point of view." },
   { t: "Search engines", body: "Google weighs links, mentions and expertise signals to decide who ranks and who stays buried.", want: "Authority signals from independent sites." },
-  { t: "Generative engines", body: "LLMs and AI search stake their reputation on citation quality, so they surface brands with genuine authority.", want: "To cite the most trusted, most mentioned source." },
+  { t: "Generative engines", body: "LLMs and AI search stake their reputation on citation quality, so they surface brands with genuine authority.", want: "To cite the most trusted, most mentioned, most independently covered source." },
 ];
 
 const RETURNS: ReadonlyArray<[string, string, string]> = [
@@ -104,6 +110,7 @@ const RETURNS: ReadonlyArray<[string, string, string]> = [
 ];
 
 const TAKEAWAYS: ReadonlyArray<string> = [
+  "Run a repeatable audit of what AI assistants say about your organisation, score it, and trace every citation to its source.",
   "Run a full earned media pipeline with AI and no code.",
   "Brief an AI agent for each of the six stages, from signal to attribution.",
   "Catch AI slop and unverified claims before they ship.",
@@ -115,16 +122,17 @@ const FAILURES: ReadonlyArray<string> = [
   "It cannot build a real relationship with a journalist.",
   "It misreads nuance, timing and embargoes.",
   "It cannot make the judgment call on what is genuinely newsworthy.",
+  "It confidently repeats outdated facts about your own brand. The audit is how you find them.",
 ];
 
 const QA: ReadonlyArray<[string, string]> = [
   ["01", "Which jobs of a PR team can AI agents genuinely run today, and where do they still fail?"],
   ["02", "How do you pair AI with human judgment so the work earns the trust of journalists, customers, LLMs and AI search?"],
-  ["03", "Why do LLMs and AI search now decide which brands get seen, and what do they reward?"],
+  ["03", "How do we get cited by ChatGPT and Gemini when a buyer asks who to trust, and what do they actually reward?"],
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
-  ["22", "years in marketing, as an operator"],
+  ["13", "years running an SEO, content and earned media agency"],
   ["1.5M", "organic visitors grown, Ridester"],
   ["04", "countries hosted on stage"],
   ["~500", "biggest live audience"],
@@ -140,9 +148,17 @@ const STATS: ReadonlyArray<[string, string]> = [
 type Fmt = { t: string; meta: string; body: string; photo: string; alt: string; caption: string };
 const FORMATS: ReadonlyArray<Fmt> = [
   {
+    t: "AI Visibility Audit Session",
+    meta: "2 to 3 hours · capped ~20 to 30",
+    body: "The live audit block on its own. Each attendee puts real questions to ChatGPT, Claude and Gemini about their organisation, scores the answers, traces the citations, and leaves with a scored audit they can repeat.",
+    photo: "/assets/gallery/astrolabs-1.jpg",
+    alt: "Syed Irfan Ajmal presenting to a room at AstroLabs in Dubai",
+    caption: "AstroLabs, Dubai · 2016",
+  },
+  {
     t: "Keynote",
     meta: "30 to 45 min + Q&A · up to ~500",
-    body: "A fast, story-led mainstage talk that maps the shift from both sides, with a live look at what AI currently says about a brand in the room. Best to open or close a track.",
+    body: "A fast, story-led mainstage talk that maps the shift from both sides, opening with a live audit of what AI currently says about a brand in the room. Best to open or close a track.",
     photo: "/assets/gallery/gdayx-1.jpg",
     alt: "Syed Irfan Ajmal speaking from the podium to a seated audience at G-Day X in Peshawar",
     caption: "G-Day X, Peshawar · 2014",
@@ -150,7 +166,7 @@ const FORMATS: ReadonlyArray<Fmt> = [
   {
     t: "Interactive workshop",
     meta: "90 min to half day · capped ~20 to 40",
-    body: "The full working session: idea sprint, spot-the-slop, and a live pitch clinic on the room's real pitches. Best as a hands-on breakout.",
+    body: "The full working session: live AI visibility audit, idea sprint, spot-the-slop, and a live pitch clinic on the room's real pitches. Best as a hands-on breakout.",
     photo: "/assets/gallery/ik-workshop.jpg",
     alt: "Workshop attendees seated at tables at IK Institute of Business in Dubai",
     caption: "IK Institute of Business, Dubai",
@@ -191,7 +207,7 @@ const Hero = () => (
       <DoubleRule />
       <div style={{ display: "flex", alignItems: "baseline", gap: 14, padding: "10px 0 6px", flexWrap: "wrap" }}>
         <Pill size={11} ls="0.18em">Flagship Session</Pill>
-        <SCaps size={11.5} ls="0.22em" color={INK}>Keynote · Interactive Workshop · Panel</SCaps>
+        <SCaps size={11.5} ls="0.22em" color={INK}>AI Visibility · Keynote · Workshop · Audit Session</SCaps>
         <div style={{ flex: 1, height: 1, background: INK35, minWidth: 40 }} />
         <SCaps size={11} ls="0.18em" color={INK55}>Vol. XV · The AI Desk</SCaps>
       </div>
@@ -202,19 +218,26 @@ const Hero = () => (
       {/* Left — the headline */}
       <div>
         <h1 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(40px, 7vw, 76px)", color: INK, lineHeight: 0.98, letterSpacing: "-0.028em" }}>
-          Earned Media
+          <Mark>AI Visibility</Mark>
           <br />
-          <span style={{ fontStyle: "italic" }}>in the Age of <Mark>AI</Mark></span>
+          <span style={{ fontStyle: "italic" }}>Through Earned Media</span>
         </h1>
+        <div style={{ marginTop: 14, display: "flex", alignItems: "baseline", gap: 9, flexWrap: "wrap" }}>
+          <Pill size={9.5} ls="0.16em">Formerly</Pill>
+          <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14.5, color: INK70, lineHeight: 1.4 }}>
+            &ldquo;Earned Media in the Age of AI&rdquo;. Same session, named for what it delivers.
+          </span>
+        </div>
         <p style={{ margin: "26px 0 0", fontFamily: SERIF, fontSize: "clamp(18px, 2.4vw, 23px)", color: INK, lineHeight: 1.5, maxWidth: 620 }}>
-          Earned media earns attention instead of buying it. That matters more every quarter, as paid ads get pricier, convert worse, and vanish behind ad blockers.
+          When someone asks an AI assistant who to trust, it names two or three organisations. This session shows you how to become one of them.
         </p>
         <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
-          AI is now rewriting earned media from both sides at once. This session maps the whole shift from the inside, using real data from the earned media OS I built and run.
+          The method is earned media, because that is what AI assistants cite. The proof is a live audit of what AI says about you today, run from inside the earned media OS I built and run.
         </p>
         <div style={{ marginTop: 26, display: "flex", gap: 12, flexWrap: "wrap" }}>
           <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={btnInk}>Invite me to speak &rarr;</a>
           <a href="/contact" style={btnGhostDark}>Ask about this session &rarr;</a>
+          <a href="#formats" style={btnGhostDark}>Book the audit session &rarr;</a>
         </div>
         <p style={{ margin: "24px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 15.5, color: INK70, lineHeight: 1.5 }}>
           By Syed Irfan Ajmal · Founder of EMOS · CEO of DMR.agency · Profiled as a case study in Harvard Business Review; quoted in Forbes.
@@ -227,7 +250,7 @@ const Hero = () => (
         </div>
         <div style={{ marginTop: 8, display: "flex", alignItems: "baseline", gap: 9, flexWrap: "wrap" }}>
           <SCaps size={10} ls="0.16em" color={INK55}>Travel edition</SCaps>
-          <a href="/speaking/earned-media-ai/travel" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK, lineHeight: 1.4 }}>
+          <a href="/speaking/ai-visibility/travel" style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 15, color: INK, lineHeight: 1.4 }}>
             When Travelers Ask ChatGPT Where to Go &rarr;
           </a>
         </div>
@@ -255,7 +278,7 @@ const Hero = () => (
           <Pill size={10} ls="0.18em">Signature</Pill>
         </div>
         <div style={{ marginTop: 12, fontFamily: SERIF, fontSize: 21, lineHeight: 1.2, color: INK, fontWeight: 700 }}>
-          One session, two sides of the shift.
+          One session. The audit opens it.
         </div>
         <div style={{ marginTop: 16, paddingTop: 14, borderTop: `1px solid ${INK15}`, display: "grid", gridTemplateColumns: "auto 1fr", gap: "10px 16px" }}>
           {SESSION_SPECS.map(([k, v]) => (
@@ -277,18 +300,18 @@ const Hero = () => (
 // ─── Formats · three ways to run it ───────────────────────────────────────────
 
 const Formats = () => (
-  <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}` }}>
+  <section id="formats" className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}` }}>
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         One session,
         <br />
-        <span style={{ fontStyle: "italic" }}><Mark>three ways to run it.</Mark></span>
+        <span style={{ fontStyle: "italic" }}><Mark>four ways to run it.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
-        Same content, tuned to your room. Every format runs in person or virtual. Tell me the slot and the audience, and I will tell you which one fits.
+        Same content, tuned to your room. Every format runs in person or virtual. The live audit opens every keynote and workshop, or runs on its own as the audit session. Tell me the slot and the audience, and I will tell you which one fits.
       </p>
     </div>
-    <div className="emai-cards3">
+    <div className="emai-cards4">
       {FORMATS.map((f) => (
         <div key={f.t} style={{ border: `1px solid ${INK}`, background: PAPER, display: "flex", flexDirection: "column" }}>
           <figure style={{ margin: 0, borderBottom: `1px solid ${INK}` }}>
@@ -317,11 +340,11 @@ const Formats = () => (
   </section>
 );
 
-// ─── §02 · The Shift ──────────────────────────────────────────────────────────
+// ─── §03 · The Shift ──────────────────────────────────────────────────────────
 
 const Shift = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84 }}>
-    <SectionMast n="02" label="The Shift · Why this, why now" />
+    <SectionMast n="03" label="The Shift · Why this, why now" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         Paid attention is getting worse.
@@ -346,7 +369,7 @@ const Shift = () => (
       <div style={{ border: `1px solid ${INK}`, background: INK, color: PAPER, padding: "28px 26px" }}>
         <SCaps size={10.5} ls="0.18em" color={YEL}>Demand side</SCaps>
         <h3 style={{ margin: "12px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: PAPER, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
-          LLMs and AI search now decide which brands get seen.
+          AI assistants and AI search now decide which brands get cited, recommended and seen.
         </h3>
         <HRule style={{ margin: "16px 0", background: "rgba(241,235,222,.35)" }} />
         <p style={{ margin: 0, fontFamily: SERIF, fontSize: 16, color: "rgba(241,235,222,.75)", lineHeight: 1.6 }}>
@@ -357,11 +380,11 @@ const Shift = () => (
   </section>
 );
 
-// ─── §04 · The Earned Media Pipeline ──────────────────────────────────────────
+// ─── §05 · The Earned Media Pipeline ──────────────────────────────────────────
 
 const Pipeline = () => (
   <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
-    <SectionMast n="04" label="Supply Side · The Earned Media Pipeline" />
+    <SectionMast n="05" label="Supply Side · The Earned Media Pipeline" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         Six jobs a PR team does.
@@ -379,15 +402,15 @@ const Pipeline = () => (
   </section>
 );
 
-// ─── §04 · The Earned Media Pipeline · V2 (active) ────────────────
-// V2 of Section 04. Same section shell as Pipeline (V1), with the reframed copy:
+// ─── §05 · The Earned Media Pipeline · V2 (active) ────────────────
+// V2 of Section 05. Same section shell as Pipeline (V1), with the reframed copy:
 // leverage-led heading, "human decides at every gate" intro, PipelineFlowV2
 // chips, the co-author caption, and the "work of ten" kicker.
 // Rollback: render <Pipeline /> instead of <PipelineV2 /> below. V1 stays intact.
 
 const PipelineV2 = () => (
   <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
-    <SectionMast n="04" label="Supply Side · The Earned Media Pipeline" />
+    <SectionMast n="05" label="Supply Side · The Earned Media Pipeline" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         Six jobs that used to need a team.
@@ -414,14 +437,14 @@ const PipelineV2 = () => (
   </section>
 );
 
-// ─── §05 · In the Room ────────────────────────────────────────────────────────
+// ─── §06 · In the Room ────────────────────────────────────────────────────────
 
 const Activities = () => (
   <section className="sx" style={{ background: INK, color: PAPER, paddingTop: 80, paddingBottom: 88, position: "relative", overflow: "hidden" }}>
     <div aria-hidden style={{ position: "absolute", top: -40, right: -60, opacity: 0.06, pointerEvents: "none" }}>
       <SiaLogo height={320} />
     </div>
-    <SectionMast n="05" label="In the Room · Three live activities" dark />
+    <SectionMast n="06" label="In the Room · Four live activities" dark />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: PAPER, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         A working session,
@@ -429,10 +452,10 @@ const Activities = () => (
         <span style={{ fontStyle: "italic", color: YEL }}>not a lecture.</span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.72)", lineHeight: 1.6, maxWidth: 560 }}>
-        The room does the work. Three activities turn the pipeline from a slide into something everyone has tried by the time they leave.
+        The room does the work. Four activities, starting with the audit, turn the pipeline from a slide into something everyone has tried by the time they leave.
       </p>
     </div>
-    <div className="emai-cards3">
+    <div className="emai-cards4">
       {ACTIVITIES.map((a) => (
         <div key={a.n} style={{ border: "1px solid rgba(241,235,222,.28)", background: "rgba(241,235,222,.04)", padding: "26px 24px", display: "flex", flexDirection: "column" }}>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(38px, 7vw, 56px)", color: YEL, lineHeight: 1, letterSpacing: "-0.03em" }}>{a.n}</div>
@@ -485,19 +508,19 @@ const Activities = () => (
   </section>
 );
 
-// ─── §03 · Demand Side ────────────────────────────────────────────────────────
+// ─── §04 · Demand Side ────────────────────────────────────────────────────────
 
 const Demand = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84 }}>
-    <SectionMast n="03" label="Demand Side · Who gets seen now" />
+    <SectionMast n="04" label="Demand Side · Who gets seen now" />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
-        AI search rewards exactly
+        AI visibility is earned,
         <br />
-        <span style={{ fontStyle: "italic" }}><Mark>what earned media produces.</Mark></span>
+        <span style={{ fontStyle: "italic" }}><Mark>not optimised.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
-        Generative engines increasingly decide which brands surface in an answer. They stake their credibility on citation quality, so they reward authoritative coverage, third party citations, and real expert content. Earn it once and it pays out to people, to search, and to the machines that cite you, at the same time.
+        AI assistants cite third-party coverage, not your homepage. Generative engines increasingly decide which brands surface in an answer. They stake their credibility on citation quality, so they reward authoritative coverage, third party citations, and real expert content. Earn it once and it pays out to people, to search, and to the machines that cite you, at the same time.
       </p>
     </div>
     <div className="emai-cards3">
@@ -515,17 +538,56 @@ const Demand = () => (
   </section>
 );
 
-// ─── §01 · The Coverage Flywheel ──────────────────────────────────────────────
+// ─── §01 · The Audit ──────────────────────────────────────────────────────────
+
+const AUDIT_STEPS: ReadonlyArray<[string, string]> = [
+  ["Ask & score", "Your questions, your brand, a one-page score sheet."],
+  ["Read out", "What came back, including the fabrications."],
+  ["Trace", "Which placements, quotes and bylines got cited, and which never do."],
+];
+
+const Audit = () => (
+  <section id="audit" className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}` }}>
+    <SectionMast n="01" label="The Audit · What AI says about you right now" />
+    <div className="emai-intro">
+      <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
+        Every keynote and workshop
+        <br />
+        <span style={{ fontStyle: "italic" }}><Mark>opens with a live audit.</Mark></span>
+      </h2>
+      <div>
+        <Pill size={10} ls="0.18em">Live in every keynote and workshop</Pill>
+        <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 560 }}>
+          Attendees put real questions to ChatGPT, Claude and Gemini about their own organisation and a competitor, score each answer as accurate, missing or invented, then trace the cited answers back to the coverage they were built from. Expect at least one confident wrong answer about a real brand in the room. That is the moment the session is built around.
+        </p>
+      </div>
+    </div>
+    <div className="emai-cards3">
+      {AUDIT_STEPS.map(([t, body], j) => (
+        <div key={t} style={{ border: `1px solid ${INK}`, background: PAPER2, padding: "24px 22px" }}>
+          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE, marginBottom: 6 }}>0{j + 1}</span>
+          <SCaps size={12} ls="0.16em" color={INK}>{t}</SCaps>
+          <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55 }}>{body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+);
+
+// ─── §02 · The Coverage Flywheel ──────────────────────────────────────────────
 
 const Flywheel = () => (
   <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}`, borderBottom: `1px solid ${INK}` }}>
-    <SectionMast n="01" label="The Payoff · The Coverage Flywheel" />
+    <SectionMast n="02" label="The Payoff · The Coverage Flywheel" />
     <div style={{ maxWidth: 720, margin: "0 auto 8px", textAlign: "center" }}>
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
         One asset. One placement. <span style={{ fontStyle: "italic" }}>Six compounding returns.</span>
       </h2>
       <p style={{ margin: "16px auto 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
         A single authority asset and a single piece of coverage do not stop at the placement. They compound around a six part flywheel. Spin it long enough and it starts turning on its own, because journalists cite sources other journalists have already cited.
+      </p>
+      <p style={{ margin: "12px auto 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 16.5, color: INK, lineHeight: 1.55, maxWidth: 620 }}>
+        Visibility now includes being the name in the AI answer, not only the link on page one.
       </p>
     </div>
 
@@ -555,11 +617,11 @@ const Flywheel = () => (
   </section>
 );
 
-// ─── §06 · What You Leave With + the honest part ──────────────────────────────
+// ─── §07 · What You Leave With + the honest part ──────────────────────────────
 
 const LeaveWith = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 84, paddingBottom: 84 }}>
-    <SectionMast n="06" label="What You Leave With · And the honest part" />
+    <SectionMast n="07" label="What You Leave With · And the honest part" />
     <div className="emai-split">
       <div style={{ border: `1px solid ${INK}`, background: PAPER, padding: "30px 28px" }}>
         <SCaps size={11} ls="0.18em" color={BLUE}>You leave able to</SCaps>
@@ -634,11 +696,11 @@ const LiveInstruments = () => (
   </section>
 );
 
-// ─── §07 · Q&A ────────────────────────────────────────────────────────────────
+// ─── §08 · Q&A ────────────────────────────────────────────────────────────────
 
 const QandA = () => (
   <section className="sx" style={{ background: PAPER2, paddingTop: 84, paddingBottom: 84, borderTop: `1px solid ${INK}` }}>
-    <SectionMast n="07" label="Q&A · Where the room usually goes" />
+    <SectionMast n="08" label="Q&A · Where the room usually goes" />
     <div style={{ maxWidth: 760, marginBottom: 30 }}>
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(26px, 4.2vw, 42px)", color: INK, lineHeight: 1.02, letterSpacing: "-0.025em" }}>
         The questions this session tends to open.
@@ -655,14 +717,14 @@ const QandA = () => (
   </section>
 );
 
-// ─── §08 · The Speaker ────────────────────────────────────────────────────────
+// ─── §09 · The Speaker ────────────────────────────────────────────────────────
 
 const Speaker = () => (
   <section className="sx" style={{ background: INK, color: PAPER, paddingTop: 84, paddingBottom: 84, position: "relative", overflow: "hidden" }}>
     <div aria-hidden style={{ position: "absolute", bottom: -60, left: -80, opacity: 0.06, pointerEvents: "none" }}>
       <SiaLogo height={340} />
     </div>
-    <SectionMast n="08" label="The Speaker · On the record" dark />
+    <SectionMast n="09" label="The Speaker · On the record" dark />
     <div className="emai-intro">
       <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 4.6vw, 46px)", color: PAPER, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
         An operator,
@@ -670,7 +732,7 @@ const Speaker = () => (
         <span style={{ fontStyle: "italic", color: YEL }}>not a commentator.</span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 17.5, color: "rgba(241,235,222,.75)", lineHeight: 1.6, maxWidth: 560 }}>
-        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, delivering SEO-PR and content results like growing Ridester from zero to 1.5M monthly organic visitors. Earlier he cofounded Silk Route Interactive, a spatial intelligence startup, and studied and worked in Scandinavia. He also hosts the SIA Business podcast.
+        Syed Irfan Ajmal is a serial entrepreneur and the founder of EMOS, an AI powered earned media operating system. He has led DMR.agency since 2013, delivering SEO, content and digital PR results like growing Ridester from zero to 1.5M monthly organic visitors. Earlier he cofounded Silk Route Interactive, a spatial intelligence startup, and studied and worked in Scandinavia. He also hosts the SIA Business podcast.
       </p>
     </div>
     <div style={{ marginTop: 6, paddingTop: 18, borderTop: "1px solid rgba(241,235,222,.16)" }}>
@@ -758,8 +820,28 @@ const BottomCTA = () => (
 export default function EarnedMediaInTheAgeOfAIPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <PageSchema
+        path="/speaking/ai-visibility"
+        name="AI Visibility Through Earned Media"
+        description={metadata.description as string}
+        crumbs={[
+          { name: "Speaking", path: "/speaking" },
+          { name: "AI Visibility Through Earned Media", path: "/speaking/ai-visibility" },
+        ]}
+        extra={[
+          {
+            "@type": "Service",
+            name: "AI Visibility Through Earned Media",
+            serviceType: "Keynote and workshop",
+            description: metadata.description as string,
+            url: "https://www.syedirfanajmal.com/speaking/ai-visibility",
+            provider: personRef,
+          },
+        ]}
+      />
       <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
       <Hero />
+      <Audit />
       <Flywheel />
       <Shift />
       <Demand />
@@ -785,7 +867,7 @@ export default function EarnedMediaInTheAgeOfAIPage() {
       <SpeakerPhotoStrip />
       <BottomCTA />
       <CTATicker />
-      <Subscriptions sectionNumber="09" />
+      <Subscriptions sectionNumber="10" />
       <Colophon />
       <ScrollButtons />
     </div>

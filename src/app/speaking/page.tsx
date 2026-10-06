@@ -2,6 +2,7 @@
 
 import { useState, Fragment } from "react";
 import Script from "next/script";
+import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import { ClientLogo } from "@/components/bureau/ClientLogo";
 import {
@@ -60,18 +61,18 @@ const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
   {
     no: "01",
     label: "Primary topic · flagship for 2026",
-    title: "Earned Media in the Age of AI",
+    title: "AI Visibility Through Earned Media",
     blurb:
-      "How AI is remaking earned media from both sides at once: agents that can now run a six stage PR pipeline, and the LLMs and AI search that decide which brands get seen. Built from real data inside the earned media OS I run, with three live activities the room works through together.",
+      "How organisations get cited, recommended and found by ChatGPT, Claude and Gemini, and why earned media is what those assistants trust. Every keynote and workshop opens with a live audit of what AI says about the brands in the room. Built from real data inside the earned media OS I run, with four live activities the room works through together.",
     bullets: [
       "The six stage AI pipeline: Signal, Authority Content, Verify, Match, Pitch, Attribute",
-      "Three live activities: an idea sprint, spot the slop, and a pitch clinic on real work",
+      "Four live activities: a live AI visibility audit, an idea sprint, spot the slop, and a pitch clinic on real work",
       "Why LLMs and AI search now decide which brands get seen, and what they reward",
       "The Coverage Flywheel: how one placement compounds into six returns",
       "Honest failures: exactly where AI still cannot do the job of a PR team",
     ],
     casestudy: { v: "06", l: "stage AI pipeline · run live in the room" },
-    moreHref: "/speaking/earned-media-ai",
+    moreHref: "/speaking/ai-visibility",
   },
   {
     no: "02",
@@ -1259,7 +1260,7 @@ const CalendlySection = () => (
 const FeaturedTravelSession = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 8 }}>
     <a
-      href="/speaking/earned-media-ai/travel"
+      href="/speaking/ai-visibility/travel"
       style={{
         display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
         maxWidth: 1000, margin: "0 auto", padding: "24px 28px",
@@ -1281,7 +1282,7 @@ const FeaturedTravelSession = () => (
           When Travelers Ask ChatGPT Where to Go
         </span>
         <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: "rgba(250,250,250,.72)", lineHeight: 1.5, marginTop: 5 }}>
-          The travel edition of my Earned Media in the Age of AI keynote, tuned for Saudi tourism and Vision 2030, for DMOs, tourism boards, hotels, airlines and travel marketers.
+          The travel edition of my AI Visibility Through Earned Media keynote, tuned for Saudi tourism and Vision 2030, for DMOs, tourism boards, hotels, airlines and travel marketers.
         </span>
       </span>
       <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: YEL, whiteSpace: "nowrap" }}>
@@ -1294,7 +1295,7 @@ const FeaturedTravelSession = () => (
 const FeaturedSession = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 40, paddingBottom: 8 }}>
     <a
-      href="/speaking/earned-media-ai"
+      href="/speaking/ai-visibility"
       style={{
         display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap",
         maxWidth: 1000, margin: "0 auto", padding: "24px 28px",
@@ -1313,10 +1314,10 @@ const FeaturedSession = () => (
       </span>
       <span style={{ flex: 1, minWidth: 260 }}>
         <span style={{ display: "block", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px, 3vw, 26px)", color: INK, lineHeight: 1.15, letterSpacing: "-0.015em" }}>
-          Earned Media in the Age of AI
+          AI Visibility Through Earned Media
         </span>
         <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.5, marginTop: 5 }}>
-          My new interactive keynote and workshop on how AI is remaking earned media from both sides. Six stage AI pipeline, live activities, and the Coverage Flywheel.
+          My flagship keynote and workshop on getting cited and recommended by AI assistants. Opens with a live audit, then the six stage AI pipeline and the Coverage Flywheel.
         </span>
       </span>
       <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, whiteSpace: "nowrap" }}>
@@ -1330,6 +1331,12 @@ export default function SpeakingPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
       <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
+      <PageSchema
+        type="CollectionPage"
+        path="/speaking"
+        name="Speaking · International Keynotes & Workshops"
+        crumbs={[{ name: "Speaking", path: "/speaking" }]}
+      />
       <Hero />
       <FeaturedTravelSession />
       <FeaturedSession />

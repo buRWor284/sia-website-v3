@@ -316,7 +316,7 @@ export default async function ArabicKsaRetailRadarPage() {
             <p style={{ margin: 0, color: "var(--ink70)", fontSize: 16, lineHeight: 1.95 }}>{UI.speakerBody}</p>
             <div className="ar-cta-row">
               <a className="ar-btn" href="/strategy-call" hrefLang="en">{UI.ctaBook} ←</a>
-              <a className="ar-tlink" href="/ar/speaking/earned-media-ai/travel">{UI.ctaSession}</a>
+              <a className="ar-tlink" href="/ar/speaking/ai-visibility/travel">{UI.ctaSession}</a>
               <a className="ar-tlink" href="/earned-media-radar" hrefLang="en">{UI.ctaGlobalRadar}</a>
               <a className="ar-tlink" href="/ar/ksa-tourism-radar">{UI.ctaSibling}</a>
             </div>

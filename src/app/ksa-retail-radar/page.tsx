@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 const LINKS = {
   book: "/strategy-call",
-  session: "/speaking/earned-media-ai",
+  session: "/speaking/ai-visibility",
   globalRadar: "/earned-media-radar",
   tourismRadar: "/ksa-tourism-radar",
   signaliq: "/tools/signaliq",

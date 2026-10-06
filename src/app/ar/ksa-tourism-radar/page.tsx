@@ -378,7 +378,7 @@ export default async function ArabicKsaTourismRadarPage() {
             </h3>
             <p style={{ margin: 0, color: "var(--ink70)", fontSize: 15.5, lineHeight: 1.9 }}>{UI.sessionBody}</p>
             <div className="ar-cta-row">
-              <a className="ar-btn" href="/ar/speaking/earned-media-ai/travel">{UI.sessionCta} ←</a>
+              <a className="ar-btn" href="/ar/speaking/ai-visibility/travel">{UI.sessionCta} ←</a>
             </div>
           </div>
 
@@ -388,7 +388,7 @@ export default async function ArabicKsaTourismRadarPage() {
             <p style={{ margin: 0, color: "var(--ink70)", fontSize: 16, lineHeight: 1.95 }}>{UI.speakerBody}</p>
             <div className="ar-cta-row">
               <a className="ar-btn" href="/strategy-call" hrefLang="en">{UI.ctaBook} ←</a>
-              <a className="ar-tlink" href="/ar/speaking/earned-media-ai/travel">{UI.ctaSession}</a>
+              <a className="ar-tlink" href="/ar/speaking/ai-visibility/travel">{UI.ctaSession}</a>
               <a className="ar-tlink" href="/earned-media-radar" hrefLang="en">{UI.ctaGlobalRadar}</a>
               <a className="ar-tlink" href="/ar/ksa-retail-radar">{UI.ctaSibling}</a>
             </div>

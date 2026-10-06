@@ -56,9 +56,15 @@ const nextConfig: NextConfig = {
       { source: "/videos",                   destination: "/gallery",  permanent: p },
       { source: "/videos/",                  destination: "/gallery",  permanent: p },
 
-      // Flagship session slug shortened (2026-07-24)
-      { source: "/speaking/earned-media-in-the-age-of-ai",  destination: "/speaking/earned-media-ai", permanent: p },
-      { source: "/speaking/earned-media-in-the-age-of-ai/", destination: "/speaking/earned-media-ai", permanent: p },
+      // Flagship session renamed for the buyer's term (2026-09-28):
+      // /speaking/earned-media-ai -> /speaking/ai-visibility, travel edition and
+      // the hidden Arabic twin included. The 2026-07-24 long-slug rule now
+      // points straight at the new home so nothing chains two redirects.
+      { source: "/speaking/earned-media-in-the-age-of-ai",  destination: "/speaking/ai-visibility", permanent: p },
+      { source: "/speaking/earned-media-in-the-age-of-ai/", destination: "/speaking/ai-visibility", permanent: p },
+      { source: "/speaking/earned-media-ai",                 destination: "/speaking/ai-visibility",        permanent: p },
+      { source: "/speaking/earned-media-ai/:path*",          destination: "/speaking/ai-visibility/:path*", permanent: p },
+      { source: "/ar/speaking/earned-media-ai/:path*",       destination: "/ar/speaking/ai-visibility/:path*", permanent: p },
 
       // Writing guides (playbooks)
       { source: "/brand-yourself-for-success",                            destination: "/resources/personal-branding", permanent: p },

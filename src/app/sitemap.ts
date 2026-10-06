@@ -46,6 +46,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { route: "",                                changeFrequency: "weekly"  as const, priority: 1.0 },
     { route: "about",                           changeFrequency: "monthly" as const, priority: 0.8 },
     { route: "speaking",                        changeFrequency: "monthly" as const, priority: 0.8 },
+    { route: "speaking/ai-visibility",          changeFrequency: "monthly" as const, priority: 0.8 },
+    { route: "speaking/ai-visibility/travel",   changeFrequency: "monthly" as const, priority: 0.7 },
     { route: "emos-academy",                            changeFrequency: "weekly"  as const, priority: 0.9 },
     { route: "emos-academy/apply",                      changeFrequency: "monthly" as const, priority: 0.8 },
     { route: "emos-platform",                           changeFrequency: "monthly" as const, priority: 0.8 },

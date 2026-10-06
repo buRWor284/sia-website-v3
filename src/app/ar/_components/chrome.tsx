@@ -6,7 +6,7 @@
  * nothing here can affect the English site. The global English header is hidden
  * under /ar/ by SiteHeaderConditional.
  *
- * NOTE: /ar/speaking/earned-media-ai/travel still carries its own inline copies
+ * NOTE: /ar/speaking/ai-visibility/travel still carries its own inline copies
  * of these three components from the first Arabic build. Fold it onto this file
  * in the same pass that applies the reviewer's edits, so there is one Arabic
  * header and one Arabic footer rather than two.
@@ -81,7 +81,7 @@ export function ArabicHeader({
         >
           {link("/ar/ksa-tourism-radar", "رادار السياحة", "tourism")}
           {link("/ar/ksa-retail-radar", "رادار التجزئة", "retail")}
-          {link("/ar/speaking/earned-media-ai/travel", "المحاضرات", "speaking")}
+          {link("/ar/speaking/ai-visibility/travel", "المحاضرات", "speaking")}
           <a
             href={switchHref}
             hrefLang="en"

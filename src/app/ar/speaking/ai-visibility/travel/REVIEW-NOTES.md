@@ -1,7 +1,7 @@
 # Arabic travel speaking page · review notes and go-live checklist
 
-**Route:** `/ar/speaking/earned-media-ai/travel`
-**English original:** `/speaking/earned-media-ai/travel`
+**Route:** `/ar/speaking/ai-visibility/travel`
+**English original:** `/speaking/ai-visibility/travel`
 **Built:** 9 September 2026
 **Status:** NOINDEX, unlinked, machine-drafted, awaiting native review
 

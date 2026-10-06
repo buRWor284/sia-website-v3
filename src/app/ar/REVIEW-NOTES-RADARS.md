@@ -101,7 +101,7 @@ travel page's checklist.
 
 ## Open items
 
-- Fold `/ar/speaking/earned-media-ai/travel` onto `src/app/ar/_components/chrome.tsx`.
+- Fold `/ar/speaking/ai-visibility/travel` onto `src/app/ar/_components/chrome.tsx`.
   It still carries its own inline header and footer from the first Arabic build, so
   there are currently two Arabic headers in the codebase.
 - The Arabic radars link out to `/strategy-call`, `/earned-media-radar` and the press

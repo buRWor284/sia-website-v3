@@ -1,5 +1,5 @@
 /**
- * /ar/speaking/earned-media-ai/travel
+ * /ar/speaking/ai-visibility/travel
  *
  * Arabic (MSA, RTL) edition of the travel speaking page.
  *
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
   description: META.description,
   // Staging draft: keep it out of the index and out of link graphs entirely.
   robots: { index: false, follow: false, nocache: true },
-  alternates: { canonical: "/ar/speaking/earned-media-ai/travel" },
+  alternates: { canonical: "/ar/speaking/ai-visibility/travel" },
 };
 
 // ─── Page-scoped CSS ─────────────────────────────────────────────────────────
@@ -171,7 +171,7 @@ const ArabicHeader = () => (
         <SCaps size={10} ls="0.12em" color={INK55}>{CHROME.role}</SCaps>
       </div>
       <nav style={{ display: "flex", gap: 18, flexWrap: "wrap", marginInlineStart: "auto", alignItems: "center" }}>
-        <a href="/ar/speaking/earned-media-ai/travel" style={{ fontFamily: AR_GROT, fontSize: 13.5, color: INK, textDecoration: "none", borderBottom: `2px solid ${YEL}` }}>{CHROME.navSpeaking}</a>
+        <a href="/ar/speaking/ai-visibility/travel" style={{ fontFamily: AR_GROT, fontSize: 13.5, color: INK, textDecoration: "none", borderBottom: `2px solid ${YEL}` }}>{CHROME.navSpeaking}</a>
         <a href="/ksa-tourism-radar" style={{ fontFamily: AR_GROT, fontSize: 13.5, color: INK70, textDecoration: "none" }}>{CHROME.navRadar}</a>
         <a href="/contact" style={{ fontFamily: AR_GROT, fontSize: 13.5, color: INK70, textDecoration: "none" }}>{CHROME.navContact}</a>
         <a

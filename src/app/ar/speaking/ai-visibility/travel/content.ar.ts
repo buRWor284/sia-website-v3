@@ -1,5 +1,5 @@
 /**
- * Arabic (MSA) copy for /ar/speaking/earned-media-ai/travel
+ * Arabic (MSA) copy for /ar/speaking/ai-visibility/travel
  *
  * REVIEW FILE. This is the only file a native reviewer needs to touch.
  * Every visible string on the Arabic travel speaking page lives here.
@@ -308,7 +308,7 @@ export const CHROME = {
   role: "استراتيجي الإعلام المكتسب · مؤسس EMOS",
   brandLine: "لماذا تدفع مقابل الانتباه بينما يمكنك أن تكسبه؟",
   switchLabel: "English",
-  switchHref: "/speaking/earned-media-ai/travel",
+  switchHref: "/speaking/ai-visibility/travel",
   navContact: "تواصل",
   navRadar: "الرادار السعودي",
   navSpeaking: "المحاضرات",
