@@ -1,95 +1,162 @@
 /**
- * EMOS MCP — Tier R tools shipped in Session 1: list_companies, get_usage.
+ * EMOS MCP — Tier R tools (spec v1.3 §3): what is saved.
  *
- * DATA ACCESS NOTE (Session 1 only). These two reads use the service client
- * with an explicit `.eq("org_id", actor.orgId)`. The spec (v1.3 §2.3) wants
- * every business-table read on an RLS-scoped client. Session 1's experiment
- * C4 settled HOW: the Clerk OAuth token is opaque (dashboard decision 3), so
- * Supabase cannot verify it as a Bearer, which means Session 2 mints a
- * short-lived Supabase JWT per actor (needs SUPABASE_JWT_SECRET on Vercel)
- * and moves these two queries onto it along with the rest of Tier R.
- * Until then the org filter is the only tenancy guard on this door; keep
- * these the only service-client reads of business tables in src/lib/mcp.
+ * Session 2 (2026-10-06): every read here now runs on actor.db(), a
+ * row-level-security client signed for the caller's organisation (see
+ * src/lib/emos/supabase-jwt.ts). The Session 1 service-client reads are gone.
+ * The one exception is get_usage's allowance meter: usage_counters is on the
+ * spec's short list of service-role tables (§2.3) and is read by explicit org.
+ *
+ * This file is only names, descriptions and input schemas. The work is in
+ * src/lib/emos/read.ts.
  */
-import { createSupabaseServiceClient } from "@/lib/supabase";
 import { getUsageMeter } from "@/lib/usage-limits";
-import type { McpTool } from "@/lib/mcp/protocol";
+import type { JsonSchema, McpTool, ToolAnnotations } from "@/lib/mcp/protocol";
+import {
+  listAssets, listCompanies, listJournalists, listPitchDrafts, listPitches, listScores, listSignals,
+} from "@/lib/emos/read";
 
-const COMPANY_COLUMNS =
-  "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, created_at, updated_at";
+const readOnly = (title: string): ToolAnnotations => ({
+  title, readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false,
+});
 
-export const listCompanies: McpTool = {
+const PAGING = {
+  limit: { type: "integer", minimum: 1, maximum: 100, description: "Rows per page. Default 25, max 100." },
+  cursor: { type: "string", description: "The next_cursor value from the previous page, unchanged." },
+  since: { type: "string", description: "Only rows created on or after this date, e.g. 2026-10-01." },
+} as const;
+
+const schema = (properties: Record<string, unknown>, required?: string[]): JsonSchema => ({
+  type: "object", properties, ...(required ? { required } : {}), additionalProperties: false,
+});
+
+const COMPANY_FILTER = { type: "string", description: "A company id from list_companies. Limits the list to that company." };
+
+export const listCompaniesTool: McpTool = {
   name: "list_companies",
   tier: "read",
   description:
     "List the companies this EMOS account runs campaigns for (each with its saved context). " +
     "Pass `id` to get one company with its approved brief. The `active` flag shows which company " +
     "the dashboard currently has selected; it is a hint only. Every other tool needs an explicit company_id from here.",
-  inputSchema: {
-    type: "object",
-    properties: {
-      id: { type: "string", description: "A company id. When given, returns that company with its approved brief." },
-    },
-    additionalProperties: false,
-  },
-  annotations: { title: "List companies", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
-  async handler(actor, args) {
-    const db = createSupabaseServiceClient();
-    const id = typeof args.id === "string" ? args.id : null;
-
-    const { data: me } = await db
-      .from("users")
-      .select("active_company_id")
-      .eq("clerk_user_id", actor.userId)
-      .eq("org_id", actor.orgId)
-      .maybeSingle();
-    const activeId = (me?.active_company_id as string | null) ?? null;
-
-    if (id) {
-      const { data: c, error } = await db
-        .from("companies")
-        .select(COMPANY_COLUMNS)
-        .eq("org_id", actor.orgId)
-        .eq("id", id)
-        .maybeSingle();
-      if (error) throw new Error(`Could not read company: ${error.message}`);
-      if (!c) return { text: "No company with that id in this account.", isError: true };
-      const { data: brief } = await db
-        .from("company_briefs")
-        .select("content, status, updated_at")
-        .eq("org_id", actor.orgId)
-        .eq("company_id", id)
-        .maybeSingle();
-      const approved = brief && brief.status === "approved" ? String(brief.content ?? "") : null;
-      return {
-        text: `${c.name}${activeId === c.id ? " (active in dashboard)" : ""}${approved ? ", approved brief attached" : ", no approved brief"}.`,
-        data: { company: { ...c, active: activeId === c.id }, brief: approved, brief_status: brief?.status ?? null },
-      };
-    }
-
-    const { data, error } = await db
-      .from("companies")
-      .select(COMPANY_COLUMNS)
-      .eq("org_id", actor.orgId)
-      .order("name", { ascending: true });
-    if (error) throw new Error(`Could not list companies: ${error.message}`);
-    const companies = (data ?? []).map((c) => ({ ...c, active: c.id === activeId }));
-    const names = companies.map((c) => `${c.name}${c.active ? " (active)" : ""}`).join(", ");
-    return {
-      text: companies.length ? `${companies.length} compan${companies.length === 1 ? "y" : "ies"}: ${names}.` : "No companies yet. Add one in the EMOS dashboard first.",
-      data: { companies },
-    };
-  },
+  inputSchema: schema({ id: { type: "string", description: "A company id. When given, returns that company with its approved brief." } }),
+  annotations: readOnly("List companies"),
+  handler: listCompanies,
 };
 
-export const getUsage: McpTool = {
+export const listJournalistsTool: McpTool = {
+  name: "list_journalists",
+  tier: "read",
+  description:
+    "Saved journalists: name, outlet, outlet domain, email, beat, Domain Rating, byline verification status, last contact, " +
+    "pitches sent, placements, and why each was saved (company and angle). An empty email means none is saved: never guess one. " +
+    "Filter by `company_id`, a name search `q`, or `has_email: true`. Pass `id` for one journalist.",
+  inputSchema: schema({
+    company_id: { type: "string", description: "Only journalists saved for this company (from list_companies)." },
+    id: { type: "string", description: "One journalist by id." },
+    q: { type: "string", description: "Part of a name." },
+    has_email: { type: "boolean", description: "true = only journalists with an email saved." },
+    ...PAGING,
+  }),
+  annotations: readOnly("List journalists"),
+  handler: listJournalists,
+};
+
+export const listSignalsTool: McpTool = {
+  name: "list_signals",
+  tier: "read",
+  description:
+    "Saved SignalIQ signals (story leads where real-world activity is ahead of press coverage): headline, score, coverage gap, fit, status. " +
+    "A signal is a lead, not a prediction. `can_build_pack` says whether build_asset_pack will work on it. " +
+    "`include_pack: true` attaches the latest saved asset pack to each signal.",
+  inputSchema: schema({
+    company_id: COMPANY_FILTER,
+    id: { type: "string", description: "One signal by id." },
+    status: { type: "string", enum: ["new", "saved", "pitched", "archived"], description: "new = found by a scan and not yet triaged." },
+    include_pack: { type: "boolean", description: "Attach the latest asset pack for each signal." },
+    ...PAGING,
+  }),
+  annotations: readOnly("List signals"),
+  handler: listSignals,
+};
+
+export const listAssetsTool: McpTool = {
+  name: "list_assets",
+  tier: "read",
+  description:
+    "Linkable assets (reports, calculators, data studies, and so on) with status, published URL and links earned. " +
+    "The AI creation brief is cut at 1,500 characters unless `full: true` or an `id` is given.",
+  inputSchema: schema({
+    company_id: COMPANY_FILTER,
+    id: { type: "string", description: "One asset by id." },
+    status: { type: "string", enum: ["draft", "in_review", "published", "archived"] },
+    full: { type: "boolean", description: "Return the whole AI creation brief." },
+    ...PAGING,
+  }),
+  annotations: readOnly("List linkable assets"),
+  handler: listAssets,
+};
+
+export const listScoresTool: McpTool = {
+  name: "list_scores",
+  tier: "read",
+  description:
+    "PressIQ pitch scores: composite score, tier, the radar dimensions and the top fixes, with which journalist and company each was for. " +
+    "Pass `id` for one score with the full rubric and the pitch text.",
+  inputSchema: schema({
+    company_id: COMPANY_FILTER,
+    journalist_id: { type: "string", description: "Only scores for this journalist." },
+    id: { type: "string", description: "One score by id, with its full rubric." },
+    ...PAGING,
+  }),
+  annotations: readOnly("List pitch scores"),
+  handler: listScores,
+};
+
+export const listPitchDraftsTool: McpTool = {
+  name: "list_pitch_drafts",
+  tier: "read",
+  description:
+    "Saved pitch drafts by journalist and company. Bodies are cut at 1,500 characters unless `full: true` or an `id` is given. " +
+    "Discarded drafts are left out unless `status: \"discarded\"`. A draft is never sent by EMOS.",
+  inputSchema: schema({
+    company_id: COMPANY_FILTER,
+    journalist_id: { type: "string", description: "Only drafts for this journalist." },
+    id: { type: "string", description: "One draft by id, with its full body." },
+    status: { type: "string", enum: ["draft", "sent", "discarded"] },
+    full: { type: "boolean", description: "Return whole bodies." },
+    ...PAGING,
+  }),
+  annotations: readOnly("List pitch drafts"),
+  handler: listPitchDrafts,
+};
+
+export const listPitchesTool: McpTool = {
+  name: "list_pitches",
+  tier: "read",
+  description:
+    "The CoverageIQ ledger: every pitch with its stage (drafted, sent, opened, replied, placed, amplified), sent date, placement fields, " +
+    "company, and the journalist's name, email and outlet domain. Use it to know who was pitched and what came of it.",
+  inputSchema: schema({
+    company_id: COMPANY_FILTER,
+    journalist_id: { type: "string", description: "Only pitches to this journalist." },
+    id: { type: "string", description: "One pitch by id." },
+    stage: { type: "string", enum: ["drafted", "sent", "opened", "replied", "placed", "amplified"] },
+    full: { type: "boolean", description: "Return whole pitch bodies (cut at 1,500 characters otherwise)." },
+    ...PAGING,
+  }),
+  annotations: readOnly("List pitches (ledger)"),
+  handler: listPitches,
+};
+
+export const getUsageTool: McpTool = {
   name: "get_usage",
   tier: "read",
   description:
     "This month's allowance meter for the account (scans, packs, drafts, scores, etc.: used and limit), " +
     "when it resets, and whether AI writes are enabled for this organisation. Call it before a large run.",
-  inputSchema: { type: "object", properties: {}, additionalProperties: false },
-  annotations: { title: "Usage this month", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false },
+  inputSchema: schema({}),
+  annotations: readOnly("Usage this month"),
   async handler(actor) {
     const meter = await getUsageMeter(actor.orgId);
     // The org-level switch arrives in Session 3 (spec §4.5). Until the column
@@ -109,4 +176,7 @@ export const getUsage: McpTool = {
   },
 };
 
-export const SESSION1_TOOLS: McpTool[] = [listCompanies, getUsage];
+export const READ_TOOLS: McpTool[] = [
+  listCompaniesTool, listSignalsTool, listJournalistsTool, listAssetsTool,
+  listScoresTool, listPitchDraftsTool, listPitchesTool, getUsageTool,
+];

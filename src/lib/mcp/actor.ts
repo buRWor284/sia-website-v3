@@ -21,6 +21,8 @@ import { subscriptionAccess } from "@/lib/emos-guard";
 import { rateLimitDb } from "@/lib/rate-limit-db";
 import { isEmosAdminEmail } from "@/lib/emos-admins";
 import { MCP_ALL_SCOPES, MCP_RESOURCE_METADATA_URL, type McpScope } from "@/lib/mcp/config";
+import { mcpDbFactory } from "@/lib/emos/actor";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type McpTier = "read" | "run" | "write";
 
@@ -32,6 +34,8 @@ export interface McpActor {
   scopes: McpScope[];
   clientId: string; // OAuth client (CIMD URL or DCR id), logged for audit
   via: "mcp_oauth";
+  /** RLS client for this actor's org (a five-minute signed token; Session 2). Never the service role. */
+  db(): SupabaseClient;
 }
 
 export type McpAuthFailure = {
@@ -156,6 +160,7 @@ export async function resolveMcpActor(tier: McpTier): Promise<McpAuthResult> {
       scopes,
       clientId: tok.clientId ?? "unknown",
       via: "mcp_oauth",
+      db: mcpDbFactory({ orgId, userId: tok.userId }),
     },
   };
 }
