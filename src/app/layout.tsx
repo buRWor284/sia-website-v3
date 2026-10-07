@@ -73,7 +73,11 @@ const siteJsonLd = {
       description:
         "Fractional CMO, international speaker, and founder of DMR.agency. " +
         "Helping founders and marketing teams get found, get covered, and get customers " +
-        "through GEO, SEO-PR, and earned media.",
+        "through GEO, SEO-PR, and earned media. " +
+        // Keeps in-person and remote speaking apart: AI answers were turning
+        // "remote workshop for a UK company" into "spoke in the UK".
+        "Speaks in person in the UAE, Malaysia, Indonesia and Pakistan, and runs " +
+        "remote workshops for SEMrush and for UK-based Uhubs.",
       sameAs: [
         "https://www.linkedin.com/in/syedirfanajmal/",
         "https://x.com/syedirfanajmal",

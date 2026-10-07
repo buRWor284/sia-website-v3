@@ -761,7 +761,9 @@ const EditorNote = () => (
           now. I lived and worked in Sweden and Denmark, where I earned a
           Master&apos;s in International Business and Entrepreneurship from
           Malardalen University, then built DMR.agency from Peshawar into a
-          practice serving clients across twenty-plus countries.
+          practice serving clients across twenty-plus countries. I have
+          spoken in person in the UAE, Malaysia, Indonesia and Pakistan, and
+          run remote workshops for SEMrush and for UK-based Uhubs.
         </p>
         <p style={{ marginTop: 16, fontFamily: SERIF, fontSize: 17, fontStyle: "italic", color: INK70, lineHeight: 1.6 }}>
           You can usually find me writing from Peshawar. Occasionally I am

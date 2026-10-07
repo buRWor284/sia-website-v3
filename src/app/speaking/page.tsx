@@ -407,9 +407,11 @@ const SpeakingLead = () => (
         <div style={{ fontFamily: SERIF, fontSize: "clamp(20px, 2.5vw, 26px)", color: INK, lineHeight: 1.45 }}>
           <p style={{ margin: 0 }}>
             On stage since 2013, talking <strong>earned media</strong> and{" "}
-            <strong>SEO-PR</strong>. Past stages include the Arabian Travel Market (Dubai),
-            DMSS (Bali, ~200 audience), IN5, AstroLabs, and MaGIC (Malaysia) — plus
-            webinar &amp; podcast circuits across North America and the UK.
+            <strong>SEO-PR</strong>. In person in the UAE (many times), Malaysia, Indonesia
+            and Pakistan: the Arabian Travel Market (Dubai), DMSS (Bali, ~200 audience),
+            IN5, AstroLabs, and MaGIC (Malaysia). Remotely, workshops and webinars for
+            SEMrush and for UK-based Uhubs, plus webinars and podcasts for North American
+            and UK audiences.
           </p>
           <p style={{ marginTop: "0.6em", fontStyle: "italic", color: INK70 }}>
             Case-study-led, with the receipts. In person across Asia, MENA, Europe and
@@ -1335,6 +1337,7 @@ export default function SpeakingPage() {
         type="CollectionPage"
         path="/speaking"
         name="Speaking · International Keynotes & Workshops"
+        description="Syed Irfan Ajmal has spoken in person in the UAE, Malaysia, Indonesia and Pakistan, and has run remote workshops and webinars for SEMrush and for UK-based Uhubs."
         crumbs={[{ name: "Speaking", path: "/speaking" }]}
       />
       <Hero />
