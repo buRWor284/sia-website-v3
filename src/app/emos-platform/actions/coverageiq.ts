@@ -18,6 +18,8 @@ import type {
 import type { JournalistHistory } from "@/lib/journalist-history-types";
 import { beatToTags } from "@/lib/journo/beat-tags";
 import { getDomainRating, getDomainRatings, ahrefsConfigured, domainFromInput } from "@/lib/ahrefs-dr";
+import type { Actor } from "@/lib/emos/actor";
+import { movePitchStage } from "@/lib/emos/ledger";
 
 // ─── Auth guard ───────────────────────────────────────────────────────────────
 
@@ -26,6 +28,26 @@ async function getAuthenticatedClient() {
   if (!userId) redirect("/emos-platform/signin");
   const token = await getToken();
   return createSupabaseServerClient(token ?? "");
+}
+
+/**
+ * The signed-in person as an Actor for the shared ledger functions in
+ * src/lib/emos (EMOS MCP Stage 4, Session 3, 2026-10-07). `db()` is the same
+ * Clerk-token, row-level-security client every action in this file uses.
+ * auth() and redirect() stay here in the wrapper; the lib functions never
+ * touch them (spec v1.3 §2.3).
+ */
+async function getDashboardActor(): Promise<Actor | null> {
+  const { userId, getToken } = await auth();
+  if (!userId) redirect("/emos-platform/signin");
+  const token = await getToken();
+  const db = createSupabaseServerClient(token ?? "");
+  const { data: org, error } = await db.from("organizations").select("id").single();
+  if (error || !org) {
+    console.error("getDashboardActor: could not resolve org_id", error?.message);
+    return null;
+  }
+  return { orgId: org.id as string, userId, email: "", isAdmin: false, via: "dashboard", db: () => db };
 }
 
 // ─── Queries ──────────────────────────────────────────────────────────────────
@@ -240,7 +262,42 @@ export async function assignUnassignedPitches(companyId: string): Promise<number
   return data?.length ?? 0;
 }
 
+/**
+ * The stage buttons on a pitch. Since 2026-10-07 (EMOS MCP Session 3) this goes
+ * through the shared outcome ledger, src/lib/emos/ledger.ts, the same functions
+ * the AI door's log_pitch_sent / log_reply / record_placement use:
+ *   Sent     also fills sent_date and logs the pitch against the journalist
+ *   Replied  also logs the reply against the journalist
+ *   Placed   also fills placed_date and counts the placement
+ * Before this, the button changed `stage` and nothing else. If the ledger
+ * functions cannot run, it falls back to that plain stage change so the button
+ * never stops working.
+ */
 export async function updatePitchStage(pitchId: string, stage: Stage): Promise<boolean> {
+  const actor = await getDashboardActor();
+  if (actor) {
+    try {
+      const moved = await movePitchStage(actor, pitchId, stage);
+      if (moved.ok) {
+        revalidatePath("/emos-platform/dashboard/coverageiq");
+        revalidatePath("/emos-platform/dashboard/journocollabiq");
+        // Awaited, never fire-and-forget (see the note on createPitch).
+        if (moved.newlyPlaced) await recordStageEvent("placement_confirmed");
+        return true;
+      }
+      if (!moved.fallback) {
+        console.warn(`updatePitchStage: ${moved.error ?? "refused"} (${pitchId})`);
+        return false;
+      }
+    } catch (e) {
+      console.error("updatePitchStage: ledger failed, falling back to a plain stage change:", e);
+    }
+  }
+  return updatePitchStagePlain(pitchId, stage);
+}
+
+/** The pre-ledger behaviour: change `stage` and nothing else. Fallback only. */
+async function updatePitchStagePlain(pitchId: string, stage: Stage): Promise<boolean> {
   const db = await getAuthenticatedClient();
 
   const { data, error } = await db
