@@ -264,7 +264,7 @@ export async function runWriteTool(
     return {
       text:
         tool === "undo_last_write"
-          ? done.result.text
+          ? `${done.result.text} (${done.rowsChanged} row${done.rowsChanged === 1 ? "" : "s"} put back.)`
           : `Recorded. ${done.result.text} It can be reversed with undo_last_write for 7 days, until another write is made.`,
       data: { status: "committed", audit_id: done.auditId, rows_changed: done.rowsChanged, ...done.result.data },
     };

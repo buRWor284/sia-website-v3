@@ -513,7 +513,19 @@ begin
   if v_row ->> 'tool' = 'undo_last_write' then
     v_target := public.mcp_audit_claim_undo((v_row ->> 'undo_of')::uuid);
     perform public.emos_undo_changes(v_target -> 'changes');
-    v_changes := jsonb_build_array(jsonb_build_object('undone', v_target ->> 'id', 'tool', v_target ->> 'tool'));
+    -- Session 4 (7 Oct 2026, migration mcp_stage4_session4_undo_audit_changes):
+    -- one entry per row reversed, so the audit row and rows_changed are true.
+    select coalesce(jsonb_agg(jsonb_build_object(
+             'table',  e.c ->> 'table',
+             'id',     e.c ->> 'id',
+             'op',     case when e.c ->> 'op' = 'insert' then 'removed' else 'restored' end,
+             'before', e.c -> 'after',
+             'after',  case when e.c ->> 'op' = 'insert' then 'null'::jsonb else e.c -> 'before' end,
+             'undone', v_target ->> 'id',
+             'tool',   v_target ->> 'tool'
+           ) order by e.ord desc), '[]'::jsonb)
+      into v_changes
+      from jsonb_array_elements(v_target -> 'changes') with ordinality as e(c, ord);
   else
     v_changes := public.emos_apply_plan(v_row -> 'plan');
   end if;
