@@ -14,7 +14,8 @@ export type Stage = "drafted" | "sent" | "opened" | "replied" | "placed" | "ampl
 export type PesoType = "Earned" | "Shared" | "Owned" | "Paid";
 export type LinkType = "Do Follow" | "No Follow" | "N/A";
 export type ContentType = "Original" | "Republished";
-export type DataSource = "manual" | "PressIQ" | "SignalIQ" | "JournoCollabIQ" | "Google Alerts";
+// "mcp" (2026-10-07): written by the user's own AI through the EMOS MCP write tools.
+export type DataSource = "manual" | "PressIQ" | "SignalIQ" | "JournoCollabIQ" | "Google Alerts" | "mcp";
 export type AlertStatus = "new" | "reviewed" | "archived";
 export type AlertType = "syndication" | "mention" | "pickup";
 export type Urgency = "overdue" | "today" | "upcoming" | "stalled" | "amplify";
@@ -255,10 +256,11 @@ export interface NewPitchDraft {
 
 /** "manual" reads as "Manual" in the UI; everything else is already display-cased. */
 export function fmtDataSource(ds: DataSource): string {
+  if (ds === "mcp") return "AI (MCP)";
   return ds === "manual" ? "Manual" : ds;
 }
 
-const KNOWN_SOURCES: DataSource[] = ["manual", "PressIQ", "SignalIQ", "JournoCollabIQ", "Google Alerts"];
+const KNOWN_SOURCES: DataSource[] = ["manual", "PressIQ", "SignalIQ", "JournoCollabIQ", "Google Alerts", "mcp"];
 
 /** Tolerates the legacy public casing ("Manual") + unknown values from old localStorage. */
 export function coerceDataSource(s: string): DataSource {

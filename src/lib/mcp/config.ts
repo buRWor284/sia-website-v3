@@ -13,7 +13,7 @@
  */
 
 export const MCP_SERVER_NAME = "emos";
-export const MCP_SERVER_VERSION = "0.2.0";
+export const MCP_SERVER_VERSION = "0.3.0";
 
 /** The one address Claude connects to. Never a redirecting host. */
 export const MCP_RESOURCE_URL =

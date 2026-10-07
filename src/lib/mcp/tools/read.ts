@@ -6,11 +6,13 @@
  * src/lib/emos/supabase-jwt.ts). The Session 1 service-client reads are gone.
  * The one exception is get_usage's allowance meter: usage_counters is on the
  * spec's short list of service-role tables (§2.3) and is read by explicit org.
+ * Session 3 (2026-10-07): get_usage reports the "AI writes" switch for real.
  *
  * This file is only names, descriptions and input schemas. The work is in
  * src/lib/emos/read.ts.
  */
 import { getUsageMeter } from "@/lib/usage-limits";
+import { aiWritesEnabled } from "@/lib/emos/write-core";
 import type { JsonSchema, McpTool, ToolAnnotations } from "@/lib/mcp/protocol";
 import {
   listAssets, listCompanies, listJournalists, listPitchDrafts, listPitches, listScores, listSignals,
@@ -159,18 +161,18 @@ export const getUsageTool: McpTool = {
   annotations: readOnly("Usage this month"),
   async handler(actor) {
     const meter = await getUsageMeter(actor.orgId);
-    // The org-level switch arrives in Session 3 (spec §4.5). Until the column
-    // exists every write tool refuses, so reporting false here is accurate.
-    const aiWritesEnabled = false;
+    // The org-level switch (spec §4.5): organizations.ai_writes_enabled, read
+    // live through row-level security. The write tools check the same column.
+    const writesOn = await aiWritesEnabled(actor);
     const lines = meter.rows.map((r) => `${r.label}: ${r.used}/${actor.isAdmin ? "unlimited" : r.limit}`);
     return {
-      text: `Allowances this month (resets ${meter.resetsOn}): ${lines.join("; ")}. AI writes: ${aiWritesEnabled ? "enabled" : "off"}.`,
+      text: `Allowances this month (resets ${meter.resetsOn}): ${lines.join("; ")}. AI writes: ${writesOn ? "ON (the write tools can record outcomes, each after a preview)" : "off (the write tools will refuse)"}.`,
       data: {
         period: meter.period,
         resets_on: meter.resetsOn,
         admin_unlimited: actor.isAdmin,
         allowances: meter.rows.map((r) => ({ action: r.action, tool: r.tool, label: r.label, used: r.used, limit: r.limit })),
-        ai_writes_enabled: aiWritesEnabled,
+        ai_writes_enabled: writesOn,
       },
     };
   },

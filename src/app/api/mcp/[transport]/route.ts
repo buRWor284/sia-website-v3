@@ -22,14 +22,16 @@ import { resolveMcpActor, bearerChallenge, type McpTier } from "@/lib/mcp/actor"
 import { dispatch, parseJsonRpc, rpcError, RPC, type JsonRpcResponse } from "@/lib/mcp/protocol";
 import { READ_TOOLS } from "@/lib/mcp/tools/read";
 import { RUN_TOOLS } from "@/lib/mcp/tools/run";
+import { WRITE_TOOLS } from "@/lib/mcp/tools/write";
 import { MCP_DEFAULT_PROTOCOL_VERSION } from "@/lib/mcp/config";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-// Session 2 (2026-10-06): the full read tier, then the run tier, all on RLS. Tier W is Session 3.
-const TOOLS = [...READ_TOOLS, ...RUN_TOOLS];
+// Session 2 (2026-10-06): the full read tier, then the run tier, all on RLS.
+// Session 3 (2026-10-07): the write tier (preview, then commit with a token; off until the org switch is on).
+const TOOLS = [...READ_TOOLS, ...RUN_TOOLS, ...WRITE_TOOLS];
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",

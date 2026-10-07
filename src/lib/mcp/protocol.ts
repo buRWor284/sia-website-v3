@@ -200,7 +200,15 @@ export async function dispatch(msg: JsonRpcRequest, ctx: DispatchContext): Promi
         if (!a.ok) return { kind: "http_error", status: a.status, error: a.error, headers: a.headers };
         return { kind: "json", status: 200, body: rpcError(id, RPC.INVALID_PARAMS, `Unknown tool: ${String(name)}`) };
       }
-      const a = await ctx.authenticate(tool.tier);
+      const args = (msg.params?.arguments ?? {}) as Record<string, unknown>;
+      // Rate-limit bucket. Write tools run twice: a preview, then a commit that
+      // carries the confirmation token. Only commits count against the write
+      // limit (spec §2.2: 120 commits an hour, previews are not counted), so a
+      // preview is metered as a read. The scope check below still asks for
+      // emos:write on both halves.
+      const isCommit = typeof args.confirmation_token === "string" && args.confirmation_token !== "";
+      const bucket: McpTier = tool.tier === "write" && !isCommit ? "read" : tool.tier;
+      const a = await ctx.authenticate(bucket);
       if (!a.ok) return { kind: "http_error", status: a.status, error: a.error, headers: a.headers };
       const needed = tierScope(tool.tier);
       if (!a.actor.scopes.includes(needed as McpActor["scopes"][number])) {
@@ -211,7 +219,6 @@ export async function dispatch(msg: JsonRpcRequest, ctx: DispatchContext): Promi
           headers: { "WWW-Authenticate": `Bearer error="insufficient_scope", scope="${needed}"` },
         };
       }
-      const args = (msg.params?.arguments ?? {}) as Record<string, unknown>;
       try {
         const r = await tool.handler(a.actor, args);
         const content: Array<{ type: "text"; text: string }> = [{ type: "text", text: r.text }];
