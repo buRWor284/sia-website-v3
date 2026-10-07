@@ -18,6 +18,7 @@
 
 import { recordAiUsage } from "@/lib/ai-usage";
 import { briefPromptBlock } from "@/lib/company-brief-prompt";
+import { friendlyAiError } from "@/lib/ai-errors";
 import { verifyJournalist } from "@/lib/journo/verify";
 import {
   applyVerification,
@@ -392,7 +393,8 @@ export async function runJournoAI(
 
     if (!res.ok) {
       const err = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
-      return { ok: false, status: res.status, error: err?.error?.message || `Anthropic API error ${res.status}` };
+      // 2026-10-07: the provider's wording (billing, keys) is ours to read, not the customer's.
+      return { ok: false, status: res.status, error: friendlyAiError("journo-ai", res.status, err?.error?.message) };
     }
 
     const json = (await res.json()) as { content?: Array<{ type: string; text: string }>; stop_reason?: string };

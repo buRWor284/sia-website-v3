@@ -39,7 +39,19 @@ export interface AiUsageContext {
   clerkUserId?: string | null;
   /** Already-resolved org (the MCP door knows it). Skips the lookup at write time. */
   orgId?: string | null;
+  /** When set, every call logged under this context is added up here, so the
+   * caller can report what one run cost (2026-10-07, the MCP cost figure). */
+  tally?: AiTally;
 }
+
+/** Running total for one run. `unpriced` counts calls whose model has no known price. */
+export interface AiTally {
+  usd: number;
+  calls: number;
+  unpriced: number;
+}
+
+export const newAiTally = (): AiTally => ({ usd: 0, calls: 0, unpriced: 0 });
 
 /** Which tool made the call. One value per call site. */
 export type AiTool =
@@ -157,6 +169,11 @@ export async function recordAiUsage(
 
     const cost = costUsd(model, u);
     if (cost === null) console.warn(`[ai-usage] no price for model "${model}", cost left NULL`);
+    if (ctx?.tally) {
+      ctx.tally.calls += 1;
+      if (cost === null) ctx.tally.unpriced += 1;
+      else ctx.tally.usd += cost;
+    }
 
     const { error } = await db.from("ai_usage").insert({
       org_id: orgId,

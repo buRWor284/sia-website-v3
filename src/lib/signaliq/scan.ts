@@ -14,7 +14,8 @@ import type { BeatId, Opportunity, ProfileExpansion, Signal } from "./types";
 import { BEAT_SLOTS, MAX_OPPORTUNITIES, MAX_SEEDS_PER_SCAN, beatById, isProbeTopic } from "./config";
 import { SIGNAL_SOURCES } from "./sources";
 import { getStoredCoverage } from "./coverage-store";
-import { expandCompanyProfile } from "./profile";
+import { expandCompanyProfileDetailed, type TailoringFailure } from "./profile";
+import { aiFailureMessage } from "@/lib/ai-errors";
 import { rankOpportunities, scoreOpportunity } from "./score";
 import { getHistorySummaries } from "./history";
 
@@ -26,6 +27,23 @@ export interface ScanResult {
   beats: BeatId[];
   /** Surfaced so the UI/library can show what the scan was tuned to. */
   expansion?: ProfileExpansion | null;
+  /** Did the company tailoring step run? (2026-10-07) "failed" carries why. */
+  tailoring: ScanTailoring;
+}
+
+export type ScanTailoring =
+  | { status: "tailored" }
+  | { status: "not_requested" }
+  | { status: "failed"; failure: TailoringFailure; message: string };
+
+/** One honest sentence for a scan that could not be tailored. */
+function tailoringMessage(f: TailoringFailure): string {
+  if (f.reason === "too_thin") return "The company description is too short to tailor topics to. Add a sentence or two about what the company does, then scan again.";
+  if (f.reason === "provider" && (f.kind === "billing" || f.kind === "setup")) {
+    return `Topics were NOT tailored to your company. ${aiFailureMessage(f.kind)} These are the standard topics for the beat.`;
+  }
+  if (f.reason === "not_configured") return `Topics were NOT tailored to your company. ${aiFailureMessage("setup")} These are the standard topics for the beat.`;
+  return "Couldn't tailor topics to your company this time, so these are the standard topics for the beat. Scan again in a moment for a tailored list.";
 }
 
 /** A single seed to scan, tagged with the beat it came from (for card badges). */
@@ -84,7 +102,14 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
   // 1) Expand the company profile into tailored seeds + relevance lexicon, using
   //    the union of all selected beats' candidate seeds (grouped per beat inside).
   let expansion: ProfileExpansion | null = null;
-  if (ctx) expansion = await expandCompanyProfile(ctx, beatList, opts.companyBrief);
+  let tailoring: ScanTailoring = { status: "not_requested" };
+  if (ctx) {
+    const expanded = await expandCompanyProfileDetailed(ctx, beatList, opts.companyBrief);
+    expansion = expanded.expansion;
+    tailoring = expansion
+      ? { status: "tailored" }
+      : { status: "failed", failure: expanded.failure ?? { reason: "error" }, message: tailoringMessage(expanded.failure ?? { reason: "error" }) };
+  }
 
   // 2) Build the seed list: tailored first (flagged), then generic beat seeds for
   //    breadth — weighted per BEAT_SLOTS so the primary beat keeps most of the
@@ -192,8 +217,10 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
         ? `Personalised to your company — scored ${count} from ${n} tailored to you.`
         : `Personalised to your company — scored ${count} from ${n} tailored to you; ${good === 0 ? "none" : good} ${good === 1 ? "fits" : "fit"} you well.`,
     );
-  } else if (ctx) {
-    notes.push("Couldn't tailor topics this time — showing the standard beat. Try again in a moment.");
+  } else if (tailoring.status === "failed") {
+    // 2026-10-07: say what actually happened. This used to read "try again in
+    // a moment" for every cause, including the provider refusing the call.
+    notes.push(tailoring.message);
   }
   // Beat mismatch (16 Sep 2026): say it plainly instead of stretching fit ratings.
   if (expansion?.beatMatch?.level === "weak") {
@@ -226,5 +253,5 @@ export async function scanBeat(beats: BeatId[], opts: ScanOptions = {}): Promise
     }
   }
 
-  return { opportunities, partial, notes, beats: beatList, expansion };
+  return { opportunities, partial, notes, beats: beatList, expansion, tailoring };
 }

@@ -2,6 +2,7 @@ import "server-only";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { recordAiUsage } from "@/lib/ai-usage";
+import { friendlyAiError } from "@/lib/ai-errors";
 import { BRIEF_MAX, BRIEF_SECTIONS, BRIEF_SECTION_HINTS } from "@/lib/company-brief-types";
 
 /**
@@ -286,7 +287,7 @@ async function callModel(system: string, user: string): Promise<ModelOk | ModelE
     });
     if (!res.ok) {
       const err = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
-      return { ok: false, error: err?.error?.message || `Anthropic API error ${res.status}`, status: 502 };
+      return { ok: false, error: friendlyAiError("company-brief", res.status, err?.error?.message), status: 502 };
     }
     const json = (await res.json()) as { content?: Array<{ type: string; text?: string }>; stop_reason?: string };
     await recordAiUsage("company-brief", MODEL, json); // cost log, before any check

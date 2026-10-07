@@ -122,8 +122,22 @@ export async function reserveUsage(
  *    repeats it with `confirmLarge: true` (spec §3, Tier A);
  *  - returns plain data (no NextResponse) plus a ready-made cost line.
  */
+/** The allowance side of a run's cost, as data (2026-10-07: results used to carry only `remaining: null` for an admin). */
+export interface SeatUsage {
+  action: PlatformAction;
+  /** What one unit is called, e.g. "pitch draft". */
+  unit: string;
+  units_used: number;
+  used_this_month: number;
+  monthly_limit: number;
+  /** Null on an admin account: counted, not capped. */
+  remaining: number | null;
+  admin_unlimited: boolean;
+  resets_on: string;
+}
+
 export type ActorSeat =
-  | { ok: true; remaining: number | null; costLine: string; release: (n?: number) => Promise<void> }
+  | { ok: true; remaining: number | null; costLine: string; usage: SeatUsage; release: (n?: number) => Promise<void> }
   | { ok: false; error: string; confirmLargeRun?: boolean; remaining?: number };
 
 export async function reserveUsageForActor(
@@ -183,6 +197,10 @@ export async function reserveUsageForActor(
     costLine: admin
       ? `Cost: used ${n} ${unit(n)} (admin account, counted but not capped; ${count} used this month).`
       : `Cost: used ${n} ${unit(n)}, ${remaining} left this month (resets ${reset}).`,
+    usage: {
+      action, unit: allowance.one, units_used: n, used_this_month: count, monthly_limit: allowance.limit,
+      remaining, admin_unlimited: admin, resets_on: reset,
+    },
     release: async (k = n) => {
       const give = Math.min(Math.max(k, 0), n - released);
       if (give <= 0) return;

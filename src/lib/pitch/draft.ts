@@ -44,6 +44,10 @@ export interface DraftBrief {
   assetDescription?: string | null;
   assetUrl?: string | null;
   angle?: string | null;
+  /** True when `angle` was written by an AI (a saved asset pack), not by the
+   * user (2026-10-07). Its story idea is used; its claims about the sender are
+   * not trusted. A live draft carried an invented credential out of a pack. */
+  angleIsAiSuggested?: boolean;
   /** The approved Company Brief, if any (2026-09-10). Server-loaded only. */
   companyBrief?: string | null;
 }
@@ -89,7 +93,9 @@ A pitch earns a reply when it hands the journalist a story they could file, not 
 - WHEN A COMPANY BRIEF IS SUPPLIED, add exactly ONE sentence of authority from it straight after the hook: the sender's own true story (e.g. why they started the company) or one proof point, in the first person. A pitch without it scores low on personal brand, and the brief is where it comes from. Keep a self-reported claim framed as the company's own claim. Use a customer story only if the brief marks it public or anonymised. Make room by trimming elsewhere, never by going over the word limit.
 - An asset without a "Published at" link is NOT finished. Say it is being built or nearly ready and offer early access. Never write "I have built", "we just published" or describe findings or results that do not exist yet.
 - Never invent a statistic, a source, a date or a credential. Use only what the brief gives you. If the brief is thin, write a shorter pitch rather than padding it with invention.
-- Close with a signature block, one item per line: the sender's full name, their title and company, the company website, then their email and LinkedIn if given. Copy the SIGNATURE lines from the brief exactly. Where the brief shows a [bracketed placeholder], keep the placeholder exactly as written so the user fills it in. Never sign with the company name alone and never invent a name, title or contact.
+- CREDENTIALS come from "Background" and the company brief only, in their own terms. Never re-label a span of time with a different or narrower field than they give ("in business, tech and marketing since 2004" must not become "20 years in digital marketing"). Never work out a number of years from a date yourself. Never add a claim about the sender's history, clients, regions or track record that is not written there.
+- WHEN THE STORY ANGLE IS MARKED "AI-SUGGESTED", treat it as an idea for the story and a pointer to the data, never as a source of facts about the sender. Use a statement about the sender's experience, past work or clients only if Background or the company brief says the same thing. If the angle makes a claim they do not, drop the claim.
+- Close with a signature block, one item per line. Copy the SIGNATURE lines from the brief exactly, in that order, and add no line that is not there. Where the brief shows a [bracketed placeholder], keep the placeholder exactly as written so the user fills it in. Never sign with the company name alone and never invent a name, title or contact.
 - The subject line is 6 to 9 words, concrete, and contains the strongest fact or the offer. Tailor it to this journalist's beat so two journalists in the same batch do not get the same subject. No colons used as clickbait, no questions.
 
 Return the subject and body through the tool. Write nothing else.`;
@@ -137,8 +143,12 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
   lines.push(brief.senderName?.trim() || "[Your full name]");
   lines.push(`${brief.senderTitle?.trim() || "[Your title]"}, ${brief.companyName}`);
   if (brief.companyWebsite) lines.push(brief.companyWebsite);
-  lines.push(brief.senderEmail?.trim() || "[Your email]");
-  lines.push(brief.senderLinkedIn?.trim() || "[Your LinkedIn URL]");
+  // 2026-10-07: email and LinkedIn are optional. When they are not saved the
+  // line is left out, instead of shipping "[Your email]" in a pitch (the
+  // scorer flagged those placeholders as an authenticity risk). Name and title
+  // still fall back to a visible placeholder: a pitch cannot go out unsigned.
+  if (brief.senderEmail?.trim()) lines.push(brief.senderEmail.trim());
+  if (brief.senderLinkedIn?.trim()) lines.push(brief.senderLinkedIn.trim());
   lines.push("");
   if (brief.assetTitle) {
     lines.push(`THE ASSET BEING OFFERED`);
@@ -151,7 +161,11 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
     lines.push("");
   }
   if (brief.angle) {
-    lines.push(`THE STORY ANGLE`);
+    lines.push(
+      brief.angleIsAiSuggested
+        ? `THE STORY ANGLE (AI-SUGGESTED from open data: use the story idea and the data points; do NOT take facts about the sender from it)`
+        : `THE STORY ANGLE`,
+    );
     lines.push(brief.angle);
     lines.push("");
   }

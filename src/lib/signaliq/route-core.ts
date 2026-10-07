@@ -13,7 +13,8 @@
  */
 import { BEATS, SIGNALIQ_MODEL } from "./config";
 import { recordAiUsage } from "@/lib/ai-usage";
-import { scanBeat } from "./scan";
+import { scanBeat, type ScanTailoring } from "./scan";
+import { friendlyAiError } from "@/lib/ai-errors";
 import { logScan, logPack } from "./log";
 import {
   PACK_SYSTEM,
@@ -64,7 +65,10 @@ export function coerceOpportunity(v: unknown): Opportunity | null {
 }
 
 /** Everything a scan response contains except the per-surface `usage` block. */
-export type ScanCore = Omit<ScanResponse, "usage">;
+export type ScanCore = Omit<ScanResponse, "usage"> & {
+  /** Whether the company tailoring step ran (2026-10-07). Callers that meter scans read it. */
+  tailoring: ScanTailoring;
+};
 
 /** Run a scan and build the response body (minus `usage`, which each route
  * attaches from its own guard). Throws on engine failure — callers map that
@@ -74,7 +78,7 @@ export async function runScanRequest(
   companyContext?: string,
   companyBrief?: string | null,
 ): Promise<ScanCore> {
-  const { opportunities, partial, notes, beats: scanned } = await scanBeat(beats, { companyContext, companyBrief });
+  const { opportunities, partial, notes, beats: scanned, tailoring } = await scanBeat(beats, { companyContext, companyBrief });
   logScan(scanned.join("+"), opportunities.length);
   return {
     beat: scanned[0], // legacy field = primary beat
@@ -83,7 +87,33 @@ export async function runScanRequest(
     opportunities,
     partial,
     notes,
+    tailoring,
   };
+}
+
+/**
+ * Number lint (2026-10-07). A live pack said filings "triple" in the headline
+ * and "double" in the subject line, for the same figure (11 in 30 days against
+ * about 3.7 a month). The prompt now forbids that; this catches it when the
+ * model does it anyway and says so in the pack's own cautions. It never
+ * rewrites the pack: a wrong auto-fix would be worse than a flagged mismatch.
+ */
+const MULTIPLIERS: { label: string; re: RegExp }[] = [
+  { label: "double", re: /\b(doubl\w*|twice|two[- ]?fold|twofold|2x)\b/i },
+  { label: "triple", re: /\b(tripl\w*|three times|three[- ]?fold|threefold|3x)\b/i },
+  { label: "quadruple", re: /\b(quadrupl\w*|four times|four[- ]?fold|fourfold|4x)\b/i },
+];
+
+export function multiplierMismatch(parts: Record<string, string | undefined>): string | null {
+  const found = new Map<string, string[]>();
+  for (const [where, text] of Object.entries(parts)) {
+    for (const m of MULTIPLIERS) {
+      if (text && m.re.test(text)) found.set(m.label, [...(found.get(m.label) ?? []), where]);
+    }
+  }
+  if (found.size < 2) return null;
+  const said = [...found].map(([label, where]) => `"${label}" in the ${where.join(" and ")}`).join(", ");
+  return `Check the numbers before sending: this pack describes a change as ${said}. Use the plain figures from the data instead of a multiplier word.`;
 }
 
 /** Everything an asset pack contains except the per-surface `usage` block. */
@@ -135,7 +165,8 @@ export async function runPackRequest(
 
     if (!res.ok) {
       const err = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
-      return { ok: false, error: err?.error?.message || `Anthropic API error ${res.status}`, status: res.status };
+      // 2026-10-07: the provider's wording (billing, keys) is ours to read, not the customer's.
+      return { ok: false, error: friendlyAiError("signaliq-pack", res.status, err?.error?.message), status: res.status };
     }
 
     const json = (await res.json()) as { content?: Array<{ type: string; name?: string; input?: unknown }>; stop_reason?: string };
@@ -166,6 +197,12 @@ export async function runPackRequest(
     const titles = `${ai.headline ?? ""} | ${ai.subjectLine ?? ""} | ${firstBriefLine}`;
     const hit = titles.match(/\b(uptick|surg\w*|spik\w*|soar\w*|skyrocket\w*)\b/gi);
     if (hit) console.warn(`[signaliq pack] direction words in titles while a signal is below norm (${opp.topic}): ${hit.join(", ")} :: ${titles}`);
+  }
+
+  const mismatch = multiplierMismatch({ headline: ai.headline, "subject line": ai.subjectLine, "pitch angle": ai.angle, brief: ai.brief });
+  if (mismatch) {
+    console.warn(`[signaliq pack] multiplier words disagree (${opp.topic}): ${ai.headline} | ${ai.subjectLine}`);
+    ai.cautions = [mismatch, ...ai.cautions].slice(0, 4);
   }
 
   const pack: PackCore = {

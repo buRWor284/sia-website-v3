@@ -21,6 +21,7 @@
  */
 import type { BeatId, ProfileExpansion } from "./types";
 import { recordAiUsage } from "@/lib/ai-usage";
+import { classifyAiError, type AiFailureKind } from "@/lib/ai-errors";
 import { SIGNALIQ_MODEL, beatById, visibleBeats } from "./config";
 import { briefPromptBlock, fitBrief } from "@/lib/company-brief-prompt";
 
@@ -244,6 +245,15 @@ const cacheKey = (s: string): string => {
   return `${SIGNALIQ_MODEL}:${h}`;
 };
 
+/** Why a scan could not be tailored (2026-10-07). "provider" carries the kind of provider failure. */
+export type TailoringFailure =
+  | { reason: "too_thin" }
+  | { reason: "not_configured" }
+  | { reason: "provider"; kind: AiFailureKind }
+  | { reason: "truncated" }
+  | { reason: "unreadable" }
+  | { reason: "error" };
+
 /**
  * Expand a company description into tailored seeds (+ fit ratings) and a
  * relevance lexicon. Returns null on any failure so the caller can fall back
@@ -254,18 +264,33 @@ export async function expandCompanyProfile(
   beats: BeatId[],
   companyBrief?: string | null,
 ): Promise<ProfileExpansion | null> {
+  return (await expandCompanyProfileDetailed(companyContext, beats, companyBrief)).expansion;
+}
+
+/**
+ * The same call, but a failure comes back with its reason instead of a bare
+ * null. Before 2026-10-07 every failure looked the same to the scan, which
+ * told the user "try again in a moment" even when the real cause was the
+ * provider refusing the call (an empty API credit balance on 6 Oct).
+ */
+export async function expandCompanyProfileDetailed(
+  companyContext: string,
+  beats: BeatId[],
+  companyBrief?: string | null,
+): Promise<{ expansion: ProfileExpansion | null; failure: TailoringFailure | null }> {
+  const fail = (failure: TailoringFailure) => ({ expansion: null, failure });
   const desc = (companyContext ?? "").trim();
-  if (desc.length < 12) return null; // too thin to tailor on
+  if (desc.length < 12) return fail({ reason: "too_thin" }); // too thin to tailor on
 
   const beatList = beats && beats.length ? beats : (["saas"] as BeatId[]);
   // Cache key includes ALL selected beats in order — a Health+AI selection must
   // not collide with a Health-only one.
   const key = cacheKey(`${beatList.join(",")}|${desc}|${companyBrief ?? ""}`);
   const hit = cache.get(key);
-  if (hit) return hit;
+  if (hit) return { expansion: hit, failure: null };
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) return fail({ reason: "not_configured" });
 
   try {
     const res = await fetch(ANTHROPIC_API, {
@@ -294,8 +319,9 @@ export async function expandCompanyProfile(
       }),
     });
     if (!res.ok) {
-      console.error("expandCompanyProfile: anthropic error", res.status);
-      return null;
+      const err = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+      console.error("expandCompanyProfile: anthropic error", res.status, err?.error?.message ?? "");
+      return fail({ reason: "provider", kind: classifyAiError(res.status, err?.error?.message) });
     }
     const json = (await res.json()) as { content?: ToolUseBlock[]; stop_reason?: string };
     await recordAiUsage("signaliq-profile", SIGNALIQ_MODEL, json); // cost log (stage 3); cache hits never reach here
@@ -305,13 +331,14 @@ export async function expandCompanyProfile(
     // documented fallback (generic beat seeds) and caches nothing.
     if (json.stop_reason === "max_tokens") {
       console.error("expandCompanyProfile: output truncated (stop_reason=max_tokens), falling back to beat seeds");
-      return null;
+      return fail({ reason: "truncated" });
     }
     const expansion = parseExpansion(json.content ?? []);
-    if (expansion) cache.set(key, expansion);
-    return expansion;
+    if (!expansion) return fail({ reason: "unreadable" });
+    cache.set(key, expansion);
+    return { expansion, failure: null };
   } catch (e) {
     console.error("expandCompanyProfile error (non-fatal):", e);
-    return null;
+    return fail({ reason: "error" });
   }
 }

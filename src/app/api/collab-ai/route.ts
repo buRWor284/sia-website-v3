@@ -19,6 +19,7 @@ import { capToolInput, clientIp } from "@/lib/public-tool-guard";
 import { consumeQuota } from "@/lib/gate/quota";
 import { PREVIEW_REVEAL, QUOTA_LIMITS } from "@/lib/gate/quota-limits";
 import { recordAiUsage } from "@/lib/ai-usage";
+import { friendlyAiError } from "@/lib/ai-errors";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
 const MODEL = "claude-opus-4-6";
@@ -281,7 +282,7 @@ export async function POST(request: NextRequest) {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({})) as { error?: { message?: string } };
-      const msg = err?.error?.message || `Anthropic API error ${res.status}`;
+      const msg = friendlyAiError("collab-ai", res.status, err?.error?.message);
       return NextResponse.json({ error: msg }, { status: res.status });
     }
 

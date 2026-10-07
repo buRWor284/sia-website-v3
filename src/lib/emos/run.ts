@@ -5,8 +5,9 @@ import {
   approvedBrief, bool, cut, fail, isUuid, loadCompany, notFound, ownedRow, str,
   type Args, type CompanyRow, type Row,
 } from "@/lib/emos/shared";
-import { withAiUsage, type AiUsageContext } from "@/lib/ai-usage";
-import { reserveUsageForActor, releaseUsageForOrg } from "@/lib/usage-limits";
+import { newAiTally, withAiUsage, type AiTally, type AiUsageContext } from "@/lib/ai-usage";
+import { scrubAiError } from "@/lib/ai-errors";
+import { reserveUsageForActor, releaseUsageForOrg, type SeatUsage } from "@/lib/usage-limits";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { coerceOpportunity, parseBeats, runPackRequest, runScanRequest } from "@/lib/signaliq/route-core";
 import { beatById, visibleBeats } from "@/lib/signaliq/config";
@@ -32,7 +33,32 @@ import { draftPitches, MAX_DRAFT_BATCH, type DraftBrief, type DraftTarget } from
  * ends with a cost line. The one brake is reserveUsageForActor's quarter rule.
  */
 
-const usageCtx = (actor: Actor): AiUsageContext => ({ surface: "mcp", clerkUserId: actor.userId, orgId: actor.orgId });
+/** One cost context per run: every AI call it makes is logged with surface "mcp" and added up in `tally`. */
+const usageCtx = (actor: Actor): AiUsageContext & { tally: AiTally } => ({
+  surface: "mcp", clerkUserId: actor.userId, orgId: actor.orgId, tally: newAiTally(),
+});
+
+/**
+ * The cost of a run as data (2026-10-07). Results used to carry only
+ * `remaining`, which is null on an admin account, so nothing in the data said
+ * what a run had cost. `cost` now always has the allowance numbers. The dollar
+ * figure is what EMOS paid its AI provider for this call: an internal number,
+ * so it is shown to admin accounts only (like placement value).
+ */
+function costData(actor: Actor, usage: SeatUsage, tally?: AiTally | null, unitsHandedBack = 0): Row {
+  const used = Math.max(usage.units_used - unitsHandedBack, 0);
+  return {
+    ...usage,
+    units_used: used,
+    used_this_month: Math.max(usage.used_this_month - unitsHandedBack, 0),
+    remaining: usage.remaining === null ? null : usage.remaining + unitsHandedBack,
+    ...(actor.isAdmin && tally
+      ? { ai_cost_usd: Math.round(tally.usd * 10_000) / 10_000, ai_calls: tally.calls, ...(tally.unpriced ? { ai_calls_without_a_price: tally.unpriced } : {}) }
+      : {}),
+  };
+}
+const costText = (actor: Actor, costLine: string, tally?: AiTally | null): string =>
+  actor.isAdmin && tally && tally.calls > 0 ? `${costLine} AI cost of this call: $${tally.usd.toFixed(3)}.` : costLine;
 const companyContext = (c: CompanyRow): string | undefined => (c.context ? c.context.slice(0, COMPANY_CONTEXT_MAX) : undefined);
 const refusal = (seat: { error: string; confirmLargeRun?: boolean; remaining?: number }): EmosResult =>
   fail(seat.error, { ...(seat.confirmLargeRun ? { confirm_large_run: true } : {}), remaining: seat.remaining ?? null });
@@ -68,7 +94,7 @@ export async function startScan(actor: Actor, args: Args): Promise<EmosResult> {
   // The scan takes 40 to 90 seconds. It keeps running after this response
   // (waitUntil, under the route's 300 s cap) inside its own cost context.
   waitUntil(
-    finishScan(actor, runId, company, beats).catch(async (e) => {
+    finishScan(actor, runId, company, beats, seat).catch(async (e) => {
       console.error(`[emos] scan run ${runId} failed:`, e);
       await seat.release();
       await actor
@@ -83,21 +109,41 @@ export async function startScan(actor: Actor, args: Args): Promise<EmosResult> {
 
   return {
     text: `Scan started for ${company.name} (${beats.map((b) => beatById(b).label).join(", ")}). It takes 40 to 90 seconds: call get_run with this run_id until status is "done". ${seat.costLine}`,
-    data: { run_id: runId, status: "running", company_id: company.id, beats, remaining: seat.remaining },
+    data: { run_id: runId, status: "running", company_id: company.id, beats, remaining: seat.remaining, cost: costData(actor, seat.usage) },
   };
 }
 
-async function finishScan(actor: Actor, runId: string, company: CompanyRow, beats: BeatId[]): Promise<void> {
+async function finishScan(
+  actor: Actor,
+  runId: string,
+  company: CompanyRow,
+  beats: BeatId[],
+  seat: { usage: SeatUsage; release: (n?: number) => Promise<void> },
+): Promise<void> {
   const brief = await approvedBrief(actor, company.id);
-  const core = await withAiUsage(usageCtx(actor), () => runScanRequest(beats, companyContext(company), brief));
+  const ctx = usageCtx(actor);
+  const core = await withAiUsage(ctx, () => runScanRequest(beats, companyContext(company), brief));
   const saved = await saveScanSignals(actor, company, core.opportunities);
+
+  // 2026-10-07: a scan asked for a company and the tailoring step failed. The
+  // standard-beat signals are still saved (they are real signals), but the
+  // scan is NOT what was asked for, so it is handed back and the result says
+  // so plainly. It used to count as one scan and say "try again in a moment".
+  const untailored = core.tailoring.status === "failed";
+  if (untailored) await seat.release();
+
   const { error } = await actor
     .db()
     .from("mcp_runs")
     .update({
       status: "done",
       finished_at: new Date().toISOString(),
-      result: { company_id: company.id, beats: core.beats, generated_at: core.generatedAt, partial: core.partial, notes: core.notes, signals: saved },
+      result: {
+        company_id: company.id, beats: core.beats, generated_at: core.generatedAt, partial: core.partial, notes: core.notes, signals: saved,
+        tailored: core.tailoring.status === "tailored",
+        ...(core.tailoring.status === "failed" ? { tailoring_problem: core.tailoring.message, counted: false } : { counted: true }),
+        cost: costData(actor, seat.usage, ctx.tally, untailored ? 1 : 0),
+      },
     })
     .eq("org_id", actor.orgId)
     .eq("id", runId);
@@ -214,14 +260,21 @@ export async function getRun(actor: Actor, args: Args): Promise<EmosResult> {
   }
   if (status === "failed") return fail(message ?? "The run failed.", { run_id: run.id, tool: run.tool, status });
 
-  const result = (run.result ?? {}) as { signals?: Row[]; partial?: boolean; notes?: string[] };
+  const result = (run.result ?? {}) as { signals?: Row[]; partial?: boolean; notes?: string[]; tailored?: boolean; tailoring_problem?: string; cost?: Row };
   const signals = result.signals ?? [];
   const top = signals.slice(0, 3).map((s) => `${String(s.headline)} (${String(s.score)})`).join("; ");
+  const n = `${signals.length} signal${signals.length === 1 ? "" : "s"}`;
+  const head = result.tailoring_problem
+    ? `Scan done, but NOT tailored to the company. ${result.tailoring_problem} ${n} from the standard beat ${signals.length === 1 ? "was" : "were"} saved to SignalIQ. ` +
+      "This scan was not counted against the allowance; run it again for a tailored one (signals already saved are reused, not duplicated)."
+    : `Scan done: ${n} saved to SignalIQ${result.partial ? " (one or more sources failed, so this is partial)" : ""}.`;
+  const dollars = typeof result.cost?.ai_cost_usd === "number" ? ` AI cost of this scan: $${(result.cost.ai_cost_usd as number).toFixed(3)}.` : "";
   return {
     text:
-      `Scan done: ${signals.length} signal${signals.length === 1 ? "" : "s"} saved to SignalIQ${result.partial ? " (one or more sources failed, so this is partial)" : ""}.` +
+      head +
       (top ? ` Top: ${top}.` : "") +
-      " A signal is a lead on thin coverage, not a prediction that a story will break.",
+      " A signal is a lead on thin coverage, not a prediction that a story will break." +
+      dollars,
     data: { run_id: run.id, tool: run.tool, status, started_at: run.created_at, finished_at: run.finished_at, ...result, _untrusted: ["signals[].headline", "signals[].topic", "notes"] },
   };
 }
@@ -244,10 +297,11 @@ export async function buildAssetPack(actor: Actor, args: Args): Promise<EmosResu
   if (!seat.ok) return refusal(seat);
 
   const brief = await approvedBrief(actor, company.id);
-  const result = await withAiUsage(usageCtx(actor), () => runPackRequest(opp, companyContext(company), brief));
+  const ctx = usageCtx(actor);
+  const result = await withAiUsage(ctx, () => runPackRequest(opp, companyContext(company), brief));
   if (!result.ok) {
     await seat.release();
-    return fail(`${result.error} It was not counted against the allowance.`);
+    return fail(`${scrubAiError(result.error)} It was not counted against the allowance.`);
   }
   const pack: AssetPack = { ...result.pack, usage: { remaining: seat.remaining ?? 999, tier: "email" } };
 
@@ -262,7 +316,7 @@ export async function buildAssetPack(actor: Actor, args: Args): Promise<EmosResu
   return {
     text:
       `Pack built for "${cut(pack.headline ?? opp.headline, 120)}"${savedId ? " and saved to SignalIQ" : " (but it could NOT be saved; copy it now)"}. ` +
-      `Journalist names in a pack are leads to verify, not confirmed contacts. ${seat.costLine}`,
+      `Journalist names in a pack are leads to verify, not confirmed contacts. Anything it says about the sender must match the saved company context; check before using it. ${costText(actor, seat.costLine, ctx.tally)}`,
     data: {
       pack_id: savedId,
       signal_id: signal.id,
@@ -276,6 +330,7 @@ export async function buildAssetPack(actor: Actor, args: Args): Promise<EmosResu
       cautions: pack.cautions ?? [],
       sources: pack.sources ?? [],
       remaining: seat.remaining,
+      cost: costData(actor, seat.usage, ctx.tally),
       _untrusted: ["sources", "journalist_leads"],
     },
   };
@@ -347,7 +402,7 @@ export async function findJournalists(actor: Actor, args: Args): Promise<EmosRes
     return {
       text:
         `${list.length} candidate${list.length === 1 ? "" : "s"}: ${s.verified} with a verified recent byline, ${s.unverified} not confirmed, ${s.pending + s.stale} still to check. ` +
-        `Nothing is saved yet, and only "verified" names may be presented as people who cover this beat. No email addresses are returned; EMOS never guesses one. ${costLine}`,
+        `Nothing is saved yet (add_journalist saves the ones worth keeping), and only "verified" names may be presented as people who cover this beat. No email addresses are returned; EMOS never guesses one. ${costLine}`,
       data: { company_id: company.id, signal_id: signal?.id ?? null, beat, candidates: list, verify_stats: s, ...extra, ms: Date.now() - startedAt, _untrusted: ["candidates[].why", "candidates[].verification.byline_title", "candidates[].verification.note"] },
     };
   };
@@ -400,7 +455,7 @@ export async function findJournalists(actor: Actor, args: Args): Promise<EmosRes
     const run = await withAiUsage(ctx, () => runJournoAI("partner-suggestions", data, brief));
     if (!run.ok) {
       await seat.release();
-      return fail(`${run.error} This search was not counted.`);
+      return fail(`${scrubAiError(run.error)} This search was not counted.`);
     }
     listJson = run.result;
   }
@@ -410,7 +465,15 @@ export async function findJournalists(actor: Actor, args: Args): Promise<EmosRes
     await seat.release();
     return fail("The journalist list came back unreadable. This search was not counted; please retry.");
   }
-  return finish(checked, { list_source: listSource, more_available: moreAvailable, skipped_already_saved: skipped, remaining: seat.remaining }, seat.costLine);
+  return finish(
+    checked,
+    {
+      list_source: listSource, more_available: moreAvailable, skipped_already_saved: skipped, remaining: seat.remaining,
+      // Byline checks still running when this returns are not in the dollar figure yet.
+      cost: costData(actor, seat.usage, ctx.tally),
+    },
+    costText(actor, seat.costLine, ctx.tally),
+  );
 }
 
 // ─── score_pitch ─────────────────────────────────────────────────────────────
@@ -450,10 +513,11 @@ export async function scorePitch(actor: Actor, args: Args): Promise<EmosResult> 
   const seat = await reserveUsageForActor(actor, "score", 1, { confirmLarge: bool(args.confirm_large_run) });
   if (!seat.ok) return refusal(seat);
 
-  const run = await withAiUsage(usageCtx(actor), () => runScoreRequest(parsed.input, { remaining: seat.remaining ?? 999, tier: "email" }));
+  const ctx = usageCtx(actor);
+  const run = await withAiUsage(ctx, () => runScoreRequest(parsed.input, { remaining: seat.remaining ?? 999, tier: "email" }));
   if (!run.ok) {
     await seat.release();
-    return fail(`${run.error} It was not counted against the allowance.`);
+    return fail(`${scrubAiError(run.error)} It was not counted against the allowance.`);
   }
   const r = run.result;
 
@@ -464,7 +528,7 @@ export async function scorePitch(actor: Actor, args: Args): Promise<EmosResult> 
     text:
       `PressIQ score ${r.composite}/100 (${r.tier.label})${scoreId ? ", saved to Score History" : " (but it could NOT be saved)"}. ` +
       (r.topFixes?.length ? `Top fix: ${cut(r.topFixes[0].text, 200)} ` : "") +
-      seat.costLine,
+      costText(actor, seat.costLine, ctx.tally),
     data: {
       score_id: scoreId,
       company_id: company.id,
@@ -479,6 +543,7 @@ export async function scorePitch(actor: Actor, args: Args): Promise<EmosResult> 
       authenticity_risk: r.authenticityRisk ?? null,
       areas: r.areas,
       remaining: seat.remaining,
+      cost: costData(actor, seat.usage, ctx.tally),
     },
   };
 }
@@ -511,11 +576,26 @@ export async function draftPitch(actor: Actor, args: Args): Promise<EmosResult> 
     if (!asset) return notFound("asset");
   }
   let angle = typeof args.angle === "string" && args.angle.trim() ? args.angle.trim().slice(0, 2000) : null;
+  // Where the angle came from. The caller's `angle` is the user's own words. A
+  // pack's angle was written by an AI: the drafter is told to take the story
+  // from it and nothing about the sender (2026-10-07; a pack once carried an
+  // invented credential straight into a draft).
+  let angleSource: "caller" | "pack" | null = angle ? "caller" : null;
   if (args.pack_id !== undefined && args.pack_id !== null && args.pack_id !== "") {
     const pack = await ownedRow(actor, "signaliq_asset_packs", args.pack_id, "id, pitch_angle, headline");
     if (!pack) return notFound("pack");
-    if (!angle) angle = [pack.headline, pack.pitch_angle].filter(Boolean).join("\n").slice(0, 2000) || null;
+    if (!angle) {
+      angle = [pack.headline, pack.pitch_angle].filter(Boolean).join("\n").slice(0, 2000) || null;
+      if (angle) angleSource = "pack";
+    }
   }
+
+  // The signature is built from the company's saved sender. A missing name or
+  // title becomes a visible [placeholder] in the draft, so say so up front.
+  const missingSender = [
+    company.spokesperson_name?.trim() ? null : "sender name",
+    company.spokesperson_title?.trim() ? null : "sender title",
+  ].filter((x): x is string => !!x);
 
   const brief: DraftBrief = {
     companyName: company.name,
@@ -529,6 +609,7 @@ export async function draftPitch(actor: Actor, args: Args): Promise<EmosResult> 
     assetDescription: (asset?.description as string | null) ?? null,
     assetUrl: (asset?.published_url as string | null) ?? null,
     angle,
+    angleIsAiSuggested: angleSource === "pack",
     companyBrief: await approvedBrief(actor, company.id),
   };
   const targets: DraftTarget[] = ids.map((id) => {
@@ -547,7 +628,8 @@ export async function draftPitch(actor: Actor, args: Args): Promise<EmosResult> 
   const seat = await reserveUsageForActor(actor, "draft", targets.length, { confirmLarge: bool(args.confirm_large_run) });
   if (!seat.ok) return refusal(seat);
 
-  const drafts = await withAiUsage(usageCtx(actor), () => draftPitches(brief, targets));
+  const ctx = usageCtx(actor);
+  const drafts = await withAiUsage(ctx, () => draftPitches(brief, targets));
   const good = drafts.filter((d) => !d.error && d.subject && d.body);
   const failed = drafts.length - good.length;
   if (failed > 0) await seat.release(failed);
@@ -576,13 +658,21 @@ export async function draftPitch(actor: Actor, args: Args): Promise<EmosResult> 
   const draftIdFor = new Map(saved.map((r) => [String(r.journalist_id), String(r.id)]));
 
   const unit = good.length === 1 ? "draft" : "drafts";
-  const cost = failed > 0 ? `${seat.costLine} ${failed} failed and ${failed === 1 ? "was" : "were"} handed back.` : seat.costLine;
+  const line = costText(actor, seat.costLine, ctx.tally);
+  const cost = failed > 0 ? `${line} ${failed} failed and ${failed === 1 ? "was" : "were"} handed back.` : line;
+  const signatureNote = missingSender.length
+    ? ` The signature has a [placeholder] for the ${missingSender.join(" and ")}: ${company.name} has none saved. Add it to the company in the EMOS dashboard, or fill it in before sending.`
+    : "";
+  const angleNote = angleSource === "pack" ? " The angle came from an AI-written pack: check every claim about the sender against the company context before sending." : "";
   return {
     text:
       `${good.length} ${unit} written${saved.length === good.length ? " and saved to PressIQ Drafts" : " (some could NOT be saved; copy them now)"}. ` +
-      `Nothing was sent: the user sends from their own inbox. ${cost}`,
+      `Nothing was sent: the user sends from their own inbox.${signatureNote}${angleNote} ${cost}`,
     data: {
       company_id: company.id,
+      angle_source: angleSource,
+      signature_complete: missingSender.length === 0,
+      missing_sender_fields: missingSender,
       drafts: drafts.map((d) => ({
         draft_id: draftIdFor.get(d.journalistId) ?? null,
         journalist_id: d.journalistId,
@@ -592,6 +682,7 @@ export async function draftPitch(actor: Actor, args: Args): Promise<EmosResult> 
         error: d.error ?? null,
       })),
       remaining: seat.remaining,
+      cost: costData(actor, seat.usage, ctx.tally, failed),
     },
   };
 }

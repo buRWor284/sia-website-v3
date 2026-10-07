@@ -11,6 +11,7 @@ import { requireEmosAccess } from "@/lib/emos-guard";
 import { getApprovedBrief } from "@/lib/company-brief";
 import { briefPromptBlock } from "@/lib/company-brief-prompt";
 import { recordAiUsage } from "@/lib/ai-usage";
+import { friendlyAiError } from "@/lib/ai-errors";
 import { reserveUsage } from "@/lib/usage-limits";
 
 const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
@@ -118,7 +119,7 @@ export async function POST(request: NextRequest) {
     if (!res.ok) {
       await seat.release();
       const err = await res.json().catch(() => ({})) as { error?: { message?: string } };
-      return NextResponse.json({ error: err?.error?.message || `Anthropic API error ${res.status}` }, { status: res.status });
+      return NextResponse.json({ error: friendlyAiError("asset-brief", res.status, err?.error?.message) }, { status: res.status });
     }
 
     const json = await res.json() as { content?: Array<{ type: string; text: string }>; stop_reason?: string };
