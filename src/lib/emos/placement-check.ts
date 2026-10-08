@@ -76,7 +76,7 @@ async function unsafeReason(url: URL): Promise<string | null> {
   return null;
 }
 
-async function fetchPage(start: URL): Promise<{ html: string | null; status: number | null; finalUrl: URL; problem: string | null }> {
+export async function fetchPage(start: URL): Promise<{ html: string | null; status: number | null; finalUrl: URL; problem: string | null }> {
   let url = start;
   for (let hop = 0; hop <= MAX_HOPS; hop++) {
     const unsafe = await unsafeReason(url);

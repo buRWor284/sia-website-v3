@@ -8,6 +8,7 @@ import {
 import { domainFromInput, getDomainRatings } from "@/lib/ahrefs-dr";
 import { beatToTags } from "@/lib/journo/beat-tags";
 import { recordStageEventFor } from "@/lib/emos-stage-events";
+import { checkContactPages, contactHintText, type ContactHint } from "@/lib/emos/contact-check";
 
 /**
  * EMOS — add_journalist (spec v1.3 §3, Tier W). Session 3, 2026-10-07.
@@ -152,6 +153,20 @@ export async function planAddJournalists(actor: Actor, args: Args): Promise<Plan
 
   const ratings = await getDomainRatings(candidates.map((c) => c.outletDomain)).catch(() => new Map<string, number | null>());
 
+  // 2026-10-08: for a new journalist with no email, look at the outlet's
+  // contact pages once, in parallel, and keep what was seen as a hint.
+  const isNew = (c: Candidate): boolean =>
+    !saved.some((s) => normName(String(s.name ?? "")) === normName(c.name));
+  const hints = new Map<string, ContactHint>();
+  await Promise.all(
+    candidates
+      .filter((c) => !c.email && c.outletDomain && isNew(c))
+      .map(async (c) => {
+        const h = await checkContactPages(c.outletDomain!, c.name, c.verification.bylineUrl ?? c.recentArticle).catch(() => null);
+        if (h) hints.set(normName(c.name), h);
+      }),
+  );
+
   const plan: PlanOp[] = [];
   const outcome: Row[] = [];
   const warnings: string[] = [];
@@ -199,6 +214,7 @@ export async function planAddJournalists(actor: Actor, args: Args): Promise<Plan
         tags: beatToTags(c.beat),
         // A verified byline title is "what they have been writing lately": draft_pitch bridges from it.
         recent_work: v.status === "verified" && v.bylineTitle ? `${v.bylineTitle}${v.bylineDate ? ` (${v.bylineDate})` : ""}`.slice(0, 600) : null,
+        contact_hint: hints.get(normName(c.name)) ?? null,
         data_source: "mcp",
       },
     });
@@ -208,8 +224,10 @@ export async function planAddJournalists(actor: Actor, args: Args): Promise<Plan
       id: newId(),
       values: { journalist_id: id, company_id: company.id, angle, beat_query: beatQuery ?? c.beat, geography, strategy: null, fit_note: c.why },
     });
-    outcome.push({ journalist_id: id, name: c.name, outlet: c.outlet, email: c.email, domain_rating: dr, verification: v.status ?? "not_checked", action: "created" });
+    const hint = hints.get(normName(c.name)) ?? null;
+    outcome.push({ journalist_id: id, name: c.name, outlet: c.outlet, email: c.email, domain_rating: dr, verification: v.status ?? "not_checked", action: "created", ...(hint ? { contact_hint: hint } : {}) });
     warnings.push(...emailWarnings(c));
+    if (hint) warnings.push(`Where to find the email: ${contactHintText(c.name, hint)}${hint.status === "email_found" ? " Ask the user before saving it." : ""}`);
     if (v.status !== "verified") warnings.push(`${c.name} has no verified recent byline at ${c.outlet ?? "the outlet given"}; saved as unverified.`);
   }
 

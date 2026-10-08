@@ -24,7 +24,7 @@ import React, { useState } from "react";
 import { useCompanyOptional } from "./CompanyProvider";
 import TestOrgBadge from "./TestOrgBadge";
 import CompanyBriefPanel from "./CompanyBriefPanel";
-import { COMPANY_CONTEXT_MAX, type Spokesperson } from "@/lib/company-types";
+import { COMPANY_CONTEXT_MAX, COMPANY_VOICE_MAX, type Spokesperson } from "@/lib/company-types";
 
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
@@ -76,8 +76,8 @@ type Panel = "none" | "add" | "edit" | "confirmDelete" | "brief";
 
 /** Who pitches go out FROM (2026-09-10). Without it every drafted pitch was
  * signed with the company name, which PressIQ's own scorer then marks down. */
-type SpokespersonDraft = { name: string; title: string; email: string; linkedin: string };
-const EMPTY_SP: SpokespersonDraft = { name: "", title: "", email: "", linkedin: "" };
+type SpokespersonDraft = { name: string; title: string; email: string; linkedin: string; voice: string };
+const EMPTY_SP: SpokespersonDraft = { name: "", title: "", email: "", linkedin: "", voice: "" };
 
 function spFromCompany(c: Spokesperson | null | undefined): SpokespersonDraft {
   return {
@@ -85,6 +85,7 @@ function spFromCompany(c: Spokesperson | null | undefined): SpokespersonDraft {
     title: c?.spokesperson_title ?? "",
     email: c?.spokesperson_email ?? "",
     linkedin: c?.spokesperson_linkedin ?? "",
+    voice: c?.voice ?? "",
   };
 }
 
@@ -94,6 +95,7 @@ function spToPatch(sp: SpokespersonDraft): Spokesperson {
     spokesperson_title: sp.title,
     spokesperson_email: sp.email,
     spokesperson_linkedin: sp.linkedin,
+    voice: sp.voice,
   };
 }
 
@@ -113,6 +115,19 @@ function SpokespersonFields({ value, onChange }: { value: SpokespersonDraft; onC
       </div>
       <p style={{ margin: "5px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
         Used to sign drafted pitches. Leave blank and drafts carry [placeholders] to fill before sending.
+      </p>
+      <label style={{ ...FIELD_LABEL, marginTop: 10 }}>
+        Voice and style {opt}
+      </label>
+      <textarea
+        value={value.voice}
+        onChange={e => onChange({ ...value, voice: e.target.value.slice(0, COMPANY_VOICE_MAX) })}
+        rows={4}
+        placeholder={"How this sender writes. For example: plain words, short sentences, no dashes, never needy, one ask per email, words to avoid."}
+        style={{ ...FIELD, lineHeight: 1.5, resize: "vertical" }}
+      />
+      <p style={{ margin: "5px 0 0", fontFamily: SERIF, fontStyle: "italic", fontSize: 11.5, color: INK55 }}>
+        Drafts follow this, here and through your AI. It sets the tone only: facts still come from what the company has saved.
       </p>
     </div>
   );

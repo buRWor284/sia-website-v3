@@ -85,6 +85,8 @@ export interface DbJournalist {
   /** 2026-09-09: what they have been writing lately, pasted by the user. Feeds
    * the pitch opening as a relevance bridge, never as a compliment. */
   recent_work?: string | null;
+  /** 2026-10-08: where to look for this journalist's email (contact-page check at save). */
+  contact_hint?: { status: string; url: string | null; email?: string; checked_at?: string } | null;
 }
 
 /** The context a journalist was found for, written alongside the journalist. */
@@ -227,6 +229,8 @@ export interface VmJournalist {
   placements: number;
   notes: string | null;
   tags: string[];
+  /** 2026-10-08: platform only; see DbJournalist.contact_hint. */
+  contactHint?: { status: string; url: string | null; email?: string } | null;
 }
 
 export interface VmAlert {
@@ -318,6 +322,7 @@ export function journalistFromDb(row: DbJournalist): VmJournalist {
     placements: row.placements,
     notes: row.notes,
     tags: row.tags ?? [],
+    contactHint: row.contact_hint ?? null,
   };
 }
 

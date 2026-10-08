@@ -137,6 +137,13 @@ export function isSensitive(text: string): boolean {
 export const visibleBeats = (): Beat[] => BEATS.filter((b) => !b.hidden);
 
 /**
+ * The beats the MCP scan tool offers (2026-10-08): every visible beat plus the
+ * Saudi (ksa-*) radar beats. Those stay hidden from the public pickers, but a
+ * Saudi campaign run through an AI had no way to start from a scan at all.
+ */
+export const mcpScanBeats = (): Beat[] => BEATS.filter((b) => !b.hidden || b.id.startsWith("ksa-"));
+
+/**
  * SEED GATE (habit 1). A seed listed here is still scanned every night (it stays
  * in BEATS, so history builds up), but no card, radar strip, mover row or scan
  * result may show it until a human has read its collocation check. A keyword can

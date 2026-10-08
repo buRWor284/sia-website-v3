@@ -95,10 +95,11 @@ export interface CompanyRow {
   spokesperson_title: string | null;
   spokesperson_email: string | null;
   spokesperson_linkedin: string | null;
+  voice: string | null;
 }
 
 const COMPANY_COLS =
-  "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin";
+  "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin, voice";
 
 /** The company, if it belongs to this actor's org. Null otherwise (not yours and not there look the same). */
 export async function loadCompany(actor: Actor, companyId: unknown): Promise<CompanyRow | null> {

@@ -65,6 +65,11 @@ export function EmosUserButton() {
         <UserButton.MenuItems>
           <UserButton.Action label="manageAccount" />
           <UserButton.Link
+            label="What your AI did"
+            labelIcon={<LogIcon />}
+            href="/emos-platform/dashboard/ai-activity"
+          />
+          <UserButton.Link
             label="Manage billing"
             labelIcon={<CardIcon />}
             href="/emos-platform/dashboard/settings"
@@ -87,6 +92,15 @@ function CardIcon() {
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="currentColor" />
       <path d="M1.5 6.5h13" stroke="currentColor" />
+    </svg>
+  );
+}
+
+function LogIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <rect x="2.5" y="1.5" width="11" height="13" rx="1.5" stroke="currentColor" />
+      <path d="M5 5h6M5 8h6M5 11h4" stroke="currentColor" />
     </svg>
   );
 }

@@ -14,6 +14,9 @@ export interface Spokesperson {
   spokesperson_title?: string | null;
   spokesperson_email?: string | null;
   spokesperson_linkedin?: string | null;
+  /** 2026-10-08: how this sender writes (tone, style, words to avoid). Read by
+   *  the pitch drafter on both doors; never overrides the fact rules. */
+  voice?: string | null;
 }
 
 export interface Company extends Spokesperson {
@@ -56,3 +59,4 @@ export const LEGACY_NAME_KEY = "emos_company_name";
 export const LEGACY_CONTEXT_KEY = "emos_company_context";
 
 export const COMPANY_CONTEXT_MAX = 600;
+export const COMPANY_VOICE_MAX = 2000;

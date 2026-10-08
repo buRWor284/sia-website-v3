@@ -10,7 +10,7 @@ import { scrubAiError } from "@/lib/ai-errors";
 import { reserveUsageForActor, releaseUsageForOrg, type SeatUsage } from "@/lib/usage-limits";
 import { COMPANY_CONTEXT_MAX } from "@/lib/company-types";
 import { coerceOpportunity, parseBeats, runPackRequest, runScanRequest } from "@/lib/signaliq/route-core";
-import { beatById, visibleBeats } from "@/lib/signaliq/config";
+import { beatById, mcpScanBeats } from "@/lib/signaliq/config";
 import { saveAssetPackForUser } from "@/lib/signaliq/save-pack";
 import type { AssetPack, BeatId, Opportunity } from "@/lib/signaliq/types";
 import { parseCandidateArray, runJournoAI, verifyCandidates } from "@/lib/journo/route-core";
@@ -73,7 +73,7 @@ export async function startScan(actor: Actor, args: Args): Promise<EmosResult> {
   if (!company) return notFound("company");
   const beats = parseBeats({ beats: Array.isArray(args.beats) ? args.beats : args.beat !== undefined ? [args.beat] : [] });
   if (beats.length === 0) {
-    return fail("Pick 1 to 3 beats by id (primary first).", { beats: visibleBeats().map((b) => ({ id: b.id, label: b.label })) });
+    return fail("Pick 1 to 3 beats by id (primary first).", { beats: mcpScanBeats().map((b) => ({ id: b.id, label: b.label })) });
   }
 
   const seat = await reserveUsageForActor(actor, "scan", 1, { confirmLarge: bool(args.confirm_large_run) });
@@ -605,6 +605,7 @@ export async function draftPitch(actor: Actor, args: Args): Promise<EmosResult> 
     senderTitle: company.spokesperson_title,
     senderEmail: company.spokesperson_email,
     senderLinkedIn: company.spokesperson_linkedin,
+    senderVoice: company.voice,
     assetTitle: (asset?.title as string | null) ?? null,
     assetDescription: (asset?.description as string | null) ?? null,
     assetUrl: (asset?.published_url as string | null) ?? null,

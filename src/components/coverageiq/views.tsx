@@ -635,6 +635,38 @@ export interface ContactsCaps {
 const NO_EMAIL_HINT =
   "EMOS does not supply emails. Check the outlet's contact or author page, then add it with Edit. Never guess one from a pattern: a wrong address bounces or reaches a stranger.";
 
+/** 2026-10-08: the specific version, from the contact-page check EMOS ran
+ * when the journalist was saved. Falls back to the general hint. */
+function noEmailHint(j: VmJournalist): { text: string; url: string | null } {
+  const h = j.contactHint;
+  if (!h) return { text: NO_EMAIL_HINT, url: null };
+  switch (h.status) {
+    case "email_found":
+      return { text: `We saw a matching email (${h.email ?? ""}) on this page. Check it is theirs, then add it with Edit.`, url: h.url };
+    case "hidden":
+      return { text: "We saw the team listed on this page, but the site hides its emails from tools (an email-hiding service such as Cloudflare). Open it in your browser to read the address, then add it with Edit. EMOS will not guess one.", url: h.url };
+    case "listed":
+      return { text: "This page names them but shows no email. Try their author page or the outlet's newsroom address.", url: h.url };
+    default:
+      return { text: `We found no contact page on the outlet's site. ${h.url ? "Start from their latest article. " : ""}Never guess an email from a pattern.`, url: h.url };
+  }
+}
+
+function NoEmailHintView({ j, size }: { j: VmJournalist; size: number }) {
+  const { text, url } = noEmailHint(j);
+  return (
+    <p style={{ fontFamily: SERIF, fontSize: size, lineHeight: 1.45, color: INK70, margin: "10px 0 0" }}>
+      {text}
+      {url && (
+        <>
+          {" "}
+          <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: INK, textDecoration: "underline", wordBreak: "break-all" }}>{url}</a>
+        </>
+      )}
+    </p>
+  );
+}
+
 export function ContactsView({
   journalists,
   contacts,
@@ -726,7 +758,7 @@ export function ContactsView({
                         {j.outlet && <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: INK55, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{j.outlet}</span>}
                       </div>
                       {j.email && <div style={{ fontFamily: MONO, fontSize: 11, color: INK70, marginTop: 2 }}>{j.email}</div>}
-                      {!j.email && expandable && <div title={NO_EMAIL_HINT} style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: INK55, marginTop: 3 }}>No email saved</div>}
+                      {!j.email && expandable && <div title={noEmailHint(j).text} style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: INK55, marginTop: 3 }}>No email saved</div>}
                     </div>
                   </div>
                   <div style={cc(true)}><span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.08em", color: INK70, lineHeight: 1.3 }}>{j.beat ?? "—"}</span></div>
@@ -773,7 +805,7 @@ export function ContactsView({
                               <span style={{ fontFamily: SERIF, fontSize: 14, color: INK }}>{value ?? "—"}</span>
                             </div>
                           ))}
-                          {!j.email && <p style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.45, color: INK70, margin: "10px 0 0" }}>{NO_EMAIL_HINT}</p>}
+                          {!j.email && <NoEmailHintView j={j} size={13} />}
                         </div>
                         <div>
                           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>Beats</div>
@@ -875,7 +907,7 @@ function EditJournalistForm({
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Email</label>
           <input value={form.email ?? ""} onChange={e => set("email", e.target.value)} style={inp} />
-          {!form.email && <p style={{ fontFamily: SERIF, fontSize: 12, lineHeight: 1.4, color: INK55, margin: "6px 0 0" }}>{NO_EMAIL_HINT}</p>}
+          {!form.email && <NoEmailHintView j={journalist} size={12} />}
         </div>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Twitter / X</label>

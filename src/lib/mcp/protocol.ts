@@ -15,6 +15,7 @@
  *   - GET → 405 (no server-initiated stream in stateless mode).
  *   - No sessions: every request is authenticated on its own.
  */
+import { getPrompt, promptListing } from "@/lib/mcp/prompts";
 import {
   MCP_DEFAULT_PROTOCOL_VERSION,
   MCP_INSTRUCTIONS,
@@ -170,7 +171,7 @@ export async function dispatch(msg: JsonRpcRequest, ctx: DispatchContext): Promi
         status: 200,
         body: rpcResult(id, {
           protocolVersion: version,
-          capabilities: { tools: { listChanged: false } },
+          capabilities: { tools: { listChanged: false }, prompts: { listChanged: false } },
           serverInfo: { name: MCP_SERVER_NAME, version: MCP_SERVER_VERSION, title: "EMOS Platform" },
           instructions: MCP_INSTRUCTIONS,
         }),
@@ -189,6 +190,24 @@ export async function dispatch(msg: JsonRpcRequest, ctx: DispatchContext): Promi
       // Only advertise tools this token's scopes can actually call.
       const visible = ctx.tools.filter((t) => a.actor.scopes.includes(tierScope(t.tier) as McpActor["scopes"][number]));
       return { kind: "json", status: 200, body: rpcResult(id, { tools: toolListing(visible) }) };
+    }
+
+    case "prompts/list": {
+      const a = await ctx.authenticate("read");
+      if (!a.ok) return { kind: "http_error", status: a.status, error: a.error, headers: a.headers };
+      return { kind: "json", status: 200, body: rpcResult(id, { prompts: promptListing() }) };
+    }
+
+    case "prompts/get": {
+      const a = await ctx.authenticate("read");
+      if (!a.ok) return { kind: "http_error", status: a.status, error: a.error, headers: a.headers };
+      const got = getPrompt(msg.params?.name, msg.params?.arguments);
+      if (!got.ok) return { kind: "json", status: 200, body: rpcError(id, RPC.INVALID_PARAMS, got.error) };
+      return {
+        kind: "json",
+        status: 200,
+        body: rpcResult(id, { description: got.description, messages: [{ role: "user", content: { type: "text", text: got.text } }] }),
+      };
     }
 
     case "tools/call": {

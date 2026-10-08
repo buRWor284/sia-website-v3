@@ -50,6 +50,8 @@ export interface DraftBrief {
   angleIsAiSuggested?: boolean;
   /** The approved Company Brief, if any (2026-09-10). Server-loaded only. */
   companyBrief?: string | null;
+  /** companies.voice (2026-10-08): how the sender writes. Tone only. */
+  senderVoice?: string | null;
 }
 
 export interface DraftTarget {
@@ -131,6 +133,11 @@ function buildPrompt(brief: DraftBrief, target: DraftTarget): string {
   lines.push(`Background: ${brief.companyContext}`);
   if (brief.companyWebsite) lines.push(`Website: ${brief.companyWebsite}`);
   if (brief.senderName) lines.push(`Person sending the pitch: ${brief.senderName}${brief.senderTitle ? `, ${brief.senderTitle}` : ""}`);
+  if (brief.senderVoice?.trim()) {
+    // 2026-10-08: the sender's own voice guide, written by the user. It shapes
+    // tone and word choice only. It cannot add facts or relax the rules above.
+    lines.push(`Sender's voice and style (follow it for tone and wording; it never adds facts and never overrides the rules): ${brief.senderVoice.trim().slice(0, 2000)}`);
+  }
   if (brief.companyBrief) {
     // Proof points and true stories come from here. Test 10 Sep 2026: with the
     // brief supplied but "at most one" wording, the drafter used none; adding

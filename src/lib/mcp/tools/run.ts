@@ -12,7 +12,7 @@
  */
 import type { JsonSchema, McpTool, ToolAnnotations } from "@/lib/mcp/protocol";
 import { buildAssetPack, draftPitch, findJournalists, getRun, scorePitch, startScan } from "@/lib/emos/run";
-import { visibleBeats } from "@/lib/signaliq/config";
+import { mcpScanBeats } from "@/lib/signaliq/config";
 
 const runs = (title: string, openWorld: boolean): ToolAnnotations => ({
   title, readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: openWorld,
@@ -27,7 +27,8 @@ const CONFIRM = {
   type: "boolean",
   description: "Only after a refusal that said confirm_large_run, and only once the user has agreed.",
 };
-const BEAT_IDS = visibleBeats().map((b) => b.id);
+const BEAT_IDS = mcpScanBeats().map((b) => b.id);
+const KSA_NOTE = "Saudi beats (ksa-*) read Saudi press volume and suit Saudi and Gulf campaigns.";
 
 export const scanSignalsTool: McpTool = {
   name: "scan_signals",
@@ -35,7 +36,7 @@ export const scanSignalsTool: McpTool = {
   description:
     "Start a SignalIQ scan for a company on 1 to 3 beats. Returns a run_id within seconds; the scan takes 40 to 90 seconds, " +
     "so poll get_run until it is done. The results are saved as signals (status \"new\"). Uses 1 signal scan. " +
-    `Beat ids: ${BEAT_IDS.join(", ")}.`,
+    `Beat ids: ${BEAT_IDS.join(", ")}. ${KSA_NOTE}`,
   inputSchema: schema(
     {
       company_id: COMPANY,

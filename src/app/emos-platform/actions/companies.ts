@@ -17,9 +17,9 @@ import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import type { Company, CreateCompanyInput, UpdateCompanyInput } from "@/lib/company-types";
-import { COMPANY_CONTEXT_MAX, SPOKESPERSON_FIELDS } from "@/lib/company-types";
+import { COMPANY_CONTEXT_MAX, COMPANY_VOICE_MAX, SPOKESPERSON_FIELDS } from "@/lib/company-types";
 
-const COLUMNS = "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin, context_previous, context_changed_at, created_at, updated_at";
+const COLUMNS = "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, spokesperson_linkedin, voice, context_previous, context_changed_at, created_at, updated_at";
 
 /** Trimmed, length-capped, empty → null. */
 function cleanOptional(v: string | null | undefined, max = 200): string | null {
@@ -97,6 +97,7 @@ export async function createCompany(input: CreateCompanyInput): Promise<Company 
       context: (input.context ?? "").slice(0, COMPANY_CONTEXT_MAX),
       website: input.website?.trim() || null,
       ...Object.fromEntries(SPOKESPERSON_FIELDS.map(f => [f, cleanOptional(input[f])])),
+      voice:   cleanOptional(input.voice, COMPANY_VOICE_MAX),
     })
     .select(COLUMNS)
     .single();
@@ -132,6 +133,7 @@ export async function updateCompany(
   for (const f of SPOKESPERSON_FIELDS) {
     if (input[f] !== undefined) patch[f] = cleanOptional(input[f]);
   }
+  if (input.voice !== undefined) patch.voice = cleanOptional(input.voice, COMPANY_VOICE_MAX);
 
   // `.select()` so a no-op write (stale id, or another org's row, which RLS
   // silently filters out rather than erroring) reports null, not success.

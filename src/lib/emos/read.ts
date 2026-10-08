@@ -27,7 +27,7 @@ const FREE_MAIL = new Set(["gmail.com", "googlemail.com", "outlook.com", "hotmai
 // ─── list_companies ──────────────────────────────────────────────────────────
 
 const COMPANY_COLUMNS =
-  "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, created_at, updated_at";
+  "id, name, context, website, spokesperson_name, spokesperson_title, spokesperson_email, voice, created_at, updated_at";
 
 export async function listCompanies(actor: Actor, args: Args): Promise<EmosResult> {
   const db = actor.db();
@@ -72,7 +72,7 @@ export async function listCompanies(actor: Actor, args: Args): Promise<EmosResul
 // ─── list_journalists ────────────────────────────────────────────────────────
 
 const JOURNALIST_COLUMNS =
-  "id, name, outlet, beat, email, twitter_handle, linkedin_url, domain_rating, notes, tags, last_contact, pitches_sent, placements, data_source, recent_work, created_at";
+  "id, name, outlet, beat, email, twitter_handle, linkedin_url, domain_rating, notes, tags, last_contact, pitches_sent, placements, data_source, recent_work, contact_hint, created_at";
 
 /** Best available outlet domain: the outlet field when it is a domain, else a
  * work email's domain. Null rather than a guess. */
@@ -198,6 +198,8 @@ export async function listJournalists(actor: Actor, args: Args): Promise<EmosRes
       placements: j.placements ?? 0,
       twitter_handle: j.twitter_handle ?? null,
       linkedin_url: j.linkedin_url ?? null,
+      // 2026-10-08: where to look for an email, from the contact-page check at save.
+      contact_hint: j.email ? null : (j.contact_hint ?? null),
       tags: j.tags ?? [],
       saved_for: c
         ? { company_id: c.company_id ?? null, asset_id: c.asset_id ?? null, angle: cut(c.angle, 600), strategy: c.strategy ?? null, geography: c.geography ?? null, fit_note: cut(c.fit_note, 600) }
