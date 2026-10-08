@@ -630,6 +630,11 @@ export interface ContactsCaps {
   onDelete: (id: string) => Promise<void>;
 }
 
+/** Shown wherever a saved journalist has no email (platform only). EMOS finds
+ * journalists by byline; it does not find or supply email addresses. */
+const NO_EMAIL_HINT =
+  "EMOS does not supply emails. Check the outlet's contact or author page, then add it with Edit. Never guess one from a pattern: a wrong address bounces or reaches a stranger.";
+
 export function ContactsView({
   journalists,
   contacts,
@@ -721,6 +726,7 @@ export function ContactsView({
                         {j.outlet && <span style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: INK55, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{j.outlet}</span>}
                       </div>
                       {j.email && <div style={{ fontFamily: MONO, fontSize: 11, color: INK70, marginTop: 2 }}>{j.email}</div>}
+                      {!j.email && expandable && <div title={NO_EMAIL_HINT} style={{ fontFamily: GROT, fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: INK55, marginTop: 3 }}>No email saved</div>}
                     </div>
                   </div>
                   <div style={cc(true)}><span style={{ fontFamily: GROT, fontSize: 10, letterSpacing: "0.08em", color: INK70, lineHeight: 1.3 }}>{j.beat ?? "—"}</span></div>
@@ -767,6 +773,7 @@ export function ContactsView({
                               <span style={{ fontFamily: SERIF, fontSize: 14, color: INK }}>{value ?? "—"}</span>
                             </div>
                           ))}
+                          {!j.email && <p style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.45, color: INK70, margin: "10px 0 0" }}>{NO_EMAIL_HINT}</p>}
                         </div>
                         <div>
                           <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 10 }}>Beats</div>
@@ -868,6 +875,7 @@ function EditJournalistForm({
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Email</label>
           <input value={form.email ?? ""} onChange={e => set("email", e.target.value)} style={inp} />
+          {!form.email && <p style={{ fontFamily: SERIF, fontSize: 12, lineHeight: 1.4, color: INK55, margin: "6px 0 0" }}>{NO_EMAIL_HINT}</p>}
         </div>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8, letterSpacing: "0.14em", textTransform: "uppercase", color: INK55, marginBottom: 4 }}>Twitter / X</label>
