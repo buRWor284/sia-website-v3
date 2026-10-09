@@ -4,6 +4,40 @@ Reverse-chronological log of substantive changes. Newest entries on top.
 
 ---
 
+## 2026-10-09 (session) · Phone Pass mobile-QA checklist 28–30: PressIQ, header links, CoverageIQ, FactCheckIQ pipeline — triaged, confirmed pushed
+
+**Commits (confirmed live via device_bash `git log`/`git status`, HEAD == origin/main at `83e648d`):** header-link and layout fixes across tools; FactCheckIQ mobile pager landed via `5847b00` → hotfixed `49f09f8` (stray backticks inside a `<style>{\`...\`}>` template literal broke the production build — **never use backticks inside a style template literal**) → final clean state folded into `baaa56a0` (2026-07-30, "Mark FactcheckIQ coming soon across every public and member surface").
+
+### PressIQ
+- **Removed** — embedded YouTube explainer video from the `/tools/pressiq` first screen; kept the ticker ("what journalists say") and reordered so the "Start scoring your pitch →" CTA sits above the "scored against" source pills.
+- **Added** — the same explainer video, as a 90-second walkthrough, on `/tools/pressiq/how-it-works`.
+- **Fixed** — header "← Main Site" link: was low-contrast (`rgba(241,235,222,.55)`) and read "← Main SIA Site"; now `.85` opacity and shortened text. `src/app/tools/pressiq/page.tsx`.
+
+### Header "← Main Site" link — made consistent across tools
+- **Fixed** — SignalIQ, JournoCollabIQ, PartnerCollabIQ, AssetIQ, FactCheckIQ all now carry the same contrast-fixed "← Main Site" link in `ToolHeader`'s `rightContent` (previously missing entirely on some, or showing "Join the EMOS Platform →" on AssetIQ/FactCheckIQ).
+- **Removed** — SignalIQ's `.siq-hide-sm { display: none; }` rule, which was hiding the Main Site link below 600px width.
+
+### CoverageIQ
+- **Changed** — `src/components/tools/CoverageIQPlatform.tsx`: header `rightContent` now holds only the Main Site link + "LIVE · SUPABASE" indicator. The "+ New Pitch" button and the follow-up-alert button moved to a new right-aligned action row directly below the header, above the tab nav (was crowding the header on phone width).
+
+### FactCheckIQ — ten-step pipeline mobile fix (the main item)
+- **Root cause** — the 10-step grid was a horizontally-scrolling CSS grid (`minWidth:760` in `overflowX:auto`) that, under a 3-column mobile override, showed only its first column (steps 1, 4, 7, 10) with zero affordance that more content existed off-screen.
+- **Fixed** — `src/app/tools/factcheckiq/page.tsx`: desktop grid now hidden below 680px (`.fciqfw-steps-desktop`) and replaced by a one-step-at-a-time Prev/Next pager (`.fciqfw-steps-mobile`) sharing the existing `selected`/`setSelected` state with the (unchanged) step-detail panel.
+- **Fixed (follow-up)** — Irfan reported the Play/Speed/Mode player bar still rendered between the pager and the step detail on mobile. Wrapped pager, detail panel and player bar in a flex-column `.fciqfw-lane2-stack` and used CSS `order` (pager → detail → player on mobile only; desktop visual order untouched) rather than moving the JSX.
+- **Fixed** — header "Join the EMOS Platform →" replaced with "← Main Site" on this page too.
+- **Note** — a parallel session worked this same bug independently around 2026-07-11/12 with a different approach (scroll-hint chips rather than a pager); this chat's pager is the version that actually shipped and is live.
+
+### Verification
+- `device_bash`: `git status` clean, `HEAD == origin/main` (`83e648de3`); the last commit touching `factcheckiq/page.tsx` is `baaa56a00` (2026-07-30). All header-link, CoverageIQ and pager changes confirmed present in the live files on disk.
+
+**Ideas captured** — none this session (none raised or endorsed by Irfan beyond the task itself).
+
+**Touches logged** — none.
+
+**Pending / next** — none outstanding from this checklist; items 28–30 are closed.
+
+---
+
 ## 2026-09-09 (2) · Arabic (RTL) editions of both KSA radars — noindex staging drafts
 
 **Commit:** `e3a176e` (pushed).
