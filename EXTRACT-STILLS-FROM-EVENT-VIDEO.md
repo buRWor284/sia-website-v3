@@ -1,3 +1,5 @@
+> **✅ DONE 2026-10-09.** Run on 31 Jul 2026: 9 stills shipped and live (`magic-malaysia-1..4`, `durshal-peshawar-1..4`, `atm-dubai-crowd`), wired into `/speaking` RoomBand and `/gallery` (`e4ba453`, `ede6c3d`). Do not run this prompt again. See WORKLOG 2026-07-31 and part 86, and memory `speaking-stills-extraction` for the full 7-video source audit. ★ Two facts in this brief were corrected by the run: MaGIC is **2019**, not 2016, and Durshal is dated **6 Aug 2018** from the organiser's own card.
+
 # Extracting speaking stills from event video
 
 **Standalone brief. Paste this into a new chat and attach the video files.**
