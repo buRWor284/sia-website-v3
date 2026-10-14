@@ -80,6 +80,13 @@ const isClerkClientRoute = createRouteMatcher(["/clients/:slug", "/clients/:slug
 // Public escape hatch — shown when a logged-in user tries the wrong workspace.
 const isClientUnauthorizedPage = createRouteMatcher(["/clients/unauthorized"]);
 
+// 2026-10-14 (site-health baseline #1): the roster page's generated share image
+// lives at /clients/opengraph-image, which ALSO matches "/clients/:slug" below, so
+// every anonymous unfurler (LinkedIn, X, Slack, WhatsApp) got a Clerk redirect →
+// 404 and the public /clients page shared with no card. It is a public asset of a
+// public page; exempt it by exact path so no real workspace slug is affected.
+const isClientsShareImage = createRouteMatcher(["/clients/opengraph-image", "/clients/twitter-image"]);
+
 // ─── Workspace pages (new prefix, 2026-08-07) ────────────────────────────────
 // /workspace/<slug> is the new home for private client + prospect pages. It exists
 // because /clients is ALSO a public marketing route (the roster page), and
@@ -159,6 +166,9 @@ export default clerkMiddleware(async (auth, req) => {
 
   // ── Public: client "wrong workspace" page ────────────────────────────────
   if (isClientUnauthorizedPage(req)) return NextResponse.next();
+
+  // ── Public: /clients share image (generated OG card, not a workspace) ────
+  if (isClientsShareImage(req)) return NextResponse.next();
 
   // ── Clerk-authenticated client workspaces ────────────────────────────────
   if (isClerkClientRoute(req)) {
