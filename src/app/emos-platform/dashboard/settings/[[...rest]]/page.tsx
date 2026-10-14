@@ -57,7 +57,7 @@ export default async function SettingsPage({
             fontSize: 11,
             letterSpacing: ".12em",
             textTransform: "uppercase",
-            color: "rgba(26,20,16,.55)",
+            color: "rgba(26,20,16,.72)",
             textDecoration: "none",
           }}
         >

@@ -8,7 +8,7 @@ import { CALENDLY, GROT, INK, SERIF, YEL, YEL2 } from "@/lib/tokens";
 /* ─── Token aliases matching homepage design ──────────────────────────────── */
 const CREAM   = "#FAFAFA";
 const CREAM50 = "rgba(250,250,250,.50)";
-const CREAM45 = "rgba(250,250,250,.45)";
+const CREAM45 = "rgba(250,250,250,.70)"; // was .45 (4.37:1 at 8.5px); raised 2026-10-14 for AA
 const CREAM12 = "rgba(250,250,250,.12)";
 const CREAM70 = "rgba(250,250,250,.70)";
 

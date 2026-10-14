@@ -9,8 +9,8 @@ import { useState } from "react";
 
 const PAPER = "#f1ebde";
 const INK   = "#1a1410";
-const INK55 = "rgba(26,20,16,.55)";
-const INK35 = "rgba(26,20,16,.32)";
+const INK55 = "rgba(26,20,16,.72)";
+const INK35 = "rgba(26,20,16,.62)";
 const YEL   = "#f5b81f";
 const GROT  = "var(--font-grot)";
 const SERIF = "var(--font-serif)";

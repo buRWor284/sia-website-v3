@@ -13,8 +13,12 @@ export const PAPER2  = "#e8e0cc";   // warm cream 2 (secondary surface / hover)
 // ── Ink ───────────────────────────────────────────────────────────────────────
 export const INK     = "#1a1410";
 export const INK70   = "rgba(26,20,16,.70)";
-export const INK55   = "rgba(26,20,16,.55)";
-export const INK35   = "rgba(26,20,16,.32)";
+// 2026-10-14 site-health baseline #1: INK55/INK35 are used as READABLE text (eyebrows,
+// "On this page", step and section numbers, Format/Author/Type labels) and measured
+// 3.85:1 and 2.03:1 on PAPER. Raised to .72 (≈4.6:1) and .62 (≈4.5:1+) so every
+// dim label clears WCAG AA. Names kept so no importer changes.
+export const INK55   = "rgba(26,20,16,.72)";
+export const INK35   = "rgba(26,20,16,.62)";
 export const INK15   = "rgba(26,20,16,.15)";
 
 // ── Accent ────────────────────────────────────────────────────────────────────

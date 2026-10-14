@@ -14,7 +14,7 @@ import React from "react";
 import { L1_BANDS, TIERS } from "@/lib/pitch/config";
 
 const INK = "#1a1410";
-const INK55 = "rgba(26,20,16,.55)";
+const INK55 = "rgba(26,20,16,.72)";
 const INK15 = "rgba(26,20,16,.15)";
 const PAPER = "#f1ebde";
 const YEL = "#f5b81f";

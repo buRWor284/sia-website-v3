@@ -34,7 +34,7 @@ export function matchesScope(
 
 const INK   = "#1a1410";
 const INK15 = "rgba(26,20,16,.15)";
-const INK55 = "rgba(26,20,16,.55)";
+const INK55 = "rgba(26,20,16,.72)";
 const PAPER = "#f1ebde";
 const GROT  = "var(--font-grot)";
 

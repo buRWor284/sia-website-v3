@@ -165,8 +165,8 @@
 /* The Window quadrant */
 .krr-window{border:1px solid var(--color-ink);padding:18px;background:var(--color-paper)}
 .krr-window svg{display:block;width:100%;height:auto}
-.krr-window .zl{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;fill:rgba(26,20,16,.55)}
-.krr-window .ax{font-family:var(--font-mono);font-size:10.5px;fill:rgba(26,20,16,.55)}
+.krr-window .zl{font-family:var(--font-mono);font-size:10px;letter-spacing:.1em;fill:rgba(26,20,16,.72)}
+.krr-window .ax{font-family:var(--font-mono);font-size:10.5px;fill:rgba(26,20,16,.72)}
 .krr-window .axm{font-family:var(--font-mono);font-size:9.5px;fill:rgba(26,20,16,.45)}
 .krr-window .dl{font-family:Archivo,sans-serif;font-size:11px;fill:rgba(26,20,16,.8)}
 .krr-window-rules{font-size:14px;line-height:1.65;color:var(--color-ink-70);max-width:860px;margin:16px 0 12px}

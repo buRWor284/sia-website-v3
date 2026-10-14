@@ -13,8 +13,8 @@ import { STAGE_META, STAGE_ORDER, type EmosStage } from "@/lib/emos-stage-config
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
 const INK    = "#1a1410";
-const INK55  = "rgba(26,20,16,.55)";
-const INK35  = "rgba(26,20,16,.32)";
+const INK55  = "rgba(26,20,16,.72)";
+const INK35  = "rgba(26,20,16,.62)";
 const INK15  = "rgba(26,20,16,.15)";
 const YEL    = "#f5b81f";
 const GROT   = "var(--font-grot)";

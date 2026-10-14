@@ -51,7 +51,7 @@ export function ClientLogo({ client, height = 56, maxWidth = 200 }: Props) {
               fontWeight: 700,
               letterSpacing: "0.16em",
               textTransform: "uppercase",
-              color: "rgba(26,20,16,.55)",
+              color: "rgba(26,20,16,.72)",
               whiteSpace: "nowrap",
             }}
           >

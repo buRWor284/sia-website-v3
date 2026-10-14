@@ -29,7 +29,7 @@ import { COMPANY_CONTEXT_MAX, COMPANY_VOICE_MAX, type Spokesperson } from "@/lib
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
 const INK    = "#1a1410";
-const INK55  = "rgba(26,20,16,.55)";
+const INK55  = "rgba(26,20,16,.72)";
 const INK15  = "rgba(26,20,16,.15)";
 const INK35  = "rgba(26,20,16,.35)";
 const YEL    = "#f5b81f";

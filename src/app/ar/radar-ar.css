@@ -17,8 +17,8 @@
   --paper2: #e8e0cc;
   --ink: #1a1410;
   --ink70: rgba(26, 20, 16, 0.7);
-  --ink55: rgba(26, 20, 16, 0.55);
-  --ink35: rgba(26, 20, 16, 0.32);
+  --ink55: rgba(26, 20, 16, 0.72); /* raised 2026-10-14 for AA */
+  --ink35: rgba(26, 20, 16, 0.62); /* raised 2026-10-14 for AA */
   --ink15: rgba(26, 20, 16, 0.15);
   --yel: #f5b81f;
   --blue: #2e90c3;

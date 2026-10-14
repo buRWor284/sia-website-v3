@@ -13,7 +13,7 @@
 import React from "react";
 import { REPEAT_WARN_DAYS, type JournalistHistory } from "@/lib/journalist-history-types";
 
-const INK55 = "rgba(26,20,16,.55)";
+const INK55 = "rgba(26,20,16,.72)";
 const AMBER = "#d99211";
 const RED   = "#c14a32";
 const GROT  = "var(--font-grot)";

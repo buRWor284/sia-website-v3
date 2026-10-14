@@ -41,8 +41,8 @@ import ResearchTicker from "@/components/pressiq/ResearchTicker";
 const PAPER  = "#f1ebde";
 const PAPER2 = "#e8e0cc";
 const INK    = "#1a1410";
-const INK55  = "rgba(26,20,16,.55)";
-const INK35  = "rgba(26,20,16,.32)";
+const INK55  = "rgba(26,20,16,.72)";
+const INK35  = "rgba(26,20,16,.62)";
 const INK15  = "rgba(26,20,16,.15)";
 const YEL    = "#f5b81f";
 const RED    = "#c14a32";
@@ -652,7 +652,7 @@ export default function PressIQPlatformClient({
             drafter use, visible where the pitch is written. Collapsed by
             default so it never pushes the tool down. */}
         <details style={{ marginBottom: 16 }}>
-          <summary style={{ cursor: "pointer", fontFamily: "var(--font-grot)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(26,20,16,.55)", padding: "6px 0" }}>
+          <summary style={{ cursor: "pointer", fontFamily: "var(--font-grot)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(26,20,16,.72)", padding: "6px 0" }}>
             What a sendable pitch looks like (aim for 85+)
           </summary>
           <div style={{ marginTop: 8 }}>

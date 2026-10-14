@@ -21,7 +21,7 @@ import {
 
 const PAPER  = "#f1ebde";
 const INK    = "#1a1410";
-const INK55  = "rgba(26,20,16,.55)";
+const INK55  = "rgba(26,20,16,.72)";
 const INK15  = "rgba(26,20,16,.15)";
 const YEL    = "#f5b81f";
 const GREEN  = "#3e6b45";

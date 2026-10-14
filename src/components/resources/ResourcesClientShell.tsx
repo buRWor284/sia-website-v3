@@ -320,7 +320,7 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
       {/* Source / headline */}
       <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, textAlign: "right", lineHeight: 1.5 }}>
         {item.newsHeadline}
-        <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 600, fontSize: 8.5, color: "rgba(26,20,16,.32)" }}>
+        <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 600, fontSize: 8.5, color: "rgba(26,20,16,.62)" }}>
           {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
         </div>
       </div>
@@ -360,7 +360,7 @@ function ResourceLedger({
         <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK55, margin: 0 }}>
           No resources match this filter.
         </p>
-        <p style={{ marginTop: 10, fontFamily: GROT, fontSize: 10.5, color: "rgba(26,20,16,.32)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
+        <p style={{ marginTop: 10, fontFamily: GROT, fontSize: 10.5, color: "rgba(26,20,16,.62)", letterSpacing: "0.18em", textTransform: "uppercase" }}>
           Try clearing a topic filter or selecting a different type.
         </p>
       </div>
@@ -523,7 +523,7 @@ function FilterBar({
 
       {/* Row 2 — Topic pills */}
       <div style={{ display: "flex", alignItems: "center", padding: "8px 56px", gap: 7, overflowX: "auto" }}>
-        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(26,20,16,.32)", flexShrink: 0, marginRight: 4 }}>
+        <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(26,20,16,.62)", flexShrink: 0, marginRight: 4 }}>
           Topic
         </span>
         {TOPIC_PILLS.map((topic) => {

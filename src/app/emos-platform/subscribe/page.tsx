@@ -17,7 +17,7 @@ import { PLATFORM_ACTION_ORDER, PLATFORM_MONTHLY_LIMITS } from "@/lib/gate/quota
 
 const PAPER = "#f1ebde";
 const INK   = "#1a1410";
-const INK55 = "rgba(26,20,16,.55)";
+const INK55 = "rgba(26,20,16,.72)";
 const YEL   = "#f5b81f";
 const GREEN  = "#3e6b45";
 const GROT  = "Arial, 'Helvetica Neue', sans-serif";
