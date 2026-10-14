@@ -2603,3 +2603,30 @@ label:has(input[type="checkbox"]),
   .emos-announce { font-size: 10px; letter-spacing: .05em; padding: 8px 14px; }
   [style*="padding-top: 91px"] { padding-top: 0 !important; }
 }
+
+/* ---- 2026-10-14 site-health baseline #1: 390px clipping fixes ---------------
+   html/body are overflow-x:clip, so anything wider than the phone is CUT OFF, not
+   scrollable. These collapse the desktop grids that overflowed at 390. !important
+   is needed because the desktop grids are inline styles. */
+@media (max-width: 640px) {
+  /* /resources, /resources/viewall, /resources/emoscurriculum (ResourcesClientShell) */
+  .res-row { grid-template-columns: minmax(0, 1fr) 24px !important; gap: 6px 12px !important; }
+  .res-row > .res-idx, .res-row > .res-thumb { display: none; }
+  .res-row > .res-title { grid-column: 1; grid-row: 1; min-width: 0; }
+  .res-row > .res-src { grid-column: 1; grid-row: 2; text-align: left !important; }
+  .res-row > .res-cta { grid-column: 2; grid-row: 1 / span 2; }
+  .res-2col, .res-press-cols { grid-template-columns: minmax(0, 1fr) !important; gap: 32px !important; }
+  .res-press-cols > div + div { padding-left: 0 !important; border-left: none !important; }
+
+  /* /fractional-cmo: 4-up stats -> 2x2; contact block and name/email row -> one column */
+  .cmo-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .cmo-stats > div:nth-child(2n) { border-right: none !important; }
+  .cmo-stats > div:nth-child(-n+2) { border-bottom: 1px solid rgba(250,250,250,.12); }
+  .cmo-contact { grid-template-columns: minmax(0, 1fr) !important; }
+  .cmo-contact > div { padding: 28px 20px !important; }
+  .cmo-contact > div:first-child { border-right: none !important; border-bottom: 1px solid rgba(250,250,250,.12); }
+  .cmo-form-row { grid-template-columns: minmax(0, 1fr) !important; }
+
+  /* long-form guide header (neuromarketing): narrower gutter so the H1 fits */
+  .guide-head { padding-left: 20px !important; padding-right: 20px !important; }
+}

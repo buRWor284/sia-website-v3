@@ -338,7 +338,7 @@ const CMOLead = () => (
 const StatsStrip = () => (
   <section style={{ background: INK }}>
     <div
-      className="sx"
+      className="sx cmo-stats"
       style={{
         display: "grid",
         gridTemplateColumns: "repeat(4, 1fr)",
@@ -1075,7 +1075,7 @@ const CMOInquiryForm = () => {
       {/* Invisible Turnstile */}
       <Turnstile onToken={handleToken} />
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div className="cmo-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <input
           type="text"
           placeholder="Name *"
@@ -1256,6 +1256,7 @@ const BookCall = () => (
 
       {/* ── Two-column body ── */}
       <div
+        className="cmo-contact"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",

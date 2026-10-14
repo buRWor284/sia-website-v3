@@ -279,15 +279,15 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
       }}
     >
       {/* Index */}
-      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", color: INK55 }}>
+      <div className="res-idx" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.2em", color: INK55 }}>
         {String(n).padStart(2, "0")}
       </div>
 
       {/* Thumbnail */}
-      <ResourceThumb item={item} />
+      <div className="res-thumb"><ResourceThumb item={item} /></div>
 
       {/* Title + deck */}
-      <div>
+      <div className="res-title">
         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 21, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK }}>
           {item.title}
           {item.beta && <span style={{ marginLeft: 7, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.1em", color: INK55, verticalAlign: "middle" }}>β</span>}
@@ -318,7 +318,7 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
       </div>
 
       {/* Source / headline */}
-      <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, textAlign: "right", lineHeight: 1.5 }}>
+      <div className="res-src" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, textAlign: "right", lineHeight: 1.5 }}>
         {item.newsHeadline}
         <div style={{ marginTop: 4, fontFamily: GROT, fontWeight: 600, fontSize: 8.5, color: "rgba(26,20,16,.62)" }}>
           {item.y}{item.updated ? ` · upd. ${item.updated}` : ""}
@@ -592,7 +592,7 @@ function PodcastTeaser({ episodeCount }: { episodeCount: number }) {
         <div style={{ borderTop: "1px solid rgba(241,235,222,.5)" }} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
+      <div className="res-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "start" }}>
         <div>
           <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(36px,5vw,64px)", lineHeight: 0.96, letterSpacing: "-0.03em", color: PAPER, margin: "0 0 28px" }}>
             The show<br /><em style={{ color: YEL }}>on the air.</em>
@@ -651,7 +651,7 @@ function PressSection() {
         <div style={{ borderTop: `1px solid ${INK}` }} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr", gap: 80, alignItems: "start" }}>
+      <div className="res-2col" style={{ display: "grid", gridTemplateColumns: "1fr 1.3fr", gap: 80, alignItems: "start" }}>
         <div>
           <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px,4.5vw,58px)", lineHeight: 1.0, letterSpacing: "-0.025em", color: INK, margin: "0 0 20px" }}>
             Where the writing<br /><em>has <span style={{ background: YEL, color: INK, padding: "0 0.1em" }}>gone.</span></em>
@@ -660,7 +660,7 @@ function PressSection() {
             Publications I have written for, been quoted in, or been featured by. A fuller index lives on the About page.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
+        <div className="res-press-cols" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0 }}>
           {/* Left col */}
           <div>
             {PRESS_OUTLETS.slice(0, Math.ceil(PRESS_OUTLETS.length / 2)).map(([n, note]) => (

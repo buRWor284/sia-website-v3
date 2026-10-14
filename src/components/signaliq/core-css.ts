@@ -401,7 +401,10 @@ export const SIQ_CSS = `
     .siq-detail-cols { grid-template-columns: 1fr; }
   }
   @media (max-width: 600px) {
-    .siq-beat-tabs { grid-template-columns: repeat(2, 1fr); }
+    .siq-beat-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    /* 2026-10-14 site-health: nowrap beat names forced the 2 columns past 390px (+76px,
+       clipped). Let labels wrap inside their cell; 40px keeps a usable tap target. */
+    .siq-tab { white-space: normal; min-width: 0; min-height: 40px; }
     /* 2-col recompute (bottom borders already correct from the desktop rules:
        only the last tab drops its bottom). The 7th tab stays full-width. */
     .siq-tab:nth-child(3n)        { border-right: 1px solid ${INK15}; }

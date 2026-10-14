@@ -139,12 +139,12 @@ export default function NeuromarketingGuidePage() {
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
 
       {/* ── Header ─────────────────────────────────────────────── */}
-      <section style={{ padding: "80px 56px 64px" }}>
+      <section className="guide-head" style={{ padding: "80px 56px 64px" }}>
         <SectionMast n="00" label="101 Series · No. 03 · Neuromarketing" />
         <div className="grid-dark-card" style={{ alignItems: "start" }}>
           <div>
             <Pill size={10.5} ls="0.18em">The Marketer&apos;s Field Guide</Pill>
-            <h1 style={{ margin: "16px 0 24px", fontFamily: SERIF, fontWeight: 700, fontSize: 72, lineHeight: 0.96, letterSpacing: "-0.03em" }}>
+            <h1 style={{ margin: "16px 0 24px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(36px, 10vw, 72px)", lineHeight: 0.96, letterSpacing: "-0.03em" }}>
               Neuromarketing 101:{" "}
               <span style={{ fontStyle: "italic" }}>
                 <Mark>What Is It & How Does It Work?</Mark>
