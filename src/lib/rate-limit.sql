@@ -15,7 +15,7 @@ alter table public.rate_limits enable row level security;
 -- SECURITY DEFINER, so it runs as the caller (service_role), and Supabase's
 -- default-privilege grants don't reliably cover tables created via the SQL editor.
 -- Without this, the function fails at runtime with "permission denied for table
--- rate_limits" and callers silently fail (rateLimitDb → in-memory; quota.ts →
+-- rate_limits" and callers fail (rateLimitDb → its failMode policy; quota.ts →
 -- fail-open). Same fix pattern as gate.sql. (Added 2026-07-12 after the P2 smoke test.)
 grant select, insert, update, delete on public.rate_limits to service_role;
 

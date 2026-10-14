@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
   const { ok: withinLimit } = await rateLimitDb(`emos-access-request:${userId}:${ip}`, {
     limit: 3,
     windowMs: 60 * 60_000,
+    failMode: "open", // signed-in user; a DB blip shouldn't lose the request
   });
   if (!withinLimit) {
     return NextResponse.json(

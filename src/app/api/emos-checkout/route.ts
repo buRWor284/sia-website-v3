@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
   const { ok: withinLimit } = await rateLimitDb(`emos-checkout:${clientIp(req)}`, {
     limit: CHECKOUT_LIMIT,
     windowMs: CHECKOUT_WINDOW_MS,
+    failMode: "open", // never block a paying customer on a DB blip
   });
   if (!withinLimit) {
     return NextResponse.json(

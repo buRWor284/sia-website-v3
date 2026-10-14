@@ -192,6 +192,7 @@ export async function requireEmosAccess(opts?: {
     const rl = await rateLimitDb(`emostool:${opts.rateLimitKey}:${userId}`, {
       limit: opts.limit ?? 30,
       windowMs: opts.windowMs ?? HOUR_MS,
+      failMode: "open", // paid, signed-in dashboard; the monthly allowance still applies
     });
     if (!rl.ok) {
       return deny(429, "Too many requests. Please wait a bit and try again.");

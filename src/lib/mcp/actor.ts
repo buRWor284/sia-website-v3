@@ -145,7 +145,7 @@ export async function resolveMcpActor(tier: McpTier): Promise<McpAuthResult> {
 
   // 5. Rate limit -----------------------------------------------------------
   const rl = TIER_LIMITS[tier];
-  const limited = await rateLimitDb(`mcp:${tier}:${orgId}:${tok.userId}`, rl);
+  const limited = await rateLimitDb(`mcp:${tier}:${orgId}:${tok.userId}`, { ...rl, failMode: "open" });
   if (!limited.ok) {
     return { ok: false, status: 429, error: `Too many ${tier} calls. Please wait a minute and try again.` };
   }
