@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 export default function ResourcesViewAllPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <h1 className="sr-only">All resources: playbooks, guides and tools</h1>
       <ResourcesClientShell defaultView="browse" episodeCount={getAllEpisodes().length} />
       <Subscriptions sectionNumber="07" />
       <Colophon />

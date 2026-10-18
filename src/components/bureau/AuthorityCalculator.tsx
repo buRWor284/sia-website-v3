@@ -79,7 +79,7 @@ function CalcSlider({ label, hint, min, max, step, value, onChange, fmtFn, accen
         <span style={{ fontFamily: C.GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.20em", textTransform: "uppercase", color: C.INK55 }}>{label}</span>
         <span style={{ fontFamily: C.SERIF, fontWeight: 700, fontSize: 26, color: accent || C.INK, lineHeight: 1, letterSpacing: "-0.015em" }}>{fmtFn(value)}</span>
       </div>
-      <input type="range" min={min} max={max} step={step} value={value}
+      <input type="range" aria-label={label} aria-valuetext={fmtFn(value)} min={min} max={max} step={step} value={value}
         onChange={e => onChange(+e.target.value)}
         style={{ width: "100%", cursor: "pointer", accentColor: C.INK }} />
       {hint && <p style={{ margin: "6px 0 0", fontFamily: C.SERIF, fontStyle: "italic", fontSize: 13, color: C.INK55, lineHeight: 1.4 }}>{hint}</p>}

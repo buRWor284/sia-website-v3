@@ -36,7 +36,7 @@ import {
 export const metadata: Metadata = {
   title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Saudi Tourism",
   description:
-    "80% of travelers now plan trips with AI (Global Muslim Travel Index 2026), and those answers are built from earned media: the coverage, reviews, and authority content the models trust. The travel edition of AI Visibility Through Earned Media, tuned for Saudi tourism and Vision 2030, shows destinations, hotels, and travel brands how to win visibility across ChatGPT, Gemini, Perplexity and Google's AI Overviews, in English and Arabic.",
+    "AI Visibility Through Earned Media, travel edition: how Saudi destinations, hotels and travel brands get recommended in ChatGPT, Gemini and AI travel answers.",
   openGraph: {
     title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Saudi Tourism",
     description:

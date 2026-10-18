@@ -9,7 +9,10 @@ Syed Irfan Ajmal is a fractional CMO and earned-media strategist who has spoken 
 - [About](https://www.syedirfanajmal.com/about): Bio, career history, awards, and press.
 - [Fractional CMO](https://www.syedirfanajmal.com/fractional-cmo): Fractional CMO engagements for B2B founders and marketing teams.
 - [Speaking](https://www.syedirfanajmal.com/speaking): Keynotes and talks on earned media, PR, and marketing.
+- [AI Visibility Through Earned Media](https://www.syedirfanajmal.com/speaking/ai-visibility): Flagship keynote and workshop on how organisations get cited and recommended by ChatGPT, Claude and Gemini, and why earned media is what those assistants trust.
 - [Ventures](https://www.syedirfanajmal.com/ventures): Companies and projects Syed is involved in.
+- [Clients](https://www.syedirfanajmal.com/clients): Client roster, featured case studies with headline results, and the full logo grid.
+- [Gallery](https://www.syedirfanajmal.com/gallery): Photos from international conferences, keynotes, workshops, and travels.
 - [Contact](https://www.syedirfanajmal.com/contact): Ways to get in touch.
 - [Strategy Call](https://www.syedirfanajmal.com/strategy-call): Book a one-on-one strategy call.
 - [Newsletter](https://www.syedirfanajmal.com/newsletter): Earned-media and marketing insights by email.
@@ -24,6 +27,13 @@ Syed Irfan Ajmal is a fractional CMO and earned-media strategist who has spoken 
 - [Authority Flywheel](https://www.syedirfanajmal.com/resources/authority-flywheel): The earned-authority flywheel model.
 - [Bing SEO Guide](https://www.syedirfanajmal.com/infographics/bing-seo): A guide to SEO for Bing and AI answer engines.
 
+## Radars (live press-coverage data)
+
+- [Earned Media Radar](https://www.syedirfanajmal.com/earned-media-radar): A live map of what the press is covering across PR, earned media, SEO, and AI search. Powered by SignalIQ.
+- [Founder Movers](https://www.syedirfanajmal.com/founder-movers): This week's biggest movers in press coverage across founder and Series-A topics.
+- [KSA Tourism & Hospitality Radar](https://www.syedirfanajmal.com/ksa-tourism-radar): Sourced signals on Saudi tourism (giga-projects, mega-events, hospitality and aviation, faith travel) wired to live press-coverage data.
+- [KSA Retail & Consumer Radar](https://www.syedirfanajmal.com/ksa-retail-radar): Sourced signals on Saudi Arabia's consumer economy (e-commerce, retail groups, lifestyle retail, the macro picture) wired to live press-coverage data.
+
 ## Free tools
 
 - [SignalIQ](https://www.syedirfanajmal.com/tools/signaliq): Finds journalist and podcast opportunities for your beat.
@@ -32,10 +42,13 @@ Syed Irfan Ajmal is a fractional CMO and earned-media strategist who has spoken 
 - [CoverageIQ](https://www.syedirfanajmal.com/tools/coverageiq): A lightweight CRM for tracking PR pitches and coverage.
 - [PartnerCollabIQ](https://www.syedirfanajmal.com/tools/partnercollabiq): Finds partner and link-building collaboration opportunities.
 - [Authority Calculator](https://www.syedirfanajmal.com/tools/authority-calculator): Estimates the value of earned authority.
+- [AssetIQ](https://www.syedirfanajmal.com/tools/assetiq): How AssetIQ turns a SignalIQ opportunity into a linkable asset (report, calculator, quiz). The tool itself runs inside the EMOS Platform.
+- [FactCheckIQ](https://www.syedirfanajmal.com/tools/factcheckiq): How FactCheckIQ turns a draft into a graded, sourced fact-check report. Coming soon to the EMOS Platform.
+- [AI Visibility Checker](https://www.syedirfanajmal.com/ai-visibility): A free Chrome extension that scores any website 0-100 on whether ChatGPT, Claude, Perplexity and Gemini can see it.
 
 ## Podcast
 
-- [Podcast](https://www.syedirfanajmal.com/podcast): The Bureau, interviews on PR, SEO, backlinks, and earned media.
+- [Podcast](https://www.syedirfanajmal.com/podcast): The SIA Show, interviews on PR, SEO, backlinks, and earned media.
 
 ## EMOS
 

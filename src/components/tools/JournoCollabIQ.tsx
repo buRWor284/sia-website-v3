@@ -270,7 +270,7 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
       <div style={{ marginBottom: 48 }}>
         <div style={{ marginBottom: 28 }}>
           <label style={lbl(TX2)}>Business name *</label>
-          <input style={inp()} placeholder="e.g. Fairground" value={biz} autoFocus
+          <input style={inp()} aria-label="Business name" placeholder="e.g. Fairground" value={biz} autoFocus
             onChange={e => dispatch({ type: "SET", key: "biz", val: e.target.value })}
             onPaste={e => setTimeout(() => dispatch({ type: "SET", key: "biz", val: (e.target as HTMLInputElement).value }), 0)}
             onBlur={e => dispatch({ type: "SET", key: "biz", val: e.target.value })} />
@@ -278,12 +278,12 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 28 }}>
           <div>
             <label style={lbl(TX3)}>Website</label>
-            <input style={inp()} placeholder="e.g. fairground.example.com" value={domain}
+            <input style={inp()} aria-label="Website" placeholder="e.g. fairground.example.com" value={domain}
               onChange={e => dispatch({ type: "SET", key: "domain", val: e.target.value })} />
           </div>
           <div>
             <label style={lbl(TX3)}>One-line description</label>
-            <input style={inp()} placeholder="What you do in one sentence" value={desc}
+            <input style={inp()} aria-label="One-line description" placeholder="What you do in one sentence" value={desc}
               onChange={e => dispatch({ type: "SET", key: "desc", val: e.target.value })} />
           </div>
         </div>
@@ -306,7 +306,7 @@ function Stage1({ state, dispatch }: { state: CollabState; dispatch: React.Dispa
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12 }}>
           <span style={{ fontFamily: MF, fontSize: 9, color: TX4, letterSpacing: "0.1em", textTransform: "uppercase" }}>Or</span>
-          <input style={{ ...inp(), flex: 1 }} placeholder="Type a custom industry…" value={customInd}
+          <input style={{ ...inp(), flex: 1 }} aria-label="Custom industry" placeholder="Type a custom industry…" value={customInd}
             onChange={e => dispatch({ type: "SET_CUSTOM_IND", val: e.target.value })} />
         </div>
       </div>

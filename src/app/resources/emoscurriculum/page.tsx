@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 export default function ResourcesEmosCurriculumPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
+      <h1 className="sr-only">The EMOS Academy curriculum, tool by tool</h1>
       <ResourcesClientShell defaultView="guided" episodeCount={getAllEpisodes().length} />
       <Subscriptions sectionNumber="07" />
       <Colophon />

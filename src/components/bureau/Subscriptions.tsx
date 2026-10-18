@@ -103,6 +103,8 @@ const MailchimpForm = () => {
           type="email"
           name="EMAIL"
           id="mce-EMAIL"
+          aria-label="Email address for the newsletter"
+          autoComplete="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}

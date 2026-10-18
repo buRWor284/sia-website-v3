@@ -81,6 +81,27 @@ const faqJsonLd = {
   })),
 };
 
+// Service structured data (2026-10-14 site-health: page had FAQPage but no Service).
+// Price mirrors the Early Adopter price shown on the page and in META_DESC.
+const serviceJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": "https://www.syedirfanajmal.com/emos-platform#service",
+  name: "EMOS Platform",
+  serviceType: "Earned media software",
+  description: META_DESC,
+  url: "https://www.syedirfanajmal.com/emos-platform",
+  provider: { "@id": "https://www.syedirfanajmal.com/#person" },
+  areaServed: "Worldwide",
+  offers: {
+    "@type": "Offer",
+    price: "149",
+    priceCurrency: "USD",
+    url: "https://www.syedirfanajmal.com/emos-platform/subscribe",
+    description: "Early Adopter price, billed monthly, cancel any time",
+  },
+};
+
 export default async function EmostoolLandingPage() {
   // Members skip the pitch — send them straight to the product. Everyone else,
   // signed in or not, sees the pitch and can reach checkout from here.
@@ -102,6 +123,10 @@ export default async function EmostoolLandingPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
       />
       <PlatformLanding signedIn={Boolean(userId)} signedInEmail={signedInEmail} />
     </>

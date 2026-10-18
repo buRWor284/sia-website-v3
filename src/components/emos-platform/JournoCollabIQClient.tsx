@@ -210,31 +210,31 @@ function StoryForm({
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Brand / company name</label>
-          <input ref={bizRef} value={form.biz} onChange={e => set("biz", e.target.value)} placeholder="Acme Corp" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+          <input ref={bizRef} aria-label="Brand or company name" value={form.biz} onChange={e => set("biz", e.target.value)} placeholder="Acme Corp" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
         </div>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Website</label>
-          <input ref={domainRef} value={form.domain} onChange={e => set("domain", e.target.value)} placeholder="acme.com" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+          <input ref={domainRef} aria-label="Website" value={form.domain} onChange={e => set("domain", e.target.value)} placeholder="acme.com" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
         </div>
         <div>
           <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Geography</label>
-          <input ref={geoRef} value={form.geo} onChange={e => set("geo", e.target.value)} placeholder="UK, US, Global…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+          <input ref={geoRef} aria-label="Geography" value={form.geo} onChange={e => set("geo", e.target.value)} placeholder="UK, US, Global…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
         </div>
       </div>
 
       <div style={{ marginBottom: 12 }}>
         <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>What you do <span style={{ fontWeight: 400, fontStyle: "italic", textTransform: "none" }}>(1-2 sentences)</span></label>
-        <textarea ref={descRef} value={form.desc} onChange={e => set("desc", e.target.value)} rows={2} placeholder="We help SMBs access working capital through AI-driven lending decisions…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.55, padding: "9px 12px", resize: "none", outline: "none" }} />
+        <textarea ref={descRef} aria-label="What you do" value={form.desc} onChange={e => set("desc", e.target.value)} rows={2} placeholder="We help SMBs access working capital through AI-driven lending decisions…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.55, padding: "9px 12px", resize: "none", outline: "none" }} />
       </div>
 
       <div style={{ marginBottom: 12 }}>
         <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>Beat / topic journalists should cover</label>
-        <input ref={industryRef} value={form.industry} onChange={e => set("industry", e.target.value)} placeholder="Fintech, SMB lending, alternative finance…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
+        <input ref={industryRef} aria-label="Beat or topic journalists should cover" value={form.industry} onChange={e => set("industry", e.target.value)} placeholder="Fintech, SMB lending, alternative finance…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontSize: 14, padding: "9px 12px", outline: "none" }} />
       </div>
 
       <div style={{ marginBottom: 16 }}>
         <label style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".12em", textTransform: "uppercase", color: INK55, marginBottom: 5 }}>The story / angle you're pitching</label>
-        <textarea ref={audDescRef} value={form.audDesc} onChange={e => set("audDesc", e.target.value)} rows={3} placeholder="We have proprietary data on 10,000+ lending decisions showing SMBs are being rejected at 3x the rate they were in 2022, despite lower default rates…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.6, padding: "9px 12px", resize: "vertical", outline: "none" }} />
+        <textarea ref={audDescRef} aria-label="The story or angle you are pitching" value={form.audDesc} onChange={e => set("audDesc", e.target.value)} rows={3} placeholder="We have proprietary data on 10,000+ lending decisions showing SMBs are being rejected at 3x the rate they were in 2022, despite lower default rates…" style={{ width: "100%", boxSizing: "border-box", background: PAPER, border: `1px solid ${INK15}`, color: INK, fontFamily: SERIF, fontStyle: "italic", fontSize: 14, lineHeight: 1.6, padding: "9px 12px", resize: "vertical", outline: "none" }} />
       </div>
 
       <div style={{ marginBottom: 16 }}>
@@ -811,6 +811,7 @@ function CRMList({ journalists, onDelete, onRefreshDr, refreshingDr, refreshNote
     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", marginBottom: 12 }}>
       <input
         type="search"
+        aria-label="Search saved journalists by name, outlet or beat"
         value={query}
         onChange={e => setQuery(e.target.value)}
         placeholder="Search name, outlet or beat…"

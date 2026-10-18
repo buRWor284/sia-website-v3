@@ -1078,6 +1078,8 @@ const CMOInquiryForm = () => {
       <div className="cmo-form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <input
           type="text"
+          aria-label="Name"
+          autoComplete="name"
           placeholder="Name *"
           value={fields.name}
           onChange={set("name")}
@@ -1086,6 +1088,8 @@ const CMOInquiryForm = () => {
         />
         <input
           type="email"
+          aria-label="Email"
+          autoComplete="email"
           placeholder="Email *"
           value={fields.email}
           onChange={set("email")}
@@ -1095,12 +1099,15 @@ const CMOInquiryForm = () => {
       </div>
       <input
         type="text"
+        aria-label="Company (optional)"
+        autoComplete="organization"
         placeholder="Company (optional)"
         value={fields.company}
         onChange={set("company")}
         style={inputStyle}
       />
       <textarea
+        aria-label="What is the situation?"
         placeholder="What&apos;s the situation? *"
         value={fields.message}
         onChange={set("message")}
