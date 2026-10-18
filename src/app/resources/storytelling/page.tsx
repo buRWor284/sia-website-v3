@@ -30,6 +30,11 @@ import {
 // NOTE: Numbered images (2.png–27.png) were not archived by Wayback Machine.
 // Run scripts/download-wp-images.sh to attempt recovery from archive.
 // Hero image (books-3071110_1280.jpg) confirmed available.
+
+// 2026-10-14 site-health (locked chip rule): amber is never readable text on cream.
+// Attributions are ink text led by a small amber dot.
+const ATTR_DOT: React.CSSProperties = { display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: YEL, marginRight: 8, verticalAlign: "middle", position: "relative", top: -1 };
+
 const ST = "/articles/storytelling";
 const IMG = {
   aesop:            `${ST}/2.png`,
@@ -228,7 +233,7 @@ export default function StorytellingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               &ldquo;We are all storytellers. We all live in a network of stories. There isn&apos;t a stronger connection between people than storytelling.&rdquo;
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Jimmy Neil Smith — Director, International Storytelling Center</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Jimmy Neil Smith — Director, International Storytelling Center</SCaps>
           </div>
           <p style={P}>
             Listening to or reading stories helps us put ourselves in someone else&apos;s shoes so we can see the world from their perspective, and in turn, empathize with them. Sharing our own tales of life&apos;s trials and tribulations is a therapeutic experience for the storyteller. Even sitting with elders — such as our grandparents — for a simple conversation can reveal a lot of beneficial stories from decades ago.
@@ -262,7 +267,7 @@ export default function StorytellingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               &ldquo;A brand is the unique story that consumers recall when they think of you.&rdquo;
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Laura Busche</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Laura Busche</SCaps>
           </div>
           <p style={P}>
             Storytelling is an unprecedented medium in marketing that connects your brand with your target audience. From Spotify to Google, or from IBM to Zillow, several brands are implementing this technique in order to engage their audiences more effectively.
@@ -431,7 +436,7 @@ export default function StorytellingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 20, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               &ldquo;I write with my ears.&rdquo;
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Eugene Schwartz — Copywriter</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Eugene Schwartz — Copywriter</SCaps>
           </div>
           <p style={P}>
             The science of storytelling uses language in such a way that it spurs the <strong>imagination</strong> of those who are reading about it, listening to it or even watching as your brand story evolves. <strong>Alliteration</strong>, or the use of memorable grammatical nuances, is a powerful way to make a brand statement that really stands out.
@@ -623,7 +628,7 @@ export default function StorytellingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, lineHeight: 1.6, color: INK70, marginBottom: 8 }}>
               &ldquo;How did your brand or service help someone to overcome a challenge? How did your brand enable someone to identify and find a solution to a pressing problem that they may have been experiencing for a while?&rdquo;
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Tasnim Nazeer — Journalist</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Tasnim Nazeer — Journalist</SCaps>
           </div>
           <p style={P}>
             These are key questions that your brand needs to address in order to establish itself as a leading part of the story and give prominence in taking your audience on a journey. The <strong>journey</strong> is conveyed through your story — you&apos;re creating a narrative which takes your audience through a process that leads to a problem being solved. The end result is that your brand comes out as the winner, since you&apos;ve proven how it can benefit the consumer.

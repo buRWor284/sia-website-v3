@@ -25,6 +25,11 @@ import {
   YEL,
 } from "@/lib/tokens";
 
+
+// 2026-10-14 site-health (locked chip rule): amber is never readable text on cream.
+// Attributions are ink text led by a small amber dot.
+const ATTR_DOT: React.CSSProperties = { display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: YEL, marginRight: 8, verticalAlign: "middle", position: "relative", top: -1 };
+
 const CATEGORIES = [
   { n: "01", id: "quality", title: "Writing Quality Content" },
   { n: "02", id: "prolific", title: "Being a Prolific Writer" },
@@ -50,7 +55,11 @@ const TIP_NUM: React.CSSProperties = {
   fontFamily: SERIF,
   fontWeight: 700,
   fontSize: 13,
-  color: YEL,
+  color: INK, // was YEL on cream (1.5:1); amber now marks the number as an underline
+  textDecoration: "underline",
+  textDecorationColor: YEL,
+  textDecorationThickness: 2,
+  textUnderlineOffset: 4,
   letterSpacing: "0.04em",
   paddingTop: 2,
 };
@@ -291,7 +300,7 @@ export default function WritingTipsGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, lineHeight: 1.6, color: INK, marginBottom: 8 }}>
               "Turn off your email; turn off your phone; disconnect from the Internet; figure out a way to set limits so you can concentrate when you need to, and disengage when you need to. Technology is a good servant but a bad master."
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Gretchen Rubin — Author, The Happiness Project</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Gretchen Rubin — Author, The Happiness Project</SCaps>
           </div>
           <div>
             {ENV_TIPS.map((tip) => (

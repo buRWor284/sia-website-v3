@@ -383,7 +383,7 @@ export default function EmosPage() {
           <section id="the-payoff" className="sy sx">
             <div className="max">
               <SectionMast noVol n="5" label="The Payoff · Six Compounding Benefits" />
-              <h2 className="sec-h2" style={{ marginBottom: 12 }}>Six benefits. One compounding <em style={{ color: YEL }}>engine.</em></h2>
+              <h2 className="sec-h2" style={{ marginBottom: 12 }}>Six benefits. One compounding <em style={{ background: YEL, color: INK, padding: "0 .1em" }}>engine.</em></h2>
               <p className="sec-sub" style={{ marginBottom: 40 }}>Every advantage EMOS builds, arranged around the flywheel that compounds them. Hover, tap, or focus any segment to explore.</p>
               <CoverageFlywheel ctaHref="#curriculum" />
             </div>

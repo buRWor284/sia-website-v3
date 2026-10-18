@@ -505,7 +505,9 @@ export default function FactcheckIQPage() {
                     {/* Tally row */}
                     <div style={{ display: "flex", flexWrap: "wrap", gap: "14px 22px", marginBottom: 16 }}>
                       {TALLY.map((t) => (
-                        <span key={t.label} style={{ fontFamily: MONO, fontWeight: 700, fontSize: 11.5, color: VERDICT_COLORS[t.verdict].bg === PAPER ? INK : VERDICT_COLORS[t.verdict].bg }}>
+                        <span key={t.label} style={{ display: "inline-flex", alignItems: "center", gap: 7, fontFamily: MONO, fontWeight: 700, fontSize: 11.5, color: INK }}>
+                          {/* 2026-10-14 site-health: verdict colour as a swatch dot, never as text (amber text was 1.89:1) */}
+                          <span aria-hidden="true" style={{ display: "inline-block", width: 9, height: 9, borderRadius: "50%", background: VERDICT_COLORS[t.verdict].bg, border: `1px solid ${INK}`, flexShrink: 0 }} />
                           {t.label}
                         </span>
                       ))}

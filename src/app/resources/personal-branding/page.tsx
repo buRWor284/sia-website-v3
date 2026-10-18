@@ -33,6 +33,11 @@ import {
 } from "@/lib/tokens";
 
 // ─── Image map (self-hosted in /public/articles/personal-branding/) ──────────
+
+// 2026-10-14 site-health (locked chip rule): amber is never readable text on cream.
+// Attributions are ink text led by a small amber dot.
+const ATTR_DOT: React.CSSProperties = { display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: YEL, marginRight: 8, verticalAlign: "middle", position: "relative", top: -1 };
+
 const PB = "/articles/personal-branding";
 const IMG = {
   hero:              `${PB}/Personalbranding101.jpg`,
@@ -247,7 +252,7 @@ export default function PersonalBrandingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 22, lineHeight: 1.4, color: INK, marginBottom: 10 }}>
               "Your brand is what people say about you when you're not in the room."
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Jeff Bezos — Founder of Amazon</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Jeff Bezos — Founder of Amazon</SCaps>
           </div>
 
           <ArticleImg
@@ -282,7 +287,7 @@ export default function PersonalBrandingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               "Embrace your story. And make sure you&apos;re the primary force in telling that story to the rest of the world."
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Rob Asghar — Management Consultant & Forbes Columnist</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Rob Asghar — Management Consultant & Forbes Columnist</SCaps>
           </div>
 
           <ArticleImg
@@ -474,7 +479,7 @@ export default function PersonalBrandingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               "I think you travel to search and you come back home to find yourself there."
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Chimamanda Ngozi Adichie — Nigerian Author</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Chimamanda Ngozi Adichie — Nigerian Author</SCaps>
           </div>
 
           <h3 style={H3}>Step 5 · Network As Much As You Can</h3>
@@ -499,7 +504,7 @@ export default function PersonalBrandingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.5, color: INK, marginBottom: 8 }}>
               My golden rule of networking is simple: Don&apos;t keep score.
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Harvey Mackey — Business Author & Speaker</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Harvey Mackey — Business Author & Speaker</SCaps>
           </div>
           <p style={P}>
             I met my former business partner Azzam Sheikh online around the start of 2014, and then in May 2015 we decided to merge our digital marketing agencies and create Digital Marketing ROI. At the time we had never met in person — he was based in the UK and I was in Pakistan. But the power of our brands brought us together and created the kind of trust necessary for strengthening a mutually beneficial relationship.
@@ -579,7 +584,7 @@ export default function PersonalBrandingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, lineHeight: 1.6, color: INK70, marginBottom: 8 }}>
               "Personal branding is about managing your name — even if you don&apos;t own a business — in a world of misinformation, disinformation, and semi-permanent Google records. Going on a date? Chances are your &apos;blind&apos; date has Googled your name. Going to a job interview? Ditto."
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Tim Ferriss — Entrepreneur, Author</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Tim Ferriss — Entrepreneur, Author</SCaps>
           </div>
           <p style={P}>
             When Tim saw his publishing company wasn&apos;t promoting The 4-Hour Workweek as well as he wanted, he took it upon himself to promote it by reaching out to bloggers and establishing himself as an authority in Lifestyle Design. He had a large group of people ready to buy before the book launched. His podcast, The Tim Ferriss Show, has been downloaded over 300 million times.
@@ -625,7 +630,7 @@ export default function PersonalBrandingGuidePage() {
             <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 17, lineHeight: 1.6, color: INK70, marginBottom: 8 }}>
               "If the first time someone asked me a question had resulted in me asking for a paycheck, I would have few clients and no friends. The aim should be to help others. If you are doing that, money will find its way to you sooner or later."
             </div>
-            <SCaps size={10.5} ls="0.14em" color={YEL}>Syed Irfan Ajmal</SCaps>
+            <SCaps size={10.5} ls="0.14em" color={INK}><span aria-hidden="true" style={ATTR_DOT} />Syed Irfan Ajmal</SCaps>
           </div>
           <p style={P}>
             Whenever you are starting a new activity to support your brand — whether it&apos;s social media, writing, or speaking — the goal should be to strengthen your brand. Ask how it will impact your reputation, not your immediate ROI.

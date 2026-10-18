@@ -299,7 +299,7 @@ function Stage0({ onStart }: { onStart: () => void }) {
       {/* CTA below panel */}
       <div style={{ textAlign: "center", marginTop: 28 }}>
         <div style={{ fontFamily: SF, fontSize: "clamp(22px,4.5vw,32px)", fontWeight: 700, color: TX, letterSpacing: "-0.025em", lineHeight: 1.1, marginBottom: 10 }}>
-          Ready to find <em style={{ color: ACC, fontStyle: "italic" }}>yours</em>?
+          Ready to find <em style={{ background: ACC, color: TX, fontStyle: "italic", padding: "0 .1em" }}>yours</em>?
         </div>
         <p style={{ fontFamily: GF, fontSize: 14, color: TX2, lineHeight: 1.6, maxWidth: 380, margin: "0 auto 20px" }}>
           AI-powered partnership intelligence. Find non-obvious partners, score them, and get your campaign brief in minutes.

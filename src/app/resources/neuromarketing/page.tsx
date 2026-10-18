@@ -27,6 +27,11 @@ import {
 } from "@/lib/tokens";
 
 // ─── Image map (local files in /public/articles/neuromarketing/) ───────────────
+
+// 2026-10-14 site-health (locked chip rule): amber is never readable text on cream.
+// Attributions are ink text led by a small amber dot.
+const ATTR_DOT: React.CSSProperties = { display: "inline-block", width: 6, height: 6, borderRadius: "50%", background: YEL, marginRight: 8, verticalAlign: "middle", position: "relative", top: -1 };
+
 const IMG = {
   redBullEeg:      "/articles/neuromarketing/RedBull-EEG.jpeg",
   phineaSkull:     "/articles/neuromarketing/Phineas-gage-rod-skull-model-story.jpg",
@@ -315,8 +320,8 @@ export default function NeuromarketingGuidePage() {
             <blockquote style={{ margin: 0, fontFamily: SERIF, fontWeight: 600, fontStyle: "italic", fontSize: 26, lineHeight: 1.3, color: INK, letterSpacing: "-0.01em" }}>
               &ldquo;Neuromarketing is simply the application of neuroscience to marketing.&rdquo;
             </blockquote>
-            <figcaption style={{ marginTop: 14, fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: YEL }}>
-              Roger Dooley — Author of <em style={{ color: INK55, fontStyle: "normal" }}>Brainfluence</em>
+            <figcaption style={{ marginTop: 14, fontFamily: GROT, fontWeight: 700, fontSize: 10.5, letterSpacing: "0.16em", textTransform: "uppercase", color: INK }}>
+              <span aria-hidden="true" style={ATTR_DOT} />Roger Dooley — Author of <em style={{ color: INK55, fontStyle: "normal" }}>Brainfluence</em>
             </figcaption>
           </figure>
 
