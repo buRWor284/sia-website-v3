@@ -269,7 +269,7 @@ const Hero = () => (
           ))}
         </div>
         <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ ...btnInk, marginTop: 18, display: "block" }}>Check a date &rarr;</a>
-        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ ...btnYel, marginTop: 8, display: "block" }}>Speaker one-sheet &darr;</a>
+        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ ...btnYel, marginTop: 8, display: "block" }}>Speaker one-sheet &darr;</a>
         <a href="/press-kit" style={{ ...btnGhostDark, marginTop: 8, display: "block" }}>View the full press kit &rarr;</a>
       </aside>
       </div>
@@ -788,7 +788,7 @@ const BottomCTA = () => (
       <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
         <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={btnInk}>Invite me to speak &rarr;</a>
         <a href="/contact" style={btnGhostDark}>Ask about this session &rarr;</a>
-        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={btnGhostDark}>Speaker one-sheet &darr;</a>
+        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf" target="_blank" rel="noopener noreferrer" style={btnGhostDark}>Speaker one-sheet &darr;</a>
         <a href="/press-kit" style={btnGhostDark}>Press kit &rarr;</a>
       </div>
     </div>

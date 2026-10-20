@@ -283,7 +283,7 @@ const Hero = () => (
             ))}
           </div>
           <a href={CALENDLY} style={{ ...btnInk, marginTop: 18, display: "block" }}>{HERO.ctaDate} {FWD}</a>
-          <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf" style={{ ...btnYel, marginTop: 8, display: "block" }}>{HERO.ctaOneSheet} {DOWN}</a>
+          <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf" style={{ ...btnYel, marginTop: 8, display: "block" }}>{HERO.ctaOneSheet} {DOWN}</a>
           <a href="/press-kit" style={{ ...btnGhost, marginTop: 8, display: "block" }}>{HERO.ctaPressKit} {FWD}</a>
         </aside>
       </div>
@@ -737,7 +737,7 @@ const BottomCTA = () => (
       <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
         <a href={CALENDLY} style={btnInk}>{CTA.invite} {FWD}</a>
         <a href="/contact" style={btnGhost}>{CTA.ask} {FWD}</a>
-        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf" style={btnGhost}>{CTA.oneSheet} {DOWN}</a>
+        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf" style={btnGhost}>{CTA.oneSheet} {DOWN}</a>
         <a href="/press-kit" style={btnGhost}>{CTA.pressKit} {FWD}</a>
       </div>
     </div>

@@ -39,7 +39,7 @@ const NAV: ReadonlyArray<NavNode> = [
       { label: "AI Visibility Through Earned Media", href: "/speaking/ai-visibility", tag: "New" },
       { label: "Press Kit",          href: "/press-kit" },
       { label: "Media Kit",          href: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-Media-Kit-Jun-2026.pdf",  external: true, tag: "PDF", tagOutline: true },
-      { label: "Speaker One-Sheet",  href: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf", external: true, tag: "PDF", tagOutline: true },
+      { label: "Speaker One-Sheet",  href: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf", external: true, tag: "PDF", tagOutline: true },
       { label: "Gallery",            href: "/gallery"   },
     ],
   },

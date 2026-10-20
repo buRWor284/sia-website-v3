@@ -66,6 +66,11 @@ const nextConfig: NextConfig = {
       { source: "/speaking/earned-media-ai/:path*",          destination: "/speaking/ai-visibility/:path*", permanent: p },
       { source: "/ar/speaking/earned-media-ai/:path*",       destination: "/ar/speaking/ai-visibility/:path*", permanent: p },
 
+      // Speaker one-sheet refreshed (2026-10-20): June PDF replaced by the October
+      // one. Old pitch emails link to the June URL, so keep it alive. statusCode
+      // 301 (not permanent: true, which sends 308) because a true 301 was asked for.
+      { source: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Jun-2026.pdf", destination: "/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf", statusCode: 301 },
+
       // Writing guides (playbooks)
       { source: "/brand-yourself-for-success",                            destination: "/resources/personal-branding", permanent: p },
       { source: "/brand-yourself-for-success/",                           destination: "/resources/personal-branding", permanent: p },
