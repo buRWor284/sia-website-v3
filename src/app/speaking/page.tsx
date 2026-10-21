@@ -34,16 +34,15 @@ import { ScrollButtons } from "@/components/ScrollButtons";
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const BOOKING_SPECS: ReadonlyArray<[string, string]> = [
-  ["Format",    "Keynote · Workshop · Panel · Webinar"],
-  ["Duration",  "20 min · 45 min · half-day · full-day"],
+  ["Format",    "Keynote · Workshop · AI Visibility Audit Session · Panel or fireside"],
+  ["Duration",  "30 min · 2 to 3 hours · half day to 3 days"],
   ["Languages", "English (primary), Urdu, Pashto"],
   ["Travel",    "Asia, MENA, Europe, North America · virtual worldwide"],
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
-  ["04",  "countries hosted on stage"],
-  ["06",  "speaker formats offered"],
-  ["12+", "webinars & guest podcasts"],
+  ["20+", "talks & workshops"],
+  ["04",  "speaker formats offered"],
   ["~500", "biggest live audience"],
 ];
 
@@ -60,7 +59,7 @@ type PrimaryTopic = {
 const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
   {
     no: "01",
-    label: "Primary topic · flagship for 2026",
+    label: "The flagship session · 2026",
     title: "AI Visibility Through Earned Media",
     blurb:
       "How organisations get cited, recommended and found by ChatGPT, Claude and Gemini, and why earned media is what those assistants trust. Every keynote and workshop opens with a live audit of what AI says about the brands in the room. Built from real data inside the earned media OS I run, with four live activities the room works through together.",
@@ -76,10 +75,10 @@ const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
   },
   {
     no: "02",
-    label: "Primary topic · most-requested",
+    label: "Also on request",
     title: "Digital PR for Publicity",
     blurb:
-      "How to land bylines, quotes and features in publications your buyers actually read — without paying for a PR agency. HARO, journalist outreach, story design.",
+      "How to land bylines, quotes and features in publications your buyers actually read, without paying for a PR agency. HARO, journalist outreach, story design.",
     bullets: [
       "Why earned media outperforms paid in 2026",
       "The HARO playbook: pitch, follow-up, conversion",
@@ -91,7 +90,7 @@ const PRIMARY_TOPICS: ReadonlyArray<PrimaryTopic> = [
   },
   {
     no: "03",
-    label: "Primary topic · most-requested",
+    label: "Also on request",
     title: "Boosting Organic Visibility Through SEO-PR",
     blurb:
       "The synthesis of SEO and digital PR. How to compound rankings and authority by earning links from publications, not buying them. Built on a hundred client campaigns.",
@@ -111,7 +110,7 @@ const SUPPORTING_TOPICS: ReadonlyArray<SupportingTopic> = [
   {
     title: "Writing Your Way to Success",
     blurb:
-      "Content marketing that builds brand, authority, and pipeline — with three case studies (Buffer, River Pools, a client at $200K/mo).",
+      "Content marketing that builds brand, authority, and pipeline, with three case studies (Buffer, River Pools, a client at $200K/mo).",
   },
   {
     title: "Brand Yourself for Success",
@@ -251,12 +250,10 @@ const STAGES: ReadonlyArray<Stage> = [
 
 type Format = { name: string; dur: string; note: string };
 const FORMATS: ReadonlyArray<Format> = [
-  { name: "Keynote",       dur: "20–45 min",   note: "Opening or closing keynote · single-track conferences, summits, internal kickoffs."                    },
-  { name: "Workshop",      dur: "Half / full", note: "Hands-on training for marketing and growth teams. Cohorts of 8 to 50, with worksheets."               },
-  { name: "Panel",         dur: "45–60 min",   note: "Moderated panel or co-panelist. Best paired with one of the signature topics."                        },
-  { name: "Webinar",       dur: "45–60 min",   note: "Virtual delivery with live Q&A. Recording rights negotiable."                                         },
-  { name: "Podcast guest", dur: "45–90 min",   note: "Long-form conversation. Bring research notes; the better the prep, the better the episode."          },
-  { name: "Radio · video", dur: "On request",  note: "Business radio, video interviews, fireside chats. Examples: Ruth King's Business Radio Show."        },
+  { name: "Keynote",                     dur: "45 to 60 min",       note: "Opening or closing keynote for up to 500 people. Single-track conferences, summits, internal kickoffs." },
+  { name: "Workshop",                    dur: "Half day to 3 days", note: "Hands-on training for marketing, PR and growth teams of 10 to 30 people, with worksheets."           },
+  { name: "AI Visibility Audit Session", dur: "2 to 3 hours",       note: "A live audit of what ChatGPT, Claude and Gemini say about the organisations in the room, traced back to the coverage behind each answer. 20 to 30 people." },
+  { name: "Panel or fireside",           dur: "30 to 45 min",       note: "Moderated panel, co-panelist or fireside chat, for any audience size."                               },
 ];
 
 type HostQuote = { quote: string; name: string; role: string; place: string; photo: string; stat?: string };
@@ -336,7 +333,7 @@ type Step = { no: string; t: string; d: string };
 const STEPS: ReadonlyArray<Step> = [
   { no: "01", t: "Send the brief",            d: "Drop a note with the event, audience, date, and the metric you want moved. Anything you can share helps." },
   { no: "02", t: "I respond in 1 working day", d: "With topic options matched to your audience, dates that work, and terms. No pressure, no salesy follow-up." },
-  { no: "03", t: "Pre-talk research call",    d: "30 minutes with you (and ideally a stakeholder) to make the talk specific to your room — not a generic deck." },
+  { no: "03", t: "Pre-talk research call",    d: "30 minutes with you (and ideally a stakeholder) to make the talk specific to your room, not a generic deck." },
   { no: "04", t: "Deliver, on time",          d: "Show up early, run AV checks, deliver the talk, stay for Q&A, and follow up with a written recap if useful." },
 ];
 
@@ -352,10 +349,10 @@ const Hero = () => (
         {/* Left: count */}
         <div className="res-hero-left">
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
-            04
+            2013
           </div>
           <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
-            Countries<br />on stage
+            On stage<br />since
           </div>
         </div>
 
@@ -365,7 +362,7 @@ const Hero = () => (
             SPEAKING
           </div>
           <SCaps size={10} ls="0.24em" color={INK55}>
-            Keynotes &nbsp;·&nbsp; Workshops &nbsp;·&nbsp; Panels &nbsp;·&nbsp; 2026 bookings open
+            International speaker &amp; trainer &nbsp;·&nbsp; Keynotes &nbsp;·&nbsp; Workshops &nbsp;·&nbsp; 2026 bookings open
           </SCaps>
           <h1 style={{ marginTop: 12, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 3.8vw, 52px)", lineHeight: 1.02, letterSpacing: "-0.028em", color: INK }}>
             Talks that move<br />
@@ -402,7 +399,7 @@ const SpeakingLead = () => (
     <DoubleRule style={{ margin: "0 0 24px" }} />
 
     <div className="grid-hero-2col" style={{ alignItems: "stretch" }}>
-      {/* Left — lead copy + inline stats */}
+      {/* Left - lead copy + inline stats */}
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div style={{ fontFamily: SERIF, fontSize: "clamp(20px, 2.5vw, 26px)", color: INK, lineHeight: 1.45 }}>
           <p style={{ margin: 0 }}>
@@ -415,12 +412,12 @@ const SpeakingLead = () => (
           </p>
           <p style={{ marginTop: "0.6em", fontStyle: "italic", color: INK70 }}>
             Case-study-led, with the receipts. In person across Asia, MENA, Europe and
-            North America; virtually worldwide. Booking open Q3–Q4 2026.
+            North America; virtually worldwide. Booking open Q3 to Q4 2026.
           </p>
         </div>
 
         {/* Compact stat row */}
-        <div className="grid-stats" style={{ marginTop: 20, gap: 8, borderTop: `2px solid ${INK}`, paddingTop: 16 }}>
+        <div className="grid-stats" style={{ marginTop: 20, gap: 8, gridTemplateColumns: `repeat(${STATS.length}, 1fr)`, borderTop: `2px solid ${INK}`, paddingTop: 16 }}>
           {STATS.map(([n, l]) => (
             <div key={n} style={{ textAlign: "center" }}>
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(24px, 3vw, 36px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>{n}</div>
@@ -430,7 +427,7 @@ const SpeakingLead = () => (
         </div>
       </div>
 
-      {/* Right — booking card */}
+      {/* Right - booking card */}
       <aside style={{ background: PAPER2, border: `1px solid ${INK}`, padding: "20px 22px" }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
           <Pill size={10} ls="0.18em">Booking Desk</Pill>
@@ -449,7 +446,6 @@ const SpeakingLead = () => (
         </div>
         <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ marginTop: 16, display: "block", textAlign: "center", padding: "12px 16px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
         <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 8, display: "block", textAlign: "center", padding: "12px 16px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Speaker one-sheet ↓</a>
-        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-Media-Kit-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ marginTop: 8, display: "block", textAlign: "center", padding: "12px 16px", background: INK, color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>Full media kit ↓</a>
         <a href="/press-kit" style={{ marginTop: 8, display: "block", textAlign: "center", padding: "12px 16px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase" }}>View the full press kit →</a>
       </aside>
     </div>
@@ -470,7 +466,7 @@ const WatchTheWork = () => {
       <SectionMast n="01" label="See how it actually sounds · Watch the work" dark />
 
       <div className="grid-watch">
-        {/* Left — reel list */}
+        {/* Left - reel list */}
         <div>
           <h2 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 5vw, 50px)", color: PAPER, lineHeight: 1.0, letterSpacing: "-0.025em" }}>
             Six reels<br />
@@ -524,7 +520,7 @@ const WatchTheWork = () => {
           }}>Full gallery & playlist ↗</a>
         </div>
 
-        {/* Right — main player */}
+        {/* Right - main player */}
         <div>
           <div style={{ background: "#000", border: "1px solid rgba(250,250,250,.25)", padding: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "4px 4px 12px", borderBottom: "1px solid rgba(250,250,250,.25)", marginBottom: 12, flexWrap: "wrap", gap: 6 }}>
@@ -564,19 +560,19 @@ const WatchTheWork = () => {
 
 const Topics = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 90, paddingBottom: 90 }}>
-    <SectionMast n="02" label="Signature Topics · The six talks" />
+    <SectionMast n="02" label="Signature Topics · One flagship, more on request" />
 
     <div className="grid-intro">
       <h2 className="h2-xl" style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, color: INK, lineHeight: 0.98, letterSpacing: "-0.025em" }}>
-        Three talks I can give<br />
-        <span style={{ fontStyle: "italic" }}><Mark>in my sleep.</Mark></span>
+        One flagship talk,<br />
+        <span style={{ fontStyle: "italic" }}><Mark>more on request.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 19, color: INK70, lineHeight: 1.55, maxWidth: 560 }}>
-        Twenty-two years of work has settled into three flagship talks and a handful of close cousins, each built around real case studies and a take-home playbook. The newest one is built from live data inside the earned media OS I run, and maps how AI is remaking earned media from both sides.
+        Twenty-two years of work has settled into one flagship session, AI Visibility Through Earned Media, built from live data inside the earned media OS I run. It maps how AI is remaking earned media from both sides. The talks below it are also on request, each built around real case studies and a take-home playbook.
       </p>
     </div>
 
-    {/* Primary topics — 2-col centered */}
+    {/* Primary topics - 2-col centered */}
     <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20, maxWidth: 960, margin: "0 auto 24px" }} className="speaking-topics-2col">
       {PRIMARY_TOPICS.map((tp) => (
         <div key={tp.title} className="letter-card" style={{
@@ -627,7 +623,7 @@ const Topics = () => (
 
     {/* Supporting topics */}
     <div style={{ marginTop: 36, marginBottom: 12 }}>
-      <SCaps size={11} ls="0.20em" color={INK70}>And three more in regular rotation</SCaps>
+      <SCaps size={11} ls="0.20em" color={INK70}>Also on request</SCaps>
     </div>
     <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
       {SUPPORTING_TOPICS.map((s, i) => (
@@ -647,7 +643,7 @@ const MPSStrip = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 70, paddingBottom: 30 }}>
     <figure style={{ margin: 0, padding: 12, background: "#0e0d0a", border: `1px solid ${INK}` }}>
       <div className="grid-mps-2">
-        {/* Left: Irfan on stage — left half of banner */}
+        {/* Left: Irfan on stage - left half of banner */}
         <div
           style={{
             height: "clamp(240px, 38vw, 440px)",
@@ -659,7 +655,7 @@ const MPSStrip = () => (
           role="img"
           aria-label="Syed Irfan Ajmal on stage at MPS2016, Dubai"
         />
-        {/* Right: audience — standalone photo */}
+        {/* Right: audience - standalone photo */}
         <div
           style={{
             height: "clamp(240px, 38vw, 440px)",
@@ -692,7 +688,7 @@ const Stages = () => (
         Where the talks<br /><span style={{ fontStyle: "italic" }}><Mark>have travelled.</Mark></span>
       </h2>
       <p style={{ margin: 0, fontFamily: SERIF, fontSize: 19, color: INK70, lineHeight: 1.55, maxWidth: 560 }}>
-        Four countries on stage, more on the webinar and podcast circuit. Below is the inventory, by format, with a short note on the talk.
+        International stages in person, more on the webinar and podcast circuit. Below is the inventory, by format, with a short note on the talk.
       </p>
     </div>
     <ol style={{ margin: 0, padding: 0, listStyle: "none", borderTop: `2px solid ${INK}` }}>
@@ -896,7 +892,7 @@ const FORMAT_PROOF: Record<string, { src: string; alt: string }> = {
     src: "/assets/gallery/ik-workshop.jpg",
     alt: "Workshop attendees seated at tables at IK Institute of Business in Dubai",
   },
-  Panel: {
+  "Panel or fireside": {
     src: "/assets/gallery/atm-dubai-panel.jpg",
     alt: "Syed Irfan Ajmal on a panel on the main stage at Arabian Travel Market in Dubai",
   },
@@ -904,12 +900,12 @@ const FORMAT_PROOF: Record<string, { src: string; alt: string }> = {
 
 const Formats = () => (
   <section className="sx" style={{ background: PAPER, paddingBottom: 90 }}>
-    <SectionMast n="04" label="Available Formats · Six ways to host" />
-    <div className="grid-cards-3" style={{ border: `1px solid ${INK}` }}>
+    <SectionMast n="04" label="Available Formats · Four ways to host" />
+    <div className="grid-cards-2" style={{ border: `1px solid ${INK}`, gap: 1, background: INK }}>
       {FORMATS.map((f, i) => {
         const proof = FORMAT_PROOF[f.name];
         return (
-        <div key={f.name} className="card-border" style={{ padding: "26px 24px", background: PAPER, display: "flex", flexDirection: "column", minHeight: 170 }}>
+        <div key={f.name} style={{ padding: "26px 24px", background: PAPER, display: "flex", flexDirection: "column", minHeight: 170 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
               {proof ? (
@@ -1007,7 +1003,7 @@ const OnCamera = () => (
 // the booking specs at the top of this page claim "Languages: English (primary),
 // Urdu, Pashto". Until now that was an unsupported assertion. A 10 hour, five
 // session curriculum delivered in Urdu, publicly viewable end to end, is the
-// evidence for it — and in the Gulf, where the Urdu-speaking workforce is large,
+// evidence for it - and in the Gulf, where the Urdu-speaking workforce is large,
 // being able to run internal training in Urdu reaches rooms most international
 // speakers cannot.
 //
@@ -1133,7 +1129,7 @@ const HostQuotes = () => {
         ))}
       </div>
 
-      {/* Closing testimonials — full-width horizontal bars */}
+      {/* Closing testimonials - full-width horizontal bars */}
       {barQuotes.map((bq) => (
         <article key={bq.name} style={{ marginTop: 20, border: `1px solid ${INK}`, padding: "28px 32px", display: "flex", alignItems: "center", gap: 32, flexWrap: "wrap", background: PAPER2 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
@@ -1230,7 +1226,6 @@ const BottomBookingCTA = () => (
       <div style={{ marginTop: 28, display: "flex", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
         <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}>Inquire about booking →</a>
         <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-One-Sheet-Oct-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Speaker one-sheet ↓</a>
-        <a href="/press-kit/assets/Syed-Irfan-Ajmal-Speaker-Media-Kit-Jun-2026.pdf" target="_blank" rel="noopener noreferrer" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Media kit ↓</a>
         <a href="/press-kit" style={{ padding: "16px 28px", background: "transparent", color: PAPER, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", border: `1px solid ${PAPER}` }}>Press kit →</a>
       </div>
     </div>

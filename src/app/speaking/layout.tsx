@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Speaking · International Keynotes & Workshops",
   description:
-    "Keynotes and workshops on SEO-PR, earned media, content marketing, and personal branding. 15+ international stages including Dubai, Bali, Copenhagen, and Lahore.",
+    "Keynotes and workshops on SEO-PR, earned media, content marketing, and personal branding. International speaker and trainer, 20+ talks and workshops including Dubai, Bali, Copenhagen, and Lahore.",
   openGraph: {
     title: "Speaking · International Keynotes & Workshops",
     description: "International keynotes and workshops on SEO-PR, earned media, and personal branding.",
