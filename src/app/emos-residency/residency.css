@@ -1,0 +1,80 @@
+/* EMOS Residency (/emos-residency): simple one-screen-per-section offer page.
+   Uses the global SIA tokens and the § box / black bar / yellow chip system.
+   Local class prefix "res-". Zero radius, ink borders, cream paper. */
+
+.res-wrap { max-width: 1040px; margin: 0 auto; padding: 40px 32px 80px; color: var(--color-ink); }
+@media (max-width: 640px) { .res-wrap { padding: 28px 16px 56px; } }
+
+.res-chip { display: inline-block; font-family: var(--font-mono); font-weight: 700; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; background: var(--color-yellow); color: var(--color-ink); border: 1px solid var(--color-ink); padding: 4px 9px; }
+.res-mark { background: linear-gradient(transparent 55%, var(--color-yellow) 55%); padding: 0 2px; }
+
+/* hero */
+.res-hero { border: 1px solid var(--color-ink); padding: 40px 36px; background: var(--color-paper); }
+@media (max-width: 640px) { .res-hero { padding: 26px 18px; } }
+.res-h1 { font-family: var(--font-serif); font-weight: 700; font-size: clamp(32px, 5vw, 58px); line-height: 1.05; letter-spacing: -0.015em; margin: 18px 0 0; max-width: 18ch; }
+.res-lede { font-family: var(--font-serif); font-size: 19px; line-height: 1.55; color: var(--color-ink-70); margin: 20px 0 0; max-width: 60ch; }
+.res-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 28px; }
+
+.res-btn { display: inline-block; font-family: var(--font-grot); font-weight: 800; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; background: var(--color-yellow); color: var(--color-ink); border: 1px solid var(--color-ink); padding: 14px 20px; text-decoration: none; }
+.res-btn:hover { background: var(--color-yellow-2); }
+.res-btn:focus-visible, .res-link:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; }
+.res-link { font-family: var(--font-grot); font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-ink); text-underline-offset: 4px; }
+
+/* section bar */
+.res-sec { margin-top: 56px; }
+.res-bar { display: flex; align-items: center; gap: 14px; background: var(--color-ink); color: var(--color-paper); padding: 10px 16px; }
+.res-bar-n { font-family: var(--font-mono); font-weight: 700; font-size: 12px; background: var(--color-yellow); color: var(--color-ink); padding: 2px 7px; }
+.res-bar-t { font-family: var(--font-grot); font-weight: 800; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; flex: 1; }
+.res-bar-tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; }
+@media (max-width: 640px) { .res-bar-tag { display: none; } }
+.res-box { border: 1px solid var(--color-ink); border-top: 0; padding: 28px; }
+@media (max-width: 640px) { .res-box { padding: 20px 16px; } }
+.res-p { font-size: 16px; line-height: 1.65; color: var(--color-ink-70); margin: 0; max-width: 68ch; }
+
+/* steps + grids */
+.res-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: 1px solid var(--color-ink); }
+.res-grid3 > div { padding: 22px; border-right: 1px solid var(--color-ink); }
+.res-grid3 > div:last-child { border-right: 0; }
+@media (max-width: 760px) {
+  .res-grid3 { grid-template-columns: 1fr; }
+  .res-grid3 > div { border-right: 0; border-bottom: 1px solid var(--color-ink); }
+  .res-grid3 > div:last-child { border-bottom: 0; }
+}
+.res-step-n { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-ink-55); }
+.res-h3 { font-family: var(--font-serif); font-weight: 700; font-size: 24px; line-height: 1.2; margin: 8px 0 10px; }
+.res-small { font-size: 15px; line-height: 1.6; color: var(--color-ink-70); margin: 0; }
+
+/* comparison table */
+.res-table-wrap { overflow-x: auto; border: 1px solid var(--color-ink); }
+.res-table { width: 100%; border-collapse: collapse; min-width: 560px; font-size: 15px; }
+.res-table th, .res-table td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--color-ink-15); vertical-align: top; line-height: 1.5; }
+.res-table thead th { font-family: var(--font-grot); font-weight: 800; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; border-bottom: 1px solid var(--color-ink); }
+.res-table tbody th { font-family: var(--font-grot); font-weight: 700; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-55); width: 22%; }
+.res-table tr:last-child th, .res-table tr:last-child td { border-bottom: 0; }
+.res-table .res-col-hi { background: var(--color-paper-2); }
+
+/* fit lists */
+.res-fit { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .res-fit { grid-template-columns: 1fr; } }
+.res-fit > div { border: 1px solid var(--color-ink); padding: 20px 22px; }
+.res-fit ul { margin: 12px 0 0; padding-left: 18px; }
+.res-fit li { font-size: 15px; line-height: 1.6; color: var(--color-ink-70); margin-bottom: 8px; }
+
+/* stats */
+.res-stats { display: grid; grid-template-columns: repeat(4, 1fr); border: 1px solid var(--color-ink); margin-top: 20px; }
+.res-stats > div { padding: 18px; border-right: 1px solid var(--color-ink); }
+.res-stats > div:last-child { border-right: 0; }
+@media (max-width: 760px) {
+  .res-stats { grid-template-columns: 1fr 1fr; }
+  .res-stats > div:nth-child(2) { border-right: 0; }
+  .res-stats > div:nth-child(-n+2) { border-bottom: 1px solid var(--color-ink); }
+}
+.res-stat-v { font-family: var(--font-serif); font-weight: 700; font-size: 30px; line-height: 1.05; }
+.res-stat-l { font-size: 13px; line-height: 1.45; color: var(--color-ink-70); margin-top: 6px; }
+
+/* closing inverted box */
+.res-close { margin-top: 56px; background: var(--color-ink); color: var(--color-paper); border: 1px solid var(--color-ink); padding: 36px; }
+@media (max-width: 640px) { .res-close { padding: 24px 18px; } }
+.res-close .res-h2 { font-family: var(--font-serif); font-weight: 700; font-size: clamp(26px, 3.6vw, 40px); line-height: 1.1; margin: 14px 0 12px; max-width: 22ch; }
+.res-close p { font-size: 16px; line-height: 1.6; color: var(--color-paper-70); margin: 0; max-width: 60ch; }
+.res-close .res-link { color: var(--color-paper); }
