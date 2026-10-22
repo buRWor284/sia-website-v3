@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
       { source: "/platform/:path*", destination: `${SIA}/emos-platform/:path*`, permanent: false, has: EMOS_HOST },
       { source: "/academy",         destination: `${SIA}/emos-academy`,         permanent: false, has: EMOS_HOST },
       { source: "/academy/:path*",  destination: `${SIA}/emos-academy/:path*`,  permanent: false, has: EMOS_HOST },
+      { source: "/residency",       destination: `${SIA}/emos-residency`,       permanent: false, has: EMOS_HOST },
+      { source: "/residency/:path*", destination: `${SIA}/emos-residency/:path*`, permanent: false, has: EMOS_HOST },
       // Anything else on emoshq.com (including the bare domain) → the platform page.
       { source: "/:path*",          destination: `${SIA}/emos-platform`,        permanent: false, has: EMOS_HOST },
     ];
