@@ -1,0 +1,77 @@
+/* EMOS hub (/emoshq). Builds on residency.css (imported first by page.tsx) and
+   adds only what the hub needs: an EMOS-own masthead and footer, the ladder
+   strip under the hero, the three offer columns, and the "which one" grid.
+   Prefix "hq-". Zero radius, ink borders, cream paper, yellow chips. */
+
+.hq-wrap { padding-top: 28px; }
+
+/* masthead: EMOS-own, so the page can move to emoshq.com unchanged */
+.hq-mast { max-width: 1040px; margin: 0 auto; padding: 18px 32px 0; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; color: var(--color-ink); }
+@media (max-width: 640px) { .hq-mast { padding: 14px 16px 0; } }
+.hq-mark { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.hq-mark-box { font-family: var(--font-grot); font-weight: 900; font-size: 13px; letter-spacing: 0.22em; background: var(--color-ink); color: var(--color-yellow); border: 1px solid var(--color-ink); padding: 6px 9px; }
+.hq-mark-sub { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-ink-55); }
+@media (max-width: 520px) { .hq-mark-sub { display: none; } }
+.hq-nav { display: flex; align-items: center; gap: 4px 18px; flex-wrap: wrap; }
+.hq-nav a { font-family: var(--font-grot); font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-ink); text-decoration: none; padding: 6px 0; border-bottom: 2px solid transparent; }
+.hq-nav a:hover { border-bottom-color: var(--color-yellow); }
+.hq-nav a:focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; }
+.hq-nav .hq-nav-signin { border: 1px solid var(--color-ink); padding: 6px 10px; }
+.hq-nav .hq-nav-signin:hover { background: var(--color-yellow); border-bottom-color: var(--color-ink); }
+
+/* ladder strip under the hero (mirrors .res-leave) */
+.hq-ladder { display: grid; grid-template-columns: 150px repeat(3, 1fr); border: 1px solid var(--color-ink); border-top: 0; background: var(--color-ink); color: var(--color-paper); }
+.hq-ladder > * { padding: 14px 16px; border-right: 1px solid rgba(241,235,222,.2); font-size: 13.5px; line-height: 1.4; }
+.hq-ladder > *:last-child { border-right: 0; }
+.hq-ladder .hq-ladder-h { background: var(--color-yellow); color: var(--color-ink); font-family: var(--font-grot); font-weight: 800; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; display: flex; align-items: center; }
+.hq-ladder a { color: var(--color-paper-70); text-decoration: none; }
+.hq-ladder a:hover { background: rgba(241,235,222,.06); color: var(--color-paper); }
+.hq-ladder a b { display: block; font-family: var(--font-serif); font-size: 17px; color: var(--color-paper); margin-bottom: 2px; }
+.hq-ladder a.hi b { color: var(--color-yellow); }
+@media (max-width: 900px) { .hq-ladder { grid-template-columns: 1fr; } .hq-ladder > * { border-right: 0; border-bottom: 1px solid rgba(241,235,222,.2); } .hq-ladder > *:last-child { border-bottom: 0; } }
+
+/* the three offer columns */
+.hq-offers { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--color-ink); border-top: 0; }
+.hq-offer { position: relative; padding: 26px 22px 24px; border-right: 1px solid var(--color-ink); display: flex; flex-direction: column; background: var(--color-paper); }
+.hq-offer:last-child { border-right: 0; }
+.hq-offer-hi { background: var(--color-paper-2); }
+.hq-offer-flag { position: absolute; top: -1px; right: -1px; font-family: var(--font-mono); font-weight: 700; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; background: var(--color-yellow); color: var(--color-ink); border: 1px solid var(--color-ink); padding: 4px 8px; }
+.hq-offer-name { font-family: var(--font-serif); font-weight: 700; font-size: 28px; line-height: 1.1; letter-spacing: -0.01em; margin: 8px 0 2px; }
+.hq-offer-how { font-family: var(--font-grot); font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-ink-55); }
+.hq-offer-price { border: 1px solid var(--color-ink); background: var(--color-paper); padding: 12px 14px; margin: 16px 0 14px; display: flex; flex-direction: column; gap: 3px; }
+.hq-offer-hi .hq-offer-price { box-shadow: 5px 5px 0 var(--color-yellow); }
+.hq-offer-amount { font-family: var(--font-mono); font-weight: 700; font-size: 26px; line-height: 1; letter-spacing: -0.02em; }
+.hq-offer-note { font-size: 12.5px; line-height: 1.4; color: var(--color-ink-70); }
+.hq-offer-dl { margin: 0; display: grid; grid-template-columns: 64px 1fr; gap: 10px 12px; font-size: 14px; line-height: 1.5; color: var(--color-ink-70); }
+.hq-offer-dl dt { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-ink-55); padding-top: 3px; }
+.hq-offer-dl dd { margin: 0; }
+.hq-offer-cta { margin-top: auto; padding-top: 22px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.hq-offer-cta .res-btn { width: 100%; text-align: center; }
+@media (max-width: 900px) {
+  .hq-offers { grid-template-columns: 1fr; }
+  .hq-offer { border-right: 0; border-bottom: 1px solid var(--color-ink); }
+  .hq-offer:last-child { border-bottom: 0; }
+  .hq-offer-flag { top: 0; right: 0; }
+}
+
+/* which one is for me */
+.hq-which { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--color-ink); border-top: 0; }
+.hq-which > div { padding: 22px; border-right: 1px solid var(--color-ink); border-bottom: 1px solid var(--color-ink); display: flex; flex-direction: column; gap: 14px; }
+.hq-which > div:nth-child(2n) { border-right: 0; }
+.hq-which > div:nth-last-child(-n+2) { border-bottom: 0; }
+.hq-which-q { font-family: var(--font-serif); font-size: 19px; line-height: 1.4; margin: 0; }
+.hq-which-a { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: auto; }
+@media (max-width: 760px) {
+  .hq-which { grid-template-columns: 1fr; }
+  .hq-which > div { border-right: 0 !important; border-bottom: 1px solid var(--color-ink) !important; }
+  .hq-which > div:last-child { border-bottom: 0 !important; }
+}
+
+/* footer: slim, EMOS-own */
+.hq-foot { max-width: 1040px; margin: 0 auto 48px; padding: 18px 32px 0; border-top: 1px solid var(--color-ink); display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; font-size: 13px; color: var(--color-ink-70); }
+@media (max-width: 640px) { .hq-foot { padding: 16px 16px 0; margin-bottom: 36px; } }
+.hq-foot-l { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.hq-foot a { color: var(--color-ink); text-underline-offset: 3px; }
+.hq-foot-r { display: flex; gap: 16px; flex-wrap: wrap; }
+.hq-foot-r a { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; }
+.hq-foot-r a:hover { text-decoration: underline; }

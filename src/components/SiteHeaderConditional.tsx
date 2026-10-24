@@ -23,7 +23,9 @@ import { SiteHeader, CredibilityTicker } from "@/components/bureau";
 const HIDDEN_PREFIXES = ["/emos-platform", "/clients/resourcex", "/emos-academy/apply", "/emos-academy/pay", "/ar/", "/card/"];
 // Exact matches: /card (the business-card QR landing) is a one-job page with
 // no site chrome. Exact, so it can't swallow a future /cards or /card-x route.
-const HIDDEN_EXACT = ["/card"];
+// /emoshq (the EMOS hub that emoshq.com lands on) ships its own EMOS masthead
+// and footer so it can move to the real emoshq.com site unchanged.
+const HIDDEN_EXACT = ["/card", "/emoshq"];
 
 export function SiteHeaderConditional() {
   const pathname = usePathname();
