@@ -218,7 +218,7 @@ export default function EmosHubPage() {
                   </span>
                   <div style={{ margin: "24px 0 8px", border: "1px solid #1a1410", padding: "18px 20px", display: "flex", flexDirection: "column", gap: "6px" }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-                      <span style={{ fontSize: "44px", fontWeight: "600", letterSpacing: "-.03em", lineHeight: "1" }}>
+                      <span style={{ fontSize: "32px", fontWeight: "600", letterSpacing: "-.03em", lineHeight: "1" }}>
                         $149
                       </span>
                       <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: ".1em", textTransform: "uppercase" }}>
@@ -250,7 +250,7 @@ export default function EmosHubPage() {
                       You get
                     </span>
                     <span>
-                      Six connected tools on one login: brief, story signals, asset briefs, journalist shortlists, scored pitch drafts and a placement log. A 1:1 onboarding call is included.
+                      Six connected AI tools that do most of the work: they find the stories editors are covering, shortlist the right journalists, draft and score every pitch, and keep the placement record. You do the human part: approve the company brief, pick the angle, edit the draft, press send. A 1:1 onboarding call is included.
                     </span>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "76px 1fr", gap: "12px", padding: "14px 0", fontSize: "16px", lineHeight: "1.45" }}>
@@ -289,7 +289,7 @@ export default function EmosHubPage() {
                       <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: ".1em", textTransform: "uppercase" }}>
                         from
                       </span>
-                      <span style={{ fontSize: "44px", fontWeight: "600", letterSpacing: "-.03em", lineHeight: "1" }}>
+                      <span style={{ fontSize: "32px", fontWeight: "600", letterSpacing: "-.03em", lineHeight: "1" }}>
                         $2,000
                       </span>
                       <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: ".1em", textTransform: "uppercase" }}>
@@ -354,12 +354,15 @@ export default function EmosHubPage() {
                   </span>
                   <div style={{ margin: "24px 0 8px", border: "1px solid #1a1410", padding: "18px 20px", display: "flex", flexDirection: "column", gap: "6px" }}>
                     <div style={{ display: "flex", alignItems: "baseline", gap: "10px" }}>
-                      <span style={{ fontSize: "36px", fontWeight: "600", letterSpacing: "-.02em", lineHeight: "1.1" }}>
-                        Set per company
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: ".1em", textTransform: "uppercase" }}>
+                        from
+                      </span>
+                      <span style={{ fontSize: "32px", fontWeight: "600", letterSpacing: "-.03em", lineHeight: "1" }}>
+                        $10,000
                       </span>
                     </div>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(26,20,16,.65)" }}>
-                      Scope and length agreed after one call
+                      Typically $10K to $30K · scope and length set per company after one call
                     </span>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "76px 1fr", gap: "12px", padding: "14px 0", borderBottom: "1px solid rgba(26,20,16,.15)", fontSize: "16px", lineHeight: "1.45" }}>
@@ -426,7 +429,7 @@ export default function EmosHubPage() {
                         Who does the work
                       </div>
                       <div style={{ padding: "14px 18px", borderLeft: "1px solid rgba(26,20,16,.15)" }}>
-                        You, with the software
+                        The tools find, draft, score and track; you approve, edit and send
                       </div>
                       <div style={{ padding: "14px 18px", borderLeft: "1px solid rgba(26,20,16,.15)", background: "#e8e0cc" }}>
                         Your team, coached by Irfan on live weekly calls
@@ -460,7 +463,7 @@ export default function EmosHubPage() {
                         $2,000 or $3,500 one-time
                       </div>
                       <div style={{ padding: "14px 18px", borderLeft: "1px solid rgba(26,20,16,.15)" }}>
-                        Set per company
+                        $10K to $30K, set per company
                       </div>
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1.15fr 1.15fr 1.15fr", borderTop: "1px solid rgba(26,20,16,.15)" }}>

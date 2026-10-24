@@ -17,8 +17,9 @@ import "./residency.css";
 // (EARNED_MEDIA_STATS, shared with /emos-platform so they never drift);
 // outlet marquee + testimonials + fit + built-by reused from /emos-academy;
 // tool chain with /emos-platform screenshots.
-// Deliberately carries NO price, duration, location or guarantee: none has
-// been decided, so the page sends people to a call instead.
+// Carries a price floor and typical range (from $10,000, typically $10K to
+// $30K; Irfan, 24 Oct 2026, same figures as the /emoshq hub) but no fixed
+// duration, location or guarantee: those are set per company after one call.
 // Hidden (noindex, not in nav or sitemap.ts), same convention as
 // /decoding-saudi. emoshq.com/residency redirects here (next.config.ts).
 export const metadata: Metadata = {
@@ -288,8 +289,9 @@ export default function EmosResidencyPage() {
           <span className="res-chip">One company at a time</span>
           <h2 className="res-h2">Length and scope are set per company, after one call.</h2>
           <p>
-            Tell me what you sell and where you want to be covered. If a Residency is the right fit, I will say so. If the
-            Academy or the EMOS Platform on its own would serve you better, I will say that instead.
+            Residencies start at $10,000 and typically run $10,000 to $30,000, depending on how long I am inside and
+            how much we build. Tell me what you sell and where you want to be covered. If a Residency is the right fit,
+            I will say so. If the Academy or the EMOS Platform on its own would serve you better, I will say that instead.
           </p>
           <CTAs email="sia@syedirfanajmal.com" />
         </section>
