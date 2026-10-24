@@ -206,7 +206,7 @@ export default function EmosHubPage() {
             <div style={{ maxWidth: "1312px", margin: "0 auto", padding: "clamp(40px,5vw,72px) clamp(20px,4vw,56px) clamp(56px,6vw,96px)" }}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,330px),1fr))", gap: "28px 24px" }}>
                 {/* WAY 01 Platform */}
-                <article style={{ display: "grid", gridRow: "span 9", gridTemplateRows: "subgrid", rowGap: "0", border: "1px solid #1a1410", background: "#f1ebde", padding: "32px 28px 28px" }}>
+                <article style={{ display: "grid", gridRow: "span 10", gridTemplateRows: "subgrid", rowGap: "0", border: "1px solid #1a1410", background: "#f1ebde", padding: "32px 28px 28px" }}>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", letterSpacing: ".14em" }}>
                     WAY 01
                   </span>
@@ -268,7 +268,7 @@ export default function EmosHubPage() {
                       Run EMOS from inside Claude
                     </span>
                     <span style={{ fontSize: "14px", lineHeight: "1.45", color: "rgba(26,20,16,.8)" }}>
-                      Your Claude becomes the EMOS agent: it finds the story, shortlists the journalists and drafts the pitch. You review and send.
+                      The agentic version of EMOS runs from your Claude: it finds the story, shortlists the journalists and drafts the pitch. You review and send.
                     </span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "14px", alignSelf: "end", paddingTop: "20px" }}>
@@ -281,7 +281,7 @@ export default function EmosHubPage() {
                   </div>
                 </article>
                 {/* WAY 02 Academy (highlighted) */}
-                <article style={{ position: "relative", display: "grid", gridRow: "span 9", gridTemplateRows: "subgrid", rowGap: "0", border: "1px solid #1a1410", background: "#e8e0cc", padding: "32px 28px 28px" }}>
+                <article style={{ position: "relative", display: "grid", gridRow: "span 10", gridTemplateRows: "subgrid", rowGap: "0", border: "1px solid #1a1410", background: "#e8e0cc", padding: "32px 28px 28px" }}>
                   <span style={{ position: "absolute", top: "-1px", right: "-1px", background: "#f5b81f", border: "1px solid #1a1410", fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: "700", letterSpacing: ".14em", padding: "6px 10px" }}>
                     MOST CHOSEN
                   </span>
@@ -342,6 +342,7 @@ export default function EmosHubPage() {
                       The system, the skills, and the first placements on the record.
                     </span>
                   </div>
+                  <div aria-hidden="true" />
                   <div style={{ display: "flex", flexDirection: "column", gap: "14px", alignSelf: "end", paddingTop: "20px" }}>
                     <Link href="/emos-academy" style={{ display: "block", textAlign: "center", background: "#f5b81f", border: "1px solid #1a1410", padding: "16px 20px", fontFamily: "var(--font-grot)", fontWeight: "800", fontSize: "12px", letterSpacing: ".16em", textTransform: "uppercase", textDecoration: "none" }} className="hq-h2">
                       See the Academy →
@@ -352,7 +353,7 @@ export default function EmosHubPage() {
                   </div>
                 </article>
                 {/* WAY 03 Residency */}
-                <article style={{ display: "grid", gridRow: "span 9", gridTemplateRows: "subgrid", rowGap: "0", border: "1px solid #1a1410", background: "#f1ebde", padding: "32px 28px 28px" }}>
+                <article style={{ display: "grid", gridRow: "span 10", gridTemplateRows: "subgrid", rowGap: "0", border: "1px solid #1a1410", background: "#f1ebde", padding: "32px 28px 28px" }}>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: "12px", letterSpacing: ".14em" }}>
                     WAY 03
                   </span>
@@ -407,6 +408,7 @@ export default function EmosHubPage() {
                       A trained operator, a journalist list, a pitch library and a placement log.
                     </span>
                   </div>
+                  <div aria-hidden="true" />
                   <div style={{ display: "flex", flexDirection: "column", gap: "14px", alignSelf: "end", paddingTop: "20px" }}>
                     <Link href="/emos-residency" style={{ display: "block", textAlign: "center", background: "#f5b81f", border: "1px solid #1a1410", padding: "16px 20px", fontFamily: "var(--font-grot)", fontWeight: "800", fontSize: "12px", letterSpacing: ".16em", textTransform: "uppercase", textDecoration: "none" }} className="hq-h2">
                       See the Residency →
