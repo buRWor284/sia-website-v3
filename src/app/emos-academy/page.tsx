@@ -485,7 +485,7 @@ export default function EmosPage() {
                   { q:"Week 1 · Foundation & Platform Setup", a:"How the journalist outreach ecosystem actually works. Identifying your quotable zones. The Relevancy Spectrum framework. Media kit and bio templates ready to send.", d:"All platforms live. Media kit complete. 3 polished bio variations." },
                   { q:"Week 2 · Pitch Writing Mastery", a:"Anatomy of a winning pitch, written for the journalist's reader. Speed vs. quality. Subject line psychology. Live pitch teardowns on your real submissions.", d:"5 personalized pitch templates. First batch of 8 to 10 submitted." },
                   { q:"Week 3 · Volume, Tracking & Optimization", a:"A sustainable pitching routine. Tracking the metrics that matter. The 700+ site blacklist. Common rejection patterns and how to overcome them.", d:"15+ pitches submitted. Tracking system live. Optimization plan documented." },
-                  { q:"Week 4 · Advanced Strategies, VA & Scale", a:"Building journalist relationships for repeat coverage. Breaking news monitoring. Extracting five returns from every placement. VA sourcing and training: typical cost $500 to $1,500 per month.", d:"At least 1 verified placement. 20+ named journalist target list. 90-day scaling plan." },
+                  { q:"Week 4 · Advanced Strategies, VA & Scale", a:"Building journalist relationships for repeat coverage. Breaking news monitoring. Extracting five returns from every placement. VA sourcing and training: a part-time VA runs $500 to $1,500 per month offshore, $1,500 to $3,000 in the US.", d:"At least 1 verified placement. 20+ named journalist target list. 90-day scaling plan." },
                 ].map(item => (
                   <div className="emos-acc-item" key={item.q}><button className="emos-acc-q"><span className="emos-acc-q-text">{item.q}</span><span className="emos-acc-icon">+</span></button><div className="emos-acc-body"><div className="emos-acc-body-inner">{item.a}<div className="emos-acc-deliverable"><strong>Deliverable:</strong> {item.d}</div></div></div></div>
                 ))}
@@ -664,12 +664,12 @@ export default function EmosPage() {
               <div className="tco">
                 <div className="tco-head">
                   <div className="tco-eyebrow">Your real cost over 3 years</div>
-                  <div className="tco-sub">EMOS is a one-time investment. The only ongoing cost is optional: a VA to run the system, roughly $5K to $30K a year depending on where you hire, or $0 if you run it yourself. An agency bills the full amount again, every single year.</div>
+                  <div className="tco-sub">EMOS is a one-time investment. The only ongoing cost is optional: a part-time VA to run the system, roughly $6K to $18K a year offshore or $18K to $36K in the US, or $0 if you run it yourself. An agency bills the full amount again, every single year.</div>
                 </div>
                 <div className="tcb-wrap">
                   <div className="tcb-row">
-                    <div className="tcb-head"><span className="tcb-name">EMOS</span><span className="tcb-amt">$3.5K once, then an optional VA · <strong>$3.5K to ~$40K total</strong></span></div>
-                    <div className="tcb-track"><div className="tcb-fill tcb-emos" style={{ width: "11%" }} /></div>
+                    <div className="tcb-head"><span className="tcb-name">EMOS</span><span className="tcb-amt">$3.5K once, then an optional part-time VA · <strong>$3.5K to ~$58K total</strong></span></div>
+                    <div className="tcb-track"><div className="tcb-fill tcb-emos" style={{ width: "8%" }} /></div>
                   </div>
                   <div className="tcb-row">
                     <div className="tcb-head"><span className="tcb-name">Content + SEO + PR agencies</span><span className="tcb-amt"><strong className="tcb-amt-big">$180K to $720K total</strong></span></div>
@@ -677,7 +677,7 @@ export default function EmosPage() {
                   </div>
                   <div className="tcb-scale">Agencies bill the full amount again, every year. EMOS is paid once.</div>
                 </div>
-                <div className="tco-foot">Three years of EMOS, even with an onshore VA, runs about half the cheapest agency path and a fraction of the rest. Run it yourself and it&#39;s a rounding error.</div>
+                <div className="tco-foot">Three years of EMOS with an offshore part-time VA is under a third of the cheapest agency path. Even a US-based VA keeps it below the cheapest agency. Run it yourself and it&#39;s a rounding error.</div>
               </div>
 
               <div id="apply" className="emos-apply-block">
@@ -734,7 +734,7 @@ export default function EmosPage() {
               <h2 className="sec-h2" style={{ marginBottom: 40 }}>Common questions.</h2>
               <AccordionGroup className="emos-faq-wrap">
                 {[
-                  { q:"How much time does this require each week?", a:"Plan for 3 to 5 hours per week: 90 minutes for the live session plus 2 to 3 hours for assignments. The assignments aren't busywork: they're real pitches going to real journalists. Most founders pair the system with a part-time VA ($300 to $1,500 per month)." },
+                  { q:"How much time does this require each week?", a:"Plan for 3 to 5 hours per week: 90 minutes for the live session plus 2 to 3 hours for assignments. The assignments aren't busywork: they're real pitches going to real journalists. Most founders pair the system with a part-time VA ($500 to $1,500 per month offshore, $1,500 to $3,000 in the US)." },
                   { q:"I don't have a team member who can run this. What do I do?", a:"Accelerate includes a VA sourcing and training module. I help you identify what support you need, source the right person, and train them on the system. The real qualification isn't whether you have someone today; it's whether you're willing to hire one after the program ends." },
                   { q:"I tried PR before and it didn't work. Why is this different?", a:"Short version: most failed efforts share four traits (generic mass pitching, no founder POV, no consistent system, agency dependency). EMOS removes all four, and because the coverage is earned, it compounds instead of evaporating when you stop paying. The full breakdown is in The Real Problem above." },
                   { q:"Is this really better than hiring agencies for content, SEO, and PR?", a:"Agencies run $60,000 to $240,000 a year and the knowledge leaves when the relationship does. EMOS is a one-time investment that builds the capability inside your company. Some clients do both; most don't need to. See the 3-year cost comparison in Investment above, and run your own numbers in the calculator." },

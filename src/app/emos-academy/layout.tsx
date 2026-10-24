@@ -11,7 +11,7 @@
 const FAQ = [
   {
     q: "How much time does this require each week?",
-    a: "Plan for 3 to 5 hours per week: 90 minutes for the live session plus 2 to 3 hours for assignments. The assignments aren't busywork: they're real pitches going to real journalists. Most founders pair the system with a part-time VA ($300 to $1,500 per month).",
+    a: "Plan for 3 to 5 hours per week: 90 minutes for the live session plus 2 to 3 hours for assignments. The assignments aren't busywork: they're real pitches going to real journalists. Most founders pair the system with a part-time VA ($500 to $1,500 per month offshore, $1,500 to $3,000 in the US).",
   },
   {
     q: "I don't have a team member who can run this. What do I do?",
