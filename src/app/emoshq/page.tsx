@@ -131,20 +131,24 @@ export default function EmosHubPage() {
           </header>
           {/* ============ 1. HERO ============ */}
           <section id="top" style={{ background: "#f1ebde" }}>
-            <div style={{ maxWidth: "1312px", margin: "0 auto", padding: "clamp(40px,6vw,88px) clamp(20px,4vw,56px) clamp(40px,5vw,72px)" }}>
+            <div style={{ maxWidth: "1312px", margin: "0 auto", padding: "clamp(28px,4vw,56px) clamp(20px,4vw,56px) clamp(40px,5vw,72px)" }}>
+              {/* v2.1: two columns from the chip down, so the product screen sits beside the headline and is above the fold on a laptop (Irfan, 24 Oct: v2 showed ~30% of it) */}
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "40px clamp(32px,5vw,72px)", alignItems: "flex-start" }}>
+              <div style={{ flex: "1 1 400px", minWidth: "0", maxWidth: "620px" }}>
               <span style={{ display: "inline-block", background: "#f5b81f", border: "1px solid #1a1410", fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: "500", letterSpacing: ".12em", textTransform: "uppercase", padding: "5px 10px" }}>
                 One method · Three ways to run it
               </span>
-              <h1 style={{ fontFamily: "var(--font-serif)", fontWeight: "500", fontSize: "clamp(40px,6.6vw,96px)", lineHeight: ".98", letterSpacing: "-.03em", margin: "28px 0 0", textWrap: "balance" }}>
+              <h1 style={{ fontFamily: "var(--font-serif)", fontWeight: "500", fontSize: "clamp(40px,4.8vw,68px)", lineHeight: "1.0", letterSpacing: "-.03em", margin: "28px 0 0", textWrap: "balance" }}>
                 Earn the coverage investors and AI check.
+                {" "}
                 <em style={{ fontWeight: "400" }}>
                   Then keep the system.
                 </em>
               </h1>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "40px clamp(32px,5vw,72px)", marginTop: "clamp(32px,4vw,56px)", alignItems: "flex-start" }}>
-                <div style={{ flex: "1 1 360px", minWidth: "0", maxWidth: "560px", display: "flex", flexDirection: "column", gap: "32px", paddingTop: "4px" }}>
+                <div style={{ marginTop: "clamp(24px,3vw,40px)", display: "flex", flexDirection: "column", gap: "28px" }}>
                   <p style={{ fontSize: "20px", lineHeight: "1.5", margin: "0", maxWidth: "60ch", color: "#1a1410", textWrap: "pretty" }}>
                     EMOS is the earned media method used on 300+ client accounts since 2013, built into connected tools. Run it yourself, learn it with a cohort, or have it built
+                    {" "}
                     <span style={{ background: "linear-gradient(transparent 55%,#f5b81f 55%)" }}>
                       inside your own company
                     </span>
@@ -159,7 +163,8 @@ export default function EmosHubPage() {
                     </Link>
                   </div>
                 </div>
-                <figure style={{ flex: "1.45 1 520px", minWidth: "0", margin: "0" }}>
+              </div>
+                <figure style={{ flex: "1.3 1 480px", minWidth: "0", margin: "0" }}>
                   <div style={{ border: "1px solid #1a1410", background: "#f1ebde" }}>
                     <div style={{ height: "28px", background: "#1a1410", display: "flex", alignItems: "center", gap: "10px", padding: "0 12px" }}>
                       <span style={{ width: "9px", height: "9px", background: "#f5b81f", flex: "0 0 auto" }} />
@@ -522,6 +527,7 @@ export default function EmosHubPage() {
             <div style={{ maxWidth: "1312px", margin: "0 auto", padding: "clamp(48px,6vw,88px) clamp(20px,4vw,56px)" }}>
               <h3 style={{ margin: "0 0 clamp(32px,4vw,48px)", fontSize: "clamp(30px,3.6vw,48px)", fontWeight: "500", lineHeight: "1.08", letterSpacing: "-.02em", maxWidth: "22ch", textWrap: "balance" }}>
                 One chain from your story to the placement,
+                {" "}
                 <em>
                   each tool reading the one before it.
                 </em>
@@ -546,8 +552,8 @@ export default function EmosHubPage() {
                   </li>
                 ))}
               </ol>
-              {/* CoverageIQ pipeline frame */}
-              <figure style={{ margin: "clamp(40px,5vw,64px) 0 0" }}>
+              {/* CoverageIQ pipeline frame: capped at 70% of the row so the 1512px source is never upscaled (it rendered soft at full width) */}
+              <figure style={{ margin: "clamp(40px,5vw,64px) auto 0", maxWidth: "min(100%, 920px)" }}>
                 <div style={{ border: "1px solid #f1ebde", background: "#f1ebde", color: "#1a1410" }}>
                   <div style={{ height: "28px", background: "#1a1410", borderBottom: "1px solid #f1ebde", display: "flex", alignItems: "center", gap: "10px", padding: "0 12px" }}>
                     <span style={{ width: "9px", height: "9px", background: "#f5b81f", flex: "0 0 auto" }} />
@@ -692,6 +698,11 @@ export default function EmosHubPage() {
                   </div>
                 </article>
               </div>
+              {/* v2.1: the three cards are the EMOS-relevant picks; the rest of the record lives on DMR.agency */}
+              <div style={{ marginTop: "20px", display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "8px 20px", fontFamily: "var(--font-mono)", fontSize: "11px", letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(26,20,16,.65)" }}>
+                <span>Also on record via DMR.agency: Efani, Physicians Thrive, Curednation, National Tyres and Autocare</span>
+                <a href="https://www.dmr.agency/case-studies/" target="_blank" rel="noopener noreferrer" style={{ color: "#1a1410", textDecoration: "underline", textUnderlineOffset: "3px" }}>All 16 case studies ↗</a>
+              </div>
             </div>
           </section>
           {/* ============ 6. § 05 WHO BUILT IT ============ */}
@@ -711,7 +722,7 @@ export default function EmosHubPage() {
             </div>
             <div style={{ maxWidth: "1312px", margin: "0 auto", padding: "clamp(40px,5vw,72px) clamp(20px,4vw,56px) clamp(56px,6vw,96px)", display: "flex", flexWrap: "wrap", gap: "40px clamp(40px,5vw,72px)", alignItems: "flex-start" }}>
               <div style={{ flex: "1 1 340px", minWidth: "0", maxWidth: "500px", display: "flex", flexDirection: "column", gap: "0" }}>
-                <img src="/assets/headshot.jpg" alt="Syed Irfan Ajmal" style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", border: "1px solid #1a1410", display: "block", background: "#e8e0cc" }} loading="lazy" />
+                <img src="/assets/headshot-square.jpg" alt="Syed Irfan Ajmal" style={{ width: "100%", aspectRatio: "1/1", objectFit: "cover", border: "1px solid #1a1410", display: "block", background: "#e8e0cc" }} loading="lazy" />
                 <div style={{ display: "flex", background: "#1a1410", color: "#f1ebde", marginTop: "16px", border: "1px solid #1a1410" }}>
                   <span style={{ flex: "0 0 112px", background: "#f5b81f", color: "#1a1410", fontFamily: "var(--font-mono)", fontSize: "10px", fontWeight: "700", letterSpacing: ".12em", padding: "12px", lineHeight: "1.4" }}>
                     WRITTEN AND CITED IN
@@ -753,7 +764,8 @@ export default function EmosHubPage() {
                       $160K → $1.2M
                     </span>
                     <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: ".1em", textTransform: "uppercase", lineHeight: "1.5" }}>
-                      Monthly organic revenue, National Tyres and Autocare
+                      Monthly organic revenue, National Tyres and Autocare ·{" "}
+                      <a href="https://www.dmr.agency/case-studies/auto-retailer-seo/" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", textUnderlineOffset: "3px" }}>Case study ↗</a>
                     </span>
                   </div>
                   <div style={{ borderRight: "1px solid #1a1410", borderBottom: "1px solid #1a1410", padding: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -842,6 +854,7 @@ export default function EmosHubPage() {
                     </span>
                     <span style={{ fontSize: "16px", color: "rgba(26,20,16,.8)" }}>
                       That is an agency.
+                      {" "}
                       <span style={{ fontFamily: "var(--font-grot)", fontWeight: "700", fontSize: "12px", letterSpacing: ".14em", textTransform: "uppercase", textDecoration: "underline", textUnderlineOffset: "4px", color: "#1a1410" }}>
                         DMR.agency ↗
                       </span>
