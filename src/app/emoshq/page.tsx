@@ -261,6 +261,16 @@ export default function EmosHubPage() {
                       Your saved journalists, every pitch and score, and the record of what landed.
                     </span>
                   </div>
+                  {/* v2.3: the agentic version, announced but not sold yet (EMOS MCP is live for Irfan only, 24 Oct 2026) */}
+                  <div style={{ marginTop: "18px", border: "1px dashed #1a1410", padding: "12px 14px", display: "flex", flexDirection: "column", gap: "6px" }}>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "10px", letterSpacing: ".14em", textTransform: "uppercase", color: "#1a1410" }}>
+                      <span style={{ background: "#f5b81f", border: "1px solid #1a1410", padding: "2px 6px", marginRight: "8px" }}>Coming soon</span>
+                      Run EMOS from inside Claude
+                    </span>
+                    <span style={{ fontSize: "14px", lineHeight: "1.45", color: "rgba(26,20,16,.8)" }}>
+                      Your Claude becomes the EMOS agent: it finds the story, shortlists the journalists and drafts the pitch. You review and send.
+                    </span>
+                  </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: "14px", alignSelf: "end", paddingTop: "20px" }}>
                     <Link href="/emos-platform" style={{ display: "block", textAlign: "center", background: "#f5b81f", border: "1px solid #1a1410", padding: "16px 20px", fontFamily: "var(--font-grot)", fontWeight: "800", fontSize: "12px", letterSpacing: ".16em", textTransform: "uppercase", textDecoration: "none" }} className="hq-h2">
                       See the Platform →
