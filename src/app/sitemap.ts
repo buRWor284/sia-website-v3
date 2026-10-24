@@ -51,7 +51,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { route: "emoshq",                                  changeFrequency: "monthly" as const, priority: 0.9 },
     { route: "emos-academy",                            changeFrequency: "weekly"  as const, priority: 0.9 },
     { route: "emos-academy/apply",                      changeFrequency: "monthly" as const, priority: 0.8 },
-    { route: "emos-platform",                           changeFrequency: "monthly" as const, priority: 0.8 },
+    // emos-platform: deliberately NOT listed while its layout sets robots noindex
+    // (kept out of search until the EMOS worthiness test is done, 24 Oct 2026).
+    // The /emoshq hub is the indexed EMOS page and links to it.
     { route: "fractional-cmo",                  changeFrequency: "monthly" as const, priority: 0.9 },
     { route: "resources",                       changeFrequency: "weekly"  as const, priority: 0.8 },
     { route: "contact",                         changeFrequency: "yearly"  as const, priority: 0.6 },

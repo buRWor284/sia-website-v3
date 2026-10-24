@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
 import Link from "next/link";
+import { EmosFamilyBar } from "@/components/EmosFamilyBar";
 import { CALENDLY } from "@/lib/tokens";
 import { EARNED_MEDIA_STATS } from "@/components/emos-platform/landing/content";
 import "../emos-residency/residency.css";
@@ -382,6 +383,7 @@ export default function EmosHubPage() {
           </div>
         </section>
       </main>
+      <EmosFamilyBar current="hub" />
       <Footer />
     </>
   );

@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Colophon } from "@/components/bureau";
+import { EmosFamilyBar } from "@/components/EmosFamilyBar";
 import { CALENDLY } from "@/lib/tokens";
 import { EARNED_MEDIA_STATS } from "@/components/emos-platform/landing/content";
 import "./residency.css";
@@ -293,6 +294,7 @@ export default function EmosResidencyPage() {
           <CTAs email="sia@syedirfanajmal.com" />
         </section>
       </main>
+      <EmosFamilyBar current="residency" />
       <Colophon />
     </>
   );

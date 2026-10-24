@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { EmosFamilyBar } from "@/components/EmosFamilyBar";
 import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { SectionMast } from "@/components/bureau/primitives";
@@ -778,6 +779,7 @@ export default function EmosPage() {
           </div>
 
           {/* ── FOOTER ─────────────────────────────────────────────────── */}
+          <EmosFamilyBar current="academy" />
           <footer className="emos-footer sx">
             <div className="max emos-footer-inner">
               <div className="emos-footer-copy">© 2026 Syed Irfan Ajmal &nbsp;·&nbsp; SIA Enterprises Inc</div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EmosFamilyBar } from "@/components/EmosFamilyBar";
 import type { CSSProperties, ReactNode } from "react";
 import { ZoomShot } from "./ZoomShot";
 import { BUILDER_CREDS, COMPARISON, EARNED_MEDIA_STATS, EMOS_PLATFORM_ONBOARDING_URL, FAQ, PRICE_BOX_ALLOWANCES, type FaqItem } from "./content";
@@ -639,6 +640,7 @@ export function PlatformLanding({ signedIn, signedInEmail }: { signedIn: boolean
       </section>
 
       {/* ── Footer link row (build note 5: the page must not be a dead end) ── */}
+      <EmosFamilyBar current="platform" />
       <footer style={{ borderTop: `1px solid ${INK}`, padding: `20px ${GUTTER}`, display: "flex", flexWrap: "wrap", gap: 20, justifyContent: "space-between", alignItems: "center" }}>
         <nav aria-label="Site" style={{ display: "flex", flexWrap: "wrap", gap: 22 }}>
           {[
