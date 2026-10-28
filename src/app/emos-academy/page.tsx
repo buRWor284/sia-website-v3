@@ -55,9 +55,9 @@ const FORBES_AUTHOR_PAGE = "https://www.forbesmiddleeast.com/author/syed-irfan-a
 const HBR_CASE_STUDY = "https://hbr.org/2019/12/how-to-motivate-your-team-during-crunch-time";
 const WORLD_BANK_POST = "https://blogs.worldbank.org/en/endpovertyinsouthasia/why-introvert-me-looks-forward-attending-digital-youth-summit";
 
-const OG_TITLE = "EMOS Academy · Build the Media Presence Investors Check";
+const OG_TITLE = "EMOS Academy · Your team learns the system";
 const OG_DESC =
-  "An earned media system your team owns, not an agency you rent. For founders 3 to 12 months from a Series A.";
+  "A group cohort over 4 to 8 weeks. Your team learns the method and does the work, with live weekly calls and a placements-or-refund guarantee.";
 
 // Open Graph + Twitter set here on the deepest route segment so every scraper
 // (LinkedIn, Twitter/X, WhatsApp, Facebook) renders the EMOS-specific card
