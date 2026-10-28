@@ -12,9 +12,21 @@
 import { UserButton } from "@clerk/nextjs";
 
 export function EmosUserButton() {
+  // The whole chip opens the menu, not just the avatar. Clerk's real trigger is
+  // the <button class="cl-userButtonTrigger"> it renders; clicks on the rest of
+  // the chip (email, caret, padding) are forwarded to it. Reported 2026-10-28.
+  const forwardToTrigger = (e: React.MouseEvent<HTMLDivElement>) => {
+    const chip = e.currentTarget;
+    const target = e.target as HTMLElement;
+    const trigger = chip.querySelector<HTMLButtonElement>("button.cl-userButtonTrigger");
+    if (!trigger || trigger.contains(target)) return;
+    trigger.click();
+  };
   return (
     <div
+      onClick={forwardToTrigger}
       style={{
+        cursor: "pointer",
         position: "fixed",
         // 76, not 24: SignalIQ / JournoCollabIQ / CollabIQ each render a wizard
         // footer fixed at bottom:0 (~60px tall) whose Next/Scan button sits at
