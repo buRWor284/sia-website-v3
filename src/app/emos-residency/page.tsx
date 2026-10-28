@@ -28,6 +28,20 @@ export const metadata: Metadata = {
     "Syed Irfan Ajmal joins your team for a set period, runs EMOS on your real stories and journalists, and hands over an earned media system your team keeps.",
   alternates: { canonical: "/emos-residency" },
   robots: { index: false, follow: false },
+  openGraph: {
+    type: "website",
+    siteName: "Syed Irfan Ajmal",
+    url: "https://www.syedirfanajmal.com/emos-residency",
+    title: "EMOS Residency · We build your earned media system around your workflow",
+    description:
+      "We join your team for a set period, the way a forward-deployed engineer does: learn how you work, then build a version of the EMOS Platform that fits it.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EMOS Residency · We build your earned media system around your workflow",
+    description:
+      "We join your team for a set period, the way a forward-deployed engineer does: learn how you work, then build a version of the EMOS Platform that fits it.",
+  },
 };
 
 const SHOTS = "/assets/emos-platform";
