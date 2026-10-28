@@ -30,6 +30,7 @@ export default function StrategyCallPage() {
       <Script id="cal-inline-strategy" strategy="afterInteractive">{`
         (function tryInit() {
           if (typeof Cal !== "undefined") {
+            Cal("init", { origin: "https://cal.com" });
             Cal("inline", {
               elementOrSelector: "#cal-strategy-call",
               calLink: "syed-irfan-ajmal-cjjebv/30min",

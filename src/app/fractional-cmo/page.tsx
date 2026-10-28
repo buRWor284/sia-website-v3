@@ -1439,6 +1439,7 @@ export default function FractionalCMOPage() {
       <Script id="cal-inline-fcmo" strategy="afterInteractive">{`
         (function tryInit() {
           if (typeof Cal !== "undefined") {
+            Cal("init", { origin: "https://cal.com" });
             Cal("inline", {
               elementOrSelector: "#cal-inline-fractional-cmo",
               calLink: "syed-irfan-ajmal-cjjebv/30min",

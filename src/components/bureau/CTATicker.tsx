@@ -17,24 +17,26 @@ export const CTATicker = ({ topOnly = false }: CTATickerProps) => (
     aria-label="Availability, EMOS, and Speaking"
   >
     {[0, 1].map((i) => (
+      // The second track is a visual duplicate for the seamless loop: hidden from AT,
+      // so its links must also be unfocusable (Lighthouse aria-hidden-focus).
       <span key={i} className="sia-ticker-track" aria-hidden={i > 0 ? true : undefined}>
         <span className="sia-ticker__dot">●</span>
         <span className="sia-ticker__bold">
-          <a href="/fractional-cmo">{cmoSpotsLabel}</a>
+          <a href="/fractional-cmo" tabIndex={i > 0 ? -1 : undefined}>{cmoSpotsLabel}</a>
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>
-          <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer">
+          <a href="https://dmr.agency/earnedmediaos/" target="_blank" rel="noopener noreferrer" tabIndex={i > 0 ? -1 : undefined}>
             GET CITED BEFORE YOUR SERIES A · EMOS FOUNDING CLASS
           </a>
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>
-          <a href="/resources#radars">LIVE RADARS: EARNED MEDIA · KSA TOURISM · FOUNDER MOVERS</a>
+          <a href="/resources#radars" tabIndex={i > 0 ? -1 : undefined}>LIVE RADARS: EARNED MEDIA · KSA TOURISM · FOUNDER MOVERS</a>
         </span>
         <span className="sia-ticker__sep">&nbsp;////&nbsp;</span>
         <span>
-          <a href="/speaking">INVITE ME TO YOUR STAGE · KEYNOTES &amp; WORKSHOPS</a>
+          <a href="/speaking" tabIndex={i > 0 ? -1 : undefined}>INVITE ME TO YOUR STAGE · KEYNOTES &amp; WORKSHOPS</a>
         </span>
         <span className="sia-ticker__sep">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
       </span>

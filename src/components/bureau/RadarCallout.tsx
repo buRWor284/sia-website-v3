@@ -97,11 +97,11 @@ export function RadarCallout({ maxWidth = 1000 }: { maxWidth?: number }) {
         <span className="rc-stats" style={{ flex: "1 1 220px" }}>
           <span>
             <span style={{ display: "block", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: YEL, lineHeight: 1 }}>28</span>
-            <span style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", marginTop: 4 }}>Beats tracked</span>
+            <span style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.72)", marginTop: 4 }}>Beats tracked</span>
           </span>
           <span>
             <span style={{ display: "block", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: YEL, lineHeight: 1 }}>4</span>
-            <span style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.45)", marginTop: 4 }}>Lenses · PR / SEO / GEO / Earned</span>
+            <span style={{ display: "block", fontFamily: GROT, fontWeight: 700, fontSize: 8.5, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(241,235,222,.72)", marginTop: 4 }}>Lenses · PR / SEO / GEO / Earned</span>
           </span>
         </span>
 
@@ -147,7 +147,7 @@ export function RadarCallout({ maxWidth = 1000 }: { maxWidth?: number }) {
             fontSize: 8.5,
             letterSpacing: ".16em",
             textTransform: "uppercase",
-            color: "rgba(241,235,222,.45)",
+            color: "rgba(241,235,222,.72)",
           }}
         >
           Also live

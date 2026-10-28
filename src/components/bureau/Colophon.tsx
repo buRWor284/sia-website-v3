@@ -149,9 +149,11 @@ const S = {
     flexWrap: "wrap",
   } as React.CSSProperties,
   open: {
-    color: "#2e90c3",
+    color: "#1f6f99", // was #2e90c3 (3.1:1 on the footer cream); 4.9:1 now
     fontWeight: 700,
     textDecoration: "none",
+    display: "inline-block",
+    padding: "8px 0", // lifts the 11px link to a 24px+ tap target
     fontFamily: "'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace",
     fontSize: 11,
     letterSpacing: "0.04em",

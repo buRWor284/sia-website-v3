@@ -22,6 +22,7 @@ const css = `
     --I45:  rgba(14,13,10,.45);
     --I15:  rgba(14,13,10,.15);
     --RED:  #2e90c3;
+    --RED-AA: #1f6f99; /* same blue, darkened for 11px text on cream: 5.3:1 (was 3.4:1) */
     --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
     --BG:  #FAFAFA;
     --BG2: #F0F0EE;
@@ -39,7 +40,7 @@ const css = `
   }
   .sec-idx__n {
     font-family: var(--mono); font-size: 11px; font-weight: 600;
-    letter-spacing: .12em; color: var(--RED); flex-shrink: 0;
+    letter-spacing: .12em; color: var(--RED-AA); flex-shrink: 0;
   }
   .sec-idx__rule { flex: 1; height: 2px; background: var(--INK); }
   .sec-idx__label {
@@ -733,6 +734,7 @@ export default function HomePage() {
 
 
 
+      <main>
       {/* ══ HERO ══ */}
       <header className="hero">
         {/* Credibility ticker is rendered globally via layout.tsx */}
@@ -1066,6 +1068,7 @@ export default function HomePage() {
 
       {/* ══ § 06 NEWSLETTER ══ */}
       <Subscriptions sectionNumber="06" />
+      </main>
 
 
       {/* ══ SCROLL BUTTONS ══ */}

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Newsreader, Archivo, JetBrains_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
-import { ClerkProvider } from "@clerk/nextjs";
 import { SiteHeaderConditional } from "@/components/SiteHeaderConditional";
 import "./globals.css";
 import "./mobile-optimization.css"; // loaded after globals so mobile overrides win the cascade
@@ -126,7 +125,6 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <ClerkProvider signInUrl="/emos-platform/signin" signUpUrl="/emos-platform/signin">
     <html
       lang="en"
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
@@ -140,7 +138,8 @@ export default function RootLayout({
         {children}
       </body>
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
-{/* Cal.com popup embed — initialises the queue; embed.js loads lazily on first interaction */}
+{/* Cal.com queue stub only. embed.js is fetched the first time a page calls Cal(...)
+          (the inline booking pages do), so public pages with no booking widget never load it. */}
       <Script id="cal-init" strategy="lazyOnload">{`
         (function (C, A, L) {
           let p = function (a, ar) { a.q.push(ar); };
@@ -166,9 +165,7 @@ export default function RootLayout({
             p(cal, ar);
           };
         })(window, "https://app.cal.com/embed/embed.js", "init");
-        Cal("init", { origin: "https://cal.com" });
       `}</Script>
     </html>
-    </ClerkProvider>
   );
 }

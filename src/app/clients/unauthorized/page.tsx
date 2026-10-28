@@ -1,5 +1,5 @@
 import { GROT, INK, INK55, PAPER, SERIF, YEL } from "@/lib/tokens";
-import { SignOutButton } from "@clerk/nextjs";
+import { ClerkProvider, SignOutButton } from "@clerk/nextjs";
 
 export const metadata = {
   title: "Access Denied",
@@ -8,6 +8,7 @@ export const metadata = {
 
 export default function ClientUnauthorizedPage() {
   return (
+    <ClerkProvider signInUrl="/emos-platform/signin" signUpUrl="/emos-platform/signin">
     <div
       style={{
         minHeight: "100vh",
@@ -90,5 +91,6 @@ export default function ClientUnauthorizedPage() {
         </button>
       </SignOutButton>
     </div>
+    </ClerkProvider>
   );
 }
