@@ -320,6 +320,8 @@ export function PlatformLanding({ signedIn, signedInEmail }: { signedIn: boolean
         </Link>
       </header>
 
+      <main>
+
       {/* ── Signed in, no subscription yet (kept from the previous page) ───── */}
       {signedIn && (
         <div style={{ background: PAPER2, borderBottom: `1px solid ${INK}` }}>
@@ -638,6 +640,8 @@ export function PlatformLanding({ signedIn, signedInEmail }: { signedIn: boolean
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* ── Footer link row (build note 5: the page must not be a dead end) ── */}
       <EmosFamilyBar current="platform" />

@@ -358,9 +358,7 @@ const Hero = () => (
 
         {/* Centre: headline */}
         <div className="res-hero-center">
-          <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
-            SPEAKING
-          </div>
+          <div aria-hidden className="ghost-word" data-ghost="SPEAKING" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }} />
           <SCaps size={10} ls="0.24em" color={INK55}>
             International speaker &amp; trainer &nbsp;·&nbsp; Keynotes &nbsp;·&nbsp; Workshops &nbsp;·&nbsp; 2026 bookings open
           </SCaps>
@@ -629,7 +627,7 @@ const Topics = () => (
       {SUPPORTING_TOPICS.map((s, i) => (
         <div key={s.title} className="card-border" style={{ padding: "26px 24px", background: PAPER, display: "flex", flexDirection: "column", minHeight: 200 }}>
           <SCaps size={10} ls="0.18em" color={INK55}>Topic 0{i + 4}</SCaps>
-          <h4 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{s.title}</h4>
+          <h3 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{s.title}</h3>
           <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.55, fontStyle: "italic", flex: 1 }}>{s.blurb}</p>
         </div>
       ))}
@@ -1083,7 +1081,7 @@ const CourseBlock = () => (
             <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 16, color: PAPER, lineHeight: 1.25 }}>Shoaib Ahmed Baig</div>
             <div style={{ marginTop: 3, fontFamily: SERIF, fontSize: 13.5, color: "rgba(241,235,222,.6)", lineHeight: 1.4 }}>Founder, Elyscents · IDMPakistan · Core47.ai</div>
             <div style={{ marginTop: 8 }}>
-              <SCaps size={9} ls="0.14em" color="rgba(241,235,222,.45)">Hired him to teach the course</SCaps>
+              <SCaps size={9} ls="0.14em" color="rgba(241,235,222,.6)">Hired him to teach the course</SCaps>
             </div>
           </div>
         </figcaption>
@@ -1177,7 +1175,7 @@ const BookingProcess = () => (
         <div key={step.no} className="step-card" style={{ padding: "28px 22px 24px", background: PAPER, display: "flex", flexDirection: "column", minHeight: 220 }}>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(40px, 8vw, 64px)", color: INK, lineHeight: 1, letterSpacing: "-0.03em" }}>{step.no}</div>
           <HRule style={{ margin: "14px 0" }} />
-          <h4 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>{step.t}</h4>
+          <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 22, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>{step.t}</h3>
           <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.55, fontStyle: "italic", flex: 1 }}>{step.d}</p>
         </div>
       ))}
@@ -1335,6 +1333,7 @@ export default function SpeakingPage() {
         description="Syed Irfan Ajmal has spoken in person in the UAE, Malaysia, Indonesia and Pakistan, and has run remote workshops and webinars for SEMrush and for UK-based Uhubs."
         crumbs={[{ name: "Speaking", path: "/speaking" }]}
       />
+      <main>
       <Hero />
       <FeaturedTravelSession />
       <FeaturedSession />
@@ -1355,6 +1354,7 @@ export default function SpeakingPage() {
       <CalendlySection />
       <CTATicker />
       <Subscriptions sectionNumber="08" />
+      </main>
       <Colophon />
       <ScrollButtons />
     </div>

@@ -139,7 +139,7 @@ const MailchimpForm = () => {
         </p>
       )}
 
-      <p style={{ margin: "16px 0 0", fontFamily: SERIF, fontSize: 12.5, color: "rgba(250,250,250,.4)", lineHeight: 1.5, fontStyle: "italic" }}>
+      <p style={{ margin: "16px 0 0", fontFamily: SERIF, fontSize: 12.5, color: "rgba(250,250,250,.55)", lineHeight: 1.5, fontStyle: "italic" }}>
         By subscribing you agree to receive email updates from SIA Enterprises.
         Unsubscribe anytime via the link in any email. We use Mailchimp; read{" "}
         <a href="https://mailchimp.com/legal/privacy/" target="_blank" rel="noreferrer"
@@ -147,7 +147,7 @@ const MailchimpForm = () => {
       </p>
 
       <div style={{ marginTop: 14 }}>
-        <SCaps size={10.5} ls="0.14em" color="rgba(250,250,250,.45)">
+        <SCaps size={10.5} ls="0.14em" color="rgba(250,250,250,.55)">
           No spam · One-click unsubscribe
         </SCaps>
       </div>

@@ -198,7 +198,7 @@ export default function SpeakingTestimonials({
                       {t.event}
                     </span>
                   ) : null}
-                  <SCaps size={9} ls="0.14em" color="rgba(241,235,222,.45)">
+                  <SCaps size={9} ls="0.14em" color="rgba(241,235,222,.6)">
                     {t.role}
                   </SCaps>
                 </div>

@@ -21,7 +21,8 @@ declare global {
           callback: (token: string) => void;
           "error-callback"?: () => void;
           "expired-callback"?: () => void;
-          size?: "invisible" | "normal" | "compact";
+          size?: "normal" | "compact" | "flexible";
+          appearance?: "always" | "execute" | "interaction-only";
           theme?: "light" | "dark" | "auto";
         }
       ) => string;
@@ -52,7 +53,9 @@ export function Turnstile({ onToken }: TurnstileProps) {
         sitekey: siteKey!,
         callback: onToken,
         "expired-callback": () => onToken(""),
-        size: "invisible",
+        // Cloudflare rejects size "invisible" (console TurnstileError, Oct 2026).
+        // interaction-only keeps the widget hidden unless a visitor must be checked.
+        appearance: "interaction-only",
       });
     }
 

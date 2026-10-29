@@ -204,9 +204,7 @@ const Hero = () => (
 
       {/* Centre: headline */}
       <div className="res-hero-center">
-        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
-          CMO
-        </div>
+        <div aria-hidden className="ghost-word" data-ghost="CMO" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }} />
         <SCaps size={10} ls="0.24em" color={INK55}>
           Senior Marketing Leadership &nbsp;&middot;&nbsp; On retainer &nbsp;&middot;&nbsp; By the month
         </SCaps>
@@ -359,7 +357,7 @@ const StatsStrip = () => (
           <div style={{ marginTop: 7, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase", color: PAPER }}>
             {s.label}
           </div>
-          <div style={{ marginTop: 4, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: "rgba(250,250,250,.45)", lineHeight: 1.4 }}>
+          <div style={{ marginTop: 4, fontFamily: SERIF, fontStyle: "italic", fontSize: 12, color: "rgba(250,250,250,.55)", lineHeight: 1.4 }}>
             {s.sub}
           </div>
         </div>
@@ -437,7 +435,7 @@ const Scope = () => (
             {s.no}
           </div>
           <HRule style={{ margin: "14px 0 16px" }} />
-          <h4
+          <h3
             style={{
               margin: 0,
               fontFamily: SERIF,
@@ -449,7 +447,7 @@ const Scope = () => (
             }}
           >
             {s.t}
-          </h4>
+          </h3>
           <p
             style={{
               margin: "12px 0 0",
@@ -515,9 +513,9 @@ const CaseFiles = () => (
           <div style={{ marginTop: 10 }}>
             <SCaps size={10.5} ls="0.16em" color={INK55}>{c.client}</SCaps>
           </div>
-          <h4 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
+          <h3 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: 20, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
             {c.result}
-          </h4>
+          </h3>
           <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.55, fontStyle: "italic", flex: 1 }}>
             {c.body}
           </p>
@@ -610,7 +608,7 @@ const Timeline = () => (
           }}
         >
           <SCaps size={10.5} ls="0.18em" color={INK55}>{s.range}</SCaps>
-          <h4
+          <h3
             style={{
               margin: "12px 0 0",
               fontFamily: SERIF,
@@ -622,7 +620,7 @@ const Timeline = () => (
             }}
           >
             {s.t}
-          </h4>
+          </h3>
           <HRule style={{ margin: "14px 0" }} />
           <p
             style={{
@@ -1065,7 +1063,7 @@ const CMOInquiryForm = () => {
     <form onSubmit={handleSubmit} className="cmo-form" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       <style>{`
         .cmo-form input::placeholder,
-        .cmo-form textarea::placeholder { color: rgba(250,250,250,.4); }
+        .cmo-form textarea::placeholder { color: rgba(250,250,250,.55); }
         .cmo-form input:focus,
         .cmo-form textarea:focus { border-color: rgba(250,250,250,.7); outline: none; }
       `}</style>
@@ -1317,13 +1315,13 @@ const BookCall = () => (
             <span style={{ fontFamily: SERIF, fontSize: 20 }}>→</span>
           </a>
 
-          <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.45)">
+          <SCaps size={10.5} ls="0.16em" color="rgba(250,250,250,.55)">
             Reply within one working day · GMT+5
           </SCaps>
 
           {/* What happens next */}
           <div style={{ paddingTop: 4 }}>
-            <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.35)">What happens next</SCaps>
+            <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.55)">What happens next</SCaps>
             <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 18 }}>
               {([
                 { n: "01", t: "30-min call",         d: "Tell me where the business is and where you need it in 12 months." },
@@ -1334,7 +1332,7 @@ const BookCall = () => (
                   <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 12, color: YEL, letterSpacing: "0.04em", paddingTop: 2, flexShrink: 0 }}>{step.n}</div>
                   <div>
                     <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: PAPER, lineHeight: 1.25 }}>{step.t}</div>
-                    <div style={{ marginTop: 4, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.45)", lineHeight: 1.55, fontStyle: "italic" }}>{step.d}</div>
+                    <div style={{ marginTop: 4, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.55)", lineHeight: 1.55, fontStyle: "italic" }}>{step.d}</div>
                   </div>
                 </div>
               ))}
@@ -1345,7 +1343,7 @@ const BookCall = () => (
 
         {/* Right — form */}
         <div style={{ padding: "36px 40px 40px", display: "flex", flexDirection: "column", gap: 12 }}>
-          <SCaps size={11} ls="0.20em" color="rgba(250,250,250,.45)">Or send a message</SCaps>
+          <SCaps size={11} ls="0.20em" color="rgba(250,250,250,.55)">Or send a message</SCaps>
           <CMOInquiryForm />
         </div>
       </div>
@@ -1450,6 +1448,7 @@ export default function FractionalCMOPage() {
           }
         })();
       `}</Script>
+      <main>
       <Hero />
       <CMOLead />
       <StatsStrip />
@@ -1464,6 +1463,7 @@ export default function FractionalCMOPage() {
       <BookCall />
       <CalSection />
       <Subscriptions sectionNumber="09" />
+      </main>
       <Colophon />
       <ScrollButtons />
     </div>

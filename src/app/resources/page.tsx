@@ -68,9 +68,11 @@ export default function ResourcesPage() {
         description={metadata.description as string}
         crumbs={[{ name: "Resources", path: "/resources" }]}
       />
+      <main>
       <Hero />
       <ResourcesClientShell episodeCount={getAllEpisodes().length} />
       <Subscriptions sectionNumber="07" />
+      </main>
       <Colophon />
       <ScrollButtons />
     </div>

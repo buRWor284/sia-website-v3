@@ -387,7 +387,7 @@ function ResourceLedger({
                 {GROUP_LABEL[group.type]}
               </span>
               <div style={{ flex: 1, height: 1, background: INK15 }} />
-              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(26,20,16,.35)" }}>
+              <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9.5, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(26,20,16,.68)" }}>
                 {group.items.length} {group.items.length === 1 ? "item" : "items"}
               </span>
             </div>
@@ -432,11 +432,11 @@ function ResourceLedger({
       {updatingItems.length > 0 && (
         <div style={{ marginTop: 48 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
-            <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>
+            <h2 style={{ margin: 0, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55 }}>
               Being Updated
-            </span>
+            </h2>
             <div style={{ flex: 1, height: 1, background: INK15 }} />
-            <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.28)" }}>
+            <span style={{ fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.68)" }}>
               {updatingItems.length} {updatingItems.length === 1 ? "item" : "items"}
             </span>
           </div>
@@ -444,9 +444,9 @@ function ResourceLedger({
             {updatingItems.map((item) => (
               <div key={item.id} style={{ background: PAPER, padding: "16px 18px 14px", opacity: 0.55, borderLeft: `3px solid ${TYPE_ACCENT[item.type]}` }}>
                 <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55, marginBottom: 8 }}>{item.badge}</div>
-                <h5 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
+                <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
                   {item.title}
-                </h5>
+                </h3>
               </div>
             ))}
           </div>
@@ -487,7 +487,7 @@ function FilterBar({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", paddingRight: 20, marginRight: 4, flexShrink: 0, borderRight: `1px solid ${INK15}` }}>
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(26,20,16,.35)" }}>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(26,20,16,.68)" }}>
             Type
           </span>
         </div>
@@ -513,7 +513,7 @@ function FilterBar({
               }}
             >
               {tab.label}
-              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.06em", color: isActive ? INK : "rgba(26,20,16,.28)" }}>
+              <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: "0.06em", color: isActive ? INK : "rgba(26,20,16,.68)" }}>
                 {cnt}
               </span>
             </button>
@@ -562,7 +562,7 @@ function FilterBar({
             ✕ Clear
           </button>
         )}
-        <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.3)" }}>
+        <span style={{ marginLeft: "auto", flexShrink: 0, fontFamily: GROT, fontWeight: 600, fontSize: 9, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(26,20,16,.68)" }}>
           {count} result{count !== 1 ? "s" : ""}
         </span>
       </div>
@@ -602,7 +602,7 @@ function PodcastTeaser({ episodeCount }: { episodeCount: number }) {
           </p>
         </div>
         <div>
-          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.4)", marginBottom: 14 }}>Browse the archive</div>
+          <div style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.6)", marginBottom: 14 }}>Browse the archive</div>
           <p style={{ fontFamily: SERIF, fontSize: 15.5, lineHeight: 1.65, color: "rgba(241,235,222,.7)", margin: "0 0 28px" }}>Tactics, case studies, and conversations with marketing leaders. New episodes monthly.</p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <a href="/podcast" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 20px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none" }}>Go to the Podcast →</a>

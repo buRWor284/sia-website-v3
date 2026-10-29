@@ -132,6 +132,7 @@ export default function EmosPage() {
             </div>
           </aside>
           <div className="page-body">
+          <main>
 
           {/* ── HERO ────────────────────────────────────────────────────── */}
           <section id="hero" className="emos-hero bg-ink sx">
@@ -778,6 +779,7 @@ export default function EmosPage() {
             <ReferralCopyButton />
           </div>
 
+          </main>
           {/* ── FOOTER ─────────────────────────────────────────────────── */}
           <EmosFamilyBar current="academy" />
           <footer className="emos-footer sx">

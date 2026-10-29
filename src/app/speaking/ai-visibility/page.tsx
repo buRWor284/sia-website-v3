@@ -20,6 +20,7 @@ import {
 import { ScrollButtons } from "@/components/ScrollButtons";
 import {
   BLUE,
+  BLUE_AA,
   CALENDLY,
   GROT,
   INK,
@@ -328,7 +329,7 @@ const Formats = () => (
           </figure>
           <div style={{ padding: "22px 22px 24px", display: "flex", flexDirection: "column", flex: 1 }}>
             <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.15 }}>{f.t}</h3>
-            <div style={{ marginTop: 8 }}><SCaps size={10} ls="0.12em" color={BLUE}>{f.meta}</SCaps></div>
+            <div style={{ marginTop: 8 }}><SCaps size={10} ls="0.12em" color={BLUE_AA}>{f.meta}</SCaps></div>
             <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55, flex: 1 }}>{f.body}</p>
           </div>
         </div>
@@ -357,7 +358,7 @@ const Shift = () => (
     </div>
     <div className="emai-split">
       <div style={{ border: `1px solid ${INK}`, background: PAPER, padding: "28px 26px" }}>
-        <SCaps size={10.5} ls="0.18em" color={BLUE}>Supply side</SCaps>
+        <SCaps size={10.5} ls="0.18em" color={BLUE_AA}>Supply side</SCaps>
         <h3 style={{ margin: "12px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(22px, 3vw, 30px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>
           AI agents can now do the core jobs of a PR team.
         </h3>
@@ -423,7 +424,7 @@ const PipelineV2 = () => (
     </div>
     <PipelineFlowV2 />
     <div style={{ margin: "34px auto 0", maxWidth: 720, border: `1px solid ${INK}`, borderLeft: `3px solid ${YEL}`, background: PAPER, padding: "22px 26px" }}>
-      <SCaps size={10.5} ls="0.18em" color={BLUE}>On AssetIQ &amp; PressIQ</SCaps>
+      <SCaps size={10.5} ls="0.18em" color={BLUE_AA}>On AssetIQ &amp; PressIQ</SCaps>
       <p style={{ margin: "10px 0 0", fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.6 }}>
         Treat the AI as a co-author, not a vending machine. You don&rsquo;t drop a coin and collect a finished pitch. You brief it, push back, rewrite. Your name goes on the final.
       </p>
@@ -565,7 +566,7 @@ const Audit = () => (
     <div className="emai-cards3">
       {AUDIT_STEPS.map(([t, body], j) => (
         <div key={t} style={{ border: `1px solid ${INK}`, background: PAPER2, padding: "24px 22px" }}>
-          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE, marginBottom: 6 }}>0{j + 1}</span>
+          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE_AA, marginBottom: 6 }}>0{j + 1}</span>
           <SCaps size={12} ls="0.16em" color={INK}>{t}</SCaps>
           <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55 }}>{body}</p>
         </div>
@@ -608,7 +609,7 @@ const Flywheel = () => (
     <div className="emai-returns">
       {RETURNS.map(([n, name, desc]) => (
         <div key={n}>
-          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE, marginBottom: 4 }}>{n}</span>
+          <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", color: BLUE_AA, marginBottom: 4 }}>{n}</span>
           <span style={{ display: "block", fontFamily: GROT, fontWeight: 800, fontSize: 14, letterSpacing: "0.12em", textTransform: "uppercase", color: INK, marginBottom: 6 }}>{name}</span>
           <span style={{ display: "block", fontFamily: SERIF, fontSize: 15.5, color: INK70, lineHeight: 1.55 }}>{desc}</span>
         </div>
@@ -624,7 +625,7 @@ const LeaveWith = () => (
     <SectionMast n="07" label="What You Leave With · And the honest part" />
     <div className="emai-split">
       <div style={{ border: `1px solid ${INK}`, background: PAPER, padding: "30px 28px" }}>
-        <SCaps size={11} ls="0.18em" color={BLUE}>You leave able to</SCaps>
+        <SCaps size={11} ls="0.18em" color={BLUE_AA}>You leave able to</SCaps>
         <ul style={{ margin: "16px 0 0", padding: 0, listStyle: "none" }}>
           {TAKEAWAYS.map((t, j) => (
             <li key={j} style={{ padding: "12px 0 12px 26px", position: "relative", borderTop: j === 0 ? "none" : `1px solid ${INK15}`, fontFamily: SERIF, fontSize: 16.5, color: INK, lineHeight: 1.5 }}>
@@ -840,6 +841,7 @@ export default function EarnedMediaInTheAgeOfAIPage() {
         ]}
       />
       <style dangerouslySetInnerHTML={{ __html: PAGE_CSS }} />
+      <main>
       <Hero />
       <Audit />
       <Flywheel />
@@ -868,6 +870,7 @@ export default function EarnedMediaInTheAgeOfAIPage() {
       <BottomCTA />
       <CTATicker />
       <Subscriptions sectionNumber="10" />
+      </main>
       <Colophon />
       <ScrollButtons />
     </div>

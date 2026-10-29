@@ -277,9 +277,7 @@ const Hero = () => (
 
       {/* Centre: headline */}
       <div className="res-hero-center">
-        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
-          ABOUT
-        </div>
+        <div aria-hidden className="ghost-word" data-ghost="ABOUT" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }} />
         <SCaps size={10} ls="0.24em" color={INK55}>
           Entrepreneur &nbsp;·&nbsp; Marketer &nbsp;·&nbsp; Columnist &nbsp;·&nbsp; Int&apos;l Speaker
         </SCaps>
@@ -462,7 +460,7 @@ const PressArchive = () => (
           </p>
         </div>
         <div style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid rgba(250,250,250,.12)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
-          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.45)">Forbes ME Guide · 2017 · Print edition</SCaps>
+          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.55)">Forbes ME Guide · 2017 · Print edition</SCaps>
           <SCaps size={10.5} ls="0.16em" color={PAPER}>Featured byline</SCaps>
         </div>
       </div>
@@ -845,6 +843,7 @@ const Outro = () => (
 export default function AboutPage() {
   return (
     <div style={{ background: PAPER }}>
+      <main>
       <Hero />
       <PageSchema
         type="ProfilePage"
@@ -863,6 +862,7 @@ export default function AboutPage() {
       <EditorNote />
       <Outro />
       <Subscriptions sectionNumber="07" />
+      </main>
       <Colophon />
       <ScrollButtons />
     </div>

@@ -100,7 +100,7 @@ export default function StrategyCallPage() {
             <div key={s.n}>
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 11, color: YEL, letterSpacing: "0.04em" }}>{s.n}</div>
               <div style={{ marginTop: 6, fontFamily: SERIF, fontWeight: 700, fontSize: 14, color: PAPER, lineHeight: 1.25 }}>{s.t}</div>
-              <div style={{ marginTop: 4, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.45)", lineHeight: 1.5, fontStyle: "italic" }}>{s.d}</div>
+              <div style={{ marginTop: 4, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.55)", lineHeight: 1.5, fontStyle: "italic" }}>{s.d}</div>
             </div>
           ))}
         </div>

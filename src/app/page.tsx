@@ -155,7 +155,7 @@ const css = `
   }
   .speaking-photo__caption {
     font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
-    color: rgba(245,197,24,.5); text-transform: uppercase;
+    color: rgba(245,197,24,.8); text-transform: uppercase;
     padding: 8px 10px; border-top: 1px solid rgba(245,197,24,.2);
   }
 

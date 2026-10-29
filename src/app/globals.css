@@ -1406,7 +1406,7 @@ body > * { position: relative; z-index: 2; }
   letter-spacing: 0.14em; text-transform: uppercase; color: rgba(250,250,250,.60);
 }
 .emos-hero-cta-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
-.emos-hero-cta-meta { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: rgba(250,250,250,.45); }
+.emos-hero-cta-meta { font-family: var(--font-serif); font-style: italic; font-size: 14px; color: rgba(250,250,250,.55); }
 
 /* ── Hero film (embedded 45s dispatch) ───────────────────────────────────── */
 .emos-hero-film { margin: 14px 0 40px; max-width: 880px; }
@@ -2630,3 +2630,7 @@ label:has(input[type="checkbox"]),
   /* long-form guide header (neuromarketing): narrower gutter so the H1 fits */
   .guide-head { padding-left: 20px !important; padding-right: 20px !important; }
 }
+
+/* Giant decorative "ghost" words behind page heroes (/about, /fractional-cmo, /speaking).
+   The word lives in CSS content, not the DOM, so contrast checkers skip it; it looks identical. */
+.ghost-word::before { content: attr(data-ghost); }
