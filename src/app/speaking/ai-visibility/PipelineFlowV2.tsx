@@ -431,7 +431,7 @@ const PF_CSS = `
 .pf-runner--on{ background:var(--pf-yel); border-color:var(--pf-yel); box-shadow:0 0 0 7px rgba(245,184,31,.22); }
 .pf-runner--on::after{ color:var(--pf-ink); }
 
-.pf-runner-tag{ position:absolute; top:30px; transform:translateX(-50%); font-family:var(--pf-mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--pf-blue); white-space:nowrap; transition:left 1.5s cubic-bezier(.65,0,.35,1),opacity .3s; opacity:0; }
+.pf-runner-tag{ position:absolute; top:30px; transform:translateX(-50%); font-family:var(--pf-mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:#17628a; white-space:nowrap; transition:left 1.5s cubic-bezier(.65,0,.35,1),opacity .3s; opacity:0; }
 .pf-runner-tag--on{ opacity:1; }
 
 @media (prefers-reduced-motion: reduce){

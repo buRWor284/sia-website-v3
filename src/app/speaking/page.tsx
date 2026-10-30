@@ -921,7 +921,7 @@ const Formats = () => (
             </div>
             <SCaps size={10} ls="0.14em" color={INK70}>{f.dur}</SCaps>
           </div>
-          <h4 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(18px, 3vw, 26px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>{f.name}</h4>
+          <h3 style={{ margin: "10px 0 0", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(18px, 3vw, 26px)", color: INK, lineHeight: 1.1, letterSpacing: "-0.015em" }}>{f.name}</h3>
           <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 14.5, color: INK70, lineHeight: 1.55, fontStyle: "italic", flex: 1 }}>{f.note}</p>
         </div>
         );
@@ -1044,7 +1044,7 @@ const CourseBlock = () => (
             ["Language", "Urdu"],
           ] as ReadonlyArray<[string, string]>).map(([k, v]) => (
             <Fragment key={k}>
-              <div><SCaps size={9.5} ls="0.14em" color="rgba(241,235,222,.5)">{k}</SCaps></div>
+              <div><SCaps size={9.5} ls="0.14em" color="rgba(241,235,222,.65)">{k}</SCaps></div>
               <div style={{ fontFamily: SERIF, fontSize: 15, color: PAPER, lineHeight: 1.4 }}>{v}</div>
             </Fragment>
           ))}

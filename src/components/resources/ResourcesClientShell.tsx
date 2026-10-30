@@ -442,7 +442,7 @@ function ResourceLedger({
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 1, background: INK15, border: `1px solid ${INK15}` }}>
             {updatingItems.map((item) => (
-              <div key={item.id} style={{ background: PAPER, padding: "16px 18px 14px", opacity: 0.55, borderLeft: `3px solid ${TYPE_ACCENT[item.type]}` }}>
+              <div key={item.id} style={{ background: PAPER, padding: "16px 18px 14px", filter: "grayscale(1)", borderLeft: `3px solid ${TYPE_ACCENT[item.type]}` }}>
                 <div style={{ fontFamily: GROT, fontWeight: 800, fontSize: 8.5, letterSpacing: "0.16em", textTransform: "uppercase", color: INK55, marginBottom: 8 }}>{item.badge}</div>
                 <h3 style={{ margin: 0, fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: INK, lineHeight: 1.2, letterSpacing: "-0.01em" }}>
                   {item.title}
