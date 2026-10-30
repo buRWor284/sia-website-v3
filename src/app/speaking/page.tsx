@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, Fragment } from "react";
-import Script from "next/script";
 import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions, CTATicker } from "@/components/bureau";
 import { ClientLogo } from "@/components/bureau/ClientLogo";
@@ -30,6 +29,7 @@ import {
 } from "@/lib/tokens";
 import { CLIENTS_PRE, CLIENTS_TIER1 } from "@/data/clients";
 import { ScrollButtons } from "@/components/ScrollButtons";
+import { LazyCalInline } from "@/components/LazyCalInline";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -454,6 +454,9 @@ const SpeakingLead = () => (
 
 const WatchTheWork = () => {
   const [active, setActive] = useState(0);
+  // Facade: show the thumbnail until the visitor asks to play, so YouTube's
+  // player JS and cookies never load on first paint (Lighthouse B4).
+  const [playing, setPlaying] = useState(false);
   const v = REELS[active];
   return (
     <section className="sx" style={{ background: INK, color: PAPER, paddingTop: 70, paddingBottom: 90, position: "relative", overflow: "hidden" }}>
@@ -478,7 +481,7 @@ const WatchTheWork = () => {
             {REELS.map((r, i) => {
               const isActive = i === active;
               return (
-                <button key={r.id} onClick={() => setActive(i)} style={{
+                <button key={r.id} onClick={() => { setActive(i); setPlaying(true); }} style={{
                   display: "grid", gridTemplateColumns: "90px 1fr",
                   gap: 12, padding: 10, textAlign: "left",
                   background: isActive ? "rgba(245,184,31,.14)" : "transparent",
@@ -531,15 +534,29 @@ const WatchTheWork = () => {
               <SCaps size={10} ls="0.18em" color="rgba(250,250,250,.55)">{v.city}, {v.region}</SCaps>
             </div>
             <div style={{ width: "100%", aspectRatio: "16 / 9", background: "#000", border: "1px solid rgba(250,250,250,.25)", overflow: "hidden" }}>
-              <iframe
-                key={v.id}
-                src={`https://www.youtube.com/embed/${v.id}?rel=0${v.startAt ? `&start=${v.startAt}` : ""}`}
-                title={v.title}
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-                style={{ width: "100%", height: "100%", border: 0, display: "block" }}
-              />
+              {playing ? (
+                <iframe
+                  key={v.id}
+                  src={`https://www.youtube-nocookie.com/embed/${v.id}?rel=0&autoplay=1${v.startAt ? `&start=${v.startAt}` : ""}`}
+                  title={v.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  style={{ width: "100%", height: "100%", border: 0, display: "block" }}
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setPlaying(true)}
+                  aria-label={`Play video: ${v.title}`}
+                  style={{ position: "relative", width: "100%", height: "100%", padding: 0, border: 0, background: "#000", cursor: "pointer", display: "block" }}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block", opacity: 0.85 }} />
+                  <span aria-hidden style={{ position: "absolute", left: "50%", top: "50%", transform: "translate(-50%, -50%)", width: 76, height: 54, background: YEL, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 8px 24px rgba(0,0,0,.4)" }}>
+                    <span style={{ width: 0, height: 0, marginLeft: 4, borderLeft: `20px solid ${INK}`, borderTop: "12px solid transparent", borderBottom: "12px solid transparent" }} />
+                  </span>
+                </button>
+              )}
             </div>
             <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(250,250,250,.25)" }}>
               <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(16px, 2.5vw, 22px)", color: PAPER, lineHeight: 1.2 }}>{v.title}</div>
@@ -1230,9 +1247,9 @@ const BottomBookingCTA = () => (
   </section>
 );
 
-// ─── §07 · Calendly ───────────────────────────────────────────────────────────
+// ─── §07 · Cal.com (loads on scroll) ─────────────────────────────────────────
 
-const CalendlySection = () => (
+const BookingCalSection = () => (
   <section className="sx" style={{ background: PAPER, paddingTop: 80, paddingBottom: 80, borderTop: `1px solid ${INK}` }}>
     <div style={{ maxWidth: 900, margin: "0 auto" }}>
       <p style={{ margin: "0 0 8px", fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: "0.14em", textTransform: "uppercase", color: INK }}>
@@ -1241,11 +1258,7 @@ const CalendlySection = () => (
       <h2 style={{ margin: "0 0 36px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 5vw, 48px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>
         Pick a time that works for you.
       </h2>
-      <div
-        className="calendly-inline-widget"
-        data-url="https://calendly.com/sia_dmr_agency/emos?hide_event_type_details=1"
-        style={{ minWidth: 320, height: 700 }}
-      />
+      <LazyCalInline id="cal-inline-speaking" />
     </div>
   </section>
 );
@@ -1325,7 +1338,6 @@ const FeaturedSession = () => (
 export default function SpeakingPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <Script src="https://assets.calendly.com/assets/external/widget.js" strategy="lazyOnload" />
       <PageSchema
         type="CollectionPage"
         path="/speaking"
@@ -1351,7 +1363,7 @@ export default function SpeakingPage() {
       <HostQuotes />
       <BookingProcess />
       <BottomBookingCTA />
-      <CalendlySection />
+      <BookingCalSection />
       <CTATicker />
       <Subscriptions sectionNumber="08" />
       </main>

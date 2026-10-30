@@ -4,6 +4,7 @@ import { Fragment } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { SectionMast } from "@/components/bureau/primitives";
 import AuthorityCalculator from "@/components/bureau/AuthorityCalculator";
+import { EmosHeroFilm } from "@/components/bureau/EmosHeroFilm";
 import {
   T1Grid,
   AccordionGroup,
@@ -145,12 +146,7 @@ export default function EmosPage() {
               <div className="emos-hero-film">
                 <p className="emos-hero-film-kicker">In a hurry? Watch the 45-second film</p>
                 <div className="emos-hero-film-frame">
-                  <iframe
-                    src="/assets/emos-hero.standalone.html"
-                    title="EMOS | what investors find when they look you up"
-                    loading="lazy"
-                    scrolling="no"
-                  />
+                  <EmosHeroFilm />
                 </div>
               </div>
 

@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { ScrollButtons } from "@/components/ScrollButtons";
-import Script from "next/script";
+import { LazyCalInline } from "@/components/LazyCalInline";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { RadarCallout } from "@/components/bureau/RadarCallout";
 import { Turnstile } from "@/components/Turnstile";
@@ -1420,10 +1420,7 @@ const CalSection = () => (
       <h2 style={{ margin: "0 0 36px", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(28px, 5vw, 48px)", color: INK, lineHeight: 1, letterSpacing: "-0.02em" }}>
         Pick a time that works for you.
       </h2>
-      <div
-        id="cal-inline-fractional-cmo"
-        style={{ minWidth: 320, height: 700, overflow: "scroll", scrollMarginTop: 112 }}
-      />
+      <LazyCalInline id="cal-inline-fractional-cmo" />
     </div>
   </section>
 );
@@ -1433,21 +1430,6 @@ const CalSection = () => (
 export default function FractionalCMOPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      {/* Initialise Cal.com inline embed for the booking section */}
-      <Script id="cal-inline-fcmo" strategy="afterInteractive">{`
-        (function tryInit() {
-          if (typeof Cal !== "undefined") {
-            Cal("init", { origin: "https://cal.com" });
-            Cal("inline", {
-              elementOrSelector: "#cal-inline-fractional-cmo",
-              calLink: "syed-irfan-ajmal-cjjebv/30min",
-              config: { layout: "month_view" },
-            });
-          } else {
-            setTimeout(tryInit, 200);
-          }
-        })();
-      `}</Script>
       <main>
       <Hero />
       <CMOLead />
