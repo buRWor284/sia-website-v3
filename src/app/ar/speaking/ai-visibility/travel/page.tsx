@@ -359,16 +359,16 @@ const ShiftStats = () => (
       <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.2)", minWidth: 40 }} />
     </div>
     <div className="ar-stats" style={{ background: "rgba(241,235,222,.22)", border: "1px solid rgba(241,235,222,.22)" }}>
-      {SHIFT_STATS.rows.map(([v, l]) => (
-        <div key={l} style={{ background: INK, padding: "24px 20px" }}>
+      {SHIFT_STATS.rows.map(([v, l, src, href]) => (
+        <div key={l} style={{ background: INK, padding: "24px 20px", display: "flex", flexDirection: "column" }}>
           <div style={{ fontFamily: AR_SERIF, fontWeight: 700, fontSize: "clamp(26px, 4vw, 40px)", color: YEL, lineHeight: 1.3 }}>{v}</div>
-          <div style={{ marginTop: 10, fontFamily: AR_SERIF, fontSize: 14.5, color: "rgba(241,235,222,.78)", lineHeight: 1.8 }}>{l}</div>
+          <div style={{ marginTop: 10, flex: 1, fontFamily: AR_SERIF, fontSize: 14.5, color: "rgba(241,235,222,.78)", lineHeight: 1.8 }}>{l}</div>
+          <a href={href} target="_blank" rel="noopener noreferrer" style={{ marginTop: 12, fontFamily: AR_GROT, fontSize: 11.5, color: "rgba(241,235,222,.55)", textDecoration: "underline", textUnderlineOffset: 3, lineHeight: 1.7 }}>
+            {src}
+          </a>
         </div>
       ))}
     </div>
-    <p style={{ margin: "16px 0 0", fontFamily: AR_GROT, fontSize: 11.5, color: "rgba(241,235,222,.5)", lineHeight: 1.8 }}>
-      {SHIFT_STATS.sources}
-    </p>
   </section>
 );
 

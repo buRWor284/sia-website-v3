@@ -135,7 +135,7 @@ const QA: ReadonlyArray<[string, string]> = [
 const STATS: ReadonlyArray<[string, string]> = [
   ["13", "years running an SEO, content and earned media agency"],
   ["1.5M", "organic visitors grown, Ridester"],
-  ["04", "countries hosted on stage"],
+  ["50+", "international speaking engagements, across various countries"],
   ["~500", "biggest live audience"],
 ];
 

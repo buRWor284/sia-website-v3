@@ -159,6 +159,7 @@ export default function PitchClinicDemoTravel() {
             <p className="pcd-text">
               Hi [Name], new data: first-time visitor bookings to AlUla rose <span className="pcd-stat">38%</span> this season across the <span className="pcd-stat">40</span> Saudi properties we track, and guest surveys now put AI assistants in the top three trip planning sources. I have the underlying data and three on-record quotes (two hotel GMs, one DMO lead) if useful for the Middle East travel beat. Happy to send the full breakdown.
             </p>
+            <p className="pcd-illus">Illustrative example: the figures, properties and quotes in this pitch are made up for the demo.</p>
             <div className={`pcd-sent${sent ? " pcd-sent--on" : ""}`}>
               &rarr; Sent to Middle East travel reporter <span className="pcd-check">Sent</span>
             </div>
@@ -170,6 +171,7 @@ export default function PitchClinicDemoTravel() {
 }
 
 const PCD_CSS = `
+.pcd-illus{ margin:10px 0 0; font-family:var(--pcd-grot); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--pcd-ink55); }
 .pcd-lead{ margin-bottom:22px; }
 .pcd-lead-top{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
 .pcd-eyebrow{ font-family:var(--pcd-grot); font-weight:800; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--pcd-yel); }

@@ -1,6 +1,6 @@
 import { ogPhotoCard, OG_SIZE, OG_CONTENT_TYPE } from "@/lib/og";
 
-export const alt = "When Travelers Ask ChatGPT Where to Go · Earned Media for Saudi Tourism";
+export const alt = "When Travelers Ask ChatGPT Where to Go · Earned Media for Travel Brands";
 export const size = OG_SIZE;
 export const contentType = OG_CONTENT_TYPE;
 

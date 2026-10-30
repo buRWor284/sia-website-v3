@@ -108,12 +108,11 @@ export const SHIFT = {
 export const SHIFT_STATS = {
   label: "التحوّل · بالأرقام",
   rows: [
-    ["80%", "من المسافرين يبحثون ويخططون لرحلاتهم الآن بأدوات الذكاء الاصطناعي"],
-    ["262 مليون", "وصول سياحي إسلامي دولي متوقع بحلول 2030، ارتفاعاً من نحو 196 مليوناً في 2025"],
-    ["310 مليار دولار", "الإنفاق السنوي المتوقع على السفر الإسلامي بحلول 2030"],
-    ["~40%", "من المسافرين الأمريكيين استخدموا الذكاء الاصطناعي للتخطيط في 2025، بارتفاع 11 نقطة خلال عام"],
-  ] as ReadonlyArray<[string, string]>,
-  sources: "المصادر: Mastercard وCrescentRating، المؤشر العالمي للسفر الإسلامي 2026 · Phocuswright، 2025",
+    ["80%", "من المسافرين يستخدمون الآن أدوات الذكاء الاصطناعي في السفر", "المصدر: Mastercard وCrescentRating، المؤشر العالمي للسفر الإسلامي 2026", "https://www.mastercard.com/news/ap/en/newsroom/press-releases/en/2026/mastercard-and-crescentrating-s-global-muslim-travel-index-2026-reveals-80-of-travelers-now-use-ai-tools-as-muslim-travel-enters-the-era-of-digital-trust/"],
+    ["262 مليون", "وصول سياحي إسلامي دولي متوقع بحلول 2030، ارتفاعاً من نحو 196 مليوناً في 2025", "المصدر: توقعات CrescentRating لعام 2030، المؤشر العالمي للسفر الإسلامي 2026", "https://crescentrating.com/downloads/GMTI_2026_Report.pdf"],
+    ["310 مليار دولار", "الإنفاق السنوي المتوقع على السفر الإسلامي بحلول 2030", "المصدر: توقعات CrescentRating لعام 2030، المؤشر العالمي للسفر الإسلامي 2026", "https://crescentrating.com/downloads/GMTI_2026_Report.pdf"],
+    ["~40%", "من المسافرين الأمريكيين استخدموا الذكاء الاصطناعي للتخطيط في 2025، بارتفاع 11 نقطة خلال عام", "المصدر: Phocuswright، نوفمبر 2025", "https://www.phocuswright.com/Travel-Research/Research-Updates/2025/search-slips-ai-surges"],
+  ] as ReadonlyArray<[string, string, string, string]>,
 };
 
 export const DEMAND = {
@@ -242,9 +241,9 @@ export const SPEAKER = {
   seenBody:
     "كتب في: البنك الدولي · HuffPost · Forbes الشرق الأوسط · SEMrush · SERPed  |  دراسة حالة في: Harvard Business Review  |  اقتُبس في: Forbes (الولايات المتحدة)  |  ورش وكلمات: SEMrush · Uhubs (المملكة المتحدة) · DMSS.io (بالي) · MaGIC (ماليزيا) · Arabian Travel Market (دبي)",
   stats: [
-    ["22", "سنة في الأعمال والتقنية والتسويق، كمُشغّل"],
+    ["22", "سنة في التقنية والتسويق والمبيعات، آخر 13 منها رئيساً تنفيذياً لـ DMR.agency"],
     ["1.5 مليون", "زائر عضوي تم تنميتهم، Ridester"],
-    ["04", "دول استضافته على المسرح"],
+    ["+50", "مشاركة دولية متحدثاً، في دول مختلفة"],
     ["~500", "أكبر جمهور مباشر"],
   ] as ReadonlyArray<[string, string]>,
 };
@@ -253,7 +252,7 @@ export const PHOTOS = {
   dmssCaption: "مؤتمر DMSS، بالي · طاقة القاعة نفسها التي بُنيت لها هذه الجلسة، نحو 200 حضور.",
   dmssTag: "تصوير · dmss.io",
   dmssAlt: "سيد عرفان أجمل يتحدث أمام جمهور كبير في مؤتمر DMSS ببالي",
-  atmCaption: "Arabian Travel Market، دبي · على منصة الحوار في واحد من أكبر معارض السفر، نحو 40,000 حضور.",
+  atmCaption: "Arabian Travel Market، دبي · على منصة الحوار في واحد من أكبر معارض السفر، الذي يستقطب نحو 40,000 زائر على مدى المعرض.",
   atmTag: "جلسة حوارية · 2018",
   atmTitle: "سيد عرفان أجمل في جلسة حوارية بمعرض سوق السفر العربي في دبي",
 };

@@ -34,11 +34,11 @@ import {
 // ─── Metadata ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Saudi Tourism",
+  title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Travel Brands",
   description:
-    "AI Visibility Through Earned Media, travel edition: how Saudi destinations, hotels and travel brands get recommended in ChatGPT, Gemini and AI travel answers.",
+    "AI Visibility Through Earned Media, travel edition: how destinations, hotels and travel brands get recommended in ChatGPT, Gemini and AI travel answers. Saudi examples by default, retuned for any destination.",
   openGraph: {
-    title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Saudi Tourism",
+    title: "When Travelers Ask ChatGPT Where to Go | AI Visibility for Travel Brands",
     description:
       "The travel edition of AI Visibility Through Earned Media: how destinations, hotels, and travel brands win visibility in AI travel answers. Keynote, workshop, or panel.",
   },
@@ -132,17 +132,19 @@ const QA: ReadonlyArray<[string, string]> = [
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
-  ["22", "years in marketing, as an operator"],
+  ["22", "years in tech, marketing and sales, the last 13 as CEO of DMR.agency"],
   ["1.5M", "organic visitors grown, Ridester"],
-  ["04", "countries hosted on stage"],
+  ["50+", "international speaking engagements, across various countries"],
   ["~500", "biggest live audience"],
 ];
 
-const TRAVEL_STATS: ReadonlyArray<[string, string]> = [
-  ["80%", "of travelers now research and plan trips with AI tools"],
-  ["262M", "international Muslim travel arrivals projected by 2030, from ~196M in 2025"],
-  ["$310B", "projected annual Muslim travel spend by 2030"],
-  ["~40%", "of US travelers used AI to plan trips in 2025, up 11 points in a year"],
+// Each figure carries its own primary source (checked 30 Oct 2026).
+type SourcedStat = { v: string; l: string; src: string; href: string };
+const TRAVEL_STATS: ReadonlyArray<SourcedStat> = [
+  { v: "80%", l: "of travelers now use AI tools for travel", src: "Mastercard & CrescentRating, GMTI 2026", href: "https://www.mastercard.com/news/ap/en/newsroom/press-releases/en/2026/mastercard-and-crescentrating-s-global-muslim-travel-index-2026-reveals-80-of-travelers-now-use-ai-tools-as-muslim-travel-enters-the-era-of-digital-trust/" },
+  { v: "262M", l: "international Muslim travel arrivals projected by 2030, from ~196M in 2025", src: "CrescentRating 2030 forecast, GMTI 2026", href: "https://crescentrating.com/downloads/GMTI_2026_Report.pdf" },
+  { v: "$310B", l: "projected annual Muslim travel spend by 2030", src: "CrescentRating 2030 forecast, GMTI 2026", href: "https://crescentrating.com/downloads/GMTI_2026_Report.pdf" },
+  { v: "~40%", l: "of US travelers used AI to plan trips in 2025, up 11 points in a year", src: "Phocuswright, Nov 2025", href: "https://www.phocuswright.com/Travel-Research/Research-Updates/2025/search-slips-ai-surges" },
 ];
 
 // Formats · one photograph per format, so the offer is shown and not just listed.
@@ -226,6 +228,9 @@ const Hero = () => (
         <p style={{ margin: "18px 0 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
           The travel edition of the flagship session{" "}
           <a href="/speaking/ai-visibility" style={{ color: INK, fontStyle: "italic" }}>AI Visibility Through Earned Media</a>, tuned for Saudi tourism and the brands connecting the Kingdom with the world, using real data from the earned media OS I built and run.
+        </p>
+        <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 18, color: INK70, lineHeight: 1.6, maxWidth: 620 }}>
+          The Saudi examples are the default. The framework works for any destination or travel brand, and I swap in examples from your market.
         </p>
         <div style={{ marginTop: 26, display: "flex", gap: 12, flexWrap: "wrap" }}>
           <a href={CALENDLY} target="_blank" rel="noopener noreferrer" style={btnInk}>Invite me to speak &rarr;</a>
@@ -366,18 +371,18 @@ const ShiftStats = () => (
       <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.2)", minWidth: 40 }} />
     </div>
     <div className="emai-stats" style={{ background: "rgba(241,235,222,.22)", border: "1px solid rgba(241,235,222,.22)" }}>
-      {TRAVEL_STATS.map(([v, l]) => (
-        <div key={l} style={{ background: INK, padding: "24px 20px" }}>
+      {TRAVEL_STATS.map(({ v, l, src, href }) => (
+        <div key={l} style={{ background: INK, padding: "24px 20px", display: "flex", flexDirection: "column" }}>
           <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(30px, 5vw, 46px)", color: YEL, lineHeight: 1, letterSpacing: "-0.02em" }}>{v}</div>
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 10, flex: 1 }}>
             <span style={{ display: "block", fontFamily: SERIF, fontSize: 14.5, color: "rgba(241,235,222,.78)", lineHeight: 1.45 }}>{l}</span>
           </div>
+          <a href={href} target="_blank" rel="noopener noreferrer" style={{ marginTop: 14, fontFamily: GROT, fontSize: 10, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(241,235,222,.55)", textDecoration: "underline", textUnderlineOffset: 3, lineHeight: 1.4 }}>
+            Source: {src}
+          </a>
         </div>
       ))}
     </div>
-    <p style={{ margin: "16px 0 0", fontFamily: GROT, fontSize: 10.5, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
-      Sources: Mastercard &amp; CrescentRating, Global Muslim Travel Index 2026 · Phocuswright, 2025
-    </p>
   </section>
 );
 
@@ -721,7 +726,7 @@ const SpeakerPhotoStrip = () => (
         </div>
         <figcaption style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "12px 4px 2px", gap: 14, flexWrap: "wrap" }}>
           <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: "#FAFAFA", lineHeight: 1.4 }}>
-            Arabian Travel Market, Dubai · On the panel at one of travel&rsquo;s biggest shows, ~40,000 attendees.
+            Arabian Travel Market, Dubai · On the panel at one of travel&rsquo;s biggest shows, which draws ~40,000 attendees across the event.
           </div>
           <SCaps size={10} ls="0.16em" color="rgba(250,250,250,.55)">Panel · 2018</SCaps>
         </figcaption>
