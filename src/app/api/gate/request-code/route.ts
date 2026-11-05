@@ -15,7 +15,7 @@ import { clientIp } from "@/lib/public-tool-guard";
 import { findVerified, storePendingCode, cooldownRemainingMs } from "@/lib/gate/subscribers";
 import { setSubscriberCookie } from "@/lib/gate/subscriber-cookie";
 import { generateCode } from "@/lib/gate/codes";
-import { subscribeNewsletter } from "@/lib/gate/newsletter";
+import { subscribeNewsletter, toolTag } from "@/lib/gate/newsletter";
 import { sendCodeEmail } from "@/lib/gate/email";
 import { REQUEST_CODE_IP_LIMIT, REQUEST_CODE_IP_WINDOW_MS } from "@/lib/gate/config";
 
@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
   if (known) {
     const res = NextResponse.json({ verified: true });
     setSubscriberCookie(res, known.id);
-    void subscribeNewsletter(email); // §8.2 coupling — unchanged default tag
+    // §8.2 coupling. Awaited: a fire-and-forget call is dropped when Vercel freezes the function.
+    await subscribeNewsletter(email, toolTag(tool));
     return res;
   }
 

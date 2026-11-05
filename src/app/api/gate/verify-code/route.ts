@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyCodeAndPromote } from "@/lib/gate/subscribers";
 import { setSubscriberCookie } from "@/lib/gate/subscriber-cookie";
-import { subscribeNewsletter } from "@/lib/gate/newsletter";
+import { subscribeNewsletter, toolTag } from "@/lib/gate/newsletter";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
 
   const res = NextResponse.json({ verified: true });
   setSubscriberCookie(res, result.id);
-  void subscribeNewsletter(email); // §8.2 coupling — unchanged default tag
+  // §8.2 coupling. Awaited: a fire-and-forget call is dropped when Vercel freezes the function.
+  await subscribeNewsletter(email, toolTag(tool));
   return res;
 }
