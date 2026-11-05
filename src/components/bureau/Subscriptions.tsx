@@ -4,83 +4,47 @@ import { useState } from "react";
 import { GROT, INK, PAPER, SERIF, YEL } from "@/lib/tokens";
 import { SCaps, SectionMast, SiaLogo } from "./primitives";
 
-// Mailchimp account constants
-const MC_U  = "92d894afae4496839afa2a07d";
-const MC_ID = "4b6d81a50f";
-const MC_VID = "4651";
-const MC_FID = "003bd4e3f0";
-const MC_HONEYPOT = `b_${MC_U}_${MC_ID}`;
-// GDPR email-permission field: consent is given by submitting the form
-const MC_GDPR_EMAIL_KEY = "2381";
-
 type Status = "idle" | "loading" | "success" | "error";
 
+// Footer signup goes through our own /api/newsletter-subscribe route (server-side
+// Mailchimp API call). The old browser-side post-json JSONP call was answered
+// with "captcha" whenever Mailchimp's bot check fired, which the form can't render.
 const MailchimpForm = () => {
   const [email, setEmail]   = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !/.+@.+\..+/.test(email)) return;
 
     setStatus("loading");
-
-    // Build query string
-    const params = new URLSearchParams({
-      u:     MC_U,
-      id:    MC_ID,
-      v_id:  MC_VID,
-      f_id:  MC_FID,
-      EMAIL: email,
-      [MC_HONEYPOT]: "", // honeypot must be empty
-    });
-    // Subscribing via this form is explicit consent to email updates
-    params.append(`gdpr[${MC_GDPR_EMAIL_KEY}]`, "Y");
-
-    // Unique callback name to avoid collisions
-    const cbName = `_mc_cb_${Date.now()}`;
-    const url = `https://us9.list-manage.com/subscribe/post-json?${params.toString()}&c=${cbName}`;
-
-    // Clean up after 10 s in case Mailchimp never responds
-    const timeout = setTimeout(() => {
-      cleanup();
-      setStatus("error");
-      setErrorMsg("Request timed out. Please try again.");
-    }, 10000);
-
-    const script = document.createElement("script");
-
-    function cleanup() {
-      clearTimeout(timeout);
-      delete (window as unknown as Record<string, unknown>)[cbName];
-      script.remove();
-    }
-
-    (window as unknown as Record<string, unknown>)[cbName] = (data: { result: string; msg: string }) => {
-      cleanup();
-      if (data.result === "success") {
+    try {
+      const res = await fetch("/api/newsletter-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, tag: "footer" }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { success?: boolean; error?: string };
+      if (res.ok && data.success) {
         setStatus("success");
       } else {
-        // Strip any Mailchimp HTML tags from the error message
-        const clean = data.msg.replace(/<[^>]+>/g, "").replace(/^\d+ - /, "");
         setStatus("error");
-        setErrorMsg(clean);
+        setErrorMsg(data.error || "Something went wrong. Please try again.");
       }
-    };
-
-    script.src = url;
-    document.body.appendChild(script);
+    } catch {
+      setStatus("error");
+      setErrorMsg("Network error. Please try again.");
+    }
   };
 
   if (status === "success") {
     return (
       <div>
-        <SCaps size={11} ls="0.20em" color={YEL}>Confirmation sent</SCaps>
+        <SCaps size={11} ls="0.20em" color={YEL}>You&rsquo;re on the list</SCaps>
         <p style={{ margin: "14px 0 0", fontFamily: SERIF, fontSize: 19, color: PAPER, lineHeight: 1.5, fontStyle: "italic" }}>
-          Check <span style={{ color: YEL, fontStyle: "normal" }}>{email}</span>
-, there&rsquo;s a confirmation note from the wire waiting for you.
-          Click the link inside and you&rsquo;re on the list.
+          <span style={{ color: YEL, fontStyle: "normal" }}>{email}</span> is subscribed.
+          The next issue lands in your inbox.
         </p>
         <button
           onClick={() => { setStatus("idle"); setEmail(""); }}

@@ -6,14 +6,6 @@ import { Colophon } from "@/components/bureau";
 import { DoubleRule, SCaps } from "@/components/bureau/primitives";
 import { CALENDLY, GROT, INK, INK55, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
 
-// Mailchimp config
-const MC_U   = "92d894afae4496839afa2a07d";
-const MC_ID  = "4b6d81a50f";
-const MC_VID = "4651";
-const MC_FID = "003bd4e3f0";
-const MC_HONEYPOT       = `b_${MC_U}_${MC_ID}`;
-const MC_GDPR_EMAIL_KEY = "2381";
-
 type Status = "idle" | "loading" | "success" | "error";
 
 function InlineNewsletterForm() {
@@ -21,50 +13,34 @@ function InlineNewsletterForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Same server-side route as the footer box (avoids Mailchimp's "captcha" reply).
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !/.+@.+\..+/.test(email)) return;
     setStatus("loading");
-
-    const params = new URLSearchParams({
-      u:    MC_U,
-      id:   MC_ID,
-      v_id: MC_VID,
-      f_id: MC_FID,
-      EMAIL: email,
-      [MC_HONEYPOT]: "",
-    });
-    params.append(`gdpr[${MC_GDPR_EMAIL_KEY}]`, "Y");
-
-    const cbName = `_mc_cb_${Date.now()}`;
-    const url    = `https://us9.list-manage.com/subscribe/post-json?${params.toString()}&c=${cbName}`;
-    const timeout = setTimeout(() => { cleanup(); setStatus("error"); setErrorMsg("Request timed out."); }, 10000);
-    const script  = document.createElement("script");
-
-    function cleanup() {
-      clearTimeout(timeout);
-      delete (window as unknown as Record<string, unknown>)[cbName];
-      script.remove();
-    }
-
-    (window as unknown as Record<string, unknown>)[cbName] = (data: { result: string; msg: string }) => {
-      cleanup();
-      if (data.result === "success") {
+    try {
+      const res = await fetch("/api/newsletter-subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, tag: "404-page" }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { success?: boolean; error?: string };
+      if (res.ok && data.success) {
         setStatus("success");
       } else {
         setStatus("error");
-        setErrorMsg(data.msg.replace(/<[^>]+>/g, "").replace(/^\d+ - /, ""));
+        setErrorMsg(data.error || "Something went wrong. Please try again.");
       }
-    };
-
-    script.src = url;
-    document.body.appendChild(script);
+    } catch {
+      setStatus("error");
+      setErrorMsg("Network error. Please try again.");
+    }
   };
 
   if (status === "success") {
     return (
       <p style={{ fontFamily: SERIF, fontSize: 15, color: INK70, fontStyle: "italic", margin: 0 }}>
-        Check <strong style={{ color: INK, fontStyle: "normal" }}>{email}</strong> for a confirmation link.
+        <strong style={{ color: INK, fontStyle: "normal" }}>{email}</strong> is on the list.
       </p>
     );
   }
