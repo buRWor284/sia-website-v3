@@ -8,8 +8,12 @@
 // plus native controls instead of autoplay.
 
 import { useEffect, useRef } from "react";
+import { preload } from "react-dom";
 
 export function EmosHeroFilm() {
+  // The poster is the page's LCP element: tell the browser about it in the
+  // <head> with high priority instead of letting it be found late.
+  preload("/assets/emos-hero-poster.jpg", { as: "image", fetchPriority: "high" });
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
