@@ -587,7 +587,7 @@ function PodcastTeaser({ episodeCount }: { episodeCount: number }) {
           <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10.5, letterSpacing: "0.18em", textTransform: "uppercase" }}>§ 02</span>
           <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>Podcast · {episodeCount} Episodes</span>
           <div style={{ flex: 1, height: 1, background: "rgba(241,235,222,.25)" }} />
-          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.35)" }}>Vol. XV · № 02</span>
+          <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.18em", textTransform: "uppercase", color: "rgba(241,235,222,.65)" }}>Vol. XV · № 02</span>
         </div>
         <div style={{ borderTop: "1px solid rgba(241,235,222,.5)" }} />
       </div>
