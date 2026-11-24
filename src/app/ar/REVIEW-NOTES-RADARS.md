@@ -52,7 +52,11 @@ Recorded here because the same trap is waiting for the next session: **never
 "repair" Arabic in a source file based on how it renders in shell output.** Verify
 against the file itself, or in a browser, before changing a single character.
 
-## What is deliberately not ported
+## Interactive radar (PORTED 2026-11-24)
+
+Both Arabic pages now run the SAME animated radar as the English pages. RetailRadarModule / KsaRadarModule take an optional `t` text pack (src/lib/signaliq/radar-text.ts) and `bands={false}` (the Arabic pages hide the module's season calendar and live-wire band, because the season calendar is already on the page and the live-wire band shows English seed phrases). Arabic words live in RetailRadarAr.tsx / KsaRadarAr.tsx. The section below is history.
+
+## What is deliberately not ported (superseded)
 
 The English interactive module (`KsaRadarModule` / `RetailRadarModule`, ~600 lines each)
 does lens and ring filtering client-side. It is an English client component, and

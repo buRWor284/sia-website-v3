@@ -19,7 +19,7 @@
  *   · a signal added in English appears here immediately, in English, marked
  *     with a "not yet translated" chip rather than silently disappearing
  *
- * The interactive lens/ring filter module from the English page is not ported.
+ * The interactive radar module is shared with the English page via an Arabic text pack (KsaRadarAr.tsx, added 2026-11-24).
  * It is an English client component; rebuilding it in Arabic is a second piece
  * of work. Here every signal is rendered, grouped by horizon, with no filter.
  */
@@ -37,7 +37,9 @@ import { ArabicFooter, ArabicHeader, DraftBanner } from "../_components/chrome";
 import HistoryStrip from "@/components/signaliq/HistoryStrip";
 import SeasonCalendar from "@/components/signaliq/SeasonCalendar";
 import { isUnusuallyQuiet, loudPeakWeeks } from "@/lib/signaliq/radar-season";
+import "../../ksa-tourism-radar/ksa-radar.css";
 import "../radar-ar.css";
+import KsaRadarAr from "./KsaRadarAr";
 
 const amiri = Amiri({ variable: "--font-ar-serif", subsets: ["arabic"], weight: ["400", "700"], display: "swap" });
 const plex = IBM_Plex_Sans_Arabic({ variable: "--font-ar-grot", subsets: ["arabic"], weight: ["400", "500", "600", "700"], display: "swap" });
@@ -237,6 +239,10 @@ export default async function ArabicKsaTourismRadarPage() {
             <h2>{UI.s01}</h2>
             <span className="ar-rule" />
             <span className="ar-fresh">{live.hasData ? UI.liveAsOf(live.asOf) : UI.wirePending}</span>
+          </div>
+
+          <div style={{ margin: "8px 0 40px" }}>
+            <KsaRadarAr live={live} />
           </div>
 
           {byRing.map((group, i) =>

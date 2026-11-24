@@ -30,7 +30,9 @@ import { ArabicFooter, ArabicHeader, DraftBanner } from "../_components/chrome";
 import HistoryStrip from "@/components/signaliq/HistoryStrip";
 import SeasonCalendar from "@/components/signaliq/SeasonCalendar";
 import { isUnusuallyQuiet, loudPeakWeeks } from "@/lib/signaliq/radar-season";
+import "../../ksa-retail-radar/ksa-retail-radar.css";
 import "../radar-ar.css";
+import RetailRadarAr from "./RetailRadarAr";
 
 const amiri = Amiri({ variable: "--font-ar-serif", subsets: ["arabic"], weight: ["400", "700"], display: "swap" });
 const plex = IBM_Plex_Sans_Arabic({ variable: "--font-ar-grot", subsets: ["arabic"], weight: ["400", "500", "600", "700"], display: "swap" });
@@ -214,6 +216,10 @@ export default async function ArabicKsaRetailRadarPage() {
             <h2>{UI.s01}</h2>
             <span className="ar-rule" />
             <span className="ar-fresh">{live.hasData ? UI.liveAsOf(live.asOf) : UI.wirePending}</span>
+          </div>
+
+          <div style={{ margin: "8px 0 40px" }}>
+            <RetailRadarAr live={live} />
           </div>
 
           {byRing.map((group, i) =>

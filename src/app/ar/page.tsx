@@ -17,7 +17,7 @@ const amiri = Amiri({ variable: "--font-ar-serif", subsets: ["arabic"], weight: 
 const plex = IBM_Plex_Sans_Arabic({ variable: "--font-ar-grot", subsets: ["arabic"], weight: ["400", "500", "600", "700"], display: "swap" });
 
 export const metadata: Metadata = {
-  title: { absolute: "سيد عرفان أجمل · الإعلام المكتسب ورادارات السوق السعودية" },
+  title: { absolute: "Syed Irfan Ajmal · سيد عرفان أجمل · الإعلام المكتسب ورادارات السوق السعودية" },
   description:
     "سيد عرفان أجمل، استراتيجي الإعلام المكتسب ومؤسس EMOS. رادارات السياحة والتجزئة في السعودية مع بيانات تغطية صحفية حية.",
   alternates: { canonical: "/ar" },

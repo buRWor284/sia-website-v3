@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { KSA_LENSES, KSA_LENS_LABEL, ksaDelta7, type KsaLens, type KsaLiveTopic, type KsaRadarData } from "@/lib/ksa-radar/types";
 import HistoryStrip from "@/components/signaliq/HistoryStrip";
 import SeasonCalendar from "@/components/signaliq/SeasonCalendar";
+import { makeEnRadarText, type RadarText } from "@/lib/signaliq/radar-text";
 import { LEAN_COPY, SHOW_AR_COUNTS, isUnusuallyQuiet, langRelative, langSplit, loudPeakWeeks } from "@/lib/signaliq/radar-season";
 import { LOW_SAMPLE_N, RING_LABEL, SIGNALS, SIGNAL_BY_TOPIC, STATUS_META, VERDICT_META, verdictFor, type KsaSignal } from "./content";
 
@@ -73,7 +74,22 @@ interface LiveLine {
   tr: number;
 }
 
-export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
+const EN_TEXT: RadarText = makeEnRadarText({
+  tabLabel: { giga: "Giga-projects", events: "Mega-events", hosp: "Hospitality", faith: "Faith travel" },
+  lensLabel: KSA_LENS_LABEL,
+  quad: ["GIGA-PROJECTS", "MEGA-EVENTS", "HOSPITALITY", "FAITH TRAVEL"],
+  ringLabels: RING_LABEL,
+  canvasAria: "Radar of 28 Saudi tourism signals by lens and time horizon. The same data is listed in the signal index below.",
+  help: (
+    <>
+      Each mark is one Saudi tourism signal. <b>Distance from the centre is time</b>: inner ring is live now, the middle is building, the outer ring is
+          the 2030+ horizon. <b>Mark size is the scale of the bet.</b> Click any mark, or any row below, to open its signal file.
+    </>
+  ),
+});
+
+export default function KsaRadarModule({ live, t, bands = true }: { live: KsaRadarData; t?: RadarText; bands?: boolean }) {
+  const tx = t ?? EN_TEXT;
   const [lens, setLens] = useState<LensFilter>("all");
   const [selectedId, setSelectedId] = useState<string>("riyadhair");
   const lensRef = useRef<LensFilter>("all");
@@ -128,6 +144,8 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
   const hist = useMemo(() => live.history ?? {}, [live.history]);
   const selectedHist = hist[selected.id] ?? null;
   const selectedVerdict = verdictFor(selectedLive?.n ?? null, selectedLive?.tr ?? null, medianN, selected.demand, selected.catalyst, selected.status, selectedHist);
+  const selText = tx.text(selected);
+  const selVerdict = tx.verdict(selectedVerdict, VERDICT_META[selectedVerdict]);
   const selectedPeakWks = loudPeakWeeks(selectedVerdict, selectedHist);
   const selectedQuiet = selectedLive
     ? isUnusuallyQuiet(selectedLive.n >= Math.max(medianN, 1), selectedHist, selectedLive.tr >= 0.1 && selectedLive.n >= LOW_SAMPLE_N)
@@ -234,20 +252,21 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
         ctx.stroke();
       });
       // ring labels up the top axis (canvas cannot resolve CSS vars — literal family)
+      ctx.direction = tx.locale === "ar" ? "rtl" : "ltr";
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.textAlign = "center";
       ctx.fillStyle = "rgba(26,20,16,.45)";
-      RING_LABEL.forEach((t, i) => {
-        ctx.fillText(t, cx, cy - R * (RING_RAD[i] + 0.045));
+      RING_LABEL.forEach((_lbl, i) => {
+        ctx.fillText(tx.ring(i), cx, cy - R * (RING_RAD[i] + 0.045));
       });
       // quadrant labels
       ctx.font = "11px Archivo, sans-serif";
       ctx.fillStyle = "rgba(26,20,16,.5)";
-      ctx.fillText("GIGA-PROJECTS", cx + R * 0.6, cy - R * 0.72);
-      ctx.fillText("MEGA-EVENTS", cx + R * 0.62, cy + R * 0.76);
-      ctx.fillText("HOSPITALITY", cx - R * 0.64, cy + R * 0.76);
+      ctx.fillText(tx.quad[0], cx + R * 0.6, cy - R * 0.72);
+      ctx.fillText(tx.quad[1], cx + R * 0.62, cy + R * 0.76);
+      ctx.fillText(tx.quad[2], cx - R * 0.64, cy + R * 0.76);
       ctx.fillStyle = "rgba(245,184,31,.95)";
-      ctx.fillText("FAITH TRAVEL", cx - R * 0.62, cy - R * 0.72);
+      ctx.fillText(tx.quad[3], cx - R * 0.62, cy - R * 0.72);
       // sweep
       for (let i = 0; i < 36; i++) {
         const a = sweep - i * 0.05;
@@ -336,14 +355,14 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
         const lv = liveFor(bb.s);
         tip.innerHTML =
           '<span style="font-family:var(--font-grot);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-yellow)">' +
-          KSA_LENS_LABEL[bb.s.lens] +
+          tx.lensLabel[bb.s.lens] +
           " · " +
-          RING_LABEL[bb.s.ring - 1] +
+          tx.ring(bb.s.ring - 1) +
           '</span><b style="display:block">' +
-          bb.s.name +
+          tx.text(bb.s).name +
           "</b>" +
           '<span style="font-size:10.5px;opacity:.85">' +
-          (lv ? lv.n.toLocaleString() + " articles / 60d · " + pct(lv.tr) : STATUS_META[bb.s.status].glyph + " " + STATUS_META[bb.s.status].note) +
+          (lv ? lv.n.toLocaleString("en") + " " + tx.articles60d + " · " + pct(lv.tr) : STATUS_META[bb.s.status].glyph + " " + tx.statusNote(bb.s.status, STATUS_META[bb.s.status].note)) +
           "</span>";
       } else {
         cv.style.cursor = "default";
@@ -369,14 +388,14 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
       cv.removeEventListener("mouseleave", onLeave);
       cv.removeEventListener("click", onClick);
     };
-  }, [liveFor]);
+  }, [liveFor, tx]);
 
   const lenses: { l: LensFilter; label: string }[] = [
-    { l: "all", label: "§ All" },
-    { l: "giga", label: "Giga-projects" },
-    { l: "events", label: "Mega-events" },
-    { l: "hosp", label: "Hospitality" },
-    { l: "faith", label: "Faith travel" },
+    { l: "all", label: tx.lensAll },
+    { l: "giga", label: tx.tabLabel.giga },
+    { l: "events", label: tx.tabLabel.events },
+    { l: "hosp", label: tx.tabLabel.hosp },
+    { l: "faith", label: tx.tabLabel.faith },
   ];
 
   const totalSeries = useMemo(
@@ -387,7 +406,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
   const visible = (s: KsaSignal): boolean => lens === "all" || s.lens === lens;
 
   return (
-    <div className="ksr-mod" data-lens={lens}>
+    <div className="ksr-mod" data-lens={lens} dir={tx.locale === "ar" ? "rtl" : undefined} lang={tx.locale === "ar" ? "ar" : undefined}>
       <div className="ksr-lenses" role="tablist" aria-label="Filter by lens">
         {lenses.map((x) => (
           <button key={x.l} type="button" className="ksr-lens" data-active={lens === x.l} aria-pressed={lens === x.l} onClick={() => setLens(x.l)}>
@@ -399,24 +418,23 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
       <div className="ksr-readout" aria-live="polite">
         {lens === "all" ? (
           <>
-            Tracking <b>{SIGNALS.length} signals</b> across 4 lenses
+            {tx.tracking} <b>{SIGNALS.length} {tx.signalsWord}</b> {tx.across4}
             {live.hasData ? (
               <>
                 {" "}
-                · <b>{fmtK(live.grand)}</b> articles of press coverage over the last 60 days · <b>{live.heating}</b> heating
+                · <b>{fmtK(live.grand)}</b> {tx.articlesLast60} · <b>{live.heating}</b> {tx.heatingWord}
               </>
             ) : (
-              <> · curated layer live · SignalIQ wire pending first scan</>
+              <> · {tx.pendingReadout}</>
             )}
           </>
         ) : (
           <>
-            <span className="ksr-ro-lens">{KSA_LENS_LABEL[lens]}</span> · <b>{SIGNALS.filter((s) => s.lens === lens).length} signals</b>
+            <span className="ksr-ro-lens">{tx.lensLabel[lens]}</span> · <b>{SIGNALS.filter((s) => s.lens === lens).length} {tx.signalsWord}</b>
             {live.hasData ? (
               <>
                 {" "}
-                · <b>{fmtK(live.lensTotal[lens])}</b> articles / 60d · {ksaDelta7(live.series[lens]) >= 0 ? "▲" : "▼"} {pct(ksaDelta7(live.series[lens]))} week
-                over week
+                · <b>{fmtK(live.lensTotal[lens])}</b> {tx.articles60d} · {ksaDelta7(live.series[lens]) >= 0 ? "▲" : "▼"} {pct(ksaDelta7(live.series[lens]))} {tx.weekOverWeek}
               </>
             ) : null}
           </>
@@ -425,44 +443,44 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
 
       <div className="ksr-stage-grid">
         <div className="ksr-radar-stage">
-          <canvas ref={canvasRef} className="ksr-radar-canvas" width={620} height={620} aria-label="Radar of 28 Saudi tourism signals by lens and time horizon. The same data is listed in the signal index below." />
+          <canvas ref={canvasRef} className="ksr-radar-canvas" width={620} height={620} aria-label={tx.canvasAria} />
           <div ref={tipRef} className="ksr-radar-tip" />
         </div>
 
         {/* signal file (detail card) */}
         <aside className="ksr-file" aria-live="polite">
-          <div className="ksr-scaps">Signal file · {RING_LABEL[selected.ring - 1]}</div>
-          <h3 className="ksr-file-name">{selected.name}</h3>
-          <div className="ksr-file-ar" dir="rtl">{selected.ar}</div>
+          <div className="ksr-scaps">{tx.signalFile} · {tx.ring(selected.ring - 1)}</div>
+          <h3 className="ksr-file-name">{selText.name}</h3>
+          <div className="ksr-file-ar" dir={tx.locale === "ar" ? "ltr" : "rtl"}>{selText.sub}</div>
           <div className="ksr-file-badges">
-            <span className={chipClass(selected.lens)}>{KSA_LENS_LABEL[selected.lens]}</span>
+            <span className={chipClass(selected.lens)}>{tx.lensLabel[selected.lens]}</span>
             <span className="ksr-chip">
-              {STATUS_META[selected.status].glyph} {STATUS_META[selected.status].label} · {STATUS_META[selected.status].note}
+              {STATUS_META[selected.status].glyph} {tx.statusLabel(selected.status, STATUS_META[selected.status].label)} · {tx.statusNote(selected.status, STATUS_META[selected.status].note)}
             </span>
           </div>
-          <p className="ksr-file-stat">{selected.stat}</p>
+          <p className="ksr-file-stat">{selText.stat}</p>
           <p className="ksr-file-sig">
-            <span className="ksr-file-lbl">Latest signal</span>
-            {selected.sig}
+            <span className="ksr-file-lbl">{tx.latestSignal}</span>
+            {selText.sig}
           </p>
           <div className="ksr-file-verdict">
-            <span className="row"><b>Press</b>{selectedLive ? `${selectedLive.n.toLocaleString()} articles · ${selectedLive.n < LOW_SAMPLE_N ? "sample too small for a trend" : selectedLive.tr >= 0.1 ? "rising" : selectedLive.tr <= -0.1 ? "falling" : "flat"}` : "wire pending"}</span>
-            <span className="row"><b>Reality</b>{selected.demand || "none on file"}</span>
-            <span className="row"><b>Next</b>{selected.catalyst || "none scheduled"}</span>
+            <span className="row"><b>{tx.press}</b>{selectedLive ? `${selectedLive.n.toLocaleString("en")} ${tx.articlesWord} · ${selectedLive.n < LOW_SAMPLE_N ? tx.sampleSmall : selectedLive.tr >= 0.1 ? tx.rising : selectedLive.tr <= -0.1 ? tx.falling : tx.flat}` : tx.wirePending}</span>
+            <span className="row"><b>{tx.reality}</b>{selText.demand || tx.noneOnFile}</span>
+            <span className="row"><b>{tx.next}</b>{selText.catalyst || tx.noneScheduled}</span>
             {selectedSplit ? (
-              <span className="row"><b>EN / AR</b>{`EN ${selectedSplit.en.toLocaleString()} · AR ${selectedSplit.ar.toLocaleString()} (60d) · ${LEAN_COPY.en[selectedSplit.lean]}`}</span>
+              <span className="row"><b>EN / AR</b>{`EN ${selectedSplit.en.toLocaleString()} · AR ${selectedSplit.ar.toLocaleString()} (60d) · ${LEAN_COPY[tx.locale][selectedSplit.lean]}`}</span>
             ) : null}
-            <span className={"ksr-verdict v-" + VERDICT_META[selectedVerdict].tone}>{VERDICT_META[selectedVerdict].label}</span>
-            <span className="vnote">{VERDICT_META[selectedVerdict].note}{selectedQuiet ? " · unusually quiet for the time of year" : ""}{selectedPeakWks !== null ? ` · usual peak in ${selectedPeakWks} ${selectedPeakWks === 1 ? "wk" : "wks"}` : ""}{selectedLive ? ` · SignalIQ × GDELT, as of ${live.asOf}` : ""}</span>
+            <span className={"ksr-verdict v-" + VERDICT_META[selectedVerdict].tone}>{selVerdict.label}</span>
+            <span className="vnote">{selVerdict.note}{selectedQuiet ? ` · ${tx.unusuallyQuiet}` : ""}{selectedPeakWks !== null ? ` · ${tx.peakIn(selectedPeakWks)}` : ""}{selectedLive ? ` · ${tx.asOf(live.asOf)}` : ""}</span>
           </div>
           {selectedHist ? (
             <div className="ksr-file-hist">
-              <span className="ksr-file-lbl">Three years of press</span>
-              <HistoryStrip h={selectedHist} />
+              <span className="ksr-file-lbl">{tx.threeYears}</span>
+              <HistoryStrip h={selectedHist} locale={tx.locale} />
             </div>
           ) : null}
           <p className="ksr-file-talk">
-            <b>Talk angle:</b> {selected.talk}
+            <b>{tx.talkAngle}</b> {selText.talk}
           </p>
           <p className="ksr-file-srcs">
             {[...selected.statS, ...selected.sigS].map((sl) => (
@@ -478,15 +496,14 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
         {KSA_LENSES.map((l) => (
           <span className="ksr-lg" key={l}>
             <LensMark lens={l} />
-            {KSA_LENS_LABEL[l]}
+            {tx.lensLabel[l]}
           </span>
         ))}
       </div>
 
       <div className="ksr-read-help ksr-read-below">
         <p className="ksr-body">
-          Each mark is one Saudi tourism signal. <b>Distance from the centre is time</b>: inner ring is live now, the middle is building, the outer ring is
-          the 2030+ horizon. <b>Mark size is the scale of the bet.</b> Click any mark, or any row below, to open its signal file.
+          {tx.help}
         </p>
       </div>
 
@@ -496,7 +513,7 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
           <div className="ksr-col" key={l} data-cat={l}>
             <h4 className="ksr-col-head">
               <LensMark lens={l} />
-              {KSA_LENS_LABEL[l]}
+              {tx.lensLabel[l]}
             </h4>
             <ul>
               {SIGNALS.filter((s) => s.lens === l).map((s) => {
@@ -504,10 +521,10 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
                 return (
                   <li key={s.id}>
                     <button type="button" data-active={s.id === selectedId} onClick={() => setSelectedId(s.id)}>
-                      <span className="nm">{s.name}</span>
+                      <span className="nm">{tx.text(s).name}</span>
                       <span className="st">
                         {lv ? fmtK(lv.n) + " · " : ""}
-                        {STATUS_META[s.status].glyph} {RING_LABEL[s.ring - 1].split(" ")[0]}
+                        {STATUS_META[s.status].glyph} {tx.ringShort(s.ring - 1)}
                       </span>
                     </button>
                   </li>
@@ -518,6 +535,8 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
         ))}
       </div>
 
+      {bands ? (
+        <>
       {/* ---- season calendar (2026-09-15): derived from three years of weekly counts ---- */}
       {live.hasData && live.thisMonday && seasonItems.length > 0 ? (
         <>
@@ -649,6 +668,8 @@ export default function KsaRadarModule({ live }: { live: KsaRadarData }) {
           <p className="ksr-micro">No fabricated trend lines: these stay empty until the first scans land. That is the house rule.</p>
         </div>
       )}
+        </>
+      ) : null}
     </div>
   );
 }
