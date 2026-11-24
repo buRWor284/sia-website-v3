@@ -53,6 +53,9 @@ export default function ArabicHome() {
           <h1 style={{ fontFamily: AR_SERIF, fontWeight: 700, fontSize: "clamp(32px,5vw,52px)", lineHeight: 1.25, color: INK, margin: "10px 0 18px" }}>
             سيد عرفان أجمل
           </h1>
+          <div dir="ltr" lang="en" style={{ fontFamily: AR_GROT, fontSize: 15, fontWeight: 600, letterSpacing: "0.08em", color: INK70, margin: "-8px 0 18px", textAlign: "right" }}>
+            Syed Irfan Ajmal
+          </div>
           <div style={{ maxWidth: 760, fontFamily: AR_SERIF, fontSize: 19, lineHeight: 1.95, color: INK }}>
             <p style={{ margin: "0 0 14px" }}>
               يعمل سيد عرفان أجمل في مجالات الأعمال والتقنية والتسويق منذ عام <span dir="ltr">2004</span>، ويدير منذ عام{" "}

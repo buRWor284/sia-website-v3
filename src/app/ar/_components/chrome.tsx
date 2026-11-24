@@ -70,7 +70,10 @@ export function ArabicHeader({
       >
         <a href="/ar" style={{ textDecoration: "none" }}>
           <div style={{ fontFamily: AR_SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.2 }}>
-            سيد عرفان أجمل
+            سيد عرفان أجمل{" "}
+            <span dir="ltr" lang="en" style={{ fontFamily: AR_GROT, fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", color: INK55 }}>
+              Syed Irfan Ajmal
+            </span>
           </div>
           <span style={{ fontFamily: AR_GROT, fontSize: 10, letterSpacing: "0.1em", color: INK55 }}>
             استراتيجي الإعلام المكتسب · مؤسس EMOS
