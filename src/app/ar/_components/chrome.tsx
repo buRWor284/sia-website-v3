@@ -81,7 +81,7 @@ export function ArabicHeader({
         >
           {link("/ar/ksa-tourism-radar", "رادار السياحة", "tourism")}
           {link("/ar/ksa-retail-radar", "رادار التجزئة", "retail")}
-          {link("/ar/speaking/ai-visibility/travel", "المحاضرات", "speaking")}
+          {/* Speaking page hidden from nav until its native review is done (it is still noindex). */}
           <a
             href={switchHref}
             hrefLang="en"
