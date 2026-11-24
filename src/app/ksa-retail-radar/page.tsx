@@ -20,7 +20,10 @@ export const metadata: Metadata = {
   title: "Saudi Retail Market & Consumer Trends Radar (KSA)",
   description:
     "25 sourced signals on Saudi Arabia's consumer economy: e-commerce and delivery, retail groups and brands, lifestyle retail, and the macro picture. Curated from official statistics and named reports, wired to live press-coverage data via SignalIQ.",
-  alternates: { canonical: "/ksa-retail-radar" },
+  alternates: {
+    canonical: "/ksa-retail-radar",
+    languages: { en: "/ksa-retail-radar", ar: "/ar/ksa-retail-radar", "x-default": "/ksa-retail-radar" },
+  },
   openGraph: {
     title: "KSA Retail & Consumer Radar · Syed Irfan Ajmal",
     description: "A consumer economy approaching $294B with thin English coverage in monitored sources (SignalIQ x GDELT). Live coverage data shows exactly where the gaps are.",
@@ -149,6 +152,9 @@ export default async function RetailRadarPage() {
           <div className="krr-hero-lead">
             <div className="krr-scaps">Signal Radar · KSA Retail Edition · إصدار التجزئة السعودية</div>
             <h1 className="krr-h1">KSA Retail &amp; Consumer Radar</h1>
+            <p style={{ margin: "10px 0 0", fontSize: 15 }}>
+              <a href="/ar/ksa-retail-radar" hrefLang="ar" lang="ar" dir="rtl" style={{ color: "inherit", textDecoration: "underline" }}>اقرأ هذه الصفحة بالعربية</a>
+            </p>
             <p className="krr-hero-sub">
               Twenty-five Saudi retail and consumer signals, one live instrument: a consumer economy approaching $294B, where English coverage stays thin
               in monitored sources (SignalIQ x GDELT), and exactly where the open stories are.

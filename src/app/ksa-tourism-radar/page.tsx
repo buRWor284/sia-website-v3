@@ -17,7 +17,10 @@ export const metadata: Metadata = {
   title: "Saudi Tourism Trends & Statistics Radar (KSA)",
   description:
     "28 sourced signals on Saudi tourism: giga-projects, mega-events, hospitality and aviation, and faith travel. Curated from official statistics and named industry reports, wired to live press-coverage data via SignalIQ.",
-  alternates: { canonical: "/ksa-tourism-radar" },
+  alternates: {
+    canonical: "/ksa-tourism-radar",
+    languages: { en: "/ksa-tourism-radar", ar: "/ar/ksa-tourism-radar", "x-default": "/ksa-tourism-radar" },
+  },
   openGraph: {
     title: "KSA Tourism & Hospitality Radar · Syed Irfan Ajmal",
     description: "What is moving in Saudi tourism now, what is building toward 2030, and which narratives are still under-claimed in monitored sources (SignalIQ x GDELT). Every number links to its source.",
@@ -170,6 +173,9 @@ export default async function KsaRadarPage() {
           <div className="ksr-hero-lead">
             <div className="ksr-scaps">Signal Radar · KSA Edition · إصدار المملكة العربية السعودية</div>
             <h1 className="ksr-h1">KSA Tourism &amp; Hospitality Radar</h1>
+            <p style={{ margin: "10px 0 0", fontSize: 15 }}>
+              <a href="/ar/ksa-tourism-radar" hrefLang="ar" lang="ar" dir="rtl" style={{ color: "inherit", textDecoration: "underline" }}>اقرأ هذه الصفحة بالعربية</a>
+            </p>
             <p className="ksr-hero-sub">
               Twenty-eight Saudi tourism signals, one live instrument: what is moving now, what is building toward 2030, and which stories are still under-claimed in monitored sources (SignalIQ x GDELT).
             </p>

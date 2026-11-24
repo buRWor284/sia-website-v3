@@ -40,8 +40,11 @@ export const revalidate = 43200;
 export const metadata: Metadata = {
   title: UI.metaTitle,
   description: UI.metaDescription,
-  robots: { index: false, follow: false, nocache: true },
-  alternates: { canonical: "/ar/ksa-retail-radar" },
+  // LIVE since 2026-11-24 with an AI-translation disclosure; native review pending.
+  alternates: {
+    canonical: "/ar/ksa-retail-radar",
+    languages: { ar: "/ar/ksa-retail-radar", en: "/ksa-retail-radar", "x-default": "/ksa-retail-radar" },
+  },
 };
 
 const EN_URL = "/ksa-retail-radar";

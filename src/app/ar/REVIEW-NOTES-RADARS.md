@@ -3,7 +3,7 @@
 **Routes:** `/ar/ksa-tourism-radar` · `/ar/ksa-retail-radar`
 **English originals:** `/ksa-tourism-radar` · `/ksa-retail-radar`
 **Built:** 9 September 2026
-**Status:** NOINDEX, unlinked, machine-drafted, awaiting native review
+**Status:** LIVE and INDEXED since 2026-11-24 (Irfan's call), with an AI-translation disclosure banner. hreflang wired both ways, in sitemap, linked from both English radars. Native review still pending: when done, swap the banner text in both content.ar.ts files. The travel speaking page stays NOINDEX until reviewed. PLAN (agreed 2026-11-24): step 1 ship these translations; step 2 probe Arabic GDELT coverage for the signals (cheap, like the Sep category probe); step 3 if coverage is enough, switch these same URLs to Arabic-seed data and update the banner (it currently says figures come from English-language press).
 
 ---
 

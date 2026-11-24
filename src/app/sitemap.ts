@@ -113,5 +113,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticEntries, ...episodes];
+  // Language pairs: English radar <-> Arabic radar (hreflang both ways).
+  const AR_PAIRS = ["ksa-tourism-radar", "ksa-retail-radar"];
+  const withLangs = staticEntries.map((e) => {
+    const route = e.url.slice(BASE.length + 1);
+    return AR_PAIRS.includes(route)
+      ? { ...e, alternates: { languages: { en: `${BASE}/${route}`, ar: `${BASE}/ar/${route}` } } }
+      : e;
+  });
+  const arabicEntries = AR_PAIRS.map((route) => ({
+    url: `${BASE}/ar/${route}`,
+    lastModified: lastModFor(`ar/${route}`),
+    changeFrequency: "daily" as const,
+    priority: 0.7,
+    alternates: { languages: { en: `${BASE}/${route}`, ar: `${BASE}/ar/${route}` } },
+  }));
+
+  return [...withLangs, ...arabicEntries, ...episodes];
 }
