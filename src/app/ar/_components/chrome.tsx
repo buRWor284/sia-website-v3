@@ -40,8 +40,8 @@ export function ArabicHeader({
   active,
   switchHref,
 }: {
-  /** Which nav item to mark current: "speaking" | "tourism" | "retail" */
-  active?: "speaking" | "tourism" | "retail";
+  /** Which nav item to mark current. */
+  active?: "home" | "speaking" | "tourism" | "retail";
   /** The English equivalent of this page, for the language switch. */
   switchHref: string;
 }) {
@@ -68,17 +68,18 @@ export function ArabicHeader({
         className="ar-shell"
         style={{ display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap", paddingBlock: 16 }}
       >
-        <div>
+        <a href="/ar" style={{ textDecoration: "none" }}>
           <div style={{ fontFamily: AR_SERIF, fontWeight: 700, fontSize: 21, color: INK, lineHeight: 1.2 }}>
             سيد عرفان أجمل
           </div>
           <span style={{ fontFamily: AR_GROT, fontSize: 10, letterSpacing: "0.1em", color: INK55 }}>
             استراتيجي الإعلام المكتسب · مؤسس EMOS
           </span>
-        </div>
+        </a>
         <nav
           style={{ display: "flex", gap: 18, flexWrap: "wrap", marginInlineStart: "auto", alignItems: "center" }}
         >
+          {link("/ar", "الرئيسية", "home")}
           {link("/ar/ksa-tourism-radar", "رادار السياحة", "tourism")}
           {link("/ar/ksa-retail-radar", "رادار التجزئة", "retail")}
           {/* Speaking page hidden from nav until its native review is done (it is still noindex). */}

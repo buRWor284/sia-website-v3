@@ -129,5 +129,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     alternates: { languages: { en: `${BASE}/${route}`, ar: `${BASE}/ar/${route}` } },
   }));
 
-  return [...withLangs, ...arabicEntries, ...episodes];
+  const arabicHub = { url: `${BASE}/ar`, lastModified: lastModFor("ar"), changeFrequency: "monthly" as const, priority: 0.6 };
+
+  return [...withLangs, arabicHub, ...arabicEntries, ...episodes];
 }

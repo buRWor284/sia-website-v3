@@ -223,6 +223,7 @@ export const Colophon = () => (
         {LEGAL.map((l) => (
           <Link key={l.label} href={l.href} style={S.legalLink}>{l.label}</Link>
         ))}
+        <a href="/ar" hrefLang="ar" lang="ar" style={S.legalLink}>العربية</a>
       </div>
     </div>
   </footer>
