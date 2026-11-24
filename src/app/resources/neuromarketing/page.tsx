@@ -584,6 +584,11 @@ export default function NeuromarketingGuidePage() {
           <p style={P}>
             Now over to you. What&apos;s your perception on neuromarketing? Are you using some of its techniques already?
           </p>
+          <p style={P}>
+            For a live view of where consumer attention is moving in one fast-growing market, see the{" "}
+            <a href="/ksa-retail-radar" style={{ color: INK, textDecoration: "underline" }}>KSA Retail &amp; Consumer Radar</a>,
+            which tracks which Saudi retail and consumer stories are gaining or losing press momentum.
+          </p>
 
           {/* ── 08 References ─────────────────────────────────── */}
           <h2 style={H2} id="references">08 · References</h2>

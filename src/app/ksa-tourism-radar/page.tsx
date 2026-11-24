@@ -13,7 +13,8 @@ export const revalidate = 43200; // 12h; the coverage scan runs daily
 // /resources ledger (Radars group), and the sitemap. It was deliberately
 // unlinked before that as a direct-URL pitch prop for the KSA speaking circuit.
 export const metadata: Metadata = {
-  title: "KSA Tourism & Hospitality Radar",
+  // Search title spells out "Saudi" (how people search); the on-page brand stays "KSA Tourism & Hospitality Radar".
+  title: "Saudi Tourism Trends & Statistics Radar (KSA)",
   description:
     "28 sourced signals on Saudi tourism: giga-projects, mega-events, hospitality and aviation, and faith travel. Curated from official statistics and named industry reports, wired to live press-coverage data via SignalIQ.",
   alternates: { canonical: "/ksa-tourism-radar" },

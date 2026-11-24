@@ -26,6 +26,15 @@ import {
   getEpisodeBySlug,
 } from "@/lib/podcast"
 
+/** Hand-picked contextual links, only where the episode's topic genuinely connects. */
+const RELATED: Record<string, { text: string; label: string; href: string }> = {
+  "peter-gould-s01e01": {
+    text: "Branding for destinations and purpose-driven companies is a live question in Saudi Arabia. See which tourism narratives are gaining press momentum in the",
+    label: "KSA Tourism & Hospitality Radar",
+    href: "/ksa-tourism-radar",
+  },
+}
+
 export async function generateStaticParams() {
   return generateEpisodeStaticParams()
 }
@@ -416,6 +425,19 @@ export default async function EpisodePage({
       )}
 
       <HRule />
+
+      {RELATED[slug] && (
+        <>
+          <section style={{ padding: "48px 56px" }}>
+            <SCaps style={{ color: INK55 }}>Related on this site</SCaps>
+            <p style={{ margin: "12px 0 0", fontFamily: SERIF, fontSize: 19, lineHeight: 1.6, color: INK, maxWidth: 700 }}>
+              {RELATED[slug].text}{" "}
+              <a href={RELATED[slug].href} style={{ color: INK, textDecoration: "underline" }}>{RELATED[slug].label}</a>.
+            </p>
+          </section>
+          <HRule />
+        </>
+      )}
 
       {/* ── Prev / Next navigation ───────────────────────────── */}
       <section style={{ padding: "56px 56px", background: PAPER2 }}>

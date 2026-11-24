@@ -16,7 +16,8 @@ export const revalidate = 43200; // 12h; the coverage scan runs daily
 // direct-URL pitch prop for the KSA speaking circuit (Seamless, Athar, the
 // Riyadh workshop).
 export const metadata: Metadata = {
-  title: "KSA Retail & Consumer Radar",
+  // Search title spells out "Saudi" (how people search); the on-page brand stays "KSA Retail & Consumer Radar".
+  title: "Saudi Retail Market & Consumer Trends Radar (KSA)",
   description:
     "25 sourced signals on Saudi Arabia's consumer economy: e-commerce and delivery, retail groups and brands, lifestyle retail, and the macro picture. Curated from official statistics and named reports, wired to live press-coverage data via SignalIQ.",
   alternates: { canonical: "/ksa-retail-radar" },
