@@ -39,7 +39,7 @@ const Hero = () => (
       {RESOURCE_COUNT} Resources
     </span>
 
-    <h1 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.3vw,28px)", lineHeight: 1.15, letterSpacing: "-0.02em", color: INK, margin: 0, flexShrink: 0 }}>
+    <h1 className="hub-h1" style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.3vw,28px)", lineHeight: 1.15, letterSpacing: "-0.02em", color: INK, margin: 0, flexShrink: 0 }}>
       The frameworks <em style={{ fontStyle: "italic" }}>behind the bylines.</em>
     </h1>
 

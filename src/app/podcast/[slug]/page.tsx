@@ -81,6 +81,7 @@ export default async function EpisodePage({
 
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section
+        className="ep-hero"
         style={{
           background: INK,
           color: PAPER,
@@ -93,7 +94,7 @@ export default async function EpisodePage({
         }}
       >
         {/* Text column */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="ep-hero-text" style={{ flex: 1, minWidth: 0 }}>
           <div
             style={{
               display: "flex",
@@ -117,10 +118,11 @@ export default async function EpisodePage({
           </div>
 
           <h1
+            className="ep-hero-title"
             style={{
               margin: "0 0 24px",
               fontWeight: 700,
-              fontSize: 64,
+              fontSize: "clamp(34px, 9vw, 64px)",
               lineHeight: 1.02,
               letterSpacing: "-0.025em",
               color: PAPER,
@@ -175,6 +177,7 @@ export default async function EpisodePage({
         {/* Episode thumbnail */}
         {ep.featured_image_url && (
           <div
+            className="ep-hero-cover"
             style={{
               flexShrink: 0,
               width: 260,

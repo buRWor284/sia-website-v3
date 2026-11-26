@@ -123,3 +123,37 @@ img {
     letter-spacing: 0.06em !important;
   }
 }
+
+/* ── 6 · Mobile responsiveness fixes · 2026-11-26 (audit of 25 Nov) ──────────
+   Batch 1 (broken). !important is needed because the base values are inline
+   styles on the elements. */
+
+/* B1 · Podcast episode hero: the 260px cover could not shrink, leaving the
+   title a 27 to 80px column on phones (one letter per line). Stack below 768. */
+@media (max-width: 767px) {
+  .ep-hero {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 28px !important;
+    padding: 40px 20px !important;
+  }
+  .ep-hero-text {
+    flex: none !important;
+    width: 100%;
+  }
+  .ep-hero-cover {
+    width: 100% !important;
+    max-width: 320px;
+    align-self: flex-start !important;
+  }
+}
+
+/* B2 · Hub headlines (/tools, /resources): the h1 was a no-shrink flex child,
+   so on 375 and 390 it ran past the right edge and was clipped. Let it take
+   its own row and wrap. */
+@media (max-width: 480px) {
+  .hub-h1 {
+    flex: 1 1 100% !important;
+    min-width: 0;
+  }
+}
