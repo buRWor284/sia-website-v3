@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import { ScrollButtons } from "@/components/ScrollButtons";
 import { Colophon } from "@/components/bureau"
+import coverDims from "@/data/podcast/cover-dims.json"
 import {
   DoubleRule,
   HRule,
@@ -75,6 +76,10 @@ export default async function EpisodePage({
 
   const { prev, next } = getAdjacentEpisodes(slug)
   const heroText = ep.hero_text_extracted || ep.title
+  // Natural size of the cover (generated from public/podcast into cover-dims.json)
+  // so the browser can reserve its space before the image loads.
+  const coverFile = ep.featured_image_url?.split("/").pop() ?? ""
+  const coverDim = (coverDims as Record<string, number[]>)[coverFile] as number[] | undefined
 
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
@@ -190,6 +195,8 @@ export default async function EpisodePage({
             <img
               src={ep.featured_image_url}
               alt={ep.title}
+              width={coverDim?.[0]}
+              height={coverDim?.[1]}
               style={{ display: "block", width: "100%", height: "auto" }}
             />
           </div>
