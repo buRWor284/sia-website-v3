@@ -324,7 +324,7 @@ export default function ContactPage() {
         <div className="grid-contact">
           {/* Left: info */}
           <div>
-            <h1
+            <h2
               style={{
                 margin: "0 0 24px",
                 fontWeight: 700,
@@ -335,7 +335,7 @@ export default function ContactPage() {
             >
               Let&rsquo;s{" "}
               <span style={{ fontStyle: "italic" }}>correspond.</span>
-            </h1>
+            </h2>
             <p
               style={{
                 margin: "0 0 32px",
@@ -378,6 +378,7 @@ export default function ContactPage() {
               ].map(({ label, value, href }) => (
                 <div
                   key={label}
+                  className="contact-row"
                   style={{
                     display: "grid",
                     gridTemplateColumns: "120px 1fr",
@@ -457,7 +458,7 @@ export default function ContactPage() {
               Prefer to{" "}
               <span style={{ fontStyle: "italic" }}>talk?</span>
             </h2>
-            <p
+            <p className="measure"
               style={{
                 margin: 0,
                 fontSize: 17,

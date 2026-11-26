@@ -81,7 +81,7 @@ function SourcesTicker() {
   return (
     <div className="siq-ticker-wrap" aria-label="Live data sources">
       <div className="siq-ticker-label">
-        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7.5, letterSpacing: ".18em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
+        <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".12em", textTransform: "uppercase", color: "rgba(241,235,222,.5)" }}>
           Live feeds
         </span>
       </div>
@@ -439,10 +439,10 @@ export default function SignalIQPage() {
         subtitle="Story Radar"
         rightContent={
           <>
-            <Link href="/tools/signaliq/how-it-works" target="_blank" rel="noopener noreferrer" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
+            <Link href="/tools/signaliq/how-it-works" target="_blank" rel="noopener noreferrer" className="tap-pad" style={{ fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: YEL, textDecoration: "none", whiteSpace: "nowrap" }}>
               How it works →
             </Link>
-            <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".16em", textTransform: "uppercase", color: "rgba(241,235,222,.85)" }}>
+            <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "rgba(241,235,222,.85)" }}>
               ← Main Site
             </span>
           </>
@@ -476,7 +476,7 @@ export default function SignalIQPage() {
               {FREE_SCANS} free scans / month, or {EMAIL_SCANS} with your email · no API key needed
             </p>
             <p style={{ margin: "8px 0 0", fontFamily: MONO, fontSize: 9, color: INK35, letterSpacing: ".10em" }}>
-              <Link href="/tools/signaliq/about" style={{ color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
+              <Link href="/tools/signaliq/about" className="tap-pad" style={{ color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
                 About the data & methodology →
               </Link>
             </p>

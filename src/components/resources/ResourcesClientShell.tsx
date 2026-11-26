@@ -296,12 +296,12 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
           {item.newsDeck}
         </div>
         {coming && (
-          <span style={{ display: "inline-block", marginTop: 8, padding: "3px 8px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+          <span style={{ display: "inline-block", marginTop: 8, padding: "3px 8px", background: INK, color: PAPER, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
             Coming Soon
           </span>
         )}
         {item.underReview && (
-          <span style={{ display: "inline-block", marginTop: 8, padding: "3px 8px", border: `1px solid ${INK15}`, color: INK55, fontFamily: GROT, fontWeight: 800, fontSize: 8, letterSpacing: "0.2em", textTransform: "uppercase" }}>
+          <span style={{ display: "inline-block", marginTop: 8, padding: "3px 8px", border: `1px solid ${INK15}`, color: INK55, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.16em", textTransform: "uppercase" }}>
             Under Review
           </span>
         )}
@@ -309,7 +309,7 @@ function LedgerRow({ item, n }: { item: ContentItem; n: number }) {
         {item.topics.length > 0 && (
           <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: 10 }}>
             {item.topics.map((t) => (
-              <span key={t} style={{ padding: "2px 7px", border: `1px solid ${INK15}`, fontFamily: GROT, fontWeight: 700, fontSize: 7.5, letterSpacing: "0.12em", textTransform: "uppercase", color: INK55 }}>
+              <span key={t} style={{ padding: "2px 7px", border: `1px solid ${INK15}`, fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.08em", textTransform: "uppercase", color: INK55 }}>
                 {TOPIC_LABEL[t]}
               </span>
             ))}
@@ -479,7 +479,7 @@ function FilterBar({
     <div className="res-filter-bar" style={{ position: "sticky", top: 0, zIndex: 90, background: PAPER, borderBottom: `2px solid ${INK}` }}>
       {/* Row 1 — Type tabs */}
       <div
-        className="px-page"
+        className="px-page chip-scroll"
         style={{
           display: "flex", alignItems: "stretch",
           padding: "0 56px",
@@ -523,7 +523,7 @@ function FilterBar({
       </div>
 
       {/* Row 2 — Topic pills */}
-      <div className="px-page" style={{ display: "flex", alignItems: "center", padding: "8px 56px", gap: 7, overflowX: "auto" }}>
+      <div className="px-page chip-scroll" style={{ display: "flex", alignItems: "center", padding: "8px 56px", gap: 7, overflowX: "auto" }}>
         <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(26,20,16,.62)", flexShrink: 0, marginRight: 4 }}>
           Topic
         </span>

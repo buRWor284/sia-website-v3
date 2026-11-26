@@ -214,3 +214,38 @@ img {
 @media (max-width: 640px) {
   .colophon-link { padding-top: 10px !important; padding-bottom: 10px !important; }
 }
+
+/* ── Batch 3 (cosmetic) · 2026-11-26 ───────────────────────────────────── */
+
+/* Hub headline was 20px on phones. */
+@media (max-width: 480px) {
+  .hub-h1 { font-size: 24px !important; }
+}
+
+/* Long lines on tablet: cap the measure. */
+.measure,
+.kit-card__body { max-width: 65ch; }
+
+/* /contact detail rows: stack label over value on phones so
+   "linkedin.com/in/syedirfanajmal" does not break mid-handle. */
+@media (max-width: 428px) {
+  .contact-row {
+    grid-template-columns: 1fr !important;
+    gap: 4px !important;
+  }
+}
+
+/* /resources chip rows scroll sideways: fade the right edge as a hint. */
+@media (max-width: 640px) {
+  .chip-scroll {
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent);
+  }
+}
+
+/* /strategy-call "what to expect": three ~100px columns on phones. The
+   attribute-selector rule in globals.css does not catch it, because server-
+   rendered markup has no space after the colon ("grid-template-columns:repeat"). */
+@media (max-width: 428px) {
+  .steps-3 { grid-template-columns: 1fr !important; }
+}

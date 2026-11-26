@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 export default function StrategyCallPage() {
   return (
     <main style={{ background: PAPER, minHeight: "100vh" }}>
-      {/* Cal.com inline init */}
-      <Script id="cal-inline-strategy" strategy="afterInteractive">{`
+      {/* Cal.com inline init: lazyOnload = after the page has painted and gone idle, so the heading and proof show first */}
+      <Script id="cal-inline-strategy" strategy="lazyOnload">{`
         (function tryInit() {
           if (typeof Cal !== "undefined") {
             Cal("init", { origin: "https://cal.com" });
@@ -83,6 +83,7 @@ export default function StrategyCallPage() {
         </p>
 
         <div
+          className="steps-3"
           style={{
             margin: "36px auto 0",
             maxWidth: 560,
@@ -103,6 +104,31 @@ export default function StrategyCallPage() {
               <div style={{ marginTop: 4, fontFamily: SERIF, fontSize: 13, color: "rgba(250,250,250,.55)", lineHeight: 1.5, fontStyle: "italic" }}>{s.d}</div>
             </div>
           ))}
+        </div>
+
+        <div
+          style={{
+            margin: "36px auto 0",
+            maxWidth: 640,
+            paddingTop: 22,
+            borderTop: "1px solid rgba(250,250,250,.14)",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: "10px 22px",
+            fontFamily: GROT,
+            fontWeight: 700,
+            fontSize: 10.5,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "rgba(250,250,250,.72)",
+          }}
+        >
+          <span>Case study in Harvard Business Review</span>
+          <span aria-hidden style={{ color: YEL }}>&middot;</span>
+          <span>300+ clients in the US, EU and Gulf</span>
+          <span aria-hidden style={{ color: YEL }}>&middot;</span>
+          <span>$160K to $1.2M monthly organic revenue for one client</span>
         </div>
       </section>
 
@@ -145,6 +171,68 @@ export default function StrategyCallPage() {
             Open on cal.com &rarr;
           </a>
         </p>
+      </section>
+
+      {/* Who it is for + what to bring */}
+      <section style={{ borderTop: `1px solid ${INK}`, padding: "56px 24px" }}>
+        <div
+          style={{
+            maxWidth: 800,
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "32px 40px",
+          }}
+        >
+          {([
+            {
+              h: "A good fit if",
+              items: [
+                "You run or lead marketing at a company with a product people already buy",
+                "You want press, links and AI answers to mention you, not just more ads",
+                "You can act on advice within the next 90 days",
+              ],
+            },
+            {
+              h: "Probably not a fit if",
+              items: [
+                "You want guaranteed placements or paid links",
+                "You need someone to run ads day to day",
+                "You are still validating the idea itself",
+              ],
+            },
+            {
+              h: "Bring with you",
+              items: [
+                "Your website and two or three competitors",
+                "Where you want the business in 12 months",
+                "What you spend on marketing now, roughly",
+              ],
+            },
+          ] as const).map(col => (
+            <div key={col.h}>
+              <SCaps size={10} ls="0.20em" color={INK55}>{col.h}</SCaps>
+              <ul style={{ margin: "14px 0 0", padding: 0, listStyle: "none", display: "grid", gap: 10 }}>
+                {col.items.map(it => (
+                  <li key={it} style={{ display: "flex", gap: 10, fontFamily: SERIF, fontSize: 15, color: INK70, lineHeight: 1.5 }}>
+                    <span aria-hidden style={{ flexShrink: 0, marginTop: 8, width: 8, height: 2, background: YEL }} />
+                    {it}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <figure style={{ maxWidth: 800, margin: "48px auto 0", padding: "26px 30px", border: `1px solid ${INK}`, background: PAPER2 }}>
+          <blockquote style={{ margin: 0, fontFamily: SERIF, fontStyle: "italic", fontSize: 18, lineHeight: 1.55, color: INK }}>
+            &ldquo;Irfan and his team earned high authority backlinks from publications like Reader&rsquo;s Digest and MSN.
+            The web portal&rsquo;s traffic increased by 140% in 3 months, greatly exceeding our goals.&rdquo;
+          </blockquote>
+          <figcaption style={{ marginTop: 14 }}>
+            <SCaps size={10} ls="0.16em" color={INK70}>Reem El Shafaki &middot; Partner, DinarStandard &middot; Dubai</SCaps>
+          </figcaption>
+        </figure>
       </section>
 
       {/* What to expect */}
