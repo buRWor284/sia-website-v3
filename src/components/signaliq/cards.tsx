@@ -476,7 +476,7 @@ export function SourcesSidebar() {
               {/* type + role badge */}
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
                 <SCaps size={8} ls="0.12em" color={INK55}>{src.type}</SCaps>
-                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 7, letterSpacing: ".14em", textTransform: "uppercase", color: src.role === "Denominator" ? AMBER : GREEN, border: `1px solid ${src.role === "Denominator" ? AMBER : GREEN}`, padding: "1px 4px" }}>
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".00em", textTransform: "uppercase", color: src.role === "Denominator" ? AMBER : GREEN, border: `1px solid ${src.role === "Denominator" ? AMBER : GREEN}`, padding: "1px 4px" }}>
                   {src.role}
                 </span>
               </div>
@@ -500,7 +500,7 @@ export function SourcesSidebar() {
                     suffix={SOURCE_STATS[src.id].suffix ?? ""}
                     style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 17, color: INK, letterSpacing: "-0.01em", display: "block", lineHeight: 1.05 }}
                   />
-                  <span style={{ display: "block", marginTop: 2, fontFamily: MONO, fontWeight: 700, fontSize: 7.5, letterSpacing: ".10em", textTransform: "uppercase", color: INK55, lineHeight: 1.3 }}>
+                  <span style={{ display: "block", marginTop: 2, fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".02em", textTransform: "uppercase", color: INK55, lineHeight: 1.3 }}>
                     {SOURCE_STATS[src.id].label}
                   </span>
                 </div>
@@ -568,14 +568,14 @@ export function OppCard({
               order; the legend above the list says why fit can move things. */}
           {rank != null && (
             <span style={{
-              fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em",
+              fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".02em",
               color: "rgba(241,235,222,.55)",
             }}>
               {String(rank).padStart(2, "0")}
             </span>
           )}
           <span style={{
-            fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em",
+            fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".04em",
             textTransform: "uppercase",
             color: bandColorLight(opp.band),
             border: `1px solid ${hexA(bandColorLight(opp.band), 0.45)}`,
@@ -611,7 +611,7 @@ export function OppCard({
         )}
         {/* Why now — market-timing driver (coverage gap) */}
         <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-          <span style={{ flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
+          <span style={{ flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".02em", textTransform: "uppercase", color: INK35 }}>
             Why&nbsp;now
           </span>
           <div style={{ flex: 1 }}>
@@ -622,7 +622,7 @@ export function OppCard({
         {/* Why you — relevance to the user's startup (only when personalized) */}
         {opp.fit && (
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ flexShrink: 0, width: 48, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
+            <span style={{ flexShrink: 0, width: 48, fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".02em", textTransform: "uppercase", color: INK35 }}>
               Why&nbsp;you
             </span>
             <span style={{ fontFamily: GROT, fontSize: 11, color: INK70 }}>
@@ -640,7 +640,7 @@ export function OppCard({
         {/* History: three years of weekly press volume (seasonality step 2, 2026-09-15) */}
         {opp.history && (
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-            <span style={{ flexShrink: 0, width: 48, paddingTop: 4, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 }}>
+            <span style={{ flexShrink: 0, width: 48, paddingTop: 4, fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".02em", textTransform: "uppercase", color: INK35 }}>
               History
             </span>
             <div style={{ flex: 1, minWidth: 0, color: INK }}>
@@ -690,7 +690,7 @@ export function OppCard({
             onClick={(e) => { e.stopPropagation(); setShowSources(v => !v); }}
             style={{
               background: "none", border: "none", cursor: "pointer", padding: 0,
-              fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".13em",
+              fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".03em",
               textTransform: "uppercase", color: INK35,
               display: "flex", alignItems: "center", gap: 5,
             }}
@@ -703,7 +703,7 @@ export function OppCard({
             <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 7 }}>
               {/* GDELT — always the coverage denominator */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: AMBER }}>
+                <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".00em", textTransform: "uppercase", color: AMBER }}>
                   GDELT · Coverage baseline
                 </span>
                 <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55, textAlign: "right" }}>
@@ -718,7 +718,7 @@ export function OppCard({
                 const sig = signalBySource[id];
                 return (
                   <div key={id} style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
-                    <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: sig ? GREEN : INK35 }}>
+                    <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".00em", textTransform: "uppercase", color: sig ? GREEN : INK35 }}>
                       {label}
                     </span>
                     <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: sig ? INK70 : INK55, textAlign: "right" }}>
@@ -769,7 +769,7 @@ function GroupHead({ group, first = false }: { group: GlossaryGroup; first?: boo
   const g = GLOSSARY_GROUPS[group];
   return (
     <div style={{ margin: first ? "0 0 8px" : "14px 0 8px", paddingBottom: 4, borderBottom: `1px solid ${INK15}` }}>
-      <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK55 }}>
+      <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".02em", textTransform: "uppercase", color: INK55 }}>
         {g.label}
       </span>
       <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 11, color: INK55 }}> · {g.plain}</span>

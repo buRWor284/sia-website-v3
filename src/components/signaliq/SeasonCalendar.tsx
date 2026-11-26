@@ -21,12 +21,12 @@ const CSS = `
 .hs-cal-col{border-inline-start:1px solid color-mix(in srgb,currentColor 18%,transparent);min-height:92px;display:flex;flex-direction:column;}
 .hs-cal-col:first-child{border-inline-start:0;}
 .hs-cal-col[data-now="true"]{background:color-mix(in srgb,var(--color-yellow,#f5b81f) 16%,transparent);}
-.hs-cal-head{font-family:var(--font-mono,"JetBrains Mono",monospace);font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 6px 5px;border-bottom:1px solid color-mix(in srgb,currentColor 18%,transparent);opacity:.8;white-space:nowrap;}
+.hs-cal-head{font-family:var(--font-mono,"JetBrains Mono",monospace);font-size: 10px;font-weight:700;letter-spacing: .06em;text-transform:uppercase;padding:6px 6px 5px;border-bottom:1px solid color-mix(in srgb,currentColor 18%,transparent);opacity:.8;white-space:nowrap;}
 .hs-cal-body{display:flex;flex-direction:column;gap:4px;padding:6px;}
 .hs-cal-chip{all:unset;box-sizing:border-box;display:block;cursor:default;font-family:var(--font-grot,Archivo,sans-serif);font-size:10.5px;font-weight:600;line-height:1.2;padding:3px 5px;border:1px solid currentColor;background:var(--hs-paper,transparent);}
 button.hs-cal-chip{cursor:pointer;}
 button.hs-cal-chip:hover,button.hs-cal-chip:focus-visible{background:var(--color-yellow,#f5b81f);}
-.hs-cal-chip small{display:block;font-family:var(--font-mono,"JetBrains Mono",monospace);font-size:8px;font-weight:600;letter-spacing:.06em;opacity:.7;margin-top:1px;}
+.hs-cal-chip small{display:block;font-family:var(--font-mono,"JetBrains Mono",monospace);font-size: 10px;font-weight:600;letter-spacing: .00em;opacity:.7;margin-top:1px;}
 .hs-cal-foot{font-family:var(--font-serif,Georgia,serif);font-style:italic;font-size:11.5px;opacity:.75;margin-top:8px;line-height:1.45;}
 @media (max-width:720px){
   .hs-cal{grid-template-columns:1fr;}

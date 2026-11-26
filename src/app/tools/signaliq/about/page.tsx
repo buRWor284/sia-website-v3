@@ -108,7 +108,7 @@ export default function SignalIQAboutPage() {
             Signal<em style={{ color: YEL, fontStyle: "italic" }}>IQ</em>
           </span>
           <div style={{ width: 1, height: 18, background: "rgba(241,235,222,.12)", margin: "0 2px" }} />
-          <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: "rgba(241,235,222,.25)" }}>
+          <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: "rgba(241,235,222,.25)" }}>
             About the data
           </span>
         </div>
@@ -172,8 +172,8 @@ export default function SignalIQAboutPage() {
                   <a href={src.url} target="_blank" rel="noopener noreferrer" style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 18, color: INK, textDecoration: "none" }}>
                     {src.name} ↗
                   </a>
-                  <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: INK55 }}>{src.type}</span>
-                  <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: src.role === "Coverage denominator" ? AMBER : GREEN, border: `1px solid ${src.role === "Coverage denominator" ? AMBER : GREEN}`, padding: "1px 5px" }}>
+                  <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase", color: INK55 }}>{src.type}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".02em", textTransform: "uppercase", color: src.role === "Coverage denominator" ? AMBER : GREEN, border: `1px solid ${src.role === "Coverage denominator" ? AMBER : GREEN}`, padding: "1px 5px" }}>
                     {src.role}
                   </span>
                   <span style={{ fontFamily: GROT, fontSize: 10, fontWeight: 700, letterSpacing: ".08em", color: INK55 }}>Credibility: {src.credibility}</span>
@@ -205,7 +205,7 @@ export default function SignalIQAboutPage() {
               <div key={c.label} style={{ display: "flex", gap: 16, padding: "14px 18px", borderTop: i > 0 ? `1px solid ${INK15}` : "none", background: i % 2 === 0 ? PAPER : PAPER2, alignItems: "baseline", flexWrap: "wrap" }}>
                 <span style={{ display: "inline-flex", flexDirection: "column", gap: 3, minWidth: 140 }}>
                   <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 11, letterSpacing: ".08em", textTransform: "uppercase", color: INK }}>{c.label}</span>
-                  <span style={{ fontFamily: MONO, fontSize: 8, letterSpacing: ".08em", textTransform: "uppercase", color: INK55 }}>{c.group}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: ".00em", textTransform: "uppercase", color: INK55 }}>{c.group}</span>
                 </span>
                 <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 15, color: YEL, minWidth: 50 }}>{c.weight}</span>
                 <span style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 14, color: INK55, lineHeight: 1.5, flex: 1 }}>{c.description}</span>

@@ -187,7 +187,7 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
                 {card.platform ? (
                   <span
                     style={{
-                      fontFamily: GROT, fontWeight: 900, fontSize: 8.5, letterSpacing: ".14em",
+                      fontFamily: GROT, fontWeight: 900, fontSize: 10, letterSpacing: ".04em",
                       textTransform: "uppercase", padding: "3px 6px",
                       background: onDark ? YEL : INK, color: onDark ? INK : YEL,
                     }}
@@ -200,7 +200,7 @@ export function ToolPipelineFooter({ currentTool, compact, onDark }: Props) {
                   </span>
                 )}
                 {badge && (
-                  <span style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: onDark ? YEL : isActive ? INK : INK35 }}>
+                  <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".00em", textTransform: "uppercase", color: onDark ? YEL : isActive ? INK : INK35 }}>
                     {badge}
                   </span>
                 )}

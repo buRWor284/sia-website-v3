@@ -55,9 +55,9 @@ export default function HistoryStrip({
           style={{
             flexShrink: 0,
             fontFamily: MONO,
-            fontSize: 8,
+            fontSize: 10,
             fontWeight: 700,
-            letterSpacing: ".12em",
+            letterSpacing: ".02em",
             textTransform: "uppercase",
             border: "1px solid currentColor",
             padding: "2px 5px",

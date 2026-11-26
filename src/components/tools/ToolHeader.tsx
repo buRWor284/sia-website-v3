@@ -93,9 +93,9 @@ export function ToolHeader({ toolPrefix, subtitle, rightContent }: ToolHeaderPro
           className="tool-header-subtitle"
           style={{
             fontFamily: MONO,
-            fontSize: 8,
+            fontSize: 10,
             fontWeight: 700,
-            letterSpacing: ".18em",
+            letterSpacing: ".07em",
             textTransform: "uppercase",
             color: DIM,
             whiteSpace: "nowrap",

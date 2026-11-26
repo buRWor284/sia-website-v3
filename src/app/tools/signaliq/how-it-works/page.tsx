@@ -599,7 +599,7 @@ export default function SignalIQHowItWorksPage() {
                   </div>
 
                   <div style={{ padding: "14px 20px", display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", color: INK35 }}>PLATFORM</span>
+                    <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".04em", color: INK35 }}>PLATFORM</span>
                     <Link href="/tools/assetiq" style={{ fontFamily: GROT, fontWeight: 700, fontSize: 12, letterSpacing: ".06em", color: INK, borderBottom: `2px solid ${YEL}`, paddingBottom: 2, textDecoration: "none" }}>
                       Build asset from this pack {"→"}
                     </Link>
@@ -671,7 +671,7 @@ export default function SignalIQHowItWorksPage() {
                         <span style={{ fontFamily: MONO, fontSize: 11, color: t.current ? YEL : "transparent" }}>{t.current ? "▸" : ""}</span>
                         <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: ".04em" }}>{t.name}</span>
                         {t.platform && (
-                          <span style={{ fontFamily: MONO, fontSize: 7, fontWeight: 700, letterSpacing: ".14em", color: INK35 }}>PLATFORM</span>
+                          <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".00em", color: INK35 }}>PLATFORM</span>
                         )}
                       </>
                     );

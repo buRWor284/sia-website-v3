@@ -169,8 +169,8 @@ export const SIQ_CSS = `
   .siq-beatrow-lbl {
     font-family: ${MONO};
     font-weight: 700;
-    font-size: 8.5px;
-    letter-spacing: .14em;
+    font-size: 10px;
+    letter-spacing: .08em;
     text-transform: uppercase;
     color: ${INK55};
   }
@@ -290,8 +290,8 @@ export const SIQ_CSS = `
   .siq-gen-sub {
     font-family: ${MONO};
     font-weight: 700;
-    font-size: 8px;
-    letter-spacing: .07em;
+    font-size: 10px;
+    letter-spacing: .00em;
     text-transform: uppercase;
     color: rgba(241,235,222,.55);
   }
@@ -410,7 +410,7 @@ export const SIQ_CSS = `
     .siq-tab:nth-child(3n)        { border-right: 1px solid ${INK15}; }
     .siq-tab:nth-child(2n)        { border-right: none; }
     .siq-cards { grid-template-columns: 1fr; }
-    .siq-step { padding: 10px 12px; font-size: 8.5px; }
+    .siq-step { padding: 10px 12px; font-size: 10px; }
   }
 
   /* ── wire-feed ticker ───────────────────────────────────────────── */
@@ -524,7 +524,7 @@ export const SIQ_CSS = `
     letter-spacing: normal !important;
     font-family: ${SERIF} !important;
     font-style: italic !important;
-    font-size: 8px !important;
+    font-size: 11px !important;
     line-height: 1.6 !important;
     color: ${INK55} !important;
   }
@@ -623,8 +623,8 @@ export const SIQ_CSS = `
   .siq-loader-stat-src {
     font-family: ${MONO};
     font-weight: 700;
-    font-size: 8px;
-    letter-spacing: .14em;
+    font-size: 10px;
+    letter-spacing: .04em;
     text-transform: uppercase;
     color: ${INK35};
   }
@@ -671,8 +671,8 @@ export const SIQ_CSS = `
   .siq-proof-src {
     font-family: ${MONO};
     font-weight: 700;
-    font-size: 8px;
-    letter-spacing: .14em;
+    font-size: 10px;
+    letter-spacing: .04em;
     text-transform: uppercase;
     color: ${INK35};
   }

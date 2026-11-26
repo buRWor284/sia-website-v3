@@ -301,7 +301,7 @@ function UnlockCard({ done, onOpen }: { done: boolean; onOpen: () => void }) {
 
 function AngleView({ opp }: { opp: Opportunity }) {
   const c = bandColor(opp.band);
-  const whyTag: React.CSSProperties = { flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: INK35 };
+  const whyTag: React.CSSProperties = { flexShrink: 0, width: 48, paddingTop: 1, fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".02em", textTransform: "uppercase", color: INK35 };
   return (
     <section style={{ padding: "18px clamp(22px,5vw,56px) 32px" }}>
       <div style={{ maxWidth: 900, margin: "0 auto" }}>
@@ -323,7 +323,7 @@ function AngleView({ opp }: { opp: Opportunity }) {
                 {opp.bandLabel}
               </span>
               <InfoTooltip text={BAND_TOOLTIP[opp.band]} />
-              <span style={{ fontFamily: MONO, fontSize: 8, color: INK55, letterSpacing: ".10em", textTransform: "uppercase" }}>
+              <span style={{ fontFamily: MONO, fontSize: 10, color: INK55, letterSpacing: ".00em", textTransform: "uppercase" }}>
                 · {BEATS.find((b) => b.id === opp.beat)?.label ?? opp.beat}
               </span>
             </span>
@@ -763,7 +763,7 @@ export default function SignalIQToolCore({
                           {scan.usage.remaining < 999 && ` · ${scan.usage.remaining} left this month`}
                         </SCaps>
                       ) : null}
-                      <Link href="/tools/signaliq/about" style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".10em", textTransform: "uppercase", color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
+                      <Link href="/tools/signaliq/about" style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".00em", textTransform: "uppercase", color: INK35, textDecoration: "underline", textDecorationColor: INK15 }}>
                         About the data
                       </Link>
                     </div>

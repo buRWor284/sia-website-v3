@@ -269,7 +269,7 @@ export function PackView({
         <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 10, borderTop: `1px solid ${INK15}` }}>
           {pack.sources.map((s, i) => (
             <div key={i} style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-              <span style={{ fontFamily: MONO, fontSize: 8, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: INK35, flexShrink: 0 }}>
+              <span style={{ fontFamily: MONO, fontSize: 10, fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase", color: INK35, flexShrink: 0 }}>
                 Live
               </span>
               <a
