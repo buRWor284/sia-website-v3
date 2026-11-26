@@ -453,7 +453,7 @@ export function SourcesSidebar() {
   return (
     <aside className="siq-sources-sidebar">
       <div style={{ paddingBottom: 10, marginBottom: 14, borderBottom: `1px solid ${INK15}` }}>
-        <SCaps size={8.5} ls="0.20em" color={INK55}>Live data feeds</SCaps>
+        <SCaps size={10} ls="0.10em" color={INK55}>Live data feeds</SCaps>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
         {SOURCES_DATA.map((src) => {
@@ -475,7 +475,7 @@ export function SourcesSidebar() {
               </div>
               {/* type + role badge */}
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-                <SCaps size={8} ls="0.12em" color={INK55}>{src.type}</SCaps>
+                <SCaps size={10} ls="0.02em" color={INK55}>{src.type}</SCaps>
                 <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: 10, letterSpacing: ".00em", textTransform: "uppercase", color: src.role === "Denominator" ? AMBER : GREEN, border: `1px solid ${src.role === "Denominator" ? AMBER : GREEN}`, padding: "1px 4px" }}>
                   {src.role}
                 </span>
@@ -483,7 +483,7 @@ export function SourcesSidebar() {
               {/* credibility bar */}
               <div style={{ marginBottom: 8 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
-                  <SCaps size={7.5} ls="0.10em" color={INK55}>Credibility</SCaps>
+                  <SCaps size={10} ls="0.02em" color={INK55}>Credibility</SCaps>
                   <span style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 10, color: credColor }}>{credPct}%</span>
                 </div>
                 <div style={{ height: 3, background: INK15 }}>

@@ -126,7 +126,7 @@ export function PackView({
           {/* Path A — with EMOS & SIA tools */}
           <div style={{ paddingRight: 20, borderRight: `1px solid ${INK15}` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <Pill size={8} ls="0.14em">Recommended</Pill>
+              <Pill size={10} ls="0.04em">Recommended</Pill>
               <SCaps size={9} ls="0.14em" color={INK}>With EMOS &amp; SIA tools</SCaps>
             </div>
             {([
@@ -260,7 +260,7 @@ export function PackView({
       <div style={{ marginTop: 16, border: `1px solid ${INK}`, padding: "16px 20px" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
           <SCaps size={10} ls="0.16em" color={INK}>Sources</SCaps>
-          <Pill size={8} ls="0.14em">Live · Primary data</Pill>
+          <Pill size={10} ls="0.04em">Live · Primary data</Pill>
         </div>
         <p style={{ margin: "8px 0 12px", fontFamily: SERIF, fontStyle: "italic", fontSize: 13, color: INK55, lineHeight: 1.5 }}>
           Every signal below comes from a live, open, primary-source database,
