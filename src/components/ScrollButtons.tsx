@@ -4,18 +4,21 @@ import { useState, useEffect } from 'react';
 
 export function ScrollButtons() {
   const [atBottom, setAtBottom] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => {
       const scrolled = window.scrollY + window.innerHeight;
       const total = document.documentElement.scrollHeight;
       setAtBottom(scrolled >= total - 80);
+      setScrolled(window.scrollY > 600);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
   return (
-    <div style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 200, display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div className="scroll-btns" data-scrolled={scrolled ? 'true' : 'false'} style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 200, display: 'flex', flexDirection: 'column', gap: 6 }}>
       <button
+        className="scroll-btn scroll-btn--top"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         title="Back to top"
         style={{
@@ -26,6 +29,7 @@ export function ScrollButtons() {
         }}
       >↑</button>
       <button
+        className="scroll-btn scroll-btn--bottom"
         onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })}
         title="Jump to bottom"
         style={{

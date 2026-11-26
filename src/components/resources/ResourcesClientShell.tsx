@@ -356,7 +356,7 @@ function ResourceLedger({
 
   if (liveItems.length === 0 && updatingItems.length === 0) {
     return (
-      <div style={{ padding: "80px 56px", textAlign: "center" }}>
+      <div className="px-page" style={{ padding: "80px 56px", textAlign: "center" }}>
         <p style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 28, color: INK55, margin: 0 }}>
           No resources match this filter.
         </p>
@@ -375,7 +375,7 @@ function ResourceLedger({
   let globalIndex = 0;
 
   return (
-    <div id="resources" style={{ padding: "0 56px 90px" }}>
+    <div id="resources" className="px-page" style={{ padding: "0 56px 90px" }}>
       {groups.map((group, gi) => {
         const startIndex = globalIndex;
         globalIndex += group.items.length;
@@ -476,9 +476,10 @@ function FilterBar({
   count: number;
 }) {
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 100, background: PAPER, borderBottom: `2px solid ${INK}` }}>
+    <div className="res-filter-bar" style={{ position: "sticky", top: 0, zIndex: 90, background: PAPER, borderBottom: `2px solid ${INK}` }}>
       {/* Row 1 — Type tabs */}
       <div
+        className="px-page"
         style={{
           display: "flex", alignItems: "stretch",
           padding: "0 56px",
@@ -522,7 +523,7 @@ function FilterBar({
       </div>
 
       {/* Row 2 — Topic pills */}
-      <div style={{ display: "flex", alignItems: "center", padding: "8px 56px", gap: 7, overflowX: "auto" }}>
+      <div className="px-page" style={{ display: "flex", alignItems: "center", padding: "8px 56px", gap: 7, overflowX: "auto" }}>
         <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.24em", textTransform: "uppercase", color: "rgba(26,20,16,.62)", flexShrink: 0, marginRight: 4 }}>
           Topic
         </span>
@@ -981,7 +982,7 @@ function ViewToggle({ view, setView }: { view: "guided" | "browse"; setView: (v:
   ];
   return (
     <div style={{ background: PAPER, borderBottom: `1px solid ${INK15}` }}>
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "18px 56px", display: "flex", gap: 10, alignItems: "center" }}>
+      <div className="px-page" style={{ maxWidth: 1200, margin: "0 auto", padding: "18px 56px", display: "flex", gap: 10, alignItems: "center" }}>
         <span style={{ fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: ".2em", textTransform: "uppercase", color: INK55, marginRight: 4 }}>View</span>
         {tabs.map((t) => {
           const on = view === t.key;

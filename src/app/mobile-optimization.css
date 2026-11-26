@@ -157,3 +157,60 @@ img {
     min-width: 0;
   }
 }
+
+/* ── Batch 2 (annoying) · 2026-11-26 ───────────────────────────────────── */
+
+/* Header: tagline wraps to two lines on phones and adds height. Hide it
+   there; MENU now sits on the logo row (SiteHeader.tsx). */
+@media (max-width: 640px) {
+  .site-header__tagline { display: none !important; }
+}
+
+/* /resources: the 56px -> 20px padding rule in globals.css only matches
+   <section>. The resources hub blocks are <div>s, so opt them in by class. */
+@media (max-width: 640px) {
+  .px-page { padding-left: 20px !important; padding-right: 20px !important; }
+}
+@media (min-width: 641px) and (max-width: 1023px) {
+  .px-page { padding-left: 32px !important; padding-right: 32px !important; }
+}
+
+/* /resources filter bar: was sticky at top:0, i.e. hidden under the sticky
+   site header. Desktop: stick below the header (height published by
+   SiteHeader as --site-header-h). Hamburger widths: not sticky at all. */
+.res-filter-bar { top: var(--site-header-h, 116px) !important; }
+@media (max-width: 1100px) {
+  .res-filter-bar { position: static !important; }
+}
+
+/* Scroll buttons: on phones show one 40px "top" button, only after scrolling. */
+@media (max-width: 767px) {
+  .scroll-btns { bottom: 16px !important; right: 16px !important; }
+  .scroll-btns[data-scrolled="false"] { display: none !important; }
+  .scroll-btn--bottom { display: none !important; }
+  .scroll-btn--top { width: 40px !important; height: 40px !important; }
+}
+
+/* Tap areas for small text links. A transparent ::after grows the hit area
+   without moving anything, so the look is unchanged. */
+.tap-pad,
+.kit-card__cta,
+.kits-all,
+.testi-all,
+.case-card__link {
+  position: relative;
+}
+.tap-pad::after,
+.kit-card__cta::after,
+.kits-all::after,
+.testi-all::after,
+.case-card__link::after {
+  content: "";
+  position: absolute;
+  inset: -15px -6px;
+}
+
+/* Footer column links: 44px rows on phones (34px contiguous on desktop). */
+@media (max-width: 640px) {
+  .colophon-link { padding-top: 10px !important; padding-bottom: 10px !important; }
+}

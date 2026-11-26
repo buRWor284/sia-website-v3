@@ -116,7 +116,7 @@ const S = {
     padding: 0,
     display: "flex",
     flexDirection: "column",
-    gap: 10,
+    gap: 0, // was 10; the 10px now lives in the links' padding (same look, bigger tap area)
   } as React.CSSProperties,
   link: {
     fontFamily: "'Archivo', 'Helvetica Neue', Arial, sans-serif",
@@ -124,6 +124,8 @@ const S = {
     color: "#0e0d0a",
     fontWeight: 600,
     textDecoration: "none",
+    display: "block",
+    padding: "5px 0",
   } as React.CSSProperties,
   bottom: {
     display: "flex",
@@ -187,13 +189,13 @@ export const Colophon = () => (
             {items.map((item) =>
               item.external ? (
                 <li key={item.label}>
-                  <a href={item.href} target="_blank" rel="noopener noreferrer" style={S.link}>
+                  <a href={item.href} target="_blank" rel="noopener noreferrer" className="colophon-link" style={S.link}>
                     {item.label}
                   </a>
                 </li>
               ) : (
                 <li key={item.label}>
-                  <Link href={item.href} style={S.link}>{item.label}</Link>
+                  <Link href={item.href} className="colophon-link" style={S.link}>{item.label}</Link>
                 </li>
               )
             )}
@@ -221,9 +223,9 @@ export const Colophon = () => (
 
       <div className="colophon-legal" style={{ ...S.monoFlex, gap: 20 }}>
         {LEGAL.map((l) => (
-          <Link key={l.label} href={l.href} style={S.legalLink}>{l.label}</Link>
+          <Link key={l.label} href={l.href} className="tap-pad" style={S.legalLink}>{l.label}</Link>
         ))}
-        <a href="/ar" hrefLang="ar" lang="ar" style={S.legalLink}>العربية</a>
+        <a href="/ar" hrefLang="ar" lang="ar" className="tap-pad" style={S.legalLink}>العربية</a>
       </div>
     </div>
   </footer>

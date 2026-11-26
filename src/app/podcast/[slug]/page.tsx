@@ -525,6 +525,7 @@ export default async function EpisodePage({
         <div style={{ marginTop: 32, textAlign: "center" }}>
           <a
             href="/podcast"
+            className="tap-pad"
             style={{
               fontFamily: GROT,
               fontWeight: 700,

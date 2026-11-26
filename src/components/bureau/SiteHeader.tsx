@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CALENDLY, GROT, INK, SERIF, YEL, YEL2 } from "@/lib/tokens";
@@ -165,7 +165,7 @@ function DropdownLink({ c, variant, active, onNavigate }: {
       }
     : {
         display: "flex", alignItems: "center", gap: 8,
-        padding: "11px 0",
+        padding: "14px 0",
         borderBottom: `1px solid rgba(250,250,250,.07)`,
         fontFamily: GROT, fontSize: 13.5, fontWeight: 600,
         color: "rgba(250,250,250,.65)", textDecoration: "none",
@@ -195,6 +195,20 @@ export const SiteHeader = () => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement | null>(null);
+
+  // Publish the header's height as --site-header-h so sticky bars further down
+  // the page (e.g. the /resources filter bar) can sit below it instead of under it.
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const set = () => root.style.setProperty("--site-header-h", `${Math.round(el.getBoundingClientRect().height)}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => { ro.disconnect(); root.style.removeProperty("--site-header-h"); };
+  }, [pathname]);
 
   // Tools get their own chrome — suppress site header
   if (pathname.startsWith("/tools/")) return null;
@@ -208,7 +222,7 @@ export const SiteHeader = () => {
         }
         .site-header__live-ping { animation: siteHeaderLivePing 1.8s cubic-bezier(.2,.6,.4,1) infinite; }
       `}</style>
-    <header style={{
+    <header ref={headerRef} style={{
       background: INK,
       color: CREAM,
       position: "sticky",
@@ -245,7 +259,7 @@ export const SiteHeader = () => {
                 Syed Irfan Ajmal
               </div>
             </Link>
-            <div style={{
+            <div className="site-header__tagline" style={{
               fontFamily: GROT, fontWeight: 700, fontSize: 8.5,
               letterSpacing: ".22em", textTransform: "uppercase",
               color: CREAM45, marginTop: 3,
@@ -255,8 +269,24 @@ export const SiteHeader = () => {
           </div>
         </div>
 
-        {/* spacer */}
-        <div />
+        {/* Mobile hamburger (hidden on desktop; sits on the logo row) */}
+        <button
+          className="site-header__hamburger"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={menuOpen}
+          aria-controls="site-header-mobile-menu"
+          style={{
+            display: "none", background: "none", border: "none", cursor: "pointer",
+            padding: "0 0 0 16px", color: CREAM,
+            fontFamily: GROT, fontSize: 11, fontWeight: 700,
+            letterSpacing: ".16em", textTransform: "uppercase",
+            alignItems: "center", justifyContent: "flex-end", gap: 10,
+            minHeight: 44, minWidth: 44,
+          }}
+        >
+          {menuOpen ? "✕" : "☰"}&nbsp;&nbsp;{menuOpen ? "CLOSE" : "MENU"}
+        </button>
       </div>
 
       {/* ── Desktop nav row ─────────────────────────────────────────── */}
@@ -363,24 +393,9 @@ export const SiteHeader = () => {
         </a>
       </div>
 
-      {/* ── Mobile hamburger ─────────────────────────────────────────── */}
-      <button
-        className="site-header__hamburger"
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label={menuOpen ? "Close navigation" : "Open navigation"}
-        style={{
-          display: "none", background: "none", border: "none", cursor: "pointer",
-          padding: "14px 20px", color: CREAM,
-          fontFamily: GROT, fontSize: 10, fontWeight: 700,
-          letterSpacing: ".16em", textTransform: "uppercase",
-          alignItems: "center", gap: 10,
-        }}
-      >
-        {menuOpen ? "✕" : "☰"}&nbsp;&nbsp;{menuOpen ? "CLOSE" : "MENU"}
-      </button>
-
       {/* ── Mobile dropdown ──────────────────────────────────────────── */}
       <nav
+        id="site-header-mobile-menu"
         className="site-header__mobile-menu"
         style={{
           display: menuOpen ? "flex" : "none",
@@ -398,7 +413,7 @@ export const SiteHeader = () => {
                 href={node.href}
                 onClick={() => setMenuOpen(false)}
                 style={{
-                  padding: "12px 0",
+                  padding: "15px 0",
                   borderBottom: `1px solid rgba(250,250,250,.10)`,
                   fontFamily: GROT, fontSize: 15, fontWeight: 600,
                   color: "rgba(250,250,250,.8)",
@@ -420,7 +435,7 @@ export const SiteHeader = () => {
                   width: "100%", textAlign: "left", cursor: "pointer",
                   background: "none", border: "none",
                   borderBottom: `1px solid rgba(250,250,250,.10)`,
-                  padding: "12px 0",
+                  padding: "15px 0",
                   fontFamily: GROT, fontSize: 15, fontWeight: 600,
                   color: "rgba(250,250,250,.8)",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -449,7 +464,7 @@ export const SiteHeader = () => {
           href="/strategy-call"
           onClick={() => setMenuOpen(false)}
           style={{
-            marginTop: 14, padding: "14px 20px",
+            marginTop: 14, padding: "17px 20px",
             background: YEL, color: INK,
             textAlign: "center",
             fontFamily: GROT, fontWeight: 800,

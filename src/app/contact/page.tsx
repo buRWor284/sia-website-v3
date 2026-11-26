@@ -186,18 +186,21 @@ function ContactForm() {
       )}
 
       {[
-        { id: "name", label: "Your name", type: "text", placeholder: "Full name", required: true },
-        { id: "email", label: "Email address", type: "email", placeholder: "you@yourcompany.com", required: true },
-        { id: "company", label: "Company or project", type: "text", placeholder: "Optional", required: false },
-      ].map(({ id, label, type, placeholder, required }) => (
+        { id: "name", label: "Your name", type: "text", placeholder: "Full name", required: true, autoComplete: "name" },
+        { id: "email", label: "Email address", type: "email", placeholder: "you@yourcompany.com", required: true, autoComplete: "email" },
+        { id: "company", label: "Company or project", type: "text", placeholder: "Optional", required: false, autoComplete: "organization" },
+      ].map(({ id, label, type, placeholder, required, autoComplete }) => (
         <div key={id} style={{ marginBottom: 20 }}>
-          <SCaps size={10.5} ls="0.16em" style={{ display: "block", marginBottom: 8 }}>
-            {label}
-          </SCaps>
+          <label htmlFor={id} style={{ display: "block" }}>
+            <SCaps size={10.5} ls="0.16em" style={{ display: "block", marginBottom: 8 }}>
+              {label}
+            </SCaps>
+          </label>
           <input
             id={id}
             name={id}
             type={type}
+            autoComplete={autoComplete}
             placeholder={placeholder}
             required={required}
             disabled={status === "sending"}
@@ -218,9 +221,11 @@ function ContactForm() {
       ))}
 
       <div style={{ marginBottom: 20 }}>
-        <SCaps size={10.5} ls="0.16em" style={{ display: "block", marginBottom: 8 }}>
-          What can we help with?
-        </SCaps>
+        <label htmlFor="message" style={{ display: "block" }}>
+          <SCaps size={10.5} ls="0.16em" style={{ display: "block", marginBottom: 8 }}>
+            What can we help with?
+          </SCaps>
+        </label>
         <textarea
           id="message"
           name="message"
