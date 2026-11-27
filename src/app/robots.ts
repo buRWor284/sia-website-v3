@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 
 // Public pages are open to all crawlers; the API, the authenticated EMOS platform,
-// and the academy pay page stay disallowed for everyone.
-const DISALLOW = ["/api/", "/emos-platform/", "/emos-academy/pay"];
+// the academy pay page and the /go email click-tracking redirect ("/go?" so it never matches /google-... paths) stay disallowed for everyone.
+const DISALLOW = ["/api/", "/emos-platform/", "/emos-academy/pay", "/go?"];
 
 // AI / LLM crawlers we explicitly allow on public pages (locked policy: AI crawlers
 // may READ public content, they still cannot RUN the JS + Turnstile gated tools).
