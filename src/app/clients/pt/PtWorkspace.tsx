@@ -394,7 +394,7 @@ export function PtWorkspace() {
         {/* ── Footer ────────────────────────────────────────────────────── */}
         <footer style={{ background: PAPER2, borderTop: `1px solid ${INK15}`, padding: "20px 48px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 24 }}>
           <p style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 400, fontSize: 12.5, lineHeight: 1.5, color: INK55, margin: 0, maxWidth: 520 }}>
-            All materials prepared exclusively for Physicians Thrive. Built on the EMOS framework by Syed Irfan Ajmal &mdash; shared privately for review.
+            All materials prepared exclusively for Physicians Thrive. Built on the EMOS framework by Syed Irfan Ajmal, shared privately for review.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <div style={{ width: 8, height: 8, background: YEL, border: `1.5px solid ${INK}`, borderRadius: "50%" }} />
