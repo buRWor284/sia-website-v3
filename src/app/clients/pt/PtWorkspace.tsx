@@ -58,11 +58,15 @@ const STRATEGY_ASSETS = [
   {
     title: "Competitor Analysis",
     body: "How PT's tool suite compares to Resolve, Contract Diagnostics, Contract Rx, WealthKeel, and FastRVU across 8 dimensions — with head-to-head scorecards and market positioning.",
+    cta: "View Analysis →",
+    href: "/clients/pt/competitor-analysis.html",
     tag: "REPORT",
   },
   {
     title: "Marketing & Distribution Plan",
     body: "How the tools become a growth engine: embeddable widgets, WCI placement, KevinMD/Medscape pitches, annual report press events, and the physician shortage data story.",
+    cta: "View Plan →",
+    href: "/clients/pt/marketing-plan.html",
     tag: "STRATEGY DOC",
   },
 ] as const;
@@ -323,9 +327,9 @@ export function PtWorkspace() {
                     <div>
                       <h2 style={{ fontFamily: SERIF, fontWeight: 700, fontSize: 24, lineHeight: 1.15, letterSpacing: "-0.01em", color: INK, marginBottom: 10 }}>{asset.title}</h2>
                       <p style={{ fontFamily: SERIF, fontWeight: 400, fontSize: 15, lineHeight: 1.6, color: INK70, marginBottom: 20 }}>{asset.body}</p>
-                      <span style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: INK35, color: PAPER, padding: "12px 20px", cursor: "not-allowed" }}>
-                        Available Upon Request
-                      </span>
+                      <a href={asset.href} className="doc-cta" style={{ display: "inline-block", fontFamily: GROT, fontWeight: 700, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", background: INK, color: PAPER, padding: "12px 20px", textDecoration: "none" }}>
+                        {asset.cta}
+                      </a>
                     </div>
                     <span style={{ fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.18em", textTransform: "uppercase", color: INK55, background: PAPER2, border: `1px solid ${INK35}`, padding: "5px 10px", whiteSpace: "nowrap" }}>
                       {asset.tag}
