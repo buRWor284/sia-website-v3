@@ -3,14 +3,13 @@ import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
 
 export const metadata: Metadata = {
-  title: "Podcast · The SIA Show",
+  title: "Podcast · The SIA Show — Syed Irfan Ajmal",
   description:
-    "38 episodes across 4 seasons. Conversations with founders, marketers, and operators on SEO, PR, link building, remote work, and growth.",
+    "29 episodes across 3 seasons — conversations with founders, marketers, and operators on SEO, PR, link building, remote work, and growth. Hosted by Syed Irfan Ajmal.",
   openGraph: {
-    title: "The SIA Show · Podcast",
+    title: "The SIA Show — Podcast",
     description: "Conversations on SEO, PR, link building, and growth with founders and operators.",
   },
-  alternates: { canonical: "/podcast" },
 };
 import {
   DoubleRule,
@@ -23,6 +22,7 @@ import {
 import {
   GROT,
   INK,
+  INK15,
   INK35,
   INK55,
   INK70,
@@ -31,11 +31,6 @@ import {
   SERIF,
   YEL,
 } from "@/lib/tokens";
-import { getEpisodeIndex } from "@/lib/podcast";
-import { EpisodeIndex, type IndexSeason } from "./EpisodeIndex";
-
-const SITE = "https://www.syedirfanajmal.com";
-const RSS_URL = "https://anchor.fm/s/1515a1c/podcast/rss";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -51,23 +46,9 @@ type Season = {
 
 const SEASONS: ReadonlyArray<Season> = [
   {
-    label: "Season 4", year: "2021–22", count: 8,
+    label: "Season 3", year: "2020", count: 9,
     episodes: [
-      ["S04E09", "Guest Post Pitch Tear Down: Avoid These 11 Mistakes Like the Plague",                      "Solo",               "guest-post-pitch-tear-down-11-mistakes"],
-      ["S04E08", "Boomerang Review — Our Agency's Favourite Tool for Pitching and Email Management",         "Solo",               "boomerang-review-email-pitching-tool"],
-      ["S04E07", "Two Methods for Finding No-Follow Links — And Why One of Them Isn't Too Good",             "Solo",               "finding-no-follow-links-two-methods"],
-      ["S04E06", "Quantifying Backlinks Quality — The Bare Minimum",                                         "Solo",               "quantifying-backlinks-quality-bare-minimum"],
-      ["S04E05", "Reviewing SEO KPIs of Target Websites",                                                    "Solo",               "reviewing-seo-kpis-target-websites"],
-      ["S04E04", "The Difference Between Creating Links vs Earning Links",                                   "Solo",               "creating-links-vs-earning-links"],
-      ["S04E02", "Brendon Burchard's High Performance Planner — My 1 Year Experience",                       "Solo",               "brendon-burchard-high-performance-planner"],
-      ["S04E01", "Lead Scraping With Ahrefs — Operation: Competitor Spying",                                 "Solo",               "lead-scraping-ahrefs-competitor-spying"],
-    ],
-  },
-  {
-    label: "Season 3", year: "2020", count: 10,
-    episodes: [
-      ["S03E10", "Our Agency's 3-Step Client Onboarding Process",                                            "Solo",               "agency-3-step-client-onboarding-process"],
-      ["S03E09", "Discussing HARO Outreach, SEO Agency Business, and Backlinks Management with Greg Heilers", "Greg Heilers",      "greg-heilers-interview", true],
+      ["S03E09", "Discussing HARO Outreach, SEO Agency Business, and Backlinks Management with Greg Heilers", "Greg Heilers",       "greg-heilers-interview", true],
       ["S03E08", "#SEObacklinks Tutorial — Type 3 Backlinks",                                                "Solo",               "seo-backlinks-type3"],
       ["S03E07", "#SEObacklinks Tutorial — Type 2 Backlinks",                                                "Solo",               "seo-backlinks-type2"],
       ["S03E06", "#SEObacklinks Tutorial — Type 1 Backlinks",                                                "Solo",               "seo-backlinks-tutorial"],
@@ -114,127 +95,35 @@ const FEATURED = {
   code:     "S01E08",
   title:    "Melanie Martin on a $2.3 Million ROI PR Campaign",
   guest:    "Melanie Martin",
-  blurb:    "The single most-listened episode of the show. Melanie walks through a public relations campaign that returned $2.3M in measurable ROI, and what most companies still get wrong about earned media.",
+  blurb:    "The single most-listened episode of the show. Melanie walks through a public relations campaign that returned $2.3M in measurable ROI — and what most companies still get wrong about earned media.",
   duration: "52 min",
   slug:     "melanie-marten-public-relations",
-  spotifyEmbedId: "7ox7Vo94iyqs4IjHQhhwpR",
 };
 
-type Guest = { name: string; role: string; topic: string; ep: string; slug: string };
+type Guest = { name: string; role: string; topic: string; ep: string };
 const NOTABLE_GUESTS: ReadonlyArray<Guest> = [
-  { name: "Liam Martin",           role: "Co-founder, Time Doctor",             topic: "Productivity & remote management",              ep: "S01E02", slug: "liam-martin-productivity-remote-employee-management-fighting-distraction-economy-s01e02" },
-  { name: "Peter Gould",           role: "Founder, Adventures",                 topic: "Branding for purpose-driven companies",          ep: "S01E01", slug: "peter-gould-s01e01" },
-  { name: "Ron Carucci",           role: "Author · Forbes contributor",          topic: "Power, leadership, persuasion",                  ep: "S02E03", slug: "ron-carucci-power-leadership" },
-  { name: "Jason Forrest",         role: "CEO, Forrest Performance",             topic: "Unleashing your inner sales warrior",            ep: "S02E10", slug: "jason-forrest" },
-  { name: "Ash Ali & Hasan Kubba", role: "Co-authors, The Unfair Advantage",     topic: "Finding your unfair advantage",                  ep: "S02E09", slug: "ash-ali-hasan-kubba" },
-  { name: "Melanie Martin",        role: "Publicist",                            topic: "$2.3M ROI PR campaign",                         ep: "S01E08", slug: "melanie-marten-public-relations" },
+  { name: "Liam Martin",           role: "Co-founder, Time Doctor",             topic: "Productivity & remote management",              ep: "S01E02" },
+  { name: "Peter Gould",           role: "Founder, Adventures",                 topic: "Branding for purpose-driven companies",          ep: "S01E01" },
+  { name: "Ron Carucci",           role: "Author · Forbes contributor",          topic: "Power, leadership, persuasion",                  ep: "S02E03" },
+  { name: "Jason Forrest",         role: "CEO, Forrest Performance",             topic: "Unleashing your inner sales warrior",            ep: "S02E10" },
+  { name: "Ash Ali & Hasan Kubba", role: "Co-authors, The Unfair Advantage",     topic: "Finding your unfair advantage",                  ep: "S02E09" },
+  { name: "Melanie Martin",        role: "Publicist",                            topic: "$2.3M ROI PR campaign",                         ep: "S01E08" },
 ];
 
 const PLATFORMS: ReadonlyArray<[string, string]> = [
-  ["Apple Podcasts", "https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466"],
-  ["Spotify",        "https://open.spotify.com/show/4ZUfaOaYVckXQ7Q9JnMS92"],
-  ["YouTube",        "https://youtube.com/@syedirfanajmal/"],
-  ["Pocket Casts",   "https://pca.st/itunes/1347540466"],
-  ["RSS feed",       RSS_URL],
+  ["Apple Podcasts", "#"],
+  ["Spotify",        "#"],
+  ["YouTube",        "#"],
+  ["Google Podcasts","#"],
+  ["RSS feed",       "#"],
 ];
 
 const STATS: ReadonlyArray<[string, string]> = [
-  ["38",   "episodes shipped"],
-  ["04",   "seasons (2018–2022)"],
-  ["11",   "expert guests"],
+  ["29",   "episodes shipped"],
+  ["03",   "seasons (2018–2020)"],
+  ["12+",  "expert guests"],
   ["$2.3M","biggest case study covered"],
 ];
-
-// ─── Episode enrichment (dates, summaries, topics from podcast data) ──────────
-
-const TOPICS = [
-  "Link building & SEO",
-  "Digital PR & HARO",
-  "Productivity & remote",
-  "Business & growth",
-] as const;
-
-function topicsFor(title: string): string[] {
-  const t = title.toLowerCase();
-  const tags: string[] = [];
-  if (/backlink|seo|link|ahrefs|kpi/.test(t)) tags.push(TOPICS[0]);
-  if (/haro|\bpr\b|publicity|newsjack|pitch|outreach/.test(t)) tags.push(TOPICS[1]);
-  if (/productiv|remote|tool|planner|boomerang|hack/.test(t)) tags.push(TOPICS[2]);
-  if (/business|agency|client|sales|speak|startup|brand|copywrit|advantage|leadership|recession|wisdom|season/.test(t)) tags.push(TOPICS[3]);
-  if (tags.length === 0) tags.push(TOPICS[3]);
-  return tags;
-}
-
-function shorten(text: string, max = 170): string {
-  const clean = text.replace(/\s+/g, " ").trim();
-  if (clean.length <= max) return clean;
-  const cut = clean.slice(0, max);
-  return `${cut.slice(0, cut.lastIndexOf(" "))}…`;
-}
-
-function buildIndexData(): {
-  seasons: IndexSeason[];
-  jsonLd: Record<string, unknown>;
-} {
-  const bySlug = new Map(getEpisodeIndex().map((ep) => [ep.slug, ep]));
-
-  const seasons: IndexSeason[] = SEASONS.map((s) => ({
-    label: s.label,
-    year: s.year,
-    episodes: s.episodes.map(([code, title, guest, slug, featured]) => {
-      const meta = bySlug.get(slug);
-      return {
-        code,
-        title,
-        guest,
-        slug,
-        featured: featured === true,
-        solo: guest === "Solo",
-        date: meta?.publication_date
-          ? new Date(meta.publication_date).toLocaleDateString("en-GB", {
-              month: "short",
-              year: "numeric",
-            })
-          : null,
-        summary: meta?.summary ? shorten(meta.summary) : null,
-        topics: topicsFor(title),
-      };
-    }),
-  }));
-
-  const episodesLd = SEASONS.flatMap((s) =>
-    s.episodes.map(([, title, , slug]) => {
-      const meta = bySlug.get(slug);
-      return {
-        "@type": "PodcastEpisode",
-        name: title,
-        url: `${SITE}/podcast/${slug}`,
-        ...(meta?.publication_date
-          ? { datePublished: meta.publication_date }
-          : {}),
-      };
-    })
-  );
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "PodcastSeries",
-    name: "The SIA Business Podcast",
-    url: `${SITE}/podcast`,
-    webFeed: RSS_URL,
-    description:
-      "Conversations on SEO, digital PR, link building, remote work, and growth with founders and operators. Hosted by Syed Irfan Ajmal.",
-    author: {
-      "@type": "Person",
-      name: "Syed Irfan Ajmal",
-      url: SITE,
-    },
-    numberOfEpisodes: 38,
-    episode: episodesLd,
-  };
-
-  return { seasons, jsonLd };
-}
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
@@ -245,10 +134,10 @@ const Hero = () => (
       {/* Left: count */}
       <div className="res-hero-left">
         <div style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(52px, 7vw, 84px)", lineHeight: 0.85, letterSpacing: "-0.04em", color: INK }}>
-          38
+          29
         </div>
         <div style={{ marginTop: 10, fontFamily: GROT, fontWeight: 700, fontSize: 9, letterSpacing: "0.22em", textTransform: "uppercase", color: INK55, lineHeight: 1.6 }}>
-          Episodes<br />four seasons
+          Episodes<br />three seasons
         </div>
       </div>
 
@@ -267,31 +156,11 @@ const Hero = () => (
         <p style={{ marginTop: 12, fontFamily: SERIF, fontStyle: "italic", fontSize: 16, lineHeight: 1.5, color: INK70, maxWidth: 480 }}>
           Interviews, solo breakdowns, and field dispatches from the earned-media trenches.
         </p>
-        <a
-          href="#subscriptions"
-          style={{
-            display: "inline-block",
-            marginTop: 18,
-            padding: "10px 16px",
-            background: YEL,
-            border: `1px solid ${INK}`,
-            color: INK,
-            textDecoration: "none",
-            fontFamily: GROT,
-            fontWeight: 800,
-            fontSize: 10.5,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-          }}
-        >
-          New season in 2026 · Get notified ↓
-        </a>
       </div>
 
       {/* Right: topic index */}
       <div className="res-hero-right">
         {[
-          { label: "Season 4 · 2021–22", sub: "Link building & tools" },
           { label: "Season 3 · 2020", sub: "SEO & outreach" },
           { label: "Season 2 · 2019", sub: "Growth & strategy" },
           { label: "Season 1 · 2018", sub: "Foundations" },
@@ -314,7 +183,7 @@ const PodcastLead = () => (
     <DoubleRule style={{ margin: "0 0 36px" }} />
 
     {/* Lead — 2-col: about the show + listen-on aside */}
-    <div className="grid-hero-2col" style={{ alignItems: "start" }}>
+    <div style={{ display: "grid", gridTemplateColumns: "1.7fr 1fr", gap: 64, alignItems: "start" }}>
       <div
         style={{
           columnCount: 2,
@@ -346,7 +215,7 @@ const PodcastLead = () => (
           </span>
           ince 2018, a show about the practical end of digital marketing:
           digital PR, SEO, content, agency operations, and the awkward
-          economics of remote work. Four seasons, thirty-eight episodes,
+          economics of remote work. Three seasons, twenty-nine episodes,
           most of them with guests, all of them under an hour.
         </p>
         <p style={{ marginTop: "0.7em" }}>
@@ -359,7 +228,7 @@ const PodcastLead = () => (
         </p>
         <p style={{ marginTop: "0.7em", fontStyle: "italic" }}>
           On pause through 2024–25 while DMR.agency grew. Returning in late
-          2026 with a fifth season focused on EMOS, earned media at scale,
+          2026 with a fourth season focused on EMOS, earned media at scale,
           and conversations with the in-house teams running both.
         </p>
       </div>
@@ -377,8 +246,6 @@ const PodcastLead = () => (
             <a
               key={name}
               href={href}
-              target="_blank"
-              rel="noopener noreferrer"
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -403,7 +270,7 @@ const PodcastLead = () => (
 
     {/* Stats strip */}
     <DoubleRule style={{ margin: "52px 0 0" }} />
-    <div className="grid-stats">
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)" }}>
       {STATS.map(([n, l], i) => (
         <div
           key={n}
@@ -432,11 +299,14 @@ const Featured = () => (
     <SectionMast n="01" label="Featured episode · Most-played" />
 
     <div
-      className="grid-featured-dark"
       style={{
         background: INK,
         color: PAPER,
         padding: "48px 48px",
+        display: "grid",
+        gridTemplateColumns: "1fr 1.3fr",
+        gap: 56,
+        alignItems: "center",
         position: "relative",
         border: `1px solid ${INK}`,
       }}
@@ -477,10 +347,10 @@ const Featured = () => (
           {FEATURED.title}
         </h2>
         <div style={{ marginTop: 22, display: "flex", gap: 24, alignItems: "baseline" }}>
-          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.65)">
+          <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.65)">
             Guest · {FEATURED.guest}
           </SCaps>
-          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.65)">
+          <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.65)">
             Run time · {FEATURED.duration}
           </SCaps>
         </div>
@@ -492,28 +362,14 @@ const Featured = () => (
             margin: 0,
             fontFamily: SERIF,
             fontSize: 19,
-            color: "rgba(250,250,250,.85)",
+            color: "rgba(241,235,222,.85)",
             lineHeight: 1.55,
             fontStyle: "italic",
           }}
         >
-          {FEATURED.blurb}
+          &ldquo;{FEATURED.blurb}&rdquo;
         </p>
-
-        {/* Inline audio player */}
-        <div style={{ marginTop: 24 }}>
-          <iframe
-            src={`https://open.spotify.com/embed/episode/${FEATURED.spotifyEmbedId}?theme=0`}
-            width="100%"
-            height={152}
-            loading="lazy"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            title={`${FEATURED.title} · audio player`}
-            style={{ border: 0, display: "block" }}
-          />
-        </div>
-
-        <div style={{ marginTop: 20, display: "flex", gap: 12 }}>
+        <div style={{ marginTop: 28, display: "flex", gap: 12 }}>
           <a
             href={`/podcast/${FEATURED.slug}`}
             style={{
@@ -532,8 +388,8 @@ const Featured = () => (
               textTransform: "uppercase",
             }}
           >
-            <span>Show notes &amp; transcript</span>
-            <span style={{ fontFamily: SERIF, fontSize: 20 }}>→</span>
+            <span>Listen to the episode</span>
+            <span style={{ fontFamily: SERIF, fontSize: 20 }}>↗</span>
           </a>
         </div>
       </div>
@@ -547,7 +403,15 @@ const Guests = () => (
   <section style={{ background: PAPER, padding: "60px 56px 90px" }}>
     <SectionMast n="02" label="Notable guests · From the desk" />
 
-    <div className="grid-intro" style={{ marginBottom: 40 }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1.4fr",
+        gap: 60,
+        alignItems: "baseline",
+        marginBottom: 40,
+      }}
+    >
       <h2
         style={{
           margin: 0,
@@ -582,13 +446,16 @@ const Guests = () => (
     </div>
 
     <div
-      className="grid-cards-3"
-      style={{ gap: 0, border: `1px solid ${INK}` }}
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(3, 1fr)",
+        gap: 0,
+        border: `1px solid ${INK}`,
+      }}
     >
       {NOTABLE_GUESTS.map((g, i) => (
-        <a
+        <div
           key={g.name}
-          href={`/podcast/${g.slug}`}
           style={{
             padding: "26px 24px",
             borderRight: i % 3 !== 2 ? `1px solid ${INK}` : "none",
@@ -597,8 +464,6 @@ const Guests = () => (
             display: "flex",
             flexDirection: "column",
             minHeight: 220,
-            textDecoration: "none",
-            color: INK,
           }}
         >
           <div
@@ -648,33 +513,142 @@ const Guests = () => (
           >
             On: {g.topic}
           </p>
-          <div style={{ marginTop: 14, textAlign: "right" }}>
-            <SCaps size={10} ls="0.16em" color={INK55}>
-              Listen ↗
-            </SCaps>
-          </div>
-        </a>
+        </div>
       ))}
     </div>
+  </section>
+);
+
+// ─── §03 · All Episodes ───────────────────────────────────────────────────────
+
+const AllEpisodes = () => (
+  <section style={{ background: PAPER, padding: "0 56px 90px" }}>
+    <SectionMast n="03" label="All episodes · Chronological index" />
+
+    {SEASONS.map((s, si) => (
+      <div key={s.label} style={{ marginBottom: si < SEASONS.length - 1 ? 56 : 0 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "baseline",
+            justifyContent: "space-between",
+            paddingBottom: 12,
+            borderBottom: `2px solid ${INK}`,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "baseline", gap: 18 }}>
+            <h3
+              style={{
+                margin: 0,
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 44,
+                color: INK,
+                lineHeight: 1,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {s.label}
+            </h3>
+            <SCaps size={11} ls="0.18em" color={INK70}>
+              {s.year} &nbsp;·&nbsp; {s.count} episodes
+            </SCaps>
+          </div>
+          <SCaps size={11} ls="0.18em" color={INK55}>
+            Reverse chronological
+          </SCaps>
+        </div>
+        <ol style={{ margin: 0, padding: 0, listStyle: "none" }}>
+          {s.episodes.map((ep) => (
+            <li
+              key={ep[0]}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "90px 1fr 160px 60px",
+                gap: 20,
+                padding: "18px 0",
+                borderBottom: `1px solid ${INK15}`,
+                alignItems: "baseline",
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: GROT,
+                  fontWeight: 800,
+                  fontSize: 13,
+                  letterSpacing: "0.06em",
+                  color: INK,
+                }}
+              >
+                {ep[0]}
+              </div>
+              <a
+                href={`/podcast/${ep[3]}`}
+                style={{
+                  fontFamily: SERIF,
+                  fontWeight: 600,
+                  fontSize: 19,
+                  color: INK,
+                  textDecoration: "none",
+                  lineHeight: 1.3,
+                }}
+              >
+                {ep[4] && (
+                  <span
+                    style={{
+                      background: YEL,
+                      padding: "0 6px",
+                      marginRight: 8,
+                    }}
+                  >
+                    Featured
+                  </span>
+                )}
+                {ep[1]}
+              </a>
+              <div
+                style={{
+                  fontFamily: SERIF,
+                  fontStyle: "italic",
+                  fontSize: 14.5,
+                  color: INK70,
+                }}
+              >
+                {ep[2]}
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <a
+                  href={`/podcast/${ep[3]}`}
+                  style={{
+                    fontFamily: GROT,
+                    fontSize: 11,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: INK55,
+                    textDecoration: "none",
+                  }}
+                >
+                  Listen ↗
+                </a>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))}
   </section>
 );
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PodcastPage() {
-  const { seasons, jsonLd } = buildIndexData();
-
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <Hero />
       <PodcastLead />
       <Featured />
       <Guests />
-      <EpisodeIndex seasons={seasons} topics={[...TOPICS]} />
+      <AllEpisodes />
       <Subscriptions sectionNumber="04" />
       <Colophon />
       <ScrollButtons />

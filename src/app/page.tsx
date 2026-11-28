@@ -1,10 +1,6 @@
 'use client';
-import { useEffect } from 'react';
-import { Subscriptions, CTATicker, Colophon } from '@/components/bureau';
-import { Reveal } from '@/components/motion/Reveal';
-import { ScrollButtons } from '@/components/ScrollButtons';
-import { RadarCallout } from '@/components/bureau/RadarCallout';
-import { RESOURCE_COUNT } from '@/components/resources/resources-content';
+import { useEffect, useState } from 'react';
+import { Subscriptions, CTATicker } from '@/components/bureau';
 
 /**
  * Homepage v4 Cream edition (SIA-homepage-v3 design)
@@ -23,10 +19,9 @@ const css = `
     --I45:  rgba(14,13,10,.45);
     --I15:  rgba(14,13,10,.15);
     --RED:  #2e90c3;
-    --RED-AA: #1f6f99; /* same blue, darkened for 11px text on cream: 5.3:1 (was 3.4:1) */
     --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
-    --BG:  #FAFAFA;
-    --BG2: #F0F0EE;
+    --BG:  #f5f0e8;
+    --BG2: #ece7da;
     --mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
   }
 
@@ -41,7 +36,7 @@ const css = `
   }
   .sec-idx__n {
     font-family: var(--mono); font-size: 11px; font-weight: 600;
-    letter-spacing: .12em; color: var(--RED-AA); flex-shrink: 0;
+    letter-spacing: .12em; color: var(--RED); flex-shrink: 0;
   }
   .sec-idx__rule { flex: 1; height: 2px; background: var(--INK); }
   .sec-idx__label {
@@ -108,7 +103,7 @@ const css = `
   }
   .hero-h1 .strike {
     text-decoration: line-through;
-    text-decoration-color: var(--Y);
+    text-decoration-color: var(--RED);
     text-decoration-thickness: 4px;
   }
   .hero-h1 .earn {
@@ -156,7 +151,7 @@ const css = `
   }
   .speaking-photo__caption {
     font-family: var(--mono); font-size: 10px; letter-spacing: .1em;
-    color: rgba(245,197,24,.8); text-transform: uppercase;
+    color: rgba(245,197,24,.5); text-transform: uppercase;
     padding: 8px 10px; border-top: 1px solid rgba(245,197,24,.2);
   }
 
@@ -265,16 +260,16 @@ const css = `
     font-size: 28px; font-weight: 700; color: rgba(245,197,24,.55);
   }
   .case-card__client {
-    font-family: var(--mono); font-size: 11px; color: rgba(250,250,250,.5);
+    font-family: var(--mono); font-size: 11px; color: rgba(241,235,222,.5);
     letter-spacing: .12em; margin-top: 12px; text-transform: uppercase;
   }
   .case-card__result {
     font-family: var(--sans); font-weight: 800; font-size: 21px;
-    color: #FAFAFA; line-height: 1.12; letter-spacing: -.01em;
+    color: #f1ebde; line-height: 1.12; letter-spacing: -.01em;
     margin-top: 18px;
   }
   .case-card__body {
-    font-family: var(--sans); font-size: 15px; color: rgba(250,250,250,.62);
+    font-family: var(--sans); font-size: 15px; color: rgba(241,235,222,.62);
     line-height: 1.55; margin-top: 14px; flex: 1;
   }
   .case-card__link {
@@ -284,7 +279,7 @@ const css = `
     text-transform: uppercase; border-bottom: 1px solid var(--RED);
     padding-bottom: 3px; align-self: flex-start;
   }
-  .case-card__link:hover { color: #FAFAFA; border-color: #FAFAFA; }
+  .case-card__link:hover { color: #f1ebde; border-color: #f1ebde; }
 
   /* ── TESTIMONIALS ───────────────────────────────────────── */
   .testimonials { background: var(--BG2); padding: 100px 56px; }
@@ -367,15 +362,14 @@ const css = `
   }
   .kit-card {
     padding: 36px 32px 32px; border-right: 2px solid var(--INK);
-    border-top: 4px solid var(--Y);
     display: flex; flex-direction: column;
   }
   .kit-card:last-child { border-right: none; }
   .kit-card__badge {
     display: inline-block; padding: 6px 12px;
-    background: var(--Y); border: 2px solid var(--Y);
+    background: var(--INK); border: 2px solid var(--INK);
     font-family: var(--mono); font-size: 10px; font-weight: 700;
-    letter-spacing: .14em; text-transform: uppercase; color: var(--INK);
+    letter-spacing: .14em; text-transform: uppercase; color: var(--BG);
     align-self: flex-start; margin-bottom: 24px;
   }
   .kit-card__paper {
@@ -415,7 +409,7 @@ const css = `
   }
   .kit-card__footer {
     display: flex; justify-content: space-between; align-items: center;
-    border-top: 2px solid var(--Y); padding-top: 18px; margin-top: 24px;
+    border-top: 2px solid var(--INK); padding-top: 18px; margin-top: 24px;
   }
   .kit-card__year {
     font-family: var(--mono); font-size: 11px; color: var(--I45); letter-spacing: .06em;
@@ -474,74 +468,44 @@ const css = `
   }
   .newsletter__note span { color: var(--RED); font-weight: 700; }
 
+  /* ── FOOTER ─────────────────────────────────────────────── */
+  .footer { background: var(--BG); padding: 56px 56px 28px; border-top: 2px solid var(--INK); }
+  .footer__grid {
+    display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr;
+    gap: 40px; padding-bottom: 40px; border-bottom: 2px solid var(--INK);
+  }
+  .footer__wordmark {
+    font-family: var(--sans); font-style: italic; font-weight: 900;
+    font-size: 56px; color: var(--INK); line-height: 1; letter-spacing: -.02em;
+  }
+  .footer__about {
+    margin-top: 14px; font-family: var(--sans); font-size: 15px;
+    color: var(--I70); line-height: 1.5; max-width: 320px;
+  }
+  .footer__col-head {
+    font-family: var(--mono); font-size: 11px; color: var(--I70);
+    letter-spacing: .18em; font-weight: 700; margin-bottom: 16px;
+  }
+  .footer__links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer__link {
+    font-family: var(--sans); font-size: 14px; color: var(--INK); font-weight: 600;
+  }
+  .footer__link:hover { color: var(--RED); }
+  .footer__bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 22px; gap: 32px; flex-wrap: wrap;
+  }
+  .footer__copy {
+    font-family: var(--mono); font-size: 11px; color: var(--I70); letter-spacing: .12em;
+  }
+  .footer__contact {
+    font-family: var(--mono); font-size: 11px; color: var(--I70);
+    letter-spacing: .04em; display: flex; gap: 24px;
+  }
+  .footer__open { color: var(--RED); font-weight: 700; }
+
   /* ── SPACER ─────────────────────────────────────────────── */
   .spacer-100 { height: 100px; }
-
-  /* ── SCROLL REVEAL ──────────────────────────────────────── */
-  .reveal {
-    opacity: 0;
-    transform: translateY(28px);
-    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
-    will-change: opacity, transform;
-  }
-  .reveal--visible { opacity: 1; transform: none; }
-
-  /* ── HERO HEADLINE STAGGER (on load) ───────────────────────*/
-  @keyframes heroLineIn {
-    from { opacity: 0; transform: translateY(22px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .hero-h1 .line {
-    display: inline-block;
-    opacity: 0;
-    animation: heroLineIn .7s cubic-bezier(.16,1,.3,1) forwards;
-  }
-  .hero-h1 .line:nth-child(1) { animation-delay: .05s; }
-  .hero-h1 .line:nth-child(2) { animation-delay: .18s; }
-  .hero-h1 .line:nth-child(3) { animation-delay: .31s; }
-  .hero-h1 .line:nth-child(4) { animation-delay: .44s; }
-  @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    .hero-h1 .line { opacity: 1; animation: none; }
-  }
-
-  /* ── HOVER MICRO-INTERACTIONS ───────────────────────────── */
-  .kit-card, .case-card, .service-card {
-    transition: transform .28s cubic-bezier(.16,1,.3,1), box-shadow .28s ease;
-  }
-  .kit-card:hover, .case-card:hover, .service-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 32px rgba(14,13,10,.14);
-    position: relative;
-    z-index: 1;
-  }
-  .casework .case-card:hover { box-shadow: 0 16px 32px rgba(0,0,0,.35); }
-  .btn-primary, .btn-outline, .speaking__cta, .newsletter__btn {
-    transition: transform .2s cubic-bezier(.16,1,.3,1), background .15s, box-shadow .2s ease;
-  }
-  .btn-primary:hover, .btn-outline:hover, .speaking__cta:hover, .newsletter__btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(14,13,10,.18);
-  }
-  .btn-primary:active, .btn-outline:active { transform: translateY(-1px); }
-  .stage-row { transition: padding-left .25s ease, background .25s ease; }
-  .stage-row:hover { padding-left: 8px; background: rgba(245,197,24,.05); }
-  .testi-row { transition: background .25s ease; }
-  .testi-row:hover { background: rgba(14,13,10,.03); }
-
-  /* Auto scroll-reveal targets (handled by useScrollReveal hook below) */
-  .testi-row, .case-card, .service-card, .stage-row {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1), background .25s ease, padding-left .25s ease;
-  }
-  .testi-row.is-revealed, .case-card.is-revealed, .service-card.is-revealed, .stage-row.is-revealed {
-    opacity: 1;
-    transform: none;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .testi-row, .case-card, .service-card, .stage-row { opacity: 1; transform: none; }
-  }
 
   /* ══════════════════════════════════════════════════════════
      RESPONSIVE BREAKPOINTS
@@ -554,6 +518,7 @@ const css = `
     .casework, .testimonials, .speaking, .kits { padding: 72px 32px; }
     .newsletter__inner { padding: 56px 32px; }
     .press { padding: 36px 32px; }
+    .footer { padding: 48px 32px 24px; }
     .hero-h1 { font-size: 64px; }
     .section-h2 { font-size: 64px; }
     .stat__num { font-size: 56px; }
@@ -626,6 +591,12 @@ const css = `
     .newsletter__input { border-right: 2px solid var(--Y); border-bottom: none; }
     .newsletter__btn { width: 100%; }
 
+    /* Footer */
+    .footer { padding: 40px 20px 24px; }
+    .footer__grid { grid-template-columns: 1fr 1fr; gap: 28px; }
+    .footer__bottom { flex-direction: column; gap: 12px; align-items: flex-start; }
+    .footer__contact { flex-direction: column; gap: 6px; }
+    .footer__wordmark { font-size: 42px; }
   }
 
   /* ── Small phones 480px ────────────────────────────────── */
@@ -635,6 +606,8 @@ const css = `
     .stats-strip { grid-template-columns: 1fr 1fr; }
     .stat__num { font-size: 36px; }
     .stat__mo { font-size: 18px; }
+    .footer__grid { grid-template-columns: 1fr; }
+    .footer__copy { font-size: 10px; }
     .testi__quote { font-size: 18px; }
     .newsletter__h2 { font-size: 38px; }
     .newsletter__sub { font-size: 15px; }
@@ -643,6 +616,7 @@ const css = `
     .hero { padding: 20px 16px 0; }
     .services { padding: 44px 16px 0; }
     .casework, .testimonials, .speaking, .kits { padding: 44px 16px; }
+    .footer { padding: 36px 16px 20px; }
     .press { padding: 28px 16px; }
     .speaking-grid .section-h2 { font-size: 40px; }
     .stage-row { grid-template-columns: 1fr; gap: 4px; }
@@ -651,47 +625,44 @@ const css = `
   }
 `;
 
-/**
- * useScrollReveal
- * Dependency-free scroll-reveal: watches all elements matching `selector`
- * and adds `.is-revealed` (with a small stagger) as they enter the viewport.
- * Pairs with the CSS block above targeting .testi-row/.case-card/etc.
- */
-function useScrollReveal(selector: string) {
+function ScrollButtons() {
+  const [atBottom, setAtBottom] = useState(false);
   useEffect(() => {
-    const els = Array.from(document.querySelectorAll<HTMLElement>(selector));
-    if (!els.length) return;
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      els.forEach((el) => el.classList.add('is-revealed'));
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const el = entry.target as HTMLElement;
-            const siblings = Array.from(el.parentElement?.children || []);
-            const i = siblings.indexOf(el);
-            el.style.transitionDelay = `${Math.min(i, 5) * 70}ms`;
-            el.classList.add('is-revealed');
-            observer.unobserve(el);
-          }
-        });
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
-    );
-
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [selector]);
+    const onScroll = () => {
+      const scrolled = window.scrollY + window.innerHeight;
+      const total = document.documentElement.scrollHeight;
+      setAtBottom(scrolled >= total - 80);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <div style={{position:'fixed',bottom:24,right:24,zIndex:200,display:'flex',flexDirection:'column',gap:6}}>
+      <button
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        title="Back to top"
+        style={{
+          width:44,height:44,background:'var(--INK)',color:'var(--Y)',border:'none',cursor:'pointer',
+          fontFamily:'var(--mono)',fontSize:18,fontWeight:700,display:'flex',alignItems:'center',
+          justifyContent:'center',opacity: atBottom ? 1 : 0.85,transition:'opacity .2s',
+          boxShadow:'0 2px 8px rgba(0,0,0,.25)',
+        }}
+      >↑</button>
+      <button
+        onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' })}
+        title="Jump to bottom"
+        style={{
+          width:44,height:44,background:'var(--INK)',color:'var(--Y)',border:'none',cursor:'pointer',
+          fontFamily:'var(--mono)',fontSize:18,fontWeight:700,display:'flex',alignItems:'center',
+          justifyContent:'center',opacity: atBottom ? 0.4 : 0.85,transition:'opacity .2s',
+          boxShadow:'0 2px 8px rgba(0,0,0,.25)',
+        }}
+      >↓</button>
+    </div>
+  );
 }
 
-
 export default function HomePage() {
-  useScrollReveal('.testi-row, .case-card, .service-card, .stage-row');
-
   return (
     <>
       {/* eslint-disable-next-line react/no-danger */}
@@ -699,7 +670,6 @@ export default function HomePage() {
 
 
 
-      <main>
       {/* ══ HERO ══ */}
       <header className="hero">
         {/* Credibility ticker is rendered globally via layout.tsx */}
@@ -707,10 +677,10 @@ export default function HomePage() {
         <div className="hero-grid">
           <div>
             <h1 className="hero-h1">
-              <span className="line">WHY <span className="strike">PAY</span></span><br />
-              <span className="line">FOR ATTENTION</span><br />
-              <span className="line">WHEN YOU CAN</span><br />
-              <span className="line"><span className="earn">EARN</span> IT?</span>
+              WHY <span className="strike">PAY</span><br />
+              FOR ATTENTION<br />
+              WHEN YOU CAN<br />
+              <span className="earn">EARN</span> IT?
             </h1>
           </div>
 
@@ -720,7 +690,7 @@ export default function HomePage() {
               Without <strong>paying for attention.</strong>
             </p>
             <div className="hero-ctas">
-              <a href="/strategy-call" className="btn-primary">Book a discovery call <span className="mono-arrow">→</span></a>
+              <a href="https://calendly.com/sia_dmr_agency/emos" target="_blank" rel="noopener noreferrer" className="btn-primary">Book a discovery call <span className="mono-arrow">→</span></a>
               <a href="/podcast" className="btn-outline">Listen to the podcast</a>
             </div>
           </div>
@@ -751,41 +721,61 @@ export default function HomePage() {
       </header>
 
       {/* ══ § 01 KITS / FREE RESOURCES ══ */}
-      <RadarCallout />
-
       <section className="kits">
         <div className="sec-idx">
           <span className="sec-idx__n">§ 01</span>
           <div className="sec-idx__rule"></div>
           <span className="sec-idx__label">FREE RESOURCES</span>
         </div>
-        <Reveal className="kits-header">
+        <div className="kits-header">
           <div>
             <h2 className="section-h2" style={{margin:0}}>Resources.</h2>
-            <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Radars · Kits · Playbooks · Calculators</p>
+            <p style={{fontFamily:'var(--sans)',fontWeight:700,fontSize:'18px',letterSpacing:'.04em',textTransform:'uppercase',color:'var(--I70)',marginTop:'12px',marginBottom:0}}>Tools · Kits · Playbooks · Calculators</p>
             <p style={{fontFamily:'var(--sans)',fontWeight:400,fontStyle:'italic',fontSize:'15px',color:'var(--I70)',marginTop:'6px',marginBottom:0}}>Might not stay free for too long.</p>
           </div>
-          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>{RESOURCE_COUNT} TOTAL IN THE LIBRARY →</a>
-        </Reveal>
+          <a href="/resources" className="kits-all" style={{color:'var(--INK)'}}>18 TOTAL IN THE LIBRARY →</a>
+        </div>
         <div className="kits-grid">
-          <Reveal className="kit-card">
-            <div className="kit-card__badge">LIVE · WEEKLY RANKINGS</div>
-            <h3 className="kit-card__title">Founder Movers</h3>
-            <p className="kit-card__body">Weekly rankings of founder and Series-A topics by press-coverage momentum, powered by SignalIQ. See what's heating up before it saturates.</p>
+          <div className="kit-card">
+            <div className="kit-card__badge">INTERACTIVE KIT</div>
+            <div className="kit-card__paper">
+              <div className="kit-card__paper-header">
+                <span className="kit-card__gazette">BUREAU GAZETTE</span>
+                <span className="kit-card__date">MMXXVI</span>
+              </div>
+              <div className="kit-card__paper-title">PITCH PERFECT</div>
+              <div className="kit-card__paper-cols">
+                <div className="kit-card__paper-col">The seven-step system that gets reporters to say yes</div>
+                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
+              </div>
+            </div>
+            <h3 className="kit-card__title">The Journo Outreach<br/>Checklist</h3>
+            <p className="kit-card__body">Seven steps to a pitch reporters actually use.</p>
             <div className="kit-card__footer">
               <span className="kit-card__year">2026</span>
-              <a href="/founder-movers" className="kit-card__cta">SEE THIS WEEK'S MOVERS ↗</a>
+              <a href="/infographics/journo-outreach-checklist" className="kit-card__cta">OPEN THE KIT ↗</a>
             </div>
-          </Reveal>
-          <Reveal className="kit-card" delay={120}>
+          </div>
+          <div className="kit-card">
             <div className="kit-card__badge">AI-POWERED TOOL</div>
-            <h3 className="kit-card__title">PartnerCollabIQ</h3>
-            <p className="kit-card__body">Go beyond links. Drop in your niche and PartnerCollabIQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
+            <div className="kit-card__paper">
+              <div className="kit-card__paper-header">
+                <span className="kit-card__gazette">BUREAU GAZETTE</span>
+                <span className="kit-card__date">MMXXVI</span>
+              </div>
+              <div className="kit-card__paper-title">COLLAB LINK BUILDER</div>
+              <div className="kit-card__paper-cols">
+                <div className="kit-card__paper-col">AI finds your best link-building partners in minutes, not weeks</div>
+                <div className="kit-card__paper-col">The SIA Bureau · Research desk · syedirfanajmal.com</div>
+              </div>
+            </div>
+            <h3 className="kit-card__title">CollabIQ</h3>
+            <p className="kit-card__body">Go beyond links. Drop in your niche and CollabIQ surfaces co-marketing allies, distribution partners, and collaboration opportunities — with scoring and ready-to-send outreach.</p>
             <div className="kit-card__footer">
               <span className="kit-card__year">2026</span>
-              <a href="/tools/partnercollabiq" className="kit-card__cta">OPEN THE TOOL ↗</a>
+              <a href="/tools/collabiq" className="kit-card__cta">OPEN THE TOOL ↗</a>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
 
@@ -812,7 +802,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/brett-helling.jpeg" alt="Brett Helling" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/brett-helling.jpeg" alt="Brett Helling" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Brett Helling</div>
             <div className="testi__role">CEO, Ridester.com / TrendlineSEO · USA</div>
           </div>
@@ -829,7 +819,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/imani-lea-brown.jpg" alt="Imani Lea Brown" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/imani-lea-brown.jpg" alt="Imani Lea Brown" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Imani Lea Brown</div>
             <div className="testi__role">Centriq (raised $11M) · USA</div>
           </div>
@@ -846,7 +836,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/azzam-sheikh.jpeg" alt="Azzam Sheikh" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/azzam-sheikh.jpeg" alt="Azzam Sheikh" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Azzam Sheikh</div>
             <div className="testi__role">National Tyres &amp; Autocare · UK</div>
           </div>
@@ -863,7 +853,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/reem-el-shafaki.jpg" alt="Reem El Shafaki" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/reem-el-shafaki.jpg" alt="Reem El Shafaki" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Reem El Shafaki</div>
             <div className="testi__role">DinarStandard · UAE</div>
           </div>
@@ -880,7 +870,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/brie-moreau.jpg" alt="Brie Moreau" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/brie-moreau.jpg" alt="Brie Moreau" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Brie Moreau</div>
             <div className="testi__role">Co-founder, DMSS.io Conference · Bali</div>
           </div>
@@ -897,7 +887,7 @@ export default function HomePage() {
           </blockquote>
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/testimonials/chuck-wang.jpg" alt="Chuck Wang" width={44} height={44} loading="lazy" decoding="async" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
+            <img src="/assets/testimonials/chuck-wang.jpg" alt="Chuck Wang" style={{width:44,height:44,borderRadius:'50%',objectFit:'cover',marginBottom:12,flexShrink:0}} />
             <div className="testi__name">Chuck Wang</div>
             <div className="testi__role">The MVP Marketing Podcast · USA</div>
           </div>
@@ -949,51 +939,42 @@ export default function HomePage() {
             </h2>
             <div className="speaking-photo">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/assets/speaking/mps2016.jpg" alt="Syed Irfan Ajmal speaking at MPS2016 Dubai" width={1200} height={390} loading="lazy" decoding="async" />
+              <img src="/assets/speaking/mps2016.jpg" alt="Syed Irfan Ajmal speaking at MPS2016 Dubai" />
               <div className="speaking-photo__caption">MPS2016 · DUBAI, UAE</div>
             </div>
-            <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Guest spots on US podcasts.</p>
-            <a href="/speaking/ai-visibility" style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 6, marginBottom: 20, textDecoration: "none" }}>
-              <span style={{ fontFamily: "var(--sans)", fontWeight: 800, fontSize: 9, letterSpacing: ".14em", textTransform: "uppercase", background: "var(--Y)", color: "var(--INK)", padding: "3px 7px", flexShrink: 0 }}>New</span>
-              <span style={{ fontFamily: "var(--sans)", fontWeight: 700, fontSize: 13, letterSpacing: ".01em", color: "var(--BG)" }}>AI Visibility Through Earned Media: my flagship session →</span>
-            </a>
+            <p className="speaking__sub">Keynotes for diverse audiences in Malaysia, Indonesia, the UAE, and Pakistan. Webinars for American and British listeners. Fifteen+ guest spots on US podcasts.</p>
             <a href="/speaking" className="speaking__cta">Speaker sheet &amp; topics <span className="mono-arrow">→</span></a>
           </div>
           <div>
             <div className="stage-row">
-              <div className="stage__n">01</div><div className="stage__city">DUBAI ATM</div>
-              <div className="stage__ctry">UAE</div>
-              <div className="stage__tag">ARABIAN TRAVEL MARKET · PANEL · ~500 AUDIENCE</div>
-            </div>
-            <div className="stage-row">
-              <div className="stage__n">02</div><div className="stage__city">KUALA LUMPUR</div>
+              <div className="stage__n">01</div><div className="stage__city">KUALA LUMPUR</div>
               <div className="stage__ctry">Malaysia</div>
               <div className="stage__tag">WEBINARS · WORKSHOPS</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">03</div><div className="stage__city">BALI</div>
+              <div className="stage__n">02</div><div className="stage__city">BALI</div>
               <div className="stage__ctry">Indonesia</div>
-              <div className="stage__tag">DMSS · ~200 AUDIENCE</div>
+              <div className="stage__tag">DMSS · 200+ AUDIENCE</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">04</div><div className="stage__city">PESHAWAR</div>
+              <div className="stage__n">03</div><div className="stage__city">PESHAWAR</div>
               <div className="stage__ctry">Pakistan</div>
               <div className="stage__tag">G-DAY X · DURSHAL</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">05</div><div className="stage__city">DUBAI</div>
+              <div className="stage__n">04</div><div className="stage__city">DUBAI</div>
               <div className="stage__ctry">UAE</div>
-              <div className="stage__tag">Astrolabs · IN5 · MPS2016</div>
+              <div className="stage__tag">ATM · IN5 · MPS2016</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">06</div><div className="stage__city">WEBINARS</div>
+              <div className="stage__n">05</div><div className="stage__city">WEBINARS</div>
               <div className="stage__ctry">US / UK</div>
               <div className="stage__tag">12+ SESSIONS</div>
             </div>
             <div className="stage-row">
-              <div className="stage__n">07</div><div className="stage__city">US PODCASTS</div>
+              <div className="stage__n">06</div><div className="stage__city">US PODCASTS</div>
               <div className="stage__ctry">Remote</div>
-              <div className="stage__tag">GUEST SPOTS</div>
+              <div className="stage__tag">15+ GUEST SPOTS</div>
             </div>
           </div>
         </div>
@@ -1013,7 +994,7 @@ export default function HomePage() {
             <div className="service-card__num">01</div>
             <h3 className="service-card__title">EMOS · Earned Media OS</h3>
             <p className="service-card__body">A productized system for landing editorial coverage — trainings, templates, journalist playbooks. For in-house teams who want the press wins without the agency retainer.</p>
-            <a href="/emos-academy" className="service-card__cta">Tour EMOS →</a>
+            <a href="/emos" className="service-card__cta">Tour EMOS →</a>
           </div>
           <div className="service-card">
             <div className="service-card__num">02</div>
@@ -1033,14 +1014,62 @@ export default function HomePage() {
 
       {/* ══ § 06 NEWSLETTER ══ */}
       <Subscriptions sectionNumber="06" />
-      </main>
 
 
       {/* ══ SCROLL BUTTONS ══ */}
       <ScrollButtons />
 
       {/* ══ FOOTER ══ */}
-      <Colophon />
+      <footer className="footer">
+        <div className="footer__grid">
+          <div>
+            <div className="footer__wordmark">SIA.</div>
+            <p className="footer__about">
+              Syed Irfan Ajmal award-winning marketing consultant, author,
+              speaker, and CEO of <strong>DMR.agency</strong>.
+            </p>
+          </div>
+          <div>
+            <div className="footer__col-head">THE WORK</div>
+            <ul className="footer__links">
+              <li><a href="/fractional-cmo" className="footer__link">Fractional CMO</a></li>
+              <li><a href="/speaking" className="footer__link">Speaking</a></li>
+              <li><a href="/emos" className="footer__link">EMOS</a></li>
+              <li><a href="https://dmr.agency" target="_blank" rel="noopener noreferrer" className="footer__link">DMR.agency ↗</a></li>
+              <li><a href="/ventures" className="footer__link">Ventures</a></li>
+              <li><a href="/clients" className="footer__link">Clients</a></li>
+            </ul>
+          </div>
+          <div>
+            <div className="footer__col-head">NAVIGATE</div>
+            <ul className="footer__links">
+              <li><a href="/" className="footer__link">Home</a></li>
+              <li><a href="/resources" className="footer__link">Resources</a></li>
+              <li><a href="/about" className="footer__link">About</a></li>
+              <li><a href="/podcast" className="footer__link">Podcast</a></li>
+              <li><a href="/gallery" className="footer__link">Gallery</a></li>
+              <li><a href="/newsletter" className="footer__link">Newsletter</a></li>
+            </ul>
+          </div>
+          <div>
+            <div className="footer__col-head">ELSEWHERE</div>
+            <ul className="footer__links">
+              <li><a href="https://x.com/syedirfanajmal" target="_blank" rel="noopener noreferrer" className="footer__link">Twitter / X ↗</a></li>
+              <li><a href="https://www.linkedin.com/in/syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">LinkedIn ↗</a></li>
+              <li><a href="https://youtube.com/@syedirfanajmal/" target="_blank" rel="noopener noreferrer" className="footer__link">YouTube ↗</a></li>
+              <li><a href="https://podcasts.apple.com/us/podcast/syed-irfan-ajmal/id1347540466" target="_blank" rel="noopener noreferrer" className="footer__link">Apple Podcasts ↗</a></li>
+            </ul>
+          </div>
+        </div>
+        <div className="footer__bottom">
+          <div className="footer__copy">© 2026 SYED IRFAN AJMAL · SIA ENTERPRISES INC · WYOMING C-CORP</div>
+          <div className="footer__contact">
+            <span>SIA[@]SYEDIRFANAJMAL[DOT]COM</span>
+            <a href="/fractional-cmo" className="footer__open">● 2 FRACTIONAL CMO SPOTS · Q3 2026</a>
+            <a href="/emos" className="footer__open">● EMOS FOUNDING CLASS · APPLY NOW</a>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }

@@ -1,58 +1,161 @@
 import type { Metadata } from "next";
-import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions } from "@/components/bureau";
+import { SCaps } from "@/components/bureau/primitives";
 
 export const metadata: Metadata = {
-  title: "Resources · Playbooks, Guides & Tools",
+  title: "Resources · Playbooks, Guides & Tools — Syed Irfan Ajmal",
   description:
-    "Free playbooks: personal branding, neuromarketing, storytelling, and SEO-PR tools. Practical guides from a fractional CMO with 22+ years in digital marketing.",
+    "Free playbooks on personal branding, neuromarketing, storytelling, writing tips, and SEO-PR tools. Practical guides from a fractional CMO with 20+ years in digital marketing.",
   openGraph: {
-    title: "Resources · Playbooks, Guides & Tools",
+    title: "Resources — Syed Irfan Ajmal",
     description: "Free playbooks and tools on personal branding, neuromarketing, storytelling, and SEO-PR.",
   },
-  alternates: { canonical: "/resources" },
 };
-import { ResourcesClientShell, RESOURCE_COUNT } from "@/components/resources/ResourcesClientShell";
-import { getAllEpisodes } from "@/lib/podcast";
-import { GROT, INK, INK55, INK70, PAPER, SERIF, YEL } from "@/lib/tokens";
+import { ResourcesClientShell } from "@/components/resources/ResourcesClientShell";
+import { GROT, INK, INK55, INK70, PAPER, SERIF } from "@/lib/tokens";
 import { ScrollButtons } from "@/components/ScrollButtons";
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
-// Compact single-bar masthead — badge + headline + short subhead + CTA, one row.
-// (Previous version was a 3-col newspaper grid with a vanity stat block and a
-// duplicate topic index that just re-teased the filters already in the shell below.)
+// 3-column editorial layout: count left · headline centre · topics right
+// No centred text.
+
+const TOPICS = [
+  { label: "SEO / GEO Backlinking", sub: "Link building · GEO" },
+  { label: "Digital PR",            sub: "Outreach · HARO" },
+  { label: "Content Marketing",     sub: "Writing · Strategy" },
+] as const;
 
 const Hero = () => (
-  <section
-    style={{
-      background: PAPER,
-      borderBottom: `1px solid ${INK}`,
-      padding: "18px 56px",
-      display: "flex",
-      alignItems: "center",
-      gap: 20,
-      flexWrap: "wrap",
-    }}
-  >
-    <span style={{ display: "inline-block", padding: "4px 9px 5px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 9, letterSpacing: "0.2em", textTransform: "uppercase", flexShrink: 0 }}>
-      {/* Derived from CONTENT in ResourcesClientShell.tsx — cannot go stale */}
-      {RESOURCE_COUNT} Resources
-    </span>
+  <section className="sx" style={{ background: PAPER }}>
+    <div className="res-hero-grid">
 
-    <h1 className="hub-h1" style={{ fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(20px,2.3vw,28px)", lineHeight: 1.15, letterSpacing: "-0.02em", color: INK, margin: 0, flexShrink: 0 }}>
-      The frameworks <em style={{ fontStyle: "italic" }}>behind the bylines.</em>
-    </h1>
+      {/* ─── Left: Count ──────────────────────────────────────────────────── */}
+      <div className="res-hero-left">
+        <div
+          style={{
+            fontFamily: SERIF,
+            fontWeight: 700,
+            fontSize: "clamp(52px, 7vw, 84px)",
+            lineHeight: 0.85,
+            letterSpacing: "-0.04em",
+            color: INK,
+          }}
+        >
+          18
+        </div>
+        <div
+          style={{
+            marginTop: 10,
+            fontFamily: GROT,
+            fontWeight: 700,
+            fontSize: 9,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: INK55,
+            lineHeight: 1.6,
+          }}
+        >
+          Resources
+          <br />
+          in the Library
+        </div>
+      </div>
 
-    <p style={{ fontFamily: SERIF, fontSize: 13, lineHeight: 1.5, color: INK70, margin: 0, maxWidth: 340, flex: "1 1 260px" }}>
-      Interactive tools, playbooks, and original research on media, PR, and SEO.
-    </p>
+      {/* ─── Centre: Headline ─────────────────────────────────────────────── */}
+      <div className="res-hero-center">
+        {/* Watermark */}
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            fontFamily: SERIF,
+            fontWeight: 700,
+            fontSize: "clamp(56px, 10vw, 128px)",
+            letterSpacing: "-0.04em",
+            color: "rgba(26,20,16,.042)",
+            whiteSpace: "nowrap",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          RESOURCES
+        </div>
 
-    <a
-      href="#resources"
-      style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "9px 16px", background: YEL, color: INK, fontFamily: GROT, fontWeight: 800, fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", textDecoration: "none", flexShrink: 0, marginLeft: "auto" }}
-    >
-      Browse All →
-    </a>
+        <SCaps size={10} ls="0.24em" color={INK55}>
+          A working library &nbsp;·&nbsp; Earned Media &amp; SEO
+        </SCaps>
+
+        <h1
+          style={{
+            marginTop: 12,
+            fontFamily: SERIF,
+            fontWeight: 700,
+            fontSize: "clamp(30px, 3.8vw, 52px)",
+            lineHeight: 1.02,
+            letterSpacing: "-0.028em",
+            color: INK,
+          }}
+        >
+          The frameworks
+          <br />
+          <em style={{ fontStyle: "italic", fontWeight: 600 }}>
+            behind the bylines.
+          </em>
+        </h1>
+
+        <p
+          style={{
+            marginTop: 12,
+            fontFamily: SERIF,
+            fontStyle: "italic",
+            fontSize: 16,
+            lineHeight: 1.5,
+            color: INK70,
+            maxWidth: 480,
+          }}
+        >
+          Interactive kits, playbooks, and original research on earned media,
+          digital PR, and SEO — packaged to use, not just read.
+        </p>
+      </div>
+
+      {/* ─── Right: Topic index ───────────────────────────────────────────── */}
+      <div className="res-hero-right">
+        {TOPICS.map((t) => (
+          <div key={t.label}>
+            <div
+              style={{
+                fontFamily: SERIF,
+                fontWeight: 700,
+                fontSize: 17,
+                color: INK,
+                lineHeight: 1.2,
+                letterSpacing: "-0.008em",
+              }}
+            >
+              {t.label}
+            </div>
+            <div
+              style={{
+                marginTop: 4,
+                fontFamily: GROT,
+                fontWeight: 700,
+                fontSize: 9,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: INK55,
+              }}
+            >
+              {t.sub}
+            </div>
+          </div>
+        ))}
+      </div>
+
+    </div>
   </section>
 );
 
@@ -61,18 +164,9 @@ const Hero = () => (
 export default function ResourcesPage() {
   return (
     <div style={{ background: PAPER, fontFamily: SERIF, color: INK }}>
-      <PageSchema
-        type="CollectionPage"
-        path="/resources"
-        name="Resources · Playbooks, Guides & Tools"
-        description={metadata.description as string}
-        crumbs={[{ name: "Resources", path: "/resources" }]}
-      />
-      <main>
       <Hero />
-      <ResourcesClientShell episodeCount={getAllEpisodes().length} />
+      <ResourcesClientShell />
       <Subscriptions sectionNumber="07" />
-      </main>
       <Colophon />
       <ScrollButtons />
     </div>

@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { PageSchema } from "@/lib/seo/page-schema";
 import { Colophon, Subscriptions } from "@/components/bureau";
 import { ScrollButtons } from "@/components/ScrollButtons";
 
 export const metadata: Metadata = {
-  title: "About · Career, Press & Recognitions",
+  title: "About Syed Irfan Ajmal · Career, Press & Recognitions",
   description:
-    "From bootstrapping a remote agency in 2013 to fractional CMO, international speaker, and Forbes contributor. Career, press mentions, and recognitions.",
+    "The story behind SIA — from bootstrapping a remote agency in 2010 to fractional CMO, international speaker, and Forbes/HBR contributor. Career chronicle, press mentions, and recognitions.",
   openGraph: {
     title: "About Syed Irfan Ajmal",
     description: "Career chronicle, press, and recognitions of a fractional CMO, speaker, and earned-media strategist.",
   },
-  alternates: { canonical: "/about" },
 };
 import {
   DoubleRule,
@@ -277,7 +275,9 @@ const Hero = () => (
 
       {/* Centre: headline */}
       <div className="res-hero-center">
-        <div aria-hidden className="ghost-word" data-ghost="ABOUT" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }} />
+        <div aria-hidden style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", fontFamily: SERIF, fontWeight: 700, fontSize: "clamp(56px, 10vw, 128px)", letterSpacing: "-0.04em", color: "rgba(26,20,16,.042)", whiteSpace: "nowrap", pointerEvents: "none", userSelect: "none" }}>
+          ABOUT
+        </div>
         <SCaps size={10} ls="0.24em" color={INK55}>
           Entrepreneur &nbsp;·&nbsp; Marketer &nbsp;·&nbsp; Columnist &nbsp;·&nbsp; Int&apos;l Speaker
         </SCaps>
@@ -428,7 +428,7 @@ const PressArchive = () => (
           <span style={{ background: YEL, color: INK, padding: "0 6px" }}>Quoted in.</span>
         </span>
       </h2>
-      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(250,250,250,.65)", lineHeight: 1.55, maxWidth: 520 }}>
+      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 18, color: "rgba(241,235,222,.65)", lineHeight: 1.55, maxWidth: 520 }}>
         100+ bylines and citations across global business, technology, marketing,
         and development — including a print spread in Forbes Middle East.
       </p>
@@ -436,13 +436,16 @@ const PressArchive = () => (
 
     {/* Forbes ME print feature — text left, photo right */}
     <div
-      className="forbes-spread"
       style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 260px",
+        gap: 20,
         padding: 14,
         background: "#111",
-        border: `1px solid rgba(250,250,250,.18)`,
+        border: `1px solid rgba(241,235,222,.18)`,
         marginBottom: 36,
       }}
+      className="forbes-spread"
     >
       <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "4px 4px" }}>
         <div>
@@ -453,18 +456,18 @@ const PressArchive = () => (
             &ldquo;How Qatar Can Become The Silicon Valley<br />
             <span style={{ fontStyle: "italic", fontWeight: 600 }}>Of The Arab World.&rdquo;</span>
           </h3>
-          <p style={{ marginTop: 14, fontFamily: SERIF, fontSize: 15.5, color: "rgba(250,250,250,.65)", lineHeight: 1.55, maxWidth: 520 }}>
+          <p style={{ marginTop: 14, fontFamily: SERIF, fontSize: 15.5, color: "rgba(241,235,222,.65)", lineHeight: 1.55, maxWidth: 520 }}>
             Published in the Forbes Middle East Guide print edition, in collaboration
             with Arab Publisher House (APH). One of a small handful of in-print Forbes
             ME bylines by a Pakistani author.
           </p>
         </div>
-        <div style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid rgba(250,250,250,.12)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
-          <SCaps size={10.5} ls="0.18em" color="rgba(250,250,250,.55)">Forbes ME Guide · 2017 · Print edition</SCaps>
+        <div style={{ marginTop: 18, paddingTop: 14, borderTop: `1px solid rgba(241,235,222,.12)`, display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+          <SCaps size={10.5} ls="0.18em" color="rgba(241,235,222,.45)">Forbes ME Guide · 2017 · Print edition</SCaps>
           <SCaps size={10.5} ls="0.16em" color={PAPER}>Featured byline</SCaps>
         </div>
       </div>
-      <figure style={{ margin: 0, padding: 8, background: "#0a0a0a", border: `1px solid rgba(250,250,250,.12)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <figure style={{ margin: 0, padding: 8, background: "#0a0a0a", border: `1px solid rgba(241,235,222,.12)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/assets/personal/forbes-me-print.jpg"
@@ -481,7 +484,7 @@ const PressArchive = () => (
           key={name}
           style={{
             padding: "8px 16px",
-            border: `1px solid rgba(250,250,250,.2)`,
+            border: `1px solid rgba(241,235,222,.2)`,
             fontFamily: SERIF,
             fontWeight: 700,
             fontSize: "clamp(13px, 1.5vw, 16px)",
@@ -495,25 +498,17 @@ const PressArchive = () => (
       <span
         style={{
           padding: "8px 16px",
-          background: "rgba(250,250,250,.08)",
+          background: "rgba(241,235,222,.08)",
           fontFamily: MONO,
           fontSize: 12,
           fontWeight: 700,
-          color: "rgba(250,250,250,.5)",
+          color: "rgba(241,235,222,.5)",
           letterSpacing: "0.1em",
           whiteSpace: "nowrap",
         }}
       >
         + 80 MORE
       </span>
-    </div>
-
-    {/* Press kit CTA */}
-    <div style={{ marginTop: 36, paddingTop: 28, borderTop: `1px solid rgba(250,250,250,.18)`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-      <p style={{ margin: 0, fontFamily: SERIF, fontSize: 16, color: "rgba(250,250,250,.65)", lineHeight: 1.5, maxWidth: 520 }}>
-        Writing about Syed, or need assets? The full media kit has copy-ready bios, fast facts, headshots, coverage, and downloads.
-      </p>
-      <a href="/press-kit" style={{ padding: "14px 22px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase", whiteSpace: "nowrap" }}>Download the full press kit →</a>
     </div>
   </section>
 );
@@ -756,12 +751,9 @@ const EditorNote = () => (
           I started my career in tech, moved into sales, then found my
           calling in SEO and earned media. The questions have stayed the
           same since 2004: who reads what, what earns trust, why this story
-          now. I lived and worked in Sweden and Denmark, where I earned a
-          Master&apos;s in International Business and Entrepreneurship from
-          Malardalen University, then built DMR.agency from Peshawar into a
-          practice serving clients across twenty-plus countries. I have
-          spoken in person in the UAE, Malaysia, Indonesia and Pakistan, and
-          run remote workshops for SEMrush and for UK-based Uhubs.
+          now. I lived and worked in Sweden and Denmark, then built
+          DMR.agency from Peshawar into a practice serving clients across
+          twenty-plus countries.
         </p>
         <p style={{ marginTop: 16, fontFamily: SERIF, fontSize: 17, fontStyle: "italic", color: INK70, lineHeight: 1.6 }}>
           You can usually find me writing from Peshawar. Occasionally I am
@@ -783,12 +775,12 @@ const Outro = () => (
       background: INK,
       paddingTop: 90,
       paddingBottom: 90,
-      borderTop: `1px solid rgba(250,250,250,.12)`,
+      borderTop: `1px solid rgba(241,235,222,.12)`,
       borderBottom: `3px solid ${YEL}`,
     }}
   >
     <div style={{ maxWidth: 860, margin: "0 auto", textAlign: "center" }}>
-      <SCaps size={11} ls="0.22em" color="rgba(250,250,250,.5)">A note to close</SCaps>
+      <SCaps size={11} ls="0.22em" color="rgba(241,235,222,.5)">A note to close</SCaps>
       <h2
         className="h2-sm"
         style={{
@@ -814,7 +806,7 @@ const Outro = () => (
           Free resources →
         </a>
         <a
-          href="/emos-academy"
+          href="/emos"
           style={{ padding: "16px 26px", background: YEL, color: INK, textDecoration: "none", fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
           EMOS →
@@ -823,15 +815,9 @@ const Outro = () => (
           href={CALENDLY}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(250,250,250,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
+          style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(241,235,222,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
         >
           Fractional CMO →
-        </a>
-        <a
-          href="/press-kit"
-          style={{ padding: "16px 26px", background: "transparent", color: PAPER, textDecoration: "none", border: `1px solid rgba(250,250,250,.35)`, fontFamily: GROT, fontWeight: 800, fontSize: 12, letterSpacing: "0.14em", textTransform: "uppercase" }}
-        >
-          Press kit →
         </a>
       </div>
     </div>
@@ -843,16 +829,7 @@ const Outro = () => (
 export default function AboutPage() {
   return (
     <div style={{ background: PAPER }}>
-      <main>
       <Hero />
-      <PageSchema
-        type="ProfilePage"
-        path="/about"
-        name="About Syed Irfan Ajmal"
-        description={metadata.description as string}
-        crumbs={[{ name: "About", path: "/about" }]}
-        page={{ mainEntity: { "@id": "https://www.syedirfanajmal.com/#person" } }}
-      />
       <StatsStrip />
       <PreAgency />
       <PressArchive />
@@ -862,7 +839,6 @@ export default function AboutPage() {
       <EditorNote />
       <Outro />
       <Subscriptions sectionNumber="07" />
-      </main>
       <Colophon />
       <ScrollButtons />
     </div>

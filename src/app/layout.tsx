@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Newsreader, Archivo, JetBrains_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import Script from "next/script";
-import { SiteHeaderConditional } from "@/components/SiteHeaderConditional";
+import { SiteHeader, CredibilityTicker } from "@/components/bureau";
 import "./globals.css";
-import "./mobile-optimization.css"; // loaded after globals so mobile overrides win the cascade
 
 const newsreader = Newsreader({
   variable: "--font-newsreader",
@@ -29,23 +28,21 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.syedirfanajmal.com"),
-  // Provides the homepage canonical; all other pages override this via their own alternates.canonical
-  alternates: { canonical: "/" },
+  metadataBase: new URL("https://syedirfanajmal.com"),
   title: {
     default: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
-    template: "%s · Syed Irfan Ajmal",
+    template: "%s — Syed Irfan Ajmal",
   },
   description:
-    // Leads with the full name on purpose: for a search on the name, Google builds
-    // the snippet from text that contains it (it was picking the footer copyright line).
-    "Syed Irfan Ajmal is a fractional CMO and founder of DMR.agency. Helping founders and marketing teams get found, get covered, and get customers through GEO, SEO-PR, and earned media.",
+    "Fractional CMO, international speaker, and founder of DMR.agency. " +
+    "Helping founders and marketing teams get found, get covered, and get customers " +
+    "through SEO-PR, GEO, and earned media.",
   openGraph: {
     type: "website",
     siteName: "Syed Irfan Ajmal",
     title: "Syed Irfan Ajmal · Fractional CMO & Earned Media Strategist",
     description:
-      "Fractional CMO, international speaker, and founder of DMR.agency — GEO, SEO-PR, and earned media.",
+      "Fractional CMO, international speaker, and founder of DMR.agency — SEO-PR, GEO, and earned media.",
   },
   twitter: {
     card: "summary_large_image",
@@ -57,70 +54,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Site-wide structured data (Person + Organization + WebSite).
-// Rendered on every route so search engines have a stable entity graph.
-const siteJsonLd = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Person",
-      "@id": "https://www.syedirfanajmal.com/#person",
-      name: "Syed Irfan Ajmal",
-      url: "https://www.syedirfanajmal.com",
-      image: "https://www.syedirfanajmal.com/headshot.jpg",
-      jobTitle: "Fractional CMO & Earned Media Strategist",
-      description:
-        "Fractional CMO, international speaker, and founder of DMR.agency. " +
-        "Helping founders and marketing teams get found, get covered, and get customers " +
-        "through GEO, SEO-PR, and earned media. " +
-        // Keeps in-person and remote speaking apart: AI answers were turning
-        // "remote workshop for a UK company" into "spoke in the UK".
-        "Speaks in person in the UAE, Malaysia, Indonesia and Pakistan, and runs " +
-        "remote workshops for SEMrush and for UK-based Uhubs.",
-      sameAs: [
-        "https://www.linkedin.com/in/syedirfanajmal/",
-        "https://x.com/syedirfanajmal",
-        "https://twitter.com/syedirfanajmal",
-        "https://youtube.com/@syedirfanajmal/",
-      ],
-      worksFor: { "@id": "https://dmr.agency/#organization" },
-      knowsAbout: [
-        "SEO",
-        "Digital PR",
-        "Earned Media",
-        "Generative Engine Optimization",
-        "Personal Branding",
-        "Content Marketing",
-        "Link Building",
-        "AI Visibility",
-        "Fractional CMO",
-      ],
-      // Stated on /about ("Master's in International Business and
-      // Entrepreneurship from Malardalen University"). Keep in step with it.
-      alumniOf: {
-        "@type": "CollegeOrUniversity",
-        name: "Mälardalen University",
-      },
-      nationality: { "@type": "Country", name: "Pakistan" },
-      mainEntityOfPage: { "@id": "https://www.syedirfanajmal.com/about#webpage" },
-    },
-    {
-      "@type": "Organization",
-      "@id": "https://dmr.agency/#organization",
-      name: "DMR.agency",
-      url: "https://dmr.agency",
-      founder: { "@id": "https://www.syedirfanajmal.com/#person" },
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://www.syedirfanajmal.com/#website",
-      url: "https://www.syedirfanajmal.com",
-      name: "Syed Irfan Ajmal",
-      publisher: { "@id": "https://www.syedirfanajmal.com/#person" },
-    },
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -130,41 +63,28 @@ export default function RootLayout({
       className={`${newsreader.variable} ${archivo.variable} ${jetbrains.variable}`}
     >
       <body>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
-        />
-        <SiteHeaderConditional />
+        <SiteHeader />
+        <CredibilityTicker />
         {children}
       </body>
       <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID!} />
-{/* Cal.com queue stub only. embed.js is fetched the first time a page calls Cal(...)
-          (the inline booking pages do), so public pages with no booking widget never load it. */}
-      <Script id="cal-init" strategy="lazyOnload">{`
-        (function (C, A, L) {
-          let p = function (a, ar) { a.q.push(ar); };
-          let d = C.document;
-          C.Cal = C.Cal || function () {
-            let cal = C.Cal;
-            let ar = arguments;
-            if (!cal.loaded) {
-              cal.ns = {};
-              cal.q = cal.q || [];
-              d.head.appendChild(d.createElement("script")).src = A;
-              cal.loaded = true;
-            }
-            if (ar[0] === L) {
-              const api = function () { p(api, arguments); };
-              const namespace = ar[1];
-              api.q = api.q || [];
-              typeof namespace === "string"
-                ? (cal.ns[namespace] = api) && p(api, ar)
-                : p(cal, ar);
-              return;
-            }
-            p(cal, ar);
-          };
-        })(window, "https://app.cal.com/embed/embed.js", "init");
+      {/* Mailchimp embedded form validation — jQuery required by mc-validate.js */}
+      <Script
+        src="https://code.jquery.com/jquery-3.7.1.min.js"
+        strategy="lazyOnload"
+      />
+      <Script
+        src="//s3.amazonaws.com/downloads.mailchimp.com/js/mc-validate.js"
+        strategy="lazyOnload"
+      />
+      <Script id="mc-init" strategy="lazyOnload">{`
+        (function($) {
+          window.fnames = new Array();
+          window.ftypes = new Array();
+          fnames[0]='EMAIL'; ftypes[0]='email';
+          fnames[1]='MMERGE1'; ftypes[1]='text';
+        }(jQuery));
+        var $mcj = jQuery.noConflict(true);
       `}</Script>
     </html>
   );
