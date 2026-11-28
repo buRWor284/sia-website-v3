@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import path from "node:path";
 
 const nextConfig: NextConfig = {
   // pdfkit is a native Node.js module — tell Next.js not to bundle it with webpack
@@ -169,11 +168,6 @@ const nextConfig: NextConfig = {
       { source: "/greg-heilers-interview",  destination: "/podcast/greg-heilers-interview",  permanent: p },
       { source: "/greg-heilers-interview/", destination: "/podcast/greg-heilers-interview",  permanent: p },
     ];
-  },
-  turbopack: {
-    // Pin the workspace root so Turbopack doesn't pick up an unrelated
-    // lockfile from a parent directory.
-    root: path.resolve(__dirname),
   },
   images: {
     remotePatterns: [
