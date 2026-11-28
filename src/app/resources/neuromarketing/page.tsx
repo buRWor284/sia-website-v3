@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Neuromarketing 101: What It Is and How It Works",
   description: "A research-backed guide to neuromarketing: history, techniques (fMRI, EEG, eye tracking), and real-world examples from Red Bull, Porsche, and Coke vs Pepsi.",
+  alternates: { canonical: "/resources/neuromarketing" },
   openGraph: {
     title: "Neuromarketing 101: What It Is and How It Works",
     description: "Research-backed guide covering fMRI, EEG, facial coding, eye tracking, and real-world neuromarketing examples from Red Bull, Porsche, and Coke vs Pepsi.",
